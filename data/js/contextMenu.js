@@ -22,7 +22,7 @@
 
 	/* Get Node Value */
 	self.on("click", function getNodeValue() {
-		var selection = window.getSelection(), element, dataId, nodes, node, value, i, l;
+		var selection = window.getSelection(), custom, element, nodes, node, value, i, l;
 		function onEditText(target) {
 			var id;
 			if(target.hasAttribute("data-with_ex_editor_id")) {
@@ -55,10 +55,11 @@
 			}
 		}
 		else {
-			for(nodes = document.createDocumentFragment(), i = 0, l = selection.rangeCount; i < l; i++) {
+			for(custom = "with-ex-editor-custom-", nodes = document.createDocumentFragment(), i = 0, l = selection.rangeCount; i < l; i++) {
 				node = selection.getRangeAt(i).cloneContents();
 				if(node.firstChild.nodeType === 3 || node.lastChild.nodeType === 3) {
-					element = document.createElement(node.firstChild.nodeType === 3 ? selection.getRangeAt(i).startContainer.parentNode.nodeName.toLowerCase() : selection.getRangeAt(i).endContainer.parentNode.nodeName.toLowerCase());
+					element = node.firstChild.nodeType === 3 ? selection.getRangeAt(i).startContainer.parentNode.nodeName.toLowerCase() : selection.getRangeAt(i).endContainer.parentNode.nodeName.toLowerCase();
+					element = document.createElement(custom + element);
 					element.appendChild(node);
 					nodes.appendChild(element);
 				}
@@ -69,7 +70,8 @@
 			}
 			element = document.createElement("div");
 			element.appendChild(nodes);
-			value = "mode=viewSelection;value=" + element.innerHTML;
+			custom = new RegExp(custom, "mg");
+			value = ("mode=viewSelection;value=" + element.innerHTML).replace(custom, "");
 		}
 		self.postMessage(value);
 	});
