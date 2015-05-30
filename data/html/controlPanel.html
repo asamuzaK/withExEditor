@@ -8,39 +8,46 @@
 	</head>
 	<body>
 		<form id="controlPanelForm">
+			<fieldset id="selectButtonIcon">
+				<legend><label id="selectIconLabel" for="selectIcon">Select Toobar Button Icon</label></legend>
+				<p>
+					<span>
+						<input type="radio" id="buttonIcon" name="buttonIconRadio" value="./img/icon.svg" />
+						<label for="buttonIcon"><img src="../img/icon.svg" alt="gray" /></label>
+						<input type="radio" id="buttonIconWhite" name="buttonIconRadio" value="./img/icon_white.svg" />
+						<label for="buttonIconWhite"><img src="../img/icon_white.svg" alt="white" /></label>
+					</span>
+					<input type="submit" id="selectIcon" value="Submit" />
+				</p>
+			</fieldset>
 			<fieldset id="selectEditor">
 				<legend><label id="getFileLabel" for="getFile">Select External Editor</label></legend>
 				<p>
 					<input type="button" id="getFile" value="Select" />
 				</p>
 			</fieldset>
-			<fieldset id="storeEditor">
+			<fieldset id="renameLabel">
 				<legend><label id="storeFileLabel" for="storeFile">Rename Editor Label</label></legend>
 				<p>
 					<label id="renameEditorLabel" for="renameEditor">(Editor is not selected)</label><br />
-					<input type="text" id="renameEditor" placeholder="Editor Label" />
-					<input type="hidden" id="editorName" />
-					<input type="hidden" id="editorPath" />
+					<span>
+						<input type="text" id="renameEditor" placeholder="Editor Label" />
+						<input type="hidden" id="editorName" />
+						<input type="hidden" id="editorPath" />
+					</span>
 					<input type="submit" id="storeFile" value="Submit" />
 				</p>
 			</fieldset>
-			<fieldset id="selectButtonIcon">
-				<legend><label id="selectIconLabel" for="selectIcon">Select Toobar Button Icon</label></legend>
-				<p>
-					<input type="radio" id="buttonIcon" name="buttonIconRadio" value="./img/icon.svg" />
-					<label for="buttonIcon"><img src="../img/icon.svg" alt="gray" /></label>
-					<input type="radio" id="buttonIconWhite" name="buttonIconRadio" value="./img/icon_white.svg" />
-					<label for="buttonIconWhite"><img src="../img/icon_white.svg" alt="white" /></label>
-					<input type="submit" id="selectIcon" value="Submit" />
-				</p>
-			</fieldset>
-			<!--fieldset id="setAccessKey">
+			<fieldset id="setAccessKey">
 				<legend><label id="setAccessKeyLabel" for="setKey">Set Access Key</label></legend>
 				<p>
-					<input type="text" id="accessKey" placeholder="Access Key" />
+					<label id="accessKeyLabel" for="accessKey">Access Key</label><br />
+					<span>
+						<input type="text" id="accessKey" placeholder="Access Key" />
+					</span>
 					<input type="submit" id="setKey" value="Submit" />
 				</p>
-			</fieldset-->
+			</fieldset>
 		</form>
 	</body>
 </html>

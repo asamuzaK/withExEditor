@@ -3,12 +3,17 @@ p {
 	margin: 0;
 	vertical-align: middle;
 }
+span {
+	display: inline-block;
+	margin-right: 1em;
+	width: 12em;
+}
 label[for^=buttonIcon] {
 	display: inline-block;
 	position: relative;
 	border-radius: 4px;
-	width: 20px;
-	height: 20px;
+	width: 24px;
+	height: 24px;
 	text-align: center;
 	vertical-align: middle;
 }
@@ -18,8 +23,11 @@ label[for=buttonIcon] {
 label[for=buttonIconWhite] {
 	background-color: #333;
 }
+label + input[type=radio] {
+	margin-left: 1em;
+}
 input[type=text] {
-	width: 10em;
+	max-width: 10em;
 }
 img {
 	position: absolute;
@@ -30,7 +38,4 @@ img {
 	margin: auto;
 	width: 16px;
 	height: 16px;
-}
-label + input[type=submit] {
-	margin-left: 1em;
 }

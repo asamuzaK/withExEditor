@@ -19,8 +19,8 @@
 			buttonIconWhite = document.getElementById("buttonIconWhite"),
 			selectIcon = document.getElementById("selectIcon"),
 			selectIconLabel = document.getElementById("selectIconLabel"),
-//			setAccessKeyLabel = document.getElementById("setAccessKeyLabel"),
-//			accessKey = document.getElementById("accessKey"),
+			setAccessKeyLabel = document.getElementById("setAccessKeyLabel"),
+			accessKey = document.getElementById("accessKey"),
 			setKey = document.getElementById("setKey");
 		function removeChildNodes(node) {
 			for(var i = node.childNodes.length - 1, l = 0; i >= 0; i--) {
@@ -61,7 +61,7 @@
 				"editorPath": editorPath.value,
 			}
 			getCheckedRadioButtonValue(buttonIcon.name) && (settings["toolbarButtonIcon"] = getCheckedRadioButtonValue(buttonIcon.name));
-//			settings["accessKey"] = accessKey.value ? accessKey.value : "";
+			settings["accessKey"] = accessKey.value ? accessKey.value : "";
 			addon.port.emit(event.type, settings);
 			event.preventDefault();
 		}
@@ -79,7 +79,7 @@
 			editorName.value = res["editorName"];
 			editorPath.value = res["editorPath"];
 			editorName.value !== "" && renameEditorLabel.hasChildNodes() && (removeChildNodes(renameEditorLabel), renameEditorLabel.appendChild(document.createTextNode(res["editorName"])), renameEditor.value = res["editorName"]);
-//			accessKey.value = res["accessKey"] ? res["accessKey"] : "";
+			accessKey.value = res["accessKey"] ? res["accessKey"] : "";
 			toggleFieldset();
 		});
 		addon.port.on("htmlValue", function(res) {
@@ -98,10 +98,12 @@
 			selectIcon.value = res["Submit"];
 			selectIconLabel.hasChildNodes() && removeChildNodes(selectIconLabel);
 			selectIconLabel.appendChild(document.createTextNode(res["SelectIconLabel"]));
-//			setAccessKeyLabel.hasChildNodes() && removeChildNodes(setAccessKeyLabel);
-//			setAccessKeyLabel.appendChild(document.createTextNode(res["setAccessKeyLabel"]));
-//			accessKey.placeholder = res["accessKeyPlaceholder"];
-//			setKey.value = res["Submit"];
+			setAccessKeyLabel.hasChildNodes() && removeChildNodes(setAccessKeyLabel);
+			setAccessKeyLabel.appendChild(document.createTextNode(res["setAccessKeyLabel"]));
+			accessKeyLabel.hasChildNodes() && removeChildNodes(accessKeyLabel);
+			accessKeyLabel.appendChild(document.createTextNode(res["accessKeyPlaceholder"]));
+			accessKey.placeholder = res["accessKeyPlaceholder"];
+			setKey.value = res["Submit"];
 		});
 		setInputTextMaxWidth();
 		toggleFieldset();
