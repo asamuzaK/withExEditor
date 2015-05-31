@@ -8,11 +8,9 @@
 		var element = document.activeElement, selection = window.getSelection(), label;
 		switch(true) {
 			case (/^(?:input|textarea)$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable)):
-				label = "EditText";
-				break;
+				label = "EditText"; break;
 			case !selection.isCollapsed:
-				label = "ViewSelection";
-				break;
+				label = "ViewSelection"; break;
 			default:
 				label = "ViewSource";
 		}
@@ -55,7 +53,7 @@
 			}
 		}
 		else {
-			for(custom = "with-ex-editor-custom-", nodes = document.createDocumentFragment(), i = 0, l = selection.rangeCount; i < l; i++) {
+			for(custom = "with_ex_editor_custom-", nodes = document.createDocumentFragment(), i = 0, l = selection.rangeCount; i < l; i++) {
 				node = selection.getRangeAt(i).cloneContents();
 				if(node.firstChild.nodeType === 3 || node.lastChild.nodeType === 3) {
 					element = node.firstChild.nodeType === 3 ? selection.getRangeAt(i).startContainer.parentNode.nodeName.toLowerCase() : selection.getRangeAt(i).endContainer.parentNode.nodeName.toLowerCase();
@@ -70,8 +68,7 @@
 			}
 			element = document.createElement("div");
 			element.appendChild(nodes);
-			custom = new RegExp(custom, "mg");
-			value = ("mode=viewSelection;value=" + element.innerHTML).replace(custom, "");
+			value = ("mode=viewSelection;value=" + element.innerHTML).replace(new RegExp(custom, "mg"), "");
 		}
 		self.postMessage(value);
 	});

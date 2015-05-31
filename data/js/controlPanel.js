@@ -78,7 +78,11 @@
 		addon.port.on("editorValue", function(res) {
 			editorName.value = res["editorName"];
 			editorPath.value = res["editorPath"];
-			editorName.value !== "" && renameEditorLabel.hasChildNodes() && (removeChildNodes(renameEditorLabel), renameEditorLabel.appendChild(document.createTextNode(res["editorName"])), renameEditor.value = res["editorName"]);
+			editorName.value !== "" && renameEditorLabel.hasChildNodes() && (
+				removeChildNodes(renameEditorLabel),
+				renameEditorLabel.appendChild(document.createTextNode(res["editorName"])),
+				renameEditor.value = res["editorName"]
+			);
 			accessKey.value = res["accessKey"] ? res["accessKey"] : "";
 			toggleFieldset();
 		});

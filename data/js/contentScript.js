@@ -10,5 +10,8 @@
 			node.removeChild(node.childNodes[i]);
 		}
 	}
-	/^(?:input|textarea)$/i.test(element.nodeName) ? element.value = value : /^(?:contenteditabl|tru)e$/i.test(element.contentEditable) && (removeChildNodes(element), element.appendChild(document.createTextNode(value)));
+	/^(?:input|textarea)$/i.test(element.nodeName) ? element.value = value : /^(?:contenteditabl|tru)e$/i.test(element.contentEditable) && (
+		removeChildNodes(element),
+		element.appendChild(document.createTextNode(value))
+	);
 })();
