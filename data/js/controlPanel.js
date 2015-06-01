@@ -90,7 +90,7 @@
 			renameEditorLabel.appendChild(document.createTextNode(res["RenameEditorLabel"]));
 			currentEditorName.hasChildNodes() && removeChildNodes(currentEditorName);
 			currentEditorName.appendChild(document.createTextNode(res["CurrentEditorName"]));
-			editorLabel.placeholder = res["EditorLabelPlaceholder"];
+			editorLabel.placeholder = res["EditorLabel"];
 			storeLabel.value = res["Submit"];
 			setAccessKeyLabel.hasChildNodes() && removeChildNodes(setAccessKeyLabel);
 			setAccessKeyLabel.appendChild(document.createTextNode(res["AccessKeyLabel"]));
