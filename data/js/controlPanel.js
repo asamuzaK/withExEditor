@@ -7,18 +7,16 @@
 		var html = document.querySelector("html"),
 			title = document.querySelector("title"),
 			controlPanelForm = document.getElementById("controlPanelForm"),
-			editorName = document.getElementById("editorName"),
-			editorPath = document.getElementById("editorPath"),
-			getFile = document.getElementById("getFile"),
-			getFileLabel = document.getElementById("getFileLabel"),
-			renameEditor = document.getElementById("renameEditor"),
-			renameEditorLabel = document.getElementById("renameEditorLabel"),
-			storeFile = document.getElementById("storeFile"),
-			storeFileLabel = document.getElementById("storeFileLabel"),
 			buttonIcon = document.getElementById("buttonIcon"),
 			buttonIconWhite = document.getElementById("buttonIconWhite"),
-			selectIcon = document.getElementById("selectIcon"),
 			selectIconLabel = document.getElementById("selectIconLabel"),
+			selectIcon = document.getElementById("selectIcon"),
+			renameEditorLabel = document.getElementById("renameEditorLabel"),
+			currentEditorName = document.getElementById("currentEditorName"),
+			editorName = document.getElementById("editorName"),
+			editorLabel = document.getElementById("editorLabel"),
+			storeLabel = document.getElementById("storeLabel"),
+			renameEditorLabel = document.getElementById("renameEditorLabel"),
 			setAccessKeyLabel = document.getElementById("setAccessKeyLabel"),
 			accessKey = document.getElementById("accessKey"),
 			setKey = document.getElementById("setKey");
@@ -27,22 +25,16 @@
 				node.removeChild(node.childNodes[i]);
 			}
 		}
-		function setInputTextMaxWidth() {
-			for(var nodes = document.querySelectorAll('input[type=text]'), node, i = 0, l = nodes.length; i < l; i++) {
-				node = nodes[i];
-				node.style.maxWidth = document.defaultView.getComputedStyle(node.parentNode).width;
-			}
-		}
 		function toggleFieldset() {
-			if(editorName.value && renameEditorLabel.hasChildNodes()) {
-				removeChildNodes(renameEditorLabel);
-				renameEditorLabel.appendChild(document.createTextNode(editorName.value));
-				storeFile.removeAttribute("disabled");
-				renameEditor.removeAttribute("disabled");
+			if(editorName.value && currentEditorName.hasChildNodes()) {
+				removeChildNodes(currentEditorName);
+				currentEditorName.appendChild(document.createTextNode(editorName.value));
+				editorLabel.removeAttribute("disabled");
+				storeLabel.removeAttribute("disabled");
 			}
 			else {
-				storeFile.setAttribute("disabled", "disabled");
-				renameEditor.setAttribute("disabled", "disabled");
+				editorLabel.setAttribute("disabled", "disabled");
+				storeLabel.setAttribute("disabled", "disabled");
 			}
 		}
 		function getCheckedRadioButtonValue(name) {
@@ -57,11 +49,10 @@
 		}
 		function addonPortEmit(event) {
 			var settings = {
-				"editorName": renameEditor.value ? renameEditor.value : editorName.value,
-				"editorPath": editorPath.value,
+				"editorName": editorLabel.value ? editorLabel.value : editorName.value,
+				"accessKey": accessKey.value ? accessKey.value : "",
 			}
 			getCheckedRadioButtonValue(buttonIcon.name) && (settings["toolbarButtonIcon"] = getCheckedRadioButtonValue(buttonIcon.name));
-			settings["accessKey"] = accessKey.value ? accessKey.value : "";
 			addon.port.emit(event.type, settings);
 			event.preventDefault();
 		}
@@ -72,44 +63,42 @@
 			addon.port.emit(event.type);
 		}, false);
 		controlPanelForm.addEventListener("submit", addonPortEmit, false);
-		getFile.addEventListener("click", addonPortEmit, false);
 		buttonIcon.addEventListener("change", isRadioChecked, false);
 		buttonIconWhite.addEventListener("change", isRadioChecked, false);
+		currentEditorName.addEventListener("click", function(event) {
+			addon.port.emit(event.type, currentEditorName.href);
+			event.preventDefault();
+		}, false);
 		addon.port.on("editorValue", function(res) {
 			editorName.value = res["editorName"];
-			editorPath.value = res["editorPath"];
-			editorName.value !== "" && renameEditorLabel.hasChildNodes() && (
-				removeChildNodes(renameEditorLabel),
-				renameEditorLabel.appendChild(document.createTextNode(res["editorName"])),
-				renameEditor.value = res["editorName"]
+			editorName.value !== "" && currentEditorName.hasChildNodes() && (
+				removeChildNodes(currentEditorName),
+				currentEditorName.appendChild(document.createTextNode(res["editorName"])),
+				editorLabel.value = res["editorName"]
 			);
 			accessKey.value = res["accessKey"] ? res["accessKey"] : "";
 			toggleFieldset();
 		});
 		addon.port.on("htmlValue", function(res) {
-			html.lang = res["HtmlLang"];
+			html.lang = res["Lang"];
 			title.hasChildNodes() && removeChildNodes(title);
 			title.appendChild(document.createTextNode(res["ControlPanelTitle"]));
-			getFile.value = res["Select"];
-			getFileLabel.hasChildNodes() && removeChildNodes(getFileLabel);
-			getFileLabel.appendChild(document.createTextNode(res["GetFileLabel"]));
-			storeFile.value = res["Submit"];
-			storeFileLabel.hasChildNodes() && removeChildNodes(storeFileLabel);
-			storeFileLabel.appendChild(document.createTextNode(res["StoreFileLabel"]));
-			renameEditor.placeholder = res["RenameEditorPlaceholder"];
-			renameEditorLabel.hasChildNodes() && removeChildNodes(renameEditorLabel);
-			renameEditorLabel.appendChild(document.createTextNode(res["RenameEditorLabel"]));
-			selectIcon.value = res["Submit"];
 			selectIconLabel.hasChildNodes() && removeChildNodes(selectIconLabel);
 			selectIconLabel.appendChild(document.createTextNode(res["SelectIconLabel"]));
+			selectIcon.value = res["Submit"];
+			renameEditorLabel.hasChildNodes() && removeChildNodes(renameEditorLabel);
+			renameEditorLabel.appendChild(document.createTextNode(res["RenameEditorLabel"]));
+			currentEditorName.hasChildNodes() && removeChildNodes(currentEditorName);
+			currentEditorName.appendChild(document.createTextNode(res["CurrentEditorName"]));
+			editorLabel.placeholder = res["EditorLabelPlaceholder"];
+			storeLabel.value = res["Submit"];
 			setAccessKeyLabel.hasChildNodes() && removeChildNodes(setAccessKeyLabel);
-			setAccessKeyLabel.appendChild(document.createTextNode(res["setAccessKeyLabel"]));
+			setAccessKeyLabel.appendChild(document.createTextNode(res["AccessKeyLabel"]));
 			accessKeyLabel.hasChildNodes() && removeChildNodes(accessKeyLabel);
-			accessKeyLabel.appendChild(document.createTextNode(res["accessKeyPlaceholder"]));
-			accessKey.placeholder = res["accessKeyPlaceholder"];
+			accessKeyLabel.appendChild(document.createTextNode(res["AccessKeyPlaceholder"]));
+			accessKey.placeholder = res["AccessKeyPlaceholder"];
 			setKey.value = res["Submit"];
 		});
-		setInputTextMaxWidth();
 		toggleFieldset();
 	}, false);
 })();

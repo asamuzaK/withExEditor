@@ -20,22 +20,15 @@
 					<input type="submit" id="selectIcon" value="Submit" />
 				</p>
 			</fieldset>
-			<fieldset id="selectEditor">
-				<legend><label id="getFileLabel" for="getFile">Select External Editor</label></legend>
+			<fieldset id="storeRenamedEditorLabel">
+				<legend><label id="renameEditorLabel" for="storeLabel">Rename Editor Label</label></legend>
 				<p>
-					<input type="button" id="getFile" value="Select" />
-				</p>
-			</fieldset>
-			<fieldset id="renameLabel">
-				<legend><label id="storeFileLabel" for="storeFile">Rename Editor Label</label></legend>
-				<p>
-					<label id="renameEditorLabel" for="renameEditor">(Editor is not selected)</label><br />
+					<a id="currentEditorName" href="about:addons">(Editor is not selected)</a><br />
 					<span>
-						<input type="text" id="renameEditor" placeholder="Editor Label" />
+						<input type="text" id="editorLabel" placeholder="Editor Label" />
 						<input type="hidden" id="editorName" />
-						<input type="hidden" id="editorPath" />
 					</span>
-					<input type="submit" id="storeFile" value="Submit" />
+					<input type="submit" id="storeLabel" value="Submit" />
 				</p>
 			</fieldset>
 			<fieldset id="setAccessKey">
