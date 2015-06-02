@@ -21,7 +21,7 @@ label[for^=buttonIcon] {
 	vertical-align: middle;
 }
 label[for=buttonIcon] {
-	background-color: #eee;
+	background-color: rgb(230,240,250);
 }
 label[for=buttonIconWhite] {
 	background-color: #333;
