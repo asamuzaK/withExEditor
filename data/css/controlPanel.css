@@ -42,3 +42,10 @@ img {
 	width: 16px;
 	height: 16px;
 }
+a::before {
+	display: inline-block;
+	margin-left: 0.5em;
+	width: 1em;
+	content: "> ";
+	text-decoration: none;
+}

@@ -13,10 +13,10 @@
 			selectIcon = document.getElementById("selectIcon"),
 			renameEditorLabel = document.getElementById("renameEditorLabel"),
 			currentEditorName = document.getElementById("currentEditorName"),
+			aboutAddons = document.getElementById("aboutAddons"),
 			editorName = document.getElementById("editorName"),
 			editorLabel = document.getElementById("editorLabel"),
 			storeLabel = document.getElementById("storeLabel"),
-			renameEditorLabel = document.getElementById("renameEditorLabel"),
 			setAccessKeyLabel = document.getElementById("setAccessKeyLabel"),
 			accessKey = document.getElementById("accessKey"),
 			setKey = document.getElementById("setKey");
@@ -65,8 +65,8 @@
 		controlPanelForm.addEventListener("submit", addonPortEmit, false);
 		buttonIcon.addEventListener("change", isRadioChecked, false);
 		buttonIconWhite.addEventListener("change", isRadioChecked, false);
-		currentEditorName.addEventListener("click", function(event) {
-			addon.port.emit(event.type, currentEditorName.href);
+		aboutAddons.addEventListener("click", function(event) {
+			addon.port.emit(event.type, event.target.href);
 			event.preventDefault();
 		}, false);
 		addon.port.on("editorValue", function(res) {
@@ -90,12 +90,12 @@
 			renameEditorLabel.appendChild(document.createTextNode(res["RenameEditorLabel"]));
 			currentEditorName.hasChildNodes() && removeChildNodes(currentEditorName);
 			currentEditorName.appendChild(document.createTextNode(res["CurrentEditorName"]));
+			aboutAddons.hasChildNodes() && removeChildNodes(aboutAddons);
+			aboutAddons.appendChild(document.createTextNode(res["AboutAddons"]));
 			editorLabel.placeholder = res["EditorLabel"];
 			storeLabel.value = res["Submit"];
 			setAccessKeyLabel.hasChildNodes() && removeChildNodes(setAccessKeyLabel);
 			setAccessKeyLabel.appendChild(document.createTextNode(res["AccessKeyLabel"]));
-			accessKeyLabel.hasChildNodes() && removeChildNodes(accessKeyLabel);
-			accessKeyLabel.appendChild(document.createTextNode(res["AccessKeyPlaceholder"]));
 			accessKey.placeholder = res["AccessKeyPlaceholder"];
 			setKey.value = res["Submit"];
 		});

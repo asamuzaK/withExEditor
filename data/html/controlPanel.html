@@ -9,7 +9,7 @@
 	<body>
 		<form id="controlPanelForm">
 			<fieldset id="selectButtonIcon">
-				<legend><label id="selectIconLabel" for="selectIcon">Select Toobar Button Icon</label></legend>
+				<legend id="selectIconLabel">Select Toobar Button Icon</legend>
 				<p>
 					<span>
 						<input type="radio" id="buttonIcon" name="buttonIconRadio" value="./img/icon.svg" />
@@ -21,9 +21,10 @@
 				</p>
 			</fieldset>
 			<fieldset id="storeRenamedEditorLabel">
-				<legend><label id="renameEditorLabel" for="storeLabel">Rename Editor Label</label></legend>
+				<legend id="renameEditorLabel">Rename Editor Label</legend>
 				<p>
-					<a id="currentEditorName" href="about:addons">(Editor is not selected)</a><br />
+					<label id="currentEditorName" for="editorLabel">(Editor is not selected)</label>
+					<a id="aboutAddons" href="about:addons">Select Editor</a><br />
 					<span>
 						<input type="text" id="editorLabel" placeholder="Editor Label" />
 						<input type="hidden" id="editorName" />
@@ -32,9 +33,8 @@
 				</p>
 			</fieldset>
 			<fieldset id="setAccessKey">
-				<legend><label id="setAccessKeyLabel" for="setKey">Set Access Key</label></legend>
+				<legend id="setAccessKeyLabel">Set Access Key</legend>
 				<p>
-					<label id="accessKeyLabel" for="accessKey">Access Key</label><br />
 					<span>
 						<input type="text" id="accessKey" placeholder="Access Key" />
 					</span>
