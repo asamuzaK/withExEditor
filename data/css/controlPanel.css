@@ -30,7 +30,7 @@ label + input[type=radio] {
 	margin-left: 1em;
 }
 input[type=text] {
-	max-width: 10em;
+	max-width: 11em;
 }
 img {
 	position: absolute;
