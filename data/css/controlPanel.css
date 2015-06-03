@@ -3,13 +3,15 @@
 */
 
 p {
+	display: flex;
+	flex-flow: row wrap;
 	margin: 0;
 	vertical-align: middle;
 }
 span {
 	display: inline-block;
-	margin-right: 1em;
-	width: 12em;
+	flex: 1 1 auto;
+	width: 15em;
 }
 label[for^=buttonIcon] {
 	display: inline-block;
@@ -30,7 +32,7 @@ label + input[type=radio] {
 	margin-left: 1em;
 }
 input[type=text] {
-	max-width: 11em;
+	max-width: 15em;
 }
 img {
 	position: absolute;
@@ -41,6 +43,9 @@ img {
 	margin: auto;
 	width: 16px;
 	height: 16px;
+}
+a {
+	display: inline-block;
 }
 a::before {
 	display: inline-block;
