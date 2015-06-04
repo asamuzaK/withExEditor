@@ -67,7 +67,6 @@
 					node = selection.getRangeAt(i).cloneContents();
 					if(node.firstChild.nodeType === 3 || node.lastChild.nodeType === 3) {
 						element = node.firstChild.nodeType === 3 ? selection.getRangeAt(i).commonAncestorContainer.nodeName.toLowerCase() : selection.getRangeAt(i).commonAncestorContainer.nodeName.toLowerCase();
-						console.log(element);
 						element = document.createElement(custom + element);
 						element.appendChild(node);
 						nodes.appendChild(element);
