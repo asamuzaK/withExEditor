@@ -20,7 +20,7 @@
 
 	/* Get Node Value */
 	self.on("click", function getNodeValue() {
-		var selection = window.getSelection(), custom, element, nodes, node, value, i, l;
+		var selection = window.getSelection(), custom, element, ranges, range, value, i, l;
 		function onEditText(target) {
 			var id;
 			if(target) {
@@ -38,11 +38,26 @@
 			return id ? "mode=editText;target=" + id + ";value=" : "mode=viewSource;value=";
 		}
 		function onContentEditable(target) {
-			for(var array = [onEditText(target)], child, childNodes = target.childNodes, i = 0, l = childNodes.length; i < l; i++) {
-				child = childNodes[i];
-				child.nodeType === 1 && child.nodeName.toLowerCase() === "br" ? (array[array.length] = "\n") : child.nodeType === 3 && (array[array.length] = child.nodeValue);
+			var array, node, nodes, i, l;
+			if(target) {
+				for(array = [], nodes = target.childNodes, i = 0, l = nodes.length; i < l; i++) {
+					node = nodes[i];
+					node.nodeType === 1 && node.nodeName.toLowerCase() === "br" ? (array[array.length] = "\n") : node.nodeType === 3 && (array[array.length] = node.nodeValue);
+				}
 			}
-			return array.join("");
+			return array ? array.join("") : "";
+		}
+		function getNodeToString(node, tag) {
+			var div;
+			if(node) {
+				div = document.createElement("div");
+				div.appendChild(node);
+				node = div.innerHTML;
+			}
+			else {
+				node = node.toString();
+			}
+			return tag ? "<" + tag + ">" + node + "</" + tag + ">" : node;
 		}
 		if(selection.isCollapsed) {
 			element = document.activeElement;
@@ -51,34 +66,32 @@
 					value = onEditText(element) + (element.value ? element.value : "");
 					break;
 				case /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
-					value = onContentEditable(element);
+					value = onEditText(element) + onContentEditable(element);
 					break;
 				default:
 					value = "mode=viewSource;";
 			}
 		}
 		else {
+			l = selection.rangeCount;
 			element = selection.getRangeAt(0).commonAncestorContainer;
-			if(selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(element.contentEditable)) {
-				value = onContentEditable(element);
+			if(l === 1 && /^(?:contenteditabl|tru)e$/i.test(element.contentEditable)) {
+				value = onEditText(element) + onContentEditable(element);
 			}
 			else {
-				for(nodes = document.createDocumentFragment(), i = 0, l = selection.rangeCount; i < l; i++) {
-					node = selection.getRangeAt(i).cloneContents();
-					if(node.firstChild.nodeType === 3 || node.lastChild.nodeType === 3) {
+				for(ranges = [], i = 0; i < l; i++) {
+					range = selection.getRangeAt(i).cloneContents();
+					if(range.firstChild.nodeType === 3 || range.lastChild.nodeType === 3) {
 						element = selection.getRangeAt(i).commonAncestorContainer.nodeName.toLowerCase();
-						element = document.createElement("with_ex_editor_custom-" + element);
-						element.appendChild(node);
-						nodes.appendChild(element);
+						ranges[ranges.length] = getNodeToString(range, element);
 					}
 					else {
-						nodes.appendChild(node);
+						element = document.createElement("div");
+						element.appendChild(range);
+						ranges[ranges.length] = element.innerHTML;
 					}
-					i > 0 && i < l - 1 && nodes.appendChild(document.createTextNode("\n"));
 				}
-				element = document.createElement("div");
-				element.appendChild(nodes);
-				value = ("mode=viewSelection;value=" + element.innerHTML).replace(/with_ex_editor_custom-/mg, "");
+				value = "mode=viewSelection;value=" + ranges.join("\n");
 			}
 		}
 		self.postMessage(value);
