@@ -31,7 +31,7 @@
 					id = ("withExEditor" + window.performance.now()).replace(/\./, "_");
 					target.setAttribute("data-with_ex_editor_id", id);
 					target.addEventListener("focus", function(event) {
-						self.postMessage(event.target.getAttribute("data-with_ex_editor_id"));
+						event && event.currentTarget === target && self.postMessage(event.target.getAttribute("data-with_ex_editor_id"));
 					}, false);
 				}
 			}
