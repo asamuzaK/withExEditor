@@ -66,7 +66,7 @@
 				for(custom = "with_ex_editor_custom-", nodes = document.createDocumentFragment(), i = 0, l = selection.rangeCount; i < l; i++) {
 					node = selection.getRangeAt(i).cloneContents();
 					if(node.firstChild.nodeType === 3 || node.lastChild.nodeType === 3) {
-						element = node.firstChild.nodeType === 3 ? selection.getRangeAt(i).commonAncestorContainer.nodeName.toLowerCase() : selection.getRangeAt(i).commonAncestorContainer.nodeName.toLowerCase();
+						element = selection.getRangeAt(i).commonAncestorContainer.nodeName.toLowerCase();
 						element = document.createElement(custom + element);
 						element.appendChild(node);
 						nodes.appendChild(element);
