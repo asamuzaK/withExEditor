@@ -63,11 +63,11 @@
 				value = onContentEditable(element);
 			}
 			else {
-				for(custom = "with_ex_editor_custom-", nodes = document.createDocumentFragment(), i = 0, l = selection.rangeCount; i < l; i++) {
+				for(nodes = document.createDocumentFragment(), i = 0, l = selection.rangeCount; i < l; i++) {
 					node = selection.getRangeAt(i).cloneContents();
 					if(node.firstChild.nodeType === 3 || node.lastChild.nodeType === 3) {
 						element = selection.getRangeAt(i).commonAncestorContainer.nodeName.toLowerCase();
-						element = document.createElement(custom + element);
+						element = document.createElement("with_ex_editor_custom-" + element);
 						element.appendChild(node);
 						nodes.appendChild(element);
 					}
@@ -78,7 +78,7 @@
 				}
 				element = document.createElement("div");
 				element.appendChild(nodes);
-				value = ("mode=viewSelection;value=" + element.innerHTML).replace(new RegExp(custom, "mg"), "");
+				value = ("mode=viewSelection;value=" + element.innerHTML).replace(/with_ex_editor_custom-/mg, "");
 			}
 		}
 		self.postMessage(value);
