@@ -46,8 +46,7 @@
 			for(var value, nodes = document.querySelectorAll("input[type=radio]"), node, i = 0, l = nodes.length; i < l; i++) {
 				node = nodes[i];
 				if(node.name && node.name === name && node.checked) {
-					node.value && (value = node.value);
-					break;
+					node.value && (value = node.value); break;
 				}
 			}
 			return value;
@@ -81,50 +80,50 @@
 		}, false);
 		addon.port.on("editorValue", function(res) {
 			if(res) {
-				editorName && (
-					editorName.value = res["editorName"],
-					editorName.value !== "" && currentEditorName.hasChildNodes() && (
-						removeChildNodes(currentEditorName),
-						currentEditorName.appendChild(document.createTextNode(res["editorName"])),
-						editorLabel.value = res["editorName"]
-					)
-				);
+				if(editorName) {
+					editorName.value = res["editorName"];
+					currentEditorName && (
+						currentEditorName.hasChildNodes() && removeChildNodes(currentEditorName),
+						currentEditorName.appendChild(document.createTextNode(editorName.value !== "" ? editorName.value : res["currentEditorName"]))
+					);
+					editorLabel.value = editorName.value;
+				}
 				accessKey && (accessKey.value = res["accessKey"] ? res["accessKey"] : "");
 				toggleFieldset();
 			}
 		});
 		addon.port.on("htmlValue", function(res) {
 			if(res) {
-				html && (html.lang = res["Lang"]);
+				html && (html.lang = res["lang"]);
 				title && (
 					title.hasChildNodes() && removeChildNodes(title),
-					title.appendChild(document.createTextNode(res["ControlPanelTitle"]))
+					title.appendChild(document.createTextNode(res["controlPanelTitle"]))
 				);
 				selectIconLabel && (
 					selectIconLabel.hasChildNodes() && removeChildNodes(selectIconLabel),
-					selectIconLabel.appendChild(document.createTextNode(res["SelectIconLabel"]))
+					selectIconLabel.appendChild(document.createTextNode(res["selectIconLabel"]))
 				);
-				selectIcon && (selectIcon.value = res["Submit"]);
+				selectIcon && (selectIcon.value = res["submit"]);
 				renameEditorLabel && (
 					renameEditorLabel.hasChildNodes() && removeChildNodes(renameEditorLabel),
-					renameEditorLabel.appendChild(document.createTextNode(res["RenameEditorLabel"]))
+					renameEditorLabel.appendChild(document.createTextNode(res["renameEditorLabel"]))
 				);
 				currentEditorName && (
 					currentEditorName.hasChildNodes() && removeChildNodes(currentEditorName),
-					currentEditorName.appendChild(document.createTextNode(res["CurrentEditorName"]))
+					currentEditorName.appendChild(document.createTextNode(res["currentEditorName"]))
 				);
 				aboutAddons && (
 					aboutAddons.hasChildNodes() && removeChildNodes(aboutAddons),
-					aboutAddons.appendChild(document.createTextNode(res["AboutAddons"]))
+					aboutAddons.appendChild(document.createTextNode(res["aboutAddons"]))
 				);
-				editorLabel && (editorLabel.placeholder = res["EditorLabel"]);
-				storeLabel && (storeLabel.value = res["Submit"]);
+				editorLabel && (editorLabel.placeholder = res["editorLabel"]);
+				storeLabel && (storeLabel.value = res["submit"]);
 				setAccessKeyLabel && (
 					setAccessKeyLabel.hasChildNodes() && removeChildNodes(setAccessKeyLabel),
-					setAccessKeyLabel.appendChild(document.createTextNode(res["AccessKeyLabel"]))
+					setAccessKeyLabel.appendChild(document.createTextNode(res["accessKeyLabel"]))
 				);
-				accessKey && (accessKey.placeholder = res["AccessKeyPlaceholder"]);
-				setKey && (setKey.value = res["Submit"]);
+				accessKey && (accessKey.placeholder = res["accessKeyPlaceholder"]);
+				setKey && (setKey.value = res["submit"]);
 			}
 		});
 		toggleFieldset();

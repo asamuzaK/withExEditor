@@ -63,11 +63,9 @@
 			element = document.activeElement;
 			switch(true) {
 				case (/^input$/i.test(element.nodeName) && element.hasAttribute("type") && element.getAttribute("type") === "text") || /^textarea$/i.test(element.nodeName):
-					value = onEditText(element) + (element.value ? element.value : "");
-					break;
+					value = onEditText(element) + (element.value ? element.value : ""); break;
 				case /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
-					value = onEditText(element) + onContentEditable(element);
-					break;
+					value = onEditText(element) + onContentEditable(element); break;
 				default:
 					value = "mode=viewSource;";
 			}
