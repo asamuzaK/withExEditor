@@ -22,7 +22,7 @@
 			setKey = document.getElementById("setKey");
 		function removeChildNodes(node) {
 			var i, l;
-			if(node.hasChildNodes()) {
+			if(node && node.hasChildNodes()) {
 				for(i = node.childNodes.length - 1, l = 0; i >= 0; i--) {
 					node.removeChild(node.childNodes[i]);
 				}
@@ -79,52 +79,52 @@
 			);
 		}, false);
 		addon.port.on("editorValue", function(res) {
-			if(res) {
-				if(editorName) {
-					editorName.value = res["editorName"];
+			res && (
+				editorName && (
+					editorName.value = res["editorName"],
 					currentEditorName && (
 						currentEditorName.hasChildNodes() && removeChildNodes(currentEditorName),
 						currentEditorName.appendChild(document.createTextNode(editorName.value !== "" ? editorName.value : res["currentEditorName"]))
-					);
-					editorLabel.value = editorName.value;
-				}
-				accessKey && (accessKey.value = res["accessKey"] ? res["accessKey"] : "");
-				toggleFieldset();
-			}
+					),
+					editorLabel.value = editorName.value
+				),
+				accessKey && (accessKey.value = res["accessKey"] ? res["accessKey"] : ""),
+				toggleFieldset()
+			);
 		});
 		addon.port.on("htmlValue", function(res) {
-			if(res) {
-				html && (html.lang = res["lang"]);
+			res && (
+				html && (html.lang = res["lang"]),
 				title && (
 					title.hasChildNodes() && removeChildNodes(title),
 					title.appendChild(document.createTextNode(res["controlPanelTitle"]))
-				);
+				),
 				selectIconLabel && (
 					selectIconLabel.hasChildNodes() && removeChildNodes(selectIconLabel),
 					selectIconLabel.appendChild(document.createTextNode(res["selectIconLabel"]))
-				);
-				selectIcon && (selectIcon.value = res["submit"]);
+				),
+				selectIcon && (selectIcon.value = res["submit"]),
 				renameEditorLabel && (
 					renameEditorLabel.hasChildNodes() && removeChildNodes(renameEditorLabel),
 					renameEditorLabel.appendChild(document.createTextNode(res["renameEditorLabel"]))
-				);
+				),
 				currentEditorName && (
 					currentEditorName.hasChildNodes() && removeChildNodes(currentEditorName),
 					currentEditorName.appendChild(document.createTextNode(res["currentEditorName"]))
-				);
+				),
 				aboutAddons && (
 					aboutAddons.hasChildNodes() && removeChildNodes(aboutAddons),
 					aboutAddons.appendChild(document.createTextNode(res["aboutAddons"]))
-				);
-				editorLabel && (editorLabel.placeholder = res["editorLabel"]);
-				storeLabel && (storeLabel.value = res["submit"]);
+				),
+				editorLabel && (editorLabel.placeholder = res["editorLabel"]),
+				storeLabel && (storeLabel.value = res["submit"]),
 				setAccessKeyLabel && (
 					setAccessKeyLabel.hasChildNodes() && removeChildNodes(setAccessKeyLabel),
 					setAccessKeyLabel.appendChild(document.createTextNode(res["accessKeyLabel"]))
-				);
-				accessKey && (accessKey.placeholder = res["accessKeyPlaceholder"]);
-				setKey && (setKey.value = res["submit"]);
-			}
+				),
+				accessKey && (accessKey.placeholder = res["accessKeyPlaceholder"]),
+				setKey && (setKey.value = res["submit"])
+			);
 		});
 		toggleFieldset();
 	}, false);
