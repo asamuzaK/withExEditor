@@ -3,7 +3,7 @@
 */
 (function() {
 	"use strict";
-	/* Set Context Menu Item Label */
+	/* set context menu item label */
 	self.on("context", function setContextMenuItemLabel() {
 		var element = document.activeElement, selection = window.getSelection(), label;
 		switch(true) {
@@ -18,23 +18,26 @@
 		return true;
 	});
 
-	/* Get Node Value */
+	/* get node value */
 	self.on("click", function getNodeValue() {
-		var selection = window.getSelection(), custom, element, ranges, range, value, i, l;
+		const VIEW_SOURCE = "mode=viewSource;";
+		const IS_REMOVED = " is removed by withExEditor.";
+
+		var selection = window.getSelection(), targetObj, ranges, nodeValue, j, k;
+
+		/* on Edit Text mode: set temporary ID to the target element */
 		function onEditText(target) {
+			const DATA_ID = "data-with_ex_editor_id";
 			var id;
-			if(target) {
-				if(target.hasAttribute("data-with_ex_editor_id")) {
-					id = target.getAttribute("data-with_ex_editor_id");
-				}
-				else {
-					id = ("withExEditor" + window.performance.now()).replace(/\./, "_");
-					target.setAttribute("data-with_ex_editor_id", id);
+			target && (
+				target.hasAttribute(DATA_ID) ? id = target.getAttribute(DATA_ID) : (
+					id = ("withExEditor" + window.performance.now()).replace(/\./, "_"),
+					target.setAttribute(DATA_ID, id),
 					target.addEventListener("focus", function(event) {
-						event && event.currentTarget === target && self.postMessage(event.target.getAttribute("data-with_ex_editor_id"));
-					}, false);
-				}
-			}
+						event && event.currentTarget === target && self.postMessage(event.target.getAttribute(DATA_ID));
+					}, false)
+				)
+			);
 			return id ? "mode=editText;target=" + id + ";value=" : "mode=viewSource;value=";
 		}
 		function onContentEditable(target) {
@@ -47,51 +50,133 @@
 			}
 			return array ? array.join("") : "";
 		}
-		function getNodeToString(node, tag) {
-			var div;
-			if(node) {
-				div = document.createElement("div");
-				div.appendChild(node);
-				node = div.innerHTML;
-			}
-			else {
-				node = node.toString();
-			}
-			return tag ? "<" + tag + ">" + node + "</" + tag + ">" : node;
-		}
-		if(selection.isCollapsed) {
-			element = document.activeElement;
-			switch(true) {
-				case (/^input$/i.test(element.nodeName) && element.hasAttribute("type") && element.getAttribute("type") === "text") || /^textarea$/i.test(element.nodeName):
-					value = onEditText(element) + (element.value ? element.value : ""); break;
-				case /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
-					value = onEditText(element) + onContentEditable(element); break;
+
+		/* on View Selection mode: create DOM tree from range */
+		function nodeTypeToNamedConstant(type) {
+			switch(type) {
+				case 1:
+					type = "ELEMENT_NODE"; break;
+				case 2:
+					type = "ATTRIBUTE_NODE"; break;
+				case 3:
+					type = "TEXT_NODE"; break;
+				case 4:
+					type = "CDATA_SECTION_NODE"; break;
+				case 5:
+					type = "ENTITY_REFERENCE_NODE"; break;
+				case 6:
+					type = "ENTITY_NODE"; break;
+				case 7:
+					type = "PROCESSING_INSTRUCTION_NODE"; break;
+				case 8:
+					type = "COMMENT_NODE"; break;
+				case 9:
+					type = "DOCUMENT_NODE"; break;
+				case 10:
+					type = "DOCUMENT_TYPE_NODE"; break;
+				case 11:
+					type = "DOCUMENT_FRAGMENT_NODE"; break;
+				case 12:
+					type = "NOTATION_NODE"; break;
 				default:
-					value = "mode=viewSource;";
+					type = "FAILED: Unknown Node.nodeType";
+			}
+			return type;
+		}
+		function getElement(node, nodes) {
+			var element, fragment, value, i, l,
+				namespaces = {
+					html: "http://www.w3.org/1999/xhtml",
+				};
+			function getNamespace(name) {
+				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(name);
+				return {
+					namespace: namespaces[elementNameParts[1]],
+					shortName: elementNameParts[2],
+				};
+			}
+			if(node) {
+				node = getNamespace(node),
+				element = document.createElementNS(node.namespace || namespaces.html, node.shortName);
+				if(nodes && element) {
+					if(nodes.hasChildNodes()) {
+						for(fragment = document.createDocumentFragment(), value, i = 0, l = nodes.childNodes.length; i < l; i++) {
+							node = nodes.childNodes[i];
+							switch(node.nodeType) {
+								case 1:
+									value = getElement(node.nodeName.toLowerCase(), node); break;
+								case 3:
+									value = document.createTextNode(node.nodeValue); break;
+								default:
+									// Maybe not necessary?
+									value = document.createComment(nodeTypeToNamedConstant(type) + IS_REMOVED);
+							}
+							fragment.appendChild(value);
+						}
+						element.appendChild(fragment);
+					}
+					Object.keys(nodes).forEach(function(key) {
+						var val = nodes[key],
+							attr = getNamespace(key);
+						typeof val === "function" ? element.addEventListener(key.replace(/^on/, ""), val, false) : element.setAttributeNS(attr.namespace || "", attr.shortName, val);
+					});
+				}
+			}
+			return element ? element : "";
+		}
+		function getDomTree(container, nodes) {
+			for(var fragment = document.createDocumentFragment(), value, node, i = 0, l = nodes.childNodes.length; i < l; i++) {
+				node = nodes.childNodes[i];
+				switch(node.nodeType) {
+					case 1:
+						value = getElement(node.nodeName.toLowerCase(), node); break;
+					case 3:
+						value = document.createTextNode(node.nodeValue); break;
+					default:
+						// Maybe not necessary?
+						value = document.createComment(nodeTypeToNamedConstant(type) + IS_REMOVED);
+				}
+				fragment.appendChild(value);
+			}
+			container = getElement(container.nodeName.toLowerCase());
+			container.appendChild(fragment);
+			return container;
+		}
+
+		/* switch mode by context */
+		if(selection.isCollapsed) {
+			targetObj = document.activeElement;
+			switch(true) {
+				case (/^input$/i.test(targetObj.nodeName) && targetObj.hasAttribute("type") && targetObj.getAttribute("type") === "text") || /^textarea$/i.test(targetObj.nodeName):
+					nodeValue = onEditText(targetObj) + (targetObj.value ? targetObj.value : ""); break;
+				case /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
+					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
+				default:
+					nodeValue = VIEW_SOURCE;
 			}
 		}
 		else {
-			l = selection.rangeCount;
-			element = selection.getRangeAt(0).commonAncestorContainer;
-			if(l === 1 && /^(?:contenteditabl|tru)e$/i.test(element.contentEditable)) {
-				value = onEditText(element) + onContentEditable(element);
-			}
-			else {
-				for(ranges = [], i = 0; i < l; i++) {
-					range = selection.getRangeAt(i).cloneContents();
-					if(range.firstChild.nodeType === 3 || range.lastChild.nodeType === 3) {
-						element = selection.getRangeAt(i).commonAncestorContainer.nodeName.toLowerCase();
-						ranges[ranges.length] = getNodeToString(range, element);
+			k = selection.rangeCount;
+			targetObj = selection.getRangeAt(0).commonAncestorContainer;
+			switch(true) {
+				case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
+					nodeValue = VIEW_SOURCE; break;
+				case k === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
+					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
+				default:
+					for(ranges = [], j = 0; j < k; j++) {
+						targetObj = selection.getRangeAt(j);
+						nodeValue = targetObj.commonAncestorContainer.parentNode.nodeName.toLowerCase();
+						targetObj = getDomTree(targetObj.commonAncestorContainer, targetObj.cloneContents());
+						nodeValue = getElement(nodeValue);
+						nodeValue && nodeValue.nodeType === 1 && (
+							nodeValue.appendChild(targetObj),
+							ranges[ranges.length] = nodeValue.innerHTML
+						);
 					}
-					else {
-						element = document.createElement("div");
-						element.appendChild(range);
-						ranges[ranges.length] = element.innerHTML;
-					}
-				}
-				value = "mode=viewSelection;value=" + ranges.join("\n");
+					nodeValue = ranges.length > 0 ? "mode=viewSelection;value=" + ranges.join("\n") : VIEW_SOURCE;
 			}
 		}
-		self.postMessage(value);
+		self.postMessage(nodeValue);
 	});
 })();

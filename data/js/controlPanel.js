@@ -20,6 +20,8 @@
 			setAccessKeyLabel = document.getElementById("setAccessKeyLabel"),
 			accessKey = document.getElementById("accessKey"),
 			setKey = document.getElementById("setKey");
+
+		/* modules */
 		function removeChildNodes(node) {
 			var i, l;
 			if(node && node.hasChildNodes()) {
@@ -28,20 +30,23 @@
 				}
 			}
 		}
+
+		/* disable form inputs for editor label rename, if editor is not selected */
 		function toggleFieldset() {
-			if(editorLabel && storeLabel) {
-				if(editorName && editorName.value && currentEditorName && currentEditorName.hasChildNodes()) {
-					removeChildNodes(currentEditorName);
-					currentEditorName.appendChild(document.createTextNode(editorName.value));
-					editorLabel.removeAttribute("disabled");
-					storeLabel.removeAttribute("disabled");
-				}
-				else {
-					editorLabel.setAttribute("disabled", "disabled");
-					storeLabel.setAttribute("disabled", "disabled");
-				}
-			}
+			editorLabel && storeLabel && (
+				editorName && editorName.value && currentEditorName && currentEditorName.hasChildNodes() ? (
+					removeChildNodes(currentEditorName),
+					currentEditorName.appendChild(document.createTextNode(editorName.value)),
+					editorLabel.removeAttribute("disabled"),
+					storeLabel.removeAttribute("disabled")
+				) : (
+					editorLabel.setAttribute("disabled", "disabled"),
+					storeLabel.setAttribute("disabled", "disabled")
+				)
+			);
 		}
+
+		/* get radio button value if checked or not */
 		function getCheckedRadioButtonValue(name) {
 			for(var value, nodes = document.querySelectorAll("input[type=radio]"), node, i = 0, l = nodes.length; i < l; i++) {
 				node = nodes[i];
@@ -51,6 +56,9 @@
 			}
 			return value;
 		}
+
+		/* event handlers */
+		/* addon.port.emit() in events */
 		function addonPortEmit(event) {
 			var settings = {
 					"editorName": editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : "",
@@ -66,18 +74,7 @@
 		function isRadioChecked(event) {
 			event && event.target && event.target.checked && addonPortEmit(event);
 		}
-		window.addEventListener("load", function(event) {
-			event && event.type && addon.port.emit(event.type);
-		}, false);
-		controlPanelForm && controlPanelForm.addEventListener("submit", addonPortEmit, false);
-		buttonIcon && buttonIcon.addEventListener("change", isRadioChecked, false);
-		buttonIconWhite && buttonIconWhite.addEventListener("change", isRadioChecked, false);
-		aboutAddons && aboutAddons.addEventListener("click", function(event) {
-			event && (
-				event.type && event.target && event.target.href && addon.port.emit(event.type, event.target.href),
-				event.preventDefault()
-			);
-		}, false);
+		/* update control panel */
 		addon.port.on("editorValue", function(res) {
 			res && (
 				editorName && (
@@ -92,6 +89,7 @@
 				toggleFieldset()
 			);
 		});
+		/* localize control panel */
 		addon.port.on("htmlValue", function(res) {
 			res && (
 				html && (html.lang = res["lang"]),
@@ -126,6 +124,21 @@
 				setKey && (setKey.value = res["submit"])
 			);
 		});
+		/* event listeners */
+		window.addEventListener("load", function(event) {
+			event && event.type && addon.port.emit(event.type);
+		}, false);
+		controlPanelForm && controlPanelForm.addEventListener("submit", addonPortEmit, false);
+		buttonIcon && buttonIcon.addEventListener("change", isRadioChecked, false);
+		buttonIconWhite && buttonIconWhite.addEventListener("change", isRadioChecked, false);
+		aboutAddons && aboutAddons.addEventListener("click", function(event) {
+			event && (
+				event.type && event.target && event.target.href && addon.port.emit(event.type, event.target.href),
+				event.preventDefault()
+			);
+		}, false);
+
+		/* on initial run */
 		toggleFieldset();
 	}, false);
 })();
