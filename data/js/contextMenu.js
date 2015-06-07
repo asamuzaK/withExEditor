@@ -25,69 +25,12 @@
 
 		var selection = window.getSelection(), targetObj, ranges, nodeValue, j, k;
 
-		/* on Edit Text mode: set temporary ID to the target element */
-		function onEditText(target) {
-			const DATA_ID = "data-with_ex_editor_id";
-			var id;
-			target && (
-				target.hasAttribute(DATA_ID) ? id = target.getAttribute(DATA_ID) : (
-					id = ("withExEditor" + window.performance.now()).replace(/\./, "_"),
-					target.setAttribute(DATA_ID, id),
-					target.addEventListener("focus", function(event) {
-						event && event.currentTarget === target && self.postMessage(event.target.getAttribute(DATA_ID));
-					}, false)
-				)
-			);
-			return id ? "mode=editText;target=" + id + ";value=" : "mode=viewSource;value=";
-		}
-		function onContentEditable(target) {
-			var array, node, nodes, i, l;
-			if(target) {
-				for(array = [], nodes = target.childNodes, i = 0, l = nodes.length; i < l; i++) {
-					node = nodes[i];
-					node.nodeType === 1 && node.nodeName.toLowerCase() === "br" ? (array[array.length] = "\n") : node.nodeType === 3 && (array[array.length] = node.nodeValue);
-				}
-			}
-			return array ? array.join("") : "";
-		}
-
-		/* on View Selection mode: create DOM tree from range */
-		function nodeTypeToNamedConstant(type) {
-			switch(type) {
-				case 1:
-					type = "ELEMENT_NODE"; break;
-				case 2:
-					type = "ATTRIBUTE_NODE"; break;
-				case 3:
-					type = "TEXT_NODE"; break;
-				case 4:
-					type = "CDATA_SECTION_NODE"; break;
-				case 5:
-					type = "ENTITY_REFERENCE_NODE"; break;
-				case 6:
-					type = "ENTITY_NODE"; break;
-				case 7:
-					type = "PROCESSING_INSTRUCTION_NODE"; break;
-				case 8:
-					type = "COMMENT_NODE"; break;
-				case 9:
-					type = "DOCUMENT_NODE"; break;
-				case 10:
-					type = "DOCUMENT_TYPE_NODE"; break;
-				case 11:
-					type = "DOCUMENT_FRAGMENT_NODE"; break;
-				case 12:
-					type = "NOTATION_NODE"; break;
-				default:
-					type = "FAILED: Unknown Node.nodeType";
-			}
-			return type;
-		}
+		/* create element */
 		function getElement(node, nodes) {
-			var element, fragment, value, i, l,
-				namespaces = {
+			const namespaces = {
 					html: "http://www.w3.org/1999/xhtml",
 				};
+			var element, fragment, value, i, l;
 			function getNamespace(name) {
 				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(name);
 				return {
@@ -108,8 +51,6 @@
 								case 3:
 									value = document.createTextNode(node.nodeValue); break;
 								default:
-									// Maybe not necessary?
-									value = document.createComment(nodeTypeToNamedConstant(type) + IS_REMOVED);
 							}
 							fragment.appendChild(value);
 						}
@@ -118,12 +59,15 @@
 					Object.keys(nodes).forEach(function(key) {
 						var val = nodes[key],
 							attr = getNamespace(key);
-						typeof val === "function" ? element.addEventListener(key.replace(/^on/, ""), val, false) : element.setAttributeNS(attr.namespace || "", attr.shortName, val);
+						//typeof val === "function" ? element.addEventListener(key.replace(/^on/, ""), val, false) : element.setAttributeNS(attr.namespace || "", attr.shortName, val);
+						typeof val !== "function" && element.setAttributeNS(attr.namespace || "", attr.shortName, val);
 					});
 				}
 			}
 			return element ? element : "";
 		}
+
+		/* create DOM tree */
 		function getDomTree(container, nodes) {
 			for(var fragment = document.createDocumentFragment(), value, node, i = 0, l = nodes.childNodes.length; i < l; i++) {
 				node = nodes.childNodes[i];
@@ -133,14 +77,71 @@
 					case 3:
 						value = document.createTextNode(node.nodeValue); break;
 					default:
-						// Maybe not necessary?
-						value = document.createComment(nodeTypeToNamedConstant(type) + IS_REMOVED);
 				}
 				fragment.appendChild(value);
 			}
 			container = getElement(container.nodeName.toLowerCase());
 			container.appendChild(fragment);
 			return container;
+		}
+
+		/* set temporary ID to the target element */
+		function onEditText(target) {
+			const DATA_ID = "data-with_ex_editor_id";
+			var id;
+			target && (
+				target.hasAttribute(DATA_ID) ? id = target.getAttribute(DATA_ID) : (
+					id = ("withExEditor" + window.performance.now()).replace(/\./, "_"),
+					target.setAttribute(DATA_ID, id),
+					target.addEventListener("focus", function(event) {
+						event && event.currentTarget === target && self.postMessage(event.target.getAttribute(DATA_ID));
+					}, false)
+				)
+			);
+			return id ? "mode=editText;target=" + id + ";value=" : VIEW_SOURCE;
+		}
+
+		/* get text node from editable content */
+		function onContentEditable(nodes) {
+			var array = [], node, container, i, l;
+			function getTextNode(children) {
+				var arr = [], child, j, k;
+				if(children) {
+					for(j = 0, k = children.childNodes.length; j < k; i++) {
+						child = children.childNodes[j];
+						switch(true) {
+							case child.nodeType === 3:
+								arr[arr.length] = child.nodeValue; break;
+							case child.nodeType === 1 && child.nodeName.toLowerCase() === "br":
+								arr[arr.length] = "\n"; break;
+							case child.nodeType === 1 && child.hasChildNodes():
+								arr[arr.length] = getTextNode(child); break;
+							default:
+						}
+					}
+				}
+				return arr.length > 0 ? arr.join("") : "";
+			}
+			if(nodes) {
+				for(i = 0, l = nodes.childNodes.length; i < l; i++) {
+					node = nodes.childNodes[i];
+					switch(true) {
+						case node.nodeType === 3:
+							array[array.length] = node.nodeValue; break;
+						case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
+							array[array.length] = "\n"; break;
+						case node.nodeType === 1 && node.hasChildNodes():
+							container = getElement(node.nodeName.toLowerCase());
+							container && container.nodeType === 1 && (
+								container = getDomTree(container, node),
+								array[array.length] = getTextNode(container)
+							);
+							break;
+						default:
+					}
+				}
+			}
+			return array.length > 0 ? array.join("") : "";
 		}
 
 		/* switch mode by context */
@@ -156,13 +157,14 @@
 			}
 		}
 		else {
-			k = selection.rangeCount;
 			targetObj = selection.getRangeAt(0).commonAncestorContainer;
+			k = selection.rangeCount;
 			switch(true) {
 				case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
 					nodeValue = VIEW_SOURCE; break;
-				case k === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
-					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
+				case k === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj):
+					nodeValue = onEditText(targetObj) + onContentEditable(targetObj);
+					break;
 				default:
 					for(ranges = [], j = 0; j < k; j++) {
 						targetObj = selection.getRangeAt(j);
