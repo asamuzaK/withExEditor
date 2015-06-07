@@ -107,7 +107,7 @@
 			function getTextNode(children) {
 				var arr = [], child, j, k;
 				if(children) {
-					for(j = 0, k = children.childNodes.length; j < k; i++) {
+					for(j = 0, k = children.childNodes.length; j < k; j++) {
 						child = children.childNodes[j];
 						switch(true) {
 							case child.nodeType === 3:
