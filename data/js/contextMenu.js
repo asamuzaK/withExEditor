@@ -21,15 +21,13 @@
 	/* get node value */
 	self.on("click", function getNodeValue() {
 		const VIEW_SOURCE = "mode=viewSource;";
-		const IS_REMOVED = " is removed by withExEditor.";
-
 		var selection = window.getSelection(), targetObj, nodeValue, j, k;
 
 		/* create element */
 		function getElement(node, nodes) {
 			const namespaces = {
-					html: "http://www.w3.org/1999/xhtml",
-				};
+				html: "http://www.w3.org/1999/xhtml",
+			};
 			var element, fragment, value, i, l;
 			function getNamespace(name) {
 				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(name);
