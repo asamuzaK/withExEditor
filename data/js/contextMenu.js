@@ -23,7 +23,7 @@
 		const VIEW_SOURCE = "mode=viewSource;";
 		const IS_REMOVED = " is removed by withExEditor.";
 
-		var selection = window.getSelection(), targetObj, ranges, nodeValue, j, k;
+		var selection = window.getSelection(), targetObj, nodeValue, j, k;
 
 		/* create element */
 		function getElement(node, nodes) {
@@ -161,22 +161,18 @@
 			k = selection.rangeCount;
 			switch(true) {
 				case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
-					nodeValue = VIEW_SOURCE; break;
+					nodeValue = VIEW_SOURCE;
+					break;
 				case k === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj):
 					nodeValue = onEditText(targetObj) + onContentEditable(targetObj);
 					break;
 				default:
-					for(ranges = [], j = 0; j < k; j++) {
+					for(nodeValue = document.createDocumentFragment(), j = 0; j < k; j++) {
 						targetObj = selection.getRangeAt(j);
-						nodeValue = targetObj.commonAncestorContainer.parentNode.nodeName.toLowerCase();
-						targetObj = getDomTree(targetObj.commonAncestorContainer, targetObj.cloneContents());
-						nodeValue = getElement(nodeValue);
-						nodeValue && nodeValue.nodeType === 1 && (
-							nodeValue.appendChild(targetObj),
-							ranges[ranges.length] = nodeValue.innerHTML
-						);
+						nodeValue.appendChild(getDomTree(targetObj.commonAncestorContainer, targetObj.cloneContents()));
+						j < k - 1 && nodeValue.appendChild(document.createTextNode("\n"));
 					}
-					nodeValue = ranges.length > 0 ? "mode=viewSelection;value=" + ranges.join("\n") : VIEW_SOURCE;
+					nodeValue = nodeValue.hasChildNodes() && window.XMLSerializer ? "mode=viewSelection;value=" + (new XMLSerializer().serializeToString(nodeValue)) : VIEW_SOURCE;
 			}
 		}
 		self.postMessage(nodeValue);
