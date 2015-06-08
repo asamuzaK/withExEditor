@@ -69,21 +69,24 @@
 
 		/* create DOM tree */
 		function getDomTree(container, nodes) {
-			for(var fragment = document.createDocumentFragment(), value, node, i = 0, l = nodes.childNodes.length; i < l; i++) {
-				node = nodes.childNodes[i];
-				switch(node.nodeType) {
-					case 1:
-						i === 0 && fragment.appendChild(document.createTextNode("\n"));
-						fragment.appendChild(getElement(node.nodeName.toLowerCase(), node));
-						i === l - 1 && fragment.appendChild(document.createTextNode("\n"));
-						break;
-					case 3:
-						fragment.appendChild(document.createTextNode(node.nodeValue)); break;
-					default:
+			function createDom(obj) {
+				for(var fragment = document.createDocumentFragment(), value, node, i = 0, l = obj.childNodes.length; i < l; i++) {
+					node = obj.childNodes[i];
+					switch(node.nodeType) {
+						case 1:
+							i === 0 && fragment.appendChild(document.createTextNode("\n"));
+							fragment.appendChild(getElement(node.nodeName.toLowerCase(), node));
+							i === l - 1 && fragment.appendChild(document.createTextNode("\n"));
+							break;
+						case 3:
+							fragment.appendChild(document.createTextNode(node.nodeValue)); break;
+						default:
+					}
 				}
+				return fragment;
 			}
-			container = getElement(container.nodeName.toLowerCase());
-			container.appendChild(fragment);
+			container = container ? getElement(container.nodeName.toLowerCase()) : "";
+			container && container.nodeType === 1 ? nodes && nodes.hasChildNodes() && container.appendChild(createDom(nodes)) : (container = document.createTextNode(""));
 			return container;
 		}
 
@@ -105,28 +108,24 @@
 
 		/* get text node from editable content */
 		function onContentEditable(nodes) {
-			var array = [];
 			function getTextNode(obj) {
-				var arr = [], node, i, l;
-				if(obj) {
-					for(i = 0, l = obj.childNodes.length; i < l; i++) {
-						node = obj.childNodes[i];
-						switch(true) {
-							case node.nodeType === 3:
-								arr[arr.length] = node.nodeValue; break;
-							case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
-								arr[arr.length] = "\n"; break;
-							case node.nodeType === 1 && node.hasChildNodes():
-								arr[arr.length] = getTextNode(node); break;
-							default:
-						}
+				for(var array = [], node, i = 0, l = obj.childNodes.length; i < l; i++) {
+					node = obj.childNodes[i];
+					switch(true) {
+						case node.nodeType === 3:
+							array[array.length] = node.nodeValue; break;
+						case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
+							array[array.length] = "\n"; break;
+						case node.nodeType === 1 && node.hasChildNodes():
+							array[array.length] = getTextNode(node); break;
+						default:
 					}
 				}
-				return arr.length > 0 ? arr.join("") : "";
+				return array.length > 0 ? array.join("") : "";
 			}
-			function setNodesArray(nodes, array) {
-				for(var node, container, i = 0, l = nodes.childNodes.length; i < l; i++) {
-					node = nodes.childNodes[i];
+			function getTextNodeFromContent(obj) {
+				for(var array = [], node, container, i = 0, l = obj.childNodes.length; i < l; i++) {
+					node = obj.childNodes[i];
 					switch(true) {
 						case node.nodeType === 3:
 							array[array.length] = node.nodeValue; break;
@@ -142,9 +141,9 @@
 						default:
 					}
 				}
+				return array.length > 0 ? array.join("") : "";
 			}
-			nodes && setNodesArray(nodes, array);
-			return array.length > 0 ? array.join("") : "";
+			return nodes ? getTextNodeFromContent(nodes) : "";
 		}
 
 		/* switch mode by context */
@@ -171,7 +170,7 @@
 					for(nodeValue = document.createDocumentFragment(), j = 0; j < k; j++) {
 						targetObj = selection.getRangeAt(j);
 						nodeValue.appendChild(getDomTree(targetObj.commonAncestorContainer, targetObj.cloneContents()));
-						j < k - 1 && nodeValue.appendChild(document.createTextNode("\n"));
+						j < k - 1 && nodeValue.appendChild(document.createTextNode("\n\n"));
 					}
 					nodeValue = nodeValue.hasChildNodes() && window.XMLSerializer ? "mode=viewSelection;value=" + (new XMLSerializer().serializeToString(nodeValue)) : VIEW_SOURCE;
 			}
