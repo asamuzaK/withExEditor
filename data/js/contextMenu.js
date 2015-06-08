@@ -28,7 +28,7 @@
 			const namespaces = {
 				html: "http://www.w3.org/1999/xhtml",
 			};
-			var element, fragment, value, i, l;
+			var element;
 			function getNamespace(name) {
 				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(name);
 				return {
@@ -36,32 +36,34 @@
 					shortName: elementNameParts[2],
 				};
 			}
-			if(node) {
-				node = getNamespace(node),
-				element = document.createElementNS(node.namespace || namespaces.html, node.shortName);
-				if(nodes && element) {
-					if(nodes.hasChildNodes()) {
-						for(fragment = document.createDocumentFragment(), value, i = 0, l = nodes.childNodes.length; i < l; i++) {
-							node = nodes.childNodes[i];
-							switch(node.nodeType) {
-								case 1:
-									value = getElement(node.nodeName.toLowerCase(), node); break;
-								case 3:
-									value = document.createTextNode(node.nodeValue); break;
-								default:
-							}
-							fragment.appendChild(value);
-						}
-						element.appendChild(fragment);
+			function appendChildNodes(obj) {
+				for(var fragment = document.createDocumentFragment(), child, i = 0, l = obj.childNodes.length; i < l; i++) {
+					child = obj.childNodes[i];
+					switch(child.nodeType) {
+						case 1:
+							fragment.appendChild(getElement(child.nodeName.toLowerCase(), child)); break;
+						case 3:
+							fragment.appendChild(document.createTextNode(child.nodeValue)); break;
+						default:
 					}
-					Object.keys(nodes).forEach(function(key) {
-						var val = nodes[key],
-							attr = getNamespace(key);
-						//typeof val === "function" ? element.addEventListener(key.replace(/^on/, ""), val, false) : element.setAttributeNS(attr.namespace || "", attr.shortName, val);
-						typeof val !== "function" && element.setAttributeNS(attr.namespace || "", attr.shortName, val);
-					});
+				}
+				return fragment;
+			}
+			function setAttributes(nodes, element) {
+				for(var attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i++) {
+					attr = nodes.attributes[i];
+					attrNs = getNamespace(attr.nodeName);
+					typeof nodes[attr.nodeName] !== "function" && element.setAttributeNS(attrNs.namespace || "", attrNs.shortName, attr.nodeValue);
 				}
 			}
+			node && (
+				node = getNamespace(node),
+				element = document.createElementNS(node.namespace || namespaces.html, node.shortName),
+				nodes && element && (
+					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes)),
+					nodes.attributes && setAttributes(nodes, element)
+				)
+			);
 			return element ? element : "";
 		}
 
@@ -71,12 +73,14 @@
 				node = nodes.childNodes[i];
 				switch(node.nodeType) {
 					case 1:
-						value = getElement(node.nodeName.toLowerCase(), node); break;
+						i === 0 && fragment.appendChild(document.createTextNode("\n"));
+						fragment.appendChild(getElement(node.nodeName.toLowerCase(), node));
+						i === l - 1 && fragment.appendChild(document.createTextNode("\n"));
+						break;
 					case 3:
-						value = document.createTextNode(node.nodeValue); break;
+						fragment.appendChild(document.createTextNode(node.nodeValue)); break;
 					default:
 				}
-				fragment.appendChild(value);
 			}
 			container = getElement(container.nodeName.toLowerCase());
 			container.appendChild(fragment);
@@ -101,27 +105,27 @@
 
 		/* get text node from editable content */
 		function onContentEditable(nodes) {
-			var array = [], node, container, i, l;
-			function getTextNode(children) {
-				var arr = [], child, j, k;
-				if(children) {
-					for(j = 0, k = children.childNodes.length; j < k; j++) {
-						child = children.childNodes[j];
+			var array = [];
+			function getTextNode(obj) {
+				var arr = [], node, i, l;
+				if(obj) {
+					for(i = 0, l = obj.childNodes.length; i < l; i++) {
+						node = obj.childNodes[i];
 						switch(true) {
-							case child.nodeType === 3:
-								arr[arr.length] = child.nodeValue; break;
-							case child.nodeType === 1 && child.nodeName.toLowerCase() === "br":
+							case node.nodeType === 3:
+								arr[arr.length] = node.nodeValue; break;
+							case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
 								arr[arr.length] = "\n"; break;
-							case child.nodeType === 1 && child.hasChildNodes():
-								arr[arr.length] = getTextNode(child); break;
+							case node.nodeType === 1 && node.hasChildNodes():
+								arr[arr.length] = getTextNode(node); break;
 							default:
 						}
 					}
 				}
 				return arr.length > 0 ? arr.join("") : "";
 			}
-			if(nodes) {
-				for(i = 0, l = nodes.childNodes.length; i < l; i++) {
+			function setNodesArray(nodes, array) {
+				for(var node, container, i = 0, l = nodes.childNodes.length; i < l; i++) {
 					node = nodes.childNodes[i];
 					switch(true) {
 						case node.nodeType === 3:
@@ -139,6 +143,7 @@
 					}
 				}
 			}
+			nodes && setNodesArray(nodes, array);
 			return array.length > 0 ? array.join("") : "";
 		}
 
@@ -159,11 +164,9 @@
 			k = selection.rangeCount;
 			switch(true) {
 				case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
-					nodeValue = VIEW_SOURCE;
-					break;
-				case k === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj):
-					nodeValue = onEditText(targetObj) + onContentEditable(targetObj);
-					break;
+					nodeValue = VIEW_SOURCE; break;
+				case k === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
+					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
 				default:
 					for(nodeValue = document.createDocumentFragment(), j = 0; j < k; j++) {
 						targetObj = selection.getRangeAt(j);
