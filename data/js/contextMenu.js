@@ -21,19 +21,44 @@
 	/* get node value */
 	self.on("click", function getNodeValue() {
 		const VIEW_SOURCE = "mode=viewSource;";
-		var selection = window.getSelection(), targetObj, nodeValue, j, k;
+		const DATA_ID = "data-with_ex_editor_id";
+		// Namespaces http://www.w3.org/html/wg/drafts/html/master/infrastructure.html#namespaces
+		const namespaces = {
+			"html": "http://www.w3.org/1999/xhtml",
+			"math": "http://www.w3.org/1998/Math/MathML",
+			"svg": "http://www.w3.org/2000/svg",
+			"xlink": "http://www.w3.org/1999/xlink",
+			"xml": "http://www.w3.org/XML/1998/namespace",
+			"xmlns": "http://www.w3.org/2000/xmlns/",
+		};
+
+		/* get namespace of node from ancestor */
+		function getNodeNs(obj) {
+			for(var namespace = {}, name; obj && obj.parentNode; obj = obj.parentNode) {
+				name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(obj.nodeName.toLowerCase());
+				if(name) {
+					namespace["node"] = obj;
+					namespace["name"] = name[1] || name[2];
+					namespace["uri"] = obj.hasAttribute("xmlns") ? obj.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : "";
+					break;
+				}
+			}
+			!name && (
+				obj = document.documentElement,
+				namespace["node"] = obj,
+				namespace["name"] = obj.nodeName.toLowerCase(),
+				namespace["uri"] = obj.hasAttribute("xmlns") ? obj.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : ""
+			);
+			return namespace;
+		}
 
 		/* create element */
 		function getElement(node, nodes) {
-			const namespaces = {
-				html: "http://www.w3.org/1999/xhtml",
-			};
-			var element;
-			function getNamespace(name) {
-				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(name);
+			function getNamespace(obj, bool) {
+				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase());
 				return {
-					namespace: namespaces[elementNameParts[1]],
-					shortName: elementNameParts[2],
+					"namespace": namespaces[elementNameParts[1]] || bool && getNodeNs(obj).uri,
+					"shortName": elementNameParts[2],
 				};
 			}
 			function appendChildNodes(obj) {
@@ -41,7 +66,7 @@
 					child = obj.childNodes[i];
 					switch(child.nodeType) {
 						case 1:
-							fragment.appendChild(getElement(child.nodeName.toLowerCase(), child)); break;
+							fragment.appendChild(getElement(child, child)); break;
 						case 3:
 							fragment.appendChild(document.createTextNode(child.nodeValue)); break;
 						default:
@@ -49,21 +74,21 @@
 				}
 				return fragment;
 			}
-			function setAttributes(nodes, element) {
-				for(var attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i++) {
-					attr = nodes.attributes[i];
-					attrNs = getNamespace(attr.nodeName);
-					typeof nodes[attr.nodeName] !== "function" && element.setAttributeNS(attrNs.namespace || "", attrNs.shortName, attr.nodeValue);
+			var element;
+			if(node) {
+				node = getNamespace(node, true);
+				element = document.createElementNS(node.namespace || namespaces["html"], node.shortName);
+				if(nodes && element) {
+					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
+					if(nodes.attributes) {
+						for(var attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i++) {
+							attr = nodes.attributes[i];
+							attrNs = getNamespace(attr, false);
+							typeof nodes[attr.nodeName] !== "function" && element.setAttributeNS(attrNs.namespace || "", attrNs.shortName, attr.nodeValue);
+						}
+					}
 				}
 			}
-			node && (
-				node = getNamespace(node),
-				element = document.createElementNS(node.namespace || namespaces.html, node.shortName),
-				nodes && element && (
-					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes)),
-					nodes.attributes && setAttributes(nodes, element)
-				)
-			);
 			return element ? element : "";
 		}
 
@@ -75,7 +100,7 @@
 					switch(node.nodeType) {
 						case 1:
 							i === 0 && fragment.appendChild(document.createTextNode("\n"));
-							fragment.appendChild(getElement(node.nodeName.toLowerCase(), node));
+							fragment.appendChild(getElement(node, node));
 							i === l - 1 && fragment.appendChild(document.createTextNode("\n"));
 							break;
 						case 3:
@@ -85,14 +110,13 @@
 				}
 				return fragment;
 			}
-			container = container ? getElement(container.nodeName.toLowerCase()) : "";
+			container = container ? getElement(container) : "";
 			container && container.nodeType === 1 ? nodes && nodes.hasChildNodes() && container.appendChild(createDom(nodes)) : (container = document.createTextNode(""));
 			return container;
 		}
 
 		/* set temporary ID to the target element */
 		function onEditText(target) {
-			const DATA_ID = "data-with_ex_editor_id";
 			var id;
 			target && (
 				target.hasAttribute(DATA_ID) ? id = target.getAttribute(DATA_ID) : (
@@ -132,7 +156,7 @@
 						case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
 							array[array.length] = "\n"; break;
 						case node.nodeType === 1 && node.hasChildNodes():
-							container = getElement(node.nodeName.toLowerCase());
+							container = getElement(node);
 							container && container.nodeType === 1 && (
 								container = getDomTree(container, node),
 								array[array.length] = getTextNode(container)
@@ -146,7 +170,45 @@
 			return nodes ? getTextNodeFromContent(nodes) : "";
 		}
 
+		/* create DOM from range and get childNodes */
+		function onViewSelection(sel) {
+			function replaceNamespaseToCommonPrefix(string) {
+				Object.keys(namespaces).forEach(function(key) {
+					var reg = new RegExp("xmlns:([a-z0-9]+)=\"" + namespaces[key] + "\""),
+						name = reg.exec(string);
+					name && (
+						name = name[1],
+						string = string.replace("xmlns:" + name + "=", "xmlns:" + key + "=", "gm").replace(" " + name + ":", " " + key + ":", "gm")
+					);
+				});
+				return string;
+			}
+			var fragment = document.createDocumentFragment();
+			if(sel && sel.rangeCount) {
+				for(var range, embed, i = 0, l = sel.rangeCount; i < l; i++) {
+					range = sel.getRangeAt(i);
+					embed = getNodeNs(range.commonAncestorContainer);
+					if(/^(?:svg|math)$/.test(embed["name"])) {
+						if(embed["node"] === document.documentElement) {
+							fragment = null;
+							break;
+						}
+						else {
+							embed["node"].parentNode && (
+								range.setStart(embed["node"].parentNode, 0),
+								range.setEnd(embed["node"].parentNode, embed["node"].parentNode.childNodes.length)
+							);
+						}
+					}
+					fragment.appendChild(getDomTree(range.commonAncestorContainer, range.cloneContents()));
+					i < l - 1 && fragment.appendChild(document.createTextNode("\n\n"));
+				}
+			}
+			return fragment && fragment.hasChildNodes() && window.XMLSerializer ? "mode=viewSelection;value=" + replaceNamespaseToCommonPrefix(new XMLSerializer().serializeToString(fragment)) : VIEW_SOURCE;
+		}
+
 		/* switch mode by context */
+		var selection = window.getSelection(), targetObj, nodeValue;
 		if(selection.isCollapsed) {
 			targetObj = document.activeElement;
 			switch(true) {
@@ -160,19 +222,13 @@
 		}
 		else {
 			targetObj = selection.getRangeAt(0).commonAncestorContainer;
-			k = selection.rangeCount;
 			switch(true) {
 				case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
 					nodeValue = VIEW_SOURCE; break;
-				case k === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
+				case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
 					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
 				default:
-					for(nodeValue = document.createDocumentFragment(), j = 0; j < k; j++) {
-						targetObj = selection.getRangeAt(j);
-						nodeValue.appendChild(getDomTree(targetObj.commonAncestorContainer, targetObj.cloneContents()));
-						j < k - 1 && nodeValue.appendChild(document.createTextNode("\n\n"));
-					}
-					nodeValue = nodeValue.hasChildNodes() && window.XMLSerializer ? "mode=viewSelection;value=" + (new XMLSerializer().serializeToString(nodeValue)) : VIEW_SOURCE;
+					nodeValue = onViewSelection(selection);
 			}
 		}
 		self.postMessage(nodeValue);
