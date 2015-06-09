@@ -74,6 +74,7 @@
 		function isRadioChecked(event) {
 			event && event.target && event.target.checked && addonPortEmit(event);
 		}
+
 		/* update control panel */
 		addon.port.on("editorValue", function(res) {
 			res && (
@@ -89,6 +90,7 @@
 				toggleFieldset()
 			);
 		});
+
 		/* localize control panel */
 		addon.port.on("htmlValue", function(res) {
 			res && (
@@ -124,6 +126,7 @@
 				setKey && (setKey.value = res["submit"])
 			);
 		});
+
 		/* event listeners */
 		window.addEventListener("load", function(event) {
 			event && event.type && addon.port.emit(event.type);

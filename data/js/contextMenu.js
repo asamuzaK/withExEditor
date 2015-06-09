@@ -22,14 +22,53 @@
 	self.on("click", function getNodeValue() {
 		const VIEW_SOURCE = "mode=viewSource;";
 		const DATA_ID = "data-with_ex_editor_id";
-		// Namespaces http://www.w3.org/html/wg/drafts/html/master/infrastructure.html#namespaces
 		const namespaces = {
+			"cc": "http://creativecommons.org/ns#",
+			"cnt": "http://www.w3.org/2008/content#",
+			"csvw": "http://www.w3.org/ns/csvw#",
+			"ctag": "http://commontag.org/ns#",
+			"dc": "http://purl.org/dc/terms/",
+			"dc11": "http://purl.org/dc/elements/1.1/",
+			"dcat": "http://www.w3.org/ns/dcat#",
+			"dcterms": "http://purl.org/dc/terms/",
+			"earl": "http://www.w3.org/ns/earl#",
+			"foaf": "http://xmlns.com/foaf/0.1/",
+			"gr": "http://purl.org/goodrelations/v1#",
+			"grddl": "http://www.w3.org/2003/g/data-view#",
+			"ht": "http://www.w3.org/2006/http#",
 			"html": "http://www.w3.org/1999/xhtml",
+			"ical": "http://www.w3.org/2002/12/cal/icaltzd#",
+			"ma": "http://www.w3.org/ns/ma-ont#",
 			"math": "http://www.w3.org/1998/Math/MathML",
+			"oa": "http://www.w3.org/ns/oa#",
+			"og": "http://ogp.me/ns#",
+			"org": "http://www.w3.org/ns/org#",
+			"owl": "http://www.w3.org/2002/07/owl#",
+			"prov": "http://www.w3.org/ns/prov#",
+			"ptr": "http://www.w3.org/2009/pointers#",
+			"qb": "http://purl.org/linked-data/cube#",
+			"rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+			"rdfa": "http://www.w3.org/ns/rdfa#",
+			"rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+			"rev": "http://purl.org/stuff/rev#",
+			"rif": "http://www.w3.org/2007/rif#",
+			"rr": "http://www.w3.org/ns/r2rml#",
+			"schema": "http://schema.org/",
+			"sd": "http://www.w3.org/ns/sparql-service-description#",
+			"sioc": "http://rdfs.org/sioc/ns#",
+			"skos": "http://www.w3.org/2004/02/skos/core#",
+			"skosxl": "http://www.w3.org/2008/05/skos-xl#",
 			"svg": "http://www.w3.org/2000/svg",
+			"v": "http://rdf.data-vocabulary.org/#",
+			"vcard": "http://www.w3.org/2006/vcard/ns#",
+			"void": "http://rdfs.org/ns/void#",
+			"wdr": "http://www.w3.org/2007/05/powder#",
+			"wdrs": "http://www.w3.org/2007/05/powder-s#",
+			"xhv": "http://www.w3.org/1999/xhtml/vocab#",
 			"xlink": "http://www.w3.org/1999/xlink",
 			"xml": "http://www.w3.org/XML/1998/namespace",
 			"xmlns": "http://www.w3.org/2000/xmlns/",
+			"xsd": "http://www.w3.org/2001/XMLSchema#",
 		};
 
 		/* get namespace of node from ancestor */
@@ -57,7 +96,7 @@
 			function getNamespace(obj, bool) {
 				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase());
 				return {
-					"namespace": namespaces[elementNameParts[1]] || bool && getNodeNs(obj).uri,
+					"namespace": namespaces[elementNameParts[1]] ? namespaces[elementNameParts[1]] : bool ? getNodeNs(obj).uri : null,
 					"shortName": elementNameParts[2],
 				};
 			}
@@ -77,14 +116,14 @@
 			var element;
 			if(node) {
 				node = getNamespace(node, true);
-				element = document.createElementNS(node.namespace || namespaces["html"], node.shortName);
+				element = document.createElementNS(node["namespace"] || namespaces["html"], node["shortName"]);
 				if(nodes && element) {
 					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
 					if(nodes.attributes) {
 						for(var attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i++) {
 							attr = nodes.attributes[i];
 							attrNs = getNamespace(attr, false);
-							typeof nodes[attr.nodeName] !== "function" && element.setAttributeNS(attrNs.namespace || "", attrNs.shortName, attr.nodeValue);
+							typeof nodes[attr.nodeName] !== "function" && element.setAttributeNS(attrNs["namespace"] || "", attrNs["shortName"], attr.nodeValue);
 						}
 					}
 				}
@@ -175,9 +214,9 @@
 			function replaceNamespaseToCommonPrefix(string) {
 				Object.keys(namespaces).forEach(function(key) {
 					var reg = new RegExp("xmlns:([a-z0-9]+)=\"" + namespaces[key] + "\""),
-						name = reg.exec(string);
-					name && (
-						name = name[1],
+						name;
+					reg.test(string) && (
+						name = reg.exec(string)[1],
 						string = string.replace("xmlns:" + name + "=", "xmlns:" + key + "=", "gm").replace(" " + name + ":", " " + key + ":", "gm")
 					);
 				});
