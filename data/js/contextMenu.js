@@ -94,10 +94,14 @@
 		/* create element */
 		function getElement(node, nodes) {
 			function getNamespace(obj, bool) {
-				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase());
+				var elementNameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase()),
+					prefix = elementNameParts[1] || null,
+					shortName = elementNameParts[2],
+					namespace = prefix && namespaces[prefix] ? namespaces[prefix] : null;
 				return {
-					"namespace": namespaces[elementNameParts[1]] ? namespaces[elementNameParts[1]] : bool ? getNodeNs(obj).uri : null,
-					"shortName": elementNameParts[2],
+					"namespace": namespace ? namespace : bool ? getNodeNs(obj).uri : null,
+					"prefix": prefix ? (prefix + ":") : "",
+					"shortName": shortName,
 				};
 			}
 			function appendChildNodes(obj) {
@@ -123,7 +127,7 @@
 						for(var attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i++) {
 							attr = nodes.attributes[i];
 							attrNs = getNamespace(attr, false);
-							typeof nodes[attr.nodeName] !== "function" && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["shortName"], attr.nodeValue);
+							typeof nodes[attr.nodeName] !== "function" && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["prefix"] + attrNs["shortName"], attr.nodeValue);
 						}
 					}
 				}
@@ -211,17 +215,6 @@
 
 		/* create DOM from range and get childNodes */
 		function onViewSelection(sel) {
-			function replaceNamespaseToCommonPrefix(string) {
-				Object.keys(namespaces).forEach(function(key) {
-					var reg = new RegExp('xmlns:([a-z0-9]+)="' + namespaces[key] + '"'),
-						name;
-					reg.test(string) && (
-						name = reg.exec(string)[1],
-						string = string.replace("xmlns:" + name + "=", "xmlns:" + key + "=", "gm").replace(" " + name + ":", " " + key + ":", "gm")
-					);
-				});
-				return string;
-			}
 			var fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
 				for(var range, embed, i = 0, l = sel.rangeCount; i < l; i++) {
@@ -243,7 +236,7 @@
 					i < l - 1 && fragment.appendChild(document.createTextNode("\n\n"));
 				}
 			}
-			return fragment && fragment.hasChildNodes() && window.XMLSerializer ? "mode=viewSelection;value=" + replaceNamespaseToCommonPrefix(new XMLSerializer().serializeToString(fragment)) : VIEW_SOURCE;
+			return fragment && fragment.hasChildNodes() && window.XMLSerializer ? "mode=viewSelection;value=" + (new XMLSerializer().serializeToString(fragment)) : VIEW_SOURCE;
 		}
 
 		/* switch mode by context */
