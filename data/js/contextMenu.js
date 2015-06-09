@@ -78,7 +78,7 @@
 				if(name) {
 					namespace["node"] = obj;
 					namespace["name"] = name[1] || name[2];
-					namespace["uri"] = obj.hasAttribute("xmlns") ? obj.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : "";
+					namespace["uri"] = namespaces[namespace["name"]];
 					break;
 				}
 			}
@@ -86,7 +86,7 @@
 				obj = document.documentElement,
 				namespace["node"] = obj,
 				namespace["name"] = obj.nodeName.toLowerCase(),
-				namespace["uri"] = obj.hasAttribute("xmlns") ? obj.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : ""
+				namespace["uri"] = obj.hasAttribute("xmlns") ? obj.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : null
 			);
 			return namespace;
 		}
@@ -116,19 +116,19 @@
 			var element;
 			if(node) {
 				node = getNamespace(node, true);
-				element = document.createElementNS(node["namespace"] || namespaces["html"], node["shortName"]);
+				element = node["shortName"] && document.createElementNS(node["namespace"] || namespaces["html"], node["shortName"]);
 				if(nodes && element) {
 					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
 					if(nodes.attributes) {
 						for(var attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i++) {
 							attr = nodes.attributes[i];
 							attrNs = getNamespace(attr, false);
-							typeof nodes[attr.nodeName] !== "function" && element.setAttributeNS(attrNs["namespace"] || "", attrNs["shortName"], attr.nodeValue);
+							typeof nodes[attr.nodeName] !== "function" && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["shortName"], attr.nodeValue);
 						}
 					}
 				}
 			}
-			return element ? element : "";
+			return element ? element : document.createTextNode("");
 		}
 
 		/* create DOM tree */
@@ -213,7 +213,7 @@
 		function onViewSelection(sel) {
 			function replaceNamespaseToCommonPrefix(string) {
 				Object.keys(namespaces).forEach(function(key) {
-					var reg = new RegExp("xmlns:([a-z0-9]+)=\"" + namespaces[key] + "\""),
+					var reg = new RegExp('xmlns:([a-z0-9]+)="' + namespaces[key] + '"'),
 						name;
 					reg.test(string) && (
 						name = reg.exec(string)[1],
