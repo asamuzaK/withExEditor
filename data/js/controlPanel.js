@@ -129,12 +129,7 @@
 
 		/* event listeners */
 		window.addEventListener("load", function(event) {
-			var aspect, height;
-			controlPanelForm && (
-				aspect = (window.getComputedStyle(controlPanelForm).fontSize).replace(/px$/, "") / (window.getComputedStyle(document.documentElement).fontSize).replace(/px$/, ""),
-				height = Math.ceil((window.getComputedStyle(controlPanelForm).height).replace(/px$/, "") * aspect)
-			);
-			event && event.type && addon.port.emit(event.type, { "height": height || null, });
+			event && event.type && addon.port.emit(event.type);
 		}, false);
 		controlPanelForm && controlPanelForm.addEventListener("submit", addonPortEmit, false);
 		buttonIcon && buttonIcon.addEventListener("change", isRadioChecked, false);
