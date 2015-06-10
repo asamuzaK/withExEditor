@@ -7,40 +7,42 @@
 		<script src="../js/controlPanel.js"></script>
 	</head>
 	<body>
-		<form id="controlPanelForm">
-			<fieldset id="selectButtonIcon">
-				<legend id="selectIconLabel">Select Toobar Button Icon</legend>
-				<p>
-					<span>
-						<input type="radio" id="buttonIcon" name="buttonIconRadio" value="./img/icon.svg" />
-						<label for="buttonIcon"><img src="../img/icon.svg" alt="gray" /></label>
-						<input type="radio" id="buttonIconWhite" name="buttonIconRadio" value="./img/icon_white.svg" />
-						<label for="buttonIconWhite"><img src="../img/icon_white.svg" alt="white" /></label>
-					</span>
-					<input type="submit" id="selectIcon" value="Submit" />
-				</p>
-			</fieldset>
-			<fieldset id="storeRenamedEditorLabel">
-				<legend id="renameEditorLabel">Rename Editor Label</legend>
-				<p>
-					<label id="currentEditorName" for="editorLabel">(Editor is not selected)</label>
-					<a id="aboutAddons" href="about:addons">Select Editor</a><br />
-					<span>
-						<input type="text" id="editorLabel" placeholder="Editor Label" />
-						<input type="hidden" id="editorName" />
-					</span>
-					<input type="submit" id="storeLabel" value="Submit" />
-				</p>
-			</fieldset>
-			<fieldset id="setAccessKey">
-				<legend id="setAccessKeyLabel">Set Access Key</legend>
-				<p>
-					<span>
-						<input type="text" id="accessKey" placeholder="Access Key" />
-					</span>
-					<input type="submit" id="setKey" value="Submit" />
-				</p>
-			</fieldset>
-		</form>
+		<main>
+			<form id="controlPanelForm">
+				<fieldset id="selectToolbarButtonIcon">
+					<legend id="selectIconLabel">Select Toobar Button Icon</legend>
+					<p>
+						<span>
+							<input type="radio" id="buttonIcon" name="buttonIconRadio" value="./img/icon.svg" />
+							<label for="buttonIcon"><img src="../img/icon.svg" alt="gray" /></label>
+							<input type="radio" id="buttonIconWhite" name="buttonIconRadio" value="./img/icon_white.svg" />
+							<label for="buttonIconWhite"><img src="../img/icon_white.svg" alt="white" /></label>
+						</span>
+						<input type="submit" id="selectIcon" value="Submit" />
+					</p>
+				</fieldset>
+				<fieldset id="storeRenamedEditorLabel">
+					<legend id="renameEditorLabel">Rename Editor Label</legend>
+					<p>
+						<label id="currentEditorName" for="editorLabel">(Editor is not selected)</label>
+						<a id="aboutAddons" href="about:addons">Select Editor</a><br />
+						<span>
+							<input type="text" id="editorLabel" placeholder="Editor Label" />
+							<input type="hidden" id="editorName" />
+						</span>
+						<input type="submit" id="storeLabel" value="Submit" />
+					</p>
+				</fieldset>
+				<fieldset id="setAccessKey">
+					<legend id="setAccessKeyLabel">Set Access Key</legend>
+					<p>
+						<span>
+							<input type="text" id="accessKey" placeholder="Access Key" />
+						</span>
+						<input type="submit" id="setKey" value="Submit" />
+					</p>
+				</fieldset>
+			</form>
+		</main>
 	</body>
 </html>
