@@ -8,6 +8,7 @@
 			title = document.querySelector("title"),
 			controlPanelForm = document.getElementById("controlPanelForm"),
 			buttonIcon = document.getElementById("buttonIcon"),
+			buttonIconGray = document.getElementById("buttonIconGray"),
 			buttonIconWhite = document.getElementById("buttonIconWhite"),
 			selectIconLabel = document.getElementById("selectIconLabel"),
 			selectIcon = document.getElementById("selectIcon"),
@@ -133,6 +134,7 @@
 		}, false);
 		controlPanelForm && controlPanelForm.addEventListener("submit", addonPortEmit, false);
 		buttonIcon && buttonIcon.addEventListener("change", isRadioChecked, false);
+		buttonIconGray && buttonIconGray.addEventListener("change", isRadioChecked, false);
 		buttonIconWhite && buttonIconWhite.addEventListener("change", isRadioChecked, false);
 		aboutAddons && aboutAddons.addEventListener("click", function(event) {
 			event && (

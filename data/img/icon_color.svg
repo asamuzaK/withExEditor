@@ -8,7 +8,7 @@
 			</cc:Work>
 		</rdf:RDF>
 	</metadata>
-	<rect width="80" height="104" rx="8" ry="8" fill="none" stroke="#666" stroke-width="16" transform="translate(12,12)" />
-	<line x1="56" y1="72" x2="116" y2="12" stroke="#666" stroke-width="24" />
-	<polygon points="0,0 0,24 12,24 24,12, 12,0" fill="#666" transform="translate(60,85) rotate(135)" />
+	<rect width="80" height="104" rx="8" ry="8" fill="none" stroke="#002147" stroke-width="16" transform="translate(12,12)" />
+	<line x1="56" y1="72" x2="116" y2="12" stroke="#E66000" stroke-width="24" />
+	<polygon points="0,0 0,24 12,24 24,12, 12,0" fill="#E66000" transform="translate(60,85) rotate(135)" />
 </svg>
