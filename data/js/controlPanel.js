@@ -24,9 +24,8 @@
 
 		/* modules */
 		function removeChildNodes(node) {
-			var i, l;
 			if(node && node.hasChildNodes()) {
-				for(i = node.childNodes.length - 1, l = 0; i >= 0; i--) {
+				for(var i = node.childNodes.length - 1, l = 0; i >= 0; i--) {
 					node.removeChild(node.childNodes[i]);
 				}
 			}
