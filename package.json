@@ -12,8 +12,11 @@
 			"title": "Select Editor"
 		}
 	],
+	"permissions": {
+		"private-browsing": true
+	},
 	"icon": "data/img/icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.11.6"
+	"version": "0.12"
 }
