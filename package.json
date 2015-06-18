@@ -10,10 +10,23 @@
 			"type": "file",
 			"name": "withExEditorFile",
 			"title": "Select Editor"
+		},
+		{
+			"type": "bool",
+			"name": "withExEditorEnablePB",
+			"title": "Enable during Private Browsing"
+		},
+		{
+			"type": "bool",
+			"name": "withExEditorNotifyInitPB",
+			"title": "Notify if failed to remove temporary files at the end of Private Browsing"
 		}
 	],
+	"permissions": {
+		"private-browsing": true
+	},
 	"icon": "data/img/icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.12.2"
+	"version": "0.13"
 }
