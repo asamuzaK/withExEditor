@@ -217,22 +217,29 @@
 		function onViewSelection(sel) {
 			var fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
-				for(var range, embed, i = 0, l = sel.rangeCount; i < l; i++) {
+				for(var range, element, i = 0, l = sel.rangeCount; i < l; i++) {
 					range = sel.getRangeAt(i);
-					embed = getNodeNs(range.commonAncestorContainer);
-					if(/^(?:svg|math)$/.test(embed["name"])) {
-						if(embed["node"] === document.documentElement) {
-							fragment = null;
-							break;
+					if(range.commonAncestorContainer.nodeType === 1) {
+						element = getNodeNs(range.commonAncestorContainer);
+						if(/^(?:svg|math)$/.test(element["name"])) {
+							if(element["node"] === document.documentElement) {
+								fragment = null;
+								break;
+							}
+							else {
+								element["node"].parentNode && (
+									range.setStart(element["node"].parentNode, 0),
+									range.setEnd(element["node"].parentNode, element["node"].parentNode.childNodes.length)
+								);
+							}
 						}
-						else {
-							embed["node"].parentNode && (
-								range.setStart(embed["node"].parentNode, 0),
-								range.setEnd(embed["node"].parentNode, embed["node"].parentNode.childNodes.length)
-							);
-						}
+						fragment.appendChild(getDomTree(range.commonAncestorContainer, range.cloneContents()));
 					}
-					fragment.appendChild(getDomTree(range.commonAncestorContainer, range.cloneContents()));
+					else if(range.commonAncestorContainer.nodeType === 3) {
+						element = getElement(range.commonAncestorContainer.parentNode);
+						element.appendChild(document.createTextNode(range.commonAncestorContainer.nodeValue));
+						fragment.appendChild(element);
+					}
 					i < l - 1 && fragment.appendChild(document.createTextNode("\n\n"));
 				}
 			}

@@ -18,8 +18,8 @@
 		},
 		{
 			"type": "bool",
-			"name": "withExEditorNotifyInitPB",
-			"title": "Notify if failed to remove the temporary files at the end of Private Browsing"
+			"name": "withExEditorForceRemove",
+			"title": "Force to remove the temporary files at shutdown"
 		}
 	],
 	"permissions": {
@@ -28,5 +28,5 @@
 	"icon": "data/img/icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.13.6"
+	"version": "0.13.7"
 }
