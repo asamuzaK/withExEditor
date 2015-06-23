@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<title>Settings</title>
+		<title data-l10n-id="Settings">Settings</title>
 		<link rel="stylesheet" href="../css/controlPanel.css" />
 		<script src="../js/controlPanel.js"></script>
 	</head>
@@ -10,24 +10,24 @@
 		<main>
 			<form id="controlPanelForm">
 				<fieldset id="selectToolbarButtonIcon">
-					<legend id="selectIconLabel">Select Toobar Button Icon</legend>
+					<legend id="selectIconLabel" data-l10n-id="SelectIconLabel">Select Toobar Button Icon</legend>
 					<p>
 						<span>
 							<input type="radio" id="buttonIcon" name="buttonIconRadio" value="./img/icon_color.svg" />
-							<label for="buttonIcon"><img src="../img/icon_color.svg" alt="color" /></label>
+							<label for="buttonIcon"><img id="iconColor" data-l10n-id="IconColor" src="../img/icon_color.svg" alt="Color" /></label>
 							<input type="radio" id="buttonIconGray" name="buttonIconRadio" value="./img/icon_gray.svg" />
-							<label for="buttonIconGray"><img src="../img/icon_gray.svg" alt="gray" /></label>
+							<label for="buttonIconGray"><img id="iconGray" data-l10n-id="IconGray" src="../img/icon_gray.svg" alt="Gray" /></label>
 							<input type="radio" id="buttonIconWhite" name="buttonIconRadio" value="./img/icon_white.svg" />
-							<label for="buttonIconWhite"><img src="../img/icon_white.svg" alt="white" /></label>
+							<label for="buttonIconWhite"><img id="iconWhite" data-l10n-id="IconWhite" src="../img/icon_white.svg" alt="White" /></label>
 						</span>
 						<input type="submit" id="selectIcon" value="Submit" />
 					</p>
 				</fieldset>
 				<fieldset id="storeRenamedEditorLabel">
-					<legend id="renameEditorLabel">Rename Editor Label</legend>
+					<legend id="renameEditorLabel" data-l10n-id="RenameEditorLabel">Rename Editor Label</legend>
 					<p>
 						<label id="currentEditorName" for="editorLabel">(Editor is not selected)</label>
-						<a id="aboutAddons" href="about:addons">Select Editor</a><br />
+						<a id="selectEditor" data-l10n-id="SelectEditor" href="about:addons">Select Editor</a><br />
 						<span>
 							<input type="text" id="editorLabel" placeholder="Editor Label" />
 							<input type="hidden" id="editorName" />
@@ -36,10 +36,10 @@
 					</p>
 				</fieldset>
 				<fieldset id="setAccessKey">
-					<legend id="setAccessKeyLabel">Set Access Key</legend>
+					<legend id="setAccessKeyLabel" data-l10n-id="SetAccessKeyLabel">Set Access Key</legend>
 					<p>
 						<span>
-							<input type="text" id="accessKey" placeholder="Access Key" />
+							<input type="text" id="accessKey" data-l10n-id="AccessKey" placeholder="Access Key" />
 						</span>
 						<input type="submit" id="setKey" value="Submit" />
 					</p>

@@ -5,20 +5,16 @@
 	"use strict";
 	document.addEventListener("DOMContentLoaded", function() {
 		var html = document.querySelector("html"),
-			title = document.querySelector("title"),
 			controlPanelForm = document.getElementById("controlPanelForm"),
 			buttonIcon = document.getElementById("buttonIcon"),
 			buttonIconGray = document.getElementById("buttonIconGray"),
 			buttonIconWhite = document.getElementById("buttonIconWhite"),
-			selectIconLabel = document.getElementById("selectIconLabel"),
 			selectIcon = document.getElementById("selectIcon"),
-			renameEditorLabel = document.getElementById("renameEditorLabel"),
 			currentEditorName = document.getElementById("currentEditorName"),
-			aboutAddons = document.getElementById("aboutAddons"),
+			selectEditor = document.getElementById("selectEditor"),
 			editorName = document.getElementById("editorName"),
 			editorLabel = document.getElementById("editorLabel"),
 			storeLabel = document.getElementById("storeLabel"),
-			setAccessKeyLabel = document.getElementById("setAccessKeyLabel"),
 			accessKey = document.getElementById("accessKey"),
 			setKey = document.getElementById("setKey");
 
@@ -95,34 +91,13 @@
 		addon.port.on("htmlValue", function(res) {
 			res && (
 				html && (html.lang = res["lang"]),
-				title && (
-					title.hasChildNodes() && removeChildNodes(title),
-					title.appendChild(document.createTextNode(res["controlPanelTitle"]))
-				),
-				selectIconLabel && (
-					selectIconLabel.hasChildNodes() && removeChildNodes(selectIconLabel),
-					selectIconLabel.appendChild(document.createTextNode(res["selectIconLabel"]))
-				),
 				selectIcon && (selectIcon.value = res["submit"]),
-				renameEditorLabel && (
-					renameEditorLabel.hasChildNodes() && removeChildNodes(renameEditorLabel),
-					renameEditorLabel.appendChild(document.createTextNode(res["renameEditorLabel"]))
-				),
 				currentEditorName && (
 					currentEditorName.hasChildNodes() && removeChildNodes(currentEditorName),
 					currentEditorName.appendChild(document.createTextNode(res["currentEditorName"]))
 				),
-				aboutAddons && (
-					aboutAddons.hasChildNodes() && removeChildNodes(aboutAddons),
-					aboutAddons.appendChild(document.createTextNode(res["aboutAddons"]))
-				),
 				editorLabel && (editorLabel.placeholder = res["editorLabel"]),
 				storeLabel && (storeLabel.value = res["submit"]),
-				setAccessKeyLabel && (
-					setAccessKeyLabel.hasChildNodes() && removeChildNodes(setAccessKeyLabel),
-					setAccessKeyLabel.appendChild(document.createTextNode(res["accessKeyLabel"]))
-				),
-				accessKey && (accessKey.placeholder = res["accessKeyPlaceholder"]),
 				setKey && (setKey.value = res["submit"])
 			);
 		});
@@ -135,7 +110,7 @@
 		buttonIcon && buttonIcon.addEventListener("change", isRadioChecked, false);
 		buttonIconGray && buttonIconGray.addEventListener("change", isRadioChecked, false);
 		buttonIconWhite && buttonIconWhite.addEventListener("change", isRadioChecked, false);
-		aboutAddons && aboutAddons.addEventListener("click", function(event) {
+		selectEditor && selectEditor.addEventListener("click", function(event) {
 			event && (
 				event.type && event.target && event.target.href && addon.port.emit(event.type, event.target.href),
 				event.preventDefault()
