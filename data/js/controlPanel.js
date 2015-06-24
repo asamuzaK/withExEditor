@@ -18,6 +18,11 @@
 			accessKey = document.getElementById("accessKey"),
 			setKey = document.getElementById("setKey");
 
+		/* for back compat prior to Fx39 */
+		var iconColorLabel = document.querySelector("label[data-l10n-id=IconColorLabel]"),
+			iconGrayLabel = document.querySelector("label[data-l10n-id=IconGrayLabel]"),
+			iconWhiteLabel = document.querySelector("label[data-l10n-id=IconWhiteLabel]");
+
 		/* modules */
 		function removeChildNodes(node) {
 			if(node && node.hasChildNodes()) {
@@ -54,7 +59,6 @@
 		}
 
 		/* event handlers */
-		/* addon.port.emit() in events */
 		function addonPortEmit(event) {
 			var settings = {
 					"editorName": editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : "",
@@ -98,7 +102,18 @@
 				),
 				editorLabel && (editorLabel.placeholder = res["editorLabel"]),
 				storeLabel && (storeLabel.value = res["submit"]),
-				setKey && (setKey.value = res["submit"])
+				setKey && (setKey.value = res["submit"]),
+				/* back compat localize attributes prior to Fx39 */
+				res["compat"] * 1 < 0 && (
+					iconColorLabel && (iconColorLabel.ariaLabel = res["iconColorLabel"]),
+					buttonIcon && (buttonIcon.alt = res["iconColorAlt"]),
+					iconGrayLabel && (iconGrayLabel.ariaLabel = res["iconGrayLabel"]),
+					buttonIconGray && (buttonIconGray.alt = res["iconGrayAlt"]),
+					iconWhiteLabel && (iconWhiteLabel.ariaLabel = res["iconWhiteLabel"]),
+					buttonIconWhite && (buttonIconWhite.alt = res["iconWhiteAlt"]),
+					currentEditorName && (currentEditorName.ariaLabel = res["currentEditorNameLabel"]),
+					accessKey && (accessKey.placeholder = res["accessKeyPlaceholder"])
+				)
 			);
 		});
 
