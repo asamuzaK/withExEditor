@@ -14,11 +14,11 @@
 					<p>
 						<span>
 							<input type="radio" id="buttonIcon" name="buttonIconRadio" value="./img/icon_color.svg" />
-							<label for="buttonIcon"><img id="iconColor" data-l10n-id="IconColor" src="../img/icon_color.svg" alt="Color" /></label>
+							<label for="buttonIcon" data-l10n-id="IconColorLabel" aria-label="Color Icon"><img id="iconColor" data-l10n-id="IconColor" src="../img/icon_color.svg" alt="Color" /></label>
 							<input type="radio" id="buttonIconGray" name="buttonIconRadio" value="./img/icon_gray.svg" />
-							<label for="buttonIconGray"><img id="iconGray" data-l10n-id="IconGray" src="../img/icon_gray.svg" alt="Gray" /></label>
+							<label for="buttonIconGray" data-l10n-id="IconGrayLabel" aria-label="Gray Icon"><img id="iconGray" data-l10n-id="IconGray" src="../img/icon_gray.svg" alt="Gray" /></label>
 							<input type="radio" id="buttonIconWhite" name="buttonIconRadio" value="./img/icon_white.svg" />
-							<label for="buttonIconWhite"><img id="iconWhite" data-l10n-id="IconWhite" src="../img/icon_white.svg" alt="White" /></label>
+							<label for="buttonIconWhite" data-l10n-id="IconWhiteLabel" aria-label="White Icon"><img id="iconWhite" data-l10n-id="IconWhite" src="../img/icon_white.svg" alt="White" /></label>
 						</span>
 						<input type="submit" id="selectIcon" value="Submit" />
 					</p>
@@ -26,7 +26,7 @@
 				<fieldset id="storeRenamedEditorLabel">
 					<legend id="renameEditorLabel" data-l10n-id="RenameEditorLabel">Rename Editor Label</legend>
 					<p>
-						<label id="currentEditorName" for="editorLabel">(Editor is not selected)</label>
+						<label id="currentEditorName" data-l10n-id="CurrentEditor" for="editorLabel" aria-label="Current editor label">(Editor is not selected)</label>
 						<a id="selectEditor" data-l10n-id="SelectEditor" href="about:addons">Select Editor</a><br />
 						<span>
 							<input type="text" id="editorLabel" placeholder="Editor Label" />
