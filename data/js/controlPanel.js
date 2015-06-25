@@ -104,7 +104,7 @@
 				storeLabel && (storeLabel.value = res["submit"]),
 				setKey && (setKey.value = res["submit"]),
 				/* back compat localize attributes prior to Fx39 */
-				res["compat"] * 1 < 0 && (
+				(res["compat"] < 0 || isNaN(res["compat"])) && (
 					iconColorLabel && (iconColorLabel.ariaLabel = res["iconColorLabel"]),
 					buttonIcon && (buttonIcon.alt = res["iconColorAlt"]),
 					iconGrayLabel && (iconGrayLabel.ariaLabel = res["iconGrayLabel"]),
