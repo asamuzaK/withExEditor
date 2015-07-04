@@ -8,17 +8,17 @@
 	"preferences": [
 		{
 			"type": "file",
-			"name": "withExEditorFile",
+			"name": "WithExEditorPrefsFile",
 			"title": "Select Editor"
 		},
 		{
 			"type": "bool",
-			"name": "withExEditorEnablePB",
+			"name": "WithExEditorPrefsEnablePB",
 			"title": "Enable during Private Browsing"
 		},
 		{
 			"type": "bool",
-			"name": "withExEditorForceRemove",
+			"name": "WithExEditorPrefsForceRemove",
 			"title": "Force to remove the temporary files at shutdown"
 		}
 	],
@@ -28,5 +28,5 @@
 	"icon": "data/img/icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.17.1"
+	"version": "0.17.2"
 }
