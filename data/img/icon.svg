@@ -13,10 +13,13 @@
 			display: none;
 		}
 		rect, #color rect {
+			fill: none;
 			stroke: #002147;
+			stroke-width: 16px;
 		}
 		line, #color line {
 			stroke: #e66000;
+			stroke-width: 24px;
 		}
 		polygon, #color polygon {
 			fill: #e66000;
@@ -41,8 +44,8 @@
 		}
 	]]></style>
 	<g id="icon">
-		<rect width="80" height="104" rx="8" ry="8" fill="none" stroke-width="16" transform="translate(12,12)"/>
-		<line x1="56" y1="72" x2="116" y2="12" stroke-width="24"/>
+		<rect width="80" height="104" rx="8" ry="8" transform="translate(12,12)"/>
+		<line x1="56" y1="72" x2="116" y2="12"/>
 		<polygon points="0,0 0,24 12,24 24,12, 12,0" transform="translate(60,85) rotate(135)"/>
 	</g>
 	<use id="color" xlink:href="#icon"/>
