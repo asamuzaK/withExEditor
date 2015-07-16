@@ -8,11 +8,9 @@
 		var element = document.activeElement, selection = window.getSelection(), label;
 		switch(true) {
 			case /^input$/i.test(element.nodeName) && element.hasAttribute('type') && element.getAttribute('type') === 'text' || /^textarea$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
-				label = 'EditText';
-				break;
+				label = 'EditText'; break;
 			case !selection.isCollapsed:
-				label = 'ViewSelection';
-				break;
+				label = 'ViewSelection'; break;
 			default:
 				label = 'ViewSource';
 		}
@@ -111,11 +109,9 @@
 					child = obj.childNodes[i];
 					switch(child.nodeType) {
 						case 1:
-							fragment.appendChild(getElement(child, child));
-							break;
+							fragment.appendChild(getElement(child, child)); break;
 						case 3:
-							fragment.appendChild(document.createTextNode(child.nodeValue));
-							break;
+							fragment.appendChild(document.createTextNode(child.nodeValue)); break;
 						default:
 					}
 				}
@@ -170,8 +166,8 @@
 				target.hasAttribute(DATA_ID) ? id = target.getAttribute(DATA_ID) : (
 					id = `withExEditor${ window.performance.now() }`.replace(/\./, '_'),
 					target.setAttribute(DATA_ID, id),
-					target.addEventListener('focus', event => {
-						event && event.currentTarget === target && self.postMessage(event.target.getAttribute(DATA_ID));
+					target.addEventListener('focus', evt => {
+						evt && evt.currentTarget === target && self.postMessage(evt.target.getAttribute(DATA_ID));
 					}, false)
 				)
 			);
@@ -185,14 +181,11 @@
 					node = obj.childNodes[i];
 					switch(true) {
 						case node.nodeType === 3:
-							array[array.length] = node.nodeValue;
-							break;
+							array[array.length] = node.nodeValue; break;
 						case node.nodeType === 1 && node.nodeName.toLowerCase() === 'br':
-							array[array.length] = '\n';
-							break;
+							array[array.length] = '\n'; break;
 						case node.nodeType === 1 && node.hasChildNodes():
-							array[array.length] = getTextNode(node);
-							break;
+							array[array.length] = getTextNode(node); break;
 						default:
 					}
 				}
@@ -210,7 +203,10 @@
 							break;
 						case node.nodeType === 1 && node.hasChildNodes():
 							container = getElement(node);
-							container && container.nodeType === 1 && (container = getDomTree(container, node), array[array.length] = getTextNode(container));
+							container && container.nodeType === 1 && (
+								container = getDomTree(container, node),
+								array[array.length] = getTextNode(container)
+							);
 							break;
 						default:
 					}
@@ -230,8 +226,7 @@
 						element = getNodeNs(range.commonAncestorContainer);
 						if(/^(?:svg|math)$/.test(element['name'])) {
 							if(element['node'] === document.documentElement) {
-								fragment = null;
-								break;
+								fragment = null; break;
 							}
 							else {
 								element['node'].parentNode && (
@@ -259,11 +254,9 @@
 			targetObj = document.activeElement;
 			switch(true) {
 				case /^input$/i.test(targetObj.nodeName) && targetObj.hasAttribute('type') && targetObj.getAttribute('type') === 'text' || /^textarea$/i.test(targetObj.nodeName):
-					nodeValue = onEditText(targetObj) + (targetObj.value ? targetObj.value : '');
-					break;
+					nodeValue = onEditText(targetObj) + (targetObj.value ? targetObj.value : ''); break;
 				case /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
-					nodeValue = onEditText(targetObj) + onContentEditable(targetObj);
-					break;
+					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
 				default:
 					nodeValue = VIEW_SOURCE;
 			}
@@ -272,11 +265,9 @@
 			targetObj = selection.getRangeAt(0).commonAncestorContainer;
 			switch(true) {
 				case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
-					nodeValue = VIEW_SOURCE;
-					break;
+					nodeValue = VIEW_SOURCE; break;
 				case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
-					nodeValue = onEditText(targetObj) + onContentEditable(targetObj);
-					break;
+					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
 				default:
 					nodeValue = onViewSelection(selection);
 			}

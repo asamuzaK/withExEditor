@@ -52,28 +52,27 @@
 			for(var value, nodes = document.querySelectorAll('input[type=radio]'), node, i = 0, l = nodes.length; i < l; i++) {
 				node = nodes[i];
 				if(node.name && node.name === name && node.checked) {
-					node.value && (value = node.value);
-					break;
+					node.value && (value = node.value); break;
 				}
 			}
 			return value;
 		}
 
 		/* event handlers */
-		function addonPortEmit(event) {
+		function addonPortEmit(evt) {
 			var settings = {
 					'editorName': editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : '',
 					'accessKey': accessKey && accessKey.value ? accessKey.value : ''
 				},
 				icon = buttonIcon && getCheckedRadioButtonValue(buttonIcon.name);
 			icon && (settings['toolbarButtonIcon'] = icon);
-			event && (
-				event.type && addon.port.emit(event.type, settings),
-				event.preventDefault()
+			evt && (
+				evt.type && addon.port.emit(evt.type, settings),
+				evt.preventDefault()
 			);
 		}
-		function isRadioChecked(event) {
-			event && event.target && event.target.checked && addonPortEmit(event);
+		function isRadioChecked(evt) {
+			evt && evt.target && evt.target.checked && addonPortEmit(evt);
 		}
 
 		/* update control panel */
@@ -119,17 +118,17 @@
 		});
 
 		/* event listeners */
-		window.addEventListener('load', event => {
-			event && event.type && addon.port.emit(event.type);
+		window.addEventListener('load', evt => {
+			evt && evt.type && addon.port.emit(evt.type);
 		}, false);
 		controlPanelForm && controlPanelForm.addEventListener('submit', addonPortEmit, false);
 		buttonIcon && buttonIcon.addEventListener('change', isRadioChecked, false);
 		buttonIconGray && buttonIconGray.addEventListener('change', isRadioChecked, false);
 		buttonIconWhite && buttonIconWhite.addEventListener('change', isRadioChecked, false);
-		selectEditor && selectEditor.addEventListener('click', event => {
-			event && (
-				event.type && event.target && event.target.href && addon.port.emit(event.type, event.target.href),
-				event.preventDefault()
+		selectEditor && selectEditor.addEventListener('click', evt => {
+			evt && (
+				evt.type && evt.target && evt.target.href && addon.port.emit(evt.type, evt.target.href),
+				evt.preventDefault()
 			);
 		}, false);
 
