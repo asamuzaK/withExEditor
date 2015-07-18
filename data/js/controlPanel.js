@@ -26,7 +26,7 @@
 		/* modules */
 		function removeChildNodes(node) {
 			if(node && node.hasChildNodes()) {
-				for(var i = node.childNodes.length - 1, l = 0; i >= 0; i--) {
+				for(var i = node.childNodes.length - 1; i >= 0; i = (i - 1) | 0) {
 					node.removeChild(node.childNodes[i]);
 				}
 			}
@@ -49,7 +49,7 @@
 
 		/* get radio button value if checked or not */
 		function getCheckedRadioButtonValue(name) {
-			for(var value, nodes = document.querySelectorAll("input[type=radio]"), node, i = 0, l = nodes.length; i < l; i++) {
+			for(var value, nodes = document.querySelectorAll("input[type=radio]"), node, i = 0, l = nodes.length; i < l; i = (i + 1) | 0) {
 				node = nodes[i];
 				if(node.name && node.name === name && node.checked) {
 					node.value && (value = node.value); break;

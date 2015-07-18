@@ -74,7 +74,7 @@
 		/* get namespace of node from ancestor */
 		function getNodeNs(obj) {
 			let namespace = {}, name;
-			for(; obj && obj.parentNode; obj = obj.parentNode) {
+			while(obj && obj.parentNode) {
 				name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(obj.nodeName.toLowerCase());
 				if(name) {
 					namespace["node"] = obj;
@@ -82,6 +82,7 @@
 					namespace["uri"] = namespaces[namespace["name"]];
 					break;
 				}
+				obj = obj.parentNode;
 			}
 			!name && (
 				obj = document.documentElement,
@@ -107,7 +108,7 @@
 			}
 			function appendChildNodes(obj) {
 				let fragment = document.createDocumentFragment();
-				for(let child, i = 0, l = obj.childNodes.length; i < l; i++) {
+				for(let child, i = 0, l = obj.childNodes.length; i < l; i = (i + 1) | 0) {
 					child = obj.childNodes[i];
 					switch(child.nodeType) {
 						case 1:
@@ -126,7 +127,7 @@
 				if(nodes && element) {
 					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
 					if(nodes.attributes) {
-						for(let attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i++) {
+						for(let attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i = (i + 1) | 0) {
 							attr = nodes.attributes[i];
 							attrNs = getNamespace(attr, false);
 							typeof nodes[attr.name] !== "function" && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["prefix"] + attrNs["shortName"], attr.value);
@@ -141,7 +142,7 @@
 		function getDomTree(container, nodes) {
 			function createDom(obj) {
 				let fragment = document.createDocumentFragment();
-				for(let node, i = 0, l = obj.childNodes.length; i < l; i++) {
+				for(let node, i = 0, l = obj.childNodes.length; i < l; i = (i + 1) | 0) {
 					node = obj.childNodes[i];
 					switch(node.nodeType) {
 						case 1:
@@ -181,7 +182,7 @@
 		function onContentEditable(nodes) {
 			function getTextNode(obj) {
 				let array = [];
-				for(let node, i = 0, l = obj.childNodes.length; i < l; i++) {
+				for(let node, i = 0, l = obj.childNodes.length; i < l; i = (i + 1) | 0) {
 					node = obj.childNodes[i];
 					switch(true) {
 						case node.nodeType === 3:
@@ -197,7 +198,7 @@
 			}
 			function getTextNodeFromContent(obj) {
 				let array = [];
-				for(let node, container, i = 0, l = obj.childNodes.length; i < l; i++) {
+				for(let node, container, i = 0, l = obj.childNodes.length; i < l; i = (i + 1) | 0) {
 					node = obj.childNodes[i];
 					switch(true) {
 						case node.nodeType === 3:
@@ -225,7 +226,7 @@
 		function onViewSelection(sel) {
 			let fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
-				for(let range, element, i = 0, l = sel.rangeCount; i < l; i++) {
+				for(let range, element, i = 0, l = sel.rangeCount; i < l; i = (i + 1) | 0) {
 					range = sel.getRangeAt(i);
 					if(range.commonAncestorContainer.nodeType === 1) {
 						element = getNodeNs(range.commonAncestorContainer);

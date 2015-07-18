@@ -13,12 +13,12 @@
 		let nodes, i, l;
 		if(node) {
 			nodes = document.createDocumentFragment();
-			for(i = 0, l = array.length; i < l; i++) {
+			for(i = 0, l = array.length; i < l; i = (i + 1) | 0) {
 				nodes.appendChild(document.createTextNode(array[i]));
 				i < l - 1 && nodes.appendChild(document.createElement("br"));
 			}
 			if(node.hasChildNodes()) {
-				for(i = node.childNodes.length - 1, l = 0; i >= 0; i--) {
+				for(i = node.childNodes.length - 1; i >= 0; i = (i - 1) | 0) {
 					node.removeChild(node.childNodes[i]);
 				}
 			}
