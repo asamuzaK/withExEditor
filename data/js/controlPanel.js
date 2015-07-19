@@ -49,8 +49,8 @@
 
 		/* get radio button value if checked or not */
 		function getCheckedRadioButtonValue(name) {
-			for(var value, nodes = document.querySelectorAll("input[type=radio]"), node, i = 0, l = nodes.length; i < l; i = (i + 1) | 0) {
-				node = nodes[i];
+			var value, nodes = document.querySelectorAll("input[type=radio]"), node;
+			for(node of nodes) {
 				if(node.name && node.name === name && node.checked) {
 					node.value && (value = node.value); break;
 				}

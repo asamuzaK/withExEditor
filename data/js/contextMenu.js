@@ -108,8 +108,7 @@
 			}
 			function appendChildNodes(obj) {
 				let fragment = document.createDocumentFragment();
-				for(let child, i = 0, l = obj.childNodes.length; i < l; i = (i + 1) | 0) {
-					child = obj.childNodes[i];
+				for(let child of obj) {
 					switch(child.nodeType) {
 						case 1:
 							fragment.appendChild(getElement(child, child)); break;
@@ -125,10 +124,10 @@
 				node = getNamespace(node, true);
 				element = node["shortName"] && document.createElementNS(node["namespace"] || namespaces["html"], node["shortName"]);
 				if(nodes && element) {
-					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
+					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes.childNodes));
 					if(nodes.attributes) {
-						for(let attr, attrNs, i = 0, l = nodes.attributes.length; i < l; i = (i + 1) | 0) {
-							attr = nodes.attributes[i];
+						let nodesAttr = nodes.attributes, attrNs;
+						for(let attr of nodesAttr) {
 							attrNs = getNamespace(attr, false);
 							typeof nodes[attr.name] !== "function" && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["prefix"] + attrNs["shortName"], attr.value);
 						}
@@ -182,24 +181,22 @@
 		function onContentEditable(nodes) {
 			function getTextNode(obj) {
 				let array = [];
-				for(let node, i = 0, l = obj.childNodes.length; i < l; i = (i + 1) | 0) {
-					node = obj.childNodes[i];
+				for(let node of obj) {
 					switch(true) {
 						case node.nodeType === 3:
 							array[array.length] = node.nodeValue; break;
 						case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
 							array[array.length] = "\n"; break;
 						case node.nodeType === 1 && node.hasChildNodes():
-							array[array.length] = getTextNode(node); break;
+							array[array.length] = getTextNode(node.childNodes); break;
 						default:
 					}
 				}
 				return array.length > 0 ? array.join("") : "";
 			}
 			function getTextNodeFromContent(obj) {
-				let array = [];
-				for(let node, container, i = 0, l = obj.childNodes.length; i < l; i = (i + 1) | 0) {
-					node = obj.childNodes[i];
+				let array = [], container;
+				for(let node of obj.childNodes) {
 					switch(true) {
 						case node.nodeType === 3:
 							array[array.length] = node.nodeValue;
@@ -211,7 +208,7 @@
 							container = getElement(node);
 							container && container.nodeType === 1 && (
 								container = getDomTree(container, node),
-								array[array.length] = getTextNode(container)
+								container.hasChildNodes() && (array[array.length] = getTextNode(container.childNodes))
 							);
 							break;
 						default:
