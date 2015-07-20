@@ -96,25 +96,27 @@
 		/* create element */
 		function getElement(node, nodes) {
 			function getNamespace(obj, bool) {
-				let elementNameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase()),
-					prefix = elementNameParts[1] || null,
-					shortName = elementNameParts[2],
-					namespace = prefix && namespaces[prefix] ? namespaces[prefix] : null;
-				return {
-					"namespace": namespace ? namespace : bool ? getNodeNs(obj).uri : null,
-					"prefix": prefix ? `${ prefix }:` : "",
-					"shortName": shortName
-				};
+				if(obj) {
+					let nameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase()),
+						prefix = nameParts[1] || null,
+						shortName = nameParts[2],
+						namespace = prefix && namespaces[prefix] ? namespaces[prefix] : null;
+					return {
+						"namespace": namespace ? namespace : bool ? getNodeNs(obj).uri : null,
+						"prefix": prefix ? `${ prefix }:` : "",
+						"shortName": shortName
+					};
+				}
+				else {
+					return false;
+				}
 			}
 			function appendChildNodes(obj) {
 				let fragment = document.createDocumentFragment();
-				for(let child of obj) {
-					switch(child.nodeType) {
-						case 1:
-							fragment.appendChild(getElement(child, child)); break;
-						case 3:
-							fragment.appendChild(document.createTextNode(child.nodeValue)); break;
-						default:
+				if(obj && obj.hasChildNodes()) {
+					obj = obj.childNodes;
+					for(let child of obj) {
+						child.nodeType === 1 ? fragment.appendChild(getElement(child, child)) : child.nodeType === 3 && fragment.appendChild(document.createTextNode(child.nodeValue));
 					}
 				}
 				return fragment;
@@ -122,14 +124,14 @@
 			let element;
 			if(node) {
 				node = getNamespace(node, true);
-				element = node["shortName"] && document.createElementNS(node["namespace"] || namespaces["html"], node["shortName"]);
+				element = node && node["shortName"] && document.createElementNS(node["namespace"] || namespaces["html"], node["shortName"]);
 				if(nodes && element) {
-					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes.childNodes));
+					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
 					if(nodes.attributes) {
 						let nodesAttr = nodes.attributes, attrNs;
 						for(let attr of nodesAttr) {
 							attrNs = getNamespace(attr, false);
-							typeof nodes[attr.name] !== "function" && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["prefix"] + attrNs["shortName"], attr.value);
+							typeof nodes[attr.name] !== "function" && attrNs && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["prefix"] + attrNs["shortName"], attr.value);
 						}
 					}
 				}
@@ -141,18 +143,15 @@
 		function getDomTree(container, nodes) {
 			function createDom(obj) {
 				let fragment = document.createDocumentFragment();
-				for(let node, i = 0, l = obj.childNodes.length; i < l; i = (i + 1) | 0) {
-					node = obj.childNodes[i];
-					switch(node.nodeType) {
-						case 1:
-							i === 0 && fragment.appendChild(document.createTextNode("\n"));
-							fragment.appendChild(getElement(node, node));
-							i === l - 1 && fragment.appendChild(document.createTextNode("\n"));
-							break;
-						case 3:
-							fragment.appendChild(document.createTextNode(node.nodeValue));
-							break;
-						default:
+				if(obj && obj.hasChildNodes()) {
+					obj = obj.childNodes;
+					for(let node, i = 0, l = obj.length; i < l; i = (i + 1) | 0) {
+						node = obj[i];
+						node.nodeType === 1 ? (
+							i === 0 && fragment.appendChild(document.createTextNode("\n")),
+							fragment.appendChild(getElement(node, node)),
+							i === l - 1 && fragment.appendChild(document.createTextNode("\n"))
+						) : node.nodeType === 3 && fragment.appendChild(document.createTextNode(node.nodeValue));
 					}
 				}
 				return fragment;
@@ -181,42 +180,49 @@
 		function onContentEditable(nodes) {
 			function getTextNode(obj) {
 				let array = [];
-				for(let node of obj) {
-					switch(true) {
-						case node.nodeType === 3:
-							array[array.length] = node.nodeValue; break;
-						case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
-							array[array.length] = "\n"; break;
-						case node.nodeType === 1 && node.hasChildNodes():
-							array[array.length] = getTextNode(node.childNodes); break;
-						default:
+				if(obj && obj.hasChildNodes()) {
+					obj = obj.childNodes;
+					for(let node of obj) {
+						switch(true) {
+							case node.nodeType === 3:
+								array[array.length] = node.nodeValue; break;
+							case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
+								array[array.length] = "\n"; break;
+							case node.nodeType === 1 && node.hasChildNodes():
+								array[array.length] = getTextNode(node); break;
+							default:
+						}
 					}
 				}
 				return array.length > 0 ? array.join("") : "";
 			}
 			function getTextNodeFromContent(obj) {
-				let array = [], container;
-				for(let node of obj.childNodes) {
-					switch(true) {
-						case node.nodeType === 3:
-							array[array.length] = node.nodeValue;
-							break;
-						case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
-							array[array.length] = "\n";
-							break;
-						case node.nodeType === 1 && node.hasChildNodes():
-							container = getElement(node);
-							container && container.nodeType === 1 && (
-								container = getDomTree(container, node),
-								container.hasChildNodes() && (array[array.length] = getTextNode(container.childNodes))
-							);
-							break;
-						default:
+				let array = [];
+				if(obj && obj.hasChildNodes()) {
+					let container;
+					obj = obj.childNodes;
+					for(let node of obj) {
+						switch(true) {
+							case node.nodeType === 3:
+								array[array.length] = node.nodeValue;
+								break;
+							case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
+								array[array.length] = "\n";
+								break;
+							case node.nodeType === 1 && node.hasChildNodes():
+								container = getElement(node);
+								container && container.nodeType === 1 && (
+									container = getDomTree(container, node),
+									container.hasChildNodes() && (array[array.length] = getTextNode(container))
+								);
+								break;
+							default:
+						}
 					}
 				}
 				return array.length > 0 ? array.join("") : "";
 			}
-			return nodes ? getTextNodeFromContent(nodes) : "";
+			return nodes && nodes.hasChildNodes() ? getTextNodeFromContent(nodes) : "";
 		}
 
 		/* create DOM from range and get childNodes */
@@ -240,10 +246,12 @@
 						}
 						fragment.appendChild(getDomTree(range.commonAncestorContainer, range.cloneContents()));
 					}
-					else if(range.commonAncestorContainer.nodeType === 3) {
-						element = getElement(range.commonAncestorContainer.parentNode);
-						element.appendChild(document.createTextNode(range.commonAncestorContainer.nodeValue));
-						fragment.appendChild(element);
+					else {
+						range.commonAncestorContainer.nodeType === 3 && (
+							element = getElement(range.commonAncestorContainer.parentNode),
+							element.appendChild(document.createTextNode(range.commonAncestorContainer.nodeValue)),
+							fragment.appendChild(element)
+						);
 					}
 					i < l - 1 && fragment.appendChild(document.createTextNode("\n\n"));
 				}
