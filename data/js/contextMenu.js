@@ -96,7 +96,7 @@
 		/* create element */
 		function getElement(node, nodes) {
 			function getNamespace(obj, bool) {
-				if(obj) {
+				if(obj && obj.nodeName) {
 					let nameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase()),
 						prefix = nameParts[1] || null,
 						shortName = nameParts[2],
