@@ -5,7 +5,7 @@
 p {
 	display: flex;
 	flex-flow: row wrap;
-	margin: 0;
+	margin: 0.25em 0;
 	vertical-align: middle;
 }
 span {
@@ -29,6 +29,11 @@ label[for=buttonIconGray] {
 label[for=buttonIconWhite] {
 	background-color: #4D4E53;
 }
+label[for=editorLabel] {
+	display: block;
+	margin: 0 0 0.5em;
+	width: 100%;
+}
 label + input[type=radio] {
 	margin-left: 1em;
 }
@@ -44,14 +49,4 @@ img {
 	margin: auto;
 	width: 16px;
 	height: 16px;
-}
-a {
-	display: inline-block;
-}
-a::before {
-	display: inline-block;
-	margin-left: 0.5em;
-	width: 1em;
-	content: "> ";
-	text-decoration: none;
 }

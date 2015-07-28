@@ -11,12 +11,10 @@
 			buttonIconWhite = document.getElementById("buttonIconWhite"),
 			selectIcon = document.getElementById("selectIcon"),
 			currentEditorName = document.getElementById("currentEditorName"),
-			selectEditor = document.getElementById("selectEditor"),
 			editorName = document.getElementById("editorName"),
 			editorLabel = document.getElementById("editorLabel"),
 			storeLabel = document.getElementById("storeLabel"),
-			accessKey = document.getElementById("accessKey"),
-			setKey = document.getElementById("setKey");
+			addonManagerLink = document.getElementById("addonManagerLink");
 
 		/* for back compat prior to Fx39 */
 		var iconColorLabel = document.querySelector("label[data-l10n-id=IconColorLabel]"),
@@ -61,8 +59,7 @@
 		/* event handlers */
 		function addonPortEmit(evt) {
 			var settings = {
-					"editorName": editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : "",
-					"accessKey": accessKey && accessKey.value ? accessKey.value : ""
+					"editorName": editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : ""
 				},
 				icon = buttonIcon && getCheckedRadioButtonValue(buttonIcon.name);
 			icon && (settings["toolbarButtonIcon"] = icon);
@@ -86,7 +83,6 @@
 					),
 					editorLabel.value = editorName.value
 				),
-				accessKey && (accessKey.value = res["accessKey"] ? res["accessKey"] : ""),
 				toggleFieldset()
 			);
 		});
@@ -102,7 +98,6 @@
 				),
 				editorLabel && (editorLabel.placeholder = res["editorLabel"]),
 				storeLabel && (storeLabel.value = res["submit"]),
-				setKey && (setKey.value = res["submit"]),
 				/* back compat localize attributes prior to Fx39 */
 				(res["compat"] < 0 || isNaN(res["compat"])) && (
 					iconColorLabel && (iconColorLabel.ariaLabel = res["iconColorLabel"]),
@@ -111,8 +106,7 @@
 					buttonIconGray && (buttonIconGray.alt = res["iconGrayAlt"]),
 					iconWhiteLabel && (iconWhiteLabel.ariaLabel = res["iconWhiteLabel"]),
 					buttonIconWhite && (buttonIconWhite.alt = res["iconWhiteAlt"]),
-					currentEditorName && (currentEditorName.ariaLabel = res["currentEditorNameLabel"]),
-					accessKey && (accessKey.placeholder = res["accessKeyPlaceholder"])
+					currentEditorName && (currentEditorName.ariaLabel = res["currentEditorNameLabel"])
 				)
 			);
 		});
@@ -125,7 +119,7 @@
 		buttonIcon && buttonIcon.addEventListener("change", isRadioChecked, false);
 		buttonIconGray && buttonIconGray.addEventListener("change", isRadioChecked, false);
 		buttonIconWhite && buttonIconWhite.addEventListener("change", isRadioChecked, false);
-		selectEditor && selectEditor.addEventListener("click", evt => {
+		addonManagerLink && addonManagerLink.addEventListener("click", evt => {
 			evt && (
 				evt.type && evt.target && evt.target.href && addon.port.emit(evt.type, evt.target.href),
 				evt.preventDefault()

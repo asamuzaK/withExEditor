@@ -1,0 +1,6 @@
+#jpmignore
+*.xpi
+.git/
+.jpmignore
+README.*
+test/

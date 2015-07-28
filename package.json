@@ -12,6 +12,12 @@
 			"title": "Select Editor"
 		},
 		{
+			"type": "string",
+			"name": "WithExEditorPrefsAccessKey",
+			"title": "Access key on context menu",
+			"value": "e"
+		},
+		{
 			"type": "bool",
 			"name": "WithExEditorPrefsEnablePB",
 			"title": "Enable during Private Browsing"
@@ -25,8 +31,8 @@
 	"permissions": {
 		"private-browsing": true
 	},
-	"icon": "data/img/icon.png",
+	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.19.0"
+	"version": "0.19.1"
 }
