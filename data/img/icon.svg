@@ -25,10 +25,10 @@
 			fill: #e66000;
 		}
 		#gray rect, #gray line {
-			stroke: GrayText;
+			stroke: #4c4c4c;
 		}
 		#gray polygon {
-			fill: GrayText;
+			fill: #4c4c4c;
 		}
 		#white rect, #white line {
 			stroke: #fff;
