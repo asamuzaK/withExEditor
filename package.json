@@ -31,8 +31,13 @@
 	"permissions": {
 		"private-browsing": true
 	},
+	"locales": {
+		"ja": {
+			"description": "外部エディターでソースや選択部分を表示、またはテキストを編集"
+		}
+	},
 	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.20.0"
+	"version": "0.20.1"
 }

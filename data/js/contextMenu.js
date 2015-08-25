@@ -5,7 +5,9 @@
 	"use strict";
 	/* set context menu item label */
 	self.on("context", () => {
-		let element = document.activeElement, selection = window.getSelection(), label;
+		const element = document.activeElement;
+		const selection = window.getSelection();
+		let label;
 		switch(true) {
 			case /^input$/i.test(element.nodeName) && element.hasAttribute("type") && element.getAttribute("type") === "text" || /^textarea$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
 				label = "EditText"; break;
@@ -260,7 +262,8 @@
 		}
 
 		/* switch mode by context */
-		let selection = window.getSelection(), targetObj, nodeValue;
+		const selection = window.getSelection();
+		let targetObj, nodeValue;
 		if(selection.isCollapsed) {
 			targetObj = document.activeElement;
 			switch(true) {

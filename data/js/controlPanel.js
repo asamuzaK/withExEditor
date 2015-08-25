@@ -21,7 +21,7 @@
 			iconGrayLabel = document.querySelector("label[data-l10n-id=IconGrayLabel]"),
 			iconWhiteLabel = document.querySelector("label[data-l10n-id=IconWhiteLabel]");
 
-		/* modules */
+		/* remove child nodes */
 		function removeChildNodes(node) {
 			if(node && node.hasChildNodes()) {
 				for(var i = node.childNodes.length - 1; i >= 0; i = (i - 1) | 0) {
