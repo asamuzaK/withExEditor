@@ -29,7 +29,8 @@
 		}
 	],
 	"permissions": {
-		"private-browsing": true
+		"private-browsing": true,
+		"multiprocess": true
 	},
 	"locales": {
 		"ja": {
@@ -39,5 +40,5 @@
 	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.20.2"
+	"version": "0.20.3"
 }
