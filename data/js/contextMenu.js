@@ -9,7 +9,7 @@
 		const selection = window.getSelection();
 		let label;
 		switch(true) {
-			case /^input$/i.test(element.nodeName) && element.hasAttribute("type") && element.getAttribute("type") === "text" || /^textarea$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
+			case /^input$/i.test(element.nodeName) && element.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(element.getAttribute("type")) || /^textarea$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
 				label = "EditText"; break;
 			case !selection.isCollapsed:
 				label = "ViewSelection"; break;
@@ -267,7 +267,7 @@
 		if(selection.isCollapsed) {
 			targetObj = document.activeElement;
 			switch(true) {
-				case /^input$/i.test(targetObj.nodeName) && targetObj.hasAttribute("type") && targetObj.getAttribute("type") === "text" || /^textarea$/i.test(targetObj.nodeName):
+				case /^input$/i.test(targetObj.nodeName) && targetObj.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(targetObj.getAttribute("type")) || /^textarea$/i.test(targetObj.nodeName):
 					nodeValue = onEditText(targetObj) + (targetObj.value ? targetObj.value : ""); break;
 				case /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
 					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
