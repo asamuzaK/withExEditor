@@ -26,6 +26,12 @@
 			"type": "bool",
 			"name": "WithExEditorPrefsForceRemove",
 			"title": "Force to remove the temporary files at shutdown"
+		},
+		{
+			"type": "string",
+			"name": "WithExEditorPrefsEnvDisplay",
+			"title": "DISPLAY environment variable (Linux)",
+			"value": ""
 		}
 	],
 	"permissions": {
@@ -40,5 +46,5 @@
 	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.20.5"
+	"version": "0.20.6"
 }
