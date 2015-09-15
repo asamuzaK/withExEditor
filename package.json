@@ -46,5 +46,5 @@
 	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.20.10"
+	"version": "0.20.11"
 }
