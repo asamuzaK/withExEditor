@@ -9,12 +9,12 @@
 	function setContentEditableText(node, array = [""]) {
 		if(node) {
 			let nodes = document.createDocumentFragment(), i, l;
-			for(i = 0, l = array.length; i < l; i = (i + 1) | 0) {
+			for(i = 0, l = array.length; i < l; i = i + 1) {
 				nodes.appendChild(document.createTextNode(array[i]));
 				i < l - 1 && nodes.appendChild(document.createElement("br"));
 			}
 			if(node.hasChildNodes()) {
-				for(i = node.childNodes.length - 1; i >= 0; i = (i - 1) | 0) {
+				for(i = node.childNodes.length - 1; i >= 0; i = i - 1) {
 					node.removeChild(node.childNodes[i]);
 				}
 			}

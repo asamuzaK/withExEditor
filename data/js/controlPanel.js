@@ -24,7 +24,7 @@
 		/* remove child nodes */
 		function removeChildNodes(node) {
 			if(node && node.hasChildNodes()) {
-				for(var i = node.childNodes.length - 1; i >= 0; i = (i - 1) | 0) {
+				for(var i = node.childNodes.length - 1; i >= 0; i = i - 1) {
 					node.removeChild(node.childNodes[i]);
 				}
 			}

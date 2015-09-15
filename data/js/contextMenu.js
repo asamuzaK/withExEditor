@@ -147,7 +147,7 @@
 				let fragment = document.createDocumentFragment();
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
-					for(let node, i = 0, l = obj.length; i < l; i = (i + 1) | 0) {
+					for(let node, i = 0, l = obj.length; i < l; i = i + 1) {
 						node = obj[i];
 						node.nodeType === 1 ? (
 							i === 0 && fragment.appendChild(document.createTextNode("\n")),
@@ -231,7 +231,7 @@
 		function onViewSelection(sel) {
 			let fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
-				for(let range, element, i = 0, l = sel.rangeCount; i < l; i = (i + 1) | 0) {
+				for(let range, element, i = 0, l = sel.rangeCount; i < l; i = i + 1) {
 					range = sel.getRangeAt(i);
 					if(range.commonAncestorContainer.nodeType === 1) {
 						element = getNodeNs(range.commonAncestorContainer);
