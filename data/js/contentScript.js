@@ -4,6 +4,9 @@
 (() => {
 	"use strict";
 	const DATA_ID = "data-with_ex_editor_id";
+	const element = document.activeElement;
+	const target = self.options["target"] || "";
+	const value = self.options["value"] || "";
 
 	/* set content editable element text */
 	function setContentEditableText(node, array = [""]) {
@@ -23,8 +26,5 @@
 	}
 
 	/* get target element and and sync text value */
-	let element = document.activeElement,
-		target = self.options["target"] || "",
-		value = self.options["value"] || "";
 	element.hasAttribute(DATA_ID) && element.getAttribute(DATA_ID) === target && (/^(?:input|textarea)$/i.test(element.nodeName) ? element.value = value : element.contentEditable && setContentEditableText(element, value.split("\n")));
 })();

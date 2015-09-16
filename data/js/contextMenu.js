@@ -99,10 +99,10 @@
 		function getElement(node, nodes) {
 			function getNamespace(obj, bool) {
 				if(obj && obj.nodeName) {
-					let nameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase()),
-						prefix = nameParts[1] || null,
-						shortName = nameParts[2],
-						namespace = prefix && namespaces[prefix] ? namespaces[prefix] : null;
+					const nameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase());
+					const prefix = nameParts[1] || null;
+					const shortName = nameParts[2];
+					const namespace = prefix && namespaces[prefix] ? namespaces[prefix] : null;
 					return {
 						"namespace": namespace ? namespace : bool ? getNodeNs(obj).uri : null,
 						"prefix": prefix ? `${ prefix }:` : "",
@@ -130,7 +130,8 @@
 				if(nodes && element) {
 					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
 					if(nodes.attributes) {
-						let nodesAttr = nodes.attributes, attrNs;
+						const nodesAttr = nodes.attributes;
+						let attrNs;
 						for(let attr of nodesAttr) {
 							attrNs = getNamespace(attr, false);
 							typeof nodes[attr.name] !== "function" && attrNs && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["prefix"] + attrNs["shortName"], attr.value);
