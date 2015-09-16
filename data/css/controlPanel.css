@@ -38,7 +38,7 @@ label + input[type=radio] {
 	margin-left: 1em;
 }
 input[type=text] {
-	max-width: 15em;
+	max-width: calc(100% - 4px);
 }
 img {
 	position: absolute;
