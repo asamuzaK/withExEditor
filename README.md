@@ -18,5 +18,5 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 * If something fails during "View Selection" or "Edit Text" mode, it will switch to "View Source" mode. (Or, just fail and do nothing.)
 * When selecting editor on Mac, pick the file under /Applications/[yourEditor].app/Contents/MacOS/ directory.
 * You can choose whether to use in Private Browsing.
-* You can choose whether or not to forcibly remove the temporary files at the end (of Private Browsing, or when you quit Firefox). (This may cause problem, it depends on editor setting)
+* You can choose whether or not to forcibly remove the temporary files at the end (of Private Browsing, or when you quit Firefox). (This may cause problem, it depends on editor setting.)
 
