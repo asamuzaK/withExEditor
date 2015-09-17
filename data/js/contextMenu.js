@@ -131,9 +131,8 @@
 					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
 					if(nodes.attributes) {
 						const nodesAttr = nodes.attributes;
-						let attrNs;
 						for(let attr of nodesAttr) {
-							attrNs = getNamespace(attr, false);
+							const attrNs = getNamespace(attr, false);
 							typeof nodes[attr.name] !== "function" && attrNs && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["prefix"] + attrNs["shortName"], attr.value);
 						}
 					}
@@ -202,7 +201,6 @@
 			function getTextNodeFromContent(obj) {
 				let array = [];
 				if(obj && obj.hasChildNodes()) {
-					let container;
 					obj = obj.childNodes;
 					for(let node of obj) {
 						switch(true) {
@@ -213,7 +211,7 @@
 								array[array.length] = "\n";
 								break;
 							case node.nodeType === 1 && node.hasChildNodes():
-								container = getElement(node);
+								let container = getElement(node);
 								container && container.nodeType === 1 && (
 									container = getDomTree(container, node),
 									container.hasChildNodes() && (array[array.length] = getTextNode(container))
@@ -263,30 +261,32 @@
 		}
 
 		/* switch mode by context */
-		const selection = window.getSelection();
-		let targetObj, nodeValue;
-		if(selection.isCollapsed) {
-			targetObj = document.activeElement;
-			switch(true) {
-				case /^input$/i.test(targetObj.nodeName) && targetObj.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(targetObj.getAttribute("type")) || /^textarea$/i.test(targetObj.nodeName):
-					nodeValue = onEditText(targetObj) + (targetObj.value ? targetObj.value : ""); break;
-				case /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
-					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
-				default:
-					nodeValue = VIEW_SOURCE;
+		(() => {
+			const selection = window.getSelection();
+			let targetObj, nodeValue;
+			if(selection.isCollapsed) {
+				targetObj = document.activeElement;
+				switch(true) {
+					case /^input$/i.test(targetObj.nodeName) && targetObj.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(targetObj.getAttribute("type")) || /^textarea$/i.test(targetObj.nodeName):
+						nodeValue = onEditText(targetObj) + (targetObj.value ? targetObj.value : ""); break;
+					case /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
+						nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
+					default:
+						nodeValue = VIEW_SOURCE;
+				}
 			}
-		}
-		else {
-			targetObj = selection.getRangeAt(0).commonAncestorContainer;
-			switch(true) {
-				case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
-					nodeValue = VIEW_SOURCE; break;
-				case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
-					nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
-				default:
-					nodeValue = onViewSelection(selection);
+			else {
+				targetObj = selection.getRangeAt(0).commonAncestorContainer;
+				switch(true) {
+					case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
+						nodeValue = VIEW_SOURCE; break;
+					case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
+						nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
+					default:
+						nodeValue = onViewSelection(selection);
+				}
 			}
-		}
-		self.postMessage(nodeValue);
+			self.postMessage(nodeValue);
+		})();
 	});
 })();

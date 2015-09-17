@@ -58,10 +58,10 @@
 
 	/* event handlers */
 	function selfPortEmit(evt) {
-		const settings = {
+		const icon = buttonIcon && getCheckedRadioButtonValue(buttonIcon.name);
+		let settings = {
 			"editorName": editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : ""
 		};
-		const icon = buttonIcon && getCheckedRadioButtonValue(buttonIcon.name);
 		icon && (settings["toolbarButtonIcon"] = icon);
 		evt && (
 			evt.type && self.port.emit(evt.type, settings),
