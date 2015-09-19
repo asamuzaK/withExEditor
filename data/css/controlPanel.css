@@ -40,6 +40,9 @@ label + input[type=radio] {
 input[type=text] {
 	max-width: calc(100% - 4px);
 }
+input[type=submit], button {
+	font-size: 0.9em;
+}
 img {
 	position: absolute;
 	top: 0;
