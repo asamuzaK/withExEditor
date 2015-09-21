@@ -5,13 +5,13 @@
 p {
 	display: flex;
 	flex-flow: row wrap;
-	margin: 0.25em 0;
+	margin: 0.2em 0;
 	vertical-align: middle;
 }
 span {
 	display: inline-block;
 	flex: 1 1 auto;
-	width: 15em;
+	width: 10em;
 }
 label[for^=buttonIcon] {
 	display: inline-block;
@@ -38,7 +38,7 @@ label + input[type=radio] {
 	margin-left: 1em;
 }
 input[type=text] {
-	max-width: calc(100% - 4px);
+	max-width: calc(100% - 1em);
 }
 input[type=submit], button {
 	font-size: 0.9em;
