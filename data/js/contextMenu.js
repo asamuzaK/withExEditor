@@ -3,18 +3,22 @@
 */
 (() => {
 	"use strict";
+	const selection = window.getSelection();
+	const activeElm = document.activeElement;
+	const EDIT_TEXT = "EditText";
+	const VIEW_SELECTION = "ViewSelection";
+	const VIEW_SOURCE = "ViewSource";
+
 	/* set context menu item label */
 	self.on("context", () => {
-		const element = document.activeElement;
-		const selection = window.getSelection();
 		let label;
 		switch(true) {
-			case /^input$/i.test(element.nodeName) && element.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(element.getAttribute("type")) || /^textarea$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
-				label = "EditText"; break;
+			case /^input$/i.test(activeElm.nodeName) && activeElm.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(activeElm.getAttribute("type")) || /^textarea$/i.test(activeElm.nodeName) || /^(?:contenteditabl|tru)e$/i.test(activeElm.contentEditable):
+				label = EDIT_TEXT; break;
 			case !selection.isCollapsed:
-				label = "ViewSelection"; break;
+				label = VIEW_SELECTION; break;
 			default:
-				label = "ViewSource";
+				label = VIEW_SOURCE;
 		}
 		self.postMessage(label);
 		return true;
@@ -22,8 +26,6 @@
 
 	/* get node value */
 	self.on("click", () => {
-		const VIEW_SOURCE = "mode=viewSource;";
-		const DATA_ID = "data-with_ex_editor_id";
 		const namespaces = {
 			"cc": "http://creativecommons.org/ns#",
 			"cnt": "http://www.w3.org/2008/content#",
@@ -67,11 +69,17 @@
 			"wdr": "http://www.w3.org/2007/05/powder#",
 			"wdrs": "http://www.w3.org/2007/05/powder-s#",
 			"xhv": "http://www.w3.org/1999/xhtml/vocab#",
+			"xi": "http://www.w3.org/2001/XInclude",
 			"xlink": "http://www.w3.org/1999/xlink",
 			"xml": "http://www.w3.org/XML/1998/namespace",
 			"xmlns": "http://www.w3.org/2000/xmlns/",
-			"xsd": "http://www.w3.org/2001/XMLSchema#"
+			"xsd": "http://www.w3.org/2001/XMLSchema#",
+			"xsl": "http://www.w3.org/1999/XSL/Transform",
+			"xul": "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 		};
+		const documentElm = document.documentElement;
+		const DATA_ID = "data-with_ex_editor_id";
+		const MODE_VIEW_SOURCE = `mode=${ VIEW_SOURCE };`;
 
 		/* get namespace of node from ancestor */
 		function getNodeNs(obj) {
@@ -87,10 +95,9 @@
 				obj = obj.parentNode;
 			}
 			!name && (
-				obj = document.documentElement,
-				namespace["node"] = obj,
-				namespace["name"] = obj.nodeName.toLowerCase(),
-				namespace["uri"] = obj.hasAttribute("xmlns") ? obj.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : null
+				namespace["node"] = documentElm,
+				namespace["name"] = documentElm.nodeName.toLowerCase(),
+				namespace["uri"] = documentElm.hasAttribute("xmlns") ? documentElm.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : null
 			);
 			return namespace;
 		}
@@ -175,7 +182,7 @@
 					}, false)
 				)
 			);
-			return id ? `mode=editText;target=${ id };value=` : VIEW_SOURCE;
+			return id ? `mode=${ EDIT_TEXT };target=${ id };value=` : MODE_VIEW_SOURCE;
 		}
 
 		/* get text node from editable content */
@@ -235,7 +242,7 @@
 					if(range.commonAncestorContainer.nodeType === 1) {
 						element = getNodeNs(range.commonAncestorContainer);
 						if(/^(?:svg|math)$/.test(element["name"])) {
-							if(element["node"] === document.documentElement) {
+							if(element["node"] === documentElm) {
 								fragment = null; break;
 							}
 							else {
@@ -257,31 +264,29 @@
 					i < l - 1 && fragment.appendChild(document.createTextNode("\n\n"));
 				}
 			}
-			return fragment && fragment.hasChildNodes() && window.XMLSerializer ? `mode=viewSelection;value=${ new XMLSerializer().serializeToString(fragment) }` : VIEW_SOURCE;
+			return fragment && fragment.hasChildNodes() && window.XMLSerializer ? `mode=${ VIEW_SELECTION };value=${ new XMLSerializer().serializeToString(fragment) }` : MODE_VIEW_SOURCE;
 		}
 
 		/* switch mode by context */
 		(() => {
-			const selection = window.getSelection();
-			let targetObj, nodeValue;
+			let nodeValue;
 			if(selection.isCollapsed) {
-				targetObj = document.activeElement;
 				switch(true) {
-					case /^input$/i.test(targetObj.nodeName) && targetObj.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(targetObj.getAttribute("type")) || /^textarea$/i.test(targetObj.nodeName):
-						nodeValue = onEditText(targetObj) + (targetObj.value ? targetObj.value : ""); break;
-					case /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
-						nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
+					case /^input$/i.test(activeElm.nodeName) && activeElm.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(activeElm.getAttribute("type")) || /^textarea$/i.test(activeElm.nodeName):
+						nodeValue = onEditText(activeElm) + (activeElm.value ? activeElm.value : ""); break;
+					case /^(?:contenteditabl|tru)e$/i.test(activeElm.contentEditable):
+						nodeValue = onEditText(activeElm) + onContentEditable(activeElm); break;
 					default:
-						nodeValue = VIEW_SOURCE;
+						nodeValue = MODE_VIEW_SOURCE;
 				}
 			}
 			else {
-				targetObj = selection.getRangeAt(0).commonAncestorContainer;
+				const container = selection.getRangeAt(0).commonAncestorContainer;
 				switch(true) {
-					case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
-						nodeValue = VIEW_SOURCE; break;
-					case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(targetObj.contentEditable):
-						nodeValue = onEditText(targetObj) + onContentEditable(targetObj); break;
+					case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === documentElm:
+						nodeValue = MODE_VIEW_SOURCE; break;
+					case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(container.contentEditable):
+						nodeValue = onEditText(container) + onContentEditable(container); break;
 					default:
 						nodeValue = onViewSelection(selection);
 				}
