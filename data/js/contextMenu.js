@@ -3,19 +3,18 @@
 */
 (() => {
 	"use strict";
-	const selection = window.getSelection();
-	const activeElm = document.activeElement;
 	const EDIT_TEXT = "EditText";
 	const VIEW_SELECTION = "ViewSelection";
 	const VIEW_SOURCE = "ViewSource";
 
 	/* set context menu item label */
 	self.on("context", () => {
+		const element = document.activeElement;
 		let label;
 		switch(true) {
-			case /^input$/i.test(activeElm.nodeName) && activeElm.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(activeElm.getAttribute("type")) || /^textarea$/i.test(activeElm.nodeName) || /^(?:contenteditabl|tru)e$/i.test(activeElm.contentEditable):
+			case /^input$/i.test(element.nodeName) && element.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(element.getAttribute("type")) || /^textarea$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
 				label = EDIT_TEXT; break;
-			case !selection.isCollapsed:
+			case !window.getSelection().isCollapsed:
 				label = VIEW_SELECTION; break;
 			default:
 				label = VIEW_SOURCE;
@@ -77,27 +76,27 @@
 			"xsl": "http://www.w3.org/1999/XSL/Transform",
 			"xul": "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 		};
-		const documentElm = document.documentElement;
 		const DATA_ID = "data-with_ex_editor_id";
 		const MODE_VIEW_SOURCE = `mode=${ VIEW_SOURCE };`;
 
 		/* get namespace of node from ancestor */
-		function getNodeNs(obj) {
+		function getNodeNs(node) {
 			let namespace = {}, name;
-			while(obj && obj.parentNode) {
-				name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(obj.nodeName.toLowerCase());
+			while(node && node.parentNode) {
+				name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName.toLowerCase());
 				if(name) {
-					namespace["node"] = obj;
+					namespace["node"] = node;
 					namespace["name"] = name[1] || name[2];
 					namespace["uri"] = namespaces[namespace["name"]];
 					break;
 				}
-				obj = obj.parentNode;
+				node = node.parentNode;
 			}
 			!name && (
-				namespace["node"] = documentElm,
-				namespace["name"] = documentElm.nodeName.toLowerCase(),
-				namespace["uri"] = documentElm.hasAttribute("xmlns") ? documentElm.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : null
+				node = document.documentElement,
+				namespace["node"] = node,
+				namespace["name"] = node.nodeName.toLowerCase(),
+				namespace["uri"] = node.hasAttribute("xmlns") ? node.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : null
 			);
 			return namespace;
 		}
@@ -242,7 +241,7 @@
 					if(range.commonAncestorContainer.nodeType === 1) {
 						element = getNodeNs(range.commonAncestorContainer);
 						if(/^(?:svg|math)$/.test(element["name"])) {
-							if(element["node"] === documentElm) {
+							if(element["node"] === document.documentElement) {
 								fragment = null; break;
 							}
 							else {
@@ -269,24 +268,26 @@
 
 		/* switch mode by context */
 		(() => {
-			let nodeValue;
+			const selection = window.getSelection();
+			let nodeValue, target;
 			if(selection.isCollapsed) {
+				target = document.activeElement;
 				switch(true) {
-					case /^input$/i.test(activeElm.nodeName) && activeElm.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(activeElm.getAttribute("type")) || /^textarea$/i.test(activeElm.nodeName):
-						nodeValue = onEditText(activeElm) + (activeElm.value ? activeElm.value : ""); break;
-					case /^(?:contenteditabl|tru)e$/i.test(activeElm.contentEditable):
-						nodeValue = onEditText(activeElm) + onContentEditable(activeElm); break;
+					case /^input$/i.test(target.nodeName) && target.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(target.getAttribute("type")) || /^textarea$/i.test(target.nodeName):
+						nodeValue = onEditText(target) + (target.value ? target.value : ""); break;
+					case /^(?:contenteditabl|tru)e$/i.test(target.contentEditable):
+						nodeValue = onEditText(target) + onContentEditable(target); break;
 					default:
 						nodeValue = MODE_VIEW_SOURCE;
 				}
 			}
 			else {
-				const container = selection.getRangeAt(0).commonAncestorContainer;
+				target = selection.getRangeAt(0).commonAncestorContainer;
 				switch(true) {
-					case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === documentElm:
+					case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
 						nodeValue = MODE_VIEW_SOURCE; break;
-					case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(container.contentEditable):
-						nodeValue = onEditText(container) + onContentEditable(container); break;
+					case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(target.contentEditable):
+						nodeValue = onEditText(target) + onContentEditable(target); break;
 					default:
 						nodeValue = onViewSelection(selection);
 				}
