@@ -13,6 +13,12 @@
 		},
 		{
 			"type": "string",
+			"name": "WithExEditorPrefsCmdArgs",
+			"title": "Command line options",
+			"value": ""
+		},
+		{
+			"type": "string",
 			"name": "WithExEditorPrefsAccessKey",
 			"title": "Access key on context menu",
 			"value": "e"
@@ -41,5 +47,5 @@
 	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.21.3"
+	"version": "0.21.4"
 }
