@@ -44,7 +44,10 @@ ex: `"Some Arg"`
 ### Force to remove the temporary files at shutdown
 * You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox. This may cause problem, it depends on the editor setting.
 
+### Initialize all settings when add-on is disabled
+* If checked, all stored data will be removed and all prefs settings will be initialized.
+
 ***
 
 ## Options in toobar button
-* You can choose icon color, and rename the label of the editor. You can open Addon Manager from here.
+* You can choose the icon color, you can rename the label of the editor, and you can open Addon Manager from here.
