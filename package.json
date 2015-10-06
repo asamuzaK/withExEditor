@@ -38,6 +38,11 @@
 			"type": "bool",
 			"name": "WithExEditorPrefsForceRemove",
 			"title": "Force to remove the temporary files at shutdown"
+		},
+		{
+			"type": "bool",
+			"name": "WithExEditorPrefsInitializeOnDisable",
+			"title": "Initialize all settings when add-on is disabled"
 		}
 	],
 	"permissions": {
@@ -47,5 +52,5 @@
 	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.21.12"
+	"version": "0.21.13"
 }
