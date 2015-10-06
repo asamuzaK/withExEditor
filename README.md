@@ -27,7 +27,7 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ### Command line options
 * Use when you want to start the editor with command line options.
-* When using back slash (`\`) charactor, it must be escapted with an extra back slash.
+* When using backslash (`\`) charactor, it must be escapted with an extra backslash.
 ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).
 ex: `"Some Arg"`
