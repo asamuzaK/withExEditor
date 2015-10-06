@@ -28,9 +28,9 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 ### Command line options
 * Use when you want to start the editor with command line options.
 * When using back slash (\) charactor, it must be escapted with an extra back slash.
-ex: `C:*\*\Windows`
+ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark.
-ex: `*"*Some Arg*"*`
+ex: `"Some Arg"`
 
 ### DISPLAY Environment Variable
 * For Linux only. Set this option if "Cannot open display" error occured. Maybe, you also need to set "xhost".
