@@ -7,7 +7,7 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 ## Usage
 
 ### View Source
-* Opens (X) HTML, JavaScript, CSS, SVG, XML source with the editor.
+* Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.
 * When browsing a local file, the local file will be opened directly.
 
 ### View Selection
@@ -27,9 +27,9 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ### Command line options
 * Use when you want to start the editor with command line options.
-* When using back slash (\) charactor, it must be escapted with an extra back slash.
+* When using back slash (`\`) charactor, it must be escapted with an extra back slash.
 ex: `C:\\Windows`
-* If argument contains space(s), quote them with the double quotation mark.
+* If argument contains space(s), quote them with the double quotation mark (`"`).
 ex: `"Some Arg"`
 
 ### DISPLAY Environment Variable
