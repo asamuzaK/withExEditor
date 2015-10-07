@@ -23,7 +23,7 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ### Select Editor
 * Choose the editor which you want to use.
-* When selecting an editor on Mac OSX, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
+* When selecting an editor on Mac OS X, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
 
 ### Command line options
 * Use when you want to start the editor with command line options.
