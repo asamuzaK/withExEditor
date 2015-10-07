@@ -19,7 +19,7 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ***
 
-## Options in Addon Manager
+## Options in Add-on Manager
 
 ### Select Editor
 * Choose the editor which you want to use.
@@ -50,4 +50,4 @@ ex: `"Some Arg"`
 ***
 
 ## Options in toobar button
-* You can choose the icon color, you can rename the label of the editor, and you can open Addon Manager from here.
+* You can choose the icon color, you can rename the label of the editor, and you can open Add-on Manager from here.
