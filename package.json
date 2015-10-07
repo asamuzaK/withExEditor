@@ -41,7 +41,7 @@
 		},
 		{
 			"type": "bool",
-			"name": "WithExEditorPrefsInitializeOnDisable",
+			"name": "WithExEditorPrefsOnDisable",
 			"title": "Initialize all settings when add-on is disabled"
 		}
 	],
@@ -52,5 +52,5 @@
 	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "0.21.16"
+	"version": "0.21.17"
 }
