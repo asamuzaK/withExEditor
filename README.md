@@ -32,7 +32,7 @@ ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).
 ex: `"Some Arg"`
 
-### DISPLAY Environment Variable
+### DISPLAY environment variable
 * For Linux only. Set this option if "Cannot open display" error occured. Maybe, you also need to set "xhost".
 
 ### Access key on context menu
