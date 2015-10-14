@@ -26,5 +26,7 @@
 	};
 
 	/* get target element and and sync text value */
-	element.hasAttribute(DATA_ID) && element.getAttribute(DATA_ID) === target && (/^(?:input|textarea)$/i.test(element.nodeName) ? element.value = value : element.contentEditable && setContentEditableText(element, value.split("\n")));
+	element.hasAttribute(DATA_ID) && element.getAttribute(DATA_ID) === target && (
+		/^(?:input|textarea)$/i.test(element.nodeName) ? element.value = value : element.contentEditable && setContentEditableText(element, value.split("\n"))
+	);
 })();

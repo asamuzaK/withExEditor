@@ -68,7 +68,8 @@
 			evt.preventDefault()
 		);
 	};
-	const isRadioChecked = evt => evt && evt.target && evt.target.checked && selfPortEmit(evt);
+	const isRadioChecked = evt =>
+		evt && evt.target && evt.target.checked && selfPortEmit(evt);
 
 	/* update control panel */
 	self.port.on("editorValue", res => {

@@ -13,9 +13,11 @@
 		let label;
 		switch(true) {
 			case /^input$/i.test(element.nodeName) && element.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(element.getAttribute("type")) || /^textarea$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
-				label = EDIT_TEXT; break;
+				label = EDIT_TEXT;
+				break;
 			case !window.getSelection().isCollapsed:
-				label = VIEW_SELECTION; break;
+				label = VIEW_SELECTION;
+				break;
 			default:
 				label = VIEW_SOURCE;
 		}
@@ -132,14 +134,21 @@
 			let element;
 			if(node) {
 				node = getNamespace(node, true);
-				element = node && node["shortName"] && document.createElementNS(node["namespace"] || namespaces["html"], node["shortName"]);
+				element = node && node["shortName"] && document.createElementNS(
+					node["namespace"] || namespaces["html"],
+					node["shortName"]
+				);
 				if(nodes && element) {
 					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
 					if(nodes.attributes) {
 						const nodesAttr = nodes.attributes;
 						for(let attr of nodesAttr) {
 							const attrNs = getNamespace(attr, false);
-							typeof nodes[attr.name] !== "function" && attrNs && attrNs["shortName"] && element.setAttributeNS(attrNs["namespace"] || "", attrNs["prefix"] + attrNs["shortName"], attr.value);
+							typeof nodes[attr.name] !== "function" && attrNs && attrNs["shortName"] && element.setAttributeNS(
+								attrNs["namespace"] || "",
+								attrNs["prefix"] + attrNs["shortName"],
+								attr.value
+							);
 						}
 					}
 				}
@@ -164,8 +173,8 @@
 				}
 				return fragment;
 			};
-			container = container ? getElement(container) : "";
-			container && container.nodeType === 1 ? nodes && nodes.hasChildNodes() && container.appendChild(createDom(nodes)) : container = document.createTextNode("");
+			container = container ? getElement(container) : document.createTextNode("");
+			container.nodeType === 1 && nodes && nodes.hasChildNodes() && container.appendChild(createDom(nodes));
 			return container;
 		};
 
@@ -193,11 +202,14 @@
 					for(let node of obj) {
 						switch(true) {
 							case node.nodeType === 3:
-								array[array.length] = node.nodeValue; break;
+								array[array.length] = node.nodeValue;
+								break;
 							case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
-								array[array.length] = "\n"; break;
+								array[array.length] = "\n";
+								break;
 							case node.nodeType === 1 && node.hasChildNodes():
-								array[array.length] = getTextNode(node); break;
+								array[array.length] = getTextNode(node);
+								break;
 							default:
 						}
 					}
@@ -220,7 +232,9 @@
 								let container = getElement(node);
 								container && container.nodeType === 1 && (
 									container = getDomTree(container, node),
-									container.hasChildNodes() && (array[array.length] = getTextNode(container))
+									container.hasChildNodes() && (
+										array[array.length] = getTextNode(container)
+									)
 								);
 								break;
 							default:
@@ -242,7 +256,8 @@
 						element = getNodeNs(range.commonAncestorContainer);
 						if(/^(?:svg|math)$/.test(element["name"])) {
 							if(element["node"] === document.documentElement) {
-								fragment = null; break;
+								fragment = null;
+								break;
 							}
 							else {
 								element["node"].parentNode && (
@@ -274,9 +289,11 @@
 				target = document.activeElement;
 				switch(true) {
 					case /^input$/i.test(target.nodeName) && target.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(target.getAttribute("type")) || /^textarea$/i.test(target.nodeName):
-						nodeValue = onEditText(target) + (target.value ? target.value : ""); break;
+						nodeValue = onEditText(target) + (target.value ? target.value : "");
+						break;
 					case /^(?:contenteditabl|tru)e$/i.test(target.contentEditable):
-						nodeValue = onEditText(target) + onContentEditable(target); break;
+						nodeValue = onEditText(target) + onContentEditable(target);
+						break;
 					default:
 						nodeValue = MODE_VIEW_SOURCE;
 				}
@@ -285,9 +302,11 @@
 				target = selection.getRangeAt(0).commonAncestorContainer;
 				switch(true) {
 					case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
-						nodeValue = MODE_VIEW_SOURCE; break;
+						nodeValue = MODE_VIEW_SOURCE;
+						break;
 					case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(target.contentEditable):
-						nodeValue = onEditText(target) + onContentEditable(target); break;
+						nodeValue = onEditText(target) + onContentEditable(target);
+						break;
 					default:
 						nodeValue = onViewSelection(selection);
 				}
