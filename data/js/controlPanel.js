@@ -28,7 +28,7 @@
 				node.removeChild(node.firstChild);
 			}
 		}
-	}
+	};
 
 	/* disable form inputs for editor label rename, if editor is not selected */
 	const toggleFieldset = () => {
@@ -43,7 +43,7 @@
 				storeLabel.setAttribute("disabled", "disabled")
 			)
 		);
-	}
+	};
 
 	/* get radio button value if checked or not */
 	const getCheckedRadioButtonValue = name => {
@@ -54,7 +54,7 @@
 			}
 		}
 		return value;
-	}
+	};
 
 	/* event handlers */
 	const selfPortEmit = evt => {
@@ -67,10 +67,10 @@
 			evt.type && self.port.emit(evt.type, settings),
 			evt.preventDefault()
 		);
-	}
+	};
 	const isRadioChecked = evt => {
 		evt && evt.target && evt.target.checked && selfPortEmit(evt);
-	}
+	};
 
 	/* update control panel */
 	self.port.on("editorValue", res => {

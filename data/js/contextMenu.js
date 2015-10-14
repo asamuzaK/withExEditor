@@ -99,7 +99,7 @@
 				namespace["uri"] = node.hasAttribute("xmlns") ? node.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : null
 			);
 			return namespace;
-		}
+		};
 
 		/* create element */
 		const getElement = (node, nodes) => {
@@ -118,7 +118,7 @@
 				else {
 					return false;
 				}
-			}
+			};
 			const appendChildNodes = obj => {
 				let fragment = document.createDocumentFragment();
 				if(obj && obj.hasChildNodes()) {
@@ -128,7 +128,7 @@
 					}
 				}
 				return fragment;
-			}
+			};
 			let element;
 			if(node) {
 				node = getNamespace(node, true);
@@ -145,7 +145,7 @@
 				}
 			}
 			return element ? element : document.createTextNode("");
-		}
+		};
 
 		/* create DOM tree */
 		const getDomTree = (container, nodes) => {
@@ -163,11 +163,11 @@
 					}
 				}
 				return fragment;
-			}
+			};
 			container = container ? getElement(container) : "";
 			container && container.nodeType === 1 ? nodes && nodes.hasChildNodes() && container.appendChild(createDom(nodes)) : container = document.createTextNode("");
 			return container;
-		}
+		};
 
 		/* set temporary ID to the target element */
 		const onEditText = target => {
@@ -182,7 +182,7 @@
 				)
 			);
 			return id ? `mode=${ EDIT_TEXT };target=${ id };value=` : MODE_VIEW_SOURCE;
-		}
+		};
 
 		/* get text node from editable content */
 		const onContentEditable = nodes => {
@@ -203,7 +203,7 @@
 					}
 				}
 				return array.length > 0 ? array.join("") : "";
-			}
+			};
 			const getTextNodeFromContent = obj => {
 				let array = [];
 				if(obj && obj.hasChildNodes()) {
@@ -228,9 +228,9 @@
 					}
 				}
 				return array.length > 0 ? array.join("") : "";
-			}
+			};
 			return nodes && nodes.hasChildNodes() ? getTextNodeFromContent(nodes) : "";
-		}
+		};
 
 		/* create DOM from range and get childNodes */
 		const onViewSelection = sel => {
@@ -264,7 +264,7 @@
 				}
 			}
 			return fragment && fragment.hasChildNodes() && window.XMLSerializer ? `mode=${ VIEW_SELECTION };value=${ new XMLSerializer().serializeToString(fragment) }` : MODE_VIEW_SOURCE;
-		}
+		};
 
 		/* switch mode by context */
 		(() => {
