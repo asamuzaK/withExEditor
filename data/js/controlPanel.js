@@ -22,7 +22,7 @@
 	const iconWhiteLabel = document.querySelector("label[data-l10n-id=IconWhiteLabel]");
 
 	/* remove child nodes */
-	function removeChildNodes(node) {
+	const removeChildNodes = node => {
 		if(node && node.hasChildNodes()) {
 			while(node.firstChild) {
 				node.removeChild(node.firstChild);
@@ -31,7 +31,7 @@
 	}
 
 	/* disable form inputs for editor label rename, if editor is not selected */
-	function toggleFieldset() {
+	const toggleFieldset = () => {
 		editorLabel && storeLabel && (
 			editorName && editorName.value && currentEditorName && currentEditorName.hasChildNodes() ? (
 				removeChildNodes(currentEditorName),
@@ -46,7 +46,7 @@
 	}
 
 	/* get radio button value if checked or not */
-	function getCheckedRadioButtonValue(name) {
+	const getCheckedRadioButtonValue = name => {
 		let value;
 		for(let node of inputRadios) {
 			if(node.name && node.name === name && node.checked) {
@@ -57,7 +57,7 @@
 	}
 
 	/* event handlers */
-	function selfPortEmit(evt) {
+	const selfPortEmit = evt => {
 		const icon = buttonIcon && getCheckedRadioButtonValue(buttonIcon.name);
 		let settings = {
 			"editorName": editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : ""
@@ -68,7 +68,7 @@
 			evt.preventDefault()
 		);
 	}
-	function isRadioChecked(evt) {
+	const isRadioChecked = evt => {
 		evt && evt.target && evt.target.checked && selfPortEmit(evt);
 	}
 

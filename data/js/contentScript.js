@@ -9,7 +9,7 @@
 	const value = self.options["value"] || "";
 
 	/* set content editable element text */
-	function setContentEditableText(node, array = [""]) {
+	const setContentEditableText = (node, array = [""]) => {
 		if(node) {
 			let nodes = document.createDocumentFragment();
 			for(let i = 0, l = array.length; i < l; i = i + 1) {

@@ -80,7 +80,7 @@
 		const MODE_VIEW_SOURCE = `mode=${ VIEW_SOURCE };`;
 
 		/* get namespace of node from ancestor */
-		function getNodeNs(node) {
+		const getNodeNs = node => {
 			let namespace = {}, name;
 			while(node && node.parentNode) {
 				name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName.toLowerCase());
@@ -102,8 +102,8 @@
 		}
 
 		/* create element */
-		function getElement(node, nodes) {
-			function getNamespace(obj, bool) {
+		const getElement = (node, nodes) => {
+			const getNamespace = (obj, bool) => {
 				if(obj && obj.nodeName) {
 					const nameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase());
 					const prefix = nameParts[1] || null;
@@ -119,7 +119,7 @@
 					return false;
 				}
 			}
-			function appendChildNodes(obj) {
+			const appendChildNodes = obj => {
 				let fragment = document.createDocumentFragment();
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
@@ -148,8 +148,8 @@
 		}
 
 		/* create DOM tree */
-		function getDomTree(container, nodes) {
-			function createDom(obj) {
+		const getDomTree = (container, nodes) => {
+			const createDom = obj => {
 				let fragment = document.createDocumentFragment();
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
@@ -170,7 +170,7 @@
 		}
 
 		/* set temporary ID to the target element */
-		function onEditText(target) {
+		const onEditText = target => {
 			let id;
 			target && (
 				target.hasAttribute(DATA_ID) ? id = target.getAttribute(DATA_ID) : (
@@ -185,8 +185,8 @@
 		}
 
 		/* get text node from editable content */
-		function onContentEditable(nodes) {
-			function getTextNode(obj) {
+		const onContentEditable = nodes => {
+			const getTextNode = obj => {
 				let array = [];
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
@@ -204,7 +204,7 @@
 				}
 				return array.length > 0 ? array.join("") : "";
 			}
-			function getTextNodeFromContent(obj) {
+			const getTextNodeFromContent = obj => {
 				let array = [];
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
@@ -233,7 +233,7 @@
 		}
 
 		/* create DOM from range and get childNodes */
-		function onViewSelection(sel) {
+		const onViewSelection = sel => {
 			let fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
 				for(let range, element, i = 0, l = sel.rangeCount; i < l; i = i + 1) {
