@@ -68,9 +68,7 @@
 			evt.preventDefault()
 		);
 	};
-	const isRadioChecked = evt => {
-		evt && evt.target && evt.target.checked && selfPortEmit(evt);
-	};
+	const isRadioChecked = evt => evt && evt.target && evt.target.checked && selfPortEmit(evt);
 
 	/* update control panel */
 	self.port.on("editorValue", res => {
@@ -111,21 +109,21 @@
 		);
 	});
 
-	/* event listeners */
-	window.addEventListener("load", evt => {
-		evt && evt.type && self.port.emit(evt.type);
-	}, false);
-	controlPanelForm && controlPanelForm.addEventListener("submit", selfPortEmit, false);
-	buttonIcon && buttonIcon.addEventListener("change", isRadioChecked, false);
-	buttonIconGray && buttonIconGray.addEventListener("change", isRadioChecked, false);
-	buttonIconWhite && buttonIconWhite.addEventListener("change", isRadioChecked, false);
-	openAddonManager && openAddonManager.addEventListener("click", evt => {
-		evt && (
-			evt.type && evt.target && evt.target.hasAttribute("data-href") && self.port.emit(evt.type, evt.target.getAttribute("data-href")),
-			evt.preventDefault()
-		);
-	}, false);
-
 	/* on initial run */
-	toggleFieldset();
+	(() => {
+		window.addEventListener("load", evt => {
+			evt && evt.type && self.port.emit(evt.type);
+		}, false);
+		controlPanelForm && controlPanelForm.addEventListener("submit", selfPortEmit, false);
+		buttonIcon && buttonIcon.addEventListener("change", isRadioChecked, false);
+		buttonIconGray && buttonIconGray.addEventListener("change", isRadioChecked, false);
+		buttonIconWhite && buttonIconWhite.addEventListener("change", isRadioChecked, false);
+		openAddonManager && openAddonManager.addEventListener("click", evt => {
+			evt && (
+				evt.type && evt.target && evt.target.hasAttribute("data-href") && self.port.emit(evt.type, evt.target.getAttribute("data-href")),
+				evt.preventDefault()
+			);
+		}, false);
+		toggleFieldset();
+	})();
 })();
