@@ -83,8 +83,8 @@
 
 		/**
 		*	get namespace of node from ancestor
-		*	@param { object } node
-		*	@returns { object }
+		*	@param {Object} node
+		*	@returns {Object}
 		*/
 		const getNodeNs = node => {
 			let namespace = {}, name;
@@ -109,9 +109,9 @@
 
 		/**
 		*	create elementNS, set attributeNS
-		*	@param { object } node - element node to create
-		*	@param { object } nodes - child nodes
-		*	@returns { object } - namespaced element containing child nodes
+		*	@param {Object} node - element node to create
+		*	@param {Object} nodes - child nodes
+		*	@returns {Object} - namespaced element containing child nodes, or text node
 		*/
 		const getElement = (node, nodes) => {
 			const getNamespace = (obj, bool) => {
@@ -167,9 +167,9 @@
 
 		/**
 		*	create DOM tree
-		*	@param { object } container - container element of the DOM tree
-		*	@param { object } nodes - child nodes
-		*	@returns { object } - DOM tree or text node
+		*	@param {Object} container - container element of the DOM tree
+		*	@param {Object} nodes - child nodes
+		*	@returns {Object} - DOM tree or text node
 		*/
 		const getDomTree = (container, nodes) => {
 			const createDom = obj => {
@@ -194,8 +194,8 @@
 
 		/**
 		*	set temporary ID to the target element and set event listener
-		*	@param { object } target - target element
-		*	@returns { string } - stringified value with ID
+		*	@param {Object} target - target element
+		*	@returns {string} - stringified value with ID
 		*/
 		const onEditText = target => {
 			let id;
@@ -213,8 +213,8 @@
 
 		/**
 		*	get text node from editable content
-		*	@param { object } nodes - text containing node
-		*	@returns { string }
+		*	@param {Object} nodes - text containing node
+		*	@returns {string}
 		*/
 		const onContentEditable = nodes => {
 			const getTextNode = obj => {
@@ -270,8 +270,8 @@
 
 		/**
 		*	create DOM from selection range and get childNodes
-		*	@param { object } sel - selection
-		*	@returns { string } - stringified values
+		*	@param {Object} sel - selection
+		*	@returns {string} - stringified values
 		*/
 		const onViewSelection = sel => {
 			let fragment = document.createDocumentFragment();
