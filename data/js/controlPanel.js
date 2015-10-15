@@ -110,7 +110,7 @@
 		);
 	});
 
-	/* on initial run */
+	/* add event listeners on initial run */
 	(() => {
 		window.addEventListener("load", evt => {
 			evt && evt.type && self.port.emit(evt.type);

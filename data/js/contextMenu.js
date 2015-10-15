@@ -81,7 +81,11 @@
 		const DATA_ID = "data-with_ex_editor_id";
 		const MODE_VIEW_SOURCE = `mode=${ VIEW_SOURCE };`;
 
-		/* get namespace of node from ancestor */
+		/**
+		*	get namespace of node from ancestor
+		*	@param { object } node
+		*	@returns { object }
+		*/
 		const getNodeNs = node => {
 			let namespace = {}, name;
 			while(node && node.parentNode) {
@@ -103,7 +107,12 @@
 			return namespace;
 		};
 
-		/* create element */
+		/**
+		*	create elementNS, set attributeNS
+		*	@param { object } node - element node to create
+		*	@param { object } nodes - child nodes
+		*	@returns { object } - namespaced element containing child nodes
+		*/
 		const getElement = (node, nodes) => {
 			const getNamespace = (obj, bool) => {
 				if(obj && obj.nodeName) {
@@ -156,7 +165,12 @@
 			return element ? element : document.createTextNode("");
 		};
 
-		/* create DOM tree */
+		/**
+		*	create DOM tree
+		*	@param { object } container - container element of the DOM tree
+		*	@param { object } nodes - child nodes
+		*	@returns { object } - DOM tree or text node
+		*/
 		const getDomTree = (container, nodes) => {
 			const createDom = obj => {
 				let fragment = document.createDocumentFragment();
@@ -178,7 +192,11 @@
 			return container;
 		};
 
-		/* set temporary ID to the target element */
+		/**
+		*	set temporary ID to the target element and set event listener
+		*	@param { object } target - target element
+		*	@returns { string } - stringified value with ID
+		*/
 		const onEditText = target => {
 			let id;
 			target && (
@@ -193,7 +211,11 @@
 			return id ? `mode=${ EDIT_TEXT };target=${ id };value=` : MODE_VIEW_SOURCE;
 		};
 
-		/* get text node from editable content */
+		/**
+		*	get text node from editable content
+		*	@param { object } nodes - text containing node
+		*	@returns { string }
+		*/
 		const onContentEditable = nodes => {
 			const getTextNode = obj => {
 				let array = [];
@@ -246,7 +268,11 @@
 			return nodes && nodes.hasChildNodes() ? getTextNodeFromContent(nodes) : "";
 		};
 
-		/* create DOM from range and get childNodes */
+		/**
+		*	create DOM from selection range and get childNodes
+		*	@param { object } sel - selection
+		*	@returns { string } - stringified values
+		*/
 		const onViewSelection = sel => {
 			let fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
