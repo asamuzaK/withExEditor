@@ -27,13 +27,13 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ### Command line options
 * Use when you want to start the editor with command line options.
-* When using backslash (`\`) character, it must be escapted with an extra backslash.
+* When using backslash (`\`) character, it must be escaped with an extra backslash.
 ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).
 ex: `"Some Arg"`
 
 ### DISPLAY environment variable
-* For Linux only. Set this option if "Cannot open display" error occured. Maybe, you also need to set "xhost".
+* For Linux only. Set this option if "Cannot open display" error occurred. Maybe, you also need to set "xhost".
 
 ### Access key on context menu
 * You can choose any key. But, it must be a single character.
@@ -49,5 +49,5 @@ ex: `"Some Arg"`
 
 ***
 
-## Options in toobar button
+## Options in toolbar button
 * You can choose the icon color, you can rename the label of the editor, and you can open Add-on Manager from here.
