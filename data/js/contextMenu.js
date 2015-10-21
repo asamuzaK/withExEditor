@@ -87,12 +87,12 @@
 		*	@returns {Object}
 		*/
 		const getNodeNs = node => {
-			let namespace = {
-					"node": null,
-					"name": null,
-					"uri": null
-				},
-				name;
+			const namespace = {
+				"node": null,
+				"name": null,
+				"uri": null
+			};
+			let name;
 			while(node && node.parentNode) {
 				name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName.toLowerCase());
 				if(name) {
@@ -136,7 +136,7 @@
 				}
 			};
 			const appendChildNodes = obj => {
-				let fragment = document.createDocumentFragment();
+				const fragment = document.createDocumentFragment();
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
 					for(let child of obj) {
@@ -178,10 +178,11 @@
 		*/
 		const getDomTree = (container, nodes) => {
 			const createDom = obj => {
-				let fragment = document.createDocumentFragment();
+				const fragment = document.createDocumentFragment();
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
-					for(let node, i = 0, l = obj.length; i < l; i = i + 1) {
+					const l = obj.length;
+					for(let node, i = 0; i < l; i = i + 1) {
 						node = obj[i];
 						node.nodeType === 1 ? (
 							i === 0 && fragment.appendChild(document.createTextNode("\n")),
@@ -223,7 +224,7 @@
 		*/
 		const onContentEditable = nodes => {
 			const getTextNode = obj => {
-				let array = [];
+				const array = [];
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
 					for(let node of obj) {
@@ -244,7 +245,7 @@
 				return array.length > 0 ? array.join("") : "";
 			};
 			const getTextNodeFromContent = obj => {
-				let array = [];
+				const array = [];
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
 					for(let node of obj) {
@@ -281,7 +282,8 @@
 		const onViewSelection = sel => {
 			let fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
-				for(let range, element, i = 0, l = sel.rangeCount; i < l; i = i + 1) {
+				const l = sel.rangeCount;
+				for(let range, element, i = 0; i < l; i = i + 1) {
 					range = sel.getRangeAt(i);
 					if(range.commonAncestorContainer.nodeType === 1) {
 						element = getNodeNs(range.commonAncestorContainer);

@@ -15,8 +15,9 @@
 	*/
 	const setContentEditableText = (node, array = [""]) => {
 		if(node) {
-			let nodes = document.createDocumentFragment();
-			for(let i = 0, l = array.length; i < l; i = i + 1) {
+			const nodes = document.createDocumentFragment();
+			const l = array.length;
+			for(let i = 0; i < l; i = i + 1) {
 				nodes.appendChild(document.createTextNode(array[i]));
 				i < l - 1 && nodes.appendChild(document.createElement("br"));
 			}
