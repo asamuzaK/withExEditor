@@ -12,7 +12,7 @@
 		const element = document.activeElement;
 		let label;
 		switch(true) {
-			case /^input$/i.test(element.nodeName) && element.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(element.getAttribute("type")) || /^textarea$/i.test(element.nodeName) || /^(?:contenteditabl|tru)e$/i.test(element.contentEditable):
+			case /^input$/i.test(element.nodeName) && element.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(element.getAttribute("type")) || /^textarea$/i.test(element.nodeName) || element.isContentEditable:
 				label = EDIT_TEXT;
 				break;
 			case !window.getSelection().isCollapsed:
@@ -87,22 +87,27 @@
 		*	@returns {Object}
 		*/
 		const getNodeNs = node => {
-			let namespace = {}, name;
+			let namespace = {
+					"node": null,
+					"name": null,
+					"uri": null
+				},
+				name;
 			while(node && node.parentNode) {
 				name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName.toLowerCase());
 				if(name) {
-					namespace["node"] = node;
-					namespace["name"] = name[1] || name[2];
-					namespace["uri"] = namespaces[namespace["name"]];
+					namespace.node = node;
+					namespace.name = name[1] || name[2];
+					namespace.uri = namespaces[namespace.name];
 					break;
 				}
 				node = node.parentNode;
 			}
 			!name && (
 				node = document.documentElement,
-				namespace["node"] = node,
-				namespace["name"] = node.nodeName.toLowerCase(),
-				namespace["uri"] = node.hasAttribute("xmlns") ? node.getAttribute("xmlns") : namespaces[namespace["name"]] ? namespaces[namespace["name"]] : null
+				namespace.node = node,
+				namespace.name = node.nodeName.toLowerCase(),
+				namespace.uri = node.hasAttribute("xmlns") ? node.getAttribute("xmlns") : namespaces[namespace.name] ? namespaces[namespace.name] : null
 			);
 			return namespace;
 		};
@@ -143,9 +148,9 @@
 			let element;
 			if(node) {
 				node = getNamespace(node, true);
-				element = node && node["shortName"] && document.createElementNS(
-					node["namespace"] || namespaces["html"],
-					node["shortName"]
+				element = node && node.shortName && document.createElementNS(
+					node.namespace || namespaces.html,
+					node.shortName
 				);
 				if(nodes && element) {
 					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
@@ -153,9 +158,9 @@
 						const nodesAttr = nodes.attributes;
 						for(let attr of nodesAttr) {
 							const attrNs = getNamespace(attr, false);
-							typeof nodes[attr.name] !== "function" && attrNs && attrNs["shortName"] && element.setAttributeNS(
-								attrNs["namespace"] || "",
-								attrNs["prefix"] + attrNs["shortName"],
+							typeof nodes[attr.name] !== "function" && attrNs && attrNs.shortName && element.setAttributeNS(
+								attrNs.namespace || "",
+								attrNs.prefix + attrNs.shortName,
 								attr.value
 							);
 						}
@@ -280,15 +285,15 @@
 					range = sel.getRangeAt(i);
 					if(range.commonAncestorContainer.nodeType === 1) {
 						element = getNodeNs(range.commonAncestorContainer);
-						if(/^(?:svg|math)$/.test(element["name"])) {
-							if(element["node"] === document.documentElement) {
+						if(/^(?:svg|math)$/.test(element.name)) {
+							if(element.node === document.documentElement) {
 								fragment = null;
 								break;
 							}
 							else {
-								element["node"].parentNode && (
-									range.setStart(element["node"].parentNode, 0),
-									range.setEnd(element["node"].parentNode, element["node"].parentNode.childNodes.length)
+								element.node.parentNode && (
+									range.setStart(element.node.parentNode, 0),
+									range.setEnd(element.node.parentNode, element.node.parentNode.childNodes.length)
 								);
 							}
 						}
@@ -317,7 +322,7 @@
 					case /^input$/i.test(target.nodeName) && target.hasAttribute("type") && /^(?:(?:emai|ur)l|te(?:l|xt)|search)$/.test(target.getAttribute("type")) || /^textarea$/i.test(target.nodeName):
 						nodeValue = onEditText(target) + (target.value ? target.value : "");
 						break;
-					case /^(?:contenteditabl|tru)e$/i.test(target.contentEditable):
+					case target.isContentEditable:
 						nodeValue = onEditText(target) + onContentEditable(target);
 						break;
 					default:
@@ -330,7 +335,7 @@
 					case selection.anchorNode === selection.focusNode && selection.anchorNode.parentNode === document.documentElement:
 						nodeValue = MODE_VIEW_SOURCE;
 						break;
-					case selection.rangeCount === 1 && /^(?:contenteditabl|tru)e$/i.test(target.contentEditable):
+					case selection.rangeCount === 1 && target.isContentEditable:
 						nodeValue = onEditText(target) + onContentEditable(target);
 						break;
 					default:
