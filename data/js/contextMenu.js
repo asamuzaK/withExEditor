@@ -37,6 +37,7 @@
 			"dcat": "http://www.w3.org/ns/dcat#",
 			"dcterms": "http://purl.org/dc/terms/",
 			"earl": "http://www.w3.org/ns/earl#",
+			"ev": "http://www.w3.org/2001/xml-events",
 			"foaf": "http://xmlns.com/foaf/0.1/",
 			"gr": "http://purl.org/goodrelations/v1#",
 			"grddl": "http://www.w3.org/2003/g/data-view#",
@@ -280,6 +281,14 @@
 		*	@returns {string} - stringified values
 		*/
 		const onViewSelection = sel => {
+			const removeChildNodes = node => {
+				if(node.hasChildNodes()) {
+					while(node.firstChild) {
+						node.removeChild(node.firstChild);
+					}
+				}
+				return node;
+			};
 			let fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
 				const l = sel.rangeCount;
@@ -303,8 +312,8 @@
 					}
 					else {
 						range.commonAncestorContainer.nodeType === 3 && (
-							element = getElement(range.commonAncestorContainer.parentNode),
-							element.appendChild(document.createTextNode(range.commonAncestorContainer.nodeValue)),
+							element = removeChildNodes(getElement(range.commonAncestorContainer.parentNode, range.commonAncestorContainer.parentNode)),
+							element.appendChild(range.cloneContents()),
 							fragment.appendChild(element)
 						);
 					}
