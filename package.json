@@ -9,40 +9,40 @@
 		{
 			"type": "file",
 			"name": "WithExEditorPrefsFile",
-			"title": "Select Editor"
+			"title": "Select The Editor"
 		},
 		{
 			"type": "string",
 			"name": "WithExEditorPrefsCmdArgs",
-			"title": "Command line options",
+			"title": "Command Line Options",
 			"value": ""
 		},
 		{
 			"type": "string",
 			"name": "WithExEditorPrefsEnvDisplay",
-			"title": "DISPLAY environment variable (Linux)",
+			"title": "DISPLAY Environment Variable (Linux)",
 			"value": ""
 		},
 		{
 			"type": "string",
 			"name": "WithExEditorPrefsAccessKey",
-			"title": "Access key on context menu",
+			"title": "Access Key On Context Menu",
 			"value": "e"
 		},
 		{
 			"type": "bool",
 			"name": "WithExEditorPrefsEnablePB",
-			"title": "Enable during Private Browsing"
+			"title": "Enable During Private Browsing"
 		},
 		{
 			"type": "bool",
 			"name": "WithExEditorPrefsForceRemove",
-			"title": "Force to remove the temporary files at shutdown"
+			"title": "Force To Remove The Temporary Files At Shutdown"
 		},
 		{
 			"type": "bool",
 			"name": "WithExEditorPrefsOnDisable",
-			"title": "Initialize all settings when add-on is disabled"
+			"title": "Initialize All Settings When Add-on Is Disabled"
 		}
 	],
 	"permissions": {
@@ -52,5 +52,5 @@
 	"icon": "icon.png",
 	"main": "lib/main.js",
 	"license": "MPL 2.0",
-	"version": "1.2.0-b.5"
+	"version": "1.2.0-b.6"
 }
