@@ -37,6 +37,7 @@
 			"dcat": "http://www.w3.org/ns/dcat#",
 			"dcterms": "http://purl.org/dc/terms/",
 			"earl": "http://www.w3.org/ns/earl#",
+			"em": "http://www.mozilla.org/2004/em-rdf#",
 			"ev": "http://www.w3.org/2001/xml-events",
 			"foaf": "http://xmlns.com/foaf/0.1/",
 			"gr": "http://purl.org/goodrelations/v1#",
@@ -116,13 +117,19 @@
 		/**
 		*	create elementNS, set attributeNS
 		*	@param {Object} node - element node to create
-		*	@param {Object} nodes - child nodes
-		*	@returns {Object} - namespaced element containing child nodes, or text node
+		*	@param {boolean} child - append child nodes
+		*	@returns {Object} - namespaced element, or text node
 		*/
-		const getElement = (node, nodes) => {
+		const getElement = (node, child = false) => {
+			/**
+			*	get namespace
+			*	@param {Object} obj - element node
+			*	@param {boolean} bool
+			*	@returns {Object|boolean}
+			*/
 			const getNamespace = (obj, bool) => {
 				if(obj && obj.nodeName) {
-					const nameParts = /^(?:(.*):)?(.*)$/.exec(obj.nodeName.toLowerCase());
+					const nameParts = /^(?:([\S]+):)?([\S]+)$/.exec(obj.nodeName.toLowerCase());
 					const prefix = nameParts[1] || null;
 					const shortName = nameParts[2];
 					const namespace = prefix && namespaces[prefix] ? namespaces[prefix] : null;
@@ -136,38 +143,59 @@
 					return false;
 				}
 			};
+			/**
+			*	create element NS
+			*	@param {Object} obj - node
+			*	@returns {?Object} - namespaced element
+			*/
+			const createElmNS = obj => {
+				const elm = getNamespace(obj, true);
+				return elm && elm.shortName ? document.createElementNS(
+					elm.namespace || namespaces.html,
+					elm.shortName
+				) : null;
+			};
+			/**
+			*	set attribute NS
+			*	@param {Object} elm - element
+			*	@param {Object} obj - node
+			*/
+			const setAttrNS = (elm, obj) => {
+				if(elm && obj) {
+					const nodeAttr = obj.attributes;
+					for(let attr of nodeAttr) {
+						const attrNs = getNamespace(attr, false);
+						typeof obj[attr.name] !== "function" && attrNs && attrNs.shortName && elm.setAttributeNS(
+							attrNs.namespace || "",
+							attrNs.prefix + attrNs.shortName,
+							attr.value
+						);
+					}
+				}
+			};
+			/**
+			*	append child nodes
+			*	@param {Object} obj - child nodes
+			*	@returns {Object} - document fragment
+			*/
 			const appendChildNodes = obj => {
 				const fragment = document.createDocumentFragment();
 				if(obj && obj.hasChildNodes()) {
 					obj = obj.childNodes;
 					for(let child of obj) {
-						child.nodeType === 1 ? fragment.appendChild(getElement(child, child)) : child.nodeType === 3 && fragment.appendChild(document.createTextNode(child.nodeValue));
+						child.nodeType === 1 ? fragment.appendChild(getElement(child, true)) : child.nodeType === 3 && fragment.appendChild(document.createTextNode(child.nodeValue));
 					}
 				}
 				return fragment;
 			};
 			let element;
-			if(node) {
-				node = getNamespace(node, true);
-				element = node && node.shortName && document.createElementNS(
-					node.namespace || namespaces.html,
-					node.shortName
-				);
-				if(nodes && element) {
-					nodes.hasChildNodes() && element.appendChild(appendChildNodes(nodes));
-					if(nodes.attributes) {
-						const nodesAttr = nodes.attributes;
-						for(let attr of nodesAttr) {
-							const attrNs = getNamespace(attr, false);
-							typeof nodes[attr.name] !== "function" && attrNs && attrNs.shortName && element.setAttributeNS(
-								attrNs.namespace || "",
-								attrNs.prefix + attrNs.shortName,
-								attr.value
-							);
-						}
-					}
-				}
-			}
+			node && (
+				element = createElmNS(node),
+				element && (
+					node.attributes && setAttrNS(element, node),
+					child && node.hasChildNodes() && element.appendChild(appendChildNodes(node))
+				)
+			);
 			return element ? element : document.createTextNode("");
 		};
 
@@ -177,7 +205,12 @@
 		*	@param {Object} nodes - child nodes
 		*	@returns {Object} - DOM tree or text node
 		*/
-		const getDomTree = (container, nodes) => {
+		const getDomTree = (container, nodes = null) => {
+			/**
+			*	create DOM
+			*	@param {Object} obj - child nodes
+			*	@returns {Object} - document fragment
+			*/
 			const createDom = obj => {
 				const fragment = document.createDocumentFragment();
 				if(obj && obj.hasChildNodes()) {
@@ -187,7 +220,7 @@
 						node = obj[i];
 						node.nodeType === 1 ? (
 							i === 0 && fragment.appendChild(document.createTextNode("\n")),
-							fragment.appendChild(getElement(node, node)),
+							fragment.appendChild(getElement(node, true)),
 							i === l - 1 && fragment.appendChild(document.createTextNode("\n"))
 						) : node.nodeType === 3 && fragment.appendChild(document.createTextNode(node.nodeValue));
 					}
@@ -221,9 +254,14 @@
 		/**
 		*	get text node from editable content
 		*	@param {Object} nodes - text containing node
-		*	@returns {string}
+		*	@returns {string} - text node
 		*/
 		const onContentEditable = nodes => {
+			/**
+			*	get text node
+			*	@param {Object} obj - node
+			*	@returns {string} - text node
+			*/
 			const getTextNode = obj => {
 				const array = [];
 				if(obj && obj.hasChildNodes()) {
@@ -245,6 +283,11 @@
 				}
 				return array.length > 0 ? array.join("") : "";
 			};
+			/**
+			*	get text node from content
+			*	@param {Object} obj - text containing node
+			*	@returns {string} - text node
+			*/
 			const getTextNodeFromContent = obj => {
 				const array = [];
 				if(obj && obj.hasChildNodes()) {
@@ -281,14 +324,6 @@
 		*	@returns {string} - stringified values
 		*/
 		const onViewSelection = sel => {
-			const removeChildNodes = node => {
-				if(node.hasChildNodes()) {
-					while(node.firstChild) {
-						node.removeChild(node.firstChild);
-					}
-				}
-				return node;
-			};
 			let fragment = document.createDocumentFragment();
 			if(sel && sel.rangeCount) {
 				const l = sel.rangeCount;
@@ -303,8 +338,9 @@
 							}
 							else {
 								element.node.parentNode && (
-									range.setStart(element.node.parentNode, 0),
-									range.setEnd(element.node.parentNode, element.node.parentNode.childNodes.length)
+									element = element.node.parentNode,
+									range.setStart(element, 0),
+									range.setEnd(element, element.childNodes.length)
 								);
 							}
 						}
@@ -312,7 +348,7 @@
 					}
 					else {
 						range.commonAncestorContainer.nodeType === 3 && (
-							element = removeChildNodes(getElement(range.commonAncestorContainer.parentNode, range.commonAncestorContainer.parentNode)),
+							element = getElement(range.commonAncestorContainer.parentNode),
 							element.appendChild(range.cloneContents()),
 							fragment.appendChild(element)
 						);
