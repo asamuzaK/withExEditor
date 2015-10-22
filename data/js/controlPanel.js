@@ -54,11 +54,11 @@
 
 	/**
 	*	get radio button value
-	*	@param {string} name
-	*	@returns {?string}
+	*	@param {string} name - radio button name
+	*	@returns {?string} - checked radio button value
 	*/
 	const getRadioButtonValue = name => {
-		let value;
+		let value = null;
 		for(let node of inputRadios) {
 			if(node.name && node.name === name && node.checked) {
 				node.value && (value = node.value);

@@ -10,23 +10,23 @@
 
 	/**
 	*	set content editable element text
-	*	@param {Object} node
+	*	@param {Object} node - editable element
 	*	@param {Array} array - array of values
 	*/
 	const setContentEditableText = (node, array = [""]) => {
 		if(node) {
-			const nodes = document.createDocumentFragment();
+			const fragment = document.createDocumentFragment();
 			const l = array.length;
 			for(let i = 0; i < l; i = i + 1) {
-				nodes.appendChild(document.createTextNode(array[i]));
-				i < l - 1 && nodes.appendChild(document.createElement("br"));
+				fragment.appendChild(document.createTextNode(array[i]));
+				i < l - 1 && fragment.appendChild(document.createElement("br"));
 			}
 			if(node.hasChildNodes()) {
 				while(node.firstChild) {
 					node.removeChild(node.firstChild);
 				}
 			}
-			node.appendChild(nodes);
+			node.appendChild(fragment);
 		}
 	};
 

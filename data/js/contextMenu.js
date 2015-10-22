@@ -118,7 +118,7 @@
 		*	create elementNS, set attributeNS
 		*	@param {Object} node - element node to create
 		*	@param {boolean} child - append child nodes
-		*	@returns {Object} - namespaced element, or text node
+		*	@returns {Object} - namespaced element or text node
 		*/
 		const getElement = (node, child = false) => {
 			/**
@@ -227,7 +227,7 @@
 				}
 				return fragment;
 			};
-			container = container ? getElement(container) : document.createTextNode("");
+			container = getElement(container);
 			container.nodeType === 1 && nodes && nodes.hasChildNodes() && container.appendChild(createDom(nodes));
 			return container;
 		};
@@ -260,7 +260,7 @@
 			/**
 			*	get text node
 			*	@param {Object} obj - node
-			*	@returns {string} - text node
+			*	@returns {string} - text
 			*/
 			const getTextNode = obj => {
 				const array = [];
@@ -286,7 +286,7 @@
 			/**
 			*	get text node from content
 			*	@param {Object} obj - text containing node
-			*	@returns {string} - text node
+			*	@returns {string} - text
 			*/
 			const getTextNodeFromContent = obj => {
 				const array = [];
