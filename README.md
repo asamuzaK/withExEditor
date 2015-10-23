@@ -21,30 +21,30 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ## Options in Add-on Manager
 
-### Select Editor
+### Select An Editor
 * Choose the editor which you want to use.
 * When selecting an editor on Mac OS X, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
 
-### Command line options
+### Command Line Options
 * Use when you want to start the editor with command line options.
 * When using backslash (`\`) character, it must be escaped with an extra backslash.
 ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).
 ex: `"Some Arg"`
 
-### DISPLAY environment variable
+### DISPLAY Environment Variable
 * For Linux only. Set this option if "Cannot open display" error occurred. Maybe, you also need to set "xhost".
 
-### Access key on context menu
+### Access Key On Context Menu
 * You can choose any key. But, it must be a single character.
 
-### Enable during Private Browsing
+### Enable During Private Browsing
 * Enables if checked, disabled if not.
 
-### Force to remove the temporary files at shutdown
+### Force To Remove The Temporary Files At Shutdown
 * You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox. This may cause problem, it depends on the editor setting.
 
-### Initialize all settings when add-on is disabled
+### Initialize All Settings When Add-on Is Disabled
 * If checked, all stored data will be removed and all prefs settings will be initialized.
 
 ***
