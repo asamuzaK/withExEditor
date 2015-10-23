@@ -28,57 +28,57 @@
 	/* get node value */
 	self.on("click", () => {
 		const namespaces = {
-			"cc": "http://creativecommons.org/ns#",
-			"cnt": "http://www.w3.org/2008/content#",
-			"csvw": "http://www.w3.org/ns/csvw#",
-			"ctag": "http://commontag.org/ns#",
-			"dc": "http://purl.org/dc/terms/",
-			"dc11": "http://purl.org/dc/elements/1.1/",
-			"dcat": "http://www.w3.org/ns/dcat#",
-			"dcterms": "http://purl.org/dc/terms/",
-			"earl": "http://www.w3.org/ns/earl#",
-			"em": "http://www.mozilla.org/2004/em-rdf#",
-			"ev": "http://www.w3.org/2001/xml-events",
-			"foaf": "http://xmlns.com/foaf/0.1/",
-			"gr": "http://purl.org/goodrelations/v1#",
-			"grddl": "http://www.w3.org/2003/g/data-view#",
-			"ht": "http://www.w3.org/2006/http#",
-			"html": "http://www.w3.org/1999/xhtml",
-			"ical": "http://www.w3.org/2002/12/cal/icaltzd#",
-			"ma": "http://www.w3.org/ns/ma-ont#",
-			"math": "http://www.w3.org/1998/Math/MathML",
-			"oa": "http://www.w3.org/ns/oa#",
-			"og": "http://ogp.me/ns#",
-			"org": "http://www.w3.org/ns/org#",
-			"owl": "http://www.w3.org/2002/07/owl#",
-			"prov": "http://www.w3.org/ns/prov#",
-			"ptr": "http://www.w3.org/2009/pointers#",
-			"qb": "http://purl.org/linked-data/cube#",
-			"rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-			"rdfa": "http://www.w3.org/ns/rdfa#",
-			"rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-			"rev": "http://purl.org/stuff/rev#",
-			"rif": "http://www.w3.org/2007/rif#",
-			"rr": "http://www.w3.org/ns/r2rml#",
-			"schema": "http://schema.org/",
-			"sd": "http://www.w3.org/ns/sparql-service-description#",
-			"sioc": "http://rdfs.org/sioc/ns#",
-			"skos": "http://www.w3.org/2004/02/skos/core#",
-			"skosxl": "http://www.w3.org/2008/05/skos-xl#",
-			"svg": "http://www.w3.org/2000/svg",
-			"v": "http://rdf.data-vocabulary.org/#",
-			"vcard": "http://www.w3.org/2006/vcard/ns#",
-			"void": "http://rdfs.org/ns/void#",
-			"wdr": "http://www.w3.org/2007/05/powder#",
-			"wdrs": "http://www.w3.org/2007/05/powder-s#",
-			"xhv": "http://www.w3.org/1999/xhtml/vocab#",
-			"xi": "http://www.w3.org/2001/XInclude",
-			"xlink": "http://www.w3.org/1999/xlink",
-			"xml": "http://www.w3.org/XML/1998/namespace",
-			"xmlns": "http://www.w3.org/2000/xmlns/",
-			"xsd": "http://www.w3.org/2001/XMLSchema#",
-			"xsl": "http://www.w3.org/1999/XSL/Transform",
-			"xul": "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+			cc: "http://creativecommons.org/ns#",
+			cnt: "http://www.w3.org/2008/content#",
+			csvw: "http://www.w3.org/ns/csvw#",
+			ctag: "http://commontag.org/ns#",
+			dc: "http://purl.org/dc/terms/",
+			dc11: "http://purl.org/dc/elements/1.1/",
+			dcat: "http://www.w3.org/ns/dcat#",
+			dcterms: "http://purl.org/dc/terms/",
+			earl: "http://www.w3.org/ns/earl#",
+			em: "http://www.mozilla.org/2004/em-rdf#",
+			ev: "http://www.w3.org/2001/xml-events",
+			foaf: "http://xmlns.com/foaf/0.1/",
+			gr: "http://purl.org/goodrelations/v1#",
+			grddl: "http://www.w3.org/2003/g/data-view#",
+			ht: "http://www.w3.org/2006/http#",
+			html: "http://www.w3.org/1999/xhtml",
+			ical: "http://www.w3.org/2002/12/cal/icaltzd#",
+			ma: "http://www.w3.org/ns/ma-ont#",
+			math: "http://www.w3.org/1998/Math/MathML",
+			oa: "http://www.w3.org/ns/oa#",
+			og: "http://ogp.me/ns#",
+			org: "http://www.w3.org/ns/org#",
+			owl: "http://www.w3.org/2002/07/owl#",
+			prov: "http://www.w3.org/ns/prov#",
+			ptr: "http://www.w3.org/2009/pointers#",
+			qb: "http://purl.org/linked-data/cube#",
+			rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+			rdfa: "http://www.w3.org/ns/rdfa#",
+			rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+			rev: "http://purl.org/stuff/rev#",
+			rif: "http://www.w3.org/2007/rif#",
+			rr: "http://www.w3.org/ns/r2rml#",
+			schema: "http://schema.org/",
+			sd: "http://www.w3.org/ns/sparql-service-description#",
+			sioc: "http://rdfs.org/sioc/ns#",
+			skos: "http://www.w3.org/2004/02/skos/core#",
+			skosxl: "http://www.w3.org/2008/05/skos-xl#",
+			svg: "http://www.w3.org/2000/svg",
+			v: "http://rdf.data-vocabulary.org/#",
+			vcard: "http://www.w3.org/2006/vcard/ns#",
+			void: "http://rdfs.org/ns/void#",
+			wdr: "http://www.w3.org/2007/05/powder#",
+			wdrs: "http://www.w3.org/2007/05/powder-s#",
+			xhv: "http://www.w3.org/1999/xhtml/vocab#",
+			xi: "http://www.w3.org/2001/XInclude",
+			xlink: "http://www.w3.org/1999/xlink",
+			xml: "http://www.w3.org/XML/1998/namespace",
+			xmlns: "http://www.w3.org/2000/xmlns/",
+			xsd: "http://www.w3.org/2001/XMLSchema#",
+			xsl: "http://www.w3.org/1999/XSL/Transform",
+			xul: "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 		};
 		const DATA_ID = "data-with_ex_editor_id";
 		const MODE_VIEW_SOURCE = `mode=${ VIEW_SOURCE };`;
@@ -90,9 +90,9 @@
 		*/
 		const getNodeNs = node => {
 			const namespace = {
-				"node": null,
-				"name": null,
-				"uri": null
+				node: null,
+				name: null,
+				uri: null
 			};
 			let name;
 			while(node && node.parentNode) {
@@ -134,9 +134,9 @@
 					const shortName = nameParts[2];
 					const namespace = prefix && namespaces[prefix] ? namespaces[prefix] : null;
 					return {
-						"namespace": namespace ? namespace : bool ? getNodeNs(obj).uri : null,
-						"prefix": prefix ? `${ prefix }:` : "",
-						"shortName": shortName
+						namespace: namespace ? namespace : bool ? getNodeNs(obj).uri : null,
+						prefix: prefix ? `${ prefix }:` : "",
+						shortName: shortName
 					};
 				}
 				else {

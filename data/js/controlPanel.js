@@ -72,8 +72,8 @@
 	const selfPortEmit = evt => {
 		evt && (
 			evt.type && self.port.emit(evt.type, {
-				"editorName": editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : "",
-				"toolbarButtonIcon": buttonIcon && getRadioButtonValue(buttonIcon.name) || null
+				editorName: editorLabel && editorLabel.value ? editorLabel.value : editorName && editorName.value ? editorName.value : "",
+				toolbarButtonIcon: buttonIcon && getRadioButtonValue(buttonIcon.name) || null
 			}),
 			evt.preventDefault()
 		);
