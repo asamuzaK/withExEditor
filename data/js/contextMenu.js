@@ -32,8 +32,14 @@
   /* get node value */
   self.on("click", () => {
     const namespaces = {
+      "ag": "http://purl.org/rss/1.0/modules/aggregation/",
+      "annotate": "http://purl.org/rss/1.0/modules/annotate/",
+      "app": "http://www.w3.org/2007/app",
+      "atom": "http://www.w3.org/2005/Atom",
       "cc": "http://creativecommons.org/ns#",
       "cnt": "http://www.w3.org/2008/content#",
+      "company": "http://purl.org/rss/1.0/modules/company",
+      "content": "http://purl.org/rss/1.0/modules/content/",
       "csvw": "http://www.w3.org/ns/csvw#",
       "ctag": "http://commontag.org/ns#",
       "dc": "http://purl.org/dc/terms/",
@@ -42,13 +48,19 @@
       "dcterms": "http://purl.org/dc/terms/",
       "earl": "http://www.w3.org/ns/earl#",
       "em": "http://www.mozilla.org/2004/em-rdf#",
+      "email": "http://purl.org/rss/1.0/modules/email/",
       "ev": "http://www.w3.org/2001/xml-events",
+      "fh": "http://purl.org/syndication/history/1.0",
       "foaf": "http://xmlns.com/foaf/0.1/",
+      "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
       "gr": "http://purl.org/goodrelations/v1#",
       "grddl": "http://www.w3.org/2003/g/data-view#",
       "ht": "http://www.w3.org/2006/http#",
       "html": "http://www.w3.org/1999/xhtml",
       "ical": "http://www.w3.org/2002/12/cal/icaltzd#",
+      "image": "http://purl.org/rss/1.0/modules/image/",
+      "itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",
+      "l": "http://purl.org/rss/1.0/modules/link/",
       "ma": "http://www.w3.org/ns/ma-ont#",
       "math": "http://www.w3.org/1998/Math/MathML",
       "oa": "http://www.w3.org/ns/oa#",
@@ -64,17 +76,27 @@
       "rev": "http://purl.org/stuff/rev#",
       "rif": "http://www.w3.org/2007/rif#",
       "rr": "http://www.w3.org/ns/r2rml#",
+      "rss1": "http://purl.org/rss/1.0/",
+      "rss11": "http://purl.org/net/rss1.1#",
       "schema": "http://schema.org/",
       "sd": "http://www.w3.org/ns/sparql-service-description#",
+      "search": "http://purl.org/rss/1.0/modules/search/",
       "sioc": "http://rdfs.org/sioc/ns#",
       "skos": "http://www.w3.org/2004/02/skos/core#",
       "skosxl": "http://www.w3.org/2008/05/skos-xl#",
+      "slash": "http://purl.org/rss/1.0/modules/slash/",
+      "ss": "http://purl.org/rss/1.0/modules/servicestatus/",
+      "sub": "http://purl.org/rss/1.0/modules/subscription/",
       "svg": "http://www.w3.org/2000/svg",
+      "sy": "http://purl.org/rss/1.0/modules/syndication/",
+      "taxo": "http://purl.org/rss/1.0/modules/taxonomy/",
+      "thr": "http://purl.org/syndication/thread/1.0",
       "v": "http://rdf.data-vocabulary.org/#",
       "vcard": "http://www.w3.org/2006/vcard/ns#",
       "void": "http://rdfs.org/ns/void#",
       "wdr": "http://www.w3.org/2007/05/powder#",
       "wdrs": "http://www.w3.org/2007/05/powder-s#",
+      "wiki": "http://purl.org/rss/1.0/modules/wiki/",
       "xhv": "http://www.w3.org/1999/xhtml/vocab#",
       "xi": "http://www.w3.org/2001/XInclude",
       "xlink": "http://www.w3.org/1999/xlink",
@@ -100,7 +122,8 @@
       };
       let name;
       while(node && node.parentNode) {
-        name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName.toLowerCase());
+      console.log();
+        name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName);
         if(name) {
           namespace.node = node;
           namespace.name = name[1] || name[2];
@@ -112,9 +135,11 @@
       !name && (
         node = document.documentElement,
         namespace.node = node,
-        namespace.name = node.nodeName.toLowerCase(),
+        namespace.name = /HTML/.test(node.toString()) ?
+          node.nodeName.toLowerCase() : node.nodeName,
         namespace.uri = node.hasAttribute("xmlns") ?
-          node.getAttribute("xmlns") : namespaces[namespace.name] ?
+          node.getAttribute("xmlns") :
+          namespaces[namespace.name.toLowerCase()] ?
           namespaces[namespace.name] : null
       );
       return namespace;
@@ -136,9 +161,10 @@
       const getNamespace = (obj, bool) => {
         let namespace = null;
         if(obj && obj.nodeName) {
-          const name = /^(?:([\S]+):)?([\S]+)$/.exec(obj.nodeName.toLowerCase());
+          const name = /^(?:([\S]+):)?([\S]+)$/.exec(obj.nodeName);
           const prefix = name[1] || null;
-          const localName = name[2];
+          const localName = /HTML/.test(obj.toString()) ?
+            name[2].toLowerCase() : name[2];
           const uri = prefix && namespaces[prefix] ? namespaces[prefix] : null;
           namespace = {
             "namespaceURI": uri ? uri : bool ? getNodeNs(obj).uri : null,
