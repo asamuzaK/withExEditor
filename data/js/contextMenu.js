@@ -60,7 +60,7 @@
       "html": "http://www.w3.org/1999/xhtml",
       "ical": "http://www.w3.org/2002/12/cal/icaltzd#",
       "image": "http://purl.org/rss/1.0/modules/image/",
-      "itms": "http://phobos.apple.com/rss/1.0/modules/itms/,
+      "itms": "http://phobos.apple.com/rss/1.0/modules/itms/",
       "itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",
       "l": "http://purl.org/rss/1.0/modules/link/",
       "ma": "http://www.w3.org/ns/ma-ont#",
