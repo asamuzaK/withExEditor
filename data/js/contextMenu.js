@@ -50,6 +50,7 @@
       "em": "http://www.mozilla.org/2004/em-rdf#",
       "email": "http://purl.org/rss/1.0/modules/email/",
       "ev": "http://www.w3.org/2001/xml-events",
+      "feed": "http://www.w3.org/2005/Atom",
       "fh": "http://purl.org/syndication/history/1.0",
       "foaf": "http://xmlns.com/foaf/0.1/",
       "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
@@ -59,6 +60,7 @@
       "html": "http://www.w3.org/1999/xhtml",
       "ical": "http://www.w3.org/2002/12/cal/icaltzd#",
       "image": "http://purl.org/rss/1.0/modules/image/",
+      "itms": "http://phobos.apple.com/rss/1.0/modules/itms/,
       "itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",
       "l": "http://purl.org/rss/1.0/modules/link/",
       "ma": "http://www.w3.org/ns/ma-ont#",
@@ -99,6 +101,7 @@
       "wiki": "http://purl.org/rss/1.0/modules/wiki/",
       "xhv": "http://www.w3.org/1999/xhtml/vocab#",
       "xi": "http://www.w3.org/2001/XInclude",
+      "xhtml": "http://www.w3.org/1999/xhtml",
       "xlink": "http://www.w3.org/1999/xlink",
       "xml": "http://www.w3.org/XML/1998/namespace",
       "xmlns": "http://www.w3.org/2000/xmlns/",
@@ -122,7 +125,6 @@
       };
       let name;
       while(node && node.parentNode) {
-      console.log();
         name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName);
         if(name) {
           namespace.node = node;
