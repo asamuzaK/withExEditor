@@ -1,45 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<title data-l10n-id="Settings">Settings</title>
-		<link rel="stylesheet" href="../css/controlPanel.css" />
-	</head>
-	<body>
-		<main>
-			<form id="controlPanelForm">
-				<fieldset id="selectToolbarButtonIcon">
-					<legend id="selectIconLabel" data-l10n-id="SelectIconLabel">Select Toolbar Button Icon</legend>
-					<p>
-						<span>
-							<input type="radio" id="buttonIcon" name="buttonIconRadio" value="./img/icon.svg#color" />
-							<label for="buttonIcon" data-l10n-id="IconColorLabel" aria-label="Color Icon"><img id="iconColor" data-l10n-id="IconColor" src="../img/icon.svg#color" alt="Color" /></label>
-							<input type="radio" id="buttonIconGray" name="buttonIconRadio" value="./img/icon.svg#gray" />
-							<label for="buttonIconGray" data-l10n-id="IconGrayLabel" aria-label="Gray Icon"><img id="iconGray" data-l10n-id="IconGray" src="../img/icon.svg#gray" alt="Gray" /></label>
-							<input type="radio" id="buttonIconWhite" name="buttonIconRadio" value="./img/icon.svg#white" />
-							<label for="buttonIconWhite" data-l10n-id="IconWhiteLabel" aria-label="White Icon"><img id="iconWhite" data-l10n-id="IconWhite" src="../img/icon.svg#white" alt="White" /></label>
-						</span>
-						<input type="submit" id="selectIcon" value="Submit" />
-					</p>
-				</fieldset>
-				<fieldset id="storeRenamedEditorLabel">
-					<legend id="renameEditorLabel" data-l10n-id="RenameEditorLabel">Rename Editor Label</legend>
-					<p>
-						<label id="currentEditorName" data-l10n-id="CurrentEditor" for="editorLabel" aria-label="Current editor label">(Editor is not selected)</label>
-						<span>
-							<input type="text" id="editorLabel" placeholder="Editor Label" />
-							<input type="hidden" id="editorName" />
-						</span>
-						<input type="submit" id="storeLabel" value="Submit" />
-					</p>
-				</fieldset>
-				<fieldset id="openAddonManagerPage">
-					<legend id="setOptionsLabel" data-l10n-id="SetOptionsLabel">Set Options</legend>
-					<p>
-						<button id="openAddonManager" data-l10n-id="OpenAddonManager" data-href="about:addons">Open Add-on Manager</button>
-					</p>
-				</fieldset>
-			</form>
-		</main>
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title data-l10n-id="Settings">Settings</title>
+    <link rel="stylesheet" href="../css/controlPanel.css" />
+  </head>
+  <body>
+    <main>
+      <form id="controlPanelForm">
+        <fieldset id="selectToolbarButtonIcon">
+          <legend id="selectIconLabel" data-l10n-id="SelectIconLabel">
+            Select Toolbar Button Icon
+          </legend>
+          <p>
+            <span>
+              <input type="radio" id="buttonIcon" name="buttonIconRadio"
+                     value="./img/icon.svg#color" />
+              <label for="buttonIcon" data-l10n-id="IconColorLabel"
+                     aria-label="Color Icon">
+                <img id="iconColor" data-l10n-id="IconColor"
+                     src="../img/icon.svg#color" alt="Color" />
+              </label>
+              <input type="radio" id="buttonIconGray"
+                     name="buttonIconRadio" value="./img/icon.svg#gray" />
+              <label for="buttonIconGray" data-l10n-id="IconGrayLabel"
+                     aria-label="Gray Icon">
+                <img id="iconGray" data-l10n-id="IconGray"
+                     src="../img/icon.svg#gray" alt="Gray" />
+              </label>
+              <input type="radio" id="buttonIconWhite"
+                     name="buttonIconRadio" value="./img/icon.svg#white" />
+              <label for="buttonIconWhite" data-l10n-id="IconWhiteLabel"
+                     aria-label="White Icon">
+                <img id="iconWhite" data-l10n-id="IconWhite"
+                     src="../img/icon.svg#white" alt="White" />
+              </label>
+            </span>
+            <input type="submit" id="selectIcon" value="Submit" />
+          </p>
+        </fieldset>
+        <fieldset id="storeRenamedEditorLabel">
+          <legend id="renameEditorLabel" data-l10n-id="RenameEditorLabel">
+            Rename Editor Label
+          </legend>
+          <p>
+            <label id="currentEditorName" data-l10n-id="CurrentEditor"
+                   for="editorLabel" aria-label="Current editor label">
+              (Editor is not selected)
+            </label>
+            <span>
+              <input type="text" id="editorLabel" placeholder="Editor Label" />
+              <input type="hidden" id="editorName" />
+            </span>
+            <input type="submit" id="storeLabel" value="Submit" />
+          </p>
+        </fieldset>
+        <fieldset id="openAddonManagerPage">
+          <legend id="setOptionsLabel" data-l10n-id="SetOptionsLabel">
+            Set Options
+          </legend>
+          <p>
+            <button id="openAddonManager" data-l10n-id="OpenAddonManager"
+                    data-href="about:addons">
+              Open Add-on Manager
+            </button>
+          </p>
+        </fieldset>
+      </form>
+    </main>
+  </body>
 </html>

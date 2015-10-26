@@ -4,53 +4,53 @@
 */
 
 p {
-	display: flex;
-	flex-flow: row wrap;
-	margin: 0.2em 0;
-	vertical-align: middle;
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0.2em 0;
+  vertical-align: middle;
 }
 span {
-	display: inline-block;
-	flex: 1 1 auto;
-	width: 10em;
+  display: inline-block;
+  flex: 1 1 auto;
+  width: 10em;
 }
 label[for^=buttonIcon] {
-	display: inline-block;
-	position: relative;
-	border-radius: 4px;
-	width: 24px;
-	height: 24px;
-	text-align: center;
-	vertical-align: middle;
+  display: inline-block;
+  position: relative;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  text-align: center;
+  vertical-align: middle;
 }
 label[for=buttonIcon],
 label[for=buttonIconGray] {
-	background-color: #EAEFF2;
+  background-color: #EAEFF2;
 }
 label[for=buttonIconWhite] {
-	background-color: #4D4E53;
+  background-color: #4D4E53;
 }
 label[for=editorLabel] {
-	display: block;
-	margin: 0 0 0.5em;
-	width: 100%;
+  display: block;
+  margin: 0 0 0.5em;
+  width: 100%;
 }
 label + input[type=radio] {
-	margin-left: 1em;
+  margin-left: 1em;
 }
 input[type=text] {
-	max-width: calc(100% - 1em);
+  max-width: calc(100% - 1em);
 }
 input[type=submit], button {
-	font-size: 0.9em;
+  font-size: 0.9em;
 }
 img {
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	margin: auto;
-	width: 16px;
-	height: 16px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width: 16px;
+  height: 16px;
 }
