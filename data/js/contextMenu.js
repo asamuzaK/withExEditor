@@ -12,11 +12,9 @@
     const elm = document.activeElement;
     let label;
     switch(true) {
-      case /^input$/i.test(elm.nodeName) &&
-           elm.hasAttribute("type") &&
+      case /^input$/i.test(elm.nodeName) && elm.hasAttribute("type") &&
            /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-           /^textarea$/i.test(elm.nodeName) ||
-           elm.isContentEditable:
+           /^textarea$/i.test(elm.nodeName) || elm.isContentEditable:
         label = EDIT_TEXT;
         break;
       case !window.getSelection().isCollapsed:
@@ -50,7 +48,6 @@
       "em": "http://www.mozilla.org/2004/em-rdf#",
       "email": "http://purl.org/rss/1.0/modules/email/",
       "ev": "http://www.w3.org/2001/xml-events",
-      "feed": "http://www.w3.org/2005/Atom",
       "fh": "http://purl.org/syndication/history/1.0",
       "foaf": "http://xmlns.com/foaf/0.1/",
       "geo": "http://www.w3.org/2003/01/geo/wgs84_pos#",
@@ -142,7 +139,7 @@
         namespace.uri = node.hasAttribute("xmlns") ?
           node.getAttribute("xmlns") :
           namespaces[namespace.name.toLowerCase()] ?
-          namespaces[namespace.name] : null
+          namespaces[namespace.name.toLowerCase()] : null
       );
       return namespace;
     };
@@ -167,9 +164,10 @@
           const prefix = name[1] || null;
           const localName = /HTML/.test(obj.toString()) ?
             name[2].toLowerCase() : name[2];
-          const uri = prefix && namespaces[prefix] ? namespaces[prefix] : null;
+          const uri = prefix && namespaces[prefix] ?
+            namespaces[prefix] : bool ? getNodeNs(obj).uri : null;
           namespace = {
-            "namespaceURI": uri ? uri : bool ? getNodeNs(obj).uri : null,
+            "namespaceURI": uri,
             "prefix": prefix ? `${ prefix }:` : "",
             "localName": localName
           };

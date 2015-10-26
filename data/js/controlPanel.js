@@ -90,7 +90,7 @@
 
   /**
   * update control panel
-  * @param {Object} res - JSON
+  * @param {Object} res - editor data
   * @return {void}
   */
   self.port.on("editorValue", res => {
@@ -116,7 +116,7 @@
 
   /**
   * localize control panel
-  * @param {Object} res - JSON
+  * @param {Object} res - localize data
   * @return {void}
   */
   self.port.on("htmlValue", res => {
