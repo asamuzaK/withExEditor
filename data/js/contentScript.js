@@ -31,7 +31,7 @@
   };
 
   /* get target element and and sync text value */
-  elm && elm.hasAttribute(DATA_ID) && elm.getAttribute(DATA_ID) === target && (
+  elm.hasAttribute(DATA_ID) && elm.getAttribute(DATA_ID) === target && (
     /^(?:input|textarea)$/i.test(elm.nodeName) ?
       elm.value = value :
       elm.isContentEditable && setContentEditableText(elm, value.split("\n"))
