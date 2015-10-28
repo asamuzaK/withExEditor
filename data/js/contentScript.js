@@ -14,7 +14,7 @@
   * @param {Array} array - array of values
   */
   const setContentEditableText = (node, array = [""]) => {
-    if(node) {
+    if(node && node.nodeType === 1 && Array.isArray(array)) {
       const fragment = document.createDocumentFragment();
       const l = array.length;
       for(let i = 0; i < l; i = i + 1) {

@@ -9,7 +9,7 @@
   const buttonIconGray = document.getElementById("buttonIconGray");
   const buttonIconWhite = document.getElementById("buttonIconWhite");
   const selectIcon = document.getElementById("selectIcon");
-  const currentEditorName = document.getElementById("currentEditorName");
+  const currentName = document.getElementById("currentEditorName");
   const editorName = document.getElementById("editorName");
   const editorLabel = document.getElementById("editorLabel");
   const storeLabel = document.getElementById("storeLabel");
@@ -39,10 +39,10 @@
   */
   const toggleInputs = () => {
     editorLabel && storeLabel && (
-      editorName && editorName.value && currentEditorName &&
-      currentEditorName.hasChildNodes() ? (
-        removeChildNodes(currentEditorName),
-        currentEditorName.appendChild(document.createTextNode(editorName.value)),
+      editorName && editorName.value && currentName &&
+      currentName.hasChildNodes() ? (
+        removeChildNodes(currentName),
+        currentName.appendChild(document.createTextNode(editorName.value)),
         editorLabel.removeAttribute("disabled"),
         storeLabel.removeAttribute("disabled")
       ) : (
@@ -97,10 +97,9 @@
     res && (
       editorName && (
         editorName.value = res.editorName,
-        currentEditorName && (
-          currentEditorName.hasChildNodes() &&
-            removeChildNodes(currentEditorName),
-          currentEditorName.appendChild(
+        currentName && (
+          currentName.hasChildNodes() && removeChildNodes(currentName),
+          currentName.appendChild(
             document.createTextNode(
               editorName.value !== "" ?
                 editorName.value : res.currentEditorName
@@ -123,12 +122,9 @@
     res && (
       html && (html.lang = res.lang),
       selectIcon && (selectIcon.value = res.submit),
-      currentEditorName && (
-        currentEditorName.hasChildNodes() &&
-          removeChildNodes(currentEditorName),
-        currentEditorName.appendChild(
-          document.createTextNode(res.currentEditorName)
-        )
+      currentName && (
+        currentName.hasChildNodes() && removeChildNodes(currentName),
+        currentName.appendChild(document.createTextNode(res.currentEditorName))
       ),
       editorLabel && (editorLabel.placeholder = res.editorLabel),
       storeLabel && (storeLabel.value = res.submit),
@@ -140,9 +136,7 @@
         buttonIconGray && (buttonIconGray.alt = res.iconGrayAlt),
         iconWhiteLabel && (iconWhiteLabel.ariaLabel = res.iconWhiteLabel),
         buttonIconWhite && (buttonIconWhite.alt = res.iconWhiteAlt),
-        currentEditorName && (
-          currentEditorName.ariaLabel = res.currentEditorNameLabel
-        )
+        currentName && (currentName.ariaLabel = res.currentEditorNameLabel)
       )
     );
     return;
@@ -165,10 +159,7 @@
       openAddonManager.addEventListener("click", evt => {
         evt && (
           evt.type && evt.target && evt.target.hasAttribute("data-href") &&
-            self.port.emit(
-              evt.type,
-              evt.target.getAttribute("data-href")
-            ),
+            self.port.emit(evt.type, evt.target.getAttribute("data-href")),
           evt.preventDefault()
         );
       }, false);
