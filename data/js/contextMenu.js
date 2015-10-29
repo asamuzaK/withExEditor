@@ -3,9 +3,10 @@
 */
 (() => {
   "use strict";
-  const EDIT_TEXT = "EditText";
-  const VIEW_SELECTION = "ViewSelection";
   const VIEW_SOURCE = "ViewSource";
+  const VIEW_SELECTION = "ViewSelection";
+  const EDIT_TEXT = "EditText";
+  const DATA_ID = "data-with_ex_editor_id";
 
   /* set context menu item label */
   self.on("context", () => {
@@ -106,8 +107,6 @@
       "xsl": "http://www.w3.org/1999/XSL/Transform",
       "xul": "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     };
-    const DATA_ID = "data-with_ex_editor_id";
-    const MODE_VIEW_SOURCE = `mode=${ VIEW_SOURCE };`;
 
     /**
     * get namespace of node from ancestor
@@ -271,25 +270,47 @@
     };
 
     /**
-    * set temporary ID to the target element and set event listener
-    * @param {Object} target - target element
-    * @return {string} - stringified value with ID
+    * create DOM from selection range and get childNodes
+    * @param {Object} sel - selection
+    * @return {?string} - serialized node string
     */
-    const onEditText = target => {
-      let id;
-      target && (
-        target.hasAttribute(DATA_ID) ?
-          id = target.getAttribute(DATA_ID) : (
-            id = `withExEditor${ window.performance.now() }`.replace(/\./, "_"),
-            target.setAttribute(DATA_ID, id),
-            target.addEventListener("focus", evt => {
-              evt && evt.currentTarget === target &&
-                self.postMessage(evt.target.getAttribute(DATA_ID));
-            }, false)
-          )
-      );
-      return id ?
-        `mode=${ EDIT_TEXT };target=${ id };value=` : MODE_VIEW_SOURCE;
+    const onViewSelection = sel => {
+      let fragment = document.createDocumentFragment();
+      if(sel && sel.rangeCount) {
+        const l = sel.rangeCount;
+        for(let range, elm, i = 0; i < l; i = i + 1) {
+          range = sel.getRangeAt(i);
+          if(range.commonAncestorContainer.nodeType === 1) {
+            elm = getNodeNs(range.commonAncestorContainer);
+            if(/^(?:svg|math)$/.test(elm.name)) {
+              if(elm.node === document.documentElement) {
+                fragment = null;
+                break;
+              }
+              else {
+                elm.node.parentNode && (
+                  elm = elm.node.parentNode,
+                  range.setStart(elm, 0),
+                  range.setEnd(elm, elm.childNodes.length)
+                );
+              }
+            }
+            fragment.appendChild(
+              getDomTree(range.commonAncestorContainer, range.cloneContents())
+            );
+          }
+          else {
+            range.commonAncestorContainer.nodeType === 3 && (
+              elm = getElement(range.commonAncestorContainer.parentNode),
+              elm.appendChild(range.cloneContents()),
+              fragment.appendChild(elm)
+            );
+          }
+          i < l - 1 && fragment.appendChild(document.createTextNode("\n\n"));
+        }
+      }
+      return fragment && fragment.hasChildNodes() && window.XMLSerializer ?
+               new XMLSerializer().serializeToString(fragment) : null;
     };
 
     /**
@@ -361,68 +382,57 @@
     };
 
     /**
-    * create DOM from selection range and get childNodes
-    * @param {Object} sel - selection
-    * @return {string} - stringified values
+    * set temporary ID to the target element and set event listener
+    * @param {Object} target - target element
+    * @return {?string} - ID
     */
-    const onViewSelection = sel => {
-      let fragment = document.createDocumentFragment();
-      if(sel && sel.rangeCount) {
-        const l = sel.rangeCount;
-        for(let range, elm, i = 0; i < l; i = i + 1) {
-          range = sel.getRangeAt(i);
-          if(range.commonAncestorContainer.nodeType === 1) {
-            elm = getNodeNs(range.commonAncestorContainer);
-            if(/^(?:svg|math)$/.test(elm.name)) {
-              if(elm.node === document.documentElement) {
-                fragment = null;
-                break;
-              }
-              else {
-                elm.node.parentNode && (
-                  elm = elm.node.parentNode,
-                  range.setStart(elm, 0),
-                  range.setEnd(elm, elm.childNodes.length)
-                );
-              }
-            }
-            fragment.appendChild(
-              getDomTree(range.commonAncestorContainer, range.cloneContents())
-            );
-          }
-          else {
-            range.commonAncestorContainer.nodeType === 3 && (
-              elm = getElement(range.commonAncestorContainer.parentNode),
-              elm.appendChild(range.cloneContents()),
-              fragment.appendChild(elm)
-            );
-          }
-          i < l - 1 && fragment.appendChild(document.createTextNode("\n\n"));
-        }
-      }
-      return fragment && fragment.hasChildNodes() && window.XMLSerializer ?
-        `mode=${ VIEW_SELECTION };value=${ new XMLSerializer().serializeToString(fragment) }` :
-        MODE_VIEW_SOURCE;
+    const getId = target => {
+      let id = null;
+      target && (
+        target.hasAttribute(DATA_ID) ?
+          id = target.getAttribute(DATA_ID) : (
+            id = `withExEditor${ window.performance.now() }`.replace(/\./, "_"),
+            target.setAttribute(DATA_ID, id),
+            target.addEventListener("focus", evt => {
+              evt && evt.currentTarget === target &&
+                self.postMessage(evt.target.getAttribute(DATA_ID));
+            }, false)
+          )
+      );
+      return id;
     };
 
     /* switch mode by context */
     (() => {
       const selection = window.getSelection();
-      let nodeValue, obj;
+      const mode = {
+        "mode": VIEW_SOURCE,
+        "target": null,
+        "value": null
+      };
+      let obj, target;
       if(selection.isCollapsed) {
         obj = document.activeElement;
         switch(true) {
-          case /^input$/i.test(obj.nodeName) &&
-               obj.hasAttribute("type") &&
+          case /^input$/i.test(obj.nodeName) && obj.hasAttribute("type") &&
                /^(?:(?:emai|te|ur)l|search|text)$/.test(obj.getAttribute("type")) ||
                /^textarea$/i.test(obj.nodeName):
-            nodeValue = onEditText(obj) + (obj.value ? obj.value : "");
+            target = getId(obj);
+            target && (
+              mode.mode = EDIT_TEXT,
+              mode.target = target,
+              mode.value = (obj.value ? obj.value : "")
+            );
             break;
           case obj.isContentEditable:
-            nodeValue = onEditText(obj) + onContentEditable(obj);
+            target = getId(obj);
+            target && (
+              mode.mode = EDIT_TEXT,
+              mode.target = target,
+              mode.value = onContentEditable(obj)
+            );
             break;
           default:
-            nodeValue = MODE_VIEW_SOURCE;
         }
       }
       else {
@@ -430,16 +440,24 @@
         switch(true) {
           case selection.anchorNode === selection.focusNode &&
                selection.anchorNode.parentNode === document.documentElement:
-            nodeValue = MODE_VIEW_SOURCE;
             break;
           case selection.rangeCount === 1 && obj.isContentEditable:
-            nodeValue = onEditText(obj) + onContentEditable(obj);
+            target = getId(obj);
+            target && (
+              mode.mode = EDIT_TEXT,
+              mode.target = target,
+              mode.value = onContentEditable(obj)
+            );
             break;
           default:
-            nodeValue = onViewSelection(selection);
+            target = onViewSelection(selection);
+            target && (
+              mode.mode = VIEW_SELECTION,
+              mode.value = target
+            );
         }
       }
-      self.postMessage(nodeValue);
+      self.postMessage(JSON.stringify(mode));
     })();
   });
 })();
