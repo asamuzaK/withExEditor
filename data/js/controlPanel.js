@@ -69,19 +69,32 @@
     return value;
   };
 
-  /* event handlers */
+  /* event handling */
   const selfPortEmit = evt => {
-    evt && (
-      evt.type && self.port.emit(evt.type, {
-        "editorName": editorLabel && editorLabel.value ?
-          editorLabel.value : editorName && editorName.value ?
-          editorName.value : "",
-        "toolbarButtonIcon": buttonIcon ?
-          getRadioButtonValue(buttonIcon.name) : null
-      }),
-      evt.preventDefault()
-    );
-    return;
+    if(evt) {
+      switch(evt.type) {
+        case "load":
+          self.port.emit(evt.type);
+          break;
+        case "change":
+        case "submit":
+          self.port.emit(evt.type, {
+            editorName: editorLabel && editorLabel.value ?
+              editorLabel.value : editorName && editorName.value ?
+              editorName.value : "",
+            toolbarButtonIcon: buttonIcon ?
+              getRadioButtonValue(buttonIcon.name) : null
+          });
+          evt.preventDefault();
+          break;
+        case "click":
+          evt.target && evt.target.hasAttribute("data-href") &&
+            self.port.emit(evt.type, evt.target.getAttribute("data-href"));
+          evt.preventDefault();
+          break;
+        default:
+      }
+    }
   };
   const isRadioChecked = evt => {
     evt && evt.target && evt.target.checked && selfPortEmit(evt);
@@ -144,9 +157,7 @@
 
   /* on initial run */
   (() => {
-    window.addEventListener("load", evt => {
-      evt && evt.type && self.port.emit(evt.type);
-    }, false);
+    window.addEventListener("load", selfPortEmit, false);
     controlPanelForm &&
       controlPanelForm.addEventListener("submit", selfPortEmit, false);
     buttonIcon &&
@@ -156,13 +167,7 @@
     buttonIconWhite &&
       buttonIconWhite.addEventListener("change", isRadioChecked, false);
     openAddonManager &&
-      openAddonManager.addEventListener("click", evt => {
-        evt && (
-          evt.type && evt.target && evt.target.hasAttribute("data-href") &&
-            self.port.emit(evt.type, evt.target.getAttribute("data-href")),
-          evt.preventDefault()
-        );
-      }, false);
+      openAddonManager.addEventListener("click", selfPortEmit, false);
     toggleInputs();
   })();
 })();
