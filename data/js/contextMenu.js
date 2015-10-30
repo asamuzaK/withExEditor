@@ -113,33 +113,61 @@
     * @param {Object} node - element node
     * @return {Object} - namespace data
     */
-    const getNodeNs = node => {
-      const namespace = {
+    const getNodeNS = node => {
+      const getNodeName = obj =>
+        /HTML/.test(obj.toString()) ? obj.nodeName.toLowerCase() : obj.nodeName;
+      const ns = {
         node: null,
         name: null,
         uri: null
       };
-      let name;
-      while(node && node.parentNode) {
-        name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName);
-        if(name) {
-          namespace.node = node;
-          namespace.name = name[1] || name[2];
-          namespace.uri = namespaces[namespace.name];
-          break;
-        }
-        node = node.parentNode;
+      if(node.namespaceURI) {
+        ns.node = node;
+        ns.name = getNodeName(node);
+        ns.uri = node.namespaceURI;
       }
-      !name && (
-        node = document.documentElement,
-        namespace.node = node,
-        namespace.name = /HTML/.test(node.toString()) ?
-          node.nodeName.toLowerCase() : node.nodeName,
-        namespace.uri = node.hasAttribute("xmlns") ?
-          node.getAttribute("xmlns") :
-          namespaces[namespace.name.toLowerCase()] ?
-          namespaces[namespace.name.toLowerCase()] : null
-      );
+      else {
+        while(node && node.parentNode) {
+          switch(true) {
+            case node.namespaceURI:
+              ns.node = node;
+              ns.name = getNodeName(node);
+              ns.uri = node.namespaceURI;
+              break;
+            case /^(?:svg:)?foreignObject$/.test(node.parentNode.nodeName) &&
+                 (node.parentNode.hasAttributeNS(namespaces.svg, "requiredExtensions") ||
+                  document.documentElement.nodeName.toLowerCase() === "html"):
+              ns.node = node;
+              ns.name = getNodeName(node);
+              ns.uri = node.parentNode.hasAttributeNS(namespaces.svg, "requiredExtensions") ?
+                node.parentNode.getAttributeNS(namespaces.svg, "requiredExtensions") :
+                namespaces.html;
+              break;
+            case /^(?:(?:math:)?math|(?:svg:)?svg)$/.test(node.nodeName):
+              const name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName);
+              ns.node = node;
+              ns.name = name[1] || name[2];
+              ns.uri = namespaces[ns.name];
+              break;
+            default:
+          }
+          if(ns.node) {
+            break;
+          }
+          else {
+            node = node.parentNode;
+          }
+        }
+        !ns.node && (
+          node = document.documentElement,
+          ns.node = node,
+          ns.name = getNodeName(node),
+          ns.uri = node.hasAttribute("xmlns") ?
+            node.getAttribute("xmlns") :
+            namespaces[ns.name.toLowerCase()] ?
+            namespaces[ns.name.toLowerCase()] : null
+        );
+      }
       return namespace;
     };
 
@@ -153,7 +181,7 @@
       /**
       * get namespace
       * @param {Object} obj - element node
-      * @param {boolean} bool - use getNodeNs
+      * @param {boolean} bool - use getNodeNS
       * @return {?Object} - namespace data
       */
       const getNamespace = (obj, bool) => {
@@ -163,10 +191,11 @@
           const prefix = name[1] || null;
           const localName = /HTML/.test(obj.toString()) ?
             name[2].toLowerCase() : name[2];
-          const uri = prefix && namespaces[prefix] ?
-            namespaces[prefix] : bool ? getNodeNs(obj).uri : null;
+          const namespaceURI = obj.namespaceURI ?
+            obj.namespaceURI : prefix && namespaces[prefix] ?
+            namespaces[prefix] : bool ? getNodeNS(obj).uri : null;
           namespace = {
-            namespaceURI: uri,
+            namespaceURI: namespaceURI,
             prefix: prefix ? `${ prefix }:` : "",
             localName: localName
           };
@@ -281,7 +310,7 @@
         for(let range, elm, i = 0; i < l; i = i + 1) {
           range = sel.getRangeAt(i);
           if(range.commonAncestorContainer.nodeType === 1) {
-            elm = getNodeNs(range.commonAncestorContainer);
+            elm = getNodeNS(range.commonAncestorContainer);
             if(/^(?:svg|math)$/.test(elm.name)) {
               if(elm.node === document.documentElement) {
                 fragment = null;
@@ -310,7 +339,7 @@
         }
       }
       return fragment && fragment.hasChildNodes() && window.XMLSerializer ?
-               new XMLSerializer().serializeToString(fragment) : null;
+        new XMLSerializer().serializeToString(fragment) : null;
     };
 
     /**
@@ -346,11 +375,11 @@
         return array.length > 0 ? array.join("") : "";
       };
       /**
-      * get text node from content
+      * get text from content
       * @param {Object} obj - text containing node
       * @return {string} - text
       */
-      const getTextNodeFromContent = obj => {
+      const getTextFromContent = obj => {
         const array = [];
         if(obj && obj.hasChildNodes()) {
           obj = obj.childNodes;
@@ -377,8 +406,7 @@
         }
         return array.length > 0 ? array.join("") : "";
       };
-      return nodes && nodes.hasChildNodes() ?
-        getTextNodeFromContent(nodes) : "";
+      return nodes && nodes.hasChildNodes() ? getTextFromContent(nodes) : "";
     };
 
     /**
@@ -408,7 +436,8 @@
       const mode = {
         mode: VIEW_SOURCE,
         target: null,
-        value: null
+        value: null,
+        namespace: null
       };
       let obj, target;
       if(selection.isCollapsed) {
@@ -429,7 +458,8 @@
             target && (
               mode.mode = EDIT_TEXT,
               mode.target = target,
-              mode.value = onContentEditable(obj)
+              mode.value = onContentEditable(obj),
+              mode.namespace = getNodeNS(obj).uri
             );
             break;
           default:
@@ -446,7 +476,8 @@
             target && (
               mode.mode = EDIT_TEXT,
               mode.target = target,
-              mode.value = onContentEditable(obj)
+              mode.value = onContentEditable(obj),
+              mode.namespace = getNodeNS(obj).uri
             );
             break;
           default:

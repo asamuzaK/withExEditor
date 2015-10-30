@@ -7,6 +7,7 @@
   const elm = document.activeElement;
   const target = self.options.target || "";
   const value = self.options.value || "";
+  const namespace = self.options.namespace || "http://www.w3.org/1999/xhtml";
 
   /**
   * set content editable element text
@@ -19,7 +20,8 @@
       const l = array.length;
       for(let i = 0; i < l; i = i + 1) {
         fragment.appendChild(document.createTextNode(array[i]));
-        i < l - 1 && fragment.appendChild(document.createElement("br"));
+        i < l - 1 && namespace === "http://www.w3.org/1999/xhtml" &&
+          fragment.appendChild(document.createElementNS(namespace, "br"));
       }
       if(node.hasChildNodes()) {
         while(node.firstChild) {
