@@ -82,7 +82,8 @@
             editorName: editorLabel && editorLabel.value ?
               editorLabel.value : editorName && editorName.value ?
               editorName.value : "",
-            toolbarButtonIcon: buttonIcon ?
+            toolbarButtonIcon: evt.type === "checked" && evt.target.checked ?
+              evt.target.name : buttonIcon ?
               getRadioButtonValue(buttonIcon.name) : null
           });
           evt.preventDefault();
