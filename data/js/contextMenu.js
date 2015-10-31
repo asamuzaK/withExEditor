@@ -168,7 +168,7 @@
             namespaces[ns.name.toLowerCase()] : null
         );
       }
-      return namespace;
+      return ns;
     };
 
     /**
