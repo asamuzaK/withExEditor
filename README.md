@@ -51,3 +51,10 @@ ex: `"Some Arg"`
 
 ## Options In Toolbar Button
 * You can choose the icon color, you can rename the label of the editor, and you can open Add-on Manager from here.
+
+***
+
+## About Error / Warning Notification
+Error or Warning message will be notified when
+* Failed to open the external editor.
+* The add-on storage is / was over quota. In this case, stored data of temporary files are initialized.
