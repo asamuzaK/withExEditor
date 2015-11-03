@@ -97,6 +97,7 @@
       wdr: "http://www.w3.org/2007/05/powder#",
       wdrs: "http://www.w3.org/2007/05/powder-s#",
       wiki: "http://purl.org/rss/1.0/modules/wiki/",
+      xbl: "http://www.mozilla.org/xbl",
       xhv: "http://www.w3.org/1999/xhtml/vocab#",
       xi: "http://www.w3.org/2001/XInclude",
       xhtml: "http://www.w3.org/1999/xhtml",
@@ -185,22 +186,24 @@
       * @return {?Object} - namespace data
       */
       const getNamespace = (obj, bool) => {
-        let namespace = null;
+        let ns = null;
         if(obj && obj.nodeName) {
           const name = /^(?:([\S]+):)?([\S]+)$/.exec(obj.nodeName);
-          const prefix = name[1] || null;
-          const localName = /HTML/.test(obj.toString()) ?
+          const prefix = obj.prefix ?
+            obj.prefix : name[1] ? name[1] : null;
+          const localName = obj.localName ?
+            obj.localName : /HTML/.test(obj.toString()) ?
             name[2].toLowerCase() : name[2];
           const namespaceURI = obj.namespaceURI ?
             obj.namespaceURI : prefix && namespaces[prefix] ?
             namespaces[prefix] : bool ? getNodeNS(obj).uri : null;
-          namespace = {
+          ns = {
             namespaceURI: namespaceURI,
-            prefix: prefix ? `${ prefix }:` : "",
+            prefix: prefix ? prefix : "",
             localName: localName
           };
         }
-        return namespace;
+        return ns;
       };
       /**
       * create element NS
@@ -208,10 +211,10 @@
       * @return {?Object} - namespaced element
       */
       const createElmNS = obj => {
-        const elm = getNamespace(obj, true);
-        return elm && document.createElementNS(
-          elm.namespaceURI || namespaces.html,
-          elm.localName
+        const ns = getNamespace(obj, true);
+        return ns && document.createElementNS(
+          ns.namespaceURI || namespaces.html,
+          ns.localName
         );
       };
       /**
@@ -223,11 +226,13 @@
         if(elm && obj) {
           const nodeAttr = obj.attributes;
           for(let attr of nodeAttr) {
-            const attrNs = getNamespace(attr, false);
-            typeof obj[attr.name] !== "function" && attrNs &&
+            const ns = getNamespace(attr, false);
+            typeof obj[attr.name] !== "function" && ns &&
               elm.setAttributeNS(
-                attrNs.namespaceURI || "",
-                attrNs.prefix + attrNs.localName,
+                ns.namespaceURI || "",
+                ns.prefix !== "" ?
+                  `${ ns.prefix }:${ ns.localName }` :
+                  ns.localName,
                 attr.value
               );
           }
@@ -299,7 +304,7 @@
     };
 
     /**
-    * create DOM from selection range and get childNodes
+    * create DOM from selection range and get child nodes
     * @param {Object} sel - selection
     * @return {?string} - serialized node string
     */

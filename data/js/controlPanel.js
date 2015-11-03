@@ -16,7 +16,7 @@
   const openAddonManager = document.getElementById("openAddonManager");
   const inputRadios = document.querySelectorAll("input[type=radio]");
 
-  /* for back compat prior to Fx39 */
+  /* for back compatibility prior to Firefox 39 */
   const iconColorLabel = document.querySelector("label[data-l10n-id=IconColorLabel]");
   const iconGrayLabel = document.querySelector("label[data-l10n-id=IconGrayLabel]");
   const iconWhiteLabel = document.querySelector("label[data-l10n-id=IconWhiteLabel]");
@@ -142,7 +142,7 @@
       ),
       editorLabel && (editorLabel.placeholder = res.editorLabel),
       storeLabel && (storeLabel.value = res.submit),
-      /* back compat localize attributes prior to Fx39 */
+      /* back compatible localize attributes prior to Firefox 39 */
       (res.compat < 0 || isNaN(res.compat)) && (
         iconColorLabel && (iconColorLabel.ariaLabel = res.iconColorLabel),
         buttonIcon && (buttonIcon.alt = res.iconColorAlt),
