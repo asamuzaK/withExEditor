@@ -7,7 +7,8 @@
 </ul>
 <em>View Selection</em>
 <ul>
-  <li>Shows a generated DOM tree from the selection. It may not be the same with the DOM tree of the document source.</li>
+  <li>Shows a generated DOM tree of the selection in XML. It may not be the same with the DOM tree of the document source.</li>
+  <li>If the selection is not DOM parsable, then creates a file that contains only the selection part.</li>
 </ul>
 <em>Edit Text</em>
 <ul>
