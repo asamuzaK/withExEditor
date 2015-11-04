@@ -1,6 +1,7 @@
 更新内容
 <ul>
 <li>View Selection モードのバグを修正。</li>
+<li>選択部分がDOMで解析可能な場合はXMLファイルを一時ファイルとして生成。</li>
 <li>SVG + foreignObject + content editable のサポートを追加。</li>
 <li>ストレージの容量を超えた場合の処理を追加。</li>
 <li>ラベルや邦訳を変更。

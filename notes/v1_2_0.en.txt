@@ -1,6 +1,7 @@
 Features
 <ul>
 <li>Fixed bug in View Selection mode.</li>
+<li>Create XML temporary file, if selection is DOM parsable.</li>
 <li>Add support for SVG + foreignObject + content editable.</li>
 <li>Add event handling on storage over quota.</li>
 <li>Refined some labels and refined localization.
