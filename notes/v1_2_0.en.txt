@@ -11,7 +11,8 @@ Features
 Codes
 <ul>
 <li>Switched some let variables to const.</li>
-<li>Replaced brackets to dot notations.</li>
+<li>Replaced brackets to dot notations.
+    Removed quotes from JavaScript object properties.</li>
 <li>Replaced indent from tabs to spaces.
     Also, wrapped long lines.</li>
 <li>Refined RegExp in main.js</li>

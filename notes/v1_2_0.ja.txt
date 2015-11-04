@@ -1,0 +1,9 @@
+機能
+<ul>
+<li>View Selection モードのバグを修正。</li>
+<li>SVG + foreignObject + content editable のサポートを追加。</li>
+<li>ストレージの容量を超えた場合の処理を追加。</li>
+<li>ラベルや邦訳を変更。
+    用語は http://www.mozilla-japan.org/jp/l10n/term/all.html に合わせるよう変更。</li>
+<li>xpi を jpm 1.0.3 で作成。</li>
+</ul>
