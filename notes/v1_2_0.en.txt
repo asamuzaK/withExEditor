@@ -1,11 +1,11 @@
 Features
 <ul>
 <li>Fixed bug in View Selection mode.</li>
-<li>Create XML temporary file, if selection is DOM parsable.</li>
-<li>Add support for SVG + foreignObject + content editable.</li>
+<li>In View Selection mode, it creates XML temporary file if the selection is DOM parsable.</li>
+<li>Add support for SVG + foreignObject + content editable in Edit Text mode.</li>
 <li>Add event handling on storage over quota.</li>
 <li>Refined some labels and refined localization.
-    Replaced localized terms to match http://www.mozilla-japan.org/jp/l10n/term/all.html [ja]</li>
+    The localized terms now matches http://www.mozilla-japan.org/jp/l10n/term/all.html [ja]</li>
 <li>Packed xpi with jpm 1.0.3</li>
 </ul>
 
