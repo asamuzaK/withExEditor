@@ -1,4 +1,4 @@
-アップデート内容
+更新内容
 <ul>
 <li>View Selection モードのバグを修正。</li>
 <li>SVG + foreignObject + content editable のサポートを追加。</li>

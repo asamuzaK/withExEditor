@@ -55,3 +55,13 @@
 <ul>
   <li>You can choose the icon color, you can rename the label of the editor, and you can open Add-on Manager from here.</li>
 </ul>
+<!--
+* * *
+<em>About Error / Warning Notification</em>
+Error or Warning message will be notified when...
+<ul>
+<li>Failed to open the external editor.</li>
+<li>Failed to remove the temporary files at the end of Private Browsing.</li>
+<li>The add-on storage is / was over quota. When this message is notified, stored data of temporary files are already initialized.</li>
+</ul>
+-->

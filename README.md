@@ -58,4 +58,4 @@ ex: `"Some Arg"`
 Error or Warning message will be notified when...
 * Failed to open the external editor.
 * Failed to remove the temporary files at the end of Private Browsing.
-* The add-on storage is / was over quota. In this case, stored data of temporary files are initialized.
+* The add-on storage is / was over quota. When this message is notified, stored data of temporary files are already initialized.
