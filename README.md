@@ -55,6 +55,7 @@ ex: `"Some Arg"`
 ***
 
 ## About Error / Warning Notification
-Error or Warning message will be notified when
+Error or Warning message will be notified when...
 * Failed to open the external editor.
+* Failed to remove the temporary files at the end of Private Browsing.
 * The add-on storage is / was over quota. In this case, stored data of temporary files are initialized.
