@@ -1,4 +1,4 @@
-Features
+Features Update
 <ul>
 <li>Fixed bug in View Selection mode.</li>
 <li>Add support for SVG + foreignObject + content editable.</li>

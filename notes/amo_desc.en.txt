@@ -1,0 +1,57 @@
+"View Source", "View Selection", "Edit Text" with the external editor which you like, on context menu.
+
+<em>View Source</em>
+<ul>
+  <li>Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.</li>
+  <li>When browsing a local file, the local file will be opened directly.</li>
+</ul>
+<em>View Selection</em>
+<ul>
+  <li>Shows a generated DOM tree from the selection. It may not be the same with the DOM tree of the document source.</li>
+</ul>
+<em>Edit Text</em>
+<ul>
+  <li>Can be used with inputs, textareas, or editable elements.</li>
+  <li>Contents will be synchronized when you go back to the browser and move focus to the element which you've edited.</li>
+</ul>
+* * *
+<em>Options In Add-on Manager</em>
+<em>Select An Editor</em>
+<ul>
+  <li>Choose the editor which you want to use.</li>
+  <li>When selecting an editor on Mac OS X, pick the file under <code>/Applications/[yourEditor].app/Contents/MacOS/</code> directory.</li>
+</ul>
+<em>Command Line Options</em>
+<ul>
+  <li>Use when you want to start the editor with command line options.</li>
+  <li>When using backslash (<code>\</code>) character, it must be escaped with an extra backslash.
+      ex: <code>C:<em>\</em>\Windows</code></li>
+  <li>If argument contains space(s), quote them with the double quotation mark (<code>"</code>).
+      ex: <code><em>"</em>Some Arg<em>"</em></code></li>
+</ul>
+<em>DISPLAY Environment Variable</em>
+<ul>
+  <li>For Linux only. Set this option if "Cannot open display" error occurred. Maybe, you also need to set "xhost".</li>
+</ul>
+<em>Access Key On Context Menu</em>
+<ul>
+  <li>You can choose any key. But, it must be a single character.</li>
+</ul>
+<em>Enable During Private Browsing</em>
+<ul>
+  <li>Enables if checked, disabled if not.</li>
+</ul>
+<em>Force To Remove The Temporary Files At Shutdown</em>
+<ul>
+  <li>You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox. This may cause problem, it depends on the editor setting.</li>
+</ul>
+
+<em>Initialize All Settings When Add-on Is Disabled</em>
+<ul>
+<li>If checked, all stored data will be removed and all prefs settings will be initialized.</li>
+</ul>
+* * *
+<em>Options In Toolbar Button</em>
+<ul>
+  <li>You can choose the icon color, you can rename the label of the editor, and you can open Add-on Manager from here.</li>
+</ul>
