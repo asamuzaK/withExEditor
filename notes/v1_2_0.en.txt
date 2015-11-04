@@ -1,0 +1,20 @@
+Features
+<ul>
+<li>Fixed bug in View Selection mode.</li>
+<li>Add support for SVG + foreignObject + content editable.</li>
+<li>Add event handling on storage over quota.</li>
+<li>Refined some labels and refined localization.
+    Replaced localized terms to match http://www.mozilla-japan.org/jp/l10n/term/all.html [ja]</li>
+<li>Packed xpi with jpm 1.0.3</li>
+</ul>
+
+Codes
+<ul>
+<li>Switched some let variables to const.</li>
+<li>Replaced brackets to dot notations.</li>
+<li>Replaced indent from tabs to spaces.
+    Also, wrapped long lines.</li>
+<li>Refined RegExp in main.js</li>
+<li>Refined createElementNS / setAttributeNS in contextMenu.js</li>
+<li>Switched stringified values to JSON string for postMessage in contextMenu.js</li>
+</ul>

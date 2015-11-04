@@ -3,4 +3,5 @@
 .git/
 .jpmignore
 README.*
+notes/
 test/
