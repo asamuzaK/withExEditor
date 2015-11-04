@@ -288,9 +288,11 @@
           for(let node, i = 0; i < l; i = i + 1) {
             node = obj[i];
             node.nodeType === 1 ? (
-              i === 0 && fragment.appendChild(document.createTextNode("\n")),
+              i === 0 &&
+                fragment.appendChild(document.createTextNode("\n")),
               fragment.appendChild(getElement(node, true)),
-              i === l - 1 && fragment.appendChild(document.createTextNode("\n"))
+              i === l - 1 &&
+                fragment.appendChild(document.createTextNode("\n"))
             ) : node.nodeType === 3 &&
               fragment.appendChild(document.createTextNode(node.nodeValue));
           }
@@ -312,7 +314,9 @@
       let fragment = document.createDocumentFragment();
       if(sel && sel.rangeCount) {
         const l = sel.rangeCount;
-        for(let range, elm, i = 0; i < l; i = i + 1) {
+        let range, elm, i = 0;
+        while(i < l) {
+          l > 1 && fragment.appendChild(document.createTextNode("\n"));
           range = sel.getRangeAt(i);
           if(range.commonAncestorContainer.nodeType === 1) {
             elm = getNodeNS(range.commonAncestorContainer);
@@ -340,8 +344,18 @@
               fragment.appendChild(elm)
             );
           }
-          i < l - 1 && fragment.appendChild(document.createTextNode("\n\n"));
+          fragment.appendChild(document.createTextNode("\n"));
+          l > 1 && i !== l - 1 &&
+            fragment.appendChild(document.createComment("Next Range"));
+          i = i + 1;
         }
+        l > 1 && fragment.hasChildNodes() && (
+          elm = getElement(document.documentElement),
+          elm.appendChild(fragment),
+          fragment = document.createDocumentFragment(),
+          fragment.appendChild(elm),
+          fragment.appendChild(document.createTextNode("\n"))
+        );
       }
       return fragment && fragment.hasChildNodes() && window.XMLSerializer ?
         new XMLSerializer().serializeToString(fragment) : null;
