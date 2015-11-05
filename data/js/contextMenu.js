@@ -202,13 +202,12 @@
         let prop = null;
         if(obj) {
           const name = getNodeName(obj);
-          const namespaceURI = obj.namespaceURI ?
-            obj.namespaceURI : name.prefix && nsURI[name.prefix] ?
-            nsURI[name.prefix] : bool ? getNodeNS(obj).uri : null;
           prop = {
             prefix: name.prefix,
             localName: name.localName,
-            namespaceURI: namespaceURI
+            namespaceURI: obj.namespaceURI ?
+              obj.namespaceURI : name.prefix && nsURI[name.prefix] ?
+              nsURI[name.prefix] : bool ? getNodeNS(obj).uri : null
           };
         }
         return prop;
@@ -292,7 +291,8 @@
         if(obj && obj.hasChildNodes()) {
           obj = obj.childNodes;
           const l = obj.length;
-          for(let node, i = 0; i < l; i = i + 1) {
+          let node, i = 0;
+          while(i < l) {
             node = obj[i];
             node.nodeType === 1 ? (
               i === 0 &&
@@ -302,6 +302,7 @@
                 fragment.appendChild(document.createTextNode("\n"))
             ) : node.nodeType === 3 &&
               fragment.appendChild(document.createTextNode(node.nodeValue));
+            i = i + 1;
           }
         }
         return fragment;
@@ -370,8 +371,8 @@
 
     /**
     * get text node from editable content
-    * @param {Object} nodes - text containing node
-    * @return {string} - text node
+    * @param {Object} nodes - node
+    * @return {string} - text
     */
     const onContentEditable = nodes => {
       /**
@@ -400,37 +401,7 @@
         }
         return array.length > 0 ? array.join("") : "";
       };
-      /**
-      * get text from content
-      * @param {Object} obj - text containing node
-      * @return {string} - text
-      */
-      const getTextFromContent = obj => {
-        const array = [];
-        if(obj && obj.hasChildNodes()) {
-          obj = obj.childNodes;
-          for(let node of obj) {
-            switch(true) {
-              case node.nodeType === 3:
-                array.push(node.nodeValue);
-                break;
-              case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
-                array.push("\n");
-                break;
-              case node.nodeType === 1 && node.hasChildNodes():
-                let cont = getElement(node);
-                cont && cont.nodeType === 1 && (
-                  cont = getDomTree(cont, node),
-                  cont.hasChildNodes() && array.push(getTextNode(cont))
-                );
-                break;
-              default:
-            }
-          }
-        }
-        return array.length > 0 ? array.join("") : "";
-      };
-      return nodes && nodes.hasChildNodes() ? getTextFromContent(nodes) : "";
+      return nodes && nodes.hasChildNodes() ? getTextNode(nodes) : "";
     };
 
     /**
