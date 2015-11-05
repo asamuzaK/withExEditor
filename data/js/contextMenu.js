@@ -193,29 +193,25 @@
     */
     const getElement = (node, child = false) => {
       /**
-      * get namespace
+      * get node properties
       * @param {Object} obj - element node
       * @param {boolean} bool - use getNodeNS
-      * @return {?Object} - namespace data
+      * @return {?Object} - node property data
       */
-      const getNamespace = (obj, bool) => {
-        let ns = null;
+      const getNodeProp = (obj, bool) => {
+        let prop = null;
         if(obj) {
           const name = getNodeName(obj);
-          const prefix = obj.prefix ?
-            obj.prefix : name.prefix ? name.prefix : null;
-          const localName = obj.localName ?
-            obj.localName : name.localName;
           const namespaceURI = obj.namespaceURI ?
-            obj.namespaceURI : prefix && nsURI[prefix] ?
-            nsURI[prefix] : bool ? getNodeNS(obj).uri : null;
-          ns = {
-            namespaceURI: namespaceURI,
-            prefix: prefix,
-            localName: localName
+            obj.namespaceURI : name.prefix && nsURI[name.prefix] ?
+            nsURI[name.prefix] : bool ? getNodeNS(obj).uri : null;
+          prop = {
+            prefix: name.prefix,
+            localName: name.localName,
+            namespaceURI: namespaceURI
           };
         }
-        return ns;
+        return prop;
       };
       /**
       * create element NS
@@ -223,10 +219,10 @@
       * @return {?Object} - namespaced element
       */
       const createElmNS = obj => {
-        const ns = getNamespace(obj, true);
-        return ns && document.createElementNS(
-          ns.namespaceURI || nsURI.html,
-          ns.localName
+        const prop = getNodeProp(obj, true);
+        return prop && document.createElementNS(
+          prop.namespaceURI || nsURI.html,
+          prop.localName
         );
       };
       /**
@@ -238,11 +234,12 @@
         if(elm && obj) {
           const nodeAttr = obj.attributes;
           for(let attr of nodeAttr) {
-            const ns = getNamespace(attr, false);
-            typeof obj[attr.name] !== "function" && ns &&
+            const prop = getNodeProp(attr, false);
+            typeof obj[attr.name] !== "function" && prop &&
               elm.setAttributeNS(
-                ns.namespaceURI || "",
-                ns.prefix ? `${ ns.prefix }:${ ns.localName }` : ns.localName,
+                prop.namespaceURI || "",
+                prop.prefix ?
+                  `${ prop.prefix }:${ prop.localName }` : prop.localName,
                 attr.value
               );
           }
