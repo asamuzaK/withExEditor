@@ -30,7 +30,7 @@
 
   /* get node value */
   self.on("click", () => {
-    const namespaces = {
+    const nsURI = {
       ag: "http://purl.org/rss/1.0/modules/aggregation/",
       annotate: "http://purl.org/rss/1.0/modules/annotate/",
       app: "http://www.w3.org/2007/app",
@@ -110,13 +110,27 @@
     };
 
     /**
+    * get node name
+    * @param {Object} node - node
+    * @return {Object} - node name data
+    */
+    const getNodeName = (node = document.documentElement) => {
+      const name = /^(?:([\S]+):)?([\S]+)$/.exec(node.nodeName);
+      return {
+        prefix: node.prefix ?
+          node.prefix : name[1] ? name[1] : null,
+        localName: node.localName ?
+          node.localName : /HTML/.test(node.toString()) ?
+          name[2].toLowerCase() : name[2]
+      };
+    };
+
+    /**
     * get namespace of node from ancestor
     * @param {Object} node - element node
     * @return {Object} - namespace data
     */
     const getNodeNS = node => {
-      const getNodeName = obj =>
-        /HTML/.test(obj.toString()) ? obj.nodeName.toLowerCase() : obj.nodeName;
       const ns = {
         node: null,
         name: null,
@@ -124,7 +138,7 @@
       };
       if(node.namespaceURI) {
         ns.node = node;
-        ns.name = getNodeName(node);
+        ns.name = getNodeName(node).localName;
         ns.uri = node.namespaceURI;
       }
       else {
@@ -132,23 +146,22 @@
           switch(true) {
             case node.namespaceURI:
               ns.node = node;
-              ns.name = getNodeName(node);
+              ns.name = getNodeName(node).localName;
               ns.uri = node.namespaceURI;
               break;
             case /^(?:svg:)?foreignObject$/.test(node.parentNode.nodeName) &&
-                 (node.parentNode.hasAttributeNS(namespaces.svg, "requiredExtensions") ||
+                 (node.parentNode.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
                   document.documentElement.nodeName.toLowerCase() === "html"):
               ns.node = node;
-              ns.name = getNodeName(node);
-              ns.uri = node.parentNode.hasAttributeNS(namespaces.svg, "requiredExtensions") ?
-                node.parentNode.getAttributeNS(namespaces.svg, "requiredExtensions") :
-                namespaces.html;
+              ns.name = getNodeName(node).localName;
+              ns.uri = node.parentNode.hasAttributeNS(nsURI.svg, "requiredExtensions") ?
+                node.parentNode.getAttributeNS(nsURI.svg, "requiredExtensions") :
+                nsURI.html;
               break;
             case /^(?:(?:math:)?math|(?:svg:)?svg)$/.test(node.nodeName):
-              const name = /^(?:(?:math:)?(math)|(?:svg:)?(svg))$/.exec(node.nodeName);
               ns.node = node;
-              ns.name = name[1] || name[2];
-              ns.uri = namespaces[ns.name];
+              ns.name = getNodeName(node).localName;
+              ns.uri = nsURI[ns.name];
               break;
             default:
           }
@@ -162,11 +175,11 @@
         !ns.node && (
           node = document.documentElement,
           ns.node = node,
-          ns.name = getNodeName(node),
+          ns.name = getNodeName(node).localName,
           ns.uri = node.hasAttribute("xmlns") ?
             node.getAttribute("xmlns") :
-            namespaces[ns.name.toLowerCase()] ?
-            namespaces[ns.name.toLowerCase()] : null
+            nsURI[ns.name.toLowerCase()] ?
+            nsURI[ns.name.toLowerCase()] : null
         );
       }
       return ns;
@@ -187,19 +200,18 @@
       */
       const getNamespace = (obj, bool) => {
         let ns = null;
-        if(obj && obj.nodeName) {
-          const name = /^(?:([\S]+):)?([\S]+)$/.exec(obj.nodeName);
+        if(obj) {
+          const name = getNodeName(obj);
           const prefix = obj.prefix ?
-            obj.prefix : name[1] ? name[1] : null;
+            obj.prefix : name.prefix ? name.prefix : null;
           const localName = obj.localName ?
-            obj.localName : /HTML/.test(obj.toString()) ?
-            name[2].toLowerCase() : name[2];
+            obj.localName : name.localName;
           const namespaceURI = obj.namespaceURI ?
-            obj.namespaceURI : prefix && namespaces[prefix] ?
-            namespaces[prefix] : bool ? getNodeNS(obj).uri : null;
+            obj.namespaceURI : prefix && nsURI[prefix] ?
+            nsURI[prefix] : bool ? getNodeNS(obj).uri : null;
           ns = {
             namespaceURI: namespaceURI,
-            prefix: prefix ? prefix : "",
+            prefix: prefix,
             localName: localName
           };
         }
@@ -213,7 +225,7 @@
       const createElmNS = obj => {
         const ns = getNamespace(obj, true);
         return ns && document.createElementNS(
-          ns.namespaceURI || namespaces.html,
+          ns.namespaceURI || nsURI.html,
           ns.localName
         );
       };
@@ -230,9 +242,7 @@
             typeof obj[attr.name] !== "function" && ns &&
               elm.setAttributeNS(
                 ns.namespaceURI || "",
-                ns.prefix !== "" ?
-                  `${ ns.prefix }:${ ns.localName }` :
-                  ns.localName,
+                ns.prefix ? `${ ns.prefix }:${ ns.localName }` : ns.localName,
                 attr.value
               );
           }
@@ -270,11 +280,11 @@
 
     /**
     * create DOM tree
-    * @param {Object} container - container element of the DOM tree
+    * @param {Object} cont - container element of the DOM tree
     * @param {Object} nodes - child nodes
     * @return {Object} - DOM tree or text node
     */
-    const getDomTree = (container, nodes = null) => {
+    const getDomTree = (cont, nodes = null) => {
       /**
       * create DOM
       * @param {Object} obj - child nodes
@@ -299,10 +309,10 @@
         }
         return fragment;
       };
-      container = getElement(container);
-      container.nodeType === 1 && nodes && nodes.hasChildNodes() &&
-        container.appendChild(createDom(nodes));
-      return container;
+      cont = getElement(cont);
+      cont.nodeType === 1 && nodes && nodes.hasChildNodes() &&
+        cont.appendChild(createDom(nodes));
+      return cont;
     };
 
     /**
@@ -345,7 +355,7 @@
             );
           }
           fragment.appendChild(document.createTextNode("\n"));
-          l > 1 && i !== l - 1 &&
+          l > 1 && i < l - 1 &&
             fragment.appendChild(document.createComment("Next Range"));
           i = i + 1;
         }
@@ -379,13 +389,13 @@
           for(let node of obj) {
             switch(true) {
               case node.nodeType === 3:
-                array[array.length] = node.nodeValue;
+                array.push(node.nodeValue);
                 break;
               case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
-                array[array.length] = "\n";
+                array.push("\n");
                 break;
               case node.nodeType === 1 && node.hasChildNodes():
-                array[array.length] = getTextNode(node);
+                array.push(getTextNode(node));
                 break;
               default:
             }
@@ -405,18 +415,16 @@
           for(let node of obj) {
             switch(true) {
               case node.nodeType === 3:
-                array[array.length] = node.nodeValue;
+                array.push(node.nodeValue);
                 break;
               case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
-                array[array.length] = "\n";
+                array.push("\n");
                 break;
               case node.nodeType === 1 && node.hasChildNodes():
-                let container = getElement(node);
-                container && container.nodeType === 1 && (
-                  container = getDomTree(container, node),
-                  container.hasChildNodes() && (
-                    array[array.length] = getTextNode(container)
-                  )
+                let cont = getElement(node);
+                cont && cont.nodeType === 1 && (
+                  cont = getDomTree(cont, node),
+                  cont.hasChildNodes() && array.push(getTextNode(cont))
                 );
                 break;
               default:
