@@ -11,11 +11,11 @@ Features
 
 Codes
 <ul>
-<li>Switched some let variables to const.</li>
+<li>Switched some `let` variables to `const`.</li>
 <li>Replaced brackets to dot notations.
     Removed quotes from JavaScript object properties.</li>
 <li>Replaced indent from tabs to spaces.
     Also, wrapped long lines.</li>
 <li>Refined RegExp and some functions in main.js</li>
-<li>Refined createElementNS / setAttributeNS and switched stringified values to JSON string for postMessage in contextMenu.js</li>
+<li>Totally refined contextMenu.js</li>
 </ul>

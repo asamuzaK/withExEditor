@@ -13,9 +13,9 @@
     const elm = document.activeElement;
     let label;
     switch(true) {
-      case /^input$/i.test(elm.nodeName) && elm.hasAttribute("type") &&
+      case /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
            /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-           /^textarea$/i.test(elm.nodeName) || elm.isContentEditable:
+           /^textarea$/.test(elm.localName) || elm.isContentEditable:
         label = EDIT_TEXT;
         break;
       case !window.getSelection().isCollapsed:
@@ -110,22 +110,6 @@
     };
 
     /**
-    * get node name
-    * @param {Object} node - node
-    * @return {Object} - node name data
-    */
-    const getNodeName = (node = document.documentElement) => {
-      const name = /^(?:([\S]+):)?([\S]+)$/.exec(node.nodeName);
-      return {
-        prefix: node.prefix ?
-          node.prefix : name[1] ? name[1] : null,
-        localName: node.localName ?
-          node.localName : /HTML/.test(node.toString()) ?
-          name[2].toLowerCase() : name[2]
-      };
-    };
-
-    /**
     * get namespace of node from ancestor
     * @param {Object} node - element node
     * @return {Object} - namespace data
@@ -138,7 +122,7 @@
       };
       if(node.namespaceURI) {
         ns.node = node;
-        ns.name = getNodeName(node).localName;
+        ns.name = node.localName;
         ns.uri = node.namespaceURI;
       }
       else {
@@ -146,22 +130,22 @@
           switch(true) {
             case node.namespaceURI:
               ns.node = node;
-              ns.name = getNodeName(node).localName;
+              ns.name = node.localName;
               ns.uri = node.namespaceURI;
               break;
-            case /^(?:svg:)?foreignObject$/.test(node.parentNode.nodeName) &&
+            case /^foreignObject$/.test(node.parentNode.localName) &&
                  (node.parentNode.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
-                  document.documentElement.nodeName.toLowerCase() === "html"):
+                  document.documentElement.localName === "html"):
               ns.node = node;
-              ns.name = getNodeName(node).localName;
+              ns.name = node.localName;
               ns.uri = node.parentNode.hasAttributeNS(nsURI.svg, "requiredExtensions") ?
                 node.parentNode.getAttributeNS(nsURI.svg, "requiredExtensions") :
                 nsURI.html;
               break;
-            case /^(?:(?:math:)?math|(?:svg:)?svg)$/.test(node.nodeName):
+            case /^(?:math|svg)$/.test(node.localName):
               ns.node = node;
-              ns.name = getNodeName(node).localName;
-              ns.uri = nsURI[ns.name];
+              ns.name = node.localName;
+              ns.uri = nsURI[node.localName];
               break;
             default:
           }
@@ -175,11 +159,11 @@
         !ns.node && (
           node = document.documentElement,
           ns.node = node,
-          ns.name = getNodeName(node).localName,
+          ns.name = node.localName,
           ns.uri = node.hasAttribute("xmlns") ?
             node.getAttribute("xmlns") :
-            nsURI[ns.name.toLowerCase()] ?
-            nsURI[ns.name.toLowerCase()] : null
+            nsURI[node.localName.toLowerCase()] ?
+            nsURI[node.localName.toLowerCase()] : null
         );
       }
       return ns;
@@ -193,35 +177,28 @@
     */
     const getElement = (node, child = false) => {
       /**
-      * get node properties
-      * @param {Object} obj - element node
+      * get namespace URI
+      * @param {Object} obj - element node or attribute node
       * @param {boolean} bool - use getNodeNS
-      * @return {?Object} - node property data
+      * @return {?Object} - namespace URI data
       */
-      const getNodeProp = (obj, bool) => {
-        let prop = null;
-        if(obj) {
-          const name = getNodeName(obj);
-          prop = {
-            prefix: name.prefix,
-            localName: name.localName,
-            namespaceURI: obj.namespaceURI ?
-              obj.namespaceURI : name.prefix && nsURI[name.prefix] ?
-              nsURI[name.prefix] : bool ? getNodeNS(obj).uri : null
-          };
-        }
-        return prop;
-      };
+      const getNsURI = (obj, bool) =>
+        obj ? {
+          namespaceURI: obj.namespaceURI ?
+            obj.namespaceURI : obj.prefix && nsURI[obj.prefix] ?
+            nsURI[obj.prefix] : bool ? getNodeNS(obj).uri : null
+        } : null;
       /**
       * create element NS
       * @param {Object} obj - element
       * @return {?Object} - namespaced element
       */
       const createElmNS = obj => {
-        const prop = getNodeProp(obj, true);
-        return prop && document.createElementNS(
-          prop.namespaceURI || nsURI.html,
-          prop.localName
+        const ns = getNsURI(obj, true);
+        return ns && document.createElementNS(
+          ns.namespaceURI || nsURI.html,
+          obj.prefix ?
+            `${ obj.prefix }:${ obj.localName }` : obj.localName
         );
       };
       /**
@@ -233,12 +210,12 @@
         if(elm && obj) {
           const nodeAttr = obj.attributes;
           for(let attr of nodeAttr) {
-            const prop = getNodeProp(attr, false);
-            typeof obj[attr.name] !== "function" && prop &&
+            const ns = getNsURI(attr, false);
+            typeof obj[attr.name] !== "function" && ns &&
               elm.setAttributeNS(
-                prop.namespaceURI || "",
-                prop.prefix ?
-                  `${ prop.prefix }:${ prop.localName }` : prop.localName,
+                ns.namespaceURI || "",
+                attr.prefix ?
+                  `${ attr.prefix }:${ attr.localName }` : attr.localName,
                 attr.value
               );
           }
@@ -254,10 +231,12 @@
         if(obj && obj.hasChildNodes()) {
           obj = obj.childNodes;
           for(let child of obj) {
-            child.nodeType === 1 ?
-              fragment.appendChild(getElement(child, true)) :
-              child.nodeType === 3 &&
-                fragment.appendChild(document.createTextNode(child.nodeValue));
+            child.nodeType === 1 ? (
+              child === child.parentNode.firstChild &&
+                fragment.appendChild(document.createTextNode("\n")),
+              fragment.appendChild(getElement(child, true))
+            ) : child.nodeType === 3 &&
+              fragment.appendChild(document.createTextNode(child.nodeValue));
           }
         }
         return fragment;
@@ -389,7 +368,7 @@
               case node.nodeType === 3:
                 array.push(node.nodeValue);
                 break;
-              case node.nodeType === 1 && node.nodeName.toLowerCase() === "br":
+              case node.nodeType === 1 && node.localName === "br":
                 array.push("\n");
                 break;
               case node.nodeType === 1 && node.hasChildNodes():
@@ -438,9 +417,9 @@
       if(selection.isCollapsed) {
         obj = document.activeElement;
         switch(true) {
-          case /^input$/i.test(obj.nodeName) && obj.hasAttribute("type") &&
+          case /^input$/.test(obj.localName) && obj.hasAttribute("type") &&
                /^(?:(?:emai|te|ur)l|search|text)$/.test(obj.getAttribute("type")) ||
-               /^textarea$/i.test(obj.nodeName):
+               /^textarea$/.test(obj.localName):
             target = getId(obj);
             target && (
               mode.mode = EDIT_TEXT,

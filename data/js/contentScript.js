@@ -18,10 +18,12 @@
     if(node && node.nodeType === 1 && Array.isArray(array)) {
       const fragment = document.createDocumentFragment();
       const l = array.length;
-      for(let i = 0; i < l; i = i + 1) {
+      let i = 0;
+      while(i < l) {
         fragment.appendChild(document.createTextNode(array[i]));
         i < l - 1 && namespace === "http://www.w3.org/1999/xhtml" &&
           fragment.appendChild(document.createElementNS(namespace, "br"));
+        i = i + 1;
       }
       if(node.hasChildNodes()) {
         while(node.firstChild) {
@@ -34,7 +36,7 @@
 
   /* get target element and and sync text value */
   elm.hasAttribute(DATA_ID) && elm.getAttribute(DATA_ID) === target && (
-    /^(?:input|textarea)$/i.test(elm.nodeName) ?
+    /^(?:input|textarea)$/.test(elm.localName) ?
       elm.value = value :
       elm.isContentEditable && setContentEditableText(elm, value.split("\n"))
   );
