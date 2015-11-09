@@ -304,14 +304,14 @@
 
     /**
     * create DOM of MathML
-    * @param {Object} obj - obj of MathML
+    * @param {Object} node - element node of MathML
     * @return {?string} - serialized node string
     */
-    const onViewMathML = obj => {
+    const onViewMathML = node => {
       let elm, range;
-      while(obj && obj.parentNode && !elm) {
-        obj.localName === "math" && (elm = obj);
-        obj = obj.parentNode;
+      while(node && node.parentNode && !elm) {
+        node.localName === "math" && (elm = node);
+        node = node.parentNode;
       }
       elm && (
         range = document.createRange(),
@@ -323,7 +323,7 @@
     };
 
     /**
-    * create DOM from selection range and get child nodes
+    * create DOM from selection range
     * @param {Object} sel - selection
     * @return {?string} - serialized node string
     */
