@@ -6,7 +6,7 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ## Usage
 
-### View Source
+### View Page Source
 * Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.
 * When browsing a local file, the local file will be opened directly.
 
