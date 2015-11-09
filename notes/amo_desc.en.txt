@@ -1,21 +1,21 @@
 "View Source", "View Selection", "Edit Text" with the external editor which you like, on context menu.
 
-<em>View Page Source</em>
+<em>View Page Source with [exEditor]</em>
 <ul>
   <li>Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.</li>
   <li>When browsing a local file, the local file will be opened directly.</li>
 </ul>
-<em>View MathML Source</em>
+<em>View MathML Source with [exEditor]</em>
 <ul>
   <li>Enabled on MathML elements and shows a generated DOM tree in MathML format. It may not be the same with the DOM tree of the document source.</li>
 </ul>
-<em>View Selection Source</em>
+<em>View Selection Source with [exEditor]</em>
 <ul>
   <li>Shows a generated DOM tree of the selection in XML format. It may not be the same with the DOM tree of the document source.</li>
   <li>If there are multiple ranges in selection, each range will be shown with a comment as a delimiter.</li>
   <li>If the selection is not DOM parsable, then creates a file that contains only the range of text selected.</li>
 </ul>
-<em>Edit Text</em>
+<em>Edit Text with [exEditor]</em>
 <ul>
   <li>Enabled on form input elements, textarea elements, and editable elements.</li>
   <li>Edited contents will be synchronized when you go back to the browser and move focus to the element which you've edited.</li>

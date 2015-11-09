@@ -6,19 +6,19 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ## Usage
 
-### View Page Source
+### View Page Source with *exEditor*
 * Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.
 * When browsing a local file, the local file will be opened directly.
 
-### View MathML Source
+### View MathML Source with *exEditor*
 * Enabled on MathML elements and shows a generated DOM tree in MathML format. It may not be the same with the DOM tree of the document source.
 
-###View Selection Source
+### View Selection Source with *exEditor*
 * Shows a generated DOM tree of the selection in XML format. It may not be the same with the DOM tree of the document source.
 * If there are multiple ranges in selection, each range will be shown with a comment as a delimiter.
 * If the selection is not DOM parsable, then creates a file that contains only the range of text selected.
 
-### Edit Text
+### Edit Text with *exEditor*
 * Enabled on form input elements, textarea elements, and editable elements.
 * Edited contents will be synchronized when you go back to the browser and move focus to the element which you've edited.
 
