@@ -1,4 +1,4 @@
-"View Page Source", "View Selection Source", "Edit Text" with the external editor which you like, on context menu.
+"View Source", "View Selection", "Edit Text" with the external editor which you like, on context menu.
 
 <em>View Page Source</em>
 <ul>
@@ -12,6 +12,7 @@
 <em>View Selection Source</em>
 <ul>
   <li>Shows a generated DOM tree of the selection in XML format. It may not be the same with the DOM tree of the document source.</li>
+  <li>If there are multiple selection, each selection will be shown with the comment as a delimiter.</li>
   <li>If the selection is not DOM parsable, then creates a file that contains only the selection part.</li>
 </ul>
 <em>Edit Text</em>

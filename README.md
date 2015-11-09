@@ -15,6 +15,8 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 
 ###View Selection Source
 * Shows a generated DOM tree of the selection in XML format. It may not be the same with the DOM tree of the document source.
+* If there are multiple selection, each selection will be shown with the comment as a delimiter.
+* If the selection is not DOM parsable, then creates a file that contains only the selection part.
 
 ### Edit Text
 * Enabled on form input elements, textarea elements, and editable elements.
