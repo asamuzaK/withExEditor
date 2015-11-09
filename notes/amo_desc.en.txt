@@ -5,15 +5,19 @@
   <li>Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.</li>
   <li>When browsing a local file, the local file will be opened directly.</li>
 </ul>
+<em>View MathML Source</em>
+<ul>
+  <li>Enabled on MathML elements and shows a generated DOM tree in MathML format. It may not be the same with the DOM tree of the document source.</li>
+</ul>
 <em>View Selection Source</em>
 <ul>
-  <li>Shows a generated DOM tree of the selection in XML. It may not be the same with the DOM tree of the document source.</li>
+  <li>Shows a generated DOM tree of the selection in XML format. It may not be the same with the DOM tree of the document source.</li>
   <li>If the selection is not DOM parsable, then creates a file that contains only the selection part.</li>
 </ul>
 <em>Edit Text</em>
 <ul>
-  <li>Can be used with inputs, textareas, or editable elements.</li>
-  <li>Contents will be synchronized when you go back to the browser and move focus to the element which you've edited.</li>
+  <li>Enabled on form input elements, textarea elements, and editable elements.</li>
+  <li>Edited contents will be synchronized when you go back to the browser and move focus to the element which you've edited.</li>
 </ul>
 * * *
 <em>Options In Add-on Manager</em>
