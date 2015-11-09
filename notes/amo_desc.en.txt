@@ -1,11 +1,11 @@
-"View Source", "View Selection", "Edit Text" with the external editor which you like, on context menu.
+"View Page Source", "View Selection Source", "Edit Text" with the external editor which you like, on context menu.
 
-<em>View Source</em>
+<em>View Page Source</em>
 <ul>
   <li>Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.</li>
   <li>When browsing a local file, the local file will be opened directly.</li>
 </ul>
-<em>View Selection</em>
+<em>View Selection Source</em>
 <ul>
   <li>Shows a generated DOM tree of the selection in XML. It may not be the same with the DOM tree of the document source.</li>
   <li>If the selection is not DOM parsable, then creates a file that contains only the selection part.</li>

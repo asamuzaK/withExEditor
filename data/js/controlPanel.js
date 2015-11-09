@@ -70,6 +70,10 @@
   };
 
   /* event handling */
+  /**
+  * self port emit
+  * @param {Object} evt - event
+  */
   const selfPortEmit = evt => {
     if(evt) {
       switch(evt.type) {
@@ -97,6 +101,10 @@
       }
     }
   };
+  /**
+  * check if radio button is checked
+  * @param {Object} evt - event
+  */
   const isRadioChecked = evt => {
     evt && evt.target && evt.target.checked && selfPortEmit(evt);
     return;
