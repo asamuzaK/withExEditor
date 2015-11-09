@@ -10,12 +10,15 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 * Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.
 * When browsing a local file, the local file will be opened directly.
 
-### View Selection
-* Shows a generated DOM tree from the selection. It may not be the same with the DOM tree of the document source.
+### View MathML Source
+* Enabled on MathML elements and shows a generated DOM tree in MathML format. It may not be the same with the DOM tree of the document source.
+
+###View Selection Source
+* Shows a generated DOM tree of the selection in XML format. It may not be the same with the DOM tree of the document source.
 
 ### Edit Text
-* Can be used with inputs, textareas, or editable elements.
-* Contents will be synchronized when you go back to the browser and move focus to the element which you've edited.
+* Enabled on form input elements, textarea elements, and editable elements.
+* Edited contents will be synchronized when you go back to the browser and move focus to the element which you've edited.
 
 ***
 
