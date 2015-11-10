@@ -3,3 +3,8 @@ New And Updated Features
 <li>Add support for `View MathML Source`.</li>
 <li>Refined some labels and localization.</li>
 </ul>
+
+Codes
+<ul>
+<li>Moved functions (const) outside the self.on() in contextMenu.js</li>
+</ul>
