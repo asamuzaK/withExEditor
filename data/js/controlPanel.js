@@ -69,7 +69,6 @@
     return value;
   };
 
-  /* event handling */
   /**
   * self port emit
   * @param {Object} evt - event
@@ -101,6 +100,7 @@
       }
     }
   };
+
   /**
   * check if radio button is checked
   * @param {Object} evt - event

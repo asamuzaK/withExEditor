@@ -18,7 +18,7 @@
 <em>Edit Text with [exEditor]</em>
 <ul>
   <li>Enabled on form input elements, textarea elements, and editable elements.</li>
-  <li>Edited contents will be synchronized when you go back to the browser and move focus to the element which you've edited.</li>
+  <li>Edited contents will be synchronized when you go back to the browser and move focus to the element which you have edited.</li>
 </ul>
 * * *
 <em>Options In Add-on Manager</em>
@@ -54,7 +54,7 @@
 
 <em>Initialize All Settings When Add-on Is Disabled</em>
 <ul>
-<li>If checked, all stored data will be removed and all prefs settings will be initialized.</li>
+<li>If checked, all stored data will be removed and all preference settings will be initialized.</li>
 </ul>
 * * *
 <em>Options In Toolbar Button</em>
