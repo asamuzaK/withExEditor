@@ -40,8 +40,10 @@ ex: `"Some Arg"`
 ### DISPLAY Environment Variable
 * For Linux only. Set this option if "Cannot open display" error occurred. Maybe, you also need to set "xhost".
 
-### Access Key On Context Menu
+### Access Key
 * You can choose any key. But, it must be a single character.
+* On context menu, press `key` itself.
+* To open / close control panel from toolbar button, press `Shift + key`.
 
 ### Enable During Private Browsing
 * Enables if checked, disabled if not.
