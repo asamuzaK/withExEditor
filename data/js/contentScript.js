@@ -4,7 +4,6 @@
 (() => {
   "use strict";
   const DATA_ID = "data-with_ex_editor_id";
-  const elm = document.activeElement;
   const target = self.options.target || "";
   const value = self.options.value || "";
   const namespace = self.options.namespace || "http://www.w3.org/1999/xhtml";
@@ -35,6 +34,7 @@
   };
 
   /* get target element and and sync text value */
+  const elm = document.activeElement;
   elm.hasAttribute(DATA_ID) && elm.getAttribute(DATA_ID) === target && (
     /^(?:input|textarea)$/.test(elm.localName) ?
       elm.value = value :

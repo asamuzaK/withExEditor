@@ -292,7 +292,7 @@
       elm = getDomTree(elm, range.cloneContents())
     );
     return elm && elm.hasChildNodes() && window.XMLSerializer ?
-      new XMLSerializer().serializeToString(elm) : null;
+      (new XMLSerializer()).serializeToString(elm) : null;
   };
 
   /**
@@ -348,7 +348,7 @@
       );
     }
     return fragment && fragment.hasChildNodes() && window.XMLSerializer ?
-      new XMLSerializer().serializeToString(fragment) : null;
+      (new XMLSerializer()).serializeToString(fragment) : null;
   };
 
   /**
