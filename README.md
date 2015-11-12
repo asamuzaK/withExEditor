@@ -43,7 +43,7 @@ ex: `"Some Arg"`
 ### Access Key
 * You can choose any key. But, it must be a single character.
 * On context menu, press `key` itself.
-* To open / close control panel from toolbar button, press `Shift + key`.
+* To open / close the panel from the toolbar button, press `Shift + key`.
 
 ### Enable During Private Browsing
 * Enables if checked, disabled if not.
