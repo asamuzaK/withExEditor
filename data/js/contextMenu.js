@@ -440,6 +440,7 @@
   self.on("click", elm => {
     const mode = {
       mode: VIEW_SOURCE,
+      charset: window.top.document.characterSet,
       target: null,
       value: null,
       namespace: null
