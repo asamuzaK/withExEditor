@@ -52,7 +52,7 @@ ex: `"Some Arg"`
 * You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox. This may cause problem, it depends on the editor setting.
 
 ### Initialize All Settings When Add-on Is Disabled
-* If checked, all stored data will be removed and all prefs settings will be initialized.
+* If checked, all stored data will be removed and all preference settings will be initialized.
 
 ***
 
