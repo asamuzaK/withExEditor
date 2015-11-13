@@ -49,7 +49,8 @@ ex: `"Some Arg"`
 * Enables if checked, disabled if not.
 
 ### Force To Remove The Temporary Files At Shutdown
-* You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox. This may cause problem, it depends on the editor setting.
+* You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox.
+* It is recommended to be checked, but there is a possibility that trouble occurs if you enable this option. It depends on the settings of the editor.
 
 ### Initialize All Settings When Add-on Is Disabled
 * If checked, all stored data will be removed and all preference settings will be initialized.
