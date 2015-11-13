@@ -43,7 +43,7 @@
 <ul>
   <li>You can choose any key. But, it must be a single character.</li>
   <li>On context menu, press `key` itself.</li>
-  <li>To open / close the panel from the toolbar button, press `Shift + key`.</li>
+  <li>To open / close the panel from the toolbar button, press `Ctrl + Alt + key` (`Cmd + Option + key` on Mac).</li>
 </ul>
 <em>Enable During Private Browsing</em>
 <ul>
