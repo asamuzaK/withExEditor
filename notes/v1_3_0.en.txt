@@ -1,7 +1,7 @@
 New And Updated Features
 <ul>
-<li>Fix bug in View Page Source mode when document encoding is not `UTF-8`.</li>
-<li>Add access key for toolbar button.</li>
+<li>Fix bug in `View Page Source` mode when document encoding is not `UTF-8`.</li>
+<li>Add keyboard shortcut for toolbar button.</li>
 <li>Add support for `View MathML Source`.</li>
 <li>Refined some labels and localization.</li>
 </ul>
