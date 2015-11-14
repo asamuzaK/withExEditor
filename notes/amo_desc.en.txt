@@ -1,8 +1,10 @@
 "View Source", "View Selection", "Edit Text" with the external editor which you like, on context menu.
+Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 
 <em>View Page Source with [exEditor]</em>
 <ul>
-  <li>Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.</li>
+  <li>Creates a temporary file and opens with the external editor.</li>
+  <li>The temporary file is encoded in UTF-8, even if the original document is not so.</li>
   <li>When browsing a local file, the local file will be opened directly.</li>
 </ul>
 <em>View MathML Source with [exEditor]</em>

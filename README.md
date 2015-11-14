@@ -1,5 +1,6 @@
 # withExEditor
 Firefox add-on to View Source, View Selection, and Edit Texts with the external editor which you like, on context menu.
+Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 
 ## Add-on Page
 [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/ja/firefox/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
@@ -7,7 +8,8 @@ Firefox add-on to View Source, View Selection, and Edit Texts with the external 
 ## Usage
 
 ### View Page Source with *exEditor*
-* Opens (X)HTML, JavaScript, CSS, SVG, XML source with the editor.
+* Creates a temporary file and opens with the external editor.
+* The temporary file is encoded in UTF-8, even if the original document is not so.
 * When browsing a local file, the local file will be opened directly.
 
 ### View MathML Source with *exEditor*
