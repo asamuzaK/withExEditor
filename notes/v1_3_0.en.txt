@@ -8,6 +8,6 @@ New And Updated Features
 
 Codes
 <ul>
-<li>Organized `const` in main.js
-<li>Moved functions (`const`) outside the self.on() in contextMenu.js</li>
+<li>Organized constants, variables, arguments in main.js
+<li>Moved functions outside self.on() in contextMenu.js</li>
 </ul>
