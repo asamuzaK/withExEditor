@@ -1,9 +1,0 @@
-Updated Features
-<ul>
-<li>Fixed default parameter of getContextMode(), in main.js</li>
-</ul>
-
-Codes
-<ul>
-<li>Switched some functions using jsm to sdk</li>
-</ul>
