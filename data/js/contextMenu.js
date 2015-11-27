@@ -1,6 +1,6 @@
 /**
-* contextMenu.js
-*/
+ * contextMenu.js
+ */
 (() => {
   "use strict";
   const VIEW_SOURCE = "ViewSource";
@@ -90,10 +90,10 @@
   };
 
   /**
-  * get namespace of node from ancestor
-  * @param {Object} node - element node
-  * @return {Object} - namespace data
-  */
+   * get namespace of node from ancestor
+   * @param {Object} node - element node
+   * @return {Object} - namespace data
+   */
   const getNodeNS = node => {
     const ns = {
       node: null,
@@ -144,11 +144,11 @@
   };
 
   /**
-  * get namespace URI
-  * @param {Object} node - element node or attribute node
-  * @param {boolean} bool - use getNodeNS
-  * @return {?Object} - namespace URI data
-  */
+   * get namespace URI
+   * @param {Object} node - element node or attribute node
+   * @param {boolean} bool - use getNodeNS
+   * @return {?Object} - namespace URI data
+   */
   const getNsURI = (node, bool) =>
     node ? {
       namespaceURI: node.namespaceURI ?
@@ -157,10 +157,10 @@
     } : null;
 
   /**
-  * create element NS
-  * @param {Object} elm - element
-  * @return {?Object} - namespaced element
-  */
+   * create element NS
+   * @param {Object} elm - element
+   * @return {?Object} - namespaced element
+   */
   const createElmNS = elm => {
     const ns = getNsURI(elm, true);
     return ns && document.createElementNS(
@@ -171,10 +171,10 @@
   };
 
   /**
-  * set attribute NS
-  * @param {Object} elm - element to append attributes
-  * @param {Object} node - node to get attributes from
-  */
+   * set attribute NS
+   * @param {Object} elm - element to append attributes
+   * @param {Object} node - node to get attributes from
+   */
   const setAttrNS = (elm, node) => {
     if(elm && node) {
       const nodeAttr = node.attributes;
@@ -192,25 +192,25 @@
   };
 
   /**
-  * is NodeList type
-  * @param {Object} obj - object
-  * @return {boolean}
-  */
+   * is NodeList type
+   * @param {Object} obj - object
+   * @return {boolean}
+   */
   const isNodeList = obj =>
     obj ? /NodeList/.test(obj.toString()) : false;
 
   /**
-  * create namespace element
-  * @param {Object} node - element node to create element from
-  * @param {boolean} bool - append child nodes
-  * @return {Object} - namespaced element or text node
-  */
+   * create namespaced element
+   * @param {Object} node - element node to create element from
+   * @param {boolean} bool - append child nodes
+   * @return {Object} - namespaced element or text node
+   */
   const getElement = (node, bool = false) => {
     /**
-    * append child nodes
-    * @param {Object} nodes - child nodes
-    * @return {Object} - document fragment
-    */
+     * append child nodes
+     * @param {Object} nodes - child nodes
+     * @return {Object} - document fragment
+     */
     const appendChildNodes = nodes => {
       const fragment = document.createDocumentFragment();
       if(isNodeList(nodes)) {
@@ -238,17 +238,17 @@
   };
 
   /**
-  * create DOM tree
-  * @param {Object} elm - container element of the DOM tree
-  * @param {Object} node - node containing child nodes to append
-  * @return {Object} - DOM tree or text node
-  */
+   * create DOM tree
+   * @param {Object} elm - container element of the DOM tree
+   * @param {Object} node - node containing child nodes to append
+   * @return {Object} - DOM tree or text node
+   */
   const getDomTree = (elm, node = null) => {
     /**
-    * create DOM
-    * @param {Object} nodes - child nodes
-    * @return {Object} - document fragment
-    */
+     * create DOM
+     * @param {Object} nodes - child nodes
+     * @return {Object} - document fragment
+     */
     const createDom = nodes => {
       const fragment = document.createDocumentFragment();
       if(isNodeList(nodes)) {
@@ -276,10 +276,10 @@
   };
 
   /**
-  * create DOM of MathML
-  * @param {Object} node - element node of MathML
-  * @return {?string} - serialized node string
-  */
+   * create DOM of MathML
+   * @param {Object} node - element node of MathML
+   * @return {?string} - serialized node string
+   */
   const onViewMathML = node => {
     let elm, range;
     while(node && node.parentNode && !elm) {
@@ -296,10 +296,10 @@
   };
 
   /**
-  * create DOM from selection range
-  * @param {Object} sel - selection
-  * @return {?string} - serialized node string
-  */
+   * create DOM from selection range
+   * @param {Object} sel - selection
+   * @return {?string} - serialized node string
+   */
   const onViewSelection = sel => {
     let fragment = document.createDocumentFragment();
     if(sel && sel.rangeCount) {
@@ -352,16 +352,16 @@
   };
 
   /**
-  * get text node from editable content
-  * @param {Object} node - node
-  * @return {string} - text
-  */
+   * get text node from editable content
+   * @param {Object} node - node
+   * @return {string} - text
+   */
   const onContentEditable = node => {
     /**
-    * get text node
-    * @param {Object} nodes - child nodes
-    * @return {string} - text
-    */
+     * get text node
+     * @param {Object} nodes - child nodes
+     * @return {string} - text
+     */
     const getTextNode = nodes => {
       const array = [];
       if(isNodeList(nodes)) {
@@ -386,10 +386,10 @@
   };
 
   /**
-  * set temporary ID to the target element and set event listener
-  * @param {Object} elm - target element
-  * @return {?string} - ID
-  */
+   * set temporary ID to the target element and set event listener
+   * @param {Object} elm - target element
+   * @return {?string} - ID
+   */
   const getId = elm => {
     let id = null;
     elm && (
@@ -407,10 +407,10 @@
   };
 
   /**
-  * set context menu item label
-  * @param {Object} elm - the element that triggered context menu
-  * @return {boolean} - true
-  */
+   * set context menu item label
+   * @param {Object} elm - the element that triggered context menu
+   * @return {boolean} - true
+   */
   self.on("context", elm => {
     const sel = window.getSelection();
     let label;
@@ -434,9 +434,9 @@
   });
 
   /**
-  * switch mode by context
-  * @param {Object} elm - the element that triggered context menu
-  */
+   * switch mode by context
+   * @param {Object} elm - the element that triggered context menu
+   */
   self.on("click", elm => {
     const mode = {
       mode: VIEW_SOURCE,

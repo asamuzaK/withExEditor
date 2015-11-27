@@ -1,6 +1,6 @@
 /**
-* controlPanel.js
-*/
+ * controlPanel.js
+ */
 (() => {
   "use strict";
   const html = document.querySelector("html");
@@ -22,9 +22,9 @@
   const iconWhiteLabel = document.querySelector("label[data-l10n-id=IconWhiteLabel]");
 
   /**
-  * remove child nodes
-  * @param {Object} node
-  */
+   * remove child nodes
+   * @param {Object} node
+   */
   const removeChildNodes = node => {
     if(node && node.hasChildNodes()) {
       while(node.firstChild) {
@@ -34,9 +34,9 @@
   };
 
   /**
-  * toggle form inputs
-  * @return {void}
-  */
+   * toggle form inputs
+   * @return {void}
+   */
   const toggleInputs = () => {
     editorLabel && storeLabel && (
       editorName && editorName.value && currentName &&
@@ -54,10 +54,10 @@
   };
 
   /**
-  * get radio button value
-  * @param {string} name - radio button name
-  * @return {?string} - checked radio button value
-  */
+   * get radio button value
+   * @param {string} name - radio button name
+   * @return {?string} - checked radio button value
+   */
   const getRadioButtonValue = name => {
     let value = null;
     for(let node of inputRadios) {
@@ -70,9 +70,9 @@
   };
 
   /**
-  * self port emit
-  * @param {Object} evt - event
-  */
+   * self port emit
+   * @param {Object} evt - event
+   */
   const selfPortEmit = evt => {
     if(evt) {
       switch(evt.type) {
@@ -102,19 +102,19 @@
   };
 
   /**
-  * check if radio button is checked
-  * @param {Object} evt - event
-  */
+   * check if radio button is checked
+   * @param {Object} evt - event
+   */
   const isRadioChecked = evt => {
     evt && evt.target && evt.target.checked && selfPortEmit(evt);
     return;
   };
 
   /**
-  * update control panel
-  * @param {Object} res - editor data
-  * @return {void}
-  */
+   * update control panel
+   * @param {Object} res - editor data
+   * @return {void}
+   */
   self.port.on("editorValue", res => {
     res && (
       editorName && (
@@ -136,10 +136,10 @@
   });
 
   /**
-  * localize control panel
-  * @param {Object} res - localize data
-  * @return {void}
-  */
+   * localize control panel
+   * @param {Object} res - localize data
+   * @return {void}
+   */
   self.port.on("htmlValue", res => {
     res && (
       html && (html.lang = res.lang),

@@ -1,6 +1,6 @@
 /**
-* contentScript.js
-*/
+ * contentScript.js
+ */
 (() => {
   "use strict";
   const DATA_ID = "data-with_ex_editor_id";
@@ -9,10 +9,10 @@
   const namespace = self.options.namespace || "http://www.w3.org/1999/xhtml";
 
   /**
-  * set content editable element text
-  * @param {Object} node - editable element
-  * @param {Array} array - array of values
-  */
+   * set content editable element text
+   * @param {Object} node - editable element
+   * @param {Array} array - array of values
+   */
   const setContentEditableText = (node, array = [""]) => {
     if(node && node.nodeType === 1 && Array.isArray(array)) {
       const fragment = document.createDocumentFragment();
