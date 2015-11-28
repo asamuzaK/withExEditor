@@ -1,0 +1,10 @@
+Updated Features
+<ul>
+<li>Fixed localize.</li>
+</ul>
+
+Codes
+<ul>
+<li>Fixed default parameter of getContextMode(), in main.js</li>
+<li>Switched some functions which were using jsm to sdk, in main.js and contextMenu.js</li>
+</ul>
