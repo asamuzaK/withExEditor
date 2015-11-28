@@ -6,5 +6,5 @@
 コード変更点
 <ul>
 <li>getContextMode()のデフォルトパラメータを修正（main.js）</li>
-<li>jsmを利用していたいくつかの関数をsdkのAPIに変更（main.js、contextMenu.js）</li>
+<li>jsmを利用していたいくつかの関数をsdkのAPIに変更（main.js、componentUtils.js）</li>
 </ul>
