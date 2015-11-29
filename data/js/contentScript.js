@@ -4,9 +4,10 @@
 (() => {
   "use strict";
   const DATA_ID = "data-with_ex_editor_id";
+  const nsURI = { html: "http://www.w3.org/1999/xhtml" };
   const target = self.options.target || "";
   const value = self.options.value || "";
-  const namespace = self.options.namespace || "http://www.w3.org/1999/xhtml";
+  const namespace = self.options.namespace || nsURI.html;
 
   /**
    * set content editable element text
@@ -20,7 +21,7 @@
       let i = 0;
       while(i < l) {
         fragment.appendChild(document.createTextNode(array[i]));
-        i < l - 1 && namespace === "http://www.w3.org/1999/xhtml" &&
+        i < l - 1 && namespace === nsURI.html &&
           fragment.appendChild(document.createElementNS(namespace, "br"));
         i = i + 1;
       }
