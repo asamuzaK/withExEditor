@@ -292,7 +292,7 @@
       elm = getDomTree(elm, range.cloneContents())
     );
     return elm && elm.hasChildNodes() && window.XMLSerializer ?
-      (new XMLSerializer).serializeToString(elm) : null;
+      (new XMLSerializer()).serializeToString(elm) : null;
   };
 
   /**
@@ -348,7 +348,7 @@
       );
     }
     return fragment && fragment.hasChildNodes() && window.XMLSerializer ?
-      (new XMLSerializer).serializeToString(fragment) : null;
+      (new XMLSerializer()).serializeToString(fragment) : null;
   };
 
   /**
@@ -416,7 +416,25 @@
    */
   const nodeContentIsEditable = node => {
     /**
-     * get isContentEditable node from ancestor and set event listener
+     * set controller of content editable node
+     * @param {object} elm - controller element
+     * @param {string} id - ID of the content editable node
+     * @return {void}
+     */
+    const setController = (elm, id) => {
+      elm && id && (
+        elm.setAttributeNS(null, `${ DATA_ID }_controls`, id),
+        elm.addEventListener("focus", evt => {
+          evt && evt.currentTarget === elm &&
+            self.postMessage(
+              evt.target.getAttributeNS(null, `${ DATA_ID }_controls`)
+            );
+        }, false)
+      );
+      return;
+    };
+    /**
+     * get isContentEditable node from ancestor
      * @return {boolean}
      */
     const getIsContentEditableNode = () => {
@@ -424,20 +442,8 @@
       while(elm) {
         if(typeof elm.isContentEditable === "boolean" &&
            (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
-          let id;
           bool = elm.isContentEditable;
-          bool && (
-            id = getId(node),
-            id && (
-              elm.setAttributeNS(null, `${ DATA_ID }_controls`, id),
-              elm.addEventListener("focus", evt => {
-                evt && evt.currentTarget === elm &&
-                  self.postMessage(
-                    evt.target.getAttributeNS(null, `${ DATA_ID }_controls`)
-                  );
-              }, false)
-            )
-          );
+          bool && setController(elm, getId(node));
           break;
         }
         if(elm.parentNode) {

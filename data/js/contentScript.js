@@ -43,7 +43,7 @@
        elm.getAttributeNS(ns, DATA_ID) === target) {
       /^(?:input|textarea)$/.test(elm.localName) ?
         elm.value = value : elm.isContentEditable &&
-        setContentEditableText(elm, value.split("\n"))
+        setContentEditableText(elm, value.split("\n"));
     }
     else {
       elm.hasAttributeNS(ns, `${ DATA_ID }_controls`) &&
