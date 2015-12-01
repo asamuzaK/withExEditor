@@ -37,8 +37,8 @@
   /* get target element and and sync text value */
   (() => {
     let elm = document.activeElement;
-    const html = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
-    const ns = html ? null : nsURI.html;
+    const ns = (!elm.namespaceURI || elm.namespaceURI === nsURI.html) ?
+      null : nsURI.html;
     if(elm.hasAttributeNS(ns, DATA_ID) &&
        elm.getAttributeNS(ns, DATA_ID) === target) {
       /^(?:input|textarea)$/.test(elm.localName) ?

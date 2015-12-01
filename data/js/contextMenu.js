@@ -446,7 +446,7 @@
       const l = node.childNodes.length;
       let i = 0;
       while(i < l) {
-        node.childNodes[i].nodeType === 3 && (isText = true);
+        isText = node.childNodes[i].nodeType === 3 ? true : false;
         if(!isText) {
           break;
         }
