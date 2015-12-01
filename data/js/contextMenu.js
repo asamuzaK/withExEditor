@@ -264,7 +264,7 @@
               fragment.appendChild(document.createTextNode("\n"))
           ) : obj.nodeType === 3 &&
             fragment.appendChild(document.createTextNode(obj.nodeValue));
-          i = i + 1;
+          i++;
         }
       }
       return fragment;
@@ -337,7 +337,7 @@
         fragment.appendChild(document.createTextNode("\n"));
         l > 1 && i < l - 1 &&
           fragment.appendChild(document.createComment("Next Range"));
-        i = i + 1;
+        i++;
       }
       l > 1 && fragment.hasChildNodes() && (
         obj = getElement(document.documentElement),
@@ -459,7 +459,7 @@
         if(!isText) {
           break;
         }
-        i = i + 1;
+        i++;
       }
     }
     return isText && getIsContentEditableNode();

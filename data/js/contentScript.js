@@ -23,7 +23,7 @@
         fragment.appendChild(document.createTextNode(array[i]));
         i < l - 1 && namespace === nsURI.html &&
           fragment.appendChild(document.createElementNS(namespace, "br"));
-        i = i + 1;
+        i++;
       }
       if(node.hasChildNodes()) {
         while(node.firstChild) {
