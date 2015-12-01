@@ -1,5 +1,14 @@
-Updated Features
+New And Updated Features
 <ul>
+<li>Add support for editable non-HTML text with contenteditable="true" at ancestor.
+    Sample:
+    <code>
+    &lt;div contenteditable=&quot;true&quot;&gt;
+    &lt;svg&gt;
+    &lt;text&gt;This is editable text&lt;/text&gt;
+    &lt;/svg&gt;
+    &lt;/div&gt;
+    </code></li>
 <li>Fixed localize.</li>
 </ul>
 

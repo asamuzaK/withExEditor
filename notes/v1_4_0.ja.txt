@@ -1,5 +1,14 @@
-更新内容
+新規ならびに更新内容
 <ul>
+<li>HTML以外の編集可能なテキストへのサポートを追加。
+    例：
+    <code>
+    &lt;div contenteditable=&quot;true&quot;&gt;
+    &lt;svg&gt;
+    &lt;text&gt;This is editable text&lt;/text&gt;
+    &lt;/svg&gt;
+    &lt;/div&gt;
+    </code></li>
 <li>ローカライズの語句を修正</li>
 </ul>
 

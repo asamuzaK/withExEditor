@@ -35,10 +35,22 @@
   };
 
   /* get target element and and sync text value */
-  const elm = document.activeElement;
-  elm.hasAttribute(DATA_ID) && elm.getAttribute(DATA_ID) === target && (
-    /^(?:input|textarea)$/.test(elm.localName) ?
-      elm.value = value :
-      elm.isContentEditable && setContentEditableText(elm, value.split("\n"))
-  );
+  (() => {
+    let elm = document.activeElement;
+    const html = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
+    const ns = html ? null : nsURI.html;
+    if(elm.hasAttributeNS(ns, DATA_ID) &&
+       elm.getAttributeNS(ns, DATA_ID) === target) {
+      /^(?:input|textarea)$/.test(elm.localName) ?
+        elm.value = value : elm.isContentEditable &&
+        setContentEditableText(elm, value.split("\n"))
+    }
+    else {
+      elm.hasAttributeNS(ns, `${ DATA_ID }_controls`) &&
+        elm.getAttributeNS(ns, `${ DATA_ID }_controls`) === target && (
+          elm = document.querySelector(`[*|${ DATA_ID }=${ target }]`),
+          elm && setContentEditableText(elm, value.split("\n"))
+        );
+    }
+  })();
 })();
