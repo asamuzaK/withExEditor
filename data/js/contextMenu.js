@@ -421,22 +421,31 @@
      */
     const getIsContentEditableNode = () => {
       let bool = false, elm = node;
-      while(elm && elm.parentNode) {
+      while(elm) {
         if(typeof elm.isContentEditable === "boolean" &&
            (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
+          let id;
           bool = elm.isContentEditable;
           bool && (
-            elm.setAttributeNS(null, `${ DATA_ID }_controls`, getId(node)),
-            elm.addEventListener("focus", evt => {
-              evt && evt.currentTarget === elm &&
-                self.postMessage(
-                  evt.target.getAttributeNS(null, `${ DATA_ID }_controls`)
-                );
-            }, false)
+            id = getId(node),
+            id && (
+              elm.setAttributeNS(null, `${ DATA_ID }_controls`, id),
+              elm.addEventListener("focus", evt => {
+                evt && evt.currentTarget === elm &&
+                  self.postMessage(
+                    evt.target.getAttributeNS(null, `${ DATA_ID }_controls`)
+                  );
+              }, false)
+            )
           );
           break;
         }
-        elm = elm.parentNode;
+        if(elm.parentNode) {
+          elm = elm.parentNode;
+        }
+        else {
+          break;
+        }
       }
       return bool;
     };
@@ -534,7 +543,7 @@
         case sel.anchorNode === sel.focusNode &&
              sel.anchorNode.parentNode === document.documentElement:
           break;
-        case sel.rangeCount === 1 && 
+        case sel.rangeCount === 1 &&
              (elm.isContentEditable || nodeContentIsEditable(elm)):
           obj = getId(elm);
           obj && (
