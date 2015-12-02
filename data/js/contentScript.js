@@ -44,10 +44,11 @@
       const l = attr.length;
       let i = 0;
       while(i < l) {
-        attr[i] === target && (
-          elm = document.querySelector(`[*|${ DATA_ID }=${ target }]`),
-          elm && setContentEditableText(elm, value.split("\n"))
-        );
+        if(attr[i] === target) {
+          (elm = document.querySelector(`[*|${ DATA_ID }=${ target }]`)) &&
+            setContentEditableText(elm, value.split("\n"));
+          break;
+        }
         i++;
       }
     }

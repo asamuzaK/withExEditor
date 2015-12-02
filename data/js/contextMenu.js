@@ -460,19 +460,19 @@
      * @return {boolean}
      */
     const getIsContentEditableNode = () => {
-      let bool = false, elm = node;
-      while(elm) {
-        if(typeof elm.isContentEditable === "boolean" &&
-           (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
-          bool = elm.isContentEditable;
-          bool && setController(elm, getId(node));
-          break;
-        }
-        if(elm.parentNode) {
-          elm = elm.parentNode;
-        }
-        else {
-          break;
+      let bool = false, elm = node, i;
+      while(elm && !i) {
+        switch(true) {
+          case typeof elm.isContentEditable === "boolean" &&
+               (!elm.namespaceURI || elm.namespaceURI === nsURI.html):
+            (bool = elm.isContentEditable) && setController(elm, getId(node));
+            i = true;
+            break;
+          case !elm.parentNode:
+            i = true;
+            break;
+          default:
+            elm = elm.parentNode;
         }
       }
       return bool;
