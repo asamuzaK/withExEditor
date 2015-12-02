@@ -182,7 +182,7 @@
         const ns = getNsURI(attr, false);
         typeof node[attr.name] !== "function" && ns &&
           elm.setAttributeNS(
-            ns.namespaceURI || "",
+            ns.namespaceURI || null,
             attr.prefix ?
               `${ attr.prefix }:${ attr.localName }` : attr.localName,
             attr.value
