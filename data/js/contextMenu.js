@@ -420,9 +420,9 @@
     /**
      * set controller of content editable node
      * @param {object} elm - controller element
-     * @param {string} id - ID of the content editable node
+     * @param {?string} id - ID of the content editable node
      */
-    const setController = (elm, id) => {
+    const setController = (elm, id = null) => {
       if(elm && id) {
         if(elm.hasAttributeNS(null, `${ DATA_ID }_controls`)) {
           const arr = (
@@ -436,7 +436,7 @@
           );
         }
         else {
-          elm.setAttributeNS(null, `${ DATA_ID }_controls`, id)
+          elm.setAttributeNS(null, `${ DATA_ID }_controls`, id);
           elm.addEventListener("focus", evt => {
             if(evt && evt.currentTarget === elm) {
               let attr = elm.getAttributeNS(null, `${ DATA_ID }_controls`);
@@ -453,7 +453,7 @@
                 self.postMessage(attr);
               }
             }
-          }, false)
+          }, false);
         }
       }
     };
