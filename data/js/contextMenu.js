@@ -405,6 +405,7 @@
           html && elm.addEventListener("focus", evt => {
             evt && evt.currentTarget === elm &&
               self.postMessage(evt.target.getAttributeNS(ns, DATA_ID));
+            return;
           }, false)
         );
     }
@@ -439,18 +440,14 @@
           elm.setAttributeNS(null, `${ DATA_ID }_controls`, id);
           elm.addEventListener("focus", evt => {
             if(evt && evt.currentTarget === elm) {
-              let attr = elm.getAttributeNS(null, `${ DATA_ID }_controls`);
-              if(/\s/.exec(attr)) {
-                let i = 0, l;
-                attr = attr.split(" ");
-                l = attr.length;
-                while(i < l) {
-                  self.postMessage(attr[i]);
-                  i++;
-                }
-              }
-              else {
-                self.postMessage(attr);
+              const attr = (
+                elm.getAttributeNS(null, `${ DATA_ID }_controls`)
+              ).split(" ");
+              const l = attr.length;
+              let i = 0;
+              while(i < l) {
+                self.postMessage(attr[i]);
+                i++;
               }
             }
           }, false);
