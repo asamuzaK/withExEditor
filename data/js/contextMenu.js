@@ -225,6 +225,7 @@
       }
       return fragment;
     };
+
     let elm;
     node && (
       elm = createElmNS(node),
@@ -269,6 +270,7 @@
       }
       return fragment;
     };
+
     elm = getElement(elm);
     elm.nodeType === 1 && node && node.hasChildNodes() &&
       elm.appendChild(createDom(node.childNodes));
@@ -419,20 +421,43 @@
      * set controller of content editable node
      * @param {object} elm - controller element
      * @param {string} id - ID of the content editable node
-     * @return {void}
      */
     const setController = (elm, id) => {
-      elm && id && (
-        elm.setAttributeNS(null, `${ DATA_ID }_controls`, id),
-        elm.addEventListener("focus", evt => {
-          evt && evt.currentTarget === elm &&
-            self.postMessage(
-              evt.target.getAttributeNS(null, `${ DATA_ID }_controls`)
-            );
-        }, false)
-      );
-      return;
+      if(elm && id) {
+        if(elm.hasAttributeNS(null, `${ DATA_ID }_controls`)) {
+          const arr = (
+            elm.getAttributeNS(null, `${ DATA_ID }_controls`)
+          ).split(" ");
+          arr.push(id);
+          elm.setAttributeNS(
+            null,
+            `${ DATA_ID }_controls`,
+            (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
+          );
+        }
+        else {
+          elm.setAttributeNS(null, `${ DATA_ID }_controls`, id)
+          elm.addEventListener("focus", evt => {
+            if(evt && evt.currentTarget === elm) {
+              let attr = elm.getAttributeNS(null, `${ DATA_ID }_controls`);
+              if(/\s/.exec(attr)) {
+                let i = 0, l;
+                attr = attr.split(" ");
+                l = attr.length;
+                while(i < l) {
+                  self.postMessage(attr[i]);
+                  i++;
+                }
+              }
+              else {
+                self.postMessage(attr);
+              }
+            }
+          }, false)
+        }
+      }
     };
+
     /**
      * get isContentEditable node from ancestor
      * @return {boolean}
@@ -455,6 +480,7 @@
       }
       return bool;
     };
+
     let isText = false;
     if(node && node.namespaceURI && node.namespaceURI !== nsURI.html &&
        node.hasChildNodes()) {
@@ -483,7 +509,7 @@
       case /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
            /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
            /^textarea$/.test(elm.localName) || elm.isContentEditable ||
-           nodeContentIsEditable(elm):
+           sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm):
         label = EDIT_TEXT;
         break;
       case sel.isCollapsed && getNodeNS(elm).uri === nsURI.math:
@@ -550,7 +576,8 @@
              sel.anchorNode.parentNode === document.documentElement:
           break;
         case sel.rangeCount === 1 &&
-             (elm.isContentEditable || nodeContentIsEditable(elm)):
+             (elm.isContentEditable ||
+              sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm)):
           obj = getId(elm);
           obj && (
             mode.mode = EDIT_TEXT,

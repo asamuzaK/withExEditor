@@ -37,19 +37,26 @@
   /* get target element and and sync text value */
   (() => {
     let elm = document.activeElement;
-    const ns = (!elm.namespaceURI || elm.namespaceURI === nsURI.html) ?
+    const ns = !elm.namespaceURI || elm.namespaceURI === nsURI.html ?
       null : nsURI.html;
-    if(elm.hasAttributeNS(ns, DATA_ID) &&
-       elm.getAttributeNS(ns, DATA_ID) === target) {
-      /^(?:input|textarea)$/.test(elm.localName) ?
-        elm.value = value : elm.isContentEditable &&
-        setContentEditableText(elm, value.split("\n"));
-    }
-    else {
-      elm.hasAttributeNS(ns, `${ DATA_ID }_controls`) &&
-        elm.getAttributeNS(ns, `${ DATA_ID }_controls`) === target && (
+    if(elm.hasAttributeNS(ns, `${ DATA_ID }_controls`)) {
+      const attr = (elm.getAttributeNS(ns, `${ DATA_ID }_controls`)).split(" ");
+      const l = attr.length;
+      let i = 0;
+      while(i < l) {
+        attr[i] === target && (
           elm = document.querySelector(`[*|${ DATA_ID }=${ target }]`),
           elm && setContentEditableText(elm, value.split("\n"))
+        );
+        i++;
+      }
+    }
+    else {
+      elm.hasAttributeNS(ns, DATA_ID) &&
+        elm.getAttributeNS(ns, DATA_ID) === target && (
+          /^(?:input|textarea)$/.test(elm.localName) ?
+            elm.value = value : elm.isContentEditable &&
+            setContentEditableText(elm, value.split("\n"))
         );
     }
   })();
