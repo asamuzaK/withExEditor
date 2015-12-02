@@ -12,15 +12,15 @@
   /**
    * set content editable element text
    * @param {Object} node - editable element
-   * @param {Array} array - array of values
+   * @param {Array} arr - array of values
    */
-  const setContentEditableText = (node, array = [""]) => {
-    if(node && node.nodeType === 1 && Array.isArray(array)) {
+  const setContentEditableText = (node, arr = [""]) => {
+    if(node && node.nodeType === 1 && Array.isArray(arr)) {
       const fragment = document.createDocumentFragment();
-      const l = array.length;
+      const l = arr.length;
       let i = 0;
       while(i < l) {
-        fragment.appendChild(document.createTextNode(array[i]));
+        fragment.appendChild(document.createTextNode(arr[i]));
         i < l - 1 && namespace === nsURI.html &&
           fragment.appendChild(document.createElementNS(namespace, "br"));
         i++;
@@ -41,15 +41,12 @@
       null : nsURI.html;
     if(elm.hasAttributeNS(ns, `${ DATA_ID }_controls`)) {
       const attr = (elm.getAttributeNS(ns, `${ DATA_ID }_controls`)).split(" ");
-      const l = attr.length;
-      let i = 0;
-      while(i < l) {
-        if(attr[i] === target) {
+      for(let id of attr) {
+        if(id === target) {
           (elm = document.querySelector(`[*|${ DATA_ID }=${ target }]`)) &&
             setContentEditableText(elm, value.split("\n"));
           break;
         }
-        i++;
       }
     }
     else {

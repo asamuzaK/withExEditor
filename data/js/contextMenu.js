@@ -365,24 +365,24 @@
      * @return {string} - text
      */
     const getTextNode = nodes => {
-      const array = [];
+      const arr = [];
       if(isNodeList(nodes)) {
         for(let node of nodes) {
           switch(true) {
             case node.nodeType === 3:
-              array.push(node.nodeValue);
+              arr.push(node.nodeValue);
               break;
             case node.nodeType === 1 && node.localName === "br":
-              array.push("\n");
+              arr.push("\n");
               break;
             case node.nodeType === 1 && node.hasChildNodes():
-              array.push(getTextNode(node.childNodes));
+              arr.push(getTextNode(node.childNodes));
               break;
             default:
           }
         }
       }
-      return array.length > 0 ? array.join("") : "";
+      return arr.length > 0 ? arr.join("") : "";
     };
     return node && node.hasChildNodes() ? getTextNode(node.childNodes) : "";
   };
@@ -443,11 +443,8 @@
               const attr = (
                 elm.getAttributeNS(null, `${ DATA_ID }_controls`)
               ).split(" ");
-              const l = attr.length;
-              let i = 0;
-              while(i < l) {
-                self.postMessage(attr[i]);
-                i++;
+              for(let value of attr) {
+                self.postMessage(value);
               }
             }
           }, false);
@@ -481,14 +478,12 @@
     let isText = false;
     if(node && node.namespaceURI && node.namespaceURI !== nsURI.html &&
        node.hasChildNodes()) {
-      const l = node.childNodes.length;
-      let i = 0;
-      while(i < l) {
-        isText = node.childNodes[i].nodeType === 3 ? true : false;
+      const nodes = node.childNodes;
+      for(let child of nodes) {
+        isText = child.nodeType === 3 ? true : false;
         if(!isText) {
           break;
         }
-        i++;
       }
     }
     return isText && getIsContentEditableNode();
@@ -501,7 +496,7 @@
    */
   self.on("context", elm => {
     const sel = window.getSelection();
-    let label;
+    let label = VIEW_SOURCE;
     switch(true) {
       case /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
            /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
@@ -516,7 +511,6 @@
         label = VIEW_SELECTION;
         break;
       default:
-        label = VIEW_SOURCE;
     }
     self.postMessage(label);
     return true;
