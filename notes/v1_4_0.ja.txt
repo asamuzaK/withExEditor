@@ -9,7 +9,8 @@
     &lt;/svg&gt;
     &lt;/div&gt;
     </code></li>
-<li>ローカライズの語句を修正</li>
+<li><code>application/x-javascript</code>のサポートを追加。</li>
+<li>ローカライズの語句を修正。</li>
 </ul>
 
 コード変更点

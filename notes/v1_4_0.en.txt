@@ -9,6 +9,7 @@ New And Updated Features
     &lt;/svg&gt;
     &lt;/div&gt;
     </code></li>
+<li>Add support for <code>application/x-javascript</code>.</li>
 <li>Fixed localize.</li>
 </ul>
 
