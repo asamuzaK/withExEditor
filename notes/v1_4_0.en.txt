@@ -5,7 +5,7 @@ New And Updated Features
     <code>
     &lt;div contenteditable=&quot;true&quot;&gt;
     &lt;svg&gt;
-    &lt;text&gt;This is editable text&lt;/text&gt;
+    &lt;text&gt;An editable text&lt;/text&gt;
     &lt;/svg&gt;
     &lt;/div&gt;
     </code></li>
@@ -13,8 +13,9 @@ New And Updated Features
 <li>Fixed localize.</li>
 </ul>
 
-Codes
+Code Fixes
 <ul>
-<li>Fixed default parameter of getContextMode(), in main.js</li>
-<li>Switched some functions which were using jsm to sdk, in main.js and componentUtils.js</li>
+<li>Switched some functions which were using jsm to sdk API. (main.js, componentUtils.js)</li>
+<li>Fixed the default parameter of getContextMode(). (main.js)</li>
+<li>Fixed the first argument of setAttributeNS() in setAttrNS(). (contextMenu.js)</li>
 </ul>

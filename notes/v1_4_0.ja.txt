@@ -5,7 +5,7 @@
     <code>
     &lt;div contenteditable=&quot;true&quot;&gt;
     &lt;svg&gt;
-    &lt;text&gt;This is editable text&lt;/text&gt;
+    &lt;text&gt;An editable text&lt;/text&gt;
     &lt;/svg&gt;
     &lt;/div&gt;
     </code></li>
@@ -13,8 +13,9 @@
 <li>ローカライズの語句を修正。</li>
 </ul>
 
-コード変更点
+コード修正点
 <ul>
-<li>getContextMode()のデフォルトパラメータを修正（main.js）</li>
 <li>jsmを利用していたいくつかの関数をsdkのAPIに変更（main.js、componentUtils.js）</li>
+<li>getContextMode()のデフォルトパラメータを修正（main.js）</li>
+<li>setAttrNS()内のsetAttributeNS()の第一引数を修正（contextMenu.js）</li>
 </ul>
