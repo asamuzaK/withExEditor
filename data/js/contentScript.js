@@ -51,11 +51,11 @@
     }
     else {
       elm.hasAttributeNS(ns, DATA_ID) &&
-        elm.getAttributeNS(ns, DATA_ID) === target && (
-          /^(?:input|textarea)$/.test(elm.localName) ?
-            elm.value = value : elm.isContentEditable &&
-            setContentEditableText(elm, value.split("\n"))
-        );
+      elm.getAttributeNS(ns, DATA_ID) === target && (
+        /^(?:input|textarea)$/.test(elm.localName) ?
+          elm.value = value : elm.isContentEditable &&
+          setContentEditableText(elm, value.split("\n"))
+      );
     }
   })();
 })();

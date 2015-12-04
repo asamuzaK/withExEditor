@@ -165,8 +165,7 @@
     const ns = getNsURI(elm, true);
     return ns && document.createElementNS(
       ns.namespaceURI || nsURI.html,
-      elm.prefix ?
-        `${ elm.prefix }:${ elm.localName }` : elm.localName
+      elm.prefix ? `${ elm.prefix }:${ elm.localName }` : elm.localName
     );
   };
 
@@ -258,11 +257,9 @@
         while(i < l) {
           const obj = nodes[i];
           obj.nodeType === 1 ? (
-            i === 0 &&
-              fragment.appendChild(document.createTextNode("\n")),
+            i === 0 && fragment.appendChild(document.createTextNode("\n")),
             fragment.appendChild(getElement(obj, true)),
-            i === l - 1 &&
-              fragment.appendChild(document.createTextNode("\n"))
+            i === l - 1 && fragment.appendChild(document.createTextNode("\n"))
           ) : obj.nodeType === 3 &&
             fragment.appendChild(document.createTextNode(obj.nodeValue));
           i++;

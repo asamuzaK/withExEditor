@@ -15,8 +15,9 @@ New And Updated Features
 
 Code Changes
 <ul>
-<li>Indent comment lines.</li>
-<li>Switched some functions which were using jsm to sdk API. (main.js, componentUtils.js)</li>
+<li>Fixed indent of comment lines and some expressions.</li>
+<li>Renamed some function names and variables.</li>
+<li>Some functions which were using jsm switched to sdk API. (main.js, componentUtils.js)</li>
 <li>Fixed the default parameter of getContextMode(). (main.js)</li>
-<li>Fixed the first argument of setAttributeNS() in setAttrNS(). (contextMenu.js)</li>
+<li>Fixed the first parameter of setAttributeNS() in setAttrNS(). (contextMenu.js)</li>
 </ul>
