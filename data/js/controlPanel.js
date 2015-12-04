@@ -43,11 +43,11 @@
       currentName.hasChildNodes() ? (
         removeChildNodes(currentName),
         currentName.appendChild(document.createTextNode(editorName.value)),
-        editorLabel.removeAttribute("disabled"),
-        storeLabel.removeAttribute("disabled")
+        editorLabel.removeAttributeNS(null, "disabled"),
+        storeLabel.removeAttributeNS(null, "disabled")
       ) : (
-        editorLabel.setAttribute("disabled", "disabled"),
-        storeLabel.setAttribute("disabled", "disabled")
+        editorLabel.setAttributeNS(null, "disabled", "disabled"),
+        storeLabel.setAttributeNS(null, "disabled", "disabled")
       )
     );
     return;
@@ -61,8 +61,8 @@
   const getRadioButtonValue = name => {
     let value = null;
     for(let node of inputRadios) {
-      if(node.name && node.name === name && node.checked) {
-        node.value && (value = node.value);
+      if(node.name && node.name === name && node.checked && node.value) {
+        value = node.value;
         break;
       }
     }
@@ -75,25 +75,27 @@
    */
   const selfPortEmit = evt => {
     if(evt) {
-      switch(evt.type) {
+      const type = evt.type;
+      const target = evt.target;
+      switch(type) {
         case "load":
-          self.port.emit(evt.type);
+          self.port.emit(type);
           break;
         case "change":
         case "submit":
-          self.port.emit(evt.type, {
+          self.port.emit(type, {
             editorName: editorLabel && editorLabel.value ?
               editorLabel.value : editorName && editorName.value ?
               editorName.value : "",
-            toolbarButtonIcon: evt.type === "checked" && evt.target.checked ?
-              evt.target.name : buttonIcon ?
+            toolbarButtonIcon: type === "checked" && target.checked ?
+              target.name : buttonIcon ?
               getRadioButtonValue(buttonIcon.name) : null
           });
           evt.preventDefault();
           break;
         case "click":
-          evt.target && evt.target.hasAttribute("data-href") &&
-            self.port.emit(evt.type, evt.target.getAttribute("data-href"));
+          target && target.hasAttributeNS(null, "data-href") &&
+            self.port.emit(type, target.getAttributeNS(null, "data-href"));
           evt.preventDefault();
           break;
         default:

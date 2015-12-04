@@ -226,13 +226,10 @@
     };
 
     let elm;
-    node && (
-      elm = createElmNS(node),
-      elm && (
-        node.attributes && setAttrNS(elm, node),
-        bool && node.hasChildNodes() &&
-          elm.appendChild(appendChildNodes(node.childNodes))
-      )
+    node && (elm = createElmNS(node)) && (
+      node.attributes && setAttrNS(elm, node),
+      bool && node.hasChildNodes() &&
+        elm.appendChild(appendChildNodes(node.childNodes))
     );
     return elm ? elm : document.createTextNode("");
   };
@@ -532,16 +529,14 @@
         case /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
              /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
              /^textarea$/.test(elm.localName):
-          obj = getId(elm);
-          obj && (
+          (obj = getId(elm)) && (
             mode.mode = EDIT_TEXT,
             mode.target = obj,
             mode.value = elm.value ? elm.value : ""
           );
           break;
         case elm.isContentEditable || nodeContentIsEditable(elm):
-          obj = getId(elm);
-          obj && (
+          (obj = getId(elm)) && (
             mode.mode = EDIT_TEXT,
             mode.target = obj,
             mode.value = onContentEditable(elm),
@@ -549,8 +544,7 @@
           );
           break;
         case getNodeNS(elm).uri === nsURI.math:
-          obj = onViewMathML(elm);
-          obj && (
+          (obj = onViewMathML(elm)) && (
             mode.mode = VIEW_MATHML,
             mode.value = obj
           );
@@ -566,8 +560,7 @@
         case sel.rangeCount === 1 &&
              (elm.isContentEditable ||
               sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm)):
-          obj = getId(elm);
-          obj && (
+          (obj = getId(elm)) && (
             mode.mode = EDIT_TEXT,
             mode.target = obj,
             mode.value = onContentEditable(elm),
@@ -575,8 +568,7 @@
           );
           break;
         default:
-          obj = onViewSelection(sel);
-          obj && (
+          (obj = onViewSelection(sel)) && (
             mode.mode = VIEW_SELECTION,
             mode.value = obj
           );
