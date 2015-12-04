@@ -13,8 +13,9 @@ New And Updated Features
 <li>Fixed localize.</li>
 </ul>
 
-Code Fixes
+Code Changes
 <ul>
+<li>Indent comment lines.</li>
 <li>Switched some functions which were using jsm to sdk API. (main.js, componentUtils.js)</li>
 <li>Fixed the default parameter of getContextMode(). (main.js)</li>
 <li>Fixed the first argument of setAttributeNS() in setAttrNS(). (contextMenu.js)</li>

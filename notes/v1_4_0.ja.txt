@@ -13,8 +13,9 @@
 <li>ローカライズの語句を修正。</li>
 </ul>
 
-コード修正点
+コード変更点
 <ul>
+<li>コメント行にインデントを追加</li>
 <li>jsmを利用していたいくつかの関数をsdkのAPIに変更（main.js、componentUtils.js）</li>
 <li>getContextMode()のデフォルトパラメータを修正（main.js）</li>
 <li>setAttrNS()内のsetAttributeNS()の第一引数を修正（contextMenu.js）</li>
