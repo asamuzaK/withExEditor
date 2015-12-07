@@ -128,8 +128,8 @@
             ns.uri = nsURI[node.localName];
             break;
           default:
+            node = node.parentNode;
         }
-        node = node.parentNode;
       }
       !ns.node && (
         node = document.documentElement,
@@ -382,6 +382,24 @@
   };
 
   /**
+   * post temporary ID value
+   * @param { Object } evt - event
+   */
+  const postTemporaryId = evt => {
+    const elm = evt && evt.target === evt.currentTarget && evt.target;
+    if(elm && (elm.hasAttributeNS(null, DATA_ID) ||
+               elm.hasAttributeNS(null, `${ DATA_ID }_controls`))) {
+      const attr = (
+        elm.getAttributeNS(null, DATA_ID) ||
+        elm.getAttributeNS(null, `${ DATA_ID }_controls`)
+      ).split(" ");
+      for(let value of attr) {
+        self.postMessage(value);
+      }
+    }
+  };
+
+  /**
    * set temporary ID to the target element and set event listener
    * @param {Object} elm - target element
    * @return {?string} - ID
@@ -396,11 +414,7 @@
           id = `withExEditor${ window.performance.now() }`.replace(/\./, "_"),
           !html && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html),
           elm.setAttributeNS(ns, html ? DATA_ID : `html:${ DATA_ID }`, id),
-          html && elm.addEventListener("focus", evt => {
-            evt && evt.currentTarget === elm &&
-              self.postMessage(evt.target.getAttributeNS(ns, DATA_ID));
-            return;
-          }, false)
+          html && elm.addEventListener("focus", postTemporaryId, false)
         );
     }
     return id;
@@ -432,16 +446,7 @@
         }
         else {
           elm.setAttributeNS(null, `${ DATA_ID }_controls`, id);
-          elm.addEventListener("focus", evt => {
-            if(evt && evt.currentTarget === elm) {
-              const attr = (
-                elm.getAttributeNS(null, `${ DATA_ID }_controls`)
-              ).split(" ");
-              for(let value of attr) {
-                self.postMessage(value);
-              }
-            }
-          }, false);
+          elm.addEventListener("focus", postTemporaryId, false);
         }
       }
     };
