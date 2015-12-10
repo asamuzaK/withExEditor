@@ -1,3 +1,10 @@
+1.4.1
+Updated
+<ul>
+<li>Avoid memory leaks.</li>
+<li>Optimized code.</li>
+</ul>
+
 New And Updated Features
 <ul>
 <li>Add support for editable non-HTML text with contenteditable="true" at ancestor.
