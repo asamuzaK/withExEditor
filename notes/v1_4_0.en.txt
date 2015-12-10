@@ -2,7 +2,7 @@
 Updated
 <ul>
 <li>Avoid memory leaks.</li>
-<li>Optimized code.</li>
+<li>Refined code.</li>
 </ul>
 
 New And Updated Features
