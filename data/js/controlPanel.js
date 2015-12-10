@@ -125,8 +125,7 @@
           currentName.hasChildNodes() && removeChildNodes(currentName),
           currentName.appendChild(
             document.createTextNode(
-              editorName.value !== "" ?
-                editorName.value : res.currentEditorName
+              editorName.value ? editorName.value : res.currentEditorName
             )
           )
         ),

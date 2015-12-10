@@ -1,6 +1,7 @@
 1.4.1
 Updated
 <ul>
+<li>Fixed bug in accesskey replacement.</li>
 <li>Avoid memory leaks.</li>
 <li>Refined code.</li>
 </ul>
