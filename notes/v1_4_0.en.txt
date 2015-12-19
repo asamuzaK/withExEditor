@@ -1,4 +1,5 @@
 1.4.2
+Updated
 <ul>
 <li>Refined code.</li>
 <li>Packed xpi with jpm 1.0.4</li>
