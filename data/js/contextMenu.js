@@ -95,11 +95,7 @@
    * @return {Object} - namespace data
    */
   const getNodeNS = node => {
-    const ns = {
-      node: null,
-      name: null,
-      uri: null
-    };
+    const ns = { node: null, name: null, uri: null };
     if(node.namespaceURI) {
       ns.node = node;
       ns.name = node.localName;

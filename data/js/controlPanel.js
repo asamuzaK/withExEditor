@@ -152,7 +152,7 @@
       editorLabel && (editorLabel.placeholder = res.editorLabel),
       storeLabel && (storeLabel.value = res.submit),
       /* back compatible localize attributes prior to Firefox 39 */
-      (res.compat < 0 || isNaN(res.compat)) && (
+      (isNaN(res.compat) || res.compat < 0) && (
         iconColorLabel && (iconColorLabel.ariaLabel = res.iconColorLabel),
         buttonIcon && (buttonIcon.alt = res.iconColorAlt),
         iconGrayLabel && (iconGrayLabel.ariaLabel = res.iconGrayLabel),
