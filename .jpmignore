@@ -1,5 +1,6 @@
 #jpmignore
 *.xpi
+*.zip
 .git/
 .jpmignore
 README.*
