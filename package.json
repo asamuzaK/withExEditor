@@ -45,15 +45,20 @@
       "title": "Initialize All Settings When Add-on Is Disabled"
     }
   ],
+  "locales": {
+     "ja": {
+       "description": "外部エディタでソースや選択部分を表示、またはテキストを編集"
+     }
+  },
   "permissions": {
     "private-browsing": true,
     "multiprocess": true
   },
   "engines": {
-    "firefox": ">=38.0 <=*"
+    "firefox": ">=38.0a1 <=47.0a1"
   },
   "icon": "icon.png",
   "main": "lib/main.js",
   "license": "MPL 2.0",
-  "version": "1.4.3-a3"
+  "version": "1.4.3-a4"
 }
