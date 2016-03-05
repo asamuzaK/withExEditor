@@ -1,3 +1,9 @@
+1.4.4
+Updated
+<ul>
+<li>Set max version to "*".</li>
+</ul>
+
 1.4.3
 Updated
 <ul>
