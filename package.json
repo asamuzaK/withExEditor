@@ -19,12 +19,6 @@
     },
     {
       "type": "string",
-      "name": "WithExEditorPrefsEnvDisplay",
-      "title": "DISPLAY Environment Variable (Linux)",
-      "value": ""
-    },
-    {
-      "type": "string",
       "name": "WithExEditorPrefsAccessKey",
       "title": "Access Key",
       "value": "e"
@@ -60,5 +54,5 @@
   "icon": "icon.png",
   "main": "lib/main.js",
   "license": "MPL 2.0",
-  "version": "1.4.4-a4"
+  "version": "1.4.4-a5"
 }

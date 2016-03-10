@@ -2,6 +2,7 @@
 Updated
 <ul>
 <li>Set max version to "*".</li>
+<li>Remove DISPLAY environment option for Linux. It will be set automatically.</li>
 </ul>
 
 1.4.3
