@@ -39,9 +39,6 @@ ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).
 ex: `"Some Arg"`
 
-### DISPLAY Environment Variable
-* For Linux only. Set this option if "Cannot open display" error occurred. Maybe, you also need to set "xhost".
-
 ### Access Key
 * You can choose any key. But, it must be a single character.
 * On context menu, press `key` itself.
