@@ -37,6 +37,11 @@
       "type": "bool",
       "name": "WithExEditorPrefsOnDisable",
       "title": "Initialize All Settings When Add-on Is Disabled"
+    },
+    {
+      "type": "bool",
+      "name": "WithExEditorPrefsOnUninstall",
+      "title": "Keep Stored Settings Even When Add-on Is Uninstalled"
     }
   ],
   "locales": {
@@ -54,5 +59,5 @@
   "icon": "icon.png",
   "main": "lib/main.js",
   "license": "MPL 2.0",
-  "version": "1.4.5-a2"
+  "version": "1.4.5-a3"
 }

@@ -2,6 +2,7 @@
 Updated
 <ul>
 <li>Organize function onUnload().</li>
+<li>Add option to keep stored settings even when add-on is uninstalled.</li>
 </ul>
 
 1.4.4
