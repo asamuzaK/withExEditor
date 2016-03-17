@@ -3,6 +3,6 @@
 *.zip
 .git/
 .jpmignore
-README.*
+README.md
 notes/
 test/
