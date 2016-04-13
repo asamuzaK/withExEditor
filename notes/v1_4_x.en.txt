@@ -1,7 +1,7 @@
 1.4.5
 Updated
 <ul>
-<li>Organize function onUnload().</li>
+<li>Organize function main() and onUnload().</li>
 <li>Add option to keep stored settings even when add-on is uninstalled.</li>
 <li>Remove option to initialize all settings when add-on is disabled.</li>
 <li>Fix Japanese localize</li>
