@@ -115,10 +115,9 @@
   /**
    * update control panel
    * @param {Object} res - editor data
-   * @return {void}
    */
   self.port.on("editorValue", res => {
-    res && (
+    if(res) {
       editorName && (
         editorName.value = res.editorName,
         currentName && (
@@ -130,27 +129,25 @@
           )
         ),
         editorLabel.value = editorName.value
-      ),
-      toggleInputs()
-    );
-    return;
+      );
+      toggleInputs();
+    }
   });
 
   /**
    * localize control panel
    * @param {Object} res - localize data
-   * @return {void}
    */
   self.port.on("htmlValue", res => {
-    res && (
-      html && (html.lang = res.lang),
-      selectIcon && (selectIcon.value = res.submit),
+    if(res) {
+      html && (html.lang = res.lang);
+      selectIcon && (selectIcon.value = res.submit);
       currentName && (
         currentName.hasChildNodes() && removeChildNodes(currentName),
         currentName.appendChild(document.createTextNode(res.currentEditorName))
-      ),
-      editorLabel && (editorLabel.placeholder = res.editorLabel),
-      storeLabel && (storeLabel.value = res.submit),
+      );
+      editorLabel && (editorLabel.placeholder = res.editorLabel);
+      storeLabel && (storeLabel.value = res.submit);
       /* back compatible localize attributes prior to Firefox 39 */
       (isNaN(res.compat) || res.compat < 0) && (
         iconColorLabel && (iconColorLabel.ariaLabel = res.iconColorLabel),
@@ -160,9 +157,8 @@
         iconWhiteLabel && (iconWhiteLabel.ariaLabel = res.iconWhiteLabel),
         buttonIconWhite && (buttonIconWhite.alt = res.iconWhiteAlt),
         currentName && (currentName.ariaLabel = res.currentEditorNameLabel)
-      )
-    );
-    return;
+      );
+    }
   });
 
   /* on initial run */
