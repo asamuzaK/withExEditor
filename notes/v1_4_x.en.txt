@@ -1,9 +1,13 @@
 1.4.5
+Changed
+<ul>
+<li>`initialize all settings when add-on is disabled` option removed.</li>
+<li>`keep stored settings even when add-on is uninstalled` option added.</li>
+</ul>
+
 Updated
 <ul>
 <li>Organize function main() and onUnload().</li>
-<li>Add option to keep stored settings even when add-on is uninstalled.</li>
-<li>Remove option to initialize all settings when add-on is disabled.</li>
 <li>Fix Japanese localize</li>
 </ul>
 
