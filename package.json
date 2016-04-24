@@ -49,10 +49,10 @@
     "multiprocess": true
   },
   "engines": {
-    "firefox": ">=45.0 <=*"
+    "firefox": ">=39.0 <=*"
   },
   "icon": "icon.png",
   "main": "lib/main.js",
   "license": "MPL 2.0",
-  "version": "1.5.0-a2"
+  "version": "1.5.0-a3"
 }
