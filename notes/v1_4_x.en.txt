@@ -2,6 +2,7 @@
 Updated
 <ul>
 <li>Fix issue `Can't remove stored data when uninstall`</li>
+<li>Removed `Keep Stored Settings Even When Add-on Is Uninstalled` option</li>
 </ul>
 
 1.4.5

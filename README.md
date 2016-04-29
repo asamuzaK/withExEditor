@@ -51,9 +51,6 @@ ex: `"Some Arg"`
 * You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox.
 * It is recommended to be checked, but there is a possibility that trouble occurs if you enable this option. It depends on the settings of the editor.
 
-### Keep Stored Settings Even When Add-on Is Uninstalled
-* If checked, stored settings will be kept.
-
 ***
 
 ## Options In Toolbar Button
