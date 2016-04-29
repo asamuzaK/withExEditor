@@ -2,6 +2,7 @@
 更新内容
 <ul>
 <li>`Can't remove stored data when uninstall`のバグフィックス</li>
+<li>「アドオンを削除しても設定情報は保持」のオプションを削除</li>
 </ul>
 
 1.4.5
