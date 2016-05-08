@@ -2,4 +2,5 @@
 New And Updated Features
 <ul>
 <li>Supported minVersion changed to Firefox 39.0</li>
+<li>Removed require("chrome")</li>
 </ul>
