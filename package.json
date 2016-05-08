@@ -31,7 +31,8 @@
     {
       "type": "bool",
       "name": "WithExEditorPrefsForceRemove",
-      "title": "Force To Remove The Temporary Files At Shutdown"
+      "title": "Force To Remove The Temporary Files At Shutdown",
+      "value": true
     }
   ],
   "locales": {
@@ -49,5 +50,5 @@
   "icon": "icon.png",
   "main": "lib/main.js",
   "license": "MPL 2.0",
-  "version": "1.5.0-a11"
+  "version": "1.5.0-a12"
 }
