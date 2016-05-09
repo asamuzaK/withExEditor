@@ -5,9 +5,10 @@
   "use strict";
   const DATA_ID = "data-with_ex_editor_id";
   const nsURI = { html: "http://www.w3.org/1999/xhtml" };
-  const target = self.options.target || "";
-  const value = self.options.value || "";
-  const namespace = self.options.namespace || nsURI.html;
+  const opt = window.self.options || {};
+  const target = opt.target || "";
+  const value = opt.value || "";
+  const namespace = opt.namespace || nsURI.html;
 
   /**
    * set content editable element text

@@ -72,11 +72,11 @@
       const target = evt.target;
       switch(type) {
         case "load":
-          self.port.emit(type);
+          window.self.port.emit(type);
           break;
         case "change":
         case "submit":
-          self.port.emit(type, {
+          window.self.port.emit(type, {
             editorName: editorLabel && editorLabel.value ?
               editorLabel.value : editorName && editorName.value ?
               editorName.value : "",
@@ -88,7 +88,10 @@
           break;
         case "click":
           target && target.hasAttributeNS(null, "data-href") &&
-            self.port.emit(type, target.getAttributeNS(null, "data-href"));
+            window.self.port.emit(
+              type,
+              target.getAttributeNS(null, "data-href")
+            );
           evt.preventDefault();
           break;
         default:
@@ -108,7 +111,7 @@
    * update control panel
    * @param {Object} res - editor data
    */
-  self.port.on("editorValue", res => {
+  window.self.port.on("editorValue", res => {
     res && (
       editorName && (
         editorName.value = res.editorName,
@@ -130,7 +133,7 @@
    * localize control panel
    * @param {Object} res - localize data
    */
-  self.port.on("htmlValue", res => {
+  window.self.port.on("htmlValue", res => {
     res && (
       html && (html.lang = res.lang),
       selectIcon && (selectIcon.value = res.submit),
