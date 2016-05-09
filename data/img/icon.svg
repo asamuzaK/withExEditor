@@ -23,23 +23,23 @@
       stroke-width: 16px;
     }
     line, #color line {
-      stroke: #e66000;
+      stroke: #E66000;
       stroke-width: 24px;
     }
     polygon, #color polygon {
-      fill: #e66000;
+      fill: #E66000;
     }
     #gray rect, #gray line {
-      stroke: #4c4c4c;
+      stroke: #4C4C4C;
     }
     #gray polygon {
-      fill: #4c4c4c;
+      fill: #4C4C4C;
     }
     #white rect, #white line {
-      stroke: #fff;
+      stroke: #FFF;
     }
     #white polygon {
-      fill: #fff;
+      fill: #FFF;
     }
     #off rect, #off line {
       stroke: ButtonShadow;
@@ -49,7 +49,7 @@
     }
   ]]></style>
   <g id="icon">
-    <rect width="80" height="104" rx="8" ry="8" transform="translate(12,12)"/>
+    <rect width="80" height="104" rx="8" ry="8" x="12" y="12"/>
     <line x1="56" y1="72" x2="116" y2="12"/>
     <polygon points="0,0 0,24 12,24 24,12, 12,0"
              transform="translate(60,85) rotate(135)"/>

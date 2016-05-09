@@ -16,11 +16,6 @@
   const openAddonManager = document.getElementById("openAddonManager");
   const inputRadios = document.querySelectorAll("input[type=radio]");
 
-  /* for back compatibility prior to Firefox 39 */
-  const iconColorLabel = document.querySelector("label[data-l10n-id=IconColorLabel]");
-  const iconGrayLabel = document.querySelector("label[data-l10n-id=IconGrayLabel]");
-  const iconWhiteLabel = document.querySelector("label[data-l10n-id=IconWhiteLabel]");
-
   /**
    * remove child nodes
    * @param {Object} node
@@ -77,11 +72,11 @@
       const target = evt.target;
       switch(type) {
         case "load":
-          self.port.emit(type);
+          window.self.port.emit(type);
           break;
         case "change":
         case "submit":
-          self.port.emit(type, {
+          window.self.port.emit(type, {
             editorName: editorLabel && editorLabel.value ?
               editorLabel.value : editorName && editorName.value ?
               editorName.value : "",
@@ -93,7 +88,10 @@
           break;
         case "click":
           target && target.hasAttributeNS(null, "data-href") &&
-            self.port.emit(type, target.getAttributeNS(null, "data-href"));
+            window.self.port.emit(
+              type,
+              target.getAttributeNS(null, "data-href")
+            );
           evt.preventDefault();
           break;
         default:
@@ -113,7 +111,7 @@
    * update control panel
    * @param {Object} res - editor data
    */
-  self.port.on("editorValue", res => {
+  window.self.port.on("editorValue", res => {
     res && (
       editorName && (
         editorName.value = res.editorName,
@@ -135,7 +133,7 @@
    * localize control panel
    * @param {Object} res - localize data
    */
-  self.port.on("htmlValue", res => {
+  window.self.port.on("htmlValue", res => {
     res && (
       html && (html.lang = res.lang),
       selectIcon && (selectIcon.value = res.submit),
@@ -144,17 +142,7 @@
         currentName.appendChild(document.createTextNode(res.currentEditorName))
       ),
       editorLabel && (editorLabel.placeholder = res.editorLabel),
-      storeLabel && (storeLabel.value = res.submit),
-      /* back compatible localize attributes prior to Firefox 39 */
-      (isNaN(res.compat) || res.compat < 0) && (
-        iconColorLabel && (iconColorLabel.ariaLabel = res.iconColorLabel),
-        buttonIcon && (buttonIcon.alt = res.iconColorAlt),
-        iconGrayLabel && (iconGrayLabel.ariaLabel = res.iconGrayLabel),
-        buttonIconGray && (buttonIconGray.alt = res.iconGrayAlt),
-        iconWhiteLabel && (iconWhiteLabel.ariaLabel = res.iconWhiteLabel),
-        buttonIconWhite && (buttonIconWhite.alt = res.iconWhiteAlt),
-        currentName && (currentName.ariaLabel = res.currentEditorNameLabel)
-      )
+      storeLabel && (storeLabel.value = res.submit)
     );
   });
 

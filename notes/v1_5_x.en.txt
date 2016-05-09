@@ -1,0 +1,7 @@
+1.5.0
+New And Updated Features
+<ul>
+<li>Supported minVersion changed to Firefox 39.0</li>
+<li>`Force To Remove The Temporary Files At Shutdown` option is now TRUE (checked) by default</li>
+<li>Removed `require("chrome")` and switched to SDK apis</li>
+</ul>

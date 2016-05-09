@@ -390,7 +390,7 @@
         elm.getAttributeNS(null, `${ DATA_ID }_controls`)
       ).split(" ");
       for(let value of attr) {
-        self.postMessage(value);
+        window.self.postMessage(value);
       }
     }
   };
@@ -489,7 +489,7 @@
    * @param {Object} elm - the element that triggered context menu
    * @return {boolean} - true
    */
-  self.on("context", elm => {
+  window.self.on("context", elm => {
     const sel = window.getSelection();
     let label = VIEW_SOURCE;
     switch(true) {
@@ -507,7 +507,7 @@
         break;
       default:
     }
-    self.postMessage(label);
+    window.self.postMessage(label);
     return true;
   });
 
@@ -515,7 +515,7 @@
    * switch mode by context
    * @param {Object} elm - the element that triggered context menu
    */
-  self.on("click", elm => {
+  window.self.on("click", elm => {
     const mode = {
       mode: VIEW_SOURCE,
       charset: window.top.document.characterSet,
@@ -575,6 +575,6 @@
           );
       }
     }
-    self.postMessage(JSON.stringify(mode));
+    window.self.postMessage(JSON.stringify(mode));
   });
 })();
