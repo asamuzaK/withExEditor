@@ -4,10 +4,12 @@
 (() => {
   "use strict";
   const DATA_ID = "data-with_ex_editor_id";
+  const DATA_TS = "data-with_ex_editor_timestamp";
   const nsURI = { html: "http://www.w3.org/1999/xhtml" };
   const opt = window.self.options || {};
   const target = opt.target || "";
   const value = opt.value || "";
+  const timestamp = opt.timestamp || 0;
   const namespace = opt.namespace || nsURI.html;
 
   /**
@@ -45,14 +47,21 @@
       for(let id of attr) {
         if(id === target) {
           (elm = document.querySelector(`[*|${ DATA_ID }=${ target }]`)) &&
-            setContentEditableText(elm, value.split("\n"));
+          (!elm.hasAttributeNS(ns, DATA_TS) ||
+           timestamp > elm.getAttributeNS(ns, DATA_TS) * 1) && (
+            elm.setAttributeNS(ns, DATA_TS, timestamp),
+            setContentEditableText(elm, value.split("\n"))
+          );
           break;
         }
       }
     }
     else {
       elm.hasAttributeNS(ns, DATA_ID) &&
-      elm.getAttributeNS(ns, DATA_ID) === target && (
+      elm.getAttributeNS(ns, DATA_ID) === target &&
+      (!elm.hasAttributeNS(ns, DATA_TS) ||
+       timestamp > elm.getAttributeNS(ns, DATA_TS) * 1) && (
+        elm.setAttributeNS(ns, DATA_TS, timestamp),
         /^(?:input|textarea)$/.test(elm.localName) ?
           elm.value = value : elm.isContentEditable &&
           setContentEditableText(elm, value.split("\n"))
