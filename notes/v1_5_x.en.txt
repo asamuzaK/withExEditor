@@ -5,5 +5,6 @@ New And Updated Features
 <li>`Force To Remove The Temporary Files At Shutdown` option is now TRUE (checked) by default</li>
 <li>Check the time stamp of the temporary file when synchronizing contents</li>
 <li>Add some pre-defined file types</li>
+<li>Fix `Remove` translation in Japanese localize</li>
 <li>Removed `require("chrome")` and switched to SDK apis</li>
 </ul>
