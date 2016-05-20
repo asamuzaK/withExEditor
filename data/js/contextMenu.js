@@ -139,9 +139,8 @@
         node = document.documentElement,
         ns.node = node,
         ns.name = node.localName,
-        ns.uri = node.hasAttribute("xmlns") ?
-          node.getAttribute("xmlns") : nsURI[node.localName.toLowerCase()] ?
-          nsURI[node.localName.toLowerCase()] : null
+        ns.uri = node.hasAttribute("xmlns") ? node.getAttribute("xmlns") :
+                 (nsURI[node.localName.toLowerCase()] || null)
       );
     }
     return ns;
@@ -155,9 +154,8 @@
    */
   const getNsURI = (node, bool) =>
     node ? {
-      namespaceURI: node.namespaceURI ?
-        node.namespaceURI : node.prefix && nsURI[node.prefix] ?
-        nsURI[node.prefix] : bool ? getNodeNS(node).uri : null
+      namespaceURI: node.namespaceURI || node.prefix && nsURI[node.prefix] ||
+                    bool && getNodeNS(node).uri || null
     } : null;
 
   /**
@@ -366,21 +364,18 @@
       const arr = [];
       if(isNodeList(nodes)) {
         for(let node of nodes) {
-          switch(true) {
-            case node.nodeType === 3:
-              arr.push(node.nodeValue);
-              break;
-            case node.nodeType === 1 && node.localName === "br":
-              arr.push("\n");
-              break;
-            case node.nodeType === 1 && node.hasChildNodes():
-              arr.push(getTextNode(node.childNodes));
-              break;
-            default:
+          if(node.nodeType === 3) {
+            arr.push(node.nodeValue);
+          }
+          else {
+            node.nodeType === 1 && (
+              node.localName === "br" ? arr.push("\n") :
+              node.hasChildNodes() && arr.push(getTextNode(node.childNodes))
+            );
           }
         }
       }
-      return arr.length > 0 ? arr.join("") : "";
+      return arr.join("");
     };
     return node && node.hasChildNodes() ? getTextNode(node.childNodes) : "";
   };
@@ -460,20 +455,14 @@
      * @return {boolean}
      */
     const getIsContentEditableNode = () => {
-      let bool = false, elm = node, i;
-      while(elm && !i) {
-        switch(true) {
-          case typeof elm.isContentEditable === "boolean" &&
-               (!elm.namespaceURI || elm.namespaceURI === nsURI.html):
-            (bool = elm.isContentEditable) && setController(elm, getId(node));
-            i = true;
-            break;
-          case !elm.parentNode:
-            i = true;
-            break;
-          default:
-            elm = elm.parentNode;
+      let bool = false, elm = node;
+      while(elm && elm.parentNode) {
+        if(typeof elm.isContentEditable === "boolean" &&
+           (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
+          (bool = elm.isContentEditable) && setController(elm, getId(node));
+          break;
         }
+        elm = elm.parentNode;
       }
       return bool;
     };
