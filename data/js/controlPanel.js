@@ -77,12 +77,11 @@
         case "change":
         case "submit":
           window.self.port.emit(type, {
-            editorName: editorLabel && editorLabel.value ?
-              editorLabel.value : editorName && editorName.value ?
-              editorName.value : "",
-            toolbarButtonIcon: type === "checked" && target.checked ?
-              target.name : buttonIcon ?
-              getRadioButtonValue(buttonIcon.name) : null
+            editorName: editorLabel && editorLabel.value ||
+                        editorName && editorName.value || "",
+            buttonIcon: type === "checked" && target.checked && target.name ||
+                        buttonIcon && getRadioButtonValue(buttonIcon.name) ||
+                        null
           });
           evt.preventDefault();
           break;
@@ -118,9 +117,7 @@
         currentName && (
           currentName.hasChildNodes() && removeChildNodes(currentName),
           currentName.appendChild(
-            document.createTextNode(
-              editorName.value ? editorName.value : res.currentEditorName
-            )
+            document.createTextNode(editorName.value || res.currentEditorName)
           )
         ),
         editorLabel.value = editorName.value

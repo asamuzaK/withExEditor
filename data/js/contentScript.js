@@ -5,6 +5,7 @@
   "use strict";
   const DATA_ID = "data-with_ex_editor_id";
   const DATA_TS = "data-with_ex_editor_timestamp";
+  const CONTROLS = `${ DATA_ID }_controls`;
   const nsURI = { html: "http://www.w3.org/1999/xhtml" };
   const opt = window.self.options || {};
   const target = opt.target || "";
@@ -41,9 +42,9 @@
   (() => {
     let elm = document.activeElement;
     const ns = !elm.namespaceURI || elm.namespaceURI === nsURI.html ?
-      null : nsURI.html;
-    if(elm.hasAttributeNS(ns, `${ DATA_ID }_controls`)) {
-      const attr = (elm.getAttributeNS(ns, `${ DATA_ID }_controls`)).split(" ");
+                 null : nsURI.html;
+    if(elm.hasAttributeNS(ns, CONTROLS)) {
+      const attr = (elm.getAttributeNS(ns, CONTROLS)).split(" ");
       for(let id of attr) {
         if(id === target) {
           (elm = document.querySelector(`[*|${ DATA_ID }=${ target }]`)) &&

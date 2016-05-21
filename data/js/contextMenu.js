@@ -8,6 +8,8 @@
   const VIEW_SELECTION = "ViewSelection";
   const EDIT_TEXT = "EditText";
   const DATA_ID = "data-with_ex_editor_id";
+  const CONTROLS = `${ DATA_ID }_controls`;
+  const REQ_EXT = "requiredExtensions";
 
   /* namespace URI */
   const nsURI = {
@@ -111,20 +113,20 @@
     }
     else {
       while(node && node.parentNode && !ns.node) {
+        const parent = node.parentNode;
         switch(true) {
           case node.namespaceURI:
             ns.node = node;
             ns.name = node.localName;
             ns.uri = node.namespaceURI;
             break;
-          case /^foreignObject$/.test(node.parentNode.localName) &&
-               (node.parentNode.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
+          case /^foreignObject$/.test(parent.localName) &&
+               (parent.hasAttributeNS(nsURI.svg, REQ_EXT) ||
                 document.documentElement.localName === "html"):
             ns.node = node;
             ns.name = node.localName;
-            ns.uri = node.parentNode.hasAttributeNS(nsURI.svg, "requiredExtensions") ?
-              node.parentNode.getAttributeNS(nsURI.svg, "requiredExtensions") :
-              nsURI.html;
+            ns.uri = parent.hasAttributeNS(nsURI.svg, REQ_EXT) &&
+                     parent.getAttributeNS(nsURI.svg, REQ_EXT) || nsURI.html;
             break;
           case /^(?:math|svg)$/.test(node.localName):
             ns.node = node;
@@ -132,15 +134,15 @@
             ns.uri = nsURI[node.localName];
             break;
           default:
-            node = node.parentNode;
+            node = parent;
         }
       }
       !ns.node && (
         node = document.documentElement,
         ns.node = node,
         ns.name = node.localName,
-        ns.uri = node.hasAttribute("xmlns") ? node.getAttribute("xmlns") :
-                 (nsURI[node.localName.toLowerCase()] || null)
+        ns.uri = node.hasAttribute("xmlns") && node.getAttribute("xmlns") ||
+                 nsURI[node.localName.toLowerCase()] || null
       );
     }
     return ns;
@@ -386,12 +388,12 @@
    */
   const postTemporaryId = evt => {
     const elm = evt && evt.target === evt.currentTarget && evt.target;
-    if(elm && (elm.hasAttributeNS(null, DATA_ID) ||
-               elm.hasAttributeNS(null, `${ DATA_ID }_controls`))) {
-      const attr = (
-        elm.getAttributeNS(null, DATA_ID) ||
-        elm.getAttributeNS(null, `${ DATA_ID }_controls`)
-      ).split(" ");
+    let attr = elm && (
+      elm.hasAttributeNS(null, DATA_ID) && elm.getAttributeNS(null, DATA_ID) ||
+      elm.hasAttributeNS(null, CONTROLS) && elm.getAttributeNS(null, CONTROLS)
+    );
+    if(attr) {
+      attr = attr.split(" ");
       for(let value of attr) {
         window.self.postMessage(value);
       }
@@ -432,19 +434,17 @@
      */
     const setController = (elm, id = null) => {
       if(elm && id) {
-        if(elm.hasAttributeNS(null, `${ DATA_ID }_controls`)) {
-          const arr = (
-            elm.getAttributeNS(null, `${ DATA_ID }_controls`)
-          ).split(" ");
+        if(elm.hasAttributeNS(null, CONTROLS)) {
+          const arr = (elm.getAttributeNS(null, CONTROLS)).split(" ");
           arr.push(id);
           elm.setAttributeNS(
             null,
-            `${ DATA_ID }_controls`,
+            CONTROLS,
             (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
           );
         }
         else {
-          elm.setAttributeNS(null, `${ DATA_ID }_controls`, id);
+          elm.setAttributeNS(null, CONTROLS, id);
           elm.addEventListener("focus", postTemporaryId, false);
         }
       }
@@ -472,7 +472,7 @@
        node.hasChildNodes()) {
       const nodes = node.childNodes;
       for(let child of nodes) {
-        isText = child.nodeType === 3 ? true : false;
+        isText = child.nodeType === 3;
         if(!isText) {
           break;
         }
