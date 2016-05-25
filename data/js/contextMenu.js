@@ -9,7 +9,6 @@
   const EDIT_TEXT = "EditText";
   const DATA_ID = "data-with_ex_editor_id";
   const CONTROLS = `${ DATA_ID }_controls`;
-  const REQ_EXT = "requiredExtensions";
 
   /* namespace URI */
   const nsURI = {
@@ -121,12 +120,13 @@
             ns.uri = node.namespaceURI;
             break;
           case /^foreignObject$/.test(parent.localName) &&
-               (parent.hasAttributeNS(nsURI.svg, REQ_EXT) ||
+               (parent.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
                 document.documentElement.localName === "html"):
             ns.node = node;
             ns.name = node.localName;
-            ns.uri = parent.hasAttributeNS(nsURI.svg, REQ_EXT) &&
-                     parent.getAttributeNS(nsURI.svg, REQ_EXT) || nsURI.html;
+            ns.uri = parent.hasAttributeNS(nsURI.svg, "requiredExtensions") &&
+                     parent.getAttributeNS(nsURI.svg, "requiredExtensions") ||
+                     nsURI.html;
             break;
           case /^(?:math|svg)$/.test(node.localName):
             ns.node = node;
@@ -235,7 +235,7 @@
       bool && node.hasChildNodes() &&
         elm.appendChild(appendChildNodes(node.childNodes))
     );
-    return elm ? elm : document.createTextNode("");
+    return elm || document.createTextNode("");
   };
 
   /**
@@ -530,7 +530,7 @@
           (obj = getId(elm)) && (
             mode.mode = EDIT_TEXT,
             mode.target = obj,
-            mode.value = elm.value ? elm.value : ""
+            mode.value = elm.value || ""
           );
           break;
         case elm.isContentEditable || nodeContentIsEditable(elm):
