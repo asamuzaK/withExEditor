@@ -14,24 +14,8 @@
     </rdf:RDF>
   </metadata>
   <style><![CDATA[
-    @namespace xlink "http://www.w3.org/1999/xlink";
     g:not(#color):not(:target) {
       display: none;
-    }
-    #color [xlink|href="#frame"] {
-      fill: #002147;
-    }
-    #color [xlink|href="#pen"] {
-      fill: #E66000;
-    }
-    #gray {
-      fill: #4C4C4C;
-    }
-    #white {
-      fill: #FFF;
-    }
-    #off {
-      fill: ButtonShadow;
     }
   ]]></style>
   <symbol id="frame">
@@ -44,18 +28,18 @@
     <path d="m0 0v24h12l12-12-12-12z" transform="translate(60,85) rotate(135)"/>
   </symbol>
   <g id="color">
+    <use xlink:href="#frame" fill="#002147"/>
+    <use xlink:href="#pen" fill="#E66000"/>
+  </g>
+  <g id="gray" fill="#4C4C4C">
     <use xlink:href="#frame"/>
     <use xlink:href="#pen"/>
   </g>
-  <g id="gray">
+  <g id="white" fill="#FFF">
     <use xlink:href="#frame"/>
     <use xlink:href="#pen"/>
   </g>
-  <g id="white">
-    <use xlink:href="#frame"/>
-    <use xlink:href="#pen"/>
-  </g>
-  <g id="off">
+  <g id="off" fill="ButtonShadow">
     <use xlink:href="#frame"/>
     <use xlink:href="#pen"/>
   </g>
