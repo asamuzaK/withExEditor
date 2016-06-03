@@ -10,8 +10,11 @@
   const DATA_ID = "data-with_ex_editor_id";
   const CONTROLS = `${ DATA_ID }_controls`;
 
-  /* namespace URI */
-  let nsURI = { math: "http://www.w3.org/1998/Math/MathML" };
+  /* namespace URI, loaded on click event */
+  let nsURI = {
+    html: null,
+    math: "http://www.w3.org/1998/Math/MathML"
+  };
 
   /**
    * get namespace of node from ancestor
@@ -118,32 +121,33 @@
     obj ? /NodeList/.test(obj.toString()) : false;
 
   /**
+   * append child nodes
+   * @param {Object} nodes - child nodes
+   * @return {Object} - document fragment
+   */
+  const appendChildNodes = nodes => {
+    const fragment = document.createDocumentFragment();
+    if(isNodeList(nodes)) {
+      for(let node of nodes) {
+        node.nodeType === 1 ? (
+          node === node.parentNode.firstChild &&
+            fragment.appendChild(document.createTextNode("\n")),
+          fragment.appendChild(getElement(node, true))
+        ) :
+        node.nodeType === 3 &&
+          fragment.appendChild(document.createTextNode(node.nodeValue));
+      }
+    }
+    return fragment;
+  };
+
+  /**
    * create namespaced element
    * @param {Object} node - element node to create element from
    * @param {boolean} bool - append child nodes
    * @return {Object} - namespaced element or text node
    */
   const getElement = (node, bool = false) => {
-    /**
-     * append child nodes
-     * @param {Object} nodes - child nodes
-     * @return {Object} - document fragment
-     */
-    const appendChildNodes = nodes => {
-      const fragment = document.createDocumentFragment();
-      if(isNodeList(nodes)) {
-        for(let node of nodes) {
-          node.nodeType === 1 ? (
-            node === node.parentNode.firstChild &&
-              fragment.appendChild(document.createTextNode("\n")),
-            fragment.appendChild(getElement(node, true))
-          ) : node.nodeType === 3 &&
-            fragment.appendChild(document.createTextNode(node.nodeValue));
-        }
-      }
-      return fragment;
-    };
-
     let elm;
     node && (elm = createElmNS(node)) && (
       node.attributes && setAttrNS(elm, node),
@@ -154,36 +158,37 @@
   };
 
   /**
+   * create DOM
+   * @param {Object} nodes - child nodes
+   * @return {Object} - document fragment
+   */
+  const createDom = nodes => {
+    const fragment = document.createDocumentFragment();
+    if(isNodeList(nodes)) {
+      const l = nodes.length;
+      let i = 0;
+      while(i < l) {
+        const obj = nodes[i];
+        obj.nodeType === 1 ? (
+          i === 0 && fragment.appendChild(document.createTextNode("\n")),
+          fragment.appendChild(getElement(obj, true)),
+          i === l - 1 && fragment.appendChild(document.createTextNode("\n"))
+        ) :
+        obj.nodeType === 3 &&
+          fragment.appendChild(document.createTextNode(obj.nodeValue));
+        i++;
+      }
+    }
+    return fragment;
+  };
+
+  /**
    * create DOM tree
    * @param {Object} elm - container element of the DOM tree
    * @param {Object} node - node containing child nodes to append
    * @return {Object} - DOM tree or text node
    */
   const getDomTree = (elm, node = null) => {
-    /**
-     * create DOM
-     * @param {Object} nodes - child nodes
-     * @return {Object} - document fragment
-     */
-    const createDom = nodes => {
-      const fragment = document.createDocumentFragment();
-      if(isNodeList(nodes)) {
-        const l = nodes.length;
-        let i = 0;
-        while(i < l) {
-          const obj = nodes[i];
-          obj.nodeType === 1 ? (
-            i === 0 && fragment.appendChild(document.createTextNode("\n")),
-            fragment.appendChild(getElement(obj, true)),
-            i === l - 1 && fragment.appendChild(document.createTextNode("\n"))
-          ) : obj.nodeType === 3 &&
-            fragment.appendChild(document.createTextNode(obj.nodeValue));
-          i++;
-        }
-      }
-      return fragment;
-    };
-
     elm = getElement(elm);
     elm.nodeType === 1 && node && node.hasChildNodes() &&
       elm.appendChild(createDom(node.childNodes));
@@ -267,35 +272,35 @@
   };
 
   /**
+   * get text node
+   * @param {Object} nodes - child nodes
+   * @return {string} - text
+   */
+  const getTextNode = nodes => {
+    const arr = [];
+    if(isNodeList(nodes)) {
+      for(let node of nodes) {
+        if(node.nodeType === 3) {
+          arr.push(node.nodeValue);
+        }
+        else {
+          node.nodeType === 1 && (
+            node.localName === "br" ? arr.push("\n") :
+            node.hasChildNodes() && arr.push(getTextNode(node.childNodes))
+          );
+        }
+      }
+    }
+    return arr.join("");
+  };
+
+  /**
    * get text node from editable content
    * @param {Object} node - node
    * @return {string} - text
    */
-  const onContentEditable = node => {
-    /**
-     * get text node
-     * @param {Object} nodes - child nodes
-     * @return {string} - text
-     */
-    const getTextNode = nodes => {
-      const arr = [];
-      if(isNodeList(nodes)) {
-        for(let node of nodes) {
-          if(node.nodeType === 3) {
-            arr.push(node.nodeValue);
-          }
-          else {
-            node.nodeType === 1 && (
-              node.localName === "br" ? arr.push("\n") :
-              node.hasChildNodes() && arr.push(getTextNode(node.childNodes))
-            );
-          }
-        }
-      }
-      return arr.join("");
-    };
-    return node && node.hasChildNodes() ? getTextNode(node.childNodes) : "";
-  };
+  const onContentEditable = node =>
+    node && node.hasChildNodes() ? getTextNode(node.childNodes) : "";
 
   /**
    * post temporary ID value
@@ -327,13 +332,54 @@
       const ns = html ? null : nsURI.html;
       elm.hasAttributeNS(ns, DATA_ID) ?
         id = elm.getAttributeNS(ns, DATA_ID) : (
-          id = `withExEditor${ window.performance.now() }`.replace(/\./, "_"),
-          !html && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html),
-          elm.setAttributeNS(ns, html ? DATA_ID : `html:${ DATA_ID }`, id),
-          html && elm.addEventListener("focus", postTemporaryId, false)
-        );
+        id = `withExEditor${ window.performance.now() }`.replace(/\./, "_"),
+        !html && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html),
+        elm.setAttributeNS(ns, html ? DATA_ID : `html:${ DATA_ID }`, id),
+        html && elm.addEventListener("focus", postTemporaryId, false)
+      );
     }
     return id;
+  };
+
+  /**
+   * set controller of content editable node
+   * @param {object} elm - controller element
+   * @param {?string} id - ID of the content editable node
+   */
+  const setController = (elm, id = null) => {
+    if(elm && id) {
+      if(elm.hasAttributeNS(null, CONTROLS)) {
+        const arr = (elm.getAttributeNS(null, CONTROLS)).split(" ");
+        arr.push(id);
+        elm.setAttributeNS(
+          null,
+          CONTROLS,
+          (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
+        );
+      }
+      else {
+        elm.setAttributeNS(null, CONTROLS, id);
+        elm.addEventListener("focus", postTemporaryId, false);
+      }
+    }
+  };
+
+  /**
+   * get isContentEditable node from ancestor
+   * @param {Object} node - element node
+   * @return {boolean}
+   */
+  const getIsContentEditableNode = node => {
+    let bool = false, elm = node;
+    while(elm && elm.parentNode) {
+      if(typeof elm.isContentEditable === "boolean" &&
+         (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
+        (bool = elm.isContentEditable) && setController(elm, getId(node));
+        break;
+      }
+      elm = elm.parentNode;
+    }
+    return bool;
   };
 
   /**
@@ -342,46 +388,6 @@
    * @return {boolean}
    */
   const nodeContentIsEditable = node => {
-    /**
-     * set controller of content editable node
-     * @param {object} elm - controller element
-     * @param {?string} id - ID of the content editable node
-     */
-    const setController = (elm, id = null) => {
-      if(elm && id) {
-        if(elm.hasAttributeNS(null, CONTROLS)) {
-          const arr = (elm.getAttributeNS(null, CONTROLS)).split(" ");
-          arr.push(id);
-          elm.setAttributeNS(
-            null,
-            CONTROLS,
-            (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
-          );
-        }
-        else {
-          elm.setAttributeNS(null, CONTROLS, id);
-          elm.addEventListener("focus", postTemporaryId, false);
-        }
-      }
-    };
-
-    /**
-     * get isContentEditable node from ancestor
-     * @return {boolean}
-     */
-    const getIsContentEditableNode = () => {
-      let bool = false, elm = node;
-      while(elm && elm.parentNode) {
-        if(typeof elm.isContentEditable === "boolean" &&
-           (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
-          (bool = elm.isContentEditable) && setController(elm, getId(node));
-          break;
-        }
-        elm = elm.parentNode;
-      }
-      return bool;
-    };
-
     let isText = false;
     if(node && node.namespaceURI && node.namespaceURI !== nsURI.html &&
        node.hasChildNodes()) {
@@ -393,7 +399,7 @@
         }
       }
     }
-    return isText && getIsContentEditableNode();
+    return isText && getIsContentEditableNode(node);
   };
 
   /**
@@ -403,23 +409,18 @@
    */
   window.self.on("context", elm => {
     const sel = window.getSelection();
-    let label = VIEW_SOURCE;
-    switch(true) {
-      case /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-           /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-           /^textarea$/.test(elm.localName) || elm.isContentEditable ||
-           sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm):
-        label = EDIT_TEXT;
-        break;
-      case sel.isCollapsed && getNodeNS(elm).uri === nsURI.math:
-        label = VIEW_MATHML;
-        break;
-      case !sel.isCollapsed:
-        label = VIEW_SELECTION;
-        break;
-      default:
-    }
-    window.self.postMessage(label);
+    window.self.postMessage(
+      /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
+      /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
+      /^textarea$/.test(elm.localName) || elm.isContentEditable ||
+      sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm) ?
+        EDIT_TEXT :
+      sel.isCollapsed && getNodeNS(elm).uri === nsURI.math ?
+        VIEW_MATHML :
+      !sel.isCollapsed ?
+        VIEW_SELECTION :
+        VIEW_SOURCE
+    );
     return true;
   });
 
@@ -440,54 +441,42 @@
     let obj;
     !nsURI.html && data && (nsURI = JSON.parse(data));
     if(sel.isCollapsed) {
-      switch(true) {
-        case /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-             /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-             /^textarea$/.test(elm.localName):
-          (obj = getId(elm)) && (
-            mode.mode = EDIT_TEXT,
-            mode.target = obj,
-            mode.value = elm.value || ""
-          );
-          break;
-        case elm.isContentEditable || nodeContentIsEditable(elm):
-          (obj = getId(elm)) && (
-            mode.mode = EDIT_TEXT,
-            mode.target = obj,
-            mode.value = onContentEditable(elm),
-            mode.namespace = getNodeNS(elm).uri
-          );
-          break;
-        case getNodeNS(elm).uri === nsURI.math:
-          (obj = onViewMathML(elm)) && (
-            mode.mode = VIEW_MATHML,
-            mode.value = obj
-          );
-          break;
-        default:
-      }
+      (/^input$/.test(elm.localName) && elm.hasAttribute("type") &&
+       /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
+       /^textarea$/.test(elm.localName)) && (obj = getId(elm)) ? (
+        mode.mode = EDIT_TEXT,
+        mode.target = obj,
+        mode.value = elm.value || ""
+      ) :
+      (elm.isContentEditable || nodeContentIsEditable(elm)) &&
+      (obj = getId(elm)) ? (
+        mode.mode = EDIT_TEXT,
+        mode.target = obj,
+        mode.value = onContentEditable(elm),
+        mode.namespace = getNodeNS(elm).uri
+      ) :
+      getNodeNS(elm).uri === nsURI.math && (obj = onViewMathML(elm)) && (
+        mode.mode = VIEW_MATHML,
+        mode.value = obj
+      );
     }
     else {
-      switch(true) {
-        case sel.anchorNode === sel.focusNode &&
-             sel.anchorNode.parentNode === document.documentElement:
-          break;
-        case sel.rangeCount === 1 &&
-             (elm.isContentEditable ||
-              sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm)):
-          (obj = getId(elm)) && (
-            mode.mode = EDIT_TEXT,
-            mode.target = obj,
-            mode.value = onContentEditable(elm),
-            mode.namespace = getNodeNS(elm).uri
-          );
-          break;
-        default:
-          (obj = onViewSelection(sel)) && (
-            mode.mode = VIEW_SELECTION,
-            mode.value = obj
-          );
-      }
+      (sel.anchorNode !== sel.focusNode ||
+       sel.anchorNode.parentNode !== document.documentElement) && (
+        sel.rangeCount === 1 &&
+        (elm.isContentEditable ||
+         sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm)) &&
+        (obj = getId(elm)) ? (
+          mode.mode = EDIT_TEXT,
+          mode.target = obj,
+          mode.value = onContentEditable(elm),
+          mode.namespace = getNodeNS(elm).uri
+        ) :
+        (obj = onViewSelection(sel)) && (
+          mode.mode = VIEW_SELECTION,
+          mode.value = obj
+        )
+      );
     }
     window.self.postMessage(JSON.stringify(mode));
   });
