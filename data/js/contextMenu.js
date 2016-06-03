@@ -350,8 +350,9 @@
   const getIsContentEditableNode = node => {
     let bool = false, elm = node;
     while(elm && elm.parentNode) {
-      if(typeof elm.isContentEditable === "boolean") {
-        (bool = elm.isContentEditable);
+      if(typeof elm.isContentEditable === "boolean" &&
+         (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
+        bool = elm.isContentEditable;
         break;
       }
       elm = elm.parentNode;
