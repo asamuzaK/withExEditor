@@ -32,29 +32,26 @@
     else {
       while(node && node.parentNode && !ns.node) {
         const parent = node.parentNode;
-        switch(true) {
-          case node.namespaceURI:
-            ns.node = node;
-            ns.name = node.localName;
-            ns.uri = node.namespaceURI;
-            break;
-          case /^foreignObject$/.test(parent.localName) &&
-               (parent.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
-                document.documentElement.localName === "html"):
-            ns.node = node;
-            ns.name = node.localName;
-            ns.uri = parent.hasAttributeNS(nsURI.svg, "requiredExtensions") &&
-                     parent.getAttributeNS(nsURI.svg, "requiredExtensions") ||
-                     nsURI.html;
-            break;
-          case /^(?:math|svg)$/.test(node.localName):
-            ns.node = node;
-            ns.name = node.localName;
-            ns.uri = nsURI[node.localName];
-            break;
-          default:
-            node = parent;
-        }
+        node.namespaceURI ? (
+          ns.node = node,
+          ns.name = node.localName,
+          ns.uri = node.namespaceURI
+        ) :
+        /^foreignObject$/.test(parent.localName) &&
+        (parent.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
+         document.documentElement.localName === "html") ? (
+          ns.node = node,
+          ns.name = node.localName,
+          ns.uri = parent.hasAttributeNS(nsURI.svg, "requiredExtensions") &&
+                   parent.getAttributeNS(nsURI.svg, "requiredExtensions") ||
+                   nsURI.html
+        ) :
+        /^(?:math|svg)$/.test(node.localName) ? (
+          ns.node = node,
+          ns.name = node.localName,
+          ns.uri = nsURI[node.localName]
+        ) :
+          node = parent;
       }
       !ns.node && (
         node = document.documentElement,
