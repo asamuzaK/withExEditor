@@ -40,18 +40,23 @@
 
   /* get target element and and sync text value */
   (() => {
-    let elm = document.activeElement;
-    const ns = !elm.namespaceURI || elm.namespaceURI === nsURI.html ?
-                 null : nsURI.html;
+    const elm = document.activeElement;
+    let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+        ns = html ? null : nsURI.html,
+        attr = html ? DATA_TS : `html:${ DATA_TS }`;
     if(elm.hasAttributeNS(ns, CONTROLS)) {
-      const attr = (elm.getAttributeNS(ns, CONTROLS)).split(" ");
-      for(let id of attr) {
+      const arr = (elm.getAttributeNS(ns, CONTROLS)).split(" ");
+      for(let id of arr) {
         if(id === target) {
-          (elm = document.querySelector(`[*|${ DATA_ID }=${ target }]`)) &&
-          (!elm.hasAttributeNS(ns, DATA_TS) ||
-           timestamp > elm.getAttributeNS(ns, DATA_TS) * 1) && (
-            elm.setAttributeNS(ns, DATA_TS, timestamp),
-            setContentEditableText(elm, value.split("\n"))
+          (id = document.querySelector(`[*|${ DATA_ID }=${ id }]`)) && (
+            html = !id.namespaceURI || id.namespaceURI === nsURI.html,
+            ns = html ? null : nsURI.html,
+            attr = html ? DATA_TS : `html:${ DATA_TS }`,
+            (!id.hasAttributeNS(ns, DATA_TS) ||
+             timestamp > id.getAttributeNS(ns, DATA_TS) * 1) && (
+              id.setAttributeNS(ns, attr, timestamp),
+              setContentEditableText(id, value.split("\n"))
+            )
           );
           break;
         }
@@ -62,9 +67,10 @@
       elm.getAttributeNS(ns, DATA_ID) === target &&
       (!elm.hasAttributeNS(ns, DATA_TS) ||
        timestamp > elm.getAttributeNS(ns, DATA_TS) * 1) && (
-        elm.setAttributeNS(ns, DATA_TS, timestamp),
+         elm.setAttributeNS(ns, attr, timestamp),
         /^(?:input|textarea)$/.test(elm.localName) ?
-          elm.value = value : elm.isContentEditable &&
+          elm.value = value :
+        elm.isContentEditable &&
           setContentEditableText(elm, value.split("\n"))
       );
     }

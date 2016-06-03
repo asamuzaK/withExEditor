@@ -10,10 +10,11 @@
   const DATA_ID = "data-with_ex_editor_id";
   const CONTROLS = `${ DATA_ID }_controls`;
 
-  /* namespace URI, loaded on click event */
+  /* namespace URI, rest will be loaded on click event */
   let nsURI = {
-    html: null,
-    math: "http://www.w3.org/1998/Math/MathML"
+    html: "http://www.w3.org/1999/xhtml",
+    math: "http://www.w3.org/1998/Math/MathML",
+    xmlns: "http://www.w3.org/2000/xmlns/"
   };
 
   /**
@@ -342,29 +343,6 @@
   };
 
   /**
-   * set controller of content editable node
-   * @param {object} elm - controller element
-   * @param {?string} id - ID of the content editable node
-   */
-  const setController = (elm, id = null) => {
-    if(elm && id) {
-      if(elm.hasAttributeNS(null, CONTROLS)) {
-        const arr = (elm.getAttributeNS(null, CONTROLS)).split(" ");
-        arr.push(id);
-        elm.setAttributeNS(
-          null,
-          CONTROLS,
-          (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
-        );
-      }
-      else {
-        elm.setAttributeNS(null, CONTROLS, id);
-        elm.addEventListener("focus", postTemporaryId, false);
-      }
-    }
-  };
-
-  /**
    * get isContentEditable node from ancestor
    * @param {Object} node - element node
    * @return {boolean}
@@ -372,12 +350,29 @@
   const getIsContentEditableNode = node => {
     let bool = false, elm = node;
     while(elm && elm.parentNode) {
-      if(typeof elm.isContentEditable === "boolean" &&
-         (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
-        (bool = elm.isContentEditable) && setController(elm, getId(node));
+      if(typeof elm.isContentEditable === "boolean") {
+        (bool = elm.isContentEditable);
         break;
       }
       elm = elm.parentNode;
+    }
+    if(bool) {
+      const id = getId(node);
+      if(id) {
+        if(elm.hasAttributeNS(null, CONTROLS)) {
+          const arr = (elm.getAttributeNS(null, CONTROLS)).split(" ");
+          arr.push(id);
+          elm.setAttributeNS(
+            null,
+            CONTROLS,
+            (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
+          );
+        }
+        else {
+          elm.setAttributeNS(null, CONTROLS, id);
+          elm.addEventListener("focus", postTemporaryId, false);
+        }
+      }
     }
     return bool;
   };
@@ -439,7 +434,7 @@
     };
     const sel = window.getSelection();
     let obj;
-    !nsURI.html && data && (nsURI = JSON.parse(data));
+    !nsURI.xul && data && (nsURI = JSON.parse(data));
     if(sel.isCollapsed) {
       (/^input$/.test(elm.localName) && elm.hasAttribute("type") &&
        /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
