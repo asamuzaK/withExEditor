@@ -67,7 +67,7 @@
       elm.getAttributeNS(ns, DATA_ID) === target &&
       (!elm.hasAttributeNS(ns, DATA_TS) ||
        timestamp > elm.getAttributeNS(ns, DATA_TS) * 1) && (
-         elm.setAttributeNS(ns, attr, timestamp),
+        elm.setAttributeNS(ns, attr, timestamp),
         /^(?:input|textarea)$/.test(elm.localName) ?
           elm.value = value :
         elm.isContentEditable &&
