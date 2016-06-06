@@ -10,7 +10,7 @@
   const DATA_ID = "data-with_ex_editor_id";
   const CONTROLS = `${ DATA_ID }_controls`;
 
-  /* namespace URI, rest will be loaded on click event */
+  /* namespace URI, the rest will be loaded on click event */
   let nsURI = {
     html: "http://www.w3.org/1999/xhtml",
     math: "http://www.w3.org/1998/Math/MathML",
@@ -278,15 +278,11 @@
     const arr = [];
     if(isNodeList(nodes)) {
       for(let node of nodes) {
-        if(node.nodeType === 3) {
-          arr.push(node.nodeValue);
-        }
-        else {
-          node.nodeType === 1 && (
-            node.localName === "br" ? arr.push("\n") :
-            node.hasChildNodes() && arr.push(getTextNode(node.childNodes))
-          );
-        }
+        node.nodeType === 3 ? arr.push(node.nodeValue) :
+        node.nodeType === 1 && (
+          node.localName === "br" ? arr.push("\n") :
+          node.hasChildNodes() && arr.push(getTextNode(node.childNodes))
+        );
       }
     }
     return arr.join("");
@@ -433,7 +429,7 @@
     const sel = window.getSelection();
     let obj;
     !nsURI.xul && data && (nsURI = JSON.parse(data));
-    if(sel.isCollapsed) {
+    sel.isCollapsed ?
       (/^input$/.test(elm.localName) && elm.hasAttribute("type") &&
        /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
        /^textarea$/.test(elm.localName)) && (obj = getId(elm)) ? (
@@ -451,26 +447,23 @@
       getNodeNS(elm).uri === nsURI.math && (obj = onViewMathML(elm)) && (
         mode.mode = VIEW_MATHML,
         mode.value = obj
-      );
-    }
-    else {
-      (sel.anchorNode !== sel.focusNode ||
-       sel.anchorNode.parentNode !== document.documentElement) && (
-        sel.rangeCount === 1 &&
-        (elm.isContentEditable ||
-         sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm)) &&
-        (obj = getId(elm)) ? (
-          mode.mode = EDIT_TEXT,
-          mode.target = obj,
-          mode.value = onContentEditable(elm),
-          mode.namespace = getNodeNS(elm).uri
-        ) :
-        (obj = onViewSelection(sel)) && (
-          mode.mode = VIEW_SELECTION,
-          mode.value = obj
-        )
-      );
-    }
+      ) :
+    (sel.anchorNode !== sel.focusNode ||
+     sel.anchorNode.parentNode !== document.documentElement) && (
+      sel.rangeCount === 1 &&
+      (elm.isContentEditable ||
+       sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm)) &&
+      (obj = getId(elm)) ? (
+        mode.mode = EDIT_TEXT,
+        mode.target = obj,
+        mode.value = onContentEditable(elm),
+        mode.namespace = getNodeNS(elm).uri
+      ) :
+      (obj = onViewSelection(sel)) && (
+        mode.mode = VIEW_SELECTION,
+        mode.value = obj
+      )
+    );
     window.self.postMessage(JSON.stringify(mode));
   });
 })();
