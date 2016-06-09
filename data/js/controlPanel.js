@@ -37,11 +37,11 @@
       currentName.hasChildNodes() ? (
         removeChildNodes(currentName),
         currentName.appendChild(document.createTextNode(editorName.value)),
-        editorLabel.removeAttributeNS(null, "disabled"),
-        storeLabel.removeAttributeNS(null, "disabled")
+        editorLabel.removeAttributeNS("", "disabled"),
+        storeLabel.removeAttributeNS("", "disabled")
       ) : (
-        editorLabel.setAttributeNS(null, "disabled", "disabled"),
-        storeLabel.setAttributeNS(null, "disabled", "disabled")
+        editorLabel.setAttributeNS("", "disabled", "disabled"),
+        storeLabel.setAttributeNS("", "disabled", "disabled")
       )
     );
   };
@@ -86,10 +86,10 @@
           evt.preventDefault();
           break;
         case "click":
-          target && target.hasAttributeNS(null, "data-href") &&
+          target && target.hasAttributeNS("", "data-href") &&
             window.self.port.emit(
               type,
-              target.getAttributeNS(null, "data-href")
+              target.getAttributeNS("", "data-href")
             );
           evt.preventDefault();
           break;
@@ -108,7 +108,6 @@
 
   /**
    * update control panel
-   * @param {Object} res - editor data
    */
   window.self.port.on("editorValue", res => {
     res && (
@@ -128,7 +127,6 @@
 
   /**
    * localize control panel
-   * @param {Object} res - localize data
    */
   window.self.port.on("htmlValue", res => {
     res && (

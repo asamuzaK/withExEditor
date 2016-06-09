@@ -42,7 +42,7 @@
   (() => {
     const elm = document.activeElement;
     let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
-        ns = html ? null : nsURI.html,
+        ns = html ? "" : nsURI.html,
         attr = html ? DATA_TS : `html:${ DATA_TS }`;
     if(elm.hasAttributeNS(ns, CONTROLS)) {
       const arr = (elm.getAttributeNS(ns, CONTROLS)).split(" ");
@@ -50,7 +50,7 @@
         if(id === target) {
           (id = document.querySelector(`[*|${ DATA_ID }=${ id }]`)) && (
             html = !id.namespaceURI || id.namespaceURI === nsURI.html,
-            ns = html ? null : nsURI.html,
+            ns = html ? "" : nsURI.html,
             attr = html ? DATA_TS : `html:${ DATA_TS }`,
             (!id.hasAttributeNS(ns, DATA_TS) ||
              timestamp > id.getAttributeNS(ns, DATA_TS) * 1) && (
