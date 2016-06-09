@@ -62,7 +62,7 @@
         ns.node = node,
         ns.name = node.localName,
         ns.uri = node.hasAttribute("xmlns") && node.getAttribute("xmlns") ||
-                 nsURI.ns[node.localName.toLowerCase()] || null
+                 nsURI.ns[node.localName.toLowerCase()] || ""
       );
     }
     return ns;
@@ -77,7 +77,7 @@
   const getNsURI = (node, bool) =>
     node ? {
       namespaceURI: node.namespaceURI || node.prefix && nsURI.ns[node.prefix] ||
-                    bool && getNodeNS(node).uri || null
+                    bool && getNodeNS(node).uri || ""
     } : null;
 
   /**
@@ -105,7 +105,7 @@
         const ns = getNsURI(attr, false);
         typeof node[attr.name] !== "function" && ns &&
           elm.setAttributeNS(
-            ns.namespaceURI || null,
+            ns.namespaceURI || "",
             attr.prefix ?
               `${ attr.prefix }:${ attr.localName }` : attr.localName,
             attr.value
@@ -304,9 +304,11 @@
   const postTemporaryId = evt => {
     const elm = evt && evt.target === evt.currentTarget && evt.target;
     let attr = elm && (
-      elm.hasAttributeNS(null, DATA_ID) && elm.getAttributeNS(null, DATA_ID) ||
-      elm.hasAttributeNS(null, CONTROLS) && elm.getAttributeNS(null, CONTROLS)
-    );
+                 elm.hasAttributeNS("", DATA_ID) &&
+                   elm.getAttributeNS("", DATA_ID) ||
+                 elm.hasAttributeNS("", CONTROLS) &&
+                   elm.getAttributeNS("", CONTROLS)
+               );
     if(attr) {
       attr = attr.split(" ");
       for(let value of attr) {
@@ -355,17 +357,17 @@
     if(bool) {
       const id = getId(node);
       if(id) {
-        if(elm.hasAttributeNS(null, CONTROLS)) {
-          const arr = (elm.getAttributeNS(null, CONTROLS)).split(" ");
+        if(elm.hasAttributeNS("", CONTROLS)) {
+          const arr = (elm.getAttributeNS("", CONTROLS)).split(" ");
           arr.push(id);
           elm.setAttributeNS(
-            null,
+            "",
             CONTROLS,
             (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
           );
         }
         else {
-          elm.setAttributeNS(null, CONTROLS, id);
+          elm.setAttributeNS("", CONTROLS, id);
           elm.addEventListener("focus", postTemporaryId, false);
         }
       }
