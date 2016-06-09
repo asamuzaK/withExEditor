@@ -106,9 +106,7 @@
     evt && evt.target && evt.target.checked && selfPortEmit(evt);
   };
 
-  /**
-   * update control panel
-   */
+  /* update control panel */
   window.self.port.on("editorValue", res => {
     res && (
       editorName && (
@@ -125,9 +123,7 @@
     );
   });
 
-  /**
-   * localize control panel
-   */
+  /* localize control panel */
   window.self.port.on("htmlValue", res => {
     res && (
       html && (html.lang = res.lang),
