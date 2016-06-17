@@ -1,3 +1,10 @@
+1.5.1
+Maintenance Release
+<ul>
+<li>Optimize codes</li>
+<li>Optimize localization files</li>
+</ul>
+
 1.5.0
 New And Updated Features
 <ul>
