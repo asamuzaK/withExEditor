@@ -2,7 +2,6 @@
 Maintenance Release
 <ul>
 <li>Optimize codes</li>
-<li>Optimize localization files</li>
 </ul>
 
 1.5.0
