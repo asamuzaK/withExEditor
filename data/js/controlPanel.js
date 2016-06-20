@@ -51,7 +51,7 @@
    * @param {string} name - radio button name
    * @return {?string} - checked radio button value
    */
-  const getRadioButtonValue = name => {
+  const getRadioValue = name => {
     let value = null;
     for(let node of inputRadios) {
       if(node.name && node.name === name && node.checked && node.value) {
@@ -67,34 +67,25 @@
    * @param {Object} evt - event
    */
   const selfPortEmit = evt => {
-    if(evt) {
-      const type = evt.type;
-      const target = evt.target;
-      switch(type) {
-        case "load":
-          window.self.port.emit(type);
-          break;
-        case "change":
-        case "submit":
-          window.self.port.emit(type, {
-            editorName: editorLabel && editorLabel.value ||
-                        editorName && editorName.value || "",
-            buttonIcon: type === "checked" && target.checked && target.name ||
-                        buttonIcon && getRadioButtonValue(buttonIcon.name) ||
-                        null
-          });
-          evt.preventDefault();
-          break;
-        case "click":
-          target && target.hasAttributeNS("", "data-href") &&
-            window.self.port.emit(
-              type,
-              target.getAttributeNS("", "data-href")
-            );
-          evt.preventDefault();
-          break;
-        default:
-      }
+    const type = evt && evt.type;
+    const target = evt && evt.target;
+    switch(type) {
+      case "load":
+        window.self.port.emit(type);
+        break;
+      case "change":
+      case "submit":
+        window.self.port.emit(type, {
+          editorName: editorLabel && editorLabel.value ||
+                      editorName && editorName.value || "",
+          buttonIcon: buttonIcon && getRadioValue(buttonIcon.name) || null
+        });
+        evt.preventDefault();
+        break;
+      case "click":
+        target && target.hasAttributeNS("", "data-href") &&
+          window.self.port.emit(type, target.getAttributeNS("", "data-href"));
+        evt.preventDefault();
     }
   };
 
