@@ -78,14 +78,17 @@
         window.self.port.emit(type, {
           editorName: editorLabel && editorLabel.value ||
                       editorName && editorName.value || "",
-          buttonIcon: target && target.checked && target.name ||
+          buttonIcon: target && target.checked && target.value ||
                       buttonIcon && getRadioValue(buttonIcon.name) || null
         });
         evt.preventDefault();
         break;
       case "click":
         target && target.hasAttributeNS("", "data-href") &&
-          window.self.port.emit(type, target.getAttributeNS("", "data-href"));
+          window.self.port.emit(
+            type,
+            target.getAttributeNS("", "data-href")
+          );
         evt.preventDefault();
     }
   };

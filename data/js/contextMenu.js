@@ -356,21 +356,21 @@
     }
     if(bool) {
       const id = getId(node);
-      if(id) {
-        if(elm.hasAttributeNS("", CONTROLS)) {
-          const arr = (elm.getAttributeNS("", CONTROLS)).split(" ");
-          arr.push(id);
+      const arr = elm.hasAttributeNS("", CONTROLS) &&
+                    (elm.getAttributeNS("", CONTROLS)).split(" ");
+      id && (
+        arr ? (
+          arr.push(id),
           elm.setAttributeNS(
             "",
             CONTROLS,
             (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
-          );
-        }
-        else {
-          elm.setAttributeNS("", CONTROLS, id);
-          elm.addEventListener("focus", postTemporaryId, false);
-        }
-      }
+          )
+        ) : (
+          elm.setAttributeNS("", CONTROLS, id),
+          elm.addEventListener("focus", postTemporaryId, false)
+        )
+      );
     }
     return bool;
   };
