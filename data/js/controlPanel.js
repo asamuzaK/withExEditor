@@ -78,7 +78,8 @@
         window.self.port.emit(type, {
           editorName: editorLabel && editorLabel.value ||
                       editorName && editorName.value || "",
-          buttonIcon: buttonIcon && getRadioValue(buttonIcon.name) || null
+          buttonIcon: target && target.checked && target.name ||
+                      buttonIcon && getRadioValue(buttonIcon.name) || null
         });
         evt.preventDefault();
         break;
