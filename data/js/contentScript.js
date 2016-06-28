@@ -1,8 +1,8 @@
 /**
  * contentScript.js
  */
-(() => {
-  "use strict";
+"use strict";
+{
   const DATA_ID = "data-with_ex_editor_id";
   const DATA_TS = "data-with_ex_editor_timestamp";
   const CONTROLS = `${ DATA_ID }_controls`;
@@ -19,18 +19,18 @@
    * @param {Array} arr - array of values
    */
   const setContentEditableText = (node, arr = [""]) => {
-    if(node && node.nodeType === 1 && Array.isArray(arr)) {
+    if (node && node.nodeType === 1 && Array.isArray(arr)) {
       const fragment = document.createDocumentFragment();
       const l = arr.length;
       let i = 0;
-      while(i < l) {
+      while (i < l) {
         fragment.appendChild(document.createTextNode(arr[i]));
         i < l - 1 && namespace === nsURI.html &&
           fragment.appendChild(document.createElementNS(namespace, "br"));
         i++;
       }
-      if(node.hasChildNodes()) {
-        while(node.firstChild) {
+      if (node.hasChildNodes()) {
+        while (node.firstChild) {
           node.removeChild(node.firstChild);
         }
       }
@@ -39,15 +39,15 @@
   };
 
   /* get target element and and sync text value */
-  (() => {
+  {
     const elm = document.activeElement;
     let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
         ns = html ? "" : nsURI.html,
         attr = html ? DATA_TS : `html:${ DATA_TS }`;
-    if(elm.hasAttributeNS(ns, CONTROLS)) {
+    if (elm.hasAttributeNS(ns, CONTROLS)) {
       const arr = (elm.getAttributeNS(ns, CONTROLS)).split(" ");
-      for(let id of arr) {
-        if(id === target) {
+      for (let id of arr) {
+        if (id === target) {
           (id = document.querySelector(`[*|${ DATA_ID }=${ id }]`)) && (
             html = !id.namespaceURI || id.namespaceURI === nsURI.html,
             ns = html ? "" : nsURI.html,
@@ -74,5 +74,5 @@
           setContentEditableText(elm, value.split("\n"))
       );
     }
-  })();
-})();
+  };
+}

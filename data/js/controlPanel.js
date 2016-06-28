@@ -1,8 +1,8 @@
 /**
  * controlPanel.js
  */
-(() => {
-  "use strict";
+"use strict";
+{
   const html = document.querySelector("html");
   const controlPanelForm = document.getElementById("controlPanelForm");
   const buttonIcon = document.getElementById("buttonIcon");
@@ -21,8 +21,8 @@
    * @param {Object} node
    */
   const removeChildNodes = node => {
-    if(node && node.hasChildNodes()) {
-      while(node.firstChild) {
+    if (node && node.hasChildNodes()) {
+      while (node.firstChild) {
         node.removeChild(node.firstChild);
       }
     }
@@ -53,8 +53,8 @@
    */
   const getRadioValue = name => {
     let value = null;
-    for(let node of inputRadios) {
-      if(node.name && node.name === name && node.checked && node.value) {
+    for (let node of inputRadios) {
+      if (node.name && node.name === name && node.checked && node.value) {
         value = node.value;
         break;
       }
@@ -69,7 +69,7 @@
   const selfPortEmit = evt => {
     const type = evt && evt.type;
     const target = evt && evt.target;
-    switch(type) {
+    switch (type) {
       case "load":
         window.self.port.emit(type);
         break;
@@ -133,7 +133,7 @@
   });
 
   /* on initial run */
-  (() => {
+  {
     window.addEventListener("load", selfPortEmit, false);
     controlPanelForm &&
       controlPanelForm.addEventListener("submit", selfPortEmit, false);
@@ -146,5 +146,5 @@
     openAddonManager &&
       openAddonManager.addEventListener("click", selfPortEmit, false);
     toggleInputs();
-  })();
-})();
+  };
+}
