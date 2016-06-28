@@ -1,7 +1,7 @@
-1.5.1
-Maintenance Release
+1.5.2
+Bug fix
 <ul>
-<li>Optimize codes</li>
+<li>Fix bug that did not open a local file.</li>
 </ul>
 
 1.5.0
