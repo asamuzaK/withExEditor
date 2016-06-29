@@ -1,0 +1,14 @@
+v1.6.0
+New And Updated Features
+<ul>
+<li>Create directory for each tab when saving temporary files.</li>
+<li>Also, tab's temporary files are saved by each host.</li>
+<li>Add support for `data URI`s.</li>
+</ul>
+
+Code Changes
+<ul>
+<li>Uses `ChildProcess` and `AccessKey` constructors.</li>
+<li>Added `close` event listener to the tab and removes temporary stored data when the tab is closed.</li>
+<li>Organized remove listeners in `onUnload` function.</li>
+</ul>
