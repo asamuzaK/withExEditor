@@ -1,8 +1,8 @@
 /**
  * contextMenu.js
  */
-(() => {
-  "use strict";
+"use strict";
+{
   const VIEW_SOURCE = "ViewSource";
   const VIEW_MATHML = "ViewMathML";
   const VIEW_SELECTION = "ViewSelection";
@@ -28,13 +28,13 @@
    */
   const getNodeNS = node => {
     const ns = { node: null, name: null, uri: null };
-    if(node.namespaceURI) {
+    if (node.namespaceURI) {
       ns.node = node;
       ns.name = node.localName;
       ns.uri = node.namespaceURI;
     }
     else {
-      while(node && node.parentNode && !ns.node) {
+      while (node && node.parentNode && !ns.node) {
         const parent = node.parentNode;
         node.namespaceURI ? (
           ns.node = node,
@@ -88,9 +88,9 @@
   const createElmNS = elm => {
     const ns = getNsURI(elm, true);
     return ns && document.createElementNS(
-      ns.namespaceURI || nsURI.ns.html,
-      elm.prefix ? `${ elm.prefix }:${ elm.localName }` : elm.localName
-    );
+             ns.namespaceURI || nsURI.ns.html,
+             elm.prefix ? `${ elm.prefix }:${ elm.localName }` : elm.localName
+           );
   };
 
   /**
@@ -99,17 +99,16 @@
    * @param {Object} node - node to get attributes from
    */
   const setAttrNS = (elm, node) => {
-    if(elm && node) {
+    if (elm && node) {
       const nodeAttr = node.attributes;
-      for(let attr of nodeAttr) {
+      for (let attr of nodeAttr) {
         const ns = getNsURI(attr, false);
-        typeof node[attr.name] !== "function" && ns &&
-          elm.setAttributeNS(
-            ns.namespaceURI || "",
-            attr.prefix ?
-              `${ attr.prefix }:${ attr.localName }` : attr.localName,
-            attr.value
-          );
+        typeof node[attr.name] !== "function" && ns && elm.setAttributeNS(
+          ns.namespaceURI || "",
+          attr.prefix ?
+            `${ attr.prefix }:${ attr.localName }` : attr.localName,
+          attr.value
+        );
       }
     }
   };
@@ -121,8 +120,8 @@
    */
   const appendChildNodes = nodes => {
     const fragment = document.createDocumentFragment();
-    if(nodes instanceof NodeList) {
-      for(let node of nodes) {
+    if (nodes instanceof NodeList) {
+      for (let node of nodes) {
         node.nodeType === 1 ? (
           node === node.parentNode.firstChild &&
             fragment.appendChild(document.createTextNode("\n")),
@@ -159,10 +158,10 @@
    */
   const createDom = nodes => {
     const fragment = document.createDocumentFragment();
-    if(nodes instanceof NodeList) {
+    if (nodes instanceof NodeList) {
       const l = nodes.length;
       let i = 0;
-      while(i < l) {
+      while (i < l) {
         let obj = nodes[i];
         obj.nodeType === 1 ? (
           (obj = getElement(obj, true)) && obj instanceof Node && (
@@ -199,7 +198,7 @@
    */
   const onViewMathML = node => {
     let elm, range;
-    while(node && node.parentNode && !elm) {
+    while (node && node.parentNode && !elm) {
       node.localName === "math" && (elm = node);
       node = node.parentNode;
     }
@@ -209,7 +208,7 @@
       elm = getDomTree(elm, range.cloneContents())
     );
     return elm && elm.hasChildNodes() && window.XMLSerializer ?
-      (new XMLSerializer()).serializeToString(elm) : null;
+             (new XMLSerializer()).serializeToString(elm) : null;
   };
 
   /**
@@ -219,16 +218,16 @@
    */
   const onViewSelection = sel => {
     let fragment = document.createDocumentFragment();
-    if(sel && sel.rangeCount) {
+    if (sel && sel.rangeCount) {
       const l = sel.rangeCount;
       let obj, i = 0;
-      while(i < l) {
+      while (i < l) {
         const range = sel.getRangeAt(i);
         l > 1 && fragment.appendChild(document.createTextNode("\n"));
-        if(range.commonAncestorContainer.nodeType === 1) {
+        if (range.commonAncestorContainer.nodeType === 1) {
           obj = getNodeNS(range.commonAncestorContainer);
-          if(/^(?:svg|math)$/.test(obj.name)) {
-            if(obj.node === document.documentElement) {
+          if (/^(?:svg|math)$/.test(obj.name)) {
+            if (obj.node === document.documentElement) {
               fragment = null;
               break;
             }
@@ -267,7 +266,7 @@
       );
     }
     return fragment && fragment.hasChildNodes() && window.XMLSerializer ?
-      (new XMLSerializer()).serializeToString(fragment) : null;
+             (new XMLSerializer()).serializeToString(fragment) : null;
   };
 
   /**
@@ -277,8 +276,8 @@
    */
   const getTextNode = nodes => {
     const arr = [];
-    if(nodes instanceof NodeList) {
-      for(let node of nodes) {
+    if (nodes instanceof NodeList) {
+      for (let node of nodes) {
         node.nodeType === 3 ? arr.push(node.nodeValue) :
         node.nodeType === 1 && (
           node.localName === "br" ? arr.push("\n") :
@@ -305,13 +304,13 @@
     const elm = evt && evt.target === evt.currentTarget && evt.target;
     let attr = elm && (
                  elm.hasAttributeNS("", DATA_ID) &&
-                   elm.getAttributeNS("", DATA_ID) ||
+                 elm.getAttributeNS("", DATA_ID) ||
                  elm.hasAttributeNS("", CONTROLS) &&
-                   elm.getAttributeNS("", CONTROLS)
+                 elm.getAttributeNS("", CONTROLS)
                );
-    if(attr) {
+    if (attr) {
       attr = attr.split(" ");
-      for(let value of attr) {
+      for (let value of attr) {
         window.self.postMessage(value);
       }
     }
@@ -324,7 +323,7 @@
    */
   const getId = elm => {
     let id = null;
-    if(elm) {
+    if (elm) {
       const html = !elm.namespaceURI || elm.namespaceURI === nsURI.ns.html;
       const ns = html ? "" : nsURI.ns.html;
       elm.hasAttributeNS(ns, DATA_ID) ?
@@ -346,15 +345,15 @@
    */
   const getIsContentEditableNode = node => {
     let bool = false, elm = node;
-    while(elm && elm.parentNode) {
-      if(typeof elm.isContentEditable === "boolean" &&
-         (!elm.namespaceURI || elm.namespaceURI === nsURI.ns.html)) {
+    while (elm && elm.parentNode) {
+      if (typeof elm.isContentEditable === "boolean" &&
+          (!elm.namespaceURI || elm.namespaceURI === nsURI.ns.html)) {
         bool = elm.isContentEditable;
         break;
       }
       elm = elm.parentNode;
     }
-    if(bool) {
+    if (bool) {
       const id = getId(node);
       const arr = elm.hasAttributeNS("", CONTROLS) &&
                     (elm.getAttributeNS("", CONTROLS)).split(" ");
@@ -382,12 +381,12 @@
    */
   const nodeContentIsEditable = node => {
     let isText = false;
-    if(node && node.namespaceURI && node.namespaceURI !== nsURI.ns.html &&
-       node.hasChildNodes()) {
+    if (node && node.namespaceURI && node.namespaceURI !== nsURI.ns.html &&
+        node.hasChildNodes()) {
       const nodes = node.childNodes;
-      for(let child of nodes) {
+      for (let child of nodes) {
         isText = child.nodeType === 3;
-        if(!isText) {
+        if (!isText) {
           break;
         }
       }
@@ -465,4 +464,4 @@
     );
     window.self.postMessage(JSON.stringify(mode));
   });
-})();
+}
