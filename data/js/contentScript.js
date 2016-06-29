@@ -74,5 +74,5 @@
           setContentEditableText(elm, value.split("\n"))
       );
     }
-  };
+  }
 }

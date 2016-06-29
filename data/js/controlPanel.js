@@ -146,5 +146,5 @@
     openAddonManager &&
       openAddonManager.addEventListener("click", selfPortEmit, false);
     toggleInputs();
-  };
+  }
 }
