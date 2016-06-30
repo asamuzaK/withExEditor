@@ -138,8 +138,8 @@
     );
   });
 
-  /* on initial run */
-  {
+  /* add event listeners */
+  document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("load", selfPortEmit, false);
     controlPanelForm &&
       controlPanelForm.addEventListener("submit", selfPortEmit, false);
@@ -152,5 +152,5 @@
     openAddonManager &&
       openAddonManager.addEventListener("click", selfPortEmit, false);
     toggleInputs();
-  }
+  }, false);
 }

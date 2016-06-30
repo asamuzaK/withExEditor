@@ -9,6 +9,8 @@
   const EDIT_TEXT = "EditText";
   const DATA_ID = "data-with_ex_editor_id";
   const CONTROLS = `${ DATA_ID }_controls`;
+  const ELEMENT_NODE = 1;
+  const TEXT_NODE = 3;
 
   /* namespace URI */
   const nsURI = {
@@ -123,13 +125,13 @@
     const fragment = document.createDocumentFragment();
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        node.nodeType === 1 ? (
+        node.nodeType === ELEMENT_NODE ? (
           node === node.parentNode.firstChild &&
             fragment.appendChild(document.createTextNode("\n")),
           node = getElement(node, true),
           node instanceof Node && fragment.appendChild(node)
         ) :
-        node.nodeType === 3 &&
+        node.nodeType === TEXT_NODE &&
           fragment.appendChild(document.createTextNode(node.nodeValue));
       }
     }
@@ -164,14 +166,13 @@
       let i = 0;
       while (i < l) {
         let obj = nodes[i];
-        obj.nodeType === 1 ? (
+        obj.nodeType === ELEMENT_NODE ?
           (obj = getElement(obj, true)) && obj instanceof Node && (
             i === 0 && fragment.appendChild(document.createTextNode("\n")),
             fragment.appendChild(obj),
             i === l - 1 && fragment.appendChild(document.createTextNode("\n"))
-          )
-        ) :
-        obj.nodeType === 3 &&
+          ) :
+        obj.nodeType === TEXT_NODE &&
           fragment.appendChild(document.createTextNode(obj.nodeValue));
         i++;
       }
@@ -225,7 +226,7 @@
       while (i < l) {
         const range = sel.getRangeAt(i);
         l > 1 && fragment.appendChild(document.createTextNode("\n"));
-        if (range.commonAncestorContainer.nodeType === 1) {
+        if (range.commonAncestorContainer.nodeType === ELEMENT_NODE) {
           obj = getNodeNS(range.commonAncestorContainer);
           if (/^(?:svg|math)$/.test(obj.name)) {
             if (obj.node === document.documentElement) {
@@ -246,7 +247,7 @@
             fragment.appendChild(obj);
         }
         else {
-          range.commonAncestorContainer.nodeType === 3 &&
+          range.commonAncestorContainer.nodeType === TEXT_NODE &&
           (obj = getElement(range.commonAncestorContainer.parentNode)) &&
           obj instanceof Node && (
             obj.appendChild(range.cloneContents()),
@@ -279,8 +280,8 @@
     const arr = [];
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        node.nodeType === 3 ? arr.push(node.nodeValue) :
-        node.nodeType === 1 && (
+        node.nodeType === TEXT_NODE ? arr.push(node.nodeValue) :
+        node.nodeType === ELEMENT_NODE && (
           node.localName === "br" ? arr.push("\n") :
           node.hasChildNodes() && arr.push(getTextNode(node.childNodes))
         );
@@ -387,7 +388,7 @@
         node.hasChildNodes()) {
       const nodes = node.childNodes;
       for (let child of nodes) {
-        isText = child.nodeType === 3;
+        isText = child.nodeType === TEXT_NODE;
         if (!isText) {
           break;
         }
