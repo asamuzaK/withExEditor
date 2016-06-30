@@ -103,7 +103,7 @@
   const setAttrNS = (elm, node) => {
     if (elm && node) {
       const nodeAttr = node.attributes;
-      for (const attr of nodeAttr) {
+      for (let attr of nodeAttr) {
         const ns = getNsURI(attr, false);
         typeof node[attr.name] !== "function" && ns && elm.setAttributeNS(
           ns.namespaceURI || "",
@@ -278,7 +278,7 @@
   const getTextNode = nodes => {
     const arr = [];
     if (nodes instanceof NodeList) {
-      for (const node of nodes) {
+      for (let node of nodes) {
         node.nodeType === TEXT_NODE ? arr.push(node.nodeValue) :
         node.nodeType === ELEMENT_NODE && (
           node.localName === "br" ? arr.push("\n") :
@@ -312,7 +312,7 @@
                );
     if (attr) {
       attr = attr.split(" ");
-      for (const value of attr) {
+      for (let value of attr) {
         window.self.postMessage(value);
       }
     }
@@ -386,7 +386,7 @@
     if (node && node.namespaceURI && node.namespaceURI !== nsURI.ns.html &&
         node.hasChildNodes()) {
       const nodes = node.childNodes;
-      for (const child of nodes) {
+      for (let child of nodes) {
         isText = child.nodeType === TEXT_NODE;
         if (!isText) {
           break;

@@ -55,7 +55,7 @@
    */
   const getRadioValue = name => {
     let value = null;
-    for (const node of inputRadios) {
+    for (let node of inputRadios) {
       if (node.name && node.name === name && node.checked && node.value) {
         value = node.value;
         break;
