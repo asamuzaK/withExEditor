@@ -11,4 +11,5 @@ v1.6.0
 <li>`ChildProcess`と`AccessKey`のコンストラクタを作成。</li>
 <li>タブに`close`のイベントリスナを登録し、タブを閉じた際に一時的に内部で保存しているデータを削除するよう追加。</li>
 <li>`onUnload`時のイベントリスナの解除を整理。</li>
+<li>JavaScriptのコードスタイルをeslintで検証</li>
 </ul>
