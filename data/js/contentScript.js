@@ -17,6 +17,7 @@
    * set content editable element text
    * @param {Object} node - editable element
    * @param {Array} arr - array of values
+   * @return {void}
    */
   const setContentEditableText = (node, arr = [""]) => {
     if (node && node.nodeType === 1 && Array.isArray(arr)) {

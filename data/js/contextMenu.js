@@ -97,6 +97,7 @@
    * set attribute NS
    * @param {Object} elm - element to append attributes
    * @param {Object} node - node to get attributes from
+   * @return {void}
    */
   const setAttrNS = (elm, node) => {
     if (elm && node) {
@@ -299,6 +300,7 @@
   /**
    * post temporary ID value
    * @param { Object } evt - event
+   * @return {void}
    */
   const postTemporaryId = evt => {
     const elm = evt && evt.target === evt.currentTarget && evt.target;

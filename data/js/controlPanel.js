@@ -18,7 +18,8 @@
 
   /**
    * remove child nodes
-   * @param {Object} node
+   * @param {Object} node - node
+   * @return {void}
    */
   const removeChildNodes = node => {
     if (node && node.hasChildNodes()) {
@@ -30,6 +31,7 @@
 
   /**
    * toggle form inputs
+   * @return {void}
    */
   const toggleInputs = () => {
     editorLabel && storeLabel && (
@@ -65,6 +67,7 @@
   /**
    * self port emit
    * @param {Object} evt - event
+   * @return {void}
    */
   const selfPortEmit = evt => {
     const type = evt && evt.type;
@@ -90,12 +93,15 @@
             target.getAttributeNS("", "data-href")
           );
         evt.preventDefault();
+        break;
+      default:
     }
   };
 
   /**
    * check if radio button is checked
    * @param {Object} evt - event
+   * @return {void}
    */
   const isRadioChecked = evt => {
     evt && evt.target && evt.target.checked && selfPortEmit(evt);
