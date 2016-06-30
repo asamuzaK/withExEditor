@@ -76,11 +76,10 @@
    * @param {boolean} bool - use getNodeNS
    * @return {?Object} - namespace URI data
    */
-  const getNsURI = (node, bool) =>
-    node ? {
-      namespaceURI: node.namespaceURI || node.prefix && nsURI.ns[node.prefix] ||
-                    bool && getNodeNS(node).uri || ""
-    } : null;
+  const getNsURI = (node, bool) => (node ? {
+    namespaceURI: node.namespaceURI || node.prefix && nsURI.ns[node.prefix] ||
+                  bool && getNodeNS(node).uri || ""
+  } : null);
 
   /**
    * create element NS
@@ -104,7 +103,7 @@
   const setAttrNS = (elm, node) => {
     if (elm && node) {
       const nodeAttr = node.attributes;
-      for (let attr of nodeAttr) {
+      for (const attr of nodeAttr) {
         const ns = getNsURI(attr, false);
         typeof node[attr.name] !== "function" && ns && elm.setAttributeNS(
           ns.namespaceURI || "",
@@ -279,7 +278,7 @@
   const getTextNode = nodes => {
     const arr = [];
     if (nodes instanceof NodeList) {
-      for (let node of nodes) {
+      for (const node of nodes) {
         node.nodeType === TEXT_NODE ? arr.push(node.nodeValue) :
         node.nodeType === ELEMENT_NODE && (
           node.localName === "br" ? arr.push("\n") :
@@ -296,7 +295,7 @@
    * @return {string} - text
    */
   const onContentEditable = node =>
-    node && node.hasChildNodes() ? getTextNode(node.childNodes) : "";
+    (node && node.hasChildNodes() ? getTextNode(node.childNodes) : "");
 
   /**
    * post temporary ID value
@@ -313,7 +312,7 @@
                );
     if (attr) {
       attr = attr.split(" ");
-      for (let value of attr) {
+      for (const value of attr) {
         window.self.postMessage(value);
       }
     }
@@ -387,7 +386,7 @@
     if (node && node.namespaceURI && node.namespaceURI !== nsURI.ns.html &&
         node.hasChildNodes()) {
       const nodes = node.childNodes;
-      for (let child of nodes) {
+      for (const child of nodes) {
         isText = child.nodeType === TEXT_NODE;
         if (!isText) {
           break;
