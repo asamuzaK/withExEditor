@@ -406,11 +406,11 @@
       /^textarea$/.test(elm.localName) || elm.isContentEditable ||
       sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm) ?
         EDIT_TEXT :
-      sel.isCollapsed && getNodeNS(elm).uri === nsURI.ns.math ?
-        VIEW_MATHML :
-      !sel.isCollapsed ?
-        VIEW_SELECTION :
-        VIEW_SOURCE
+      sel.isCollapsed ?
+        getNodeNS(elm).uri === nsURI.ns.math ?
+          VIEW_MATHML :
+          VIEW_SOURCE :
+        VIEW_SELECTION
     );
     return true;
   });
