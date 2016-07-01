@@ -62,4 +62,3 @@ ex: `"Some Arg"`
 Error or Warning message will be notified when...
 * Failed to execute the external editor.
 * Failed to remove the temporary files at the end of Private Browsing.
-* The add-on storage is / was over quota. When this message is notified, it's better to restart the browser, or disable withExEditor and then enable again.
