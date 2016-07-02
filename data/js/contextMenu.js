@@ -74,7 +74,7 @@
    * get namespace URI
    * @param {Object} node - element node or attribute node
    * @param {boolean} bool - use getNodeNS
-   * @return {?Object} - namespace URI data
+   * @return {Object} - namespace URI data
    */
   const getNsURI = (node, bool) => (node ? {
     namespaceURI: node.namespaceURI || node.prefix && nsURI.ns[node.prefix] ||
@@ -84,7 +84,7 @@
   /**
    * create element NS
    * @param {Object} elm - element
-   * @return {?Object} - namespaced element
+   * @return {Object} - namespaced element
    */
   const createElmNS = elm => {
     const ns = getNsURI(elm, true);
