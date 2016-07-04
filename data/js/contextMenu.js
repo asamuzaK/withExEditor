@@ -78,8 +78,7 @@
    */
   const getNsURI = (node, bool) =>
     node && {
-      namespaceURI: node.namespaceURI ||
-                    node.prefix && nsURI.ns[node.prefix] ||
+      namespaceURI: node.namespaceURI || node.prefix && nsURI.ns[node.prefix] ||
                     bool && getNodeNS(node).uri || ""
     } || null;
 
@@ -241,9 +240,10 @@
               );
             }
           }
-          (obj = getDomTree(range.commonAncestorContainer,
-                            range.cloneContents())) && obj instanceof Node &&
-            fragment.appendChild(obj);
+          (obj = getDomTree(
+            range.commonAncestorContainer,
+            range.cloneContents()
+          )) && obj instanceof Node && fragment.appendChild(obj);
         }
         else {
           range.commonAncestorContainer.nodeType === TEXT_NODE &&
