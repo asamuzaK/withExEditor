@@ -408,9 +408,9 @@
       sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm) ?
         EDIT_TEXT :
       sel.isCollapsed ?
-        getNodeNS(elm).uri === nsURI.ns.math ?
-          VIEW_MATHML :
-          VIEW_SOURCE :
+      getNodeNS(elm).uri === nsURI.ns.math ?
+        VIEW_MATHML :
+        VIEW_SOURCE :
         VIEW_SELECTION
     );
     return true;
@@ -432,39 +432,39 @@
       nsURI.extended = true
     );
     obj ?
-      sel.isCollapsed ?
-        /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-        /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-        /^textarea$/.test(elm.localName) ? (
-          mode.mode = EDIT_TEXT,
-          mode.target = obj,
-          mode.value = elm.value || ""
-        ) :
-        (elm.isContentEditable || nodeContentIsEditable(elm)) && (
-          mode.mode = EDIT_TEXT,
-          mode.target = obj,
-          mode.value = onContentEditable(elm),
-          mode.namespace = getNodeNS(elm).uri
-        ) :
-      (sel.anchorNode !== sel.focusNode ||
-       sel.anchorNode.parentNode !== document.documentElement) &&
-      (sel.rangeCount === 1 &&
-       (elm.isContentEditable ||
-        sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm))) && (
-        mode.mode = EDIT_TEXT,
-        mode.target = obj,
-        mode.value = onContentEditable(elm),
-        mode.namespace = getNodeNS(elm).uri
-      ) :
     sel.isCollapsed ?
-      getNodeNS(elm).uri === nsURI.ns.math && (obj = onViewMathML(elm)) && (
-        mode.mode = VIEW_MATHML,
-        mode.value = obj
-      ) :
-      (obj = onViewSelection(sel)) && (
-        mode.mode = VIEW_SELECTION,
-        mode.value = obj
-      );
+    /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
+    /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
+    /^textarea$/.test(elm.localName) ? (
+      mode.mode = EDIT_TEXT,
+      mode.target = obj,
+      mode.value = elm.value || ""
+    ) :
+    (elm.isContentEditable || nodeContentIsEditable(elm)) && (
+      mode.mode = EDIT_TEXT,
+      mode.target = obj,
+      mode.value = onContentEditable(elm),
+      mode.namespace = getNodeNS(elm).uri
+    ) :
+    (sel.anchorNode !== sel.focusNode ||
+     sel.anchorNode.parentNode !== document.documentElement) &&
+    sel.rangeCount === 1 &&
+    (elm.isContentEditable ||
+     sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm)) && (
+      mode.mode = EDIT_TEXT,
+      mode.target = obj,
+      mode.value = onContentEditable(elm),
+      mode.namespace = getNodeNS(elm).uri
+    ) :
+    sel.isCollapsed ?
+    getNodeNS(elm).uri === nsURI.ns.math && (obj = onViewMathML(elm)) && (
+      mode.mode = VIEW_MATHML,
+      mode.value = obj
+    ) :
+    (obj = onViewSelection(sel)) && (
+      mode.mode = VIEW_SELECTION,
+      mode.value = obj
+    );
     window.self.postMessage(JSON.stringify(mode));
   });
 }
