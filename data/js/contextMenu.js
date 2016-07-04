@@ -8,7 +8,7 @@
   const VIEW_SELECTION = "ViewSelection";
   const EDIT_TEXT = "EditText";
   const DATA_ID = "data-with_ex_editor_id";
-  const CONTROLS = `${ DATA_ID }_controls`;
+  const CONTROLS = `${DATA_ID}_controls`;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
 
@@ -29,7 +29,7 @@
    * @return {Object} - namespace data
    */
   const getNodeNS = node => {
-    const ns = { node: null, name: null, uri: null };
+    const ns = {node: null, name: null, uri: null};
     if (node.namespaceURI) {
       ns.node = node;
       ns.name = node.localName;
@@ -76,10 +76,12 @@
    * @param {boolean} bool - use getNodeNS
    * @return {Object} - namespace URI data
    */
-  const getNsURI = (node, bool) => (node ? {
-    namespaceURI: node.namespaceURI || node.prefix && nsURI.ns[node.prefix] ||
-                  bool && getNodeNS(node).uri || ""
-  } : null);
+  const getNsURI = (node, bool) =>
+    node && {
+      namespaceURI: node.namespaceURI ||
+                    node.prefix && nsURI.ns[node.prefix] ||
+                    bool && getNodeNS(node).uri || ""
+    } || null;
 
   /**
    * create element NS
@@ -90,7 +92,7 @@
     const ns = getNsURI(elm, true);
     return ns && document.createElementNS(
              ns.namespaceURI || nsURI.ns.html,
-             elm.prefix ? `${ elm.prefix }:${ elm.localName }` : elm.localName
+             elm.prefix ? `${elm.prefix}:${elm.localName}` : elm.localName
            );
   };
 
@@ -108,7 +110,7 @@
         typeof node[attr.name] !== "function" && ns && elm.setAttributeNS(
           ns.namespaceURI || "",
           attr.prefix ?
-            `${ attr.prefix }:${ attr.localName }` : attr.localName,
+            `${attr.prefix}:${attr.localName}` : attr.localName,
           attr.value
         );
       }
@@ -295,11 +297,11 @@
    * @return {string} - text
    */
   const onContentEditable = node =>
-    (node && node.hasChildNodes() ? getTextNode(node.childNodes) : "");
+    node && node.hasChildNodes() && getTextNode(node.childNodes) || "";
 
   /**
    * post temporary ID value
-   * @param { Object } evt - event
+   * @param {Object} evt - event
    * @return {void}
    */
   const postTemporaryId = evt => {
@@ -330,10 +332,10 @@
       const ns = html ? "" : nsURI.ns.html;
       elm.hasAttributeNS(ns, DATA_ID) ?
         id = elm.getAttributeNS(ns, DATA_ID) : (
-        id = `withExEditor${ window.performance.now() }`.replace(/\./, "_"),
+        id = `withExEditor${window.performance.now()}`.replace(/\./, "_"),
         !html &&
           elm.setAttributeNS(nsURI.ns.xmlns, "xmlns:html", nsURI.ns.html),
-        elm.setAttributeNS(ns, html ? DATA_ID : `html:${ DATA_ID }`, id),
+        elm.setAttributeNS(ns, html ? DATA_ID : `html:${DATA_ID}`, id),
         html && elm.addEventListener("focus", postTemporaryId, false)
       );
     }

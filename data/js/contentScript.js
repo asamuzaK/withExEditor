@@ -5,8 +5,8 @@
 {
   const DATA_ID = "data-with_ex_editor_id";
   const DATA_TS = "data-with_ex_editor_timestamp";
-  const CONTROLS = `${ DATA_ID }_controls`;
-  const nsURI = { html: "http://www.w3.org/1999/xhtml" };
+  const CONTROLS = `${DATA_ID}_controls`;
+  const nsURI = {html: "http://www.w3.org/1999/xhtml"};
   const opt = window.self.options || {};
   const target = opt.target || "";
   const value = opt.value || "";
@@ -44,15 +44,15 @@
     const elm = document.activeElement;
     let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
         ns = html ? "" : nsURI.html,
-        attr = html ? DATA_TS : `html:${ DATA_TS }`;
+        attr = html ? DATA_TS : `html:${DATA_TS}`;
     if (elm.hasAttributeNS(ns, CONTROLS)) {
       const arr = (elm.getAttributeNS(ns, CONTROLS)).split(" ");
       for (let id of arr) {
         if (id === target) {
-          (id = document.querySelector(`[*|${ DATA_ID }=${ id }]`)) && (
+          (id = document.querySelector(`[*|${DATA_ID}=${id}]`)) && (
             html = !id.namespaceURI || id.namespaceURI === nsURI.html,
             ns = html ? "" : nsURI.html,
-            attr = html ? DATA_TS : `html:${ DATA_TS }`,
+            attr = html ? DATA_TS : `html:${DATA_TS}`,
             (!id.hasAttributeNS(ns, DATA_TS) ||
              timestamp > id.getAttributeNS(ns, DATA_TS) * 1) && (
               id.setAttributeNS(ns, attr, timestamp),
