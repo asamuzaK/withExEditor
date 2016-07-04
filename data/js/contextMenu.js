@@ -109,8 +109,7 @@
         const ns = getNsURI(attr, false);
         typeof node[attr.name] !== "function" && ns && elm.setAttributeNS(
           ns.namespaceURI || "",
-          attr.prefix &&
-            `${attr.prefix}:${attr.localName}` || attr.localName,
+          attr.prefix && `${attr.prefix}:${attr.localName}` || attr.localName,
           attr.value
         );
       }
@@ -243,8 +242,7 @@
             }
           }
           (obj = getDomTree(range.commonAncestorContainer,
-                            range.cloneContents())) &&
-          obj instanceof Node &&
+                            range.cloneContents())) && obj instanceof Node &&
             fragment.appendChild(obj);
         }
         else {
