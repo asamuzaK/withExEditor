@@ -118,34 +118,34 @@
   };
 
   /**
-   * append child nodes
-   * @param {Object} nodes - child nodes
-   * @return {Object} - document fragment
-   */
-  const appendChildNodes = nodes => {
-    const fragment = document.createDocumentFragment();
-    if (nodes instanceof NodeList) {
-      for (let node of nodes) {
-        node.nodeType === ELEMENT_NODE ? (
-          node === node.parentNode.firstChild &&
-            fragment.appendChild(document.createTextNode("\n")),
-          node = getElement(node, true),
-          node instanceof Node && fragment.appendChild(node)
-        ) :
-        node.nodeType === TEXT_NODE &&
-          fragment.appendChild(document.createTextNode(node.nodeValue));
-      }
-    }
-    return fragment;
-  };
-
-  /**
    * create namespaced element
    * @param {Object} node - element node to create element from
    * @param {boolean} bool - append child nodes
    * @return {Object} - namespaced element or text node
    */
   const getElement = (node, bool = false) => {
+    /**
+     * append child nodes
+     * @param {Object} nodes - child nodes
+     * @return {Object} - document fragment
+     */
+    const appendChildNodes = nodes => {
+      const fragment = document.createDocumentFragment();
+      if (nodes instanceof NodeList) {
+        for (let child of nodes) {
+          child.nodeType === ELEMENT_NODE ? (
+            child === child.parentNode.firstChild &&
+              fragment.appendChild(document.createTextNode("\n")),
+            child = getElement(child, true),
+            child instanceof Node && fragment.appendChild(child)
+          ) :
+          child.nodeType === TEXT_NODE &&
+            fragment.appendChild(document.createTextNode(child.nodeValue));
+        }
+      }
+      return fragment;
+    };
+
     let elm;
     node && (elm = createElmNS(node)) && (
       node.attributes && setAttrNS(elm, node),
