@@ -92,7 +92,7 @@
     const ns = getNsURI(elm, true);
     return ns && document.createElementNS(
              ns.namespaceURI || nsURI.ns.html,
-             elm.prefix ? `${elm.prefix}:${elm.localName}` : elm.localName
+             elm.prefix && `${elm.prefix}:${elm.localName}` || elm.localName
            );
   };
 
@@ -109,8 +109,8 @@
         const ns = getNsURI(attr, false);
         typeof node[attr.name] !== "function" && ns && elm.setAttributeNS(
           ns.namespaceURI || "",
-          attr.prefix ?
-            `${attr.prefix}:${attr.localName}` : attr.localName,
+          attr.prefix &&
+            `${attr.prefix}:${attr.localName}` || attr.localName,
           attr.value
         );
       }
@@ -210,8 +210,8 @@
       range.selectNodeContents(elm),
       elm = getDomTree(elm, range.cloneContents())
     );
-    return elm && elm.hasChildNodes() && window.XMLSerializer ?
-             (new XMLSerializer()).serializeToString(elm) : null;
+    return elm && elm.hasChildNodes() && window.XMLSerializer &&
+             (new XMLSerializer()).serializeToString(elm) || null;
   };
 
   /**
@@ -268,8 +268,8 @@
         fragment.appendChild(document.createTextNode("\n"))
       );
     }
-    return fragment && fragment.hasChildNodes() && window.XMLSerializer ?
-             (new XMLSerializer()).serializeToString(fragment) : null;
+    return fragment && fragment.hasChildNodes() && window.XMLSerializer &&
+             (new XMLSerializer()).serializeToString(fragment) || null;
   };
 
   /**
@@ -329,7 +329,7 @@
     let id = null;
     if (elm) {
       const html = !elm.namespaceURI || elm.namespaceURI === nsURI.ns.html;
-      const ns = html ? "" : nsURI.ns.html;
+      const ns = !html && nsURI.ns.html || "";
       elm.hasAttributeNS(ns, DATA_ID) ?
         id = elm.getAttributeNS(ns, DATA_ID) : (
         id = `withExEditor${window.performance.now()}`.replace(/\./, "_"),
