@@ -37,27 +37,27 @@
     }
     else {
       while (node && node.parentNode && !ns.node) {
-        const parent = node.parentNode;
+        const obj = node.parentNode;
         node.namespaceURI ? (
           ns.node = node,
           ns.name = node.localName,
           ns.uri = node.namespaceURI
         ) :
-        /^foreignObject$/.test(parent.localName) &&
-        (parent.hasAttributeNS(nsURI.ns.svg, "requiredExtensions") ||
+        /^foreignObject$/.test(obj.localName) &&
+        (obj.hasAttributeNS(nsURI.ns.svg, "requiredExtensions") ||
          document.documentElement.localName === "html") ? (
           ns.node = node,
           ns.name = node.localName,
-          ns.uri = parent.hasAttributeNS(nsURI.ns.svg, "requiredExtensions") &&
-                   parent.getAttributeNS(nsURI.ns.svg, "requiredExtensions") ||
-                   nsURI.ns.html
+          ns.uri = obj.hasAttributeNS(nsURI.ns.svg, "requiredExtensions") &&
+                     obj.getAttributeNS(nsURI.ns.svg, "requiredExtensions") ||
+                     nsURI.ns.html
         ) :
         /^(?:math|svg)$/.test(node.localName) ? (
           ns.node = node,
           ns.name = node.localName,
           ns.uri = nsURI.ns[node.localName]
         ) :
-          node = parent;
+          node = obj;
       }
       !ns.node && (
         node = document.documentElement,
@@ -221,12 +221,13 @@
     let fragment = document.createDocumentFragment();
     if (sel && sel.rangeCount) {
       const l = sel.rangeCount;
-      let obj, i = 0;
+      let i = 0, obj;
       while (i < l) {
         const range = sel.getRangeAt(i);
+        const ancestor = range.commonAncestorContainer;
         l > 1 && fragment.appendChild(document.createTextNode("\n"));
-        if (range.commonAncestorContainer.nodeType === ELEMENT_NODE) {
-          obj = getNodeNS(range.commonAncestorContainer);
+        if (ancestor.nodeType === ELEMENT_NODE) {
+          obj = getNodeNS(ancestor);
           if (/^(?:svg|math)$/.test(obj.name)) {
             if (obj.node === document.documentElement) {
               fragment = null;
@@ -240,14 +241,13 @@
               );
             }
           }
-          (obj = getDomTree(
-            range.commonAncestorContainer,
-            range.cloneContents()
-          )) && obj instanceof Node && fragment.appendChild(obj);
+          (obj = getDomTree(ancestor, range.cloneContents())) &&
+          obj instanceof Node &&
+            fragment.appendChild(obj);
         }
         else {
-          range.commonAncestorContainer.nodeType === TEXT_NODE &&
-          (obj = getElement(range.commonAncestorContainer.parentNode)) &&
+          ancestor.nodeType === TEXT_NODE &&
+          (obj = getElement(ancestor.parentNode)) &&
           obj instanceof Node && (
             obj.appendChild(range.cloneContents()),
             fragment.appendChild(obj)
