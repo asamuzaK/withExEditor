@@ -47,7 +47,7 @@ ex: `"Some Arg"`
 ### Enable During Private Browsing
 * Enables if checked, disabled if not.
 
-### Use Edit Texts Mode Only
+### Enable Only For Text Entry Fields
 * Appears on context menu only when content is editable.
 
 ### Force To Remove The Temporary Files At Shutdown

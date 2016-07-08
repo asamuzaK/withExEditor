@@ -31,7 +31,7 @@
     {
       "type": "bool",
       "name": "WithExEditorPrefsContext",
-      "title": "Use Edit Text Mode Only"
+      "title": "Enable Only For Text Entry Fields"
     },
     {
       "type": "bool",
