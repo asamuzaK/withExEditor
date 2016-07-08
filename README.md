@@ -47,6 +47,9 @@ ex: `"Some Arg"`
 ### Enable During Private Browsing
 * Enables if checked, disabled if not.
 
+### Use Edit Texts Mode Only
+* Appears on context menu only when content is editable.
+
 ### Force To Remove The Temporary Files At Shutdown
 * You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox.
 * It is recommended to be checked, but there is a possibility that trouble occurs if you enable this option. It depends on the settings of the editor.
