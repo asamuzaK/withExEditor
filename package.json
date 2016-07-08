@@ -30,6 +30,11 @@
     },
     {
       "type": "bool",
+      "name": "WithExEditorPrefsContext",
+      "title": "Use Edit Text Mode Only"
+    },
+    {
+      "type": "bool",
       "name": "WithExEditorPrefsForceRemove",
       "title": "Force To Remove The Temporary Files At Shutdown",
       "value": true
