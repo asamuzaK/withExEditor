@@ -9,8 +9,8 @@ New And Updated Features
 
 Code Changes
 <ul>
-<li>Uses `StorageTmp`, `ChildProcess` and `AccessKey` constructors.</li>
+<li>Partially `class` based.</li>
 <li>Added `close` event listener to the tab and removes temporary stored data when the tab is closed.</li>
-<li>Organized remove listeners in `onUnload` function.</li>
+<li>Removed removeListeners in `onUnload` function.</li>
 <li>Checked JavaScript code style with eslint.</li>
 </ul>
