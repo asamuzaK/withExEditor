@@ -26,14 +26,26 @@
     get extended() {
       return this._extended;
     }
-    set extended(bool) {
-      this._extended = bool;
+    set extended(bool = false) {
+      typeof bool === "boolean" && (this._extended = bool);
     }
     get ns() {
       return this._ns;
     }
     set ns(data) {
-      this._ns = data;
+      (typeof data === "string" || data instanceof String) &&
+        (data = JSON.parse(data)) && (this._ns = data);
+    }
+    /**
+     * extend namespace URI data
+     * @param {string} data - namespace URI data
+     */
+    extend(data) {
+      (typeof data === "string" || data instanceof String) &&
+      (data = JSON.parse(data)) && (
+        this._ns = data,
+        this._extended = true
+      );
     }
   }
 
@@ -424,10 +436,7 @@
     };
     const sel = window.getSelection();
     let obj;
-    !nsURI.extended && data && (
-      nsURI.ns = JSON.parse(data),
-      nsURI.extended = true
-    );
+    !nsURI.extended && data && nsURI.extend(data);
     sel.isCollapsed ?
       (/^input$/.test(elm.localName) && elm.hasAttribute("type") &&
        /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
