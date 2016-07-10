@@ -208,7 +208,7 @@
       range.selectNodeContents(elm),
       elm = getDomTree(elm, range.cloneContents())
     );
-    return elm && elm.hasChildNodes() && window.XMLSerializer &&
+    return elm && elm.hasChildNodes() &&
              (new XMLSerializer()).serializeToString(elm) || null;
   };
 
@@ -266,7 +266,7 @@
         fragment.appendChild(document.createTextNode("\n"))
       );
     }
-    return fragment && fragment.hasChildNodes() && window.XMLSerializer &&
+    return fragment && fragment.hasChildNodes() &&
              (new XMLSerializer()).serializeToString(fragment) || null;
   };
 
