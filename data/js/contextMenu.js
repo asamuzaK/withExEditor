@@ -23,19 +23,24 @@
         xmlns: "http://www.w3.org/2000/xmlns/"
       };
     }
+
     get extended() {
       return this._extended;
     }
+
     set extended(bool = false) {
       typeof bool === "boolean" && (this._extended = bool);
     }
+
     get ns() {
       return this._ns;
     }
+
     set ns(data) {
       (typeof data === "string" || data instanceof String) &&
         (data = JSON.parse(data)) && (this._ns = data);
     }
+
     /**
      * extend namespace URI data
      * @param {string} data - namespace URI data
