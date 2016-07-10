@@ -12,16 +12,33 @@
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
 
-  /* namespace URI */
-  const nsURI = {
-    extended: false,
-    ns: {
-      html: "http://www.w3.org/1999/xhtml",
-      math: "http://www.w3.org/1998/Math/MathML",
-      svg: "http://www.w3.org/2000/svg",
-      xmlns: "http://www.w3.org/2000/xmlns/"
+  /* namespace URI class */
+  class NsURI {
+    constructor() {
+      this._extended = false;
+      this._ns = {
+        html: "http://www.w3.org/1999/xhtml",
+        math: "http://www.w3.org/1998/Math/MathML",
+        svg: "http://www.w3.org/2000/svg",
+        xmlns: "http://www.w3.org/2000/xmlns/"
+      };
     }
-  };
+    get extended() {
+      return this._extended;
+    }
+    set extended(bool) {
+      this._extended = bool;
+    }
+    get ns() {
+      return this._ns;
+    }
+    set ns(data) {
+      this._ns = data;
+    }
+  }
+
+  /* namespace URI */
+  const nsURI = new NsURI();
 
   /**
    * get namespace of node from ancestor
@@ -71,31 +88,6 @@
   };
 
   /**
-   * get namespace URI
-   * @param {Object} node - element node or attribute node
-   * @param {boolean} bool - use getNodeNS
-   * @return {Object} - namespace URI data
-   */
-  const getNsURI = (node, bool) =>
-    node && {
-      namespaceURI: node.namespaceURI || node.prefix && nsURI.ns[node.prefix] ||
-                    bool && getNodeNS(node).uri || ""
-    } || null;
-
-  /**
-   * create element NS
-   * @param {Object} elm - element
-   * @return {Object} - namespaced element
-   */
-  const createElmNS = elm => {
-    const ns = getNsURI(elm, true);
-    return ns && document.createElementNS(
-             ns.namespaceURI || nsURI.ns.html,
-             elm.prefix && `${elm.prefix}:${elm.localName}` || elm.localName
-           );
-  };
-
-  /**
    * set attribute NS
    * @param {Object} elm - element to append attributes
    * @param {Object} node - node to get attributes from
@@ -105,10 +97,11 @@
     if (elm && node) {
       const nodeAttr = node.attributes;
       for (let attr of nodeAttr) {
-        const ns = getNsURI(attr, false);
-        typeof node[attr.name] !== "function" && ns && elm.setAttributeNS(
-          ns.namespaceURI || "",
-          attr.prefix && `${attr.prefix}:${attr.localName}` || attr.localName,
+        const prefix = attr.prefix;
+        const localName = attr.localName;
+        typeof node[attr.name] !== "function" && elm.setAttributeNS(
+          attr.namespaceURI || prefix && nsURI.ns[prefix] || "",
+          prefix && `${prefix}:${localName}` || localName,
           attr.value
         );
       }
@@ -144,8 +137,14 @@
       return fragment;
     };
 
-    let elm;
-    node && (elm = createElmNS(node)) && (
+    const prefix = node && node.prefix;
+    const localName = node && node.localName;
+    const elm = node && document.createElementNS(
+      node.namespaceURI || prefix && nsURI.ns[prefix] || getNodeNS(node).uri ||
+        nsURI.ns.html,
+      prefix && `${prefix}:${localName}` || localName
+    );
+    elm && (
       node.attributes && setAttrNS(elm, node),
       bool && node.hasChildNodes() &&
         elm.appendChild(appendChildNodes(node.childNodes))
@@ -346,16 +345,16 @@
    * @return {boolean}
    */
   const getIsContentEditableNode = node => {
-    let bool = false, elm = node;
+    let editable = false, elm = node;
     while (elm && elm.parentNode) {
       if (typeof elm.isContentEditable === "boolean" &&
           (!elm.namespaceURI || elm.namespaceURI === nsURI.ns.html)) {
-        bool = elm.isContentEditable;
+        editable = elm.isContentEditable;
         break;
       }
       elm = elm.parentNode;
     }
-    if (bool) {
+    if (editable) {
       const id = getId(node);
       const arr = elm.hasAttributeNS("", CONTROLS) &&
                     (elm.getAttributeNS("", CONTROLS)).split(" ");
@@ -373,7 +372,7 @@
         )
       );
     }
-    return bool;
+    return editable;
   };
 
   /**
