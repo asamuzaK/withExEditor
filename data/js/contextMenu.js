@@ -329,7 +329,7 @@
   };
 
   /**
-   * set temporary ID to the target element and set event listener
+   * get temporary ID / create temporary ID and add listener
    * @param {Object} elm - target element
    * @return {?string} - ID
    */
@@ -351,11 +351,11 @@
   };
 
   /**
-   * get isContentEditable node from ancestor
+   * node or ancestor is editable
    * @param {Object} node - element node
    * @return {boolean}
    */
-  const getIsContentEditableNode = node => {
+  const nodeIsEditable = node => {
     let editable = false, elm = node;
     while (elm && elm.parentNode) {
       if (typeof elm.isContentEditable === "boolean" &&
@@ -387,11 +387,11 @@
   };
 
   /**
-   * node content is editable or not
+   * node content is text node
    * @param {Object} node - element node
    * @return {boolean}
    */
-  const nodeContentIsEditable = node => {
+  const nodeContentIsText = node => {
     let isText = false;
     if (node && node.namespaceURI && node.namespaceURI !== nsURI.ns.html &&
         node.hasChildNodes()) {
@@ -403,17 +403,17 @@
         }
       }
     }
-    return isText && getIsContentEditableNode(node);
+    return isText && nodeIsEditable(node);
   };
 
-  /* set context menu item label */
+  /* switch context menu item label */
   window.self.on("context", elm => {
     const sel = window.getSelection();
     window.self.postMessage(
       /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
       /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
       /^textarea$/.test(elm.localName) || elm.isContentEditable ||
-      sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm) ?
+      sel.anchorNode === sel.focusNode && nodeContentIsText(elm) ?
         EDIT_TEXT :
       sel.isCollapsed ?
       getNodeNS(elm).uri === nsURI.ns.math ?
@@ -444,7 +444,7 @@
         mode.target = obj,
         mode.value = elm.value || ""
       ) :
-      (elm.isContentEditable || nodeContentIsEditable(elm)) &&
+      (elm.isContentEditable || nodeContentIsText(elm)) &&
       (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
@@ -459,7 +459,7 @@
      sel.anchorNode.parentNode !== document.documentElement) && (
       sel.rangeCount === 1 &&
       (elm.isContentEditable ||
-       sel.anchorNode === sel.focusNode && nodeContentIsEditable(elm)) &&
+       sel.anchorNode === sel.focusNode && nodeContentIsText(elm)) &&
       (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
