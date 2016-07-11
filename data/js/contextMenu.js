@@ -215,7 +215,7 @@
    * @param {Object} node - element node of MathML
    * @return {?string} - serialized node string
    */
-  const onViewMathML = node => {
+  const createDomMathML = node => {
     let elm, range;
     while (node && node.parentNode && !elm) {
       node.localName === "math" && (elm = node);
@@ -235,7 +235,7 @@
    * @param {Object} sel - selection
    * @return {?string} - serialized node string
    */
-  const onViewSelection = sel => {
+  const createDomFromSelRange = sel => {
     let fragment = document.createDocumentFragment();
     if (sel && sel.rangeCount) {
       const l = sel.rangeCount;
@@ -306,14 +306,6 @@
     }
     return arr.join("");
   };
-
-  /**
-   * get text node from editable content
-   * @param {Object} node - node
-   * @return {string} - text
-   */
-  const onContentEditable = node =>
-    node && node.hasChildNodes() && getTextNode(node.childNodes) || "";
 
   /**
    * post temporary ID value
@@ -456,10 +448,10 @@
       (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
-        mode.value = onContentEditable(elm),
+        mode.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
         mode.namespace = getNodeNS(elm).uri
       ) :
-      getNodeNS(elm).uri === nsURI.ns.math && (obj = onViewMathML(elm)) && (
+      getNodeNS(elm).uri === nsURI.ns.math && (obj = createDomMathML(elm)) && (
         mode.mode = VIEW_MATHML,
         mode.value = obj
       ) :
@@ -471,10 +463,10 @@
       (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
-        mode.value = onContentEditable(elm),
+        mode.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
         mode.namespace = getNodeNS(elm).uri
       ) :
-      (obj = onViewSelection(sel)) && (
+      (obj = createDomFromSelRange(sel)) && (
         mode.mode = VIEW_SELECTION,
         mode.value = obj
       )
