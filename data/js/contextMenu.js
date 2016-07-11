@@ -28,7 +28,7 @@
       return this._extended;
     }
 
-    set extended(bool = false) {
+    set extended(bool) {
       typeof bool === "boolean" && (this._extended = bool);
     }
 
@@ -37,18 +37,19 @@
     }
 
     set ns(data) {
-      (typeof data === "string" || data instanceof String) &&
-        (data = JSON.parse(data)) && (this._ns = data);
+      const _ns = typeof data === "string" && JSON.parse(data);
+      _ns && (this._ns = _ns);
     }
 
     /**
      * extend namespace URI data
-     * @param {string} data - namespace URI data
+     * @param {string} data - stringified JSON
+     * @return {void}
      */
     extend(data) {
-      (typeof data === "string" || data instanceof String) &&
-      (data = JSON.parse(data)) && (
-        this._ns = data,
+      const _ns = typeof data === "string" && JSON.parse(data);
+      _ns && (
+        this._ns = _ns,
         this._extended = true
       );
     }
@@ -161,10 +162,11 @@
         nsURI.ns.html,
       prefix && `${prefix}:${localName}` || localName
     );
+    const childNode = bool && node.hasChildNodes() &&
+                        appendChildNodes(node.childNodes);
     elm && (
       node.attributes && setAttrNS(elm, node),
-      bool && node.hasChildNodes() &&
-        elm.appendChild(appendChildNodes(node.childNodes))
+      childNode instanceof Node && elm.appendChild(childNode)
     );
     return elm || document.createTextNode("");
   };
