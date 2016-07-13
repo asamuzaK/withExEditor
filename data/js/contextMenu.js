@@ -205,7 +205,7 @@
    */
   const getDomTree = (elm, node = null) => {
     elm = getElement(elm);
-    elm.nodeType === 1 && node && node.hasChildNodes() &&
+    elm.nodeType === ELEMENT_NODE && node && node.hasChildNodes() &&
       elm.appendChild(createDom(node.childNodes));
     return elm;
   };
