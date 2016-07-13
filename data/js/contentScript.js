@@ -6,6 +6,7 @@
   const DATA_ID = "data-with_ex_editor_id";
   const DATA_TS = "data-with_ex_editor_timestamp";
   const CONTROLS = `${DATA_ID}_controls`;
+  const ELEMENT_NODE = 1;
   const nsURI = {html: "http://www.w3.org/1999/xhtml"};
   const opt = window.self.options || {};
   const target = opt.target || "";
@@ -20,7 +21,7 @@
    * @return {void}
    */
   const setContentEditableText = (node, arr = [""]) => {
-    if (node && node.nodeType === 1 && Array.isArray(arr)) {
+    if (node && node.nodeType === ELEMENT_NODE && Array.isArray(arr)) {
       const fragment = document.createDocumentFragment();
       const l = arr.length;
       let i = 0;
