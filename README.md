@@ -13,10 +13,10 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 * When browsing a local file, the local file will be opened directly.
 
 ### View MathML Source with *exEditor*
-* Enabled on MathML elements and shows a generated DOM tree in MathML format. It may not be the same with the DOM tree of the document source.
+* Enabled on MathML elements and shows a generated DOM tree in MathML format. It may not be exactly the same as the source of the DOM tree, e.g. the order of the attributes.
 
 ### View Selection Source with *exEditor*
-* Shows a generated DOM tree of the selection in XML format. It may not be the same with the DOM tree of the document source.
+* Shows a generated DOM tree of the selection in XML format. It may not be exactly the same as the source of the DOM tree, e.g. the order of the attributes.
 * If there are multiple ranges in selection, each range will be shown with a comment as a delimiter.
 * If the selection is not DOM parsable, then creates a file that contains only the range of text selected.
 
