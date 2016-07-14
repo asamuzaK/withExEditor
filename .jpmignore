@@ -2,6 +2,7 @@
 *.xpi
 *.zip
 .git/
+.gitingore
 .jpmignore
 README.md
 notes/
