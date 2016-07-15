@@ -1,5 +1,5 @@
 # withExEditor
-Firefox add-on to View Source, View Selection, and Edit Texts with the external editor which you like, on context menu.
+Firefox add-on to View Source, View Selection, and Edit Texts with the external editor which you like, from the context menu.
 Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 
 ## Add-on Page
@@ -33,25 +33,26 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 * When selecting an editor on Mac OS X, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
 
 ### Command Line Options
-* Use when you want to start the editor with command line options.
+* Command line options when you run the editor.
 * When using backslash (`\`) character, it must be escaped with an extra backslash.
 ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).
 ex: `"Some Arg"`
 
 ### Access Key
-* You can choose any key. But, it must be a single character.
-* On context menu, press `key` itself.
+* Access key to be used in the context menu and the toolbar button.
+* Choose any key, but it must be a single character.
+* In the context menu, press `key` itself.
 * To open / close the panel from the toolbar button, press `Ctrl + Alt + key` (`Cmd + Opt + key` on Mac).
 
 ### Enable During Private Browsing
-* Enables if checked, disabled if not.
+* Enables if checked, disables if not.
 
 ### Enable Only When Editing Text
-* Appears on context menu only when content is editable.
+* Appears in the context menu only if the content is editable.
 
 ### Forcibly Remove The Temporary Files
-* If checked, the temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
+* The temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
 * It is recommended to be checked, but there is a possibility that trouble occurs if you enable this option. It depends on the settings of the editor.
 
 ***
