@@ -53,7 +53,7 @@ ex: `"Some Arg"`
 
 ### Forcibly Remove The Temporary Files
 * The temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
-* It is recommended to be checked, but there is a possibility that trouble occurs if you enable this option. It depends on the settings of the editor.
+* It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option.
 
 ***
 
