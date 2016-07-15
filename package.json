@@ -36,7 +36,7 @@
     {
       "type": "bool",
       "name": "WithExEditorPrefsForceRemove",
-      "title": "Force To Remove The Temporary Files At Shutdown",
+      "title": "Forcibly Remove The Temporary Files",
       "value": true
     }
   ],

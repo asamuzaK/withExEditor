@@ -50,8 +50,8 @@ ex: `"Some Arg"`
 ### Enable Only When Editing Text
 * Appears on context menu only when content is editable.
 
-### Force To Remove The Temporary Files At Shutdown
-* You can choose whether or not to forcibly remove the temporary files at the end of Private Browsing, or when you quit Firefox.
+### Forcibly Remove The Temporary Files
+* If checked, the temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
 * It is recommended to be checked, but there is a possibility that trouble occurs if you enable this option. It depends on the settings of the editor.
 
 ***
