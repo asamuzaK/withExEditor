@@ -4,6 +4,6 @@
 .git/
 .gitingore
 .jpmignore
-README.md
+*.md
 notes/
 test/
