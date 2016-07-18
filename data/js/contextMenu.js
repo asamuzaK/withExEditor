@@ -297,10 +297,12 @@
     const arr = [];
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        node.nodeType === TEXT_NODE ? arr.push(node.nodeValue) :
+        node.nodeType === TEXT_NODE ?
+          arr.push(node.nodeValue) :
         node.nodeType === ELEMENT_NODE && (
-          node.localName === "br" ? arr.push("\n") :
-          node.hasChildNodes() && arr.push(getTextNode(node.childNodes))
+          node.localName === "br" ?
+            arr.push("\n") :
+            node.hasChildNodes() && arr.push(getTextNode(node.childNodes))
         );
       }
     }
@@ -343,7 +345,7 @@
         id = `withExEditor${window.performance.now()}`.replace(/\./, "_"),
         !html &&
           elm.setAttributeNS(nsURI.ns.xmlns, "xmlns:html", nsURI.ns.html),
-        elm.setAttributeNS(ns, html ? DATA_ID : `html:${DATA_ID}`, id),
+        elm.setAttributeNS(ns, html && DATA_ID || `html:${DATA_ID}`, id),
         html && elm.addEventListener("focus", postTemporaryId, false)
       );
     }
