@@ -357,7 +357,7 @@
    * @param {Object} node - element node
    * @return {boolean}
    */
-  const nodeIsEditable = node => {
+  const isEditable = node => {
     let editable = false, elm = node;
     while (elm && elm.parentNode) {
       if (typeof elm.isContentEditable === "boolean" &&
@@ -393,7 +393,7 @@
    * @param {Object} node - element node
    * @return {boolean}
    */
-  const nodeContentIsText = node => {
+  const isContentTextNode = node => {
     let isText = false;
     if (node && node.namespaceURI && node.namespaceURI !== nsURI.ns.html &&
         node.hasChildNodes()) {
@@ -405,7 +405,7 @@
         }
       }
     }
-    return isText && nodeIsEditable(node);
+    return isText && isEditable(node);
   };
 
   /* switch context menu item label */
@@ -415,7 +415,7 @@
       /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
       /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
       /^textarea$/.test(elm.localName) || elm.isContentEditable ||
-      sel.anchorNode === sel.focusNode && nodeContentIsText(elm) ?
+      sel.anchorNode === sel.focusNode && isContentTextNode(elm) ?
         EDIT_TEXT :
       sel.isCollapsed ?
       getNodeNS(elm).uri === nsURI.ns.math ?
@@ -446,7 +446,7 @@
         mode.target = obj,
         mode.value = elm.value || ""
       ) :
-      (elm.isContentEditable || nodeContentIsText(elm)) &&
+      (elm.isContentEditable || isContentTextNode(elm)) &&
       (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
@@ -461,7 +461,7 @@
      sel.anchorNode.parentNode !== document.documentElement) && (
       sel.rangeCount === 1 &&
       (elm.isContentEditable ||
-       sel.anchorNode === sel.focusNode && nodeContentIsText(elm)) &&
+       sel.anchorNode === sel.focusNode && isContentTextNode(elm)) &&
       (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
