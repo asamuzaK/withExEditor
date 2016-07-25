@@ -2,7 +2,7 @@
 *.xpi
 *.zip
 .git/
-.gitingore
+.gitignore
 .jpmignore
 *.md
 notes/
