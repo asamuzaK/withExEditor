@@ -1,3 +1,15 @@
+v1.6.1
+Updated Features
+<ul>
+<li>Renamed the title of the option item to `Forcibly Remove The Temporary Files`.</li>
+</ul>
+
+Code changes
+<ul>
+<li>Fixed bug in the regular expression of command line options.</li>
+<li>Added newlines between operands of ternary expressions.</li>
+</ul>
+
 v1.6.0
 New And Updated Features
 <ul>
