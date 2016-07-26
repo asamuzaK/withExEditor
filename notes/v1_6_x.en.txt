@@ -6,7 +6,7 @@ Updated Features
 
 Code changes
 <ul>
-<li>Fixed bug in the regular expression of command line options.</li>
+<li>Fixed bug in the command line options.</li>
 <li>Added newlines between operands of ternary expressions.</li>
 </ul>
 
