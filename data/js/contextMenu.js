@@ -412,6 +412,16 @@
   };
 
   /**
+   * is text edit control element
+   * @param {Object} elm - element
+   * @return {boolean}
+   */
+  const isEditControl = elm =>
+   /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
+   /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
+   /^textarea$/.test(elm.localName);
+
+  /**
    * get content
    * @param {Object} elm - element node
    * @param {Object} data - extended nsURI data
@@ -428,9 +438,7 @@
     let obj;
     !nsURI.extended && data && nsURI.extend(data);
     sel.isCollapsed ?
-      (/^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-       /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-       /^textarea$/.test(elm.localName)) && (obj = getId(elm)) ? (
+      isEditControl(elm) && (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
         mode.value = elm.value || ""
@@ -469,9 +477,7 @@
   window.self.on("context", elm => {
     const sel = window.getSelection();
     window.self.postMessage(
-      /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-      /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-      /^textarea$/.test(elm.localName) || elm.isContentEditable ||
+      isEditControl(elm) || elm.isContentEditable ||
       sel.anchorNode === sel.focusNode && isContentTextNode(elm) ?
         EDIT_TEXT :
       sel.isCollapsed ?
@@ -490,18 +496,27 @@
 
   /* get content from keypress */
   window.self.port.on("keyCombo", opt => {
-    const elm = document.documentElement;
-    elm && elm.addEventListener("keypress", evt => {
+    const attachKeyCombo = evt => {
+      const sel = window.getSelection();
+      const elm = evt && evt.target;
+      elm &&
       evt.key.toLowerCase() === opt.key &&
       evt.ctrlKey === opt.ctrlKey &&
       evt.altKey === opt.altKey &&
       evt.shiftKey === opt.shiftKey &&
-      evt.metaKey === opt.metaKey &&
-      EXP_MEDIA_TYPE.test(document.contentType) &&
+      evt.metaKey === opt.metaKey && (
+        opt.onlyEdit ?
+          isEditControl(elm) || elm.isContentEditable ||
+          sel.anchorNode === sel.focusNode && isContentTextNode(elm) :
+          EXP_MEDIA_TYPE.test(document.contentType)
+      ) &&
         window.self.port.emit(
           "pageContent",
-          JSON.stringify(getContent(evt.target, opt.data))
+          JSON.stringify(getContent(elm, opt.data))
         );
-    }, false);
+    };
+
+    const elm = document.documentElement;
+    elm && elm.addEventListener("keypress", attachKeyCombo, false);
   });
 }
