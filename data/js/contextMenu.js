@@ -11,6 +11,7 @@
   const CONTROLS = `${DATA_ID}_controls`;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
+  const EXP_MEDIA_TYPE = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
 
   /* namespace URI class */
   class NsURI {
@@ -325,7 +326,9 @@
     if (attr) {
       attr = attr.split(" ");
       for (let value of attr) {
-        window.self.postMessage(value);
+        window.self.port.emit &&
+          window.self.port.emit("syncText", value) ||
+          window.self.postMessage(value);
       }
     }
   };
@@ -408,26 +411,12 @@
     return isText && isEditable(node);
   };
 
-  /* switch context menu item label */
-  window.self.on("context", elm => {
-    const sel = window.getSelection();
-    window.self.postMessage(
-      /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-      /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-      /^textarea$/.test(elm.localName) || elm.isContentEditable ||
-      sel.anchorNode === sel.focusNode && isContentTextNode(elm) ?
-        EDIT_TEXT :
-      sel.isCollapsed ?
-      getNodeNS(elm).uri === nsURI.ns.math ?
-        VIEW_MATHML :
-        VIEW_SOURCE :
-        VIEW_SELECTION
-    );
-    return true;
-  });
-
-  /* switch mode by context */
-  window.self.on("click", (elm, data) => {
+  /**
+   * get content
+   * @param {Object} elm - element node
+   * @param {Object} data - extended nsURI data
+   */
+  const getContent = (elm, data) => {
     const mode = {
       mode: VIEW_SOURCE,
       charset: window.top.document.characterSet,
@@ -473,6 +462,46 @@
         mode.value = obj
       )
     );
-    window.self.postMessage(JSON.stringify(mode));
+    return mode;
+  };
+
+  /* switch context menu item label */
+  window.self.on("context", elm => {
+    const sel = window.getSelection();
+    window.self.postMessage(
+      /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
+      /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
+      /^textarea$/.test(elm.localName) || elm.isContentEditable ||
+      sel.anchorNode === sel.focusNode && isContentTextNode(elm) ?
+        EDIT_TEXT :
+      sel.isCollapsed ?
+      getNodeNS(elm).uri === nsURI.ns.math ?
+        VIEW_MATHML :
+        VIEW_SOURCE :
+        VIEW_SELECTION
+    );
+    return true;
+  });
+
+  /* get content from context-menu click */
+  window.self.on("click", (elm, data) => {
+    window.self.postMessage(JSON.stringify(getContent(elm, data)));
+  });
+
+  /* get content from keypress */
+  window.self.port.on("keyCombo", opt => {
+    const elm = document.documentElement;
+    elm && elm.addEventListener("keypress", evt => {
+      evt.key.toLowerCase() === opt.key &&
+      evt.ctrlKey === opt.ctrlKey &&
+      evt.altKey === opt.altKey &&
+      evt.shiftKey === opt.shiftKey &&
+      evt.metaKey === opt.metaKey &&
+      EXP_MEDIA_TYPE.test(document.contentType) &&
+        window.self.port.emit(
+          "pageContent",
+          JSON.stringify(getContent(evt.target, opt.data))
+        );
+    }, false);
   });
 }
