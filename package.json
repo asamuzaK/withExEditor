@@ -38,6 +38,12 @@
       "name": "WithExEditorPrefsForceRemove",
       "title": "Forcibly Remove The Temporary Files",
       "value": true
+    },
+    {
+      "type": "control",
+      "name": "WithExEditorPrefsPanel",
+      "title": "Other Options",
+      "label": "Open Options Panel"
     }
   ],
   "locales": {
