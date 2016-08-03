@@ -324,9 +324,8 @@
                    elm.getAttributeNS("", CONTROLS)
                  );
     attr && attr.split(" ").forEach(value => {
-      window.self.port.emit &&
-        window.self.port.emit("syncText", value) ||
-        window.self.postMessage(value);
+      window.self.port.emit("syncText", value) ||
+      window.self.postMessage(value);
     });
   };
 
