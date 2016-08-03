@@ -413,9 +413,11 @@
    * @return {boolean}
    */
   const isEditControl = elm =>
-   /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-   /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-   /^textarea$/.test(elm.localName);
+   elm && (
+     /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
+     /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
+     /^textarea$/.test(elm.localName)
+   ) || false;
 
   /**
    * get content
@@ -433,7 +435,7 @@
     const sel = window.getSelection();
     let obj;
     !nsURI.extended && data && nsURI.extend(data);
-    sel.isCollapsed ?
+    elm && sel.isCollapsed ?
       isEditControl(elm) && (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
@@ -450,8 +452,10 @@
         mode.mode = VIEW_MATHML,
         mode.value = obj
       ) :
-    (sel.anchorNode !== sel.focusNode ||
-     sel.anchorNode.parentNode !== document.documentElement) && (
+    elm && (
+      sel.anchorNode !== sel.focusNode ||
+      sel.anchorNode.parentNode !== document.documentElement
+    ) && (
       sel.rangeCount === 1 &&
       (elm.isContentEditable ||
        sel.anchorNode === sel.focusNode && isContentTextNode(elm)) &&
