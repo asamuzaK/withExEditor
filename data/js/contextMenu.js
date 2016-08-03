@@ -323,14 +323,14 @@
                  elm.hasAttributeNS("", CONTROLS) &&
                  elm.getAttributeNS("", CONTROLS)
                );
-    if (attr) {
-      attr = attr.split(" ");
-      for (let value of attr) {
+    attr && (
+      attr = attr.split(" "),
+      attr.forEach(value => {
         window.self.port.emit &&
           window.self.port.emit("syncText", value) ||
           window.self.postMessage(value);
-      }
-    }
+      })
+    );
   };
 
   /**
