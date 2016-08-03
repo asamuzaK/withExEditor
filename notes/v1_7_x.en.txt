@@ -1,6 +1,6 @@
 v1.7.0
 New And Updated Features
 <ul>
-<li>Add shortcut key to execute the editor directly. (<kbd>Cmd + Shift + key</kbd>)</li>
+<li>Add shortcut key to execute the editor directly. (`Ctrl + Shift + key`)</li>
 <li>Add button to customize the other options.</li>
 </ul>

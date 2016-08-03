@@ -1,8 +1,6 @@
 v1.7.0
 新規、および、更新内容
-v1.7.0
-New And Updated Features
 <ul>
-<li>エディタを直接起動するショートカットキーを追加。 (<kbd>Cmd + Shift + key</kbd>)</li>
+<li>エディタを直接起動するショートカットキーを追加。 (`Ctrl + Shift + key`)</li>
 <li>その他のオプションをカスタマイズするためのボタンを追加。</li>
 </ul>
