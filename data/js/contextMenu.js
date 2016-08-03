@@ -495,8 +495,13 @@
   });
 
   /* get content from keypress */
-  window.self.port.on("keyCombo", opt => {
-    const attachKeyCombo = evt => {
+  window.self.port.on("attachKeyCombo", opt => {
+    /**
+     * get content if key combo matches
+     * @param {Object} evt - Event
+     * @return {void}
+     */
+    const keyCombo = evt => {
       const sel = window.getSelection();
       const elm = evt && evt.target;
       elm &&
@@ -514,9 +519,13 @@
           "pageContent",
           JSON.stringify(getContent(elm, opt.data))
         );
+      window.self.port.on("detach", () => {
+        const elm = document.documentElement;
+        elm && elm.removeEventListener("keypress", keyCombo, false);
+      });
     };
 
     const elm = document.documentElement;
-    elm && elm.addEventListener("keypress", attachKeyCombo, false);
+    elm && elm.addEventListener("keypress", keyCombo, false);
   });
 }
