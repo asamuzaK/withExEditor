@@ -317,20 +317,17 @@
    */
   const postTemporaryId = evt => {
     const elm = evt && evt.target === evt.currentTarget && evt.target;
-    let attr = elm && (
-                 elm.hasAttributeNS("", DATA_ID) &&
-                 elm.getAttributeNS("", DATA_ID) ||
-                 elm.hasAttributeNS("", CONTROLS) &&
-                 elm.getAttributeNS("", CONTROLS)
-               );
-    attr && (
-      attr = attr.split(" "),
-      attr.forEach(value => {
-        window.self.port.emit &&
-          window.self.port.emit("syncText", value) ||
-          window.self.postMessage(value);
-      })
-    );
+    const attr = elm && (
+                   elm.hasAttributeNS("", DATA_ID) &&
+                   elm.getAttributeNS("", DATA_ID) ||
+                   elm.hasAttributeNS("", CONTROLS) &&
+                   elm.getAttributeNS("", CONTROLS)
+                 );
+    attr && attr.split(" ").forEach(value => {
+      window.self.port.emit &&
+        window.self.port.emit("syncText", value) ||
+        window.self.postMessage(value);
+    });
   };
 
   /**
