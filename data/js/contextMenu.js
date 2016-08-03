@@ -503,23 +503,20 @@
      */
     const keyCombo = evt => {
       const sel = window.getSelection();
-      const elm = evt && evt.target;
-      elm &&
-      evt.key.toLowerCase() === opt.key &&
-      evt.ctrlKey === opt.ctrlKey &&
-      evt.altKey === opt.altKey &&
-      evt.shiftKey === opt.shiftKey &&
-      evt.metaKey === opt.metaKey && (
+      const target = evt && evt.target;
+      target && evt.key.toLowerCase() === opt.key &&
+      evt.ctrlKey === opt.ctrlKey && evt.altKey === opt.altKey &&
+      evt.shiftKey === opt.shiftKey && evt.metaKey === opt.metaKey && (
         opt.onlyEdit ?
-          isEditControl(elm) || elm.isContentEditable ||
-          sel.anchorNode === sel.focusNode && isContentTextNode(elm) :
+          isEditControl(target) || target.isContentEditable ||
+          sel.anchorNode === sel.focusNode && isContentTextNode(target) :
           EXP_MEDIA_TYPE.test(document.contentType)
       ) &&
         window.self.port.emit(
           "pageContent",
-          JSON.stringify(getContent(elm, opt.data))
+          JSON.stringify(getContent(target, opt.data))
         );
-      window.self.port.on("detach", () => {
+      window.self.port.on("detachKeyCombo", () => {
         const elm = document.documentElement;
         elm && elm.removeEventListener("keypress", keyCombo, false);
       });
