@@ -11,6 +11,7 @@
   const CONTROLS = `${DATA_ID}_controls`;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
+  const EXP_MEDIA_TYPE = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
 
   /* namespace URI class */
   class NsURI {
@@ -316,18 +317,16 @@
    */
   const postTemporaryId = evt => {
     const elm = evt && evt.target === evt.currentTarget && evt.target;
-    let attr = elm && (
-                 elm.hasAttributeNS("", DATA_ID) &&
-                 elm.getAttributeNS("", DATA_ID) ||
-                 elm.hasAttributeNS("", CONTROLS) &&
-                 elm.getAttributeNS("", CONTROLS)
-               );
-    if (attr) {
-      attr = attr.split(" ");
-      for (let value of attr) {
-        window.self.postMessage(value);
-      }
-    }
+    const attr = elm && (
+                   elm.hasAttributeNS("", DATA_ID) &&
+                   elm.getAttributeNS("", DATA_ID) ||
+                   elm.hasAttributeNS("", CONTROLS) &&
+                   elm.getAttributeNS("", CONTROLS)
+                 );
+    attr && attr.split(" ").forEach(value => {
+      window.self.port.emit("syncText", value) ||
+      window.self.postMessage(value);
+    });
   };
 
   /**
@@ -408,26 +407,22 @@
     return isText && isEditable(node);
   };
 
-  /* switch context menu item label */
-  window.self.on("context", elm => {
-    const sel = window.getSelection();
-    window.self.postMessage(
-      /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-      /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-      /^textarea$/.test(elm.localName) || elm.isContentEditable ||
-      sel.anchorNode === sel.focusNode && isContentTextNode(elm) ?
-        EDIT_TEXT :
-      sel.isCollapsed ?
-      getNodeNS(elm).uri === nsURI.ns.math ?
-        VIEW_MATHML :
-        VIEW_SOURCE :
-        VIEW_SELECTION
-    );
-    return true;
-  });
+  /**
+   * is text edit control element
+   * @param {Object} elm - element
+   * @return {boolean}
+   */
+  const isEditControl = elm =>
+   /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
+   /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
+   /^textarea$/.test(elm.localName);
 
-  /* switch mode by context */
-  window.self.on("click", (elm, data) => {
+  /**
+   * get content
+   * @param {Object} elm - element node
+   * @param {Object} data - extended nsURI data
+   */
+  const getContent = (elm, data) => {
     const mode = {
       mode: VIEW_SOURCE,
       charset: window.top.document.characterSet,
@@ -439,9 +434,7 @@
     let obj;
     !nsURI.extended && data && nsURI.extend(data);
     sel.isCollapsed ?
-      (/^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-       /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-       /^textarea$/.test(elm.localName)) && (obj = getId(elm)) ? (
+      isEditControl(elm) && (obj = getId(elm)) ? (
         mode.mode = EDIT_TEXT,
         mode.target = obj,
         mode.value = elm.value || ""
@@ -473,6 +466,59 @@
         mode.value = obj
       )
     );
-    window.self.postMessage(JSON.stringify(mode));
+    return mode;
+  };
+
+  /* switch context menu item label */
+  window.self.on("context", elm => {
+    const sel = window.getSelection();
+    window.self.postMessage(
+      isEditControl(elm) || elm.isContentEditable ||
+      sel.anchorNode === sel.focusNode && isContentTextNode(elm) ?
+        EDIT_TEXT :
+      sel.isCollapsed ?
+      getNodeNS(elm).uri === nsURI.ns.math ?
+        VIEW_MATHML :
+        VIEW_SOURCE :
+        VIEW_SELECTION
+    );
+    return true;
+  });
+
+  /* get content from context-menu click */
+  window.self.on("click", (elm, data) => {
+    window.self.postMessage(JSON.stringify(getContent(elm, data)));
+  });
+
+  /* get content from keypress */
+  window.self.port.on("attachKeyCombo", opt => {
+    /**
+     * get content if key combo matches
+     * @param {Object} evt - Event
+     * @return {void}
+     */
+    const keyCombo = evt => {
+      const sel = window.getSelection();
+      const target = evt && evt.target;
+      target && evt.key.toLowerCase() === opt.key &&
+      evt.ctrlKey === opt.ctrlKey && evt.altKey === opt.altKey &&
+      evt.shiftKey === opt.shiftKey && evt.metaKey === opt.metaKey && (
+        opt.onlyEdit ?
+          isEditControl(target) || target.isContentEditable ||
+          sel.anchorNode === sel.focusNode && isContentTextNode(target) :
+          EXP_MEDIA_TYPE.test(document.contentType)
+      ) &&
+        window.self.port.emit(
+          "pageContent",
+          JSON.stringify(getContent(target, opt.data))
+        );
+      window.self.port.on("detachKeyCombo", () => {
+        const elm = document.documentElement;
+        elm && elm.removeEventListener("keypress", keyCombo, false);
+      });
+    };
+
+    const elm = document.documentElement;
+    elm && elm.addEventListener("keypress", keyCombo, false);
   });
 }
