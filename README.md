@@ -55,6 +55,9 @@ ex: `"Some Arg"`
 * The temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
 * It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option.
 
+### Other Options
+* You can customize the other options from the options panel.
+
 ***
 
 ## Options In Toolbar Button
