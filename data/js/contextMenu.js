@@ -11,7 +11,8 @@
   const CONTROLS = `${DATA_ID}_controls`;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
-  const EXP_MEDIA_TYPE = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
+
+  const regExpType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
 
   /* namespace URI class */
   class NsURI {
@@ -510,7 +511,7 @@
         opt.onlyEdit ?
           isEditControl(target) || target.isContentEditable ||
           sel.anchorNode === sel.focusNode && isContentTextNode(target) :
-          EXP_MEDIA_TYPE.test(document.contentType)
+          regExpType.test(document.contentType)
       ) && (
         evt.preventDefault(),
         window.self.port.emit(
