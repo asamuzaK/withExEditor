@@ -44,7 +44,7 @@ ex: `"Some Arg"`
 * Choose any key, but it must be a single character.
 * In the context menu, press `key` itself.
 * To open / close the panel from the toolbar button, press `Ctrl + Alt + key` (`Cmd + Opt + key` on Mac).
-* To execute the editor directly, press `Ctrl + Shift + key`.
+* To execute the editor directly, press `Ctrl + Shift + key` (`Cmd + Shift + key` on Mac).
 
 ### Enable During Private Browsing
 * Enables if checked, disables if not.
