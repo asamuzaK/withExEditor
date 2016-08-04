@@ -506,16 +506,18 @@
       const target = evt && evt.target;
       target && evt.key.toLowerCase() === opt.key.toLowerCase() &&
       evt.ctrlKey === opt.ctrlKey && evt.altKey === opt.altKey &&
-      evt.shiftKey === opt.shiftKey && (
+      evt.shiftKey === opt.shiftKey && evt.metaKey === opt.metaKey && (
         opt.onlyEdit ?
           isEditControl(target) || target.isContentEditable ||
           sel.anchorNode === sel.focusNode && isContentTextNode(target) :
           EXP_MEDIA_TYPE.test(document.contentType)
-      ) &&
+      ) && (
+        evt.preventDefault(),
         window.self.port.emit(
           "pageContent",
           JSON.stringify(getContent(target, opt.data))
-        );
+        )
+      );
       window.self.port.on("detachKeyCombo", () => {
         const elm = document.documentElement;
         elm && elm.removeEventListener("keypress", keyCombo, false);
