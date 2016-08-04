@@ -504,9 +504,9 @@
     const keyCombo = evt => {
       const sel = window.getSelection();
       const target = evt && evt.target;
-      target && evt.key.toLowerCase() === opt.key &&
+      target && evt.key.toLowerCase() === opt.key.toLowerCase() &&
       evt.ctrlKey === opt.ctrlKey && evt.altKey === opt.altKey &&
-      evt.shiftKey === opt.shiftKey && evt.metaKey === opt.metaKey && (
+      evt.shiftKey === opt.shiftKey && (
         opt.onlyEdit ?
           isEditControl(target) || target.isContentEditable ||
           sel.anchorNode === sel.focusNode && isContentTextNode(target) :
