@@ -1,3 +1,5 @@
+EN / [JA](./README.ja.md)
+
 # withExEditor
 Firefox add-on to View Source, View Selection, and Edit Texts with the external editor which you like, from the context menu.
 Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
