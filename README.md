@@ -1,4 +1,4 @@
-EN / [JA](./README.ja.md)
+EN | [JA](./README.ja.md)
 
 # withExEditor
 Firefox add-on to View Source, View Selection, and Edit Texts with the external editor which you like, from the context menu.
