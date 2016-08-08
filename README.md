@@ -42,11 +42,15 @@ ex: `C:\\Windows`
 ex: `"Some Arg"`
 
 ### Access Key
-* Access key to be used in the context menu and the toolbar button.
+* Access key commonly used for the context menu, the shortcut for toolbar button options panel, and the shortcut for executing the editor directly.
 * Choose any key, but it must be a single character.
 * In the context menu, press `key` itself.
+
+### Enable Shortcut Key To Open / Close The Options Panel
 * To open / close the panel from the toolbar button, press `Ctrl + Alt + key` (`Cmd + Opt + key` on Mac).
-* To execute the editor directly, press `Ctrl + Shift + key` (`Cmd + Shift + key` on Mac).
+
+### Enable Shortcut Key To Execute The Editor Directly
+* To execute the editor without going through the context menu, press `Ctrl + Shift + key` (`Cmd + Shift + key` on Mac).
 
 ### Enable During Private Browsing
 * Enables if checked, disables if not.
