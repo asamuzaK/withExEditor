@@ -4,5 +4,5 @@ New And Updated Features
 <li>Add shortcut key to execute the editor directly. `Ctrl + Shift + key` (`Cmd + Shift + key` on Mac)</li>
 <li>Add options to enable / disable shortcut keys.</li>
 <li>Add button to customize the other options.</li>
-<li>Check system environment variables `$USER`, `$HOME`, `$DISPLAY`, `$XAUTHORITY`, `$LANG`, `$PATH` by default (for Linux).</li>
+<li>Check system environment variables `$USER`, `$HOME`, `$DISPLAY`, `$XAUTHORITY`, `$LANG`, `$PATH` by default (Linux).</li>
 </ul>
