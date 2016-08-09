@@ -11,7 +11,7 @@
   const CONTROLS = `${DATA_ID}_controls`;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
-
+  const opt = window.self.options || {};
   const regExpType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
 
   /* namespace URI class */
@@ -474,6 +474,31 @@
     return mode;
   };
 
+  /**
+   * get content on keypress
+   * @param {Object} evt - Event
+   * @return {void}
+   */
+  const keyCombo = evt => {
+    const sel = window.getSelection();
+    const elm = evt && evt.target;
+    elm &&
+    evt.key && opt.key && evt.key.toLowerCase() === opt.key.toLowerCase() &&
+    evt.altKey === opt.altKey && evt.ctrlKey === opt.ctrlKey &&
+    evt.metaKey === opt.metaKey && evt.shiftKey === opt.shiftKey && (
+      opt.onlyEdit ?
+        isEditControl(elm) || elm.isContentEditable ||
+        sel.anchorNode === sel.focusNode && isContentTextNode(elm) :
+        regExpType.test(document.contentType)
+    ) && (
+      evt.preventDefault(),
+      window.self.port.emit(
+        "pageContent",
+        JSON.stringify(getContent(elm, opt.data))
+      )
+    );
+  };
+
   /* switch context menu item label */
   window.self.on("context", elm => {
     const sel = window.getSelection();
@@ -490,42 +515,18 @@
     return true;
   });
 
-  /* get content from context-menu click */
+  /* get content on context-menu click */
   window.self.on("click", (elm, data) => {
     window.self.postMessage(JSON.stringify(getContent(elm, data)));
   });
 
-  /* get content from keypress */
-  window.self.port.on("attachKeyCombo", opt => {
-    /**
-     * get content if key combo matches
-     * @param {Object} evt - Event
-     * @return {void}
-     */
-    const keyCombo = evt => {
-      const sel = window.getSelection();
-      const target = evt && evt.target;
-      target && evt.key.toLowerCase() === opt.key.toLowerCase() &&
-      evt.altKey === opt.altKey && evt.ctrlKey === opt.ctrlKey &&
-      evt.metaKey === opt.metaKey && evt.shiftKey === opt.shiftKey && (
-        opt.onlyEdit ?
-          isEditControl(target) || target.isContentEditable ||
-          sel.anchorNode === sel.focusNode && isContentTextNode(target) :
-          regExpType.test(document.contentType)
-      ) && (
-        evt.preventDefault(),
-        window.self.port.emit(
-          "pageContent",
-          JSON.stringify(getContent(target, opt.data))
-        )
-      );
-      window.self.port.on("detachKeyCombo", () => {
-        const elm = document.documentElement;
-        elm && elm.removeEventListener("keypress", keyCombo, false);
-      });
-    };
+  /* attach keyCombo */
+  window.self.port.on("attachKeyCombo", () => {
+    document.documentElement.addEventListener("keypress", keyCombo, false);
+  });
 
-    const elm = document.documentElement;
-    elm && elm.addEventListener("keypress", keyCombo, false);
+  /* detach keyCombo */
+  window.self.port.on("detachKeyCombo", () => {
+    document.documentElement.removeEventListener("keypress", keyCombo, false);
   });
 }
