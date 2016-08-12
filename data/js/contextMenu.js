@@ -421,12 +421,13 @@
    ) || false;
 
   /**
-   * get content
-   * @param {Object} elm - element node
-   * @param {Object} data - extended nsURI data
+   * get content data
+   * @param {Object} elm - element
+   * @param {Object} data - extended nsURI
+   * @return {Object} - content data
    */
   const getContent = (elm, data) => {
-    const mode = {
+    const cnt = {
       mode: VIEW_SOURCE,
       charset: window.top.document.characterSet,
       target: null,
@@ -438,20 +439,20 @@
     !nsURI.extended && data && nsURI.extend(data);
     elm && sel.isCollapsed ?
       isEditControl(elm) && (obj = getId(elm)) ? (
-        mode.mode = EDIT_TEXT,
-        mode.target = obj,
-        mode.value = elm.value || ""
+        cnt.mode = EDIT_TEXT,
+        cnt.target = obj,
+        cnt.value = elm.value || ""
       ) :
       (elm.isContentEditable || isContentTextNode(elm)) &&
       (obj = getId(elm)) ? (
-        mode.mode = EDIT_TEXT,
-        mode.target = obj,
-        mode.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
-        mode.namespace = getNodeNS(elm).uri
+        cnt.mode = EDIT_TEXT,
+        cnt.target = obj,
+        cnt.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
+        cnt.namespace = getNodeNS(elm).uri
       ) :
       getNodeNS(elm).uri === nsURI.ns.math && (obj = createDomMathML(elm)) && (
-        mode.mode = VIEW_MATHML,
-        mode.value = obj
+        cnt.mode = VIEW_MATHML,
+        cnt.value = obj
       ) :
     elm && (
       sel.anchorNode !== sel.focusNode ||
@@ -461,21 +462,21 @@
       (elm.isContentEditable ||
        sel.anchorNode === sel.focusNode && isContentTextNode(elm)) &&
       (obj = getId(elm)) ? (
-        mode.mode = EDIT_TEXT,
-        mode.target = obj,
-        mode.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
-        mode.namespace = getNodeNS(elm).uri
+        cnt.mode = EDIT_TEXT,
+        cnt.target = obj,
+        cnt.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
+        cnt.namespace = getNodeNS(elm).uri
       ) :
       (obj = createDomFromSelRange(sel)) && (
-        mode.mode = VIEW_SELECTION,
-        mode.value = obj
+        cnt.mode = VIEW_SELECTION,
+        cnt.value = obj
       )
     );
-    return mode;
+    return cnt;
   };
 
   /**
-   * get content on keypress
+   * send content data if key combination matches
    * @param {Object} evt - Event
    * @return {void}
    */
@@ -515,7 +516,7 @@
     return true;
   });
 
-  /* get content on context-menu click */
+  /* send content data on context-menu click */
   window.self.on("click", (elm, data) => {
     window.self.postMessage(JSON.stringify(getContent(elm, data)));
   });
