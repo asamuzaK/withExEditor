@@ -27,14 +27,14 @@
       "type": "bool",
       "name": "WithExEditorPrefsHotkey",
       "title": "Enable Shortcut Key To Open / Close The Options Panel",
-      "description": "`Ctrl + Alt + key` (`Cmd + Opt + key` on Mac)",
+      "description": "`Ctrl+Alt+key` (`Cmd+Opt+key` on Mac)",
       "value": true
     },
     {
       "type": "bool",
       "name": "WithExEditorPrefsExecEditor",
       "title": "Enable Shortcut Key To Execute The Editor Directly",
-      "description": "`Ctrl + Shift + key` (`Cmd + Shift + key` on Mac)",
+      "description": "`Ctrl+Shift+key` (`Cmd+Shift+key` on Mac)",
       "value": true
     },
     {
