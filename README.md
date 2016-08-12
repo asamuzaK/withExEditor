@@ -35,7 +35,7 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 * When selecting an editor on Mac OS X, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
 
 ### Command Line Options
-* Command line options when you run the editor.
+* Command line options of the editor.
 * When using backslash (`\`) character, it must be escaped with an extra backslash.
 ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).
