@@ -437,39 +437,40 @@
     const sel = window.getSelection();
     let obj;
     !nsURI.extended && data && nsURI.extend(data);
-    elm && sel.isCollapsed ?
-      isEditControl(elm) && (obj = getId(elm)) ? (
-        cnt.mode = EDIT_TEXT,
-        cnt.target = obj,
-        cnt.value = elm.value || ""
-      ) :
-      (elm.isContentEditable || isContentTextNode(elm)) &&
-      (obj = getId(elm)) ? (
-        cnt.mode = EDIT_TEXT,
-        cnt.target = obj,
-        cnt.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
-        cnt.namespace = getNodeNS(elm).uri
-      ) :
-      getNodeNS(elm).uri === nsURI.ns.math && (obj = createDomMathML(elm)) && (
-        cnt.mode = VIEW_MATHML,
-        cnt.value = obj
-      ) :
     elm && (
-      sel.anchorNode !== sel.focusNode ||
-      sel.anchorNode.parentNode !== document.documentElement
-    ) && (
-      sel.rangeCount === 1 &&
-      (elm.isContentEditable ||
-       sel.anchorNode === sel.focusNode && isContentTextNode(elm)) &&
-      (obj = getId(elm)) ? (
-        cnt.mode = EDIT_TEXT,
-        cnt.target = obj,
-        cnt.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
-        cnt.namespace = getNodeNS(elm).uri
-      ) :
-      (obj = createDomFromSelRange(sel)) && (
-        cnt.mode = VIEW_SELECTION,
-        cnt.value = obj
+      sel.isCollapsed ?
+        isEditControl(elm) && (obj = getId(elm)) ? (
+          cnt.mode = EDIT_TEXT,
+          cnt.target = obj,
+          cnt.value = elm.value || ""
+        ) :
+        (elm.isContentEditable || isContentTextNode(elm)) &&
+        (obj = getId(elm)) ? (
+          cnt.mode = EDIT_TEXT,
+          cnt.target = obj,
+          cnt.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
+          cnt.namespace = getNodeNS(elm).uri
+        ) :
+        getNodeNS(elm).uri === nsURI.ns.math &&
+        (obj = createDomMathML(elm)) && (
+          cnt.mode = VIEW_MATHML,
+          cnt.value = obj
+        ) :
+      (sel.anchorNode !== sel.focusNode ||
+       sel.anchorNode.parentNode !== document.documentElement) && (
+        sel.rangeCount === 1 &&
+        (elm.isContentEditable ||
+         sel.anchorNode === sel.focusNode && isContentTextNode(elm)) &&
+        (obj = getId(elm)) ? (
+          cnt.mode = EDIT_TEXT,
+          cnt.target = obj,
+          cnt.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
+          cnt.namespace = getNodeNS(elm).uri
+        ) :
+        (obj = createDomFromSelRange(sel)) && (
+          cnt.mode = VIEW_SELECTION,
+          cnt.value = obj
+        )
       )
     );
     return cnt;
