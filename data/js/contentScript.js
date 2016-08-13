@@ -15,12 +15,12 @@
   const namespace = opt.namespace || nsURI.html;
 
   /**
-   * set content editable element text
+   * sync content editable element text
    * @param {Object} node - editable element
    * @param {Array} arr - array of values
    * @return {void}
    */
-  const setContentEditableText = (node, arr = [""]) => {
+  const syncContentEditableText = (node, arr = [""]) => {
     if (node && node.nodeType === ELEMENT_NODE && Array.isArray(arr)) {
       const fragment = document.createDocumentFragment();
       const l = arr.length;
@@ -40,7 +40,7 @@
     }
   };
 
-  /* get target element and and sync text value */
+  /* get target element and and sync text */
   {
     const elm = document.activeElement;
     let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
@@ -57,7 +57,7 @@
             (!id.hasAttributeNS(ns, DATA_TS) ||
              timestamp > id.getAttributeNS(ns, DATA_TS) * 1) && (
               id.setAttributeNS(ns, attr, timestamp),
-              setContentEditableText(id, value.split("\n"))
+              syncContentEditableText(id, value.split("\n"))
             )
           );
           break;
@@ -73,7 +73,7 @@
         /^(?:input|textarea)$/.test(elm.localName) ?
           elm.value = value :
         elm.isContentEditable &&
-          setContentEditableText(elm, value.split("\n"))
+          syncContentEditableText(elm, value.split("\n"))
       );
     }
   }
