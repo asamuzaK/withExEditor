@@ -9,7 +9,7 @@
   const CONTROLS = `${DATA_ID}_controls`;
   const ELEMENT_NODE = 1;
 
-  /* nsURI */
+  /* namespace URI data */
   const nsURI = {html: "http://www.w3.org/1999/xhtml"};
 
   /* options */

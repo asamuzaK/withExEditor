@@ -3,6 +3,7 @@
  */
 "use strict";
 {
+  /* constants */
   const VIEW_SOURCE = "ViewSource";
   const VIEW_MATHML = "ViewMathML";
   const VIEW_SELECTION = "ViewSelection";
@@ -11,7 +12,11 @@
   const CONTROLS = `${DATA_ID}_controls`;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
+
+  /* options */
   const opt = window.self.options || {};
+
+  /* RegExp */
   const regExpType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
 
   /* namespace URI class */
@@ -477,7 +482,7 @@
   };
 
   /**
-   * send content data if key combination matches
+   * post content data if key combination matches
    * @param {Object} evt - Event
    * @return {void}
    */
@@ -517,7 +522,7 @@
     return true;
   });
 
-  /* send content data on context-menu click */
+  /* post content data on context-menu click */
   window.self.on("click", (elm, data) => {
     window.self.postMessage(JSON.stringify(getContent(elm, data)));
   });
