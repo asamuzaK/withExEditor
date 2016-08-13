@@ -3,11 +3,16 @@
  */
 "use strict";
 {
+  /* constants */
   const DATA_ID = "data-with_ex_editor_id";
   const DATA_TS = "data-with_ex_editor_timestamp";
   const CONTROLS = `${DATA_ID}_controls`;
   const ELEMENT_NODE = 1;
+
+  /* nsURI */
   const nsURI = {html: "http://www.w3.org/1999/xhtml"};
+
+  /* options */
   const opt = window.self.options || {};
   const target = opt.target || "";
   const value = opt.value || "";

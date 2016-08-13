@@ -3,6 +3,7 @@
  */
 "use strict";
 {
+  /* elements */
   const html = document.querySelector("html");
   const controlPanelForm = document.getElementById("controlPanelForm");
   const buttonIcon = document.getElementById("buttonIcon");
