@@ -419,11 +419,11 @@
    * @return {boolean}
    */
   const isEditControl = elm =>
-   elm && (
-     /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-     /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-     /^textarea$/.test(elm.localName)
-   ) || false;
+    elm && (
+      /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
+      /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
+      /^textarea$/.test(elm.localName)
+    ) || false;
 
   /**
    * get content data

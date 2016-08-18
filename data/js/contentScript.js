@@ -45,7 +45,7 @@
     }
   };
 
-  /* get target element and and sync text */
+  /* get target element and sync text */
   {
     const elm = document.activeElement;
     let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
