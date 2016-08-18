@@ -17,7 +17,7 @@
   const opt = window.self.options || {};
 
   /* RegExp */
-  const regExpType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
+  const reType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
 
   /* namespace URI class */
   class NsURI {
@@ -496,7 +496,7 @@
       opt.onlyEdit ?
         isEditControl(elm) || elm.isContentEditable ||
         sel.anchorNode === sel.focusNode && isContentTextNode(elm) :
-        regExpType.test(document.contentType)
+        reType.test(document.contentType)
     ) && (
       evt.preventDefault(),
       window.self.port.emit(
