@@ -1,3 +1,9 @@
+v1.7.1
+Updated Features
+<ul>
+<li>Fixed SVG icon.</li>
+</ul>
+
 v1.7.0
 New And Updated Features
 <ul>
