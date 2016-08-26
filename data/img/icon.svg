@@ -14,7 +14,8 @@
     </rdf:RDF>
   </metadata>
   <style><![CDATA[
-    g:not(#color):not(:target) {
+    g:not(#color):not(:target),
+    g:target ~ #color {
       display: none;
     }
   ]]></style>
@@ -27,10 +28,6 @@
     <path d="m107.52 3.5156-60 60 16.969 16.969 60-60-16.969-16.969z"/>
     <path d="m0 0v24h12l12-12-12-12z" transform="translate(60,85) rotate(135)"/>
   </symbol>
-  <g id="color">
-    <use xlink:href="#frame" fill="#002147"/>
-    <use xlink:href="#pen" fill="#E66000"/>
-  </g>
   <g id="gray" fill="#4C4C4C">
     <use xlink:href="#frame"/>
     <use xlink:href="#pen"/>
@@ -42,5 +39,9 @@
   <g id="off" fill="ButtonShadow">
     <use xlink:href="#frame"/>
     <use xlink:href="#pen"/>
+  </g>
+  <g id="color">
+    <use xlink:href="#frame" fill="#002147"/>
+    <use xlink:href="#pen" fill="#E66000"/>
   </g>
 </svg>
