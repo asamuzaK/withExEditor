@@ -1,0 +1,5 @@
+v1.8.0
+Updated Features
+<ul>
+<li>Add some Windows system environment variables.</li>
+</ul>
