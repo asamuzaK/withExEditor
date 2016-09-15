@@ -1,5 +1,6 @@
 v1.8.0
-Updated Features
+New And Updated Features
 <ul>
 <li>Add some Windows system environment variables.</li>
+<li>Add `Execute The Editor In The Shell` option.</li>
 </ul>
