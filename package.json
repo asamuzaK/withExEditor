@@ -18,11 +18,6 @@
       "value": ""
     },
     {
-      "type": "bool",
-      "name": "WithExEditorPrefsShell",
-      "title": "Execute The Editor In The Shell"
-    },
-    {
       "type": "string",
       "name": "WithExEditorPrefsAccessKey",
       "title": "Access Key",

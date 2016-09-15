@@ -1,6 +1,10 @@
 v1.8.0
-New And Updated Features
+Updated Features
 <ul>
 <li>Add some Windows system environment variables.</li>
-<li>Add `Execute The Editor In The Shell` option.</li>
+</ul>
+
+Code Refactoring
+<ul>
+<li>Switch from child_process.execFile() to child_process.spawn()</li>
 </ul>
