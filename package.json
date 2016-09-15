@@ -18,6 +18,11 @@
       "value": ""
     },
     {
+      "type": "bool",
+      "name": "WithExEditorPrefsShell",
+      "title": "Run commands within a shell"
+    },
+    {
       "type": "string",
       "name": "WithExEditorPrefsAccessKey",
       "title": "Access Key",
