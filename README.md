@@ -41,6 +41,9 @@ ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).
 ex: `"Some Arg"`
 
+### Run Command In A Shell
+* Spawns a shell and runs a command within that shell.
+
 ### Access Key
 * Access key commonly used for the context menu, the shortcut for toolbar button options panel, and the shortcut for executing the editor directly.
 * Choose any key, but it must be a single character.
