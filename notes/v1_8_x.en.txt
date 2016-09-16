@@ -2,7 +2,7 @@ v1.8.0
 New And Updated Features
 <ul>
 <li>Add some Windows system environment variables.</li>
-<li>Add `Run commands within a shell` option.</li>
+<li>Add `Run Command In A Shell` option.</li>
 </ul>
 
 Code Refactoring
