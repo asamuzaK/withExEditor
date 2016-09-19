@@ -47,7 +47,7 @@
 例: sample.cmd
 ```
 @echo off
-start "" "C:\Program Files\SomeEditor\Editor.exe" /f %*
+start "" "C:\Program Files\SomeEditor\Editor.exe" /arg %*
 ```
 
 ### アクセスキー

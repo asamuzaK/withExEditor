@@ -47,7 +47,7 @@ ex: `"Some Arg"`
 ex: sample.cmd
 ```
 @echo off
-start "" "C:\Program Files\MyEditor\Editor.exe" /f %*
+start "" "C:\Program Files\MyEditor\Editor.exe" /arg %*
 ```
 
 ### Access Key
