@@ -43,6 +43,12 @@ ex: `"Some Arg"`
 
 ### Run Command In A Shell
 * Spawns a shell and runs a command within that shell.
+* Basically, the editor will be executed like `editorPath filePath cmdArgs`. But for example, suppose you want to put some extra arguments before the file path. To do so, enable this option, and create a shell script (batch file), select that shell script instead of the editor.
+ex: sample.cmd
+```
+@echo off
+start "" "C:\Program Files\MyEditor\Editor.exe" /f %*
+```
 
 ### Access Key
 * Access key commonly used for the context menu, the shortcut for toolbar button options panel, and the shortcut for executing the editor directly.
