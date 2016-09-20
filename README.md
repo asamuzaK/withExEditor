@@ -41,22 +41,16 @@ ex: `C:\\Windows`
 * If argument contains space(s), quote them with the double quotation mark (`"`).  
 ex: `"Some Arg"`
 
-### Put Command Line Options In Front Of File Path
-* By default, the editor will be executed like Node.js `child_process.spawn(editorPath, [filePath, cmdArgs])`.
+### Put File Path After Command Line Options
 * Some editor requires the file path to be put after the command arguments.
-  Enable this option in that case.
+Enable this option in that case.
 
 ### Run Command In A Shell
 * Spawns a shell and runs a command within that shell.
-* If this option is enabled, you can also execute shell script.
-  * Create a shell script (batch file) which executes the editor  
-    ex: sample.cmd  
-    ```
-    start "" "C:\Program Files\SomeEditor\Editor.exe" /arg %*
-    ```
-  * In `Select An Editor` option, pick that shell script instead of the editor
-  * Enable this option
-* Then it will be spawned like `child_process.spawn(C:\Windows\system32\cmd.exe, [/c, shellScript, filePath, cmdArgs])` (or `child_process.spawn(/bin/sh, [-c, shellScript, filePath, cmdArgs])` on Linux / Mac).
+* If this option is enabled, you can run a shell script instead of executing the editor directly.
+  1. Create a shell script (batch file) which executes the editor.
+  2. In `Select An Editor` option, pick that shell script instead of the editor.
+  3. Enable this option.
 
 ### Access Key
 * Access key commonly used for the context menu, the shortcut for toolbar button options panel, and the shortcut for executing the editor directly.
