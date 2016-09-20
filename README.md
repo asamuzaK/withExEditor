@@ -53,7 +53,7 @@ ex: `"Some Arg"`
     ```
   * Pick that shell script instead of the editor
   * Enable this option
-* Then it will be spawned like `child_process.spawn(C:\Windows\system32\cmd.exe [/c, shellScript, filePath, cmdArgs], option)` (or `child_process.spawn(/bin/sh [-c, shellScript, filePath, cmdArgs], option)` on Linux / Mac).
+* Then it will be spawned like `child_process.spawn(C:\Windows\system32\cmd.exe, [/c, shellScript, filePath, cmdArgs], option)` (or `child_process.spawn(/bin/sh, [-c, shellScript, filePath, cmdArgs], option)` on Linux / Mac).
 
 ### Access Key
 * Access key commonly used for the context menu, the shortcut for toolbar button options panel, and the shortcut for executing the editor directly.

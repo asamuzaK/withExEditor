@@ -52,7 +52,7 @@
     ```
   * エディタの代わりにそのシェルスクリプトを選択
   * このオプションを有効化
-* そうすると `child_process.spawn(C:\Windows\system32\cmd.exe [/c, shellScript, filePath, cmdArgs], option)` （Linux / Mac では `child_process.spawn(/bin/sh [-c, shellScript, filePath, cmdArgs], option)`）のようにコマンドを実行します。
+* そうすると `child_process.spawn(C:\Windows\system32\cmd.exe, [/c, shellScript, filePath, cmdArgs], option)` （Linux / Mac では `child_process.spawn(/bin/sh, [-c, shellScript, filePath, cmdArgs], option)`）のようにコマンドを実行します。
 
 ### アクセスキー
 * コンテキストメニュー、ツールバーボタンのオプションパネルのショートカット、および直接エディタを実行するためのショートカットで共通して使用するアクセスキーを設定します。
