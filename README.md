@@ -51,7 +51,7 @@ ex: `"Some Arg"`
     ```
     start "" "C:\Program Files\MyEditor\Editor.exe" /arg %*
     ```
-  * Pick that shell script instead of the editor.
+  * Pick that shell script instead of the editor
   * Enable this option
 * Then it will be spawned like `child_process.spawn(C:\Windows\system32\cmd.exe [/c, shellScript, filePath, cmdArgs], option)` (`child_process.spawn(/bin/sh [-c, shellScript, filePath, cmdArgs], option)` on Linux / Mac).
 
