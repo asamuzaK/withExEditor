@@ -20,7 +20,7 @@
     {
       "type": "bool",
       "name": "WithExEditorPrefsCmdPos",
-      "title": "Put Command Line Options In Front Of File Path"
+      "title": "Put File Path After Command Line Options"
     },
     {
       "type": "bool",
