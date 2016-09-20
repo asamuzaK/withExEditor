@@ -49,7 +49,7 @@ ex: `"Some Arg"`
   * Create a shell script (batch file)  
     ex: sample.cmd  
     ```
-    start "" "C:\Program Files\MyEditor\Editor.exe" /arg %*
+    start "" "C:\Program Files\SomeEditor\Editor.exe" /arg %*
     ```
   * Pick that shell script instead of the editor
   * Enable this option
