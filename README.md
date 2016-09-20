@@ -47,11 +47,11 @@ ex: `"Some Arg"`
   But for example, suppose you want to put some extra arguments before the file path.
   To do so
   * Create a shell script (batch file)  
-ex: sample.cmd
-```
-@echo off
-start "" "C:\Program Files\MyEditor\Editor.exe" /arg %*
-```
+    ex: sample.cmd  
+    ```
+    @echo off  
+    start "" "C:\Program Files\MyEditor\Editor.exe" /arg %*
+    ```
   * Pick that shell script instead of the editor.
   * Enable this option
 * Then it will be spawned like `child_process.spawn("C:\Windows\system32\cmd.exe" [/c, shellScript, filePath, cmdArgs])` (`child_process.spawn(/bin/sh [-c, shellScript, filePath, cmdArgs])` on Linux and Mac).
