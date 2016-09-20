@@ -43,7 +43,7 @@
 
 ### シェルでコマンドを実行
 * シェルを起動し、そのシェル内でコマンドを実行します。
-* 基本的に、エディタはNode.jsの `child_process.spawn(editorPath, [filePath, cmdArgs], option)` のような形で起動します。
+* 基本的に、エディタはNode.jsの `child_process.spawn(editorPath, [filePath, cmdArgs])` のような形で起動します。
   そうではなく、例えばファイルパスの前にも何らかの引数を置きたい場合などには
   * シェルスクリプト（バッチファイル）を作成  
     例: sample.cmd  
@@ -52,7 +52,7 @@
     ```
   * エディタの代わりにそのシェルスクリプトを選択
   * このオプションを有効化
-* そうすると `child_process.spawn(C:\Windows\system32\cmd.exe, [/c, shellScript, filePath, cmdArgs], option)` （Linux / Mac では `child_process.spawn(/bin/sh, [-c, shellScript, filePath, cmdArgs], option)`）のようにコマンドを実行します。
+* そうすると `child_process.spawn(C:\Windows\system32\cmd.exe, [/c, shellScript, filePath, cmdArgs])` （Linux / Mac では `child_process.spawn(/bin/sh, [-c, shellScript, filePath, cmdArgs])`）のようにコマンドを実行します。
 
 ### アクセスキー
 * コンテキストメニュー、ツールバーボタンのオプションパネルのショートカット、および直接エディタを実行するためのショートカットで共通して使用するアクセスキーを設定します。
