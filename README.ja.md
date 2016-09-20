@@ -41,16 +41,20 @@
 * 空白が含まれる場合は二重引用符（`"`）で囲ってください。
 例: `"Some Arg"`
 
+### コマンドラインオプションをファイルパスの前で使用
+* 基本的に、エディタはNode.jsの `child_process.spawn(editorPath, [filePath, cmdArgs])` のような形で起動します。
+* しかしながら、いくつかのエディタ（例えば『秀丸エディタ』）では、ファイルを指定する場合はコマンドの最後に置くように求めているものがあります。
+そのような場合に有効化してください。
+
 ### シェルでコマンドを実行
 * シェルを起動し、そのシェル内でコマンドを実行します。
-* 基本的に、エディタはNode.jsの `child_process.spawn(editorPath, [filePath, cmdArgs])` のような形で起動します。
-  そうではなく、例えばファイルパスの前にも何らかの引数を置きたい場合などには
-  * シェルスクリプト（バッチファイル）を作成  
+* このオプションを有効化した場合、任意のシェルスクリプトを実行させることもできます。
+  * エディタを起動するシェルスクリプト（バッチファイル）を作成  
     例: sample.cmd  
     ```
     start "" "C:\Program Files\SomeEditor\Editor.exe" /arg %*
     ```
-  * エディタの代わりにそのシェルスクリプトを選択
+  * 「エディタの選択」オプションでは、エディタの代わりにシェルスクリプトを選択
   * このオプションを有効化
 * そうすると `child_process.spawn(C:\Windows\system32\cmd.exe, [/c, shellScript, filePath, cmdArgs])` （Linux / Mac では `child_process.spawn(/bin/sh, [-c, shellScript, filePath, cmdArgs])`）のようにコマンドを実行します。
 
