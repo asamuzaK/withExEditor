@@ -43,7 +43,7 @@
 
 ### シェルでコマンドを実行
 * シェルを起動し、そのシェル内でコマンドを実行します。
-* エディタはNode.jsの `child_process.spawn(editorPath, [filePath, cmdArgs], option)` のような形で起動します。
+* 基本的に、エディタはNode.jsの `child_process.spawn(editorPath, [filePath, cmdArgs], option)` のような形で起動します。
   そうではなく、例えばファイルパスの前にも何らかの引数を置きたい場合などには
   * シェルスクリプト（バッチファイル）を作成  
     例: sample.cmd  

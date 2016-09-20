@@ -43,7 +43,7 @@ ex: `"Some Arg"`
 
 ### Run Command In A Shell
 * Spawns a shell and runs a command within that shell.
-* The editor will be executed like Node.js `child_process.spawn(editorPath, [filePath, cmdArgs], option)`.
+* By default, the editor will be executed like Node.js `child_process.spawn(editorPath, [filePath, cmdArgs], option)`.
   But for example, suppose you want to put some extra arguments before the file path.
   To do so
   * Create a shell script (batch file)  
