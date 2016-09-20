@@ -1,6 +1,5 @@
 [
   "APPDATA",
-  "ComSpec",
   "DISPLAY",
   "HOME",
   "HOMEDRIVE",
@@ -8,7 +7,6 @@
   "LANG",
   "LOCALAPPDATA",
   "PATH",
-  "PSModulePath",
   "USER",
   "USERNAME",
   "USERPROFILE",
