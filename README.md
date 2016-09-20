@@ -43,12 +43,18 @@ ex: `"Some Arg"`
 
 ### Run Command In A Shell
 * Spawns a shell and runs a command within that shell.
-* Basically, the editor will be executed like `editorPath filePath cmdArgs`. But for example, suppose you want to put some extra arguments before the file path. To do so, enable this option, and create a shell script (batch file), select that shell script instead of the editor.  
-ex: sample.cmd
-```
-@echo off
-start "" "C:\Program Files\MyEditor\Editor.exe" /arg %*
-```
+* The editor will be executed like Node.js `child_process.spawn(editorPath, [filePath, cmdArgs], option)`.
+  But for example, suppose you want to put some extra arguments before the file path.
+  To do so
+  * Create a shell script (batch file)  
+    ex: sample.cmd
+    ```
+    @echo off
+    start "" "C:\Program Files\MyEditor\Editor.exe" /arg %*
+    ```
+  * Pick that shell script instead of the editor.
+  * Enable this option
+* Then it will be spawned like `child_process.spawn("C:\Windows\system32\cmd.exe" [/c, shellScript, filePath, cmdArgs])` (`child_process.spawn(/bin/sh [-c, shellScript, filePath, cmdArgs])` on Linux and Mac).
 
 ### Access Key
 * Access key commonly used for the context menu, the shortcut for toolbar button options panel, and the shortcut for executing the editor directly.
