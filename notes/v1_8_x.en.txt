@@ -1,8 +1,9 @@
 v1.8.0
 New And Updated Features
 <ul>
-<li>Add some Windows system environment variables.</li>
+<li>Add `Put Command Line Options In Front Of File Path` option.</li>
 <li>Add `Run Command In A Shell` option.</li>
+<li>Add some Windows system environment variables.</li>
 </ul>
 
 Code Refactoring
