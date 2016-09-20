@@ -19,6 +19,11 @@
     },
     {
       "type": "bool",
+      "name": "WithExEditorPrefsCmdPos",
+      "title": "Put Command Line Options In Front Of File Path"
+    },
+    {
+      "type": "bool",
       "name": "WithExEditorPrefsShell",
       "title": "Run Command In A Shell"
     },
