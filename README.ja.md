@@ -5,7 +5,7 @@
 (X)HTML、JavaScript、CSS、SVG、XMLなどで使用可能です。
 
 ## アドオンのページ
-[withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/ja/firefox/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
+[withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
 
 ## 使用方法
 
