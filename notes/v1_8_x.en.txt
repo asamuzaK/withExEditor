@@ -4,6 +4,7 @@ New And Updated Features
 <li>Add `Put File Path After Command Line Options` option.</li>
 <li>Add `Run Command In A Shell` option.</li>
 <li>Add some Windows system environment variables.</li>
+<li>Warning will be notified when the process of the editor did not exit normally.</li>
 </ul>
 
 Code Refactoring

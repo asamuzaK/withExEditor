@@ -85,5 +85,6 @@ Enable this option in that case.
 
 ## About Error / Warning Notification
 Error or Warning message will be notified when...
-* Failed to execute the external editor.
+* Failed to execute the editor.
+* The process of the editor did not exit normally.
 * Failed to remove the temporary files at the end of Private Browsing.
