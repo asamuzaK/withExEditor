@@ -14,7 +14,7 @@
     {
       "type": "string",
       "name": "WithExEditorPrefsPath",
-      "title": "Or Enter File Path",
+      "title": "Or Enter Editor Path",
       "value": ""
     },
     {
