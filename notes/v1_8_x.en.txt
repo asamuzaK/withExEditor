@@ -1,3 +1,9 @@
+v1.8.1
+New And Updated Features
+<ul>
+<li>Add `Enter File Path` option in the case that the editor were not able to select.</li>
+</ul>
+
 v1.8.0
 New And Updated Features
 <ul>
