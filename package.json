@@ -13,6 +13,12 @@
     },
     {
       "type": "string",
+      "name": "WithExEditorPrefsPath",
+      "title": "Or Enter File Path",
+      "value": ""
+    },
+    {
+      "type": "string",
       "name": "WithExEditorPrefsCmdArgs",
       "title": "Command Line Options",
       "value": ""
