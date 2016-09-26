@@ -33,6 +33,7 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 ### Select An Editor
 * Choose the editor which you want to use.
 * When selecting an editor on Mac OS X, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
+* Or, you can also enter the editor path directly in the input field below.
 
 ### Command Line Options
 * Command line options of the editor.
