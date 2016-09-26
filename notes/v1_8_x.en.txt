@@ -4,6 +4,11 @@ Updated Features
 <li>Add `Enter Editor Path` option in the case that the editor were not able to select.</li>
 </ul>
 
+Code Refactoring
+<ul>
+<li>Replace deprecated io/file with fs/path, io/fs APIs.</li>
+</ul>
+
 v1.8.0
 New And Updated Features
 <ul>
