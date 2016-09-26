@@ -36,7 +36,7 @@
     }
 
     set extended(bool) {
-      typeof bool === "boolean" && (this._extended = bool);
+      this._extended = !!bool;
     }
 
     get ns() {
