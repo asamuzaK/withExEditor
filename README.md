@@ -31,7 +31,7 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 ## Options In Add-on Manager
 
 ### Select An Editor
-* Choose the editor which you want to use.
+* Select the editor which you want to use.
 Or, you can enter the editor path directly in the input field below.
 * When selecting an editor on Mac OS X, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
 
