@@ -91,5 +91,5 @@
   "icon": "icon.png",
   "main": "lib/main.js",
   "license": "MPL 2.0",
-  "version": "1.8.1-a1"
+  "version": "1.8.1-a2"
 }
