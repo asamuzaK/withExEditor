@@ -6,7 +6,7 @@ Updated Features
 
 Code Refactoring
 <ul>
-<li>Replace deprecated io/file with fs/path, io/fs APIs.</li>
+<li>Replace deprecated io/file to fs/path and io/fs APIs.</li>
 </ul>
 
 v1.8.0
