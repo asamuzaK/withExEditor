@@ -1,5 +1,5 @@
 v1.8.1
-New And Updated Features
+Updated Features
 <ul>
 <li>Add `Enter Editor Path` option in the case that the editor were not able to select.</li>
 </ul>
