@@ -7,6 +7,7 @@ exports["test main"] = function(assert) {
     assert.deepEqual(concatArg([]), [], "arguments array 0-2");
     assert.deepEqual(concatArg({}), [], "arguments array 0-3");
     assert.deepEqual(concatArg(null), [], "arguments array 0-4");
+    assert.deepEqual(concatArg(""), [], "arguments array 0-5");
     assert.deepEqual(concatArg("1", "-a b -c \"d e\""), ["1", "-a", "b", "-c", "d e"], "arguments array 1-1");
     assert.deepEqual(concatArg("1", ["-a"], "b", ["-c", "\"d e\""]), ["1", "-a", "b", "-c", "d e"], "arguments array 1-2");
     assert.deepEqual(concatArg("2", 'a \'b\' "c"'), ["2", 'a', 'b', 'c'], "arguments array 2");
