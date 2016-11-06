@@ -86,7 +86,7 @@
     "multiprocess": true
   },
   "engines": {
-    "firefox": ">=39.0 <=*"
+    "firefox": ">=52.0a1 <=*"
   },
   "icon": "icon.png",
   "main": "lib/main.js",
