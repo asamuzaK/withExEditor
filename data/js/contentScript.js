@@ -25,7 +25,7 @@
    * @param {Array} arr - array of values
    * @return {void}
    */
-  const syncContentEditableText = (node, arr = [""]) => {
+  const syncContentEditableText = async (node, arr = [""]) => {
     if (node && node.nodeType === ELEMENT_NODE && Array.isArray(arr)) {
       const fragment = document.createDocumentFragment();
       const l = arr.length;

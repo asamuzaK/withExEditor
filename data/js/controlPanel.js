@@ -22,7 +22,7 @@
    * @param {Object} node - node
    * @return {void}
    */
-  const removeChildNodes = node => {
+  const removeChildNodes = async node => {
     if (node && node.hasChildNodes()) {
       while (node.firstChild) {
         node.removeChild(node.firstChild);
@@ -38,10 +38,11 @@
     editorLabel && storeLabel && (
       editorName && editorName.value && currentName &&
       currentName.hasChildNodes() ? (
-        removeChildNodes(currentName),
-        currentName.appendChild(document.createTextNode(editorName.value)),
-        editorLabel.removeAttributeNS("", "disabled"),
-        storeLabel.removeAttributeNS("", "disabled")
+        removeChildNodes(currentName).then(() => {
+          currentName.appendChild(document.createTextNode(editorName.value));
+          editorLabel.removeAttributeNS("", "disabled");
+          storeLabel.removeAttributeNS("", "disabled");
+        })
       ) : (
         editorLabel.setAttributeNS("", "disabled", "disabled"),
         storeLabel.setAttributeNS("", "disabled", "disabled")
@@ -54,7 +55,7 @@
    * @param {string} name - radio button name
    * @return {?string} - checked radio button value
    */
-  const getRadioValue = name => {
+  const getRadioValue = async name => {
     let value = null;
     for (let node of inputRadios) {
       if (node.name && node.name === name && node.checked && node.value) {
@@ -70,9 +71,11 @@
    * @param {Object} evt - event
    * @return {void}
    */
-  const selfPortEmit = evt => {
+  const selfPortEmit = async evt => {
     const type = evt && evt.type;
     const target = evt && evt.target;
+    const button = target && target.checked && target.value ||
+                   buttonIcon && await getRadioValue(buttonIcon.name) || null
     switch (type) {
       case "load":
         window.self.port.emit(type);
@@ -82,8 +85,7 @@
         window.self.port.emit(type, {
           editorName: editorLabel && editorLabel.value ||
                       editorName && editorName.value || "",
-          buttonIcon: target && target.checked && target.value ||
-                      buttonIcon && getRadioValue(buttonIcon.name) || null
+          buttonIcon: button
         });
         evt.preventDefault();
         break;
@@ -106,12 +108,12 @@
   };
 
   /* update control panel */
-  window.self.port.on("editorValue", res => {
+  window.self.port.on("editorValue", async res => {
     res && (
       editorName && (
         editorName.value = res.editorName,
         currentName && (
-          currentName.hasChildNodes() && removeChildNodes(currentName),
+          currentName.hasChildNodes() && await removeChildNodes(currentName),
           currentName.appendChild(
             document.createTextNode(editorName.value || res.currentEditorName)
           )
@@ -123,12 +125,12 @@
   });
 
   /* localize control panel */
-  window.self.port.on("htmlValue", res => {
+  window.self.port.on("htmlValue", async res => {
     res && (
       html && (html.lang = res.lang),
       selectIcon && (selectIcon.value = res.submit),
       currentName && (
-        currentName.hasChildNodes() && removeChildNodes(currentName),
+        currentName.hasChildNodes() && await removeChildNodes(currentName),
         currentName.appendChild(document.createTextNode(res.currentEditorName))
       ),
       editorLabel && (editorLabel.placeholder = res.editorLabel),

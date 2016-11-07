@@ -461,7 +461,8 @@
         (obj = getId(elm)) ? (
           cnt.mode = EDIT_TEXT,
           cnt.target = obj,
-          cnt.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
+          cnt.value = elm.hasChildNodes() &&
+                      await getTextNode(elm.childNodes) || "",
           cnt.namespace = nodeNS.uri
         ) :
         nodeNS.uri === nsURI.ns.math &&
@@ -477,7 +478,8 @@
         (obj = getId(elm)) ? (
           cnt.mode = EDIT_TEXT,
           cnt.target = obj,
-          cnt.value = elm.hasChildNodes() && getTextNode(elm.childNodes) || "",
+          cnt.value = elm.hasChildNodes() &&
+                      await getTextNode(elm.childNodes) || "",
           cnt.namespace = nodeNS.uri
         ) :
         (obj = await createDomFromSelRange(sel)) && (
