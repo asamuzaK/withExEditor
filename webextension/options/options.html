@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title data-i18n="optionsTitle">withExEditor Options</title>
+    <link rel="stylesheet" href="./css/options.css" />
+    <script src="./js/options.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>withExEditor</h1>
+    </header>
+    <main>
+      <form id="optionsForm">
+        <fieldset id="toolbarIcon">
+          <legend data-i18n="optionsToolbarIconLabel">
+            Toolbar Button Icon
+          </legend>
+          <div>
+            <p aria-details="iconDetail">
+              <input type="radio" id="buttonIcon" name="buttonIconRadio"
+                     value="../img/icon.svg#color" />
+              <label for="buttonIcon" data-i18n="optionsIconColorLabel"
+                     aria-label="Color Icon">
+                <img data-i18n="optionsIconColor" src="../img/icon.svg#color"
+                     alt="Color" />
+              </label>
+              <input type="radio" id="buttonIconGray"
+                     name="buttonIconRadio" value="./img/icon.svg#gray" />
+              <label for="buttonIconGray" data-i18n="optionsIconGrayLabel"
+                     aria-label="Gray Icon">
+                <img id="iconGray" data-i18n="optionsIconGray"
+                     src="../img/icon.svg#gray" alt="Gray" />
+              </label>
+              <input type="radio" id="buttonIconWhite"
+                     name="buttonIconRadio" value="./img/icon.svg#white" />
+              <label for="buttonIconWhite" data-i18n="optionsIconWhiteLabel"
+                     aria-label="White Icon">
+                <img id="iconWhite" data-i18n="optionsIconWhite"
+                     src="../img/icon.svg#white" alt="White" />
+              </label>
+            </p>
+            <details id="iconDetail">
+              <div>
+                <p data-i18n="optionsIconDetail">
+                  Choose the icon.
+                </p>
+              </div>
+            </details>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="optionsEditorSettings">
+            Editor Settings
+          </legend>
+          <div>
+            <p>
+              <label for="editorPath" class="label"
+                     data-i18n="optionsEditorPathLabel"
+                     aria-details="editorPathDetail">
+                Editor Path
+              </label>
+              <input type="text" id="editorPath" data-i18n="optionsEditorPath"
+                     placeholder="Input Editor Path" />
+            </p>
+            <details id="editorPathDetail">
+              <div>
+                <p data-i18n="optionsEditorPathDetail">
+                  Enter the editor path.
+                </p>
+                <p  data-i18n="optionsEditorPathDetail2">
+                  When selecting an editor on Mac OS, pick the file under
+                  '/Applications/[yourEditor].app/Contents/MacOS/' directory.
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <label for="editorLabel" class="label"
+                     data-i18n="optionsEditorLabelLabel"
+                     aria-details="editorLabelDetail">
+                Editor Label
+              </label>
+              <input type="text" id="editorLabel"
+                     data-i18n="optionsEditorLabel"
+                     placeholder="Rename Editor Label" />
+            </p>
+            <details id="editorLabelDetail">
+              <div>
+                <p data-i18n="optionsEditorLabelDetail">
+                  Enter the label of the editor.
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <label for="editorCmdArgs" class="label"
+                     data-i18n="optionsEditorCmdArgsLabel"
+                     aria-details="editorCmdArgsDetail">
+                Command Line Options
+              </label>
+              <input type="text" id="editorCmdArgs"
+                     data-i18n="optionsEditorCmdArgs"
+                     placeholder="Input Command Line Options" />
+            </p>
+            <details id="editorCmdArgsDetail">
+              <div>
+                <p data-i18n="optionsEditorCmdArgsDetail">
+                  Command line options of the editor.
+                </p>
+                <p data-i18n="optionsEditorCmdArgsDetail2">
+                  When using backslash (\) character, it must be escaped with
+                  an extra backslash.
+                  ex: C:\\Windows
+                </p>
+                <p data-i18n="optionsEditorCmdArgsDetail3">
+                  If argument contains space(s), quote them with the double
+                  quotation mark (").
+                  ex: "Some Arg"
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <input type="checkbox" id="editorCmdPos" />
+              <label for="editorCmdPos" class="checkboxLabel"
+                     data-i18n="optionsEditorCmdPosLabel"
+                     aria-details="editorCmdPosDetail">
+                Put File Path After Command Line Options
+              </label>
+            </p>
+            <details id="editorCmdPosDetail">
+              <div>
+                <p data-i18n="optionsEditorCmdPosDetail">
+                  Some editor requires the file path to be put after the command
+                  arguments.
+                  Enable this option in that case.
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <input type="checkbox" id="editorShell" />
+              <label for="editorShell" class="checkboxLabel"
+                     data-i18n="optionsEditorShellLabel"
+                     aria-details="editorShellDetail">
+                Run Command In A Shell
+              </label>
+            </p>
+            <details id="editorShellDetail">
+              <div>
+                <p data-i18n="optionsEditorShellDetail">
+                  Spawns a shell and runs a command within that shell.
+                </p>
+              </div>
+            </details>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="optionsAccessKeySettings">
+            Access Key Settings
+          </legend>
+          <div>
+            <p>
+              <label for="accessKey" class="label" data-i18n="optionsAccessKeyLabel"
+                     aria-details="accessKeyDetail">
+                Access Key
+              </label>
+              <input type="text" id="accessKey" data-i18n="optionsAccessKey"
+                     placeholder="Input Access Key" value= "e" />
+            </p>
+            <details id="accessKeyDetail">
+              <div>
+                <p data-i18n="optionsAccessKeyDetail">
+                  Access key commonly used for the context menu, the shortcut
+                  for opening options from the toolbar button, and the shortcut
+                  for executing the editor directly.
+                </p>
+                <p data-i18n="optionsAccessKeyDetail2">
+                  Choose any key, but it must be a single character.
+                </p>
+                <p data-i18n="optionsAccessKeyDetail3">
+                  In the context menu, press 'key' itself.
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <span>
+                <input type="checkbox" id="optionsShortCut" checked="checked" />
+                <label for="optionsShortCut" class="checkboxLabel"
+                       data-i18n="optionsOptionsShortCutLabel"
+                       aria-details="optionsShortCutDetail">
+                  Enable Shortcut Key To Open The Options
+                </label>
+              </span>
+            </p>
+            <details id="optionsShortCutDetail">
+              <div>
+                <p data-i18n="optionsOptionsShortCutDetail">
+                  To open the options page, press 'Ctrl + Alt + key'
+                  ('Cmd + Opt + key' on Mac).
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <span>
+                <input type="checkbox" id="editorShortCut" checked="checked" />
+                <label for="editorShortCut" class="checkboxLabel"
+                       data-i18n="optionsEditorShortCutLabel"
+                       aria-details="editorShortCutDetail">
+                  Enable Shortcut Key To Execute The Editor Directly
+                </label>
+              </span>
+            </p>
+            <details id="editorShortCutDetail">
+              <div>
+                <p data-i18n="optionsEditorShortCutDetail">
+                  To execute the editor without going through the context menu,
+                  press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac).
+                </p>
+              </div>
+            </details>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend data-i18n="optionsOtherSettings">
+            Other Settings
+          </legend>
+          <div>
+            <p>
+              <input type="checkbox" id="enablePB" />
+              <label for="enablePB" class="checkboxLabel"
+                     data-i18n="optionsEnablePBLabel"
+                     aria-details="enablePBDetail">
+                Enable During Private Browsing
+              </label>
+            </p>
+            <details id="enablePBDetail">
+              <div>
+                <p data-i18n="optionsEnablePBDetail">
+                  Enables if checked, disables if not.
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <input type="checkbox" id="editableContext" />
+              <label for="editableContext" class="checkboxLabel"
+                     data-i18n="optionsEditableContextLabel"
+                     aria-details="editableContextDetail">
+                Enable Only When Editing Text
+              </label>
+            </p>
+            <details id="editableContextDetail">
+              <div>
+                <p data-i18n="optionsEditableContextDetail">
+                  Appears in the context menu only if the content is editable.
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <input type="checkbox" id="forceRemove" checked="checked" />
+              <label for="forceRemove" class="checkboxLabel"
+                     data-i18n="optionsForceRemoveLabel"
+                     aria-details="forceRemoveDetail">
+                Forcibly Remove The Temporary Files
+              </label>
+            </p>
+            <details id="forceRemoveDetail">
+              <div>
+                <p data-i18n="optionsForceRemoveDetail">
+                  The temporary files will be forcibly removed both at the end
+                  of Private Browsing and at shut down.
+                </p>
+                <p data-i18n="optionsForceRemoveDetail2">
+                  It is recommended to be checked, but depending on the setting
+                  of the editor, there is a possibility that trouble occurs if
+                  you enable this option.
+                </p>
+              </div>
+            </details>
+          </div>
+        </fieldset>
+    </form>
+    </main>
+  </body>
+</html>

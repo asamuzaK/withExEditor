@@ -1,0 +1,6 @@
+/**
+ * getSource.js
+ */
+"use strict";
+{
+}

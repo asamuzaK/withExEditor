@@ -1,0 +1,140 @@
+{
+  "extensionDescription": {
+    "message": "View Source, View Selection, and Edit Text with the external editor"
+  },
+  "extensionName": {
+    "message": "withExEditor"
+  },
+  "optionsAccessKey.placeholder": {
+    "message": "Input Access Key"
+  },
+  "optionsAccessKeyDetail": {
+    "message": "Access key commonly used for the context menu, the shortcut for opening options from the toolbar button, and the shortcut for executing the editor directly."
+  },
+  "optionsAccessKeyDetail2": {
+    "message": "Choose any key, but it must be a single character."
+  },
+  "optionsAccessKeyDetail3": {
+    "message": "In the context menu, press 'key' itself."
+  },
+  "optionsAccessKeyLabel": {
+    "message": "Access Key"
+  },
+  "optionsAccessKeySettings": {
+    "message": "Access Key Settings"
+  },
+  "optionsEditableContextDetail": {
+    "message": "Appears in the context menu only if the content is editable."
+  },
+  "optionsEditableContextLabel": {
+    "message": "Enable Only When Editing Text"
+  },
+  "optionsEditorCmdArgs.placeholder": {
+    "message": "Input Command Line Options"
+  },
+  "optionsEditorCmdArgsDetail": {
+    "message": "Command line options of the editor."
+  },
+  "optionsEditorCmdArgsDetail2": {
+    "message": "When using backslash (\\) character, it must be escaped with an extra backslash. ex: C:\\\\Windows"
+  },
+  "optionsEditorCmdArgsDetail3": {
+    "message": "If argument contains space(s), quote them with the double quotation mark (\"). ex: \"Some Arg\""
+  },
+  "optionsEditorCmdArgsLabel": {
+    "message": "Command Line Options"
+  },
+  "optionsEditorCmdPosDetail": {
+    "message": "Some editor requires the file path to be put after the command arguments. Enable this option in that case."
+  },
+  "optionsEditorCmdPosLabel": {
+    "message": "Put File Path After Command Line Options"
+  },
+  "optionsEditorLabel.placeholder": {
+    "message": "Rename Editor Label"
+  },
+  "optionsEditorLabelDetail": {
+    "message": "Enter the label of the editor."
+  },
+  "optionsEditorLabelLabel": {
+    "message": "Editor Label"
+  },
+  "optionsEditorPath.placeholder": {
+    "message": "Input Editor Path"
+  },
+  "optionsEditorPathDetail": {
+    "message": "Enter the full path of the editor."
+  },
+  "optionsEditorPathDetail2": {
+    "message": "When selecting an editor on Mac OS, pick the file under '/Applications/[yourEditor].app/Contents/MacOS/' directory."
+  },
+  "optionsEditorPathLabel": {
+    "message": "Editor Path"
+  },
+  "optionsEditorSettings": {
+    "message": "Editor Settings"
+  },
+  "optionsEditorShellDetail": {
+    "message": "Spawns a shell and runs a command within that shell."
+  },
+  "optionsEditorShellLabel": {
+    "message": "Run Command In A Shell"
+  },
+  "optionsEditorShortCutDetail": {
+    "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac)."
+  },
+  "optionsEditorShortCutLabel": {
+    "message": "Enable Shortcut Key To Execute The Editor Directly"
+  },
+  "optionsEnablePBDetail": {
+    "message": "Enables if checked, disables if not."
+  },
+  "optionsEnablePBLabel": {
+    "message": "Enable During Private Browsing"
+  },
+  "optionsForceRemoveDetail": {
+    "message": "The temporary files will be forcibly removed both at the end of Private Browsing and at shut down."
+  },
+  "optionsForceRemoveDetail2": {
+    "message": "It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option."
+  },
+  "optionsForceRemoveLabel": {
+    "message": "Forcibly Remove The Temporary Files"
+  },
+  "optionsIconColor.alt": {
+    "message": "Color"
+  },
+  "optionsIconColorLabel.ariaLabel": {
+    "message": "Color Icon"
+  },
+  "optionsIconDetail": {
+    "message": "Choose the icon."
+  },
+  "optionsIconGray.alt": {
+    "message": "Gray"
+  },
+  "optionsIconGrayLabel.ariaLabel": {
+    "message": "Gray Icon"
+  },
+  "optionsIconWhite.alt": {
+    "message": "White"
+  },
+  "optionsIconWhiteLabel.ariaLabel": {
+    "message": "White Icon"
+  },
+  "optionsOptionsShortCutDetail": {
+    "message": "To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac)."
+  },
+  "optionsOptionsShortCutLabel": {
+    "message": "Enable Shortcut Key To Open The Options"
+  },
+  "optionsOtherSettings": {
+    "message": "Other Settings"
+  },
+  "optionsTitle": {
+    "message": "withExEditor Options"
+  },
+  "optionsToolbarIconLabel": {
+    "message": "Toolbar Button Icon"
+  }
+}

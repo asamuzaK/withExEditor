@@ -1,0 +1,101 @@
+@charset "UTF-8";
+/**
+ * options.css
+ */
+
+body {
+  padding: 1rem 1rem 0;
+  background-color: rgb(250, 250, 250);
+  color: black;
+  line-height: 1.5;
+}
+h1 {
+  margin: 0;
+  font-size: 1rem;
+}
+form {
+  margin: 0 0 2rem 0;
+}
+fieldset {
+  border: 1px solid rgb(128, 128, 128);
+  border-radius: 8px;
+}
+legend {
+  margin: 1rem 0.5rem;
+  font-weight: bold;
+}
+fieldset > div {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0;
+  vertical-align: middle;
+}
+fieldset > div > p {
+  flex: 1 1 50%;
+  margin: 0.5rem 0;
+  min-width: 15rem;
+  max-width: calc(100% / 3 * 2);
+}
+details {
+  position: relative;
+  flex: 1 1 calc(100% / 3);
+  margin: 0.5rem 0;
+  font-size: smaller;
+}
+details > div {
+  position: absolute;
+  left: 0.9rem;
+  border: 1px solid rgb(192,192,192);
+  border-radius: 4px;
+  background-color: ivory;
+  z-index: 2;
+}
+fieldset:last-child > div:last-child > details > div {
+  bottom: 1.5rem;
+}
+details > div > p {
+  margin: 0.5rem;
+}
+label[for^=buttonIcon] {
+  display: inline-block;
+  position: relative;
+  margin-right: 1.5rem;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  text-align: center;
+  vertical-align: middle;
+}
+label[for=buttonIcon],
+label[for=buttonIconGray] {
+  background-color: #EAEFF2;
+}
+label[for=buttonIconWhite] {
+  background-color: #4D4E53;
+}
+.label {
+  box-sizing: border-box;
+  display: inline-block;
+  padding-left: 0.2rem;
+  min-width: 15rem;
+}
+label + input[type=radio] {
+  margin-left: 1rem;
+}
+input[type=text] {
+  min-width: 15rem;
+  max-width: calc(100% - 1rem);
+}
+input[type=submit], button {
+  font-size: 0.9rem;
+}
+img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  width: 16px;
+  height: 16px;
+}

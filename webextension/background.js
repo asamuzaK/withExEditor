@@ -1,0 +1,6 @@
+/**
+ * background.js
+ */
+"use strict";
+{
+}
