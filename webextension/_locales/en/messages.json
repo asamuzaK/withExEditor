@@ -77,6 +77,18 @@
   "optionsEditorShellDetail": {
     "message": "Spawns a shell and runs a command within that shell."
   },
+  "optionsEditorShellDetail2": {
+    "message": "If this option is enabled, you can run a shell script instead of executing the editor directly."
+  },
+  "optionsEditorShellDetail3": {
+    "message": "Create a shell script (batch file) which executes the editor."
+  },
+  "optionsEditorShellDetail4": {
+    "message": "In the 'Editor Path' field, enter the shell script path instead of the editor."
+  },
+  "optionsEditorShellDetail5": {
+    "message": "Enable this option."
+  },
   "optionsEditorShellLabel": {
     "message": "Run Command In A Shell"
   },

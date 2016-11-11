@@ -3,6 +3,10 @@
  */
 "use strict";
 {
+  /* shortcuts */
+  const i18n = browser.i18n;
+  const storage = browser.storage.local;
+
   /* variables */
   let editorPath, editorName;
 
@@ -25,27 +29,6 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
-  /* localize */
-  const i18n = browser.i18n;
-
-  /* storage */
-  const storage = browser.storage.local;
-
-/*
-{
-  pref: {
-    key(id): {
-      id: string
-      checked: boolean
-      value: string
-      data: {
-        executable: boolean
-      }
-    }
-  }
-}
-*/
-
   /**
    * synchronize editorName value
    * @param {string} name - editor name
@@ -64,7 +47,9 @@
   };
 
   /**
-   *
+   * check given path is executable (FAKE NOW)
+   * @param {string} path - path
+   * @return {boolean}
    */
   const checkExecutable = async path => {
     const app = {
@@ -87,7 +72,7 @@
       pref[elm.id] = {
         id: elm.id,
         value: elm.value || "",
-        checked: (elm.type === "checkbox" || elm.type === "radio") ?
+        checked: elm.type === "checkbox" || elm.type === "radio" ?
                    !!elm.checked :
                    null,
         data: {
@@ -113,7 +98,17 @@
         const inputs = document.querySelectorAll(`[name=${elm.name}]`);
         for (let input of inputs) {
           pref = await createPrefObj(input);
-          pref && storage.set(pref);
+          pref && (
+            storage.set(pref),
+            pref.checked && storage.set({
+              icon: {
+                id: pref.id,
+                value: pref.value,
+                checked: pref.checked,
+                data: pref.data
+              }
+            })
+          );
         }
       }
       else {

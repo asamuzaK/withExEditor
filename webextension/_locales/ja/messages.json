@@ -77,6 +77,18 @@
   "optionsEditorShellDetail": {
     "message": "シェルを起動し、そのシェル内でコマンドを実行します。"
   },
+  "optionsEditorShellDetail2": {
+    "message": "このオプションを有効化した場合、エディタを直接起動させる代わりに任意のシェルスクリプトを実行させることができます。"
+  },
+  "optionsEditorShellDetail3": {
+    "message": "エディタを起動するシェルスクリプト（バッチファイル）を作成。"
+  },
+  "optionsEditorShellDetail4": {
+    "message": "「エディタのパス」欄にはエディタの代わりにシェルスクリプトのパスを入力。"
+  },
+  "optionsEditorShellDetail5": {
+    "message": "このオプションを有効化。"
+  },
   "optionsEditorShellLabel": {
     "message": "シェルでコマンドを実行"
   },
