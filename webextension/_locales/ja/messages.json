@@ -50,13 +50,13 @@
   "optionsEditorCmdPosLabel": {
     "message": "コマンドラインオプションの後にファイルパスを指定"
   },
-  "optionsEditorLabel.placeholder": {
+  "optionsEditorName.placeholder": {
     "message": "エディタの表示名を変更"
   },
-  "optionsEditorLabelDetail": {
+  "optionsEditorNameDetail": {
     "message": "エディタの表示名を入力してください。"
   },
-  "optionsEditorLabelLabel": {
+  "optionsEditorNameLabel": {
     "message": "エディタの表示名"
   },
   "optionsEditorPath.placeholder": {

@@ -50,13 +50,13 @@
   "optionsEditorCmdPosLabel": {
     "message": "Put File Path After Command Line Options"
   },
-  "optionsEditorLabel.placeholder": {
+  "optionsEditorName.placeholder": {
     "message": "Rename Editor Label"
   },
-  "optionsEditorLabelDetail": {
+  "optionsEditorNameDetail": {
     "message": "Enter the label of the editor."
   },
-  "optionsEditorLabelLabel": {
+  "optionsEditorNameLabel": {
     "message": "Editor Label"
   },
   "optionsEditorPath.placeholder": {
