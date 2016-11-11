@@ -56,6 +56,9 @@
   "optionsEditorNameDetail": {
     "message": "エディタの表示名を入力してください。"
   },
+  "optionsEditorNameDetail2": {
+    "message": "エディタが選択されてない場合は無効となります。"
+  },
   "optionsEditorNameLabel": {
     "message": "エディタの表示名"
   },

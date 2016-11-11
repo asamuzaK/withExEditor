@@ -42,7 +42,17 @@
       ) : (
         editorName.value = "",
         editorName.disabled = true
-      )
+      ),
+      storage.set({
+        editorName: {
+          id: "editorName",
+          value: name && isString(name) && name || "",
+          checked: null,
+          data: {
+            executable: null
+          }
+        }
+      })
     );
   };
 
