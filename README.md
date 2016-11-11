@@ -28,41 +28,44 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 
 ***
 
-## Options In Add-on Manager
+## Options
 
-### Select An Editor
-* Select the editor which you want to use.
-Or, you can enter the editor path directly in the input field below.
-* When selecting an editor on Mac OS X, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
+### Toolbar Button Icon
+* Choose the icon.
+
+### Editor Path
+* Enter the editor path.
+* When selecting an editor on Mac OS, pick the file under '/Applications/[yourEditor].app/Contents/MacOS/' directory.
+
+### Editor Label
+* Enter the label of the editor.
+* Disabled if editor is not selected.
 
 ### Command Line Options
 * Command line options of the editor.
-* When using backslash (`\`) character, it must be escaped with an extra backslash.
-ex: `C:\\Windows`
-* If argument contains space(s), quote them with the double quotation mark (`"`).
-ex: `"Some Arg"`
+* When using backslash (\) character, it must be escaped with an extra backslash. ex: C:\\Windows
+* If argument contains space(s), quote them with the double quotation mark ("). ex: "Some Arg"
 
 ### Put File Path After Command Line Options
-* Some editor requires the file path to be put after the command arguments.
-Enable this option in that case.
+* Some editor requires the file path to be put after the command arguments. Enable this option in that case.
 
 ### Run Command In A Shell
 * Spawns a shell and runs a command within that shell.
 * If this option is enabled, you can run a shell script instead of executing the editor directly.
   1. Create a shell script (batch file) which executes the editor.
-  2. In `Select An Editor` option, pick that shell script instead of the editor.
+  2. In the 'Editor Path' field, enter the shell script path instead of the editor.
   3. Enable this option.
 
 ### Access Key
-* Access key commonly used for the context menu, the shortcut for toolbar button options panel, and the shortcut for executing the editor directly.
+* Access key commonly used for the context menu, the shortcut for opening options from the toolbar button, and the shortcut for executing the editor directly.
 * Choose any key, but it must be a single character.
-* In the context menu, press `key` itself.
+* In the context menu, press 'key' itself.
 
-### Enable Shortcut Key To Open / Close The Options Panel
-* To open / close the panel from the toolbar button, press `Ctrl + Alt + key` (`Cmd + Opt + key` on Mac).
+### Enable Shortcut Key To Open The Options
+* To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac).
 
 ### Enable Shortcut Key To Execute The Editor Directly
-* To execute the editor without going through the context menu, press `Ctrl + Shift + key` (`Cmd + Shift + key` on Mac).
+* To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac).
 
 ### Enable During Private Browsing
 * Enables if checked, disables if not.
@@ -73,14 +76,6 @@ Enable this option in that case.
 ### Forcibly Remove The Temporary Files
 * The temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
 * It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option.
-
-### Other Options
-* You can customize the other options from the options panel.
-
-***
-
-## Options In Toolbar Button
-* You can choose the icon color, you can rename the label of the editor, and you can open Add-on Manager from here.
 
 ***
 

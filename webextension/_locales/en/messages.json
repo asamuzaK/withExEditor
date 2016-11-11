@@ -56,6 +56,9 @@
   "optionsEditorNameDetail": {
     "message": "Enter the label of the editor."
   },
+  "optionsEditorNameDetail2": {
+    "message": "Disabled if editor is not selected."
+  },
   "optionsEditorNameLabel": {
     "message": "Editor Label"
   },
