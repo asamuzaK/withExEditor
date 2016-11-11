@@ -78,17 +78,16 @@
   const createPrefObj = async elm => {
     let pref = null;
     if (elm && elm.id) {
+      const bool = editorPath && elm === editorPath &&
+                     await checkExecutable(elm.value) || false;
       pref = {};
       pref[elm.id] = {
         id: elm.id,
         value: elm.value || "",
-        checked: elm.type === "checkbox" || elm.type === "radio" ?
-                   !!elm.checked :
-                   null,
+        checked: (elm.type === "checkbox" || elm.type === "radio") &&
+                 !!elm.checked || false,
         data: {
-          executable: editorPath && elm === editorPath ?
-                        await !!checkExecutable(elm.value) :
-                        null
+          executable: bool
         }
       };
     }
@@ -108,17 +107,7 @@
         const inputs = document.querySelectorAll(`[name=${elm.name}]`);
         for (let input of inputs) {
           pref = await createPrefObj(input);
-          pref && (
-            storage.set(pref),
-            pref.checked && storage.set({
-              icon: {
-                id: pref.id,
-                value: pref.value,
-                checked: pref.checked,
-                data: pref.data
-              }
-            })
-          );
+          pref && storage.set(pref);
         }
       }
       else {
@@ -147,7 +136,7 @@
             case "text":
               elm.value = isString(key.value) && key.value || "";
               editorPath && elm === editorPath && elm.value &&
-              !!key.data.executable && (
+              key.data.executable && (
                 elm.dataset.executable = "true",
                 editorName && (editorName.disabled = false)
               );
