@@ -91,7 +91,7 @@
         id: elm.id,
         value: elm.value || "",
         checked: (elm.type === "checkbox" || elm.type === "radio") &&
-                 !!elm.checked || false,
+                   !!elm.checked || false,
         data: {
           executable: bool
         }
@@ -110,10 +110,12 @@
     if (elm) {
       let pref;
       if (elm.type === "radio") {
-        const inputs = document.querySelectorAll(`[name=${elm.name}]`);
-        for (let input of inputs) {
-          pref = await createPrefObj(input);
-          pref && storage.set(pref);
+        const nodes = document.querySelectorAll(`[name=${elm.name}]`);
+        if (nodes instanceof NodeList) {
+          for (let node of nodes) {
+            pref = await createPrefObj(node);
+            pref && storage.set(pref);
+          }
         }
       }
       else {
@@ -124,30 +126,14 @@
   };
 
   /**
-   * set value / checked from storage
+   * add event listener to input elements
    * @return {void}
    */
-  const setValuesFromStorage = async () => {
-    const pref = await storage.get() || {};
-    for (let key in pref) {
-      key = pref[key];
-      let elm;
-      if (key.id && (elm = document.getElementById(key.id))) {
-        switch (elm.type) {
-          case "checkbox":
-          case "radio":
-            elm.checked = !!key.checked;
-            break;
-          case "text":
-            elm.value = isString(key.value) && key.value || "";
-            editorPath && elm === editorPath && elm.value &&
-            key.data.executable && (
-              elm.dataset.executable = "true",
-              editorName && (editorName.disabled = false)
-            );
-            break;
-          default:
-        }
+  const addInputChangeListener = async () => {
+    const nodes = document.querySelectorAll("input");
+    if (nodes instanceof NodeList) {
+      for (let node of nodes) {
+        node.addEventListener("change", setPrefStorage, false);
       }
     }
   };
@@ -204,18 +190,53 @@
    */
   const localizeHtml = () => localizeHtmlLang().then(localizeElm);
 
-  window.addEventListener(
-    "DOMContentLoaded",
-    () => {
-      editorPath = document.getElementById(EDITOR_PATH);
-      editorName = document.getElementById(EDITOR_NAME);
-      return Promise.all([localizeHtml(), setValuesFromStorage()]).then(() => {
-        const inputs = document.querySelectorAll("input");
-        for (let input of inputs) {
-          input.addEventListener("change", setPrefStorage, false);
+  /**
+   * set value / checked from storage
+   * @return {void}
+   */
+  const setValuesFromStorage = async () => {
+    const pref = await storage.get() || {};
+    for (let key in pref) {
+      const elm = (key = pref[key]) && key.id &&
+                    document.getElementById(key.id);
+      if (elm) {
+        switch (elm.type) {
+          case "checkbox":
+          case "radio":
+            elm.checked = !!key.checked;
+            break;
+          case "text":
+            elm.value = isString(key.value) && key.value || "";
+            editorPath && elm === editorPath && elm.value &&
+            key.data.executable && (
+              elm.dataset.executable = "true",
+              editorName && (editorName.disabled = false)
+            );
+            break;
+          default:
         }
-      }).catch(logError);
-    },
-    false
-  );
+      }
+    }
+  };
+
+  /**
+   * set variables value
+   * @return {void}
+   */
+  const setVariables = async () => {
+    editorPath = document.getElementById(EDITOR_PATH);
+    editorName = document.getElementById(EDITOR_NAME);
+  };
+
+  /**
+   * start up
+   * @return {Object} - Promise
+   */
+  const startUp = () => Promise.all([
+    localizeHtml(),
+    setVariables().then(setValuesFromStorage),
+    addInputChangeListener()
+  ]).catch(logError);
+
+  window.addEventListener("DOMContentLoaded", startUp, false);
 }
