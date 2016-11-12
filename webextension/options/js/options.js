@@ -3,12 +3,18 @@
  */
 "use strict";
 {
-  /* shortcuts */
-  const i18n = browser.i18n;
-  const storage = browser.storage.local;
+  /* constants */
+  const EDITOR_PATH = "editorPath";
+  const EDITOR_NAME = "editorName";
+  const ELEMENT_NODE = 1;
 
   /* variables */
   let editorPath, editorName;
+
+  /* shortcuts */
+  const i18n = browser.i18n;
+  const runtime = browser.runtime;
+  const storage = browser.storage.local;
 
   /* error handling */
   /**
@@ -45,11 +51,11 @@
       ),
       storage.set({
         editorName: {
-          id: "editorName",
+          id: EDITOR_NAME,
           value: name && isString(name) && name || "",
-          checked: null,
+          checked: false,
           data: {
-            executable: null
+            executable: false
           }
         }
       })
@@ -122,27 +128,25 @@
    * @return {void}
    */
   const setValuesFromStorage = async () => {
-    const pref = await storage.get(null);
-    if (pref) {
-      for (let key in pref) {
-        key = pref[key];
-        let elm;
-        if (key.id && (elm = document.getElementById(key.id))) {
-          switch (elm.type) {
-            case "checkbox":
-            case "radio":
-              elm.checked = !!key.checked;
-              break;
-            case "text":
-              elm.value = isString(key.value) && key.value || "";
-              editorPath && elm === editorPath && elm.value &&
-              key.data.executable && (
-                elm.dataset.executable = "true",
-                editorName && (editorName.disabled = false)
-              );
-              break;
-            default:
-          }
+    const pref = await storage.get() || {};
+    for (let key in pref) {
+      key = pref[key];
+      let elm;
+      if (key.id && (elm = document.getElementById(key.id))) {
+        switch (elm.type) {
+          case "checkbox":
+          case "radio":
+            elm.checked = !!key.checked;
+            break;
+          case "text":
+            elm.value = isString(key.value) && key.value || "";
+            editorPath && elm === editorPath && elm.value &&
+            key.data.executable && (
+              elm.dataset.executable = "true",
+              editorName && (editorName.disabled = false)
+            );
+            break;
+          default:
         }
       }
     }
@@ -154,7 +158,7 @@
    * @return {void}
    */
   const localizeAttr = async elm => {
-    if (elm && elm.hasAttributes()) {
+    if (elm && elm.nodeType === ELEMENT_NODE && elm.hasAttributes()) {
       const attrs = {
         ariaLabel: "aria-label",
         alt: "alt",
@@ -176,10 +180,12 @@
    */
   const localizeElm = async () => {
     const nodes = document.querySelectorAll("[data-i18n]");
-    for (let node of nodes) {
-      const data = await i18n.getMessage(node.dataset.i18n);
-      data && (node.textContent = data);
-      node.hasAttributes() && localizeAttr(node);
+    if (nodes instanceof NodeList) {
+      for (let node of nodes) {
+        const data = await i18n.getMessage(node.dataset.i18n);
+        data && (node.textContent = data);
+        node.hasAttributes() && localizeAttr(node);
+      }
     }
   };
 
@@ -201,8 +207,8 @@
   window.addEventListener(
     "DOMContentLoaded",
     () => {
-      editorPath = document.getElementById("editorPath");
-      editorName = document.getElementById("editorName");
+      editorPath = document.getElementById(EDITOR_PATH);
+      editorName = document.getElementById(EDITOR_NAME);
       return Promise.all([localizeHtml(), setValuesFromStorage()]).then(() => {
         const inputs = document.querySelectorAll("input");
         for (let input of inputs) {
