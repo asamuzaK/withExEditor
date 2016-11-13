@@ -61,7 +61,7 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 * Choose any key, but it must be a single character.
 * In the context menu, press 'key' itself.
 
-### Enable Shortcut Key To Open The Options
+### Enable Shortcut Key To Open The Options Page
 * To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac).
 
 ### Enable Shortcut Key To Execute The Editor Directly

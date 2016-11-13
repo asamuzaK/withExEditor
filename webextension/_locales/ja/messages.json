@@ -141,7 +141,7 @@
     "message": "設定ページを開くには「Ctrl + Alt + キー」（Macは「Cmd + Opt + キー」）を押してください。"
   },
   "optionsOptionsShortCutLabel": {
-    "message": "設定を開くショートカットキーを有効化"
+    "message": "設定ページを開くショートカットキーを有効化"
   },
   "optionsOtherSettings": {
     "message": "その他"
