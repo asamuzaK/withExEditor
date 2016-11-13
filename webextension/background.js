@@ -34,6 +34,9 @@
     return false;
   };
 
+  /* connect to SDK */
+  //const port = runtime.connect({name: PORT_BACKGROUND});
+
   /**
    * toggle button badge
    * @param {boolean} bool - boolean
@@ -62,16 +65,6 @@
   }).then(toggleButtonBadge).catch(logError);
 
   /**
-   * open options page
-   * @return {void}
-   */
-  const openOptionsPage = () => {
-    runtime.openOptionsPage();
-  };
-
-  browserAction.onClicked.addListener(openOptionsPage);
-
-  /**
    * replace icon
    * @param {Object} data - icon data
    * @return {void}
@@ -93,6 +86,16 @@
       }
     }
   }).catch(logError);
+
+  /**
+   * open options page
+   * @return {void}
+   */
+  const openOptionsPage = () => {
+    runtime.openOptionsPage();
+  };
+
+  browserAction.onClicked.addListener(openOptionsPage);
 
   /* ports collection */
   const ports = {};
@@ -187,8 +190,4 @@
     ports[port.name] = port;
     port.onMessage.addListener(handleMsg);
   });
-
-  /* connect to SDK */
-  //const port = runtime.connect({name: PORT_BACKGROUND});
-
 }
