@@ -7,6 +7,7 @@
   const EDITOR_PATH = "editorPath";
   const EDITOR_NAME = "editorName";
   const ELEMENT_NODE = 1;
+  const PORT_OPTIONS = "portOptions";
 
   /* variables */
   let editorPath, editorName;
@@ -62,19 +63,23 @@
     );
   };
 
-  /**
-   * check given path is executable (FAKE NOW)
-   * @param {string} path - path
-   * @return {boolean}
-   */
-  const checkExecutable = async path => {
-    const app = {
-      executable: isString(path) && !!path,
-      name: isString(path) && path.replace(/\..*$/, "") || ""
-    };
-    synchronizeEditorName(app.name);
-    return app.executable;
-  };
+  /* connect to SDK */
+  const port = runtime.connect({name: PORT_OPTIONS});
+
+  port.onMessage.addListener(res => {
+    const bool = res && res.executable;
+    storage.set({
+      editorPath: {
+        id: EDITOR_PATH,
+        value: editorPath.value,
+        checked: false,
+        data: {
+          executable: bool || false
+        }
+      }
+    });
+    synchronizeEditorName(bool && res.name || "");
+  });
 
   /**
    * create pref object
@@ -84,8 +89,6 @@
   const createPrefObj = async elm => {
     let pref = null;
     if (elm && elm.id) {
-      const bool = editorPath && elm === editorPath &&
-                     await checkExecutable(elm.value) || false;
       pref = {};
       pref[elm.id] = {
         id: elm.id,
@@ -93,7 +96,7 @@
         checked: (elm.type === "checkbox" || elm.type === "radio") &&
                    !!elm.checked || false,
         data: {
-          executable: bool
+          executable: false
         }
       };
     }
@@ -119,8 +122,15 @@
         }
       }
       else {
-        pref = await createPrefObj(elm);
-        pref && storage.set(pref);
+        editorPath && elm === editorPath ?
+          port.postMessage({
+            checkExecutable: {
+              path: elm.value
+            }
+          }) : (
+            pref = await createPrefObj(elm),
+            pref && storage.set(pref)
+          );
       }
     }
   };

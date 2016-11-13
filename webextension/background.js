@@ -4,6 +4,18 @@
 "use strict";
 {
   /* constants */
+  const ACCESS_KEY = "accessKey";
+  const EDITOR_PATH = "editorPath";
+//  const EDITOR_NAME = "editorName";
+  const EXEC_EDITOR_KEY = "editorShortcut";
+  const KEY_COMBO = "keyCombo";
+  const ICON_COLOR = "buttonIcon";
+  const ICON_GRAY = "buttonIconGray";
+  const ICON_WHITE = "buttonIconWhite";
+  const OPEN_OPTIONS = "openOptions";
+  const OPEN_OPTIONS_KEY = "optionsShortCut";
+//  const PORT_BACKGROUND = "portBackground";
+  const PORT_KBD = "portKbdEvent";
   const WARN_MARK = "!";
   const WARN_COLOR = "#C13832";
 
@@ -34,13 +46,16 @@
     browserAction.setBadgeBackgroundColor({color});
   };
 
-  storage.get("editorPath").then(res => {
+  storage.get(EDITOR_PATH).then(res => {
     const items = Object.keys(res);
     let bool = false;
-    for (let item of items) {
-      if (item === "editorPath") {
-        bool = items[item].data && items[item].data.executable || false;
-        break;
+    if (items.length > 0) {
+      for (let item of items) {
+        item = res[item];
+        if (item.id === EDITOR_PATH) {
+          bool = item.data && item.data.executable || false;
+          break;
+        }
       }
     }
     return bool;
@@ -50,11 +65,11 @@
    * open options page
    * @return {void}
    */
-  const openOptions = () => {
+  const openOptionsPage = () => {
     runtime.openOptionsPage();
   };
 
-  browserAction.onClicked.addListener(openOptions);
+  browserAction.onClicked.addListener(openOptionsPage);
 
   /**
    * replace icon
@@ -66,6 +81,53 @@
       browserAction.setIcon({path: data.value});
   };
 
+  storage.get([ICON_COLOR, ICON_GRAY, ICON_WHITE]).then(res => {
+    const items = Object.keys(res);
+    if (items.length > 0) {
+      for (let item of items) {
+        item = res[item];
+        if (item.checked) {
+          replaceIcon(item);
+          break;
+        }
+      }
+    }
+  }).catch(logError);
+
+  /* ports collection */
+  const ports = {};
+
+  /**
+   * create key combination
+   * @return {void}
+   */
+  const createKeyCombo = async () => {
+    const key = await storage.get(ACCESS_KEY).then(res => {
+      const value = (res = res[ACCESS_KEY]) && res.value ?
+                      res.value :
+                      "e";
+      return value;
+    });
+    const openOptions = await storage.get(OPEN_OPTIONS_KEY).then(res => {
+      const value = (res = res[OPEN_OPTIONS_KEY]) ?
+                      res :
+                      true;
+      return value;
+    });
+    const execEditor = await storage.get(EXEC_EDITOR_KEY).then(res => {
+      const value = (res = res[EXEC_EDITOR_KEY]) ?
+              res :
+              true;
+      return value;
+    });
+    console.log(`post message to ${ports[PORT_KBD].name}`);
+    ports[PORT_KBD] && ports[PORT_KBD].postMessage({
+      keyCombo: {
+        key, openOptions, execEditor
+      }
+    });
+  };
+
   /**
    * handle storage changes
    * @param {Object} data - StorageChange
@@ -74,15 +136,20 @@
   const storageChange = async data => {
     const items = Object.keys(data);
     for (let item of items) {
-      switch (item) {
-        case "buttonIcon":
-        case "buttonIconGray":
-        case "buttonIconWhite":
-          data[item].newValue.checked && replaceIcon(data[item].newValue);
+      item = data[item].newValue;
+      switch (item.id) {
+        case ICON_COLOR:
+        case ICON_GRAY:
+        case ICON_WHITE:
+          item.checked && replaceIcon(item);
           break;
-        case "editorPath":
-          data[item].newValue.data &&
-            toggleButtonBadge(data[item].newValue.data.executable);
+        case EDITOR_PATH:
+          item.data && toggleButtonBadge(item.data.executable);
+          break;
+        case ACCESS_KEY:
+        case EXEC_EDITOR_KEY:
+        case OPEN_OPTIONS_KEY:
+          createKeyCombo();
           break;
         default:
       }
@@ -90,4 +157,38 @@
   };
 
   browser.storage.onChanged.addListener(storageChange);
+
+  /**
+   * handle runtime message
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const handleMsg = async msg => {
+    const items = Object.keys(msg);
+    if (items.length > 0) {
+      for (let item of items) {
+        switch (item) {
+          case KEY_COMBO:
+            createKeyCombo();
+            break;
+          case OPEN_OPTIONS:
+            msg[item] && openOptionsPage();
+            break;
+          default:
+        }
+      }
+    }
+  };
+
+  runtime.onMessage.addListener(handleMsg);
+
+  runtime.onConnect.addListener(port => {
+    console.log(`port connected: ${port.name}`);
+    ports[port.name] = port;
+    port.onMessage.addListener(handleMsg);
+  });
+
+  /* connect to SDK */
+  //const port = runtime.connect({name: PORT_BACKGROUND});
+
 }

@@ -6,7 +6,7 @@
     }
   },
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background.js", "./dummy_sdk/sdk.js"]
   },
   "browser_action": {
     "browser_style": false,
@@ -19,8 +19,8 @@
     {
       "all_frames": false,
       "matches": ["<all_urls>"],
-      "js": ["./js/getSource.js"],
-      "run_at": "document_end"
+      "js": ["./js/getSource.js", "./js/kbdEvent.js"],
+      "run_at": "document_start"
     }
   ],
   "default_locale": "en",
