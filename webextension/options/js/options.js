@@ -80,8 +80,7 @@
       pref[elm.id] = {
         id: elm.id,
         value: elm.value || "",
-        checked: (elm.type === "checkbox" || elm.type === "radio") &&
-                   !!elm.checked || false,
+        checked: !!elm.checked,
         data: {
           executable: false
         }
@@ -231,14 +230,14 @@
     if (items.length === 1) {
       const item = items[0] === RES_EXECUTABLE && msg[items[0]];
       if (item) {
-        const bool = item.executable;
+        const bool = !!item.executable;
         storage.set({
           editorPath: {
             id: EDITOR_PATH,
-            value: editorPath.value,
+            value: bool && item.value || "",
             checked: false,
             data: {
-              executable: bool || false
+              executable: bool
             }
           }
         });

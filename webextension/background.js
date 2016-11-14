@@ -176,6 +176,17 @@
   };
 
   /**
+   * port SDK prefs
+   * @param {Object} msg - message
+   * @return {void}
+   */
+  const portSdkPrefs = async msg => {
+    const setSdkPrefs = msg;
+    console.log(setSdkPrefs);
+    setSdkPrefs && port.postMessage({setSdkPrefs});
+  };
+
+  /**
    * handle storage changes
    * @param {Object} data - StorageChange
    * @return {void}
@@ -183,20 +194,71 @@
   const storageChange = async data => {
     const items = Object.keys(data);
     for (let item of items) {
-      item = data[item].newValue;
-      switch (item.id) {
+      const obj = data[item].newValue;
+      switch (item) {
         case ICON_COLOR:
         case ICON_GRAY:
         case ICON_WHITE:
-          item.checked && replaceIcon(item.value);
+          obj.checked && replaceIcon(obj.value);
           break;
         case EDITOR_PATH:
-          item.data && toggleBadge(item.data.executable);
+          obj.data && toggleBadge(obj.data.executable);
+          portSdkPrefs({
+            editorPath: obj.value
+          });
+          break;
+        case EDITOR_NAME:
+          portSdkPrefs({
+            editorName: obj.value
+          });
+          break;
+        case CMD_ARGS:
+          portSdkPrefs({
+            editorCmdArgs: obj.value
+          });
+          break;
+        case CMD_POSITION:
+          portSdkPrefs({
+            editorCmdPos: obj.checked
+          });
+          break;
+        case SPAWN_SHELL:
+          portSdkPrefs({
+            editorShell: obj.checked
+          });
           break;
         case KEY_ACCESS:
+          portKeyCombo();
+          portSdkPrefs({
+            accessKey: obj.value
+          });
+          break;
         case KEY_OPEN_OPTIONS:
+          portKeyCombo();
+          portSdkPrefs({
+            optionsShortCut: obj.checked
+          });
+          break;
         case KEY_EXEC_EDITOR:
           portKeyCombo();
+          portSdkPrefs({
+            editorShortCut: obj.checked
+          });
+          break;
+        case ENABLE_PB:
+          portSdkPrefs({
+            enablePB: obj.checked
+          });
+          break;
+        case EDITABLE_CONTEXT:
+          portSdkPrefs({
+            editableContext: obj.checked
+          });
+          break;
+        case FORCE_REMOVE:
+          portSdkPrefs({
+            forceRemove: obj.checked
+          });
           break;
         default:
       }
@@ -211,17 +273,82 @@
   const setVariablesFromStorage = async res => {
     const items = Object.keys(res);
     if (items.length > 0) {
-      for (let item of items) {
-        switch (item) {
-          default:
-            console.log(item);
-        }
-      }
+      port.postMessage({
+        setSdkPrefs: res
+      });
     }
     else {
       port.postMessage({
         getSdkPrefs: res
       });
+    }
+  };
+
+  /**
+   * set pref storage
+   * @param {Object} pref - pref
+   * @return {void}
+   */
+  const setPrefStorage = async pref => {
+    pref && storage.set(pref);
+  };
+
+  /**
+   * create pref object
+   * @param {Object} item - item
+   * @param {string|boolean} value - value
+   * @return {Object}
+   */
+  const createPrefObj = async (item, value) => {
+    let pref = null;
+    switch (item) {
+      case EDITOR_PATH:
+      case EDITOR_NAME:
+      case CMD_ARGS:
+      case KEY_ACCESS:
+        pref = {};
+        pref[item] = {
+          id: item,
+          value: value || "",
+          checked: false,
+          data: {
+            executable: value && item === EDITOR_PATH || false
+          }
+        };
+        break;
+      case CMD_POSITION:
+      case SPAWN_SHELL:
+      case KEY_OPEN_OPTIONS:
+      case KEY_EXEC_EDITOR:
+      case ENABLE_PB:
+      case EDITABLE_CONTEXT:
+      case FORCE_REMOVE:
+        pref = {};
+        pref[item] = {
+          id: item,
+          value: "",
+          checked: !!value,
+          data: {
+            executable: false
+          }
+        };
+        break;
+      default:
+    }
+    return pref;
+  };
+
+  /**
+   * set SDK prefs to storage
+   * @param {Object} res - result
+   * @return {void}
+   */
+  const setSdkPrefsToStorage = async res => {
+    const items = Object.keys(res);
+    if (items.length > 0) {
+      for (let item of items) {
+        createPrefObj(item, res[item]).then(setPrefStorage).catch(logError);
+      }
     }
   };
 
@@ -245,7 +372,7 @@
             obj && openOptionsPage();
             break;
           case RES_SDK_PREFS:
-            setVariablesFromStorage(obj);
+            setSdkPrefsToStorage(obj);
             break;
           case TOGGLE_ENABLED:
             toggleIcon(obj);
