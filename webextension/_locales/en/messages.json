@@ -151,5 +151,8 @@
   },
   "optionsToolbarIconLabel": {
     "message": "Toolbar Button Icon"
+  },
+  "warnEditorNotSelected": {
+    "message": "Editor is not selected."
   }
 }

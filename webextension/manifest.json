@@ -6,7 +6,7 @@
     }
   },
   "background": {
-    "scripts": ["background.js", "./dummy_sdk/sdk.js"]
+    "scripts": ["background.js"]
   },
   "browser_action": {
     "browser_style": false,

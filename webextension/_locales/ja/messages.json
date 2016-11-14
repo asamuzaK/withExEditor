@@ -151,5 +151,8 @@
   },
   "optionsToolbarIconLabel": {
     "message": "ツールバーボタンアイコン"
+  },
+  "warnEditorNotSelected": {
+    "message": "エディタが選択されていません。"
   }
 }

@@ -4,10 +4,12 @@
 "use strict";
 {
   /* constants */
+  const ATTR_I18N = "data-i18n";
   const EDITOR_PATH = "editorPath";
   const EDITOR_NAME = "editorName";
   const ELEMENT_NODE = 1;
   const PORT_OPTIONS = "portOptions";
+  const RESULT_EXECUTABLE = "resultExecutable";
 
   /* variables */
   let editorPath, editorName;
@@ -36,6 +38,9 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
+  /* connect to SDK */
+  const port = runtime.connect({name: PORT_OPTIONS});
+
   /**
    * synchronize editorName value
    * @param {string} name - editor name
@@ -62,24 +67,6 @@
       })
     );
   };
-
-  /* connect to SDK */
-  const port = runtime.connect({name: PORT_OPTIONS});
-
-  port.onMessage.addListener(res => {
-    const bool = res && res.executable;
-    storage.set({
-      editorPath: {
-        id: EDITOR_PATH,
-        value: editorPath.value,
-        checked: false,
-        data: {
-          executable: bool || false
-        }
-      }
-    });
-    synchronizeEditorName(bool && res.name || "");
-  });
 
   /**
    * create pref object
@@ -163,7 +150,9 @@
       };
       for (let attr in attrs) {
         if (elm.hasAttribute(attrs[attr])) {
-          const data = await i18n.getMessage(`${elm.dataset.i18n}.${attr}`);
+          const data = await i18n.getMessage(
+                               `${elm.getAttribute(ATTR_I18N)}.${attr}`
+                             );
           data && elm.setAttribute(attrs[attr], data);
         }
       }
@@ -175,10 +164,10 @@
    * @return {void}
    */
   const localizeElm = async () => {
-    const nodes = document.querySelectorAll("[data-i18n]");
+    const nodes = document.querySelectorAll(`[${ATTR_I18N}]`);
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        const data = await i18n.getMessage(node.dataset.i18n);
+        const data = await i18n.getMessage(node.getAttribute(ATTR_I18N));
         data && (node.textContent = data);
         node.hasAttributes() && localizeAttr(node);
       }
@@ -193,12 +182,6 @@
     const lang = await browser.i18n.getUILanguage();
     lang && document.documentElement.setAttribute("lang", lang);
   };
-
-  /**
-   * localize html
-   * @return {Object} - Promise
-   */
-  const localizeHtml = () => localizeHtmlLang().then(localizeElm);
 
   /**
    * set value / checked from storage
@@ -239,14 +222,43 @@
   };
 
   /**
-   * start up
+   * handleMsg
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const handleMsg = async msg => {
+    const items = Object.keys(msg);
+    if (items.length > 0) {
+      for (let item of items) {
+        if (item === RESULT_EXECUTABLE) {
+          const bool = msg[item].executable;
+          storage.set({
+            editorPath: {
+              id: EDITOR_PATH,
+              value: editorPath.value,
+              checked: false,
+              data: {
+                executable: bool || false
+              }
+            }
+          });
+          synchronizeEditorName(bool && msg[item].name || "");
+          break;
+        }
+      }
+    }
+  };
+
+  /**
+   * startup
    * @return {Object} - Promise
    */
   const startUp = () => Promise.all([
-    localizeHtml(),
+    localizeHtmlLang().then(localizeElm),
     setVariables().then(setValuesFromStorage),
     addInputChangeListener()
   ]).catch(logError);
 
+  port.onMessage.addListener(handleMsg);
   window.addEventListener("DOMContentLoaded", startUp, false);
 }

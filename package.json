@@ -17,8 +17,9 @@
   "engines": {
     "firefox": ">=52.0a1 <=*"
   },
+  "hasEmbeddedWebExtension": true,
   "icon": "icon.png",
-  "main": "lib/main.js",
+  "main": "lib/main_hybrid.js",
   "license": "MPL 2.0",
   "version": "1.9.0"
 }
