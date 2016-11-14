@@ -222,29 +222,27 @@
   };
 
   /**
-   * handleMsg
+   * handle message
    * @param {*} msg - message
    * @return {void}
    */
   const handleMsg = async msg => {
     const items = Object.keys(msg);
-    if (items.length > 0) {
-      for (let item of items) {
-        if (item === RES_EXECUTABLE) {
-          const bool = msg[item].executable;
-          storage.set({
-            editorPath: {
-              id: EDITOR_PATH,
-              value: editorPath.value,
-              checked: false,
-              data: {
-                executable: bool || false
-              }
+    if (items.length === 1) {
+      const item = items[0] === RES_EXECUTABLE && msg[items[0]];
+      if (item) {
+        const bool = item.executable;
+        storage.set({
+          editorPath: {
+            id: EDITOR_PATH,
+            value: editorPath.value,
+            checked: false,
+            data: {
+              executable: bool || false
             }
-          });
-          synchronizeEditorName(bool && msg[item].name || "");
-          break;
-        }
+          }
+        });
+        synchronizeEditorName(bool && item.name || "");
       }
     }
   };
