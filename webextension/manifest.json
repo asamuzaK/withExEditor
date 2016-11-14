@@ -19,7 +19,7 @@
     {
       "all_frames": false,
       "matches": ["<all_urls>"],
-      "js": ["./js/getSource.js", "./js/kbdEvent.js"],
+      "js": ["./js/content.js"],
       "run_at": "document_start"
     }
   ],
@@ -45,5 +45,5 @@
     "tabs",
     "webRequest"
   ],
-  "version": "2.0.0a1"
+  "version": "2.0.0"
 }

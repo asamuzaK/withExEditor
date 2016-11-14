@@ -14,15 +14,11 @@
   const WARN_EDITOR = "warnEditorNotSelected";
 
   const PORT_BACKGROUND = "portBackground";
-  const PORT_KBD = "portKbdEvent";
+  const PORT_CONTENT = "portContent";
   const KEY_COMBO = "keyCombo";
   const OPEN_OPTIONS = "openOptions";
   const TOGGLE_ENABLED = "toggleEnabled";
-
-  const SDK_PREFS_GET = "getSdkPrefs";
-  const SDK_PREFS_RES = "resSdkPrefs";
-  const SDK_PREFS_SET = "setSdkPrefs";
-  const CHECK_EXECUTABLE = "checkExecutable";
+  const RES_SDK_PREFS = "resSdkPrefs";
 
   const EDITOR_PATH = "editorPath";
   const EDITOR_NAME = "editorName";
@@ -176,7 +172,7 @@
       return value;
     });
     const keyCombo = {key, openOptions, execEditor};
-    ports[PORT_KBD] && ports[PORT_KBD].postMessage({keyCombo});
+    ports[PORT_CONTENT] && ports[PORT_CONTENT].postMessage({keyCombo});
   };
 
   /**
@@ -248,11 +244,11 @@
           case OPEN_OPTIONS:
             obj && openOptionsPage();
             break;
+          case RES_SDK_PREFS:
+            setVariablesFromStorage(obj);
+            break;
           case TOGGLE_ENABLED:
             toggleIcon(obj);
-            break;
-          case SDK_PREFS_RES:
-            setVariablesFromStorage(obj);
             break;
           default:
         }

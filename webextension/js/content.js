@@ -1,5 +1,5 @@
 /**
- * kbdEvent.js
+ * content.js
  */
 "use strict";
 {

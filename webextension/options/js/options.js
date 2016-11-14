@@ -9,7 +9,7 @@
   const EDITOR_NAME = "editorName";
   const ELEMENT_NODE = 1;
   const PORT_OPTIONS = "portOptions";
-  const RESULT_EXECUTABLE = "resultExecutable";
+  const RES_EXECUTABLE = "resExecutable";
 
   /* variables */
   let editorPath, editorName;
@@ -230,7 +230,7 @@
     const items = Object.keys(msg);
     if (items.length > 0) {
       for (let item of items) {
-        if (item === RESULT_EXECUTABLE) {
+        if (item === RES_EXECUTABLE) {
           const bool = msg[item].executable;
           storage.set({
             editorPath: {
