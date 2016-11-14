@@ -20,6 +20,7 @@
   const TOGGLE_ENABLED = "toggleEnabled";
 
   const SDK_PREFS_GET = "getSdkPrefs";
+  const SDK_PREFS_RES = "resSdkPrefs";
   const SDK_PREFS_SET = "setSdkPrefs";
   const CHECK_EXECUTABLE = "checkExecutable";
 
@@ -45,7 +46,7 @@
   const port = runtime.connect({name: PORT_BACKGROUND});
 
   /* variables */
-  let isEnabled = true;
+  let isEnabled = false;
 
   /**
    * log error
@@ -71,16 +72,16 @@
    * open options page
    * @return {void}
    */
-  const openOptionsPage = () => {
+  const openOptionsPage = async () => {
     isEnabled && runtime.openOptionsPage();
   };
 
   /**
-   * toggle button badge
-   * @param {boolean} bool - boolean
+   * toggle badge
+   * @param {boolean} bool - executable
    * @return {void}
    */
-  const toggleButtonBadge = async bool => {
+  const toggleBadge = async bool => {
     const text = !bool && WARN_MARK || "";
     const color = !bool && WARN_COLOR || "transparent";
     browserAction.setBadgeText({text});
@@ -92,7 +93,7 @@
    * check stored editor path is executable
    * @return {Object} - Promise
    */
-  const isEditorExecutable = () =>
+  const isExecutable = () =>
     storage.get(EDITOR_PATH).then(res => {
       const items = Object.keys(res);
       let bool = false;
@@ -142,8 +143,8 @@
    * @param {boolean} bool - enabled
    * @return {void}
    */
-  const toggleIcon = async bool => {
-    (isEnabled = bool) ?
+  const toggleIcon = async (bool = false) => {
+    (isEnabled = !!bool) ?
       getIconSelected().then(replaceIcon) :
       replaceIcon(`${ICON_PATH}#off`);
   };
@@ -174,11 +175,8 @@
                       true;
       return value;
     });
-    ports[PORT_KBD] && ports[PORT_KBD].postMessage({
-      keyCombo: {
-        key, openOptions, execEditor
-      }
-    });
+    const keyCombo = {key, openOptions, execEditor};
+    ports[PORT_KBD] && ports[PORT_KBD].postMessage({keyCombo});
   };
 
   /**
@@ -197,7 +195,7 @@
           item.checked && replaceIcon(item.value);
           break;
         case EDITOR_PATH:
-          item.data && toggleButtonBadge(item.data.executable);
+          item.data && toggleBadge(item.data.executable);
           break;
         case KEY_ACCESS:
         case KEY_OPEN_OPTIONS:
@@ -225,7 +223,9 @@
       }
     }
     else {
-      port.postMessage({getSdkPrefs: res});
+      port.postMessage({
+        getSdkPrefs: res
+      });
     }
   };
 
@@ -251,7 +251,7 @@
           case TOGGLE_ENABLED:
             toggleIcon(obj);
             break;
-          case SDK_PREFS_SET:
+          case SDK_PREFS_RES:
             setVariablesFromStorage(obj);
             break;
           default:
@@ -280,7 +280,7 @@
   /* startup */
   Promise.all([
     storage.get().then(setVariablesFromStorage),
-    isEditorExecutable().then(toggleButtonBadge),
-    getIconSelected().then(replaceIcon)
+    isExecutable().then(toggleBadge),
+    toggleIcon().then(replaceIcon)
   ]).catch(logError);
 }
