@@ -87,7 +87,7 @@
    * @param {Object} path - icon path
    * @return {void}
    */
-  const replaceIcon = async (path = ICON_PATH) => {
+  const replaceIcon = async (path = `${ICON_PATH}#gray`) => {
     browserAction.setIcon({path});
   };
 
@@ -170,7 +170,7 @@
         case ICON_WHITE:
           obj.checked && (
             iconPath = obj.value,
-            replaceIcon(obj.value)
+            replaceIcon(iconPath)
           );
           break;
         case EDITOR_PATH:
@@ -191,12 +191,12 @@
           break;
         case CMD_POSITION:
           portSdkPrefs({
-            editorCmdPos: obj.checked
+            editorCmdPos: !!obj.checked
           });
           break;
         case SPAWN_SHELL:
           portSdkPrefs({
-            editorShell: obj.checked
+            editorShell: !!obj.checked
           });
           break;
         case KEY_ACCESS:
@@ -211,23 +211,21 @@
         case KEY_EXEC_EDITOR:
           portKeyCombo();
           portSdkPrefs({
-            editorShortCut: obj.checked
+            editorShortCut: !!obj.checked
           });
           break;
         case ENABLE_PB:
-          enablePB = obj.checked;
-          portSdkPrefs({
-            enablePB: obj.checked
-          });
+          enablePB = !!obj.checked;
+          portSdkPrefs({enablePB});
           break;
         case EDITABLE_CONTEXT:
           portSdkPrefs({
-            editableContext: obj.checked
+            editableContext: !!obj.checked
           });
           break;
         case FORCE_REMOVE:
           portSdkPrefs({
-            forceRemove: obj.checked
+            forceRemove: !!obj.checked
           });
           break;
         default:
