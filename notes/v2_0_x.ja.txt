@@ -1,0 +1,12 @@
+v2.0.0
+新規ならびに更新内容
+<ul>
+<li>設定ページを新たに作成</li>
+<li>`Ctrl + Alt + キー`のショートカットは設定ページを開くよう変更</li>
+</ul>
+
+Code Refactoring
+<ul>
+<li>WebExtensionsを部分的に埋め込み</li>
+<li>async/awaitで関数を書き直し</li>
+</ul>

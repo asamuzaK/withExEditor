@@ -1,0 +1,12 @@
+v2.0.0
+New And Updated Features
+<ul>
+<li>New Options page</li>
+<li>`Ctrl + Alt + key` shortcut has changed to open Options page</li>
+</ul>
+
+Code Refactoring
+<ul>
+<li>Partially embed WebExtensions</li>
+<li>Rewrite functions with async/await</li>
+</ul>
