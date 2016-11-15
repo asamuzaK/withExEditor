@@ -10,7 +10,7 @@
   },
   "browser_action": {
     "browser_style": false,
-    "default_icon": "./img/icon.svg",
+    "default_icon": "./img/icon.svg#gray",
     "default_title": "withExEditor"
   },
   "commands": {

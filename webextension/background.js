@@ -5,7 +5,7 @@
 {
   /* constants */
   const LABEL = "withExEditor";
-  const ICON_PATH = "./img/icon.svg";
+  const ICON_PATH = "./img/icon.svg#gray";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
