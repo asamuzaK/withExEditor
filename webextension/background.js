@@ -123,19 +123,19 @@
    * @return {void}
    */
   const portKeyCombo = async () => {
-    const key = await storage.get(KEY_ACCESS, res => {
+    const key = await storage.get(KEY_ACCESS).then(res => {
       const value = (res = res[KEY_ACCESS]) && res.value ?
                       res.value :
                       "e";
       return value;
     });
-    const openOptions = await storage.get(KEY_OPEN_OPTIONS, res => {
+    const openOptions = await storage.get(KEY_OPEN_OPTIONS).then(res => {
       const value = (res = res[KEY_OPEN_OPTIONS]) ?
                       res :
                       true;
       return value;
     });
-    const execEditor = await storage.get(KEY_EXEC_EDITOR, res => {
+    const execEditor = await storage.get(KEY_EXEC_EDITOR).then(res => {
       const value = (res = res[KEY_EXEC_EDITOR]) ?
                       res :
                       true;
@@ -207,9 +207,6 @@
           break;
         case KEY_OPEN_OPTIONS:
           portKeyCombo();
-          portSdkPrefs({
-            optionsShortCut: obj.checked
-          });
           break;
         case KEY_EXEC_EDITOR:
           portKeyCombo();
