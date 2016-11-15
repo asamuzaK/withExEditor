@@ -5,13 +5,13 @@
 {
   /* constants */
   const KEY = "e";
-  const PORT_KBD = "portKbdEvent";
+  const PORT_CONTENT = "portContent";
 
   /* shortcut */
   const runtime = browser.runtime;
 
-  /* connect to background */
-  const port = runtime.connect({name: PORT_KBD});
+  /* port */
+  const port = runtime.connect({name: PORT_CONTENT});
 
   /**
    * is string
@@ -157,8 +157,14 @@
     }
   };
 
+  /* add listeners */
   port.onMessage.addListener(updateKeyCombo);
 
+  document.addEventListener("DOMContentLoaded", () => {
+    document.documentElement.addEventListener("keypress", portKeyCombo, false);
+  }, false);
+
+  /* startup */
   port.postMessage({
     keyCombo: {
       key: KEY,
@@ -166,8 +172,4 @@
       execEditor: execEditorKey.enabled
     }
   });
-
-  document.addEventListener("DOMContentLoaded", () => {
-    document.documentElement.addEventListener("keypress", portKeyCombo, false);
-  }, false);
 }

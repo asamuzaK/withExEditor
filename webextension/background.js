@@ -38,7 +38,7 @@
   const storage = browser.storage.local;
   const windows = browser.windows;
 
-  /* port to SDK */
+  /* port */
   const port = runtime.connect({name: PORT_BACKGROUND});
 
   /* variables */

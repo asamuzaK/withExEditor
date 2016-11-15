@@ -11,15 +11,17 @@
   const PORT_OPTIONS = "portOptions";
   const RES_EXECUTABLE = "resExecutable";
 
-  /* variables */
-  let editorPath, editorName;
-
   /* shortcuts */
   const i18n = browser.i18n;
   const runtime = browser.runtime;
   const storage = browser.storage.local;
 
-  /* error handling */
+  /* port */
+  const port = runtime.connect({name: PORT_OPTIONS});
+
+  /* variables */
+  let editorPath, editorName;
+
   /**
    * log error
    * @param {Object} e - Error
@@ -37,9 +39,6 @@
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
-
-  /* connect to SDK */
-  const port = runtime.connect({name: PORT_OPTIONS});
 
   /**
    * synchronize editorName value
@@ -183,7 +182,7 @@
   };
 
   /**
-   * set value / checked from storage
+   * set values from storage
    * @return {void}
    */
   const setValuesFromStorage = async () => {
@@ -246,6 +245,9 @@
     }
   };
 
+  /* add listener */
+  port.onMessage.addListener(handleMsg);
+
   /**
    * startup
    * @return {Object} - Promise
@@ -256,6 +258,5 @@
     addInputChangeListener()
   ]).catch(logError);
 
-  port.onMessage.addListener(handleMsg);
   window.addEventListener("DOMContentLoaded", startUp, false);
 }
