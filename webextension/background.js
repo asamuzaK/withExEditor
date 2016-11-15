@@ -42,7 +42,7 @@
   const port = runtime.connect({name: PORT_BACKGROUND});
 
   /* variables */
-  let isEnabled = false;
+  let isEnabled = false, iconPath = ICON_PATH;
 
   /**
    * log error
@@ -111,28 +111,9 @@
    * @return {void}
    */
   const replaceIcon = async (path = ICON_PATH) => {
+    iconPath = path;
     browserAction.setIcon({path});
   };
-
-  /**
-   * get selected icon from storage
-   * @return {Object} - Promise
-   */
-  const getIconSelected = () =>
-    storage.get([ICON_COLOR, ICON_GRAY, ICON_WHITE]).then(res => {
-      const items = Object.keys(res);
-      let path = ICON_PATH;
-      if (items.length > 0) {
-        for (let item of items) {
-          item = res[item];
-          if (item.checked) {
-            path = item.value;
-            break;
-          }
-        }
-      }
-      return path;
-    });
 
   /**
    * toggle icon
@@ -141,7 +122,7 @@
    */
   const toggleIcon = async (bool = false) => {
     (isEnabled = !!bool) ?
-      getIconSelected().then(replaceIcon) :
+      replaceIcon(iconPath) :
       replaceIcon(`${ICON_PATH}#off`);
   };
 
@@ -153,19 +134,19 @@
    * @return {void}
    */
   const portKeyCombo = async () => {
-    const key = await storage.get(KEY_ACCESS).then(res => {
+    const key = await storage.get(KEY_ACCESS, res => {
       const value = (res = res[KEY_ACCESS]) && res.value ?
                       res.value :
                       "e";
       return value;
     });
-    const openOptions = await storage.get(KEY_OPEN_OPTIONS).then(res => {
+    const openOptions = await storage.get(KEY_OPEN_OPTIONS, res => {
       const value = (res = res[KEY_OPEN_OPTIONS]) ?
                       res :
                       true;
       return value;
     });
-    const execEditor = await storage.get(KEY_EXEC_EDITOR).then(res => {
+    const execEditor = await storage.get(KEY_EXEC_EDITOR, res => {
       const value = (res = res[KEY_EXEC_EDITOR]) ?
                       res :
                       true;
@@ -182,7 +163,6 @@
    */
   const portSdkPrefs = async msg => {
     const setSdkPrefs = msg;
-    console.log(setSdkPrefs);
     setSdkPrefs && port.postMessage({setSdkPrefs});
   };
 
@@ -276,6 +256,24 @@
       port.postMessage({
         setSdkPrefs: res
       });
+      for (let item of items) {
+        const obj = res[item];
+        let bool = false;
+        switch (item) {
+          case ICON_COLOR:
+          case ICON_GRAY:
+          case ICON_WHITE:
+            obj.checked && (
+              bool = true,
+              replaceIcon(obj.value)
+            );
+            break;
+          default:
+        }
+        if (bool) {
+          break;
+        }
+      }
     }
     else {
       port.postMessage({
@@ -359,11 +357,9 @@
    */
   const handleMsg = async msg => {
     const items = Object.keys(msg);
-    console.log(`background handleMsg items: ${items}`);
     if (items.length > 0) {
       for (let item of items) {
         const obj = msg[item];
-        console.log(obj);
         switch (item) {
           case KEY_COMBO:
             portKeyCombo();
@@ -403,7 +399,6 @@
   /* startup */
   Promise.all([
     storage.get().then(setVariablesFromStorage),
-    isExecutable().then(toggleBadge),
-    toggleIcon().then(replaceIcon)
+    isExecutable().then(toggleBadge)
   ]).catch(logError);
 }
