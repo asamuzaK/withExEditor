@@ -57,7 +57,7 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
   3. Enable this option.
 
 ### Access Key
-* Access key commonly used for the context menu, the shortcut for opening options from the toolbar button, and the shortcut for executing the editor directly.
+* Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly.
 * Choose any key, but it must be a single character.
 * In the context menu, press 'key' itself.
 
