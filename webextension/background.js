@@ -83,39 +83,6 @@
   };
 
   /**
-   * toggle badge
-   * @param {boolean} bool - executable
-   * @return {void}
-   */
-  const toggleBadge = async bool => {
-    const text = !bool && WARN_MARK || "";
-    const color = !bool && WARN_COLOR || "transparent";
-    browserAction.setBadgeText({text});
-    browserAction.setBadgeBackgroundColor({color});
-    !bool && logWarn(`${LABEL}: ${i18n.getMessage(WARN_EDITOR)}`);
-  };
-
-  /**
-   * check stored editor path is executable
-   * @return {Object} - Promise
-   */
-  const isExecutable = () =>
-    storage.get(EDITOR_PATH).then(res => {
-      const items = Object.keys(res);
-      let bool = false;
-      if (items.length > 0) {
-        for (let item of items) {
-          item = res[item];
-          if (item.id === EDITOR_PATH) {
-            bool = item.data && item.data.executable || false;
-            break;
-          }
-        }
-      }
-      return bool;
-    });
-
-  /**
    * replace icon
    * @param {Object} path - icon path
    * @return {void}
@@ -134,6 +101,19 @@
         replaceIcon(iconPath) :
         replaceIcon(`${ICON_PATH}#off`);
     });
+
+  /**
+   * toggle badge
+   * @param {boolean} bool - executable
+   * @return {void}
+   */
+  const toggleBadge = async bool => {
+    const text = !bool && WARN_MARK || "";
+    const color = !bool && WARN_COLOR || "transparent";
+    browserAction.setBadgeText({text});
+    browserAction.setBadgeBackgroundColor({color});
+    !bool && logWarn(`${LABEL}: ${i18n.getMessage(WARN_EDITOR)}`);
+  };
 
   /* ports collection */
   const ports = {};
@@ -283,6 +263,9 @@
               replaceIcon(obj.value)
             );
             break;
+          case EDITOR_PATH:
+            toggleBadge(obj.data.executable);
+            break;
           default:
         }
       }
@@ -407,8 +390,5 @@
   browser.windows.onFocusChanged.addListener(toggleIcon);
 
   /* startup */
-  Promise.all([
-    storage.get().then(setVariablesFromStorage).then(toggleIcon),
-    isExecutable().then(toggleBadge)
-  ]).catch(logError);
+  storage.get().then(setVariablesFromStorage).then(toggleIcon).catch(logError);
 }
