@@ -254,6 +254,7 @@
         switch (item) {
           case ENABLE_PB:
             enablePB = !!obj.checked;
+            toggleIcon();
             break;
           case ICON_COLOR:
           case ICON_GRAY:
@@ -390,5 +391,5 @@
   browser.windows.onFocusChanged.addListener(toggleIcon);
 
   /* startup */
-  storage.get().then(setVariablesFromStorage).then(toggleIcon).catch(logError);
+  storage.get().then(setVariablesFromStorage).catch(logError);
 }
