@@ -17,7 +17,6 @@
   const PORT_CONTENT = "portContent";
   const KEY_COMBO = "keyCombo";
   const OPEN_OPTIONS = "openOptions";
-  const TOGGLE_ENABLED = "toggleEnabled";
   const RES_SDK_PREFS = "resSdkPrefs";
 
   const EDITOR_PATH = "editorPath";
@@ -37,12 +36,13 @@
   const i18n = browser.i18n;
   const runtime = browser.runtime;
   const storage = browser.storage.local;
+  const windows = browser.windows;
 
   /* port to SDK */
   const port = runtime.connect({name: PORT_BACKGROUND});
 
   /* variables */
-  let isEnabled = false, iconPath = ICON_PATH;
+  let enablePB = false, isEnabled = false, iconPath = ICON_PATH;
 
   /**
    * log error
@@ -62,6 +62,16 @@
   const logWarn = m => {
     m && console.warn(m);
     return false;
+  };
+
+  /**
+   * check enabled
+   * @return {void}
+   */
+  const checkEnabled = async () => {
+    const win = await windows.getCurrent();
+    isEnabled = !win.incognito || enablePB;
+    port.postMessage({isEnabled});
   };
 
   /**
@@ -111,20 +121,19 @@
    * @return {void}
    */
   const replaceIcon = async (path = ICON_PATH) => {
-    iconPath = path;
     browserAction.setIcon({path});
   };
 
   /**
    * toggle icon
-   * @param {boolean} bool - enabled
-   * @return {void}
+   * @return {Object} - Promise
    */
-  const toggleIcon = async (bool = false) => {
-    (isEnabled = !!bool) ?
-      replaceIcon(iconPath) :
-      replaceIcon(`${ICON_PATH}#off`);
-  };
+  const toggleIcon = async () =>
+    checkEnabled().then(() => {
+      isEnabled ?
+        replaceIcon(iconPath) :
+        replaceIcon(`${ICON_PATH}#off`);
+    });
 
   /* ports collection */
   const ports = {};
@@ -179,7 +188,10 @@
         case ICON_COLOR:
         case ICON_GRAY:
         case ICON_WHITE:
-          obj.checked && replaceIcon(obj.value);
+          obj.checked && (
+            iconPath = obj.value,
+            replaceIcon(obj.value)
+          );
           break;
         case EDITOR_PATH:
           obj.data && toggleBadge(obj.data.executable);
@@ -226,6 +238,7 @@
           });
           break;
         case ENABLE_PB:
+          enablePB = obj.checked;
           portSdkPrefs({
             enablePB: obj.checked
           });
@@ -258,20 +271,19 @@
       });
       for (let item of items) {
         const obj = res[item];
-        let bool = false;
         switch (item) {
+          case ENABLE_PB:
+            enablePB = !!obj.checked;
+            break;
           case ICON_COLOR:
           case ICON_GRAY:
           case ICON_WHITE:
             obj.checked && (
-              bool = true,
+              iconPath = obj.value,
               replaceIcon(obj.value)
             );
             break;
           default:
-        }
-        if (bool) {
-          break;
         }
       }
     }
@@ -370,9 +382,6 @@
           case RES_SDK_PREFS:
             setSdkPrefsToStorage(obj);
             break;
-          case TOGGLE_ENABLED:
-            toggleIcon(obj);
-            break;
           default:
         }
       }
@@ -395,10 +404,11 @@
   port.onMessage.addListener(handleMsg);
   runtime.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(handleConnectedPort);
+  browser.windows.onFocusChanged.addListener(toggleIcon);
 
   /* startup */
   Promise.all([
-    storage.get().then(setVariablesFromStorage),
+    storage.get().then(setVariablesFromStorage).then(toggleIcon),
     isExecutable().then(toggleBadge)
   ]).catch(logError);
 }
