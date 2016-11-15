@@ -5,7 +5,7 @@
 {
   /* constants */
   const LABEL = "withExEditor";
-  const ICON_PATH = "./img/icon.svg#gray";
+  const ICON_PATH = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
@@ -42,7 +42,7 @@
   const port = runtime.connect({name: PORT_BACKGROUND});
 
   /* variables */
-  let enablePB = false, isEnabled = false, iconPath = ICON_PATH;
+  let enablePB = false, isEnabled = false, iconPath = `${ICON_PATH}#gray`;
 
   /**
    * log error
