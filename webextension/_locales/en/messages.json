@@ -5,16 +5,16 @@
   "extensionName": {
     "message": "withExEditor"
   },
-  "menuEditText": {
+  "modeEditText": {
     "message": "Edit Text with $1"
   },
-  "menuViewMathML": {
+  "modeViewMathML": {
     "message": "View MathML Source with $1"
   },
-  "menuViewSelection": {
+  "modeViewSelection": {
     "message": "View Selection Source with $1"
   },
-  "menuViewSource": {
+  "modeViewSource": {
     "message": "View Page Source with $1"
   },
   "optionsAccessKey.placeholder": {

@@ -14,18 +14,18 @@
   const OPEN_OPTIONS = "openOptions";
   const SDK_PREFS = "sdkPrefs";
 
-  const MODE_VIEW_SOURCE = "modeViewSource";
-  const MODE_VIEW_MATHML = "modeViewMathML";
-  const MODE_VIEW_SELECTION = "modeViewSelection";
-  const MODE_EDIT_TEXT = "modeEditText";
-  const NS_URI_EXTEND_VALUE = 4;
-  const ICON_PATH = "./img/icon.svg";
+  const ICON = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
-  const WARN_MARK = "!";
+  const MODE_EDIT_TEXT = "modeEditText";
+  const MODE_EDIT_TEXT_SELECT = "modeEditTextSelect";
+  const MODE_VIEW_MATHML = "modeViewMathML";
+  const MODE_VIEW_SELECTION = "modeViewSelection";
+  const MODE_VIEW_SOURCE = "modeViewSource";
+  const NS_URI_EXTEND_VALUE = 4;
   const WARN_COLOR = "#C13832";
-  const WARN_EDITOR = "warnEditorNotSelected";
+  const WARN_TEXT = "!";
 
   const EDITOR_PATH = "editorPath";
   const EDITOR_NAME = "editorName";
@@ -55,7 +55,7 @@
     editorName: "",
     enablePB: false,
     isEnabled: false,
-    iconPath: `${ICON_PATH}#gray`
+    iconPath: `${ICON}#gray`
   };
 
   /**
@@ -65,16 +65,6 @@
    */
   const logError = e => {
     e && console.error(e);
-    return false;
-  };
-
-  /**
-   * log warning
-   * @param {string} m - message
-   * @return {boolean} - false
-   */
-  const logWarn = m => {
-    m && console.warn(m);
     return false;
   };
 
@@ -143,7 +133,7 @@
    * @param {Object} path - icon path
    * @return {void}
    */
-  const replaceIcon = async (path = `${ICON_PATH}#gray`) => {
+  const replaceIcon = async (path = `${ICON}#gray`) => {
     browserAction.setIcon({path});
   };
 
@@ -155,7 +145,7 @@
     checkEnabled().then(() => {
       vars.isEnabled ?
         replaceIcon(vars.iconPath) :
-        replaceIcon(`${ICON_PATH}#off`);
+        replaceIcon(`${ICON}#off`);
     });
 
   /**
@@ -164,11 +154,10 @@
    * @return {void}
    */
   const toggleBadge = async bool => {
-    const text = !bool && WARN_MARK || "";
     const color = !bool && WARN_COLOR || "transparent";
-    browserAction.setBadgeText({text});
+    const text = !bool && WARN_TEXT || "";
     browserAction.setBadgeBackgroundColor({color});
-    !bool && logWarn(`${LABEL}: ${i18n.getMessage(WARN_EDITOR)}`);
+    browserAction.setBadgeText({text});
   };
 
   /* ports */
@@ -188,17 +177,18 @@
     });
     const openOptions = await storage.get(KEY_OPEN_OPTIONS).then(res => {
       const value = (res = res[KEY_OPEN_OPTIONS]) ?
-                      res :
+                      !!res.checked :
                       true;
       return value;
     });
     const execEditor = await storage.get(KEY_EXEC_EDITOR).then(res => {
       const value = (res = res[KEY_EXEC_EDITOR]) ?
-                      res :
+                      !!res.checked :
                       true;
       return value;
     });
-    const keyCombo = {key, openOptions, execEditor};
+    const isEnabled = vars.isEnabled;
+    const keyCombo = {key, openOptions, execEditor, isEnabled};
     ports[PORT_CONTENT] && ports[PORT_CONTENT].postMessage({keyCombo});
   };
 
@@ -217,26 +207,30 @@
 
   /* context menu */
   const menu = {
-    menuPage: contextMenus.create({
-      title: i18n(MODE_VIEW_SOURCE, vars.editorName || LABEL),
+    modeViewSource: contextMenus.create({
+      id: MODE_VIEW_SOURCE,
+      title: i18n.getMessage(MODE_VIEW_SOURCE, vars.editorName || LABEL),
       contexts: ["page"],
-      onclick: "",
+      onclick: () => false,
       enabled: false
     }),
-    menuEditSelect: contextMenus.create({
-      title: i18n(MODE_EDIT_TEXT, vars.editorName || LABEL),
+    modeEditTextSelect: contextMenus.create({
+      id: MODE_EDIT_TEXT_SELECT,
+      title: i18n.getMessage(MODE_EDIT_TEXT, vars.editorName || LABEL),
       contexts: ["editable", "selection"],
       onclick: () => false,
       enabled: false
     }),
-    menuEdit: contextMenus.create({
-      title: i18n(MODE_EDIT_TEXT, vars.editorName || LABEL),
+    modeEditText: contextMenus.create({
+      id: MODE_EDIT_TEXT,
+      title: i18n.getMessage(MODE_EDIT_TEXT, vars.editorName || LABEL),
       contexts: ["editable"],
       onclick: () => false,
       enabled: false
     }),
-    menuSelect: contextMenus.create({
-      title: i18n(MODE_VIEW_SELECTION, vars.editorName || LABEL),
+    modeViewSelection: contextMenus.create({
+      id: MODE_VIEW_SELECTION,
+      title: i18n.getMessage(MODE_VIEW_SELECTION, vars.editorName || LABEL),
       contexts: ["selection"],
       onclick: () => false,
       enabled: false
@@ -250,17 +244,32 @@
    */
   const replaceContextMenu = async (ns = nsURI.ns.html) => {
     const items = Object.keys(menu);
-    if (items.length > 0) {
+    if (items.length === 0) {
       for (let item of items) {
-        item === MODE_VIEW_SOURCE ? (
-          isString(ns) && ns === nsURI.ns.math ?
-            item.title = await i18n(MODE_VIEW_MATHML, vars.editorName) :
-            item.title = await i18n(item, vars.editorName),
-          item.enabled = vars.isEnabled
-        ) : (
-          item.title = await i18n(item, vars.editorName),
-          item.enabled = vars.isEnabled
-        );
+        switch (item) {
+          case MODE_VIEW_SOURCE:
+            isString(ns) && ns === nsURI.ns.math ?
+              contextMenus.update(item, {
+                title: i18n.getMessage(MODE_VIEW_MATHML, vars.editorName),
+                enabled: vars.isEnabled
+              }) :
+              contextMenus.update(item, {
+                title: i18n.getMessage(item, vars.editorName),
+                enabled: vars.isEnabled
+              });
+            break;
+          case MODE_EDIT_TEXT_SELECT:
+            contextMenus.update(item, {
+              title: i18n.getMessage(MODE_EDIT_TEXT, vars.editorName),
+              enabled: vars.isEnabled
+            });
+            break;
+          default:
+            contextMenus.update(item, {
+              title: i18n.getMessage(item, vars.editorName),
+              enabled: vars.isEnabled
+            });
+        }
       }
     }
   };
@@ -275,7 +284,7 @@
     const items = Object.keys(res);
     if (items.length > 0) {
       port.postMessage({
-        setSdkPrefs: res
+        setVars: res
       });
       for (let item of items) {
         const obj = res[item];

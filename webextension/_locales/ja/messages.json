@@ -5,16 +5,16 @@
   "extensionName": {
     "message": "withExEditor"
   },
-  "menuEditText": {
+  "modeEditText": {
     "message": "テキストを $1 で編集"
   },
-  "menuViewMathML": {
+  "modeViewMathML": {
     "message": "MathML のソースを $1 で表示"
   },
-  "menuViewSelection": {
+  "modeViewSelection": {
     "message": "選択した部分のソースを $1 で表示"
   },
-  "menuViewSource": {
+  "modeViewSource": {
     "message": "ページのソースを $1 で表示"
   },
   "optionsAccessKey.placeholder": {

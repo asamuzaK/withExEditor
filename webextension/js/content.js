@@ -173,7 +173,7 @@
    */
   const portContent = async msg => {
     const items = Object.keys(msg);
-    items.length > 0 && port.message(msg);
+    items.length > 0 && port.postMessage(msg);
   };
 
   /**
@@ -726,7 +726,7 @@
    * @return {boolean}
    */
   const keyComboMatches = async (evt, key) =>
-    vars.isEnabled && key.enabled &&
+    /*vars.isEnabled &&*/ key.enabled &&
     evt.key && evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
@@ -753,7 +753,6 @@
     const openOptions = await keyComboMatches(evt, openOptionsKey);
     const execEditor = await keyComboMatches(evt, execEditorKey);
     if (openOptions) {
-      evt.preventDefault();
       portContent({openOptions});
     }
     else {
@@ -765,7 +764,6 @@
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
           reType.test(document.contentType)
       ) && (
-        evt.preventDefault(),
         getContent(elm).then(portContent).catch(logError)
       );
     }
