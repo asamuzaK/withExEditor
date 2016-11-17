@@ -5,6 +5,20 @@
 {
   /* constants */
   const LABEL = "withExEditor";
+
+  const PORT_BACKGROUND = "portBackground";
+  const PORT_CONTENT = "portContent";
+  const CONTEXT_MENU = "contextMenu";
+  const KEY_COMBO = "keyCombo";
+  const NS_URI = "nsURI";
+  const OPEN_OPTIONS = "openOptions";
+  const SDK_PREFS = "sdkPrefs";
+
+  const MODE_VIEW_SOURCE = "modeViewSource";
+  const MODE_VIEW_MATHML = "modeViewMathML";
+  const MODE_VIEW_SELECTION = "modeViewSelection";
+  const MODE_EDIT_TEXT = "modeEditText";
+  const NS_URI_EXTEND_VALUE = 4;
   const ICON_PATH = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
@@ -12,12 +26,6 @@
   const WARN_MARK = "!";
   const WARN_COLOR = "#C13832";
   const WARN_EDITOR = "warnEditorNotSelected";
-
-  const PORT_BACKGROUND = "portBackground";
-  const PORT_CONTENT = "portContent";
-  const KEY_COMBO = "keyCombo";
-  const OPEN_OPTIONS = "openOptions";
-  const RES_SDK_PREFS = "resSdkPrefs";
 
   const EDITOR_PATH = "editorPath";
   const EDITOR_NAME = "editorName";
@@ -33,6 +41,7 @@
 
   /* shortcuts */
   const browserAction = browser.browserAction;
+  const contextMenus = browser.contextMenus;
   const i18n = browser.i18n;
   const runtime = browser.runtime;
   const storage = browser.storage.local;
@@ -42,7 +51,12 @@
   const port = runtime.connect({name: PORT_BACKGROUND});
 
   /* variables */
-  let enablePB = false, isEnabled = false, iconPath = `${ICON_PATH}#gray`;
+  const vars = {
+    editorName: "",
+    enablePB: false,
+    isEnabled: false,
+    iconPath: `${ICON_PATH}#gray`
+  };
 
   /**
    * log error
@@ -65,12 +79,53 @@
   };
 
   /**
+   * is string
+   * @param {*} o - object to check
+   * @return {boolean}
+   */
+  const isString = o =>
+    o && (typeof o === "string" || o instanceof String) || false;
+
+  /* classes */
+  /* namespace URI class */
+  class NsURI {
+    constructor() {
+      this._extended = false;
+      this._ns = {
+        html: "http://www.w3.org/1999/xhtml",
+        math: "http://www.w3.org/1998/Math/MathML",
+        svg: "http://www.w3.org/2000/svg",
+        xmlns: "http://www.w3.org/2000/xmlns/"
+      };
+    }
+
+    get extended() {
+      return this._extended;
+    }
+
+    set extended(bool) {
+      const items = Object.keys(this._ns);
+      this._extended = items.length > NS_URI_EXTEND_VALUE && !!bool || false;
+    }
+
+    get ns() {
+      return this._ns;
+    }
+
+    set ns(data) {
+      const items = Object.keys(data);
+      items.length > NS_URI_EXTEND_VALUE && (this._ns = data);
+    }
+  }
+
+  /**
    * check enabled
    * @return {void}
    */
   const checkEnabled = async () => {
     const win = await windows.getCurrent();
-    isEnabled = !win.incognito || enablePB;
+    const isEnabled = !win.incognito || vars.enablePB;
+    vars.isEnabled = isEnabled;
     port.postMessage({isEnabled});
   };
 
@@ -79,9 +134,10 @@
    * @return {void}
    */
   const openOptionsPage = async () => {
-    isEnabled && runtime.openOptionsPage();
+    vars.isEnabled && runtime.openOptionsPage();
   };
 
+  /* icon */
   /**
    * replace icon
    * @param {Object} path - icon path
@@ -97,8 +153,8 @@
    */
   const toggleIcon = async () =>
     checkEnabled().then(() => {
-      isEnabled ?
-        replaceIcon(iconPath) :
+      vars.isEnabled ?
+        replaceIcon(vars.iconPath) :
         replaceIcon(`${ICON_PATH}#off`);
     });
 
@@ -115,6 +171,7 @@
     !bool && logWarn(`${LABEL}: ${i18n.getMessage(WARN_EDITOR)}`);
   };
 
+  /* ports */
   /* ports collection */
   const ports = {};
 
@@ -146,93 +203,69 @@
   };
 
   /**
-   * port SDK prefs
+   * port variables
    * @param {Object} msg - message
    * @return {void}
    */
-  const portSdkPrefs = async msg => {
-    const setSdkPrefs = msg;
-    setSdkPrefs && port.postMessage({setSdkPrefs});
+  const portVars = async msg => {
+    const setVars = msg;
+    setVars && port.postMessage({setVars});
+  };
+
+  /* namespace URI */
+  const nsURI = new NsURI();
+
+  /* context menu */
+  const menu = {
+    menuPage: contextMenus.create({
+      title: i18n(MODE_VIEW_SOURCE, vars.editorName || LABEL),
+      contexts: ["page"],
+      onclick: "",
+      enabled: false
+    }),
+    menuEditSelect: contextMenus.create({
+      title: i18n(MODE_EDIT_TEXT, vars.editorName || LABEL),
+      contexts: ["editable", "selection"],
+      onclick: () => false,
+      enabled: false
+    }),
+    menuEdit: contextMenus.create({
+      title: i18n(MODE_EDIT_TEXT, vars.editorName || LABEL),
+      contexts: ["editable"],
+      onclick: () => false,
+      enabled: false
+    }),
+    menuSelect: contextMenus.create({
+      title: i18n(MODE_VIEW_SELECTION, vars.editorName || LABEL),
+      contexts: ["selection"],
+      onclick: () => false,
+      enabled: false
+    })
   };
 
   /**
-   * handle storage changes
-   * @param {Object} data - StorageChange
+   * replace context menu items
+   * @param {string} ns - namespace URI
    * @return {void}
    */
-  const storageChange = async data => {
-    const items = Object.keys(data);
-    for (let item of items) {
-      const obj = data[item].newValue;
-      switch (item) {
-        case ICON_COLOR:
-        case ICON_GRAY:
-        case ICON_WHITE:
-          obj.checked && (
-            iconPath = obj.value,
-            replaceIcon(iconPath)
-          );
-          break;
-        case EDITOR_PATH:
-          obj.data && toggleBadge(obj.data.executable);
-          portSdkPrefs({
-            editorPath: obj.value
-          });
-          break;
-        case EDITOR_NAME:
-          portSdkPrefs({
-            editorName: obj.value
-          });
-          break;
-        case CMD_ARGS:
-          portSdkPrefs({
-            editorCmdArgs: obj.value
-          });
-          break;
-        case CMD_POSITION:
-          portSdkPrefs({
-            editorCmdPos: !!obj.checked
-          });
-          break;
-        case SPAWN_SHELL:
-          portSdkPrefs({
-            editorShell: !!obj.checked
-          });
-          break;
-        case KEY_ACCESS:
-          portKeyCombo();
-          portSdkPrefs({
-            accessKey: obj.value
-          });
-          break;
-        case KEY_OPEN_OPTIONS:
-          portKeyCombo();
-          break;
-        case KEY_EXEC_EDITOR:
-          portKeyCombo();
-          portSdkPrefs({
-            editorShortCut: !!obj.checked
-          });
-          break;
-        case ENABLE_PB:
-          enablePB = !!obj.checked;
-          portSdkPrefs({enablePB});
-          break;
-        case EDITABLE_CONTEXT:
-          portSdkPrefs({
-            editableContext: !!obj.checked
-          });
-          break;
-        case FORCE_REMOVE:
-          portSdkPrefs({
-            forceRemove: !!obj.checked
-          });
-          break;
-        default:
+  const replaceContextMenu = async (ns = nsURI.ns.html) => {
+    const items = Object.keys(menu);
+    if (items.length > 0) {
+      for (let item of items) {
+        item === MODE_VIEW_SOURCE ? (
+          isString(ns) && ns === nsURI.ns.math ?
+            item.title = await i18n(MODE_VIEW_MATHML, vars.editorName) :
+            item.title = await i18n(item, vars.editorName),
+          item.enabled = vars.isEnabled
+        ) : (
+          item.title = await i18n(item, vars.editorName),
+          item.enabled = vars.isEnabled
+        );
       }
     }
   };
 
+  /* storage */
   /**
    * set variables from storage
    * @param {Object} res - result
@@ -248,14 +281,14 @@
         const obj = res[item];
         switch (item) {
           case ENABLE_PB:
-            enablePB = !!obj.checked;
+            vars[item] = !!obj.checked;
             toggleIcon();
             break;
           case ICON_COLOR:
           case ICON_GRAY:
           case ICON_WHITE:
             obj.checked && (
-              iconPath = obj.value,
+              vars.iconPath = obj.value,
               replaceIcon(obj.value)
             );
             break;
@@ -295,6 +328,7 @@
       case EDITOR_NAME:
       case CMD_ARGS:
       case KEY_ACCESS:
+        item === EDITOR_NAME && (vars[item] = value);
         pref = {};
         pref[item] = {
           id: item,
@@ -341,6 +375,7 @@
     }
   };
 
+  /* handlers */
   /**
    * handle runtime message
    * @param {*} msg - message
@@ -352,13 +387,22 @@
       for (let item of items) {
         const obj = msg[item];
         switch (item) {
+          case CONTEXT_MENU:
+            replaceContextMenu(obj.nsURI);
+            break;
           case KEY_COMBO:
             portKeyCombo();
+            break;
+          case NS_URI:
+            !nsURI.extended && (
+              nsURI.ns = obj,
+              nsURI.extended = true
+            );
             break;
           case OPEN_OPTIONS:
             obj && openOptionsPage();
             break;
-          case RES_SDK_PREFS:
+          case SDK_PREFS:
             setSdkPrefsToStorage(obj);
             break;
           default:
@@ -368,22 +412,104 @@
   };
 
   /**
+   * handle storage changes
+   * @param {Object} data - storage.StorageChange
+   * @return {void}
+   */
+  const handleStorageChange = async data => {
+    const items = Object.keys(data);
+    for (let item of items) {
+      const obj = data[item].newValue;
+      switch (item) {
+        case ICON_COLOR:
+        case ICON_GRAY:
+        case ICON_WHITE:
+          obj.checked && (
+            vars.iconPath = obj.value,
+            replaceIcon(obj.value)
+          );
+          break;
+        case EDITOR_PATH:
+          obj.data && toggleBadge(obj.data.executable);
+          portVars({
+            editorPath: obj.value
+          });
+          break;
+        case EDITOR_NAME:
+          vars[item] = obj.value;
+          replaceContextMenu();
+          portVars({
+            editorName: obj.value
+          });
+          break;
+        case CMD_ARGS:
+          portVars({
+            editorCmdArgs: obj.value
+          });
+          break;
+        case CMD_POSITION:
+          portVars({
+            editorCmdPos: !!obj.checked
+          });
+          break;
+        case SPAWN_SHELL:
+          portVars({
+            editorShell: !!obj.checked
+          });
+          break;
+        case KEY_ACCESS:
+          portKeyCombo();
+          portVars({
+            accessKey: obj.value
+          });
+          break;
+        case KEY_OPEN_OPTIONS:
+          portKeyCombo();
+          break;
+        case KEY_EXEC_EDITOR:
+          portKeyCombo();
+          portVars({
+            editorShortCut: !!obj.checked
+          });
+          break;
+        case ENABLE_PB:
+          vars[item] = !!obj.checked;
+          portVars({
+            enablePB: !!obj.checked
+          });
+          break;
+        case EDITABLE_CONTEXT:
+          portVars({
+            editableContext: !!obj.checked
+          });
+          break;
+        case FORCE_REMOVE:
+          portVars({
+            forceRemove: !!obj.checked
+          });
+          break;
+        default:
+      }
+    }
+  };
+
+  /**
    * handle connected port
    * @param {Object} conn - runtime.Port
    * @return {void}
    */
-  const handleConnectedPort = async conn => {
+  const handlePort = async conn => {
     ports[conn.name] = conn;
     conn.onMessage.addListener(handleMsg);
   };
 
   /* add listeners */
   browserAction.onClicked.addListener(openOptionsPage);
-  browser.storage.onChanged.addListener(storageChange);
+  browser.storage.onChanged.addListener(handleStorageChange);
   port.onMessage.addListener(handleMsg);
   runtime.onMessage.addListener(handleMsg);
-  runtime.onConnect.addListener(handleConnectedPort);
-  browser.windows.onFocusChanged.addListener(toggleIcon);
+  runtime.onConnect.addListener(handlePort);
+  windows.onFocusChanged.addListener(toggleIcon);
 
   /* startup */
   storage.get().then(setVariablesFromStorage).catch(logError);

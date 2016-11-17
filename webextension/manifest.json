@@ -6,7 +6,7 @@
     }
   },
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["./js/background.js"]
   },
   "browser_action": {
     "browser_style": false,
@@ -27,7 +27,8 @@
   "description": "__MSG_extensionDescription__",
   "homepage_url": "https://github.com/asamuzaK/withExEditor",
   "icons": {
-    "48": "./img/icon.svg"
+    "32": "./img/icon.svg#gray",
+    "64": "./img/icon.svg"
   },
   "manifest_version": 2,
   "name": "__MSG_extensionName__",

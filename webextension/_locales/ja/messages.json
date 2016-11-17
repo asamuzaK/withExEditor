@@ -5,6 +5,18 @@
   "extensionName": {
     "message": "withExEditor"
   },
+  "menuEditText": {
+    "message": "テキストを $1 で編集"
+  },
+  "menuViewMathML": {
+    "message": "MathML のソースを $1 で表示"
+  },
+  "menuViewSelection": {
+    "message": "選択した部分のソースを $1 で表示"
+  },
+  "menuViewSource": {
+    "message": "ページのソースを $1 で表示"
+  },
   "optionsAccessKey.placeholder": {
     "message": "アクセスキーを入力"
   },

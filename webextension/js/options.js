@@ -4,12 +4,13 @@
 "use strict";
 {
   /* constants */
+  const PORT_OPTIONS = "portOptions";
+  const RES_EXECUTABLE = "resExecutable";
+
   const ATTR_I18N = "data-i18n";
   const EDITOR_PATH = "editorPath";
   const EDITOR_NAME = "editorName";
   const ELEMENT_NODE = 1;
-  const PORT_OPTIONS = "portOptions";
-  const RES_EXECUTABLE = "resExecutable";
 
   /* shortcuts */
   const i18n = browser.i18n;
@@ -20,7 +21,10 @@
   const port = runtime.connect({name: PORT_OPTIONS});
 
   /* variables */
-  let editorPath, editorName;
+  const vars = {
+    editorPath: null,
+    editorName: null
+  };
 
   /**
    * log error
@@ -40,19 +44,20 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
+  /* storage */
   /**
    * synchronize editorName value
    * @param {string} name - editor name
    * @return {void}
    */
   const synchronizeEditorName = async name => {
-    editorName && (
+    vars.editorName && (
       name && isString(name) ? (
-        editorName.value = name,
-        editorName.disabled = false
+        vars.editorName.value = name,
+        vars.editorName.disabled = false
       ) : (
-        editorName.value = "",
-        editorName.disabled = true
+        vars.editorName.value = "",
+        vars.editorName.disabled = true
       ),
       storage.set({
         editorName: {
@@ -107,7 +112,7 @@
         }
       }
       else {
-        editorPath && elm === editorPath ?
+        vars.editorPath && elm === vars.editorPath ?
           port.postMessage({
             checkExecutable: {
               path: elm.value
@@ -120,6 +125,7 @@
     }
   };
 
+  /* html */
   /**
    * add event listener to input elements
    * @return {void}
@@ -198,10 +204,10 @@
             break;
           case "text":
             elm.value = isString(key.value) && key.value || "";
-            editorPath && elm === editorPath && elm.value &&
+            vars.editorPath && elm === vars.editorPath && elm.value &&
             key.data.executable && (
               elm.dataset.executable = "true",
-              editorName && (editorName.disabled = false)
+              vars.editorName && (vars.editorName.disabled = false)
             );
             break;
           default:
@@ -215,10 +221,11 @@
    * @return {void}
    */
   const setVariables = async () => {
-    editorPath = document.getElementById(EDITOR_PATH);
-    editorName = document.getElementById(EDITOR_NAME);
+    vars.editorPath = document.getElementById(EDITOR_PATH);
+    vars.editorName = document.getElementById(EDITOR_NAME);
   };
 
+  /* handler */
   /**
    * handle message
    * @param {*} msg - message
