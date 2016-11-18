@@ -134,8 +134,7 @@
    * @return {void}
    */
   const portMsg = async msg => {
-    const keys = Object.keys(msg);
-    if (keys.length > 0) {
+    if (Object.keys(msg).length > 0) {
       const items = ports[PORT_CONTENT] && Object.keys(ports[PORT_CONTENT]);
       if (items && items.length > 0) {
         for (let item of items) {
@@ -487,7 +486,8 @@
       delete ports[conn.name][id];
     });
     conn.postMessage({
-      setVars: vars
+      setVars: vars,
+      tabId: id
     });
   };
 

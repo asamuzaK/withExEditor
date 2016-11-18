@@ -28,6 +28,7 @@
   const KEY_EXEC_EDITOR = "editorShortCut";
   const EDITABLE_CONTEXT = "editableContext";
   const IS_ENABLED = "isEnabled";
+  const TAB_ID: "tabId";
 
   /* shortcut */
   const runtime = browser.runtime;
@@ -42,7 +43,8 @@
     editorShortCut: true,
     editableContext: false,
     isEnabled: false,
-    contextNode: null
+    contextNode: null,
+    tabId: null
   };
 
   /* RegExp */
@@ -790,19 +792,16 @@
     if (items.length > 0) {
       for (let item of items) {
         const obj = msg[item];
-        if (item === SET_VARS) {
-          handleMsg(obj);
-          break;
-        }
         switch (item) {
+          case SET_VARS:
+            handleMsg(obj);
+            break;
           case EDITABLE_CONTEXT:
+          case IS_ENABLED:
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
             getContent().then(portMsg).catch(logError);
-            break;
-          case IS_ENABLED:
-            vars[item] = !!obj;
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -820,6 +819,9 @@
           case SYNC_TEXT:
             console.log(`${item}: ${obj}`);
             syncText(obj);
+            break;
+          case TAB_ID:
+            vars[item] = obj;
             break;
           default:
         }
