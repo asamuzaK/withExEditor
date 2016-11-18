@@ -5,7 +5,6 @@
 {
   /* constants */
   const GET_CONTENT = "getContent";
-  const NS_URI = "nsURI";
   const PORT_CONTENT = "portContent";
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
@@ -19,9 +18,10 @@
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
+  const NS_URI_DATA_PATH = "./data/nsUri.json";
+  const NS_URI_EXTEND_VALUE = 4;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
-  const NS_URI_EXTEND_VALUE = 4;
 
   const KEY_ACCESS = "accessKey";
   const KEY_OPEN_OPTIONS = "optionsShortCut";
@@ -176,7 +176,7 @@
    * @return {void}
    */
   const portMsg = async msg => {
-    const items = msg && Object.keys(msg) || 0;
+    const items = Object.keys(msg);
     items.length > 0 && port.postMessage(msg);
   };
 
@@ -202,6 +202,26 @@
   /* get content */
   /* namespace URI */
   const nsURI = new NsURI();
+
+  /**
+   * extend nsURI.ns data
+   * @param {string} path - path
+   * @return {void}
+   */
+  const extendNsURI = async (path = NS_URI_DATA_PATH) => {
+    const url = nsURI && !nsURI.extended && await runtime.getURL(path) || false;
+    if (url) {
+      fetch(url).then(async res => {
+        const ns = await res.json();
+        const items = Object.keys(ns);
+        items.length > NS_URI_EXTEND_VALUE && (
+          nsURI.ns = ns,
+          nsURI.extended = true
+        );
+      }).catch(logError);
+    }
+  };
+
 
   /**
    * get namespace of node from ancestor
@@ -814,5 +834,6 @@
     const root = document.documentElement;
     root.addEventListener("contextmenu", handleContextMenu, false);
     root.addEventListener("keypress", handleKeyPress, false);
+    extendNsURI();
   }, false);
 }

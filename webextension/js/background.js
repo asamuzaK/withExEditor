@@ -134,7 +134,8 @@
    * @return {void}
    */
   const portMsg = async msg => {
-    if (Object.keys(msg).length > 0) {
+    const keys = Object.keys(msg);
+    if (keys.length > 0) {
       const items = ports[PORT_CONTENT] && Object.keys(ports[PORT_CONTENT]);
       if (items && items.length > 0) {
         for (let item of items) {
@@ -170,9 +171,6 @@
   /* context menu */
   /* context menu items collection */
   const menus = {};
-
-  /* namespace URI */
-  const nsURI = new NsURI();
 
   /**
    * create context menu items
@@ -386,89 +384,91 @@
    */
   const handleStorageChange = async data => {
     const items = Object.keys(data);
-    for (let item of items) {
-      const obj = data[item].newValue;
-      switch (item) {
-        case ICON_COLOR:
-        case ICON_GRAY:
-        case ICON_WHITE:
-          obj.checked && (
-            vars.iconPath = obj.value,
-            replaceIcon()
-          );
-          break;
-        case EDITOR_PATH:
-          vars.editorPath = obj.value;
-          vars.isExecutable = obj.data && !!obj.data.executable;
-          toggleBadge();
-          portVars({
-            editorPath: obj.value
-          });
-          break;
-        case EDITOR_NAME:
-          vars[item] = obj.value;
-          updateContextMenuItems();
-          portVars({
-            editorName: obj.value
-          });
-          break;
-        case CMD_ARGS:
-          vars[item] = obj.value;
-          portVars({
-            editorCmdArgs: obj.value
-          });
-          break;
-        case CMD_POSITION:
-          vars[item] = !!obj.checked;
-          portVars({
-            editorCmdPos: !!obj.checked
-          });
-          break;
-        case SPAWN_SHELL:
-          vars[item] = !!obj.checked;
-          portVars({
-            editorShell: !!obj.checked
-          });
-          break;
-        case KEY_ACCESS:
-          vars[item] = obj.value;
-          portVars({
-            accessKey: obj.value
-          });
-          break;
-        case KEY_OPEN_OPTIONS:
-          vars[item] = !!obj.checked;
-          portVars({
-            optionsShortCut: !!obj.checked
-          });
-          break;
-        case KEY_EXEC_EDITOR:
-          vars[item] = !!obj.checked;
-          portVars({
-            editorShortCut: !!obj.checked
-          });
-          break;
-        case ENABLE_PB:
-          vars[item] = !!obj.checked;
-          syncUI();
-          portVars({
-            enablePB: !!obj.checked
-          });
-          break;
-        case EDITABLE_CONTEXT:
-          vars[item] = !!obj.checked;
-          createContextMenuItems();
-          portVars({
-            editableContext: !!obj.checked
-          });
-          break;
-        case FORCE_REMOVE:
-          vars[item] = !!obj.checked;
-          portVars({
-            forceRemove: !!obj.checked
-          });
-          break;
-        default:
+    if (items.length > 0) {
+      for (let item of items) {
+        const obj = data[item].newValue;
+        switch (item) {
+          case ICON_COLOR:
+          case ICON_GRAY:
+          case ICON_WHITE:
+            obj.checked && (
+              vars.iconPath = obj.value,
+              replaceIcon()
+            );
+            break;
+          case EDITOR_PATH:
+            vars.editorPath = obj.value;
+            vars.isExecutable = obj.data && !!obj.data.executable;
+            toggleBadge();
+            portVars({
+              editorPath: obj.value
+            });
+            break;
+          case EDITOR_NAME:
+            vars[item] = obj.value;
+            updateContextMenuItems();
+            portVars({
+              editorName: obj.value
+            });
+            break;
+          case CMD_ARGS:
+            vars[item] = obj.value;
+            portVars({
+              editorCmdArgs: obj.value
+            });
+            break;
+          case CMD_POSITION:
+            vars[item] = !!obj.checked;
+            portVars({
+              editorCmdPos: !!obj.checked
+            });
+            break;
+          case SPAWN_SHELL:
+            vars[item] = !!obj.checked;
+            portVars({
+              editorShell: !!obj.checked
+            });
+            break;
+          case KEY_ACCESS:
+            vars[item] = obj.value;
+            portVars({
+              accessKey: obj.value
+            });
+            break;
+          case KEY_OPEN_OPTIONS:
+            vars[item] = !!obj.checked;
+            portVars({
+              optionsShortCut: !!obj.checked
+            });
+            break;
+          case KEY_EXEC_EDITOR:
+            vars[item] = !!obj.checked;
+            portVars({
+              editorShortCut: !!obj.checked
+            });
+            break;
+          case ENABLE_PB:
+            vars[item] = !!obj.checked;
+            syncUI();
+            portVars({
+              enablePB: !!obj.checked
+            });
+            break;
+          case EDITABLE_CONTEXT:
+            vars[item] = !!obj.checked;
+            createContextMenuItems();
+            portVars({
+              editableContext: !!obj.checked
+            });
+            break;
+          case FORCE_REMOVE:
+            vars[item] = !!obj.checked;
+            portVars({
+              forceRemove: !!obj.checked
+            });
+            break;
+          default:
+        }
       }
     }
   };
