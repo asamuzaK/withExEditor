@@ -5,26 +5,27 @@
 {
   /* constants */
   const GET_CONTENT = "getContent";
-  const KEY_COMBO = "keyCombo";
   const NS_URI = "nsURI";
   const PORT_CONTENT = "portContent";
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
 
-  const ATTR_DATA_ID = "data-with_ex_editor_id";
-  const ATTR_DATA_ID_NS = `html:${ATTR_DATA_ID}`;
-  const ATTR_DATA_ID_CONTROLS = `${ATTR_DATA_ID}_controls`;
-  const ATTR_DATA_TS = "data-with_ex_editor_timestamp";
-  const ATTR_DATA_TS_NS = `html:${ATTR_DATA_TS}`;
+  const DATA_ATTR_ID = "data-with_ex_editor_id";
+  const DATA_ATTR_ID_NS = `html:${DATA_ATTR_ID}`;
+  const DATA_ATTR_ID_CONTROLS = `${DATA_ATTR_ID}_controls`;
+  const DATA_ATTR_TS = "data-with_ex_editor_timestamp";
+  const DATA_ATTR_TS_NS = `html:${DATA_ATTR_TS}`;
   const MODE_EDIT_TEXT = "modeEditText";
-  const MODE_VIEW_MATHML = "modeViewMathML";
-  const MODE_VIEW_SELECTION = "modeViewSelection";
-  const MODE_VIEW_SOURCE = "modeViewSource";
+  const MODE_MATHML = "modeViewMathML";
+  const MODE_SELECTION = "modeViewSelection";
+  const MODE_SOURCE = "modeViewSource";
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
-  const KEY = "e";
   const NS_URI_EXTEND_VALUE = 4;
 
+  const KEY_ACCESS = "accessKey";
+  const KEY_OPEN_OPTIONS = "optionsShortCut";
+  const KEY_EXEC_EDITOR = "editorShortCut";
   const EDITABLE_CONTEXT = "editableContext";
   const IS_ENABLED = "isEnabled";
 
@@ -36,9 +37,12 @@
 
   /* variables */
   const vars = {
-    contextNode: null,
+    accessKey: "e",
+    optionsShortCut: true,
+    editorShortCut: true,
     editableContext: false,
-    isEnabled: false
+    isEnabled: false,
+    contextNode: null
   };
 
   /* RegExp */
@@ -167,28 +171,13 @@
 
   /* port message */
   /**
-   * port content
-   * @param {Object} msg - message
+   * port content message
+   * @param {*} msg - message
    * @return {void}
    */
-  const portContent = async msg => {
-    const items = Object.keys(msg);
+  const portMsg = async msg => {
+    const items = msg && Object.keys(msg) || 0;
     items.length > 0 && port.postMessage(msg);
-  };
-
-  /**
-   * port context menu
-   * @param {Object} evt - Event
-   * @return {void}
-   */
-  const portContextMenu = async evt => {
-    const node = evt && evt.target;
-    const contextMenu = {
-      node,
-      nsURI: node.namespaceURI
-    };
-    vars.contextNode = node;
-    node && port.postMessage({contextMenu});
   };
 
   /**
@@ -199,16 +188,14 @@
   const portTemporaryId = evt => {
     const elm = evt && evt.target === evt.currentTarget && evt.target;
     const attr = elm && (
-                   elm.hasAttributeNS("", ATTR_DATA_ID) &&
-                   elm.getAttributeNS("", ATTR_DATA_ID) ||
-                   elm.hasAttributeNS("", ATTR_DATA_ID_CONTROLS) &&
-                   elm.getAttributeNS("", ATTR_DATA_ID_CONTROLS)
+                   elm.hasAttributeNS("", DATA_ATTR_ID) &&
+                   elm.getAttributeNS("", DATA_ATTR_ID) ||
+                   elm.hasAttributeNS("", DATA_ATTR_ID_CONTROLS) &&
+                   elm.getAttributeNS("", DATA_ATTR_ID_CONTROLS)
                  );
     attr && attr.split(" ").forEach(value => {
-      const syncText = {
-        value
-      };
-      port.postMessage({syncText});
+      const syncText = value;
+      portMsg({syncText});
     });
   };
 
@@ -483,12 +470,12 @@
     if (elm) {
       const html = !elm.namespaceURI || elm.namespaceURI === nsURI.ns.html;
       const ns = !html && nsURI.ns.html || "";
-      elm.hasAttributeNS(ns, ATTR_DATA_ID) ?
-        id = elm.getAttributeNS(ns, ATTR_DATA_ID) : (
+      elm.hasAttributeNS(ns, DATA_ATTR_ID) ?
+        id = elm.getAttributeNS(ns, DATA_ATTR_ID) : (
         id = `withExEditor${window.performance.now()}`.replace(/\./, "_"),
         !html &&
           elm.setAttributeNS(nsURI.ns.xmlns, "xmlns:html", nsURI.ns.html),
-        elm.setAttributeNS(ns, html && ATTR_DATA_ID || ATTR_DATA_ID_NS, id),
+        elm.setAttributeNS(ns, html && DATA_ATTR_ID || DATA_ATTR_ID_NS, id),
         html && elm.addEventListener("focus", portTemporaryId, false)
       );
     }
@@ -509,24 +496,6 @@
         break;
       }
       elm = elm.parentNode;
-    }
-    if (editable) {
-      const id = getId(node);
-      const arr = elm.hasAttributeNS("", ATTR_DATA_ID_CONTROLS) &&
-                    (elm.getAttributeNS("", ATTR_DATA_ID_CONTROLS)).split(" ");
-      id && (
-        arr ? (
-          arr.push(id),
-          elm.setAttributeNS(
-            "",
-            ATTR_DATA_ID_CONTROLS,
-            (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
-          )
-        ) : (
-          elm.setAttributeNS("", ATTR_DATA_ID_CONTROLS, id),
-          elm.addEventListener("focus", portTemporaryId, false)
-        )
-      );
     }
     return editable;
   };
@@ -565,13 +534,39 @@
     ) || false;
 
   /**
+   * set data attribute and add listener
+   * @param {Object} elm - element
+   * @return {void}
+   */
+  const setDataAttrs = async elm => {
+    if (elm) {
+      const id = getId(elm);
+      const arr = elm.hasAttributeNS("", DATA_ATTR_ID_CONTROLS) &&
+                    (elm.getAttributeNS("", DATA_ATTR_ID_CONTROLS)).split(" ");
+      id && (
+        arr ? (
+          arr.push(id),
+          elm.setAttributeNS(
+            "",
+            DATA_ATTR_ID_CONTROLS,
+            (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
+          )
+        ) : (
+          elm.setAttributeNS("", DATA_ATTR_ID_CONTROLS, id),
+          elm.addEventListener("focus", portTemporaryId, false)
+        )
+      );
+    }
+  };
+
+  /**
    * get content data
    * @param {Object} elm - element
    * @return {Object} - content data
    */
   const getContent = async (elm = vars.contextNode) => {
     const cnt = {
-      mode: MODE_VIEW_SOURCE,
+      mode: MODE_SOURCE,
       charset: window.top.document.characterSet,
       target: null,
       value: null,
@@ -593,11 +588,12 @@
           cnt.target = obj,
           cnt.value = elm.hasChildNodes() &&
                       await getTextNode(elm.childNodes) || "",
-          cnt.namespace = nodeNS.uri
+          cnt.namespace = nodeNS.uri,
+          setDataAttrs(elm)
         ) :
         nodeNS.uri === nsURI.ns.math &&
         (obj = await createDomMathML(elm)) && (
-          cnt.mode = MODE_VIEW_MATHML,
+          cnt.mode = MODE_MATHML,
           cnt.value = obj
         ) :
       (sel.anchorNode !== sel.focusNode ||
@@ -610,10 +606,11 @@
           cnt.target = obj,
           cnt.value = elm.hasChildNodes() &&
                       await getTextNode(elm.childNodes) || "",
-          cnt.namespace = nodeNS.uri
+          cnt.namespace = nodeNS.uri,
+          setDataAttrs(elm)
         ) :
         (obj = await createDomFromSelRange(sel)) && (
-          cnt.mode = MODE_VIEW_SELECTION,
+          cnt.mode = MODE_SELECTION,
           cnt.value = obj
         )
       )
@@ -631,8 +628,7 @@
    * @param {string} ns - namespace URI
    * @return {void}
    */
-  const syncContentEditableText = async (node, arr = [""],
-                                         ns = nsURI.html) => {
+  const syncContentText = async (node, arr = [""], ns = nsURI.html) => {
     if (node && node.nodeType === ELEMENT_NODE && Array.isArray(arr)) {
       const fragment = document.createDocumentFragment();
       const l = arr.length;
@@ -665,19 +661,19 @@
     const value = data.value || "";
     let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
         ns = !html && nsURI.html || "",
-        attr = html && ATTR_DATA_TS || ATTR_DATA_TS_NS;
-    if (elm.hasAttributeNS(ns, ATTR_DATA_ID_CONTROLS)) {
-      const arr = (elm.getAttributeNS(ns, ATTR_DATA_ID_CONTROLS)).split(" ");
+        attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS;
+    if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CONTROLS)) {
+      const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CONTROLS)).split(" ");
       for (let id of arr) {
         if (id === target) {
-          (id = document.querySelector(`[*|${ATTR_DATA_ID}=${id}]`)) && (
+          (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`)) && (
             html = !id.namespaceURI || id.namespaceURI === nsURI.html,
             ns = !html && nsURI.html || "",
-            attr = html && ATTR_DATA_TS || `html:${ATTR_DATA_TS}`,
-            (!id.hasAttributeNS(ns, ATTR_DATA_TS) ||
-             timestamp > id.getAttributeNS(ns, ATTR_DATA_TS) * 1) && (
+            attr = html && DATA_ATTR_TS || `html:${DATA_ATTR_TS}`,
+            (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
+             timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
               id.setAttributeNS(ns, attr, timestamp),
-              syncContentEditableText(id, value.split("\n"), namespace)
+              syncContentText(id, value.split("\n"), namespace)
             )
           );
           break;
@@ -685,15 +681,15 @@
       }
     }
     else {
-      elm.hasAttributeNS(ns, ATTR_DATA_ID) &&
-      elm.getAttributeNS(ns, ATTR_DATA_ID) === target &&
-      (!elm.hasAttributeNS(ns, ATTR_DATA_TS) ||
-       timestamp > elm.getAttributeNS(ns, ATTR_DATA_TS) * 1) && (
+      elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
+      elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
+      (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
+       timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
         elm.setAttributeNS(ns, attr, timestamp),
         /^(?:input|textarea)$/.test(elm.localName) ?
           elm.value = value :
         elm.isContentEditable &&
-          syncContentEditableText(elm, value.split("\n"), namespace)
+          syncContentText(elm, value.split("\n"), namespace)
       );
     }
   };
@@ -701,22 +697,22 @@
   /* key combo */
   /* open options key */
   const openOptionsKey = new KeyCombo({
-    key: KEY,
+    key: vars.accessKey,
     alt: true,
     ctrl: true,
     meta: false,
     shift: false,
-    enabled: true
+    enabled: vars.optionsShortCut
   });
 
   /* execute editor key */
   const execEditorKey = new KeyCombo({
-    key: KEY,
+    key: vars.accessKey,
     alt: false,
     ctrl: true,
     meta: false,
     shift: true,
-    enabled: true
+    enabled: vars.editorShortCut
   });
 
   /**
@@ -726,22 +722,10 @@
    * @return {boolean}
    */
   const keyComboMatches = async (evt, key) =>
-    /*vars.isEnabled &&*/ key.enabled &&
+    vars.isEnabled && key.enabled &&
     evt.key && evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
-
-  /**
-   * replace key combo props
-   * @param {Object} obj - replace data
-   * @return {void}
-   */
-  const replaceKeyCombo = async obj => {
-    openOptionsKey.key = obj.key;
-    execEditorKey.key = obj.key;
-    openOptionsKey.enabled = !!obj.openOptions;
-    execEditorKey.enabled = !!obj.execEditor;
-  };
 
   /* handlers */
   /**
@@ -749,24 +733,31 @@
    * @param {Object} evt - Event
    * @return {void}
    */
-  const handleKeyEvt = async evt => {
+  const handleKeyPress = async evt => {
+    const elm = evt && evt.target;
+    const sel = window.getSelection();
     const openOptions = await keyComboMatches(evt, openOptionsKey);
     const execEditor = await keyComboMatches(evt, execEditorKey);
     if (openOptions) {
-      portContent({openOptions});
+      portMsg({openOptions});
     }
     else {
-      const sel = window.getSelection();
-      let elm = evt && evt.target;
       elm && execEditor && (
         vars.editableContext ?
           isEditControl(elm) || elm.isContentEditable ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
           reType.test(document.contentType)
-      ) && (
-        getContent(elm).then(portContent).catch(logError)
-      );
+      ) && getContent(elm).then(portMsg).catch(logError);
     }
+  };
+
+  /**
+   * handle context menu event
+   * @param {Object} evt - Event
+   * @return {void}
+   */
+  const handleContextMenu = async evt => {
+    vars.contextNode = evt && evt.target || null;
   };
 
   /**
@@ -785,24 +776,29 @@
         }
         switch (item) {
           case EDITABLE_CONTEXT:
-            vars[item] = !!obj.checked;
+            vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            getContent(vars.contextNode).then(portContent).catch(logError);
+            getContent().then(portMsg).catch(logError);
             break;
           case IS_ENABLED:
             vars[item] = !!obj;
             break;
-          case KEY_COMBO:
-            replaceKeyCombo(obj);
+          case KEY_ACCESS:
+            vars[item] = obj;
+            openOptionsKey.key = obj;
+            execEditorKey.key = obj;
             break;
-          case NS_URI:
-            !nsURI.extended && (
-              nsURI.ns = obj,
-              nsURI.extended = true
-            );
+          case KEY_EXEC_EDITOR:
+            vars[item] = !!obj;
+            execEditorKey.enabled = !!obj;
+            break;
+          case KEY_OPEN_OPTIONS:
+            vars[item] = !!obj;
+            openOptionsKey.enabled = !!obj;
             break;
           case SYNC_TEXT:
+            console.log(`${item}: ${obj}`);
             syncText(obj);
             break;
           default:
@@ -816,19 +812,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
-    root.addEventListener("contextmenu", portContextMenu, false);
-    root.addEventListener("keypress", handleKeyEvt, false);
+    root.addEventListener("contextmenu", handleContextMenu, false);
+    root.addEventListener("keypress", handleKeyPress, false);
   }, false);
-
-  /* startup */
-  port.postMessage({
-    keyCombo: {
-      key: KEY,
-      openOptions: openOptionsKey.enabled,
-      execEditor: execEditorKey.enabled
-    },
-    getNsURI: {
-      extended: nsURI.extended
-    }
-  });
 }

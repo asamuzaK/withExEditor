@@ -8,9 +8,6 @@
 
   const PORT_BACKGROUND = "portBackground";
   const PORT_CONTENT = "portContent";
-  const CONTEXT_MENU = "contextMenu";
-  const KEY_COMBO = "keyCombo";
-  const NS_URI = "nsURI";
   const OPEN_OPTIONS = "openOptions";
   const SDK_PREFS = "sdkPrefs";
 
@@ -19,10 +16,9 @@
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
   const MODE_EDIT_TEXT = "modeEditText";
-  const MODE_EDIT_TEXT_SELECT = "modeEditTextSelect";
-  const MODE_VIEW_MATHML = "modeViewMathML";
-  const MODE_VIEW_SELECTION = "modeViewSelection";
-  const MODE_VIEW_SOURCE = "modeViewSource";
+//  const MODE_MATHML = "modeViewMathML";
+  const MODE_SELECTION = "modeViewSelection";
+  const MODE_SOURCE = "modeViewSource";
   const NS_URI_EXTEND_VALUE = 4;
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
@@ -52,9 +48,19 @@
 
   /* variables */
   const vars = {
+    editorPath: "",
     editorName: "",
+    editorCmdArgs: "",
+    editorCmdPos: false,
+    editorShell: false,
+    accessKey: "e",
+    optionsShortCut: true,
+    editorShortCut: true,
     enablePB: false,
+    editableContext: false,
+    forceRemove: true,
     isEnabled: false,
+    isExecutable: false,
     iconPath: `${ICON}#gray`
   };
 
@@ -69,46 +75,6 @@
   };
 
   /**
-   * is string
-   * @param {*} o - object to check
-   * @return {boolean}
-   */
-  const isString = o =>
-    o && (typeof o === "string" || o instanceof String) || false;
-
-  /* classes */
-  /* namespace URI class */
-  class NsURI {
-    constructor() {
-      this._extended = false;
-      this._ns = {
-        html: "http://www.w3.org/1999/xhtml",
-        math: "http://www.w3.org/1998/Math/MathML",
-        svg: "http://www.w3.org/2000/svg",
-        xmlns: "http://www.w3.org/2000/xmlns/"
-      };
-    }
-
-    get extended() {
-      return this._extended;
-    }
-
-    set extended(bool) {
-      const items = Object.keys(this._ns);
-      this._extended = items.length > NS_URI_EXTEND_VALUE && !!bool || false;
-    }
-
-    get ns() {
-      return this._ns;
-    }
-
-    set ns(data) {
-      const items = Object.keys(data);
-      items.length > NS_URI_EXTEND_VALUE && (this._ns = data);
-    }
-  }
-
-  /**
    * check enabled
    * @return {void}
    */
@@ -116,7 +82,6 @@
     const win = await windows.getCurrent();
     const isEnabled = !win.incognito || vars.enablePB;
     vars.isEnabled = isEnabled;
-    port.postMessage({isEnabled});
   };
 
   /**
@@ -133,27 +98,26 @@
    * @param {Object} path - icon path
    * @return {void}
    */
-  const replaceIcon = async (path = `${ICON}#gray`) => {
+  const replaceIcon = async (path = vars.iconPath) => {
     browserAction.setIcon({path});
   };
 
   /**
    * toggle icon
-   * @return {Object} - Promise
+   * @return {void}
    */
-  const toggleIcon = async () =>
-    checkEnabled().then(() => {
-      vars.isEnabled ?
-        replaceIcon(vars.iconPath) :
-        replaceIcon(`${ICON}#off`);
-    });
+  const toggleIcon = async () => {
+    vars.isEnabled ?
+      replaceIcon() :
+      replaceIcon(`${ICON}#off`);
+  };
 
   /**
    * toggle badge
    * @param {boolean} bool - executable
    * @return {void}
    */
-  const toggleBadge = async bool => {
+  const toggleBadge = async (bool = vars.isExecutable) => {
     const color = !bool && WARN_COLOR || "transparent";
     const text = !bool && WARN_TEXT || "";
     browserAction.setBadgeBackgroundColor({color});
@@ -165,31 +129,20 @@
   const ports = {};
 
   /**
-   * port key combination
+   * port message
+   * @param {Object} msg - message
    * @return {void}
    */
-  const portKeyCombo = async () => {
-    const key = await storage.get(KEY_ACCESS).then(res => {
-      const value = (res = res[KEY_ACCESS]) && res.value ?
-                      res.value :
-                      "e";
-      return value;
-    });
-    const openOptions = await storage.get(KEY_OPEN_OPTIONS).then(res => {
-      const value = (res = res[KEY_OPEN_OPTIONS]) ?
-                      !!res.checked :
-                      true;
-      return value;
-    });
-    const execEditor = await storage.get(KEY_EXEC_EDITOR).then(res => {
-      const value = (res = res[KEY_EXEC_EDITOR]) ?
-                      !!res.checked :
-                      true;
-      return value;
-    });
-    const isEnabled = vars.isEnabled;
-    const keyCombo = {key, openOptions, execEditor, isEnabled};
-    ports[PORT_CONTENT] && ports[PORT_CONTENT].postMessage({keyCombo});
+  const portMsg = async msg => {
+    if (Object.keys(msg).length > 0) {
+      const items = ports[PORT_CONTENT] && Object.keys(ports[PORT_CONTENT]);
+      if (items && items.length > 0) {
+        for (let item of items) {
+          items[item] && items[item].postMessage(msg);
+        }
+      }
+      port.postMessage(msg);
+    }
   };
 
   /**
@@ -199,77 +152,75 @@
    */
   const portVars = async msg => {
     const setVars = msg;
-    setVars && port.postMessage({setVars});
+    portMsg({setVars});
   };
+
+  /**
+   * port context menu
+   * @param {Object} info - contextMenus.OnClickData
+   * @param {Object} tab - tabs.Tab
+   * @return {void}
+   */
+  const portContextMenu = async (info, tab) => {
+    const getContent = {info, tab};
+    ports[PORT_CONTENT][tab.id] &&
+      ports[PORT_CONTENT][tab.id].postMessage({getContent});
+  };
+
+  /* context menu */
+  /* context menu items collection */
+  const menus = {};
 
   /* namespace URI */
   const nsURI = new NsURI();
 
-  /* context menu */
-  const menu = {
-    modeViewSource: contextMenus.create({
-      id: MODE_VIEW_SOURCE,
-      title: i18n.getMessage(MODE_VIEW_SOURCE, vars.editorName || LABEL),
-      contexts: ["page"],
-      onclick: () => false,
-      enabled: false
-    }),
-    modeEditTextSelect: contextMenus.create({
-      id: MODE_EDIT_TEXT_SELECT,
-      title: i18n.getMessage(MODE_EDIT_TEXT, vars.editorName || LABEL),
-      contexts: ["editable", "selection"],
-      onclick: () => false,
-      enabled: false
-    }),
-    modeEditText: contextMenus.create({
-      id: MODE_EDIT_TEXT,
-      title: i18n.getMessage(MODE_EDIT_TEXT, vars.editorName || LABEL),
-      contexts: ["editable"],
-      onclick: () => false,
-      enabled: false
-    }),
-    modeViewSelection: contextMenus.create({
-      id: MODE_VIEW_SELECTION,
-      title: i18n.getMessage(MODE_VIEW_SELECTION, vars.editorName || LABEL),
-      contexts: ["selection"],
-      onclick: () => false,
-      enabled: false
-    })
+  /**
+   * create context menu items
+   * @return {void}
+   */
+  const createContextMenuItems = async () => {
+    const items = [MODE_EDIT_TEXT, MODE_SELECTION, MODE_SOURCE];
+    contextMenus.removeAll();
+    if (vars.isEnabled) {
+      for (let item of items) {
+        switch (item) {
+          case MODE_EDIT_TEXT:
+            menus[item] = await contextMenus.create({
+              id: item,
+              title: i18n.getMessage(item, vars.editorName || LABEL),
+              contexts: ["editable"]
+            }) || null;
+            break;
+          case MODE_SELECTION:
+          case MODE_SOURCE:
+            !vars.editableContext && (
+              menus[item] = await contextMenus.create({
+                id: item,
+                title: i18n.getMessage(item, vars.editorName || LABEL),
+                contexts: [
+                  item === MODE_SELECTION && "selection" || "page"
+                ]
+              }) || null
+            );
+            break;
+          default:
+        }
+      }
+    }
   };
 
   /**
-   * replace context menu items
-   * @param {string} ns - namespace URI
+   * update context menu items
    * @return {void}
    */
-  const replaceContextMenu = async (ns = nsURI.ns.html) => {
-    const items = Object.keys(menu);
-    if (items.length === 0) {
+  const updateContextMenuItems = async () => {
+    const items = Object.keys(menus);
+    if (items.length > 0) {
       for (let item of items) {
-        switch (item) {
-          case MODE_VIEW_SOURCE:
-            isString(ns) && ns === nsURI.ns.math ?
-              contextMenus.update(item, {
-                title: i18n.getMessage(MODE_VIEW_MATHML, vars.editorName),
-                enabled: vars.isEnabled
-              }) :
-              contextMenus.update(item, {
-                title: i18n.getMessage(item, vars.editorName),
-                enabled: vars.isEnabled
-              });
-            break;
-          case MODE_EDIT_TEXT_SELECT:
-            contextMenus.update(item, {
-              title: i18n.getMessage(MODE_EDIT_TEXT, vars.editorName),
-              enabled: vars.isEnabled
-            });
-            break;
-          default:
-            contextMenus.update(item, {
-              title: i18n.getMessage(item, vars.editorName),
-              enabled: vars.isEnabled
-            });
-        }
+        items[item] &&
+          contextMenus.update(item, {
+            title: i18n.getMessage(item, vars.editorName || LABEL),
+          });
       }
     }
   };
@@ -283,30 +234,35 @@
   const setVariablesFromStorage = async res => {
     const items = Object.keys(res);
     if (items.length > 0) {
-      port.postMessage({
-        setVars: res
-      });
       for (let item of items) {
         const obj = res[item];
         switch (item) {
           case ENABLE_PB:
+          case EDITABLE_CONTEXT:
             vars[item] = !!obj.checked;
-            toggleIcon();
             break;
           case ICON_COLOR:
           case ICON_GRAY:
           case ICON_WHITE:
             obj.checked && (
-              vars.iconPath = obj.value,
-              replaceIcon(obj.value)
+              vars.iconPath = obj.value
             );
             break;
+          case EDITOR_NAME:
+            vars[item] = obj.value;
+            break;
           case EDITOR_PATH:
-            toggleBadge(obj.data.executable);
+            vars[item] = obj.value;
+            vars.isExecutable = obj.data && !!obj.data.executable;
             break;
           default:
         }
       }
+      checkEnabled().then(() => {
+        portMsg({
+          setVars: vars
+        });
+      }).catch(logError);
     }
     else {
       port.postMessage({
@@ -384,6 +340,21 @@
     }
   };
 
+  /* UI */
+  /**
+   * synchronize UI components
+   * @return {Object} - Promise
+   */
+  const syncUI = async () =>
+    checkEnabled().then(() => Promise.all([
+      portMsg({
+        isEnabled: vars.isEnabled
+      }),
+      toggleIcon(),
+      toggleBadge(),
+      createContextMenuItems()
+    ]));
+
   /* handlers */
   /**
    * handle runtime message
@@ -396,18 +367,6 @@
       for (let item of items) {
         const obj = msg[item];
         switch (item) {
-          case CONTEXT_MENU:
-            replaceContextMenu(obj.nsURI);
-            break;
-          case KEY_COMBO:
-            portKeyCombo();
-            break;
-          case NS_URI:
-            !nsURI.extended && (
-              nsURI.ns = obj,
-              nsURI.extended = true
-            );
-            break;
           case OPEN_OPTIONS:
             obj && openOptionsPage();
             break;
@@ -435,64 +394,76 @@
         case ICON_WHITE:
           obj.checked && (
             vars.iconPath = obj.value,
-            replaceIcon(obj.value)
+            replaceIcon()
           );
           break;
         case EDITOR_PATH:
-          obj.data && toggleBadge(obj.data.executable);
+          vars.editorPath = obj.value;
+          vars.isExecutable = obj.data && !!obj.data.executable;
+          toggleBadge();
           portVars({
             editorPath: obj.value
           });
           break;
         case EDITOR_NAME:
           vars[item] = obj.value;
-          replaceContextMenu();
+          updateContextMenuItems();
           portVars({
             editorName: obj.value
           });
           break;
         case CMD_ARGS:
+          vars[item] = obj.value;
           portVars({
             editorCmdArgs: obj.value
           });
           break;
         case CMD_POSITION:
+          vars[item] = !!obj.checked;
           portVars({
             editorCmdPos: !!obj.checked
           });
           break;
         case SPAWN_SHELL:
+          vars[item] = !!obj.checked;
           portVars({
             editorShell: !!obj.checked
           });
           break;
         case KEY_ACCESS:
-          portKeyCombo();
+          vars[item] = obj.value;
           portVars({
             accessKey: obj.value
           });
           break;
         case KEY_OPEN_OPTIONS:
-          portKeyCombo();
+          vars[item] = !!obj.checked;
+          portVars({
+            optionsShortCut: !!obj.checked
+          });
           break;
         case KEY_EXEC_EDITOR:
-          portKeyCombo();
+          vars[item] = !!obj.checked;
           portVars({
             editorShortCut: !!obj.checked
           });
           break;
         case ENABLE_PB:
           vars[item] = !!obj.checked;
+          syncUI();
           portVars({
             enablePB: !!obj.checked
           });
           break;
         case EDITABLE_CONTEXT:
+          vars[item] = !!obj.checked;
+          createContextMenuItems();
           portVars({
             editableContext: !!obj.checked
           });
           break;
         case FORCE_REMOVE:
+          vars[item] = !!obj.checked;
           portVars({
             forceRemove: !!obj.checked
           });
@@ -508,18 +479,27 @@
    * @return {void}
    */
   const handlePort = async conn => {
-    ports[conn.name] = conn;
+    const id = conn.sender.tab.id;
+    ports[conn.name] = ports[conn.name] || {};
+    ports[conn.name][id] = conn;
     conn.onMessage.addListener(handleMsg);
+    conn.onDisconnect.addListener(() => {
+      delete ports[conn.name][id];
+    });
+    conn.postMessage({
+      setVars: vars
+    });
   };
 
   /* add listeners */
   browserAction.onClicked.addListener(openOptionsPage);
   browser.storage.onChanged.addListener(handleStorageChange);
+  contextMenus.onClicked.addListener(portContextMenu);
   port.onMessage.addListener(handleMsg);
   runtime.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(handlePort);
-  windows.onFocusChanged.addListener(toggleIcon);
+  windows.onFocusChanged.addListener(syncUI);
 
   /* startup */
-  storage.get().then(setVariablesFromStorage).catch(logError);
+  storage.get().then(setVariablesFromStorage).then(syncUI).catch(logError);
 }

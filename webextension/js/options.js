@@ -7,7 +7,7 @@
   const PORT_OPTIONS = "portOptions";
   const RES_EXECUTABLE = "resExecutable";
 
-  const ATTR_I18N = "data-i18n";
+  const DATA_ATTR_I18N = "data-i18n";
   const EDITOR_PATH = "editorPath";
   const EDITOR_NAME = "editorName";
   const ELEMENT_NODE = 1;
@@ -155,8 +155,8 @@
       for (let attr in attrs) {
         if (elm.hasAttribute(attrs[attr])) {
           const data = await i18n.getMessage(
-                               `${elm.getAttribute(ATTR_I18N)}.${attr}`
-                             );
+            `${elm.getAttribute(DATA_ATTR_I18N)}.${attr}`
+          );
           data && elm.setAttribute(attrs[attr], data);
         }
       }
@@ -168,10 +168,10 @@
    * @return {void}
    */
   const localizeElm = async () => {
-    const nodes = document.querySelectorAll(`[${ATTR_I18N}]`);
+    const nodes = document.querySelectorAll(`[${DATA_ATTR_I18N}]`);
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        const data = await i18n.getMessage(node.getAttribute(ATTR_I18N));
+        const data = await i18n.getMessage(node.getAttribute(DATA_ATTR_I18N));
         data && (node.textContent = data);
         node.hasAttributes() && localizeAttr(node);
       }
@@ -193,24 +193,27 @@
    */
   const setValuesFromStorage = async () => {
     const pref = await storage.get() || {};
-    for (let key in pref) {
-      const elm = (key = pref[key]) && key.id &&
-                    document.getElementById(key.id);
-      if (elm) {
-        switch (elm.type) {
-          case "checkbox":
-          case "radio":
-            elm.checked = !!key.checked;
-            break;
-          case "text":
-            elm.value = isString(key.value) && key.value || "";
-            vars.editorPath && elm === vars.editorPath && elm.value &&
-            key.data.executable && (
-              elm.dataset.executable = "true",
-              vars.editorName && (vars.editorName.disabled = false)
-            );
-            break;
-          default:
+    const items = Object.keys(pref);
+    if (items.length > 0) {
+      for (let item of items) {
+        const obj = pref[item];
+        const elm = document.getElementById(obj.id);
+        if (elm) {
+          switch (elm.type) {
+            case "checkbox":
+            case "radio":
+              elm.checked = !!obj.checked;
+              break;
+            case "text":
+              elm.value = isString(obj.value) && obj.value || "";
+              vars.editorPath && elm === vars.editorPath && elm.value &&
+              obj.data && obj.data.executable && (
+                elm.dataset.executable = "true",
+                vars.editorName && (vars.editorName.disabled = false)
+              );
+              break;
+            default:
+          }
         }
       }
     }
@@ -255,15 +258,9 @@
   /* add listener */
   port.onMessage.addListener(handleMsg);
 
-  /**
-   * startup
-   * @return {Object} - Promise
-   */
-  const startUp = () => Promise.all([
+  window.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtmlLang().then(localizeElm),
     setVariables().then(setValuesFromStorage),
     addInputChangeListener()
-  ]).catch(logError);
-
-  window.addEventListener("DOMContentLoaded", startUp, false);
+  ]).catch(logError), false);
 }
