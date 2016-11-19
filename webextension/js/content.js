@@ -28,7 +28,8 @@
   const KEY_EXEC_EDITOR = "editorShortCut";
   const EDITABLE_CONTEXT = "editableContext";
   const IS_ENABLED = "isEnabled";
-  const TAB_ID: "tabId";
+  const CONTEXT_NODE = "contextNode";
+  const TAB_ID = "tabId";
 
   /* shortcut */
   const runtime = browser.runtime;
@@ -37,15 +38,16 @@
   const port = runtime.connect({name: PORT_CONTENT});
 
   /* variables */
-  const vars = {
-    accessKey: "e",
-    optionsShortCut: true,
-    editorShortCut: true,
-    editableContext: false,
-    isEnabled: false,
-    contextNode: null,
-    tabId: null
-  };
+  const vars = {};
+
+  /* set default variables*/
+  vars[KEY_ACCESS] = "e";
+  vars[KEY_OPEN_OPTIONS] = true;
+  vars[KEY_EXEC_EDITOR] = true;
+  vars[EDITABLE_CONTEXT] = false;
+  vars[IS_ENABLED] = false;
+  vars[CONTEXT_NODE] = null;
+  vars[TAB_ID] = null;
 
   /* RegExp */
   const reType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
@@ -196,8 +198,11 @@
                    elm.getAttributeNS("", DATA_ATTR_ID_CONTROLS)
                  );
     attr && attr.split(" ").forEach(value => {
-      const syncText = value;
-      portMsg({syncText});
+      const getTmpFile = {
+        dataId: value,
+        tabId: vars[TAB_ID]
+      };
+      portMsg({getTmpFile});
     });
   };
 
@@ -214,6 +219,8 @@
     const url = nsURI && !nsURI.extended && await runtime.getURL(path) || false;
     if (url) {
       fetch(url).then(async res => {
+        const r = await res.headers;
+        console.log(r);
         const ns = await res.json();
         const items = Object.keys(ns);
         items.length > NS_URI_EXTEND_VALUE && (
@@ -586,7 +593,7 @@
    * @param {Object} elm - element
    * @return {Object} - content data
    */
-  const getContent = async (elm = vars.contextNode) => {
+  const getContent = async (elm = vars[CONTEXT_NODE]) => {
     const cnt = {
       mode: MODE_SOURCE,
       charset: window.top.document.characterSet,
@@ -719,22 +726,22 @@
   /* key combo */
   /* open options key */
   const openOptionsKey = new KeyCombo({
-    key: vars.accessKey,
+    key: vars[KEY_ACCESS],
     alt: true,
     ctrl: true,
     meta: false,
     shift: false,
-    enabled: vars.optionsShortCut
+    enabled: vars[KEY_OPEN_OPTIONS]
   });
 
   /* execute editor key */
   const execEditorKey = new KeyCombo({
-    key: vars.accessKey,
+    key: vars[KEY_ACCESS],
     alt: false,
     ctrl: true,
     meta: false,
     shift: true,
-    enabled: vars.editorShortCut
+    enabled: vars[KEY_EXEC_EDITOR]
   });
 
   /**
@@ -744,7 +751,7 @@
    * @return {boolean}
    */
   const keyComboMatches = async (evt, key) =>
-    vars.isEnabled && key.enabled &&
+    vars[IS_ENABLED] && key.enabled &&
     evt.key && evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
@@ -765,7 +772,7 @@
     }
     else {
       elm && execEditor && (
-        vars.editableContext ?
+        vars[EDITABLE_CONTEXT] ?
           isEditControl(elm) || elm.isContentEditable ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
           reType.test(document.contentType)
@@ -779,7 +786,7 @@
    * @return {void}
    */
   const handleContextMenu = async evt => {
-    vars.contextNode = evt && evt.target || null;
+    vars[CONTEXT_NODE] = evt && evt.target || null;
   };
 
   /**

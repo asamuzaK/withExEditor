@@ -6,11 +6,11 @@
   /* constants */
   const PORT_OPTIONS = "portOptions";
   const RES_EXECUTABLE = "resExecutable";
-
   const DATA_ATTR_I18N = "data-i18n";
+  const ELEMENT_NODE = 1;
+
   const EDITOR_PATH = "editorPath";
   const EDITOR_NAME = "editorName";
-  const ELEMENT_NODE = 1;
 
   /* shortcuts */
   const i18n = browser.i18n;
@@ -21,10 +21,11 @@
   const port = runtime.connect({name: PORT_OPTIONS});
 
   /* variables */
-  const vars = {
-    editorPath: null,
-    editorName: null
-  };
+  const vars = {};
+
+  /* set default variables*/
+  vars[EDITOR_PATH] = null;
+  vars[EDITOR_NAME] = null;
 
   /**
    * log error
@@ -51,13 +52,13 @@
    * @return {void}
    */
   const synchronizeEditorName = async name => {
-    vars.editorName && (
+    vars[EDITOR_NAME] && (
       name && isString(name) ? (
-        vars.editorName.value = name,
-        vars.editorName.disabled = false
+        vars[EDITOR_NAME].value = name,
+        vars[EDITOR_NAME].disabled = false
       ) : (
-        vars.editorName.value = "",
-        vars.editorName.disabled = true
+        vars[EDITOR_NAME].value = "",
+        vars[EDITOR_NAME].disabled = true
       ),
       storage.set({
         editorName: {
@@ -112,7 +113,7 @@
         }
       }
       else {
-        vars.editorPath && elm === vars.editorPath ?
+        vars[EDITOR_PATH] && elm === vars[EDITOR_PATH] ?
           port.postMessage({
             checkExecutable: {
               path: elm.value
@@ -206,10 +207,10 @@
               break;
             case "text":
               elm.value = isString(obj.value) && obj.value || "";
-              vars.editorPath && elm === vars.editorPath && elm.value &&
+              vars[EDITOR_PATH] && elm === vars[EDITOR_PATH] && elm.value &&
               obj.data && obj.data.executable && (
                 elm.dataset.executable = "true",
-                vars.editorName && (vars.editorName.disabled = false)
+                vars[EDITOR_NAME] && (vars[EDITOR_NAME].disabled = false)
               );
               break;
             default:
@@ -224,8 +225,8 @@
    * @return {void}
    */
   const setVariables = async () => {
-    vars.editorPath = document.getElementById(EDITOR_PATH);
-    vars.editorName = document.getElementById(EDITOR_NAME);
+    vars[EDITOR_PATH] = document.getElementById(EDITOR_PATH);
+    vars[EDITOR_NAME] = document.getElementById(EDITOR_NAME);
   };
 
   /* handler */

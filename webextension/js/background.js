@@ -19,7 +19,6 @@
 //  const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
-  const NS_URI_EXTEND_VALUE = 4;
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
 
@@ -34,6 +33,9 @@
   const ENABLE_PB = "enablePB";
   const EDITABLE_CONTEXT = "editableContext";
   const FORCE_REMOVE = "forceRemove";
+  const IS_ENABLED = "isEnabled";
+  const IS_EXECUTABLE = "isExecutable";
+  const ICON_PATH = "iconPath";
 
   /* shortcuts */
   const browserAction = browser.browserAction;
@@ -47,22 +49,23 @@
   const port = runtime.connect({name: PORT_BACKGROUND});
 
   /* variables */
-  const vars = {
-    editorPath: "",
-    editorName: "",
-    editorCmdArgs: "",
-    editorCmdPos: false,
-    editorShell: false,
-    accessKey: "e",
-    optionsShortCut: true,
-    editorShortCut: true,
-    enablePB: false,
-    editableContext: false,
-    forceRemove: true,
-    isEnabled: false,
-    isExecutable: false,
-    iconPath: `${ICON}#gray`
-  };
+  const vars = {};
+
+  /* set default variables*/
+  vars[EDITOR_PATH] = "";
+  vars[EDITOR_NAME] = "";
+  vars[CMD_ARGS] = "";
+  vars[CMD_POSITION] = false;
+  vars[SPAWN_SHELL] = false;
+  vars[KEY_ACCESS] = "e";
+  vars[KEY_OPEN_OPTIONS] = true;
+  vars[KEY_EXEC_EDITOR] = true;
+  vars[ENABLE_PB] = false;
+  vars[EDITABLE_CONTEXT] = false;
+  vars[FORCE_REMOVE] = true;
+  vars[IS_ENABLED] = false;
+  vars[IS_EXECUTABLE] = false;
+  vars[ICON_PATH] = `${ICON}#gray`;
 
   /**
    * log error
@@ -80,8 +83,8 @@
    */
   const checkEnabled = async () => {
     const win = await windows.getCurrent();
-    const isEnabled = !win.incognito || vars.enablePB;
-    vars.isEnabled = isEnabled;
+    const isEnabled = !win.incognito || vars[ENABLE_PB];
+    vars[IS_ENABLED] = isEnabled;
   };
 
   /**
@@ -89,7 +92,7 @@
    * @return {void}
    */
   const openOptionsPage = async () => {
-    vars.isEnabled && runtime.openOptionsPage();
+    vars[IS_ENABLED] && runtime.openOptionsPage();
   };
 
   /* icon */
@@ -98,7 +101,7 @@
    * @param {Object} path - icon path
    * @return {void}
    */
-  const replaceIcon = async (path = vars.iconPath) => {
+  const replaceIcon = async (path = vars[ICON_PATH]) => {
     browserAction.setIcon({path});
   };
 
@@ -107,7 +110,7 @@
    * @return {void}
    */
   const toggleIcon = async () => {
-    vars.isEnabled ?
+    vars[IS_ENABLED] ?
       replaceIcon() :
       replaceIcon(`${ICON}#off`);
   };
@@ -117,7 +120,7 @@
    * @param {boolean} bool - executable
    * @return {void}
    */
-  const toggleBadge = async (bool = vars.isExecutable) => {
+  const toggleBadge = async (bool = vars[IS_EXECUTABLE]) => {
     const color = !bool && WARN_COLOR || "transparent";
     const text = !bool && WARN_TEXT || "";
     browserAction.setBadgeBackgroundColor({color});
@@ -178,22 +181,22 @@
   const createContextMenuItems = async () => {
     const items = [MODE_EDIT_TEXT, MODE_SELECTION, MODE_SOURCE];
     contextMenus.removeAll();
-    if (vars.isEnabled) {
+    if (vars[IS_ENABLED]) {
       for (let item of items) {
         switch (item) {
           case MODE_EDIT_TEXT:
             menus[item] = await contextMenus.create({
               id: item,
-              title: i18n.getMessage(item, vars.editorName || LABEL),
+              title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
               contexts: ["editable"]
             }) || null;
             break;
           case MODE_SELECTION:
           case MODE_SOURCE:
-            !vars.editableContext && (
+            !vars[EDITABLE_CONTEXT] && (
               menus[item] = await contextMenus.create({
                 id: item,
-                title: i18n.getMessage(item, vars.editorName || LABEL),
+                title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
                 contexts: [
                   item === MODE_SELECTION && "selection" || "page"
                 ]
@@ -216,7 +219,7 @@
       for (let item of items) {
         items[item] &&
           contextMenus.update(item, {
-            title: i18n.getMessage(item, vars.editorName || LABEL),
+            title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
           });
       }
     }
@@ -242,7 +245,7 @@
           case ICON_GRAY:
           case ICON_WHITE:
             obj.checked && (
-              vars.iconPath = obj.value
+              vars[ICON_PATH] = obj.value
             );
             break;
           case EDITOR_NAME:
@@ -250,7 +253,7 @@
             break;
           case EDITOR_PATH:
             vars[item] = obj.value;
-            vars.isExecutable = obj.data && !!obj.data.executable;
+            vars[IS_EXECUTABLE] = obj.data && !!obj.data.executable;
             break;
           default:
         }
@@ -345,7 +348,7 @@
   const syncUI = async () =>
     checkEnabled().then(() => Promise.all([
       portMsg({
-        isEnabled: vars.isEnabled
+        isEnabled: vars[IS_ENABLED]
       }),
       toggleIcon(),
       toggleBadge(),
@@ -391,13 +394,13 @@
           case ICON_GRAY:
           case ICON_WHITE:
             obj.checked && (
-              vars.iconPath = obj.value,
+              vars[ICON_PATH] = obj.value,
               replaceIcon()
             );
             break;
           case EDITOR_PATH:
-            vars.editorPath = obj.value;
-            vars.isExecutable = obj.data && !!obj.data.executable;
+            vars[EDITOR_PATH] = obj.value;
+            vars[IS_EXECUTABLE] = obj.data && !!obj.data.executable;
             toggleBadge();
             portVars({
               editorPath: obj.value
