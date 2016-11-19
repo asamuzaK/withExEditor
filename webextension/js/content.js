@@ -18,8 +18,6 @@
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
-  const NS_URI_DATA_PATH = "./data/nsUri.json";
-  const NS_URI_EXTEND_VALUE = 4;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
 
@@ -70,38 +68,7 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
-  /* classes */
-  /* namespace URI class */
-  class NsURI {
-    constructor() {
-      this._extended = false;
-      this._ns = {
-        html: "http://www.w3.org/1999/xhtml",
-        math: "http://www.w3.org/1998/Math/MathML",
-        svg: "http://www.w3.org/2000/svg",
-        xmlns: "http://www.w3.org/2000/xmlns/"
-      };
-    }
-
-    get extended() {
-      return this._extended;
-    }
-
-    set extended(bool) {
-      const items = Object.keys(this._ns);
-      this._extended = items.length > NS_URI_EXTEND_VALUE && !!bool || false;
-    }
-
-    get ns() {
-      return this._ns;
-    }
-
-    set ns(data) {
-      const items = Object.keys(data);
-      items.length > NS_URI_EXTEND_VALUE && (this._ns = data);
-    }
-  }
-
+  /* class */
   /**
    * key combo class
    */
@@ -208,29 +175,92 @@
 
   /* get content */
   /* namespace URI */
-  const nsURI = new NsURI();
-
-  /**
-   * extend nsURI.ns data
-   * @param {string} path - path
-   * @return {void}
-   */
-  const extendNsURI = async (path = NS_URI_DATA_PATH) => {
-    const url = nsURI && !nsURI.extended && await runtime.getURL(path) || false;
-    if (url) {
-      fetch(url).then(async res => {
-        const r = await res.headers;
-        console.log(r);
-        const ns = await res.json();
-        const items = Object.keys(ns);
-        items.length > NS_URI_EXTEND_VALUE && (
-          nsURI.ns = ns,
-          nsURI.extended = true
-        );
-      }).catch(logError);
-    }
+  const nsURI =   {
+    ag: "http://purl.org/rss/1.0/modules/aggregation/",
+    annotate: "http://purl.org/rss/1.0/modules/annotate/",
+    app: "http://www.w3.org/2007/app",
+    atom: "http://www.w3.org/2005/Atom",
+    cc: "http://creativecommons.org/ns#",
+    cnt: "http://www.w3.org/2008/content#",
+    company: "http://purl.org/rss/1.0/modules/company",
+    content: "http://purl.org/rss/1.0/modules/content/",
+    csvw: "http://www.w3.org/ns/csvw#",
+    ctag: "http://commontag.org/ns#",
+    dc: "http://purl.org/dc/terms/",
+    dc11: "http://purl.org/dc/elements/1.1/",
+    dcat: "http://www.w3.org/ns/dcat#",
+    dcterms: "http://purl.org/dc/terms/",
+    earl: "http://www.w3.org/ns/earl#",
+    em: "http://www.mozilla.org/2004/em-rdf#",
+    email: "http://purl.org/rss/1.0/modules/email/",
+    emma: "http://www.w3.org/2003/04/emma",
+    emo: "http://www.w3.org/2009/10/emotionml",
+    ev: "http://www.w3.org/2001/xml-events",
+    fh: "http://purl.org/syndication/history/1.0",
+    foaf: "http://xmlns.com/foaf/0.1/",
+    geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
+    gr: "http://purl.org/goodrelations/v1#",
+    grddl: "http://www.w3.org/2003/g/data-view#",
+    ht: "http://www.w3.org/2006/http#",
+    html: "http://www.w3.org/1999/xhtml",
+    ical: "http://www.w3.org/2002/12/cal/icaltzd#",
+    image: "http://purl.org/rss/1.0/modules/image/",
+    itms: "http://phobos.apple.com/rss/1.0/modules/itms/",
+    its: "http://www.w3.org/2005/11/its",
+    itunes: "http://www.itunes.com/dtds/podcast-1.0.dtd",
+    l: "http://purl.org/rss/1.0/modules/link/",
+    ma: "http://www.w3.org/ns/ma-ont#",
+    math: "http://www.w3.org/1998/Math/MathML",
+    oa: "http://www.w3.org/ns/oa#",
+    og: "http://ogp.me/ns#",
+    org: "http://www.w3.org/ns/org#",
+    owl: "http://www.w3.org/2002/07/owl#",
+    prov: "http://www.w3.org/ns/prov#",
+    ptr: "http://www.w3.org/2009/pointers#",
+    qb: "http://purl.org/linked-data/cube#",
+    rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    rdfa: "http://www.w3.org/ns/rdfa#",
+    rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+    rev: "http://purl.org/stuff/rev#",
+    rif: "http://www.w3.org/2007/rif#",
+    rr: "http://www.w3.org/ns/r2rml#",
+    rss1: "http://purl.org/rss/1.0/",
+    rss11: "http://purl.org/net/rss1.1#",
+    schema: "http://schema.org/",
+    sd: "http://www.w3.org/ns/sparql-service-description#",
+    search: "http://purl.org/rss/1.0/modules/search/",
+    sioc: "http://rdfs.org/sioc/ns#",
+    skos: "http://www.w3.org/2004/02/skos/core#",
+    skosxl: "http://www.w3.org/2008/05/skos-xl#",
+    slash: "http://purl.org/rss/1.0/modules/slash/",
+    sparql: "http://www.w3.org/2005/sparql-results#",
+    ss: "http://purl.org/rss/1.0/modules/servicestatus/",
+    sub: "http://purl.org/rss/1.0/modules/subscription/",
+    svg: "http://www.w3.org/2000/svg",
+    sy: "http://purl.org/rss/1.0/modules/syndication/",
+    taxo: "http://purl.org/rss/1.0/modules/taxonomy/",
+    thr: "http://purl.org/syndication/thread/1.0",
+    ttml: "http://www.w3.org/ns/ttml",
+    v: "http://rdf.data-vocabulary.org/#",
+    vcard: "http://www.w3.org/2006/vcard/ns#",
+    "void": "http://rdfs.org/ns/void#",
+    wdr: "http://www.w3.org/2007/05/powder#",
+    wdrs: "http://www.w3.org/2007/05/powder-s#",
+    wiki: "http://purl.org/rss/1.0/modules/wiki/",
+    wsdl: "http://www.w3.org/ns/wsdl",
+    wsp: "http://www.w3.org/ns/ws-policy",
+    xbl: "http://www.mozilla.org/xbl",
+    xhv: "http://www.w3.org/1999/xhtml/vocab#",
+    xi: "http://www.w3.org/2001/XInclude",
+    xhtml: "http://www.w3.org/1999/xhtml",
+    xlink: "http://www.w3.org/1999/xlink",
+    xml: "http://www.w3.org/XML/1998/namespace",
+    xmlns: "http://www.w3.org/2000/xmlns/",
+    xsd: "http://www.w3.org/2001/XMLSchema#",
+    xsi: "http://www.w3.org/2001/XMLSchema-instance",
+    xsl: "http://www.w3.org/1999/XSL/Transform",
+    xul: "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
   };
-
 
   /**
    * get namespace of node from ancestor
@@ -253,13 +283,13 @@
           ns.uri = node.namespaceURI
         ) :
         /^foreignObject$/.test(obj.localName) &&
-        (obj.hasAttributeNS(nsURI.ns.svg, "requiredExtensions") ||
+        (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
          document.documentElement.localName === "html") ? (
           ns.node = node,
           ns.name = node.localName,
-          ns.uri = obj.hasAttributeNS(nsURI.ns.svg, "requiredExtensions") &&
-                     obj.getAttributeNS(nsURI.ns.svg, "requiredExtensions") ||
-                     nsURI.ns.html
+          ns.uri = obj.hasAttributeNS(nsURI.svg, "requiredExtensions") &&
+                     obj.getAttributeNS(nsURI.svg, "requiredExtensions") ||
+                     nsURI.html
         ) :
         /^(?:math|svg)$/.test(node.localName) ? (
           ns.node = node,
@@ -334,7 +364,7 @@
     const localName = node && node.localName;
     const elm = node && document.createElementNS(
       node.namespaceURI || prefix && nsURI.ns[prefix] ||
-      (obj = await getNodeNS(node)) && obj.uri || nsURI.ns.html,
+      (obj = await getNodeNS(node)) && obj.uri || nsURI.html,
       prefix && `${prefix}:${localName}` || localName
     );
     const childNode = bool && node.hasChildNodes() &&
@@ -497,13 +527,13 @@
   const getId = elm => {
     let id = null;
     if (elm) {
-      const html = !elm.namespaceURI || elm.namespaceURI === nsURI.ns.html;
-      const ns = !html && nsURI.ns.html || "";
+      const html = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
+      const ns = !html && nsURI.html || "";
       elm.hasAttributeNS(ns, DATA_ATTR_ID) ?
         id = elm.getAttributeNS(ns, DATA_ATTR_ID) : (
         id = `withExEditor${window.performance.now()}`.replace(/\./, "_"),
         !html &&
-          elm.setAttributeNS(nsURI.ns.xmlns, "xmlns:html", nsURI.ns.html),
+          elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html),
         elm.setAttributeNS(ns, html && DATA_ATTR_ID || DATA_ATTR_ID_NS, id),
         html && elm.addEventListener("focus", portTemporaryId, false)
       );
@@ -520,7 +550,7 @@
     let editable = false, elm = node;
     while (elm && elm.parentNode) {
       if (typeof elm.isContentEditable === "boolean" &&
-          (!elm.namespaceURI || elm.namespaceURI === nsURI.ns.html)) {
+          (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
         editable = elm.isContentEditable;
         break;
       }
@@ -536,7 +566,7 @@
    */
   const isContentTextNode = async node => {
     let isText = false;
-    if (node && node.namespaceURI && node.namespaceURI !== nsURI.ns.html &&
+    if (node && node.namespaceURI && node.namespaceURI !== nsURI.html &&
         node.hasChildNodes()) {
       const nodes = node.childNodes;
       for (let child of nodes) {
@@ -599,7 +629,8 @@
       charset: window.top.document.characterSet,
       target: null,
       value: null,
-      namespace: null
+      namespace: null,
+      tabId: vars[TAB_ID]
     };
     const sel = window.getSelection();
     const nodeNS = await getNodeNS(elm);
@@ -620,7 +651,7 @@
           cnt.namespace = nodeNS.uri,
           setDataAttrs(elm)
         ) :
-        nodeNS.uri === nsURI.ns.math &&
+        nodeNS.uri === nsURI.math &&
         (obj = await createDomMathML(elm)) && (
           cnt.mode = MODE_MATHML,
           cnt.value = obj
@@ -679,47 +710,49 @@
 
   /**
    * get target element and sync text
-   * @param {Object} data - sync data
+   * @param {Object} obj - sync data object
    * @return {void}
    */
-  const syncText = async data => {
-    const elm = document.activeElement;
-    const namespace = data.namespace || nsURI.html;
-    const target = data.target || "";
-    const timestamp = data.timestamp || 0;
-    const value = data.value || "";
-    let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
-        ns = !html && nsURI.html || "",
-        attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS;
-    if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CONTROLS)) {
-      const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CONTROLS)).split(" ");
-      for (let id of arr) {
-        if (id === target) {
-          (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`)) && (
-            html = !id.namespaceURI || id.namespaceURI === nsURI.html,
-            ns = !html && nsURI.html || "",
-            attr = html && DATA_ATTR_TS || `html:${DATA_ATTR_TS}`,
-            (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
-             timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
-              id.setAttributeNS(ns, attr, timestamp),
-              syncContentText(id, value.split("\n"), namespace)
-            )
-          );
-          break;
+  const syncText = async obj => {
+    if (obj.tabId === vars[TAB_ID]) {
+      const elm = document.activeElement;
+      const namespace = obj.data.namespace || nsURI.html;
+      const target = obj.data.target || "";
+      const timestamp = obj.data.timestamp || 0;
+      const value = obj.value || "";
+      let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+          ns = !html && nsURI.html || "",
+          attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS;
+      if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CONTROLS)) {
+        const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CONTROLS)).split(" ");
+        for (let id of arr) {
+          if (id === target) {
+            (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`)) && (
+              html = !id.namespaceURI || id.namespaceURI === nsURI.html,
+              ns = !html && nsURI.html || "",
+              attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS,
+              (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
+               timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
+                id.setAttributeNS(ns, attr, timestamp),
+                syncContentText(id, value.split("\n"), namespace)
+              )
+            );
+            break;
+          }
         }
       }
-    }
-    else {
-      elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-      elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
-      (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
-       timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
-        elm.setAttributeNS(ns, attr, timestamp),
-        /^(?:input|textarea)$/.test(elm.localName) ?
-          elm.value = value :
-        elm.isContentEditable &&
-          syncContentText(elm, value.split("\n"), namespace)
-      );
+      else {
+        elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
+        elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
+        (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
+         timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
+          elm.setAttributeNS(ns, attr, timestamp),
+          /^(?:input|textarea)$/.test(elm.localName) ?
+            elm.value = value :
+          elm.isContentEditable &&
+            syncContentText(elm, value.split("\n"), namespace)
+        );
+      }
     }
   };
 
@@ -824,7 +857,6 @@
             openOptionsKey.enabled = !!obj;
             break;
           case SYNC_TEXT:
-            console.log(`${item}: ${obj}`);
             syncText(obj);
             break;
           case TAB_ID:
@@ -843,6 +875,5 @@
     const root = document.documentElement;
     root.addEventListener("contextmenu", handleContextMenu, false);
     root.addEventListener("keypress", handleKeyPress, false);
-    extendNsURI();
   }, false);
 }
