@@ -8,6 +8,6 @@ v2.0.0
 
 Code Refactoring
 <ul>
-<li>「WebExtensions」を部分的に埋め込み</li>
+<li>「WebExtensions」を埋め込み</li>
 <li>「async / await」で関数を書き直し</li>
 </ul>

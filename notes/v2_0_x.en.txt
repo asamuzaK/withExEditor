@@ -8,6 +8,6 @@ New And Updated Features
 
 Code Refactoring
 <ul>
-<li>Partially embedded `WebExtensions`</li>
+<li>Embedded `WebExtensions`</li>
 <li>Rewrote functions with `async / await`</li>
 </ul>
