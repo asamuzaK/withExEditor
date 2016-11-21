@@ -11,15 +11,15 @@
 
   const DATA_ATTR_ID = "data-with_ex_editor_id";
   const DATA_ATTR_ID_NS = `html:${DATA_ATTR_ID}`;
-  const DATA_ATTR_ID_CONTROLS = `${DATA_ATTR_ID}_controls`;
+  const DATA_ATTR_ID_CTRL = `${DATA_ATTR_ID}_controls`;
   const DATA_ATTR_TS = "data-with_ex_editor_timestamp";
   const DATA_ATTR_TS_NS = `html:${DATA_ATTR_TS}`;
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
-  const NS_URI_DATA_PATH = "./data/nsUri.json";
-  const NS_URI_EXTEND_VALUE = 4;
+  const NS_URI = "nsURI";
+  const NS_URI_DEFAULT_ITEMS = 4;
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
 
@@ -33,6 +33,7 @@
 
   /* shortcut */
   const runtime = browser.runtime;
+  const storage = browser.storage.local;
 
   /* port */
   const port = runtime.connect({name: PORT_CONTENT});
@@ -70,38 +71,7 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
-  /* classes */
-  /* namespace URI class */
-  class NsURI {
-    constructor() {
-      this._extended = false;
-      this._ns = {
-        html: "http://www.w3.org/1999/xhtml",
-        math: "http://www.w3.org/1998/Math/MathML",
-        svg: "http://www.w3.org/2000/svg",
-        xmlns: "http://www.w3.org/2000/xmlns/"
-      };
-    }
-
-    get extended() {
-      return this._extended;
-    }
-
-    set extended(bool) {
-      const items = Object.keys(this._ns);
-      this._extended = items.length > NS_URI_EXTEND_VALUE && !!bool || false;
-    }
-
-    get ns() {
-      return this._ns;
-    }
-
-    set ns(data) {
-      const items = Object.keys(data);
-      items.length > NS_URI_EXTEND_VALUE && (this._ns = data);
-    }
-  }
-
+  /* class */
   /**
    * key combo class
    */
@@ -124,50 +94,40 @@
       this._enabled = opt.enabled || false;
     }
 
+    /* getter / setter */
     get key() {
       return this._key;
     }
-
     set key(key) {
       this._key = isString(key) && key.length === 1 && key || "";
     }
-
     get altKey() {
       return this._alt;
     }
-
     set altKey(bool) {
       this._alt = !!bool;
     }
-
     get ctrlKey() {
       return this._ctrl;
     }
-
     set ctrlKey(bool) {
       this._ctrl = !!bool;
     }
-
     get metaKey() {
       return this._meta;
     }
-
     set metaKey(bool) {
       this._meta = !!bool;
     }
-
     get shiftKey() {
       return this._shift;
     }
-
     set shiftKey(bool) {
       this._shift = !!bool;
     }
-
     get enabled() {
       return this._enabled;
     }
-
     set enabled(bool) {
       this._enabled = !!bool;
     }
@@ -180,8 +140,7 @@
    * @return {void}
    */
   const portMsg = async msg => {
-    const items = Object.keys(msg);
-    items.length > 0 && port.postMessage(msg);
+    Object.keys(msg).length > 0 && port.postMessage(msg);
   };
 
   /**
@@ -194,8 +153,8 @@
     const attr = elm && (
                    elm.hasAttributeNS("", DATA_ATTR_ID) &&
                    elm.getAttributeNS("", DATA_ATTR_ID) ||
-                   elm.hasAttributeNS("", DATA_ATTR_ID_CONTROLS) &&
-                   elm.getAttributeNS("", DATA_ATTR_ID_CONTROLS)
+                   elm.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
+                   elm.getAttributeNS("", DATA_ATTR_ID_CTRL)
                  );
     attr && attr.split(" ").forEach(value => {
       const getTmpFile = {
@@ -206,27 +165,30 @@
     });
   };
 
-  /* get content */
+  /* get content source */
   /* namespace URI */
-  /* namespace URI */
-  const nsURI = new NsURI();
+  const nsURI = {
+    html: "http://www.w3.org/1999/xhtml",
+    math: "http://www.w3.org/1998/Math/MathML",
+    svg: "http://www.w3.org/2000/svg",
+    xmlns: "http://www.w3.org/2000/xmlns/"
+  };
 
   /**
-   * extend nsURI.ns data
-   * @param {string} path - path
+   * extend nsURI namespace items
    * @return {void}
    */
-  const extendNsURI = async (path = NS_URI_DATA_PATH) => {
-    const url = nsURI && !nsURI.extended && await runtime.getURL(path) || false;
-    if (url) {
-      fetch(url).then(async res => {
-        const ns = await res.json();
-        const items = Object.keys(ns);
-        items.length > NS_URI_EXTEND_VALUE && (
-          nsURI.ns = ns,
-          nsURI.extended = true
-        );
-      }).catch(logError);
+  const extendNsURI = async () => {
+    if (Object.keys(nsURI).length <= NS_URI_DEFAULT_ITEMS) {
+      const ns = await storage.get(NS_URI);
+      if (Object.keys(ns).length > 0) {
+        const items = Object.keys(ns[NS_URI]);
+        if (items.length > NS_URI_DEFAULT_ITEMS) {
+          for (let item of items) {
+            nsURI[item] = ns[NS_URI][item];
+          }
+        }
+      }
     }
   };
 
@@ -251,18 +213,18 @@
           ns.uri = node.namespaceURI
         ) :
         /^foreignObject$/.test(obj.localName) &&
-        (obj.hasAttributeNS(nsURI.ns.svg, "requiredExtensions") ||
+        (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
          document.documentElement.localName === "html") ? (
           ns.node = node,
           ns.name = node.localName,
-          ns.uri = obj.hasAttributeNS(nsURI.ns.svg, "requiredExtensions") &&
-                     obj.getAttributeNS(nsURI.ns.svg, "requiredExtensions") ||
-                     nsURI.ns.html
+          ns.uri = obj.hasAttributeNS(nsURI.svg, "requiredExtensions") &&
+                     obj.getAttributeNS(nsURI.svg, "requiredExtensions") ||
+                     nsURI.html
         ) :
         /^(?:math|svg)$/.test(node.localName) ? (
           ns.node = node,
           ns.name = node.localName,
-          ns.uri = nsURI.ns.ns[node.localName]
+          ns.uri = nsURI.ns[node.localName]
         ) :
           node = obj;
       }
@@ -271,7 +233,7 @@
         ns.node = node,
         ns.name = node.localName,
         ns.uri = node.hasAttribute("xmlns") && node.getAttribute("xmlns") ||
-                 nsURI.ns.ns[node.localName.toLowerCase()] || ""
+                 nsURI.ns[node.localName.toLowerCase()] || ""
       );
     }
     return ns;
@@ -290,7 +252,7 @@
         const prefix = attr.prefix;
         const localName = attr.localName;
         typeof node[attr.name] !== "function" && elm.setAttributeNS(
-          attr.namespaceURI || prefix && nsURI.ns.ns[prefix] || "",
+          attr.namespaceURI || prefix && nsURI[prefix] || "",
           prefix && `${prefix}:${localName}` || localName,
           attr.value
         );
@@ -331,8 +293,8 @@
     const prefix = node && node.prefix;
     const localName = node && node.localName;
     const elm = node && document.createElementNS(
-      node.namespaceURI || prefix && nsURI.ns.ns[prefix] ||
-      (obj = await getNodeNS(node)) && obj.uri || nsURI.ns.html,
+      node.namespaceURI || prefix && nsURI[prefix] ||
+      (obj = await getNodeNS(node)) && obj.uri || nsURI.html,
       prefix && `${prefix}:${localName}` || localName
     );
     const childNode = bool && node.hasChildNodes() &&
@@ -495,13 +457,13 @@
   const getId = elm => {
     let id = null;
     if (elm) {
-      const html = !elm.namespaceURI || elm.namespaceURI === nsURI.ns.html;
-      const ns = !html && nsURI.ns.html || "";
+      const html = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
+      const ns = !html && nsURI.html || "";
       elm.hasAttributeNS(ns, DATA_ATTR_ID) ?
         id = elm.getAttributeNS(ns, DATA_ATTR_ID) : (
         id = `withExEditor${window.performance.now()}`.replace(/\./, "_"),
         !html &&
-          elm.setAttributeNS(nsURI.ns.xmlns, "xmlns:html", nsURI.ns.html),
+          elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html),
         elm.setAttributeNS(ns, html && DATA_ATTR_ID || DATA_ATTR_ID_NS, id),
         html && elm.addEventListener("focus", portTemporaryId, false)
       );
@@ -518,7 +480,7 @@
     let editable = false, elm = node;
     while (elm && elm.parentNode) {
       if (typeof elm.isContentEditable === "boolean" &&
-          (!elm.namespaceURI || elm.namespaceURI === nsURI.ns.html)) {
+          (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
         editable = elm.isContentEditable;
         break;
       }
@@ -534,7 +496,7 @@
    */
   const isContentTextNode = async node => {
     let isText = false;
-    if (node && node.namespaceURI && node.namespaceURI !== nsURI.ns.html &&
+    if (node && node.namespaceURI && node.namespaceURI !== nsURI.html &&
         node.hasChildNodes()) {
       const nodes = node.childNodes;
       for (let child of nodes) {
@@ -561,6 +523,29 @@
     ) || false;
 
   /**
+   * get editable element from ancestor
+   * @param {Object} node - node
+   * @return {Object} - editable element
+   */
+  const getEditableElm = async node => {
+    let elm = null;
+    if (isEditControl(node)) {
+      elm = node;
+    }
+    else {
+      while (node && node.parentNode) {
+        if (typeof node.isContentEditable === "boolean" &&
+            (!node.namespaceURI || node.namespaceURI === nsURI.html)) {
+          elm = node;
+          break;
+        }
+        node = node.parentNode;
+      }
+    }
+    return elm;
+  };
+
+  /**
    * set data attribute and add listener
    * @param {Object} elm - element
    * @return {void}
@@ -568,31 +553,35 @@
   const setDataAttrs = async elm => {
     if (elm) {
       const id = getId(elm);
-      const arr = elm.hasAttributeNS("", DATA_ATTR_ID_CONTROLS) &&
-                    (elm.getAttributeNS("", DATA_ATTR_ID_CONTROLS)).split(" ");
-      id && (
-        arr ? (
-          arr.push(id),
-          elm.setAttributeNS(
-            "",
-            DATA_ATTR_ID_CONTROLS,
-            (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
+      const ctrl = await getEditableElm(elm);
+      if (ctrl) {
+        const arr = ctrl.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
+                      (ctrl.getAttributeNS("", DATA_ATTR_ID_CTRL)).split(" ");
+        id && (
+          arr ? (
+            arr.push(id),
+            ctrl.setAttributeNS(
+              "",
+              DATA_ATTR_ID_CTRL,
+              (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
+            )
+          ) : (
+            ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, id),
+            ctrl.addEventListener("focus", portTemporaryId, false)
           )
-        ) : (
-          elm.setAttributeNS("", DATA_ATTR_ID_CONTROLS, id),
-          elm.addEventListener("focus", portTemporaryId, false)
-        )
-      );
+        );
+      }
     }
   };
 
   /**
    * get content data
    * @param {Object} elm - element
+   * @param {string} mode - content mode
    * @return {Object} - content data
    */
-  const getContent = async (elm = vars[CONTEXT_NODE]) => {
-    const cnt = {
+  const getContent = async (elm, mode = "") => {
+    const resContent = {
       mode: MODE_SOURCE,
       charset: window.top.document.characterSet,
       target: null,
@@ -600,52 +589,56 @@
       namespace: null,
       tabId: vars[TAB_ID]
     };
-    const sel = window.getSelection();
-    const nodeNS = await getNodeNS(elm);
-    let obj;
-    elm && (
-      sel.isCollapsed ?
-        isEditControl(elm) && (obj = getId(elm)) ? (
-          cnt.mode = MODE_EDIT_TEXT,
-          cnt.target = obj,
-          cnt.value = elm.value || ""
-        ) :
-        (elm.isContentEditable || await isContentTextNode(elm)) &&
-        (obj = getId(elm)) ? (
-          cnt.mode = MODE_EDIT_TEXT,
-          cnt.target = obj,
-          cnt.value = elm.hasChildNodes() &&
-                      await getTextNode(elm.childNodes) || "",
-          cnt.namespace = nodeNS.uri,
-          setDataAttrs(elm)
-        ) :
-        nodeNS.uri === nsURI.ns.math &&
-        (obj = await createDomMathML(elm)) && (
-          cnt.mode = MODE_MATHML,
-          cnt.value = obj
-        ) :
-      (sel.anchorNode !== sel.focusNode ||
-       sel.anchorNode.parentNode !== document.documentElement) && (
-        sel.rangeCount === 1 &&
-        (elm.isContentEditable ||
-         sel.anchorNode === sel.focusNode && await isContentTextNode(elm)) &&
-        (obj = getId(elm)) ? (
-          cnt.mode = MODE_EDIT_TEXT,
-          cnt.target = obj,
-          cnt.value = elm.hasChildNodes() &&
-                      await getTextNode(elm.childNodes) || "",
-          cnt.namespace = nodeNS.uri,
-          setDataAttrs(elm)
-        ) :
+    if (elm) {
+      const ns = await getNodeNS(elm);
+      const sel = window.getSelection();
+      const hasRange = sel.anchorNode !== sel.focusNode ||
+                       sel.anchorNode.parentNode !== document.documentElement;
+      const modeEdit = (!mode || mode === MODE_EDIT_TEXT) && (
+                         elm.isContentEditable ||
+                         sel.anchorNode === sel.focusNode &&
+                         await isContentTextNode(elm)
+                       );
+      let obj;
+      if (sel.isCollapsed) {
+        if (isEditControl(elm) && (obj = getId(elm))) {
+          resContent.mode = MODE_EDIT_TEXT;
+          resContent.target = obj;
+          resContent.value = elm.value || "";
+        }
+        else if ((elm.isContentEditable || await isContentTextNode(elm)) &&
+                 (obj = getId(elm))) {
+          resContent.mode = MODE_EDIT_TEXT;
+          resContent.target = obj;
+          resContent.value = elm.hasChildNodes() &&
+                             await getTextNode(elm.childNodes) || "";
+          resContent.namespace = ns.uri;
+          setDataAttrs(elm);
+        }
+        else {
+          ns.uri === nsURI.math && (obj = await createDomMathML(elm)) && (
+            resContent.mode = MODE_MATHML,
+            resContent.value = obj
+          );
+        }
+      }
+      else if (hasRange &&
+               sel.rangeCount === 1 && modeEdit && (obj = getId(elm))) {
+        resContent.mode = MODE_EDIT_TEXT;
+        resContent.target = obj;
+        resContent.value = elm.hasChildNodes() &&
+                           await getTextNode(elm.childNodes) || "";
+        resContent.namespace = ns.uri;
+        setDataAttrs(elm);
+      }
+      else {
         (obj = await createDomFromSelRange(sel)) && (
-          cnt.mode = MODE_SELECTION,
-          cnt.value = obj
-        )
-      )
-    );
-    return {
-      resContent: cnt
-    };
+          resContent.mode = MODE_SELECTION,
+          resContent.value = obj
+        );
+      }
+    }
+    return {resContent};
   };
 
   /* sync edited text */
@@ -656,14 +649,14 @@
    * @param {string} ns - namespace URI
    * @return {void}
    */
-  const syncContentText = async (node, arr = [""], ns = nsURI.ns.html) => {
+  const syncContentText = async (node, arr = [""], ns = nsURI.html) => {
     if (node && node.nodeType === ELEMENT_NODE && Array.isArray(arr)) {
       const fragment = document.createDocumentFragment();
       const l = arr.length;
       let i = 0;
       while (i < l) {
         fragment.appendChild(document.createTextNode(arr[i]));
-        i < l - 1 && ns === nsURI.ns.html &&
+        i < l - 1 && ns === nsURI.html &&
           fragment.appendChild(document.createElementNS(ns, "br"));
         i++;
       }
@@ -684,20 +677,20 @@
   const syncText = async obj => {
     if (obj.tabId === vars[TAB_ID]) {
       const elm = document.activeElement;
-      const namespace = obj.data.namespace || nsURI.ns.html;
+      const namespace = obj.data.namespace || nsURI.html;
       const target = obj.data.target || "";
       const timestamp = obj.data.timestamp || 0;
       const value = obj.value || "";
-      let html = !elm.namespaceURI || elm.namespaceURI === nsURI.ns.html,
-          ns = !html && nsURI.ns.html || "",
+      let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+          ns = !html && nsURI.html || "",
           attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS;
-      if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CONTROLS)) {
-        const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CONTROLS)).split(" ");
+      if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CTRL)) {
+        const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CTRL)).split(" ");
         for (let id of arr) {
           if (id === target) {
             (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`)) && (
-              html = !id.namespaceURI || id.namespaceURI === nsURI.ns.html,
-              ns = !html && nsURI.ns.html || "",
+              html = !id.namespaceURI || id.namespaceURI === nsURI.html,
+              ns = !html && nsURI.html || "",
               attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS,
               (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
                timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
@@ -759,38 +752,6 @@
 
   /* handlers */
   /**
-   * handle keypress event
-   * @param {Object} evt - Event
-   * @return {void}
-   */
-  const handleKeyPress = async evt => {
-    const elm = evt && evt.target;
-    const sel = window.getSelection();
-    const openOptions = await keyComboMatches(evt, openOptionsKey);
-    const execEditor = await keyComboMatches(evt, execEditorKey);
-    if (openOptions) {
-      portMsg({openOptions});
-    }
-    else {
-      elm && execEditor && (
-        vars[EDITABLE_CONTEXT] ?
-          isEditControl(elm) || elm.isContentEditable ||
-          sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
-          reType.test(document.contentType)
-      ) && getContent(elm).then(portMsg).catch(logError);
-    }
-  };
-
-  /**
-   * handle context menu event
-   * @param {Object} evt - Event
-   * @return {void}
-   */
-  const handleContextMenu = async evt => {
-    vars[CONTEXT_NODE] = evt && evt.target || null;
-  };
-
-  /**
    * handle message
    * @param {*} msg - message
    * @return {void}
@@ -809,7 +770,10 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            getContent().then(portMsg).catch(logError);
+            getContent(
+              vars[CONTEXT_NODE],
+              obj.info && obj.info.menuItemId
+            ).then(portMsg).catch(logError);
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -833,6 +797,38 @@
           default:
         }
       }
+    }
+  };
+
+  /**
+   * handle context menu event
+   * @param {Object} evt - Event
+   * @return {void}
+   */
+  const handleContextMenu = async evt => {
+    vars[CONTEXT_NODE] = evt && evt.target || null;
+  };
+
+  /**
+   * handle keypress event
+   * @param {Object} evt - Event
+   * @return {void}
+   */
+  const handleKeyPress = async evt => {
+    const elm = evt && evt.target;
+    const sel = window.getSelection();
+    const openOptions = await keyComboMatches(evt, openOptionsKey);
+    const execEditor = await keyComboMatches(evt, execEditorKey);
+    if (openOptions) {
+      portMsg({openOptions});
+    }
+    else {
+      elm && execEditor && (
+        vars[EDITABLE_CONTEXT] ?
+          isEditControl(elm) || elm.isContentEditable ||
+          sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
+          reType.test(document.contentType)
+      ) && getContent(elm).then(portMsg).catch(logError);
     }
   };
 

@@ -19,6 +19,7 @@
 //  const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
+  const NS_URI_PATH = "../data/nsUri.json";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
 
@@ -227,13 +228,32 @@
 
   /* storage */
   /**
+   * set storage
+   * @param {Object} obj - object to set
+   * @return {void}
+   */
+  const setStorage = async obj => {
+    Object.keys(obj).length > 0 && storage.set(obj);
+  };
+
+  /**
+   * set namespace URI data
+   * @return {Object} - Promise
+   */
+  const setNsURI = () =>
+    fetch(NS_URI_PATH).then(async data => {
+      const nsURI = await data.json();
+      setStorage({nsURI});
+    });
+
+  /**
    * set variables from storage
    * @param {Object} res - result
    * @return {void}
    */
   const setVariablesFromStorage = async res => {
     const items = Object.keys(res);
-    if (items.length > 0) {
+    if (items.length > 1) {
       for (let item of items) {
         const obj = res[item];
         switch (item) {
@@ -269,15 +289,6 @@
         getSdkPrefs: res
       });
     }
-  };
-
-  /**
-   * set pref storage
-   * @param {Object} pref - pref
-   * @return {void}
-   */
-  const setPrefStorage = async pref => {
-    pref && storage.set(pref);
   };
 
   /**
@@ -335,7 +346,7 @@
     const items = Object.keys(res);
     if (items.length > 0) {
       for (let item of items) {
-        createPrefObj(item, res[item]).then(setPrefStorage).catch(logError);
+        createPrefObj(item, res[item]).then(setStorage).catch(logError);
       }
     }
   };
@@ -345,7 +356,7 @@
    * synchronize UI components
    * @return {Object} - Promise
    */
-  const syncUI = async () =>
+  const syncUI = () =>
     checkEnabled().then(() => Promise.all([
       portMsg({
         isEnabled: vars[IS_ENABLED]
@@ -377,6 +388,25 @@
         }
       }
     }
+  };
+
+  /**
+   * handle connected port
+   * @param {Object} conn - runtime.Port
+   * @return {void}
+   */
+  const handlePort = async conn => {
+    const id = conn.sender.tab.id;
+    ports[conn.name] = ports[conn.name] || {};
+    ports[conn.name][id] = conn;
+    conn.onMessage.addListener(handleMsg);
+    conn.onDisconnect.addListener(() => {
+      delete ports[conn.name][id];
+    });
+    conn.postMessage({
+      setVars: vars,
+      tabId: id
+    });
   };
 
   /**
@@ -475,25 +505,6 @@
     }
   };
 
-  /**
-   * handle connected port
-   * @param {Object} conn - runtime.Port
-   * @return {void}
-   */
-  const handlePort = async conn => {
-    const id = conn.sender.tab.id;
-    ports[conn.name] = ports[conn.name] || {};
-    ports[conn.name][id] = conn;
-    conn.onMessage.addListener(handleMsg);
-    conn.onDisconnect.addListener(() => {
-      delete ports[conn.name][id];
-    });
-    conn.postMessage({
-      setVars: vars,
-      tabId: id
-    });
-  };
-
   /* add listeners */
   browserAction.onClicked.addListener(openOptionsPage);
   browser.storage.onChanged.addListener(handleStorageChange);
@@ -504,5 +515,8 @@
   windows.onFocusChanged.addListener(syncUI);
 
   /* startup */
-  storage.get().then(setVariablesFromStorage).then(syncUI).catch(logError);
+  Promise.all([
+    storage.get().then(setVariablesFromStorage).then(syncUI),
+    setNsURI()
+  ]).catch(logError);
 }
