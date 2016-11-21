@@ -495,9 +495,9 @@
    * @return {boolean}
    */
   const isContentTextNode = async node => {
-    let isText = false;
-    if (node && node.namespaceURI && node.namespaceURI !== nsURI.html &&
-        node.hasChildNodes()) {
+    let isText = await isEditable(node);
+    if (isText && node && node.namespaceURI &&
+        node.namespaceURI !== nsURI.html && node.hasChildNodes()) {
       const nodes = node.childNodes;
       for (let child of nodes) {
         isText = child.nodeType === TEXT_NODE;
@@ -506,7 +506,6 @@
         }
       }
     }
-    isText && (isText = await isEditable(node));
     return isText;
   };
 
@@ -596,7 +595,7 @@
                        !sel.isCollapsed && sel.rangeCount === 1 &&
                        anchorElm === sel.focusNode.parentNode &&
                        anchorElm !== document.documentElement &&
-                       (elm.isContentEditable || await isEditable(elm));
+                       (elm.isContentEditable || await isContentTextNode(elm));
       let ns = await getNodeNS(elm), obj;
       if (sel.isCollapsed) {
         isEditControl(elm) && (obj = getId(elm)) ? (
