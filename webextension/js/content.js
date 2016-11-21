@@ -593,6 +593,7 @@
       const sel = window.getSelection();
       const anchorElm = sel.anchorNode.parentNode;
       const modeEdit = (!mode || mode === MODE_EDIT_TEXT) &&
+                       !sel.isCollapsed && sel.rangeCount === 1 &&
                        anchorElm === sel.focusNode.parentNode &&
                        anchorElm !== document.documentElement &&
                        (elm.isContentEditable || await isEditable(elm));
@@ -617,7 +618,7 @@
             resContent.value = obj
           );
       }
-      else if (sel.rangeCount === 1 && modeEdit && (obj = getId(anchorElm))) {
+      else if (modeEdit && (obj = getId(anchorElm))) {
         ns =  await getNodeNS(anchorElm);
         resContent.mode = MODE_EDIT_TEXT;
         resContent.target = obj;

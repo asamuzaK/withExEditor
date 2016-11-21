@@ -220,7 +220,7 @@
       for (let item of items) {
         items[item] &&
           contextMenus.update(item, {
-            title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
+            title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL)
           });
       }
     }
