@@ -233,7 +233,7 @@
         ns.node = node,
         ns.name = node.localName,
         ns.uri = node.hasAttribute("xmlns") && node.getAttribute("xmlns") ||
-                 nsURI.ns[node.localName.toLowerCase()] || ""
+                 nsURI[node.localName.toLowerCase()] || ""
       );
     }
     return ns;
@@ -590,46 +590,41 @@
       tabId: vars[TAB_ID]
     };
     if (elm) {
-      const ns = await getNodeNS(elm);
       const sel = window.getSelection();
-      const hasRange = sel.anchorNode !== sel.focusNode ||
-                       sel.anchorNode.parentNode !== document.documentElement;
-      const modeEdit = (!mode || mode === MODE_EDIT_TEXT) && (
-                         elm.isContentEditable ||
-                         sel.anchorNode === sel.focusNode &&
-                         await isContentTextNode(elm)
-                       );
-      let obj;
+      const anchorElm = sel.anchorNode.parentNode;
+      const modeEdit = (!mode || mode === MODE_EDIT_TEXT) &&
+                       anchorElm === sel.focusNode.parentNode &&
+                       anchorElm !== document.documentElement &&
+                       (elm.isContentEditable || await isEditable(elm));
+      let ns = await getNodeNS(elm), obj;
       if (sel.isCollapsed) {
-        if (isEditControl(elm) && (obj = getId(elm))) {
-          resContent.mode = MODE_EDIT_TEXT;
-          resContent.target = obj;
-          resContent.value = elm.value || "";
-        }
-        else if ((elm.isContentEditable || await isContentTextNode(elm)) &&
-                 (obj = getId(elm))) {
-          resContent.mode = MODE_EDIT_TEXT;
-          resContent.target = obj;
+        isEditControl(elm) && (obj = getId(elm)) ? (
+          resContent.mode = MODE_EDIT_TEXT,
+          resContent.target = obj,
+          resContent.value = elm.value || ""
+        ) :
+        (elm.isContentEditable || await isContentTextNode(elm)) &&
+        (obj = getId(elm)) ? (
+          resContent.mode = MODE_EDIT_TEXT,
+          resContent.target = obj,
           resContent.value = elm.hasChildNodes() &&
-                             await getTextNode(elm.childNodes) || "";
-          resContent.namespace = ns.uri;
-          setDataAttrs(elm);
-        }
-        else {
+                             await getTextNode(elm.childNodes) || "",
+          resContent.namespace = ns.uri,
+          setDataAttrs(elm)
+        ) :
           ns.uri === nsURI.math && (obj = await createDomMathML(elm)) && (
             resContent.mode = MODE_MATHML,
             resContent.value = obj
           );
-        }
       }
-      else if (hasRange &&
-               sel.rangeCount === 1 && modeEdit && (obj = getId(elm))) {
+      else if (sel.rangeCount === 1 && modeEdit && (obj = getId(anchorElm))) {
+        ns =  await getNodeNS(anchorElm);
         resContent.mode = MODE_EDIT_TEXT;
         resContent.target = obj;
-        resContent.value = elm.hasChildNodes() &&
-                           await getTextNode(elm.childNodes) || "";
+        resContent.value = anchorElm.hasChildNodes() &&
+                           await getTextNode(anchorElm.childNodes) || "";
         resContent.namespace = ns.uri;
-        setDataAttrs(elm);
+        setDataAttrs(anchorElm);
       }
       else {
         (obj = await createDomFromSelRange(sel)) && (
@@ -823,7 +818,7 @@
       portMsg({openOptions});
     }
     else {
-      elm && execEditor && (
+      execEditor && elm && (
         vars[EDITABLE_CONTEXT] ?
           isEditControl(elm) || elm.isContentEditable ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
