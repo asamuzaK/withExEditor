@@ -23,7 +23,7 @@
   /* variables */
   const vars = {};
 
-  /* set default variables*/
+  /* default variables */
   vars[EDITOR_PATH] = null;
   vars[EDITOR_NAME] = null;
 
@@ -153,12 +153,13 @@
         placeholder: "placeholder",
         title: "title"
       };
-      for (let attr in attrs) {
-        if (elm.hasAttribute(attrs[attr])) {
+      const items = Object.keys(attrs);
+      for (let item of items) {
+        if (elm.hasAttribute(attrs[item])) {
           const data = await i18n.getMessage(
-            `${elm.getAttribute(DATA_ATTR_I18N)}.${attr}`
+            `${elm.getAttribute(DATA_ATTR_I18N)}.${item}`
           );
-          data && elm.setAttribute(attrs[attr], data);
+          data && elm.setAttribute(attrs[item], data);
         }
       }
     }
@@ -192,7 +193,7 @@
    * set values from storage
    * @return {void}
    */
-  const setValuesFromStorage = async () => {
+  const createVariablesFromStorage = async () => {
     const pref = await storage.get() || {};
     const items = Object.keys(pref);
     if (items.length > 0) {
@@ -221,7 +222,7 @@
   };
 
   /**
-   * set variables value
+   * set default variables value
    * @return {void}
    */
   const setVariables = async () => {
@@ -261,7 +262,7 @@
 
   window.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtmlLang().then(localizeElm),
-    setVariables().then(setValuesFromStorage),
+    setVariables().then(createVariablesFromStorage),
     addInputChangeListener()
   ]).catch(logError), false);
 }
