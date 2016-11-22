@@ -23,7 +23,7 @@
   /* variables */
   const vars = {};
 
-  /* default variables */
+  /* set default variables */
   vars[EDITOR_PATH] = null;
   vars[EDITOR_NAME] = null;
 
