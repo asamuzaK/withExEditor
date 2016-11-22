@@ -58,7 +58,6 @@
   /* variables */
   const vars = {};
 
-  /* set default variables*/
   vars[EDITOR_PATH] = "";
   vars[EDITOR_NAME] = "";
   vars[CMD_ARGS] = "";

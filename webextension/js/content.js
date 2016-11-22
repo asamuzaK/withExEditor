@@ -42,7 +42,6 @@
   /* variables */
   const vars = {};
 
-  /* set default variables*/
   vars[KEY_ACCESS] = "e";
   vars[KEY_OPEN_OPTIONS] = true;
   vars[KEY_EXEC_EDITOR] = true;
