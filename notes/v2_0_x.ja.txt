@@ -6,7 +6,7 @@ v2.0.0
 <li>「Ctrl + Alt + キー」のショートカットは設定ページを開くよう変更</li>
 </ul>
 
-Code Refactoring
+コード変更点
 <ul>
 <li>「WebExtensions」を埋め込み</li>
 <li>「async / await」で関数を書き直し</li>
