@@ -29,6 +29,7 @@
   const EDITABLE_CONTEXT = "editableContext";
   const IS_ENABLED = "isEnabled";
   const CONTEXT_NODE = "contextNode";
+  const CONTEXT_TYPE = "contextType";
   const TAB_ID = "tabId";
 
   /* shortcut */
@@ -48,6 +49,7 @@
   vars[EDITABLE_CONTEXT] = false;
   vars[IS_ENABLED] = false;
   vars[CONTEXT_NODE] = null;
+  vars[CONTEXT_TYPE] = null;
   vars[TAB_ID] = null;
 
   /* RegExp */
@@ -574,12 +576,63 @@
   };
 
   /**
+   * get context type
+   * @param {Object} elm - element
+   * @return {Object} - context type data
+   */
+  const getContextType = async elm => {
+    const contextType = {
+      menuItemId: MODE_SOURCE,
+      mode: MODE_SOURCE,
+      enabled: true,
+      ns: ""
+    };
+    if (elm) {
+      const sel = window.getSelection();
+      const anchorElm = sel.anchorNode.parentNode;
+      const modeEdit = !sel.isCollapsed && sel.rangeCount === 1 &&
+                       anchorElm === sel.focusNode.parentNode &&
+                       anchorElm !== document.documentElement &&
+                       (elm.isContentEditable || await isContentTextNode(elm));
+      let ns = await getNodeNS(elm);
+      contextType.ns = ns.uri;
+      if (sel.isCollapsed) {
+        isEditControl(elm) ? (
+          contextType.menuItemId = MODE_EDIT_TEXT,
+          contextType.mode = MODE_EDIT_TEXT
+        ) :
+        elm.isContentEditable || await isContentTextNode(elm) ? (
+          contextType.menuItemId = MODE_EDIT_TEXT,
+          contextType.mode = MODE_EDIT_TEXT
+        ) :
+          ns.uri === nsURI.math && (
+            contextType.menuItemId = MODE_SOURCE,
+            contextType.mode = MODE_MATHML
+          );
+      }
+      else if (modeEdit) {
+        ns = await getNodeNS(anchorElm);
+        contextType.menuItemId = MODE_EDIT_TEXT;
+        contextType.mode = MODE_EDIT_TEXT;
+        contextType.ns = ns.uri;
+      }
+      else {
+        contextType.menuItemId = MODE_EDIT_TEXT;
+        contextType.mode = MODE_SELECTION;
+        contextType.enabled = false;
+      }
+    }
+    return {contextType};
+  };
+
+  /**
    * get content data
    * @param {Object} elm - element
-   * @param {string} mode - content mode
+   * @param {Object} type - context type data
    * @return {Object} - content data
    */
-  const getContent = async (elm, mode = "") => {
+  const getContent = async (elm, type = null) => {
+    const contextType = type || await getContextType(elm);
     const resContent = {
       mode: MODE_SOURCE,
       charset: window.top.document.characterSet,
@@ -591,46 +644,49 @@
     if (elm) {
       const sel = window.getSelection();
       const anchorElm = sel.anchorNode.parentNode;
-      const modeEdit = (!mode || mode === MODE_EDIT_TEXT) &&
-                       !sel.isCollapsed && sel.rangeCount === 1 &&
-                       anchorElm === sel.focusNode.parentNode &&
-                       anchorElm !== document.documentElement &&
-                       (elm.isContentEditable || await isContentTextNode(elm));
       let ns = await getNodeNS(elm), obj;
-      if (sel.isCollapsed) {
-        isEditControl(elm) && (obj = getId(elm)) ? (
-          resContent.mode = MODE_EDIT_TEXT,
-          resContent.target = obj,
-          resContent.value = elm.value || ""
-        ) :
-        (elm.isContentEditable || await isContentTextNode(elm)) &&
-        (obj = getId(elm)) ? (
-          resContent.mode = MODE_EDIT_TEXT,
-          resContent.target = obj,
-          resContent.value = elm.hasChildNodes() &&
-                             await getTextNode(elm.childNodes) || "",
-          resContent.namespace = ns.uri,
-          setDataAttrs(elm)
-        ) :
-          ns.uri === nsURI.math && (obj = await createDomMathML(elm)) && (
+      switch (contextType.mode) {
+        case MODE_EDIT_TEXT:
+          if (sel.isCollapsed) {
+            isEditControl(elm) && (obj = getId(elm)) ? (
+              resContent.mode = contextType.mode,
+              resContent.target = obj,
+              resContent.value = elm.value || ""
+            ) :
+            (elm.isContentEditable || await isContentTextNode(elm)) &&
+            (obj = getId(elm)) && (
+              resContent.mode = contextType.mode,
+              resContent.target = obj,
+              resContent.value = elm.hasChildNodes() &&
+                                 await getTextNode(elm.childNodes) || "",
+              resContent.namespace = ns.uri,
+              setDataAttrs(elm)
+            );
+          }
+          else {
+            !!contextType.enabled && (obj = getId(anchorElm)) &&
+            (ns = await getNodeNS(anchorElm)) && (
+              resContent.mode = contextType.mode,
+              resContent.target = obj,
+              resContent.value = anchorElm.hasChildNodes() &&
+                                 await getTextNode(anchorElm.childNodes) || "",
+              resContent.namespace = ns.uri,
+              setDataAttrs(anchorElm)
+            );
+          }
+          break;
+        case MODE_MATHML:
+          sel.isCollapsed && ns.uri === nsURI.math &&
+          (obj = await createDomMathML(elm)) && (
             resContent.mode = MODE_MATHML,
             resContent.value = obj
           );
-      }
-      else if (modeEdit && (obj = getId(anchorElm))) {
-        ns =  await getNodeNS(anchorElm);
-        resContent.mode = MODE_EDIT_TEXT;
-        resContent.target = obj;
-        resContent.value = anchorElm.hasChildNodes() &&
-                           await getTextNode(anchorElm.childNodes) || "";
-        resContent.namespace = ns.uri;
-        setDataAttrs(anchorElm);
-      }
-      else {
-        (obj = await createDomFromSelRange(sel)) && (
-          resContent.mode = MODE_SELECTION,
-          resContent.value = obj
-        );
+          break;
+        default:
+          !sel.isCollapsed && (obj = await createDomFromSelRange(sel)) && (
+            resContent.mode = MODE_SELECTION,
+            resContent.value = obj
+          );
       }
     }
     return {resContent};
@@ -755,7 +811,7 @@
     const items = Object.keys(msg);
     if (items.length > 0) {
       for (let item of items) {
-        const obj = msg[item];
+        let obj = msg[item];
         switch (item) {
           case SET_VARS:
             handleMsg(obj);
@@ -765,9 +821,12 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
+            obj = obj && obj.info && obj.info.menuItemId;
             getContent(
               vars[CONTEXT_NODE],
-              obj.info && obj.info.menuItemId
+              vars[CONTEXT_TYPE] && obj &&
+              vars[CONTEXT_TYPE].menuItemId === obj &&
+              vars[CONTEXT_TYPE] || null
             ).then(portMsg).catch(logError);
             break;
           case KEY_ACCESS:
@@ -801,7 +860,11 @@
    * @return {void}
    */
   const handleContextMenu = async evt => {
-    vars[CONTEXT_NODE] = evt && evt.target || null;
+    const elm = evt && evt.target;
+    const contextType = await getContextType(elm);
+    vars[CONTEXT_NODE] = elm;
+    vars[CONTEXT_TYPE] = contextType;
+    portMsg({contextType});
   };
 
   /**

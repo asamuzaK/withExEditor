@@ -8,6 +8,7 @@
 
   const PORT_BACKGROUND = "portBackground";
   const PORT_CONTENT = "portContent";
+  const CONTEXT_TYPE = "contextType";
   const OPEN_OPTIONS = "openOptions";
   const SDK_PREFS = "sdkPrefs";
 
@@ -34,9 +35,14 @@
   const ENABLE_PB = "enablePB";
   const EDITABLE_CONTEXT = "editableContext";
   const FORCE_REMOVE = "forceRemove";
+  const ID = "id";
   const IS_ENABLED = "isEnabled";
   const IS_EXECUTABLE = "isExecutable";
   const ICON_PATH = "iconPath";
+  const FILE_EXT = "fileExt";
+  const FILE_EXT_PATH = "../data/fileExt.json";
+  const SYS_ENV = "sysEnv";
+  const SYS_ENV_PATH = "../data/sysEnv.json";
 
   /* shortcuts */
   const browserAction = browser.browserAction;
@@ -64,9 +70,12 @@
   vars[ENABLE_PB] = false;
   vars[EDITABLE_CONTEXT] = false;
   vars[FORCE_REMOVE] = true;
+  vars[ID] = runtime.id;
   vars[IS_ENABLED] = false;
   vars[IS_EXECUTABLE] = false;
   vars[ICON_PATH] = `${ICON}#gray`;
+  vars[FILE_EXT] = null;
+  vars[SYS_ENV] = null;
 
   /**
    * log error
@@ -175,18 +184,18 @@
   /* context menu items collection */
   const menus = {};
 
+  // NOTE: no "mathml" context type, no "accesskey" feature
   /**
    * create context menu items
    * @return {void}
    */
   const createContextMenuItems = async () => {
     const items = [MODE_EDIT_TEXT, MODE_SELECTION, MODE_SOURCE];
-    contextMenus.removeAll();
-    if (vars[IS_ENABLED]) {
+    contextMenus.removeAll().then(async () => {
       for (let item of items) {
         switch (item) {
           case MODE_EDIT_TEXT:
-            menus[item] = await contextMenus.create({
+            menus[item] = vars[IS_ENABLED] && await contextMenus.create({
               id: item,
               title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
               contexts: ["editable"]
@@ -194,34 +203,55 @@
             break;
           case MODE_SELECTION:
           case MODE_SOURCE:
-            !vars[EDITABLE_CONTEXT] && (
-              menus[item] = await contextMenus.create({
+            menus[item] = vars[IS_ENABLED] && !vars[EDITABLE_CONTEXT] &&
+              await contextMenus.create({
                 id: item,
                 title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
                 contexts: [
                   item === MODE_SELECTION && "selection" || "page"
                 ]
-              }) || null
-            );
+              }) || null;
             break;
           default:
         }
       }
-    }
+    }).catch(logError);
   };
 
+  // NOTE: does not update. bug?
   /**
    * update context menu items
+   * @param {Object} type - context type data
    * @return {void}
    */
-  const updateContextMenuItems = async () => {
+  const updateContextMenuItems = (type = null) => {
     const items = Object.keys(menus);
     if (items.length > 0) {
-      for (let item of items) {
-        items[item] &&
-          contextMenus.update(item, {
-            title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL)
-          });
+      if (type) {
+        switch (type.menuItemId) {
+          case MODE_EDIT_TEXT:
+            menus[MODE_EDIT_TEXT] &&
+              contextMenus.update(MODE_EDIT_TEXT, {
+                enabled: !!type.enabled
+              });
+            break;
+          case MODE_SOURCE:
+            menus[MODE_SOURCE] &&
+              contextMenus.update(MODE_SOURCE, {
+                title: i18n.getMessage(type.mode || MODE_SOURCE,
+                                       vars[EDITOR_NAME] || LABEL)
+              });
+            break;
+          default:
+        }
+      }
+      else {
+        for (let item of items) {
+          menus[item] &&
+            contextMenus.update(item, {
+              title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL)
+            });
+        }
       }
     }
   };
@@ -235,16 +265,6 @@
   const setStorage = async obj => {
     Object.keys(obj).length > 0 && storage.set(obj);
   };
-
-  /**
-   * set namespace URI data
-   * @return {Object} - Promise
-   */
-  const setNsURI = () =>
-    fetch(NS_URI_PATH).then(async data => {
-      const nsURI = await data.json();
-      setStorage({nsURI});
-    });
 
   /**
    * set variables from storage
@@ -378,6 +398,9 @@
       for (let item of items) {
         const obj = msg[item];
         switch (item) {
+          case CONTEXT_TYPE:
+            obj && updateContextMenuItems(obj[CONTEXT_TYPE]);
+            break;
           case OPEN_OPTIONS:
             obj && openOptionsPage();
             break;
@@ -517,6 +540,23 @@
   /* startup */
   Promise.all([
     storage.get().then(setVariablesFromStorage).then(syncUI),
-    setNsURI()
+    fetch(NS_URI_PATH).then(async data => {
+      const nsURI = await data.json();
+      setStorage({nsURI});
+    }),
+    fetch(FILE_EXT_PATH).then(async data => {
+      const fileExt = await data.json();
+      fileExt && (
+        vars[FILE_EXT] = fileExt,
+        portMsg({fileExt})
+      );
+    }),
+    fetch(SYS_ENV_PATH).then(async data => {
+      const sysEnv = await data.json();
+      sysEnv && (
+        vars[SYS_ENV] = sysEnv,
+        portMsg({sysEnv})
+      );
+    })
   ]).catch(logError);
 }
