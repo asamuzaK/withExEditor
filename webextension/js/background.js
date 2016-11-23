@@ -17,7 +17,7 @@
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
   const MODE_EDIT_TEXT = "modeEditText";
-  const MODE_MATHML = "modeViewMathML";
+//  const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const NS_URI_PATH = "../data/nsUri.json";

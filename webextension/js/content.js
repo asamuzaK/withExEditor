@@ -674,6 +674,7 @@
             resContent.mode = contextType.mode,
             resContent.value = obj
           );
+          break;
         default:
       }
     }
