@@ -150,7 +150,8 @@
       const items = ports[PORT_CONTENT] && Object.keys(ports[PORT_CONTENT]);
       if (items && items.length > 0) {
         for (let item of items) {
-          items[item] && items[item].postMessage(msg);
+          const conn = ports[item];
+          conn && conn.postMessage(msg);
         }
       }
       port.postMessage(msg);
