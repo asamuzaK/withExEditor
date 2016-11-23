@@ -8,7 +8,7 @@
 
   const PORT_BACKGROUND = "portBackground";
   const PORT_CONTENT = "portContent";
-  const CONTEXT_TYPE = "contextType";
+  const CONTEXT_MENU = "contextMenu";
   const OPEN_OPTIONS = "openOptions";
   const SDK_PREFS = "sdkPrefs";
 
@@ -17,7 +17,7 @@
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
   const MODE_EDIT_TEXT = "modeEditText";
-//  const MODE_MATHML = "modeViewMathML";
+  const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const NS_URI_PATH = "../data/nsUri.json";
@@ -217,34 +217,40 @@
     }).catch(logError);
   };
 
-  // NOTE: does not update. bug?
   /**
    * update context menu items
    * @param {Object} type - context type data
    * @return {void}
    */
-  const updateContextMenuItems = (type = null) => {
-    const items = Object.keys(menus);
-    if (items.length > 0) {
-      if (type) {
-        switch (type.menuItemId) {
-          case MODE_EDIT_TEXT:
-            menus[MODE_EDIT_TEXT] &&
-              contextMenus.update(MODE_EDIT_TEXT, {
-                enabled: !!type.enabled
-              });
-            break;
-          case MODE_SOURCE:
-            menus[MODE_SOURCE] &&
-              contextMenus.update(MODE_SOURCE, {
-                title: i18n.getMessage(type.mode || MODE_SOURCE,
-                                       vars[EDITOR_NAME] || LABEL)
-              });
-            break;
-          default:
+  const updateContextMenuItems = async (type = null) => {
+    if (type) {
+      const items = Object.keys(type);
+      if (items.length > 0) {
+        for (let item of items) {
+          const obj = type[item];
+          const menuItemId = obj.menuItemId;
+          switch (item) {
+            case MODE_EDIT_TEXT:
+              menus[menuItemId] &&
+                contextMenus.update(menuItemId, {
+                  enabled: !!obj.enabled
+                });
+              break;
+            case MODE_SOURCE:
+              menus[menuItemId] &&
+                contextMenus.update(menuItemId, {
+                  title: i18n.getMessage(obj.mode || menuItemId,
+                                         vars[EDITOR_NAME] || LABEL)
+                });
+              break;
+            default:
+          }
         }
       }
-      else {
+    }
+    else {
+      const items = Object.keys(menus);
+      if (items.length > 0) {
         for (let item of items) {
           menus[item] &&
             contextMenus.update(item, {
@@ -397,8 +403,8 @@
       for (let item of items) {
         const obj = msg[item];
         switch (item) {
-          case CONTEXT_TYPE:
-            obj && updateContextMenuItems(obj[CONTEXT_TYPE]);
+          case CONTEXT_MENU:
+            obj && updateContextMenuItems(obj);
             break;
           case OPEN_OPTIONS:
             obj && openOptionsPage();
