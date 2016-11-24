@@ -584,8 +584,8 @@
     };
     if (elm) {
       const sel = window.getSelection();
-      const anchorElm = sel.anchorNode.parentNode;
-      const modeEdit = !sel.isCollapsed && sel.rangeCount === 1 &&
+      const anchorElm = sel.anchorNode && sel.anchorNode.parentNode;
+      const modeEdit = !sel.isCollapsed && sel.rangeCount === 1 && anchorElm &&
                        anchorElm === sel.focusNode.parentNode &&
                        anchorElm !== document.documentElement &&
                        (isEditControl(anchorElm) ||
@@ -629,7 +629,7 @@
     };
     if (elm) {
       const sel = window.getSelection();
-      const anchorElm = sel.anchorNode.parentNode;
+      const anchorElm = sel.anchorNode && sel.anchorNode.parentNode;
       let obj;
       switch (contextType.mode) {
         case MODE_EDIT_TEXT:
