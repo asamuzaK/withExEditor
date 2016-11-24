@@ -49,6 +49,7 @@
   const i18n = browser.i18n;
   const runtime = browser.runtime;
   const storage = browser.storage.local;
+  const tabs = browser.tabs;
   const windows = browser.windows;
 
   /* port */
@@ -87,12 +88,13 @@
 
   /**
    * check enabled
-   * @return {void}
+   * @return {boolean}
    */
   const checkEnabled = async () => {
     const win = await windows.getCurrent();
     const isEnabled = !win.incognito || vars[ENABLE_PB];
     vars[IS_ENABLED] = isEnabled;
+    return isEnabled;
   };
 
   /**
@@ -142,7 +144,7 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
-   * @return {void}
+   * @return {Object} - windows.windowId
    */
   const restorePorts = async data => {
     const windowId = (data.windowId === windows.WINDOW_ID_NONE ||
@@ -155,6 +157,7 @@
     id ?
       windowId && ports[windowId] && delete ports[windowId][id] :
       windowId && delete ports[windowId];
+    return windowId;
   };
 
   /**
@@ -184,11 +187,11 @@
   /**
    * port variables
    * @param {Object} msg - message
-   * @return {void}
+   * @return {Object} - Promise
    */
   const portVars = async msg => {
     const setVars = msg;
-    portMsg({setVars});
+    return portMsg({setVars});
   };
 
   /**
@@ -215,18 +218,20 @@
   // NOTE: no "mathml" context type, no "accesskey" feature
   /**
    * create context menu items
-   * @return {void}
+   * @param {boolean} enable - enable
+   * @return {Object} - Promise
    */
-  const createContextMenuItems = async () => {
+  const createContextMenuItems = async (enable = false) => {
     const items = [MODE_EDIT_TEXT, MODE_SELECTION, MODE_SOURCE];
-    contextMenus.removeAll().then(async () => {
+    return contextMenus.removeAll().then(async () => {
       for (let item of items) {
         switch (item) {
           case MODE_EDIT_TEXT:
             menus[item] = vars[IS_ENABLED] && await contextMenus.create({
               id: item,
               title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
-              contexts: ["editable"]
+              contexts: ["editable"],
+              enabled: !!enable
             }) || null;
             break;
           case MODE_SELECTION:
@@ -237,13 +242,14 @@
                 title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
                 contexts: [
                   item === MODE_SELECTION && "selection" || "page"
-                ]
+                ],
+                enabled: !!enable
               }) || null;
             break;
           default:
         }
       }
-    }).catch(logError);
+    });
   };
 
   /**
@@ -283,7 +289,8 @@
         for (let item of items) {
           menus[item] &&
             contextMenus.update(item, {
-              title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL)
+              title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
+              enabled: true
             });
         }
       }
@@ -416,8 +423,7 @@
         isEnabled: vars[IS_ENABLED]
       }),
       toggleIcon(),
-      toggleBadge(),
-      createContextMenuItems()
+      toggleBadge()
     ]));
 
   /* handlers */
@@ -455,9 +461,12 @@
   const handleDisconnectedPort = async conn => {
     const windowId = conn.sender.tab.windowId;
     const id = conn.sender.tab.id;
-    restorePorts({windowId, id}).then(() => {
-      const items = Object.keys(ports[windowId]);
-      items && items.length === 0 && restorePorts({windowId});
+    restorePorts({windowId, id}).then(async res => {
+      const items = ports[res] && Object.keys(ports[res]);
+      items && items.length === 0 &&
+        restorePorts({
+          windowId: res
+        });
     }).catch(logError);
   };
 
@@ -582,6 +591,23 @@
   port.onMessage.addListener(handleMsg);
   runtime.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(handlePort);
+  tabs.onActivated.addListener(async info => {
+    const windowId = info.windowId;
+    const tabId = info.tabId;
+    ports[windowId] && ports[windowId][tabId] ?
+      createContextMenuItems(true) :
+      createContextMenuItems();
+  });
+  tabs.onUpdated.addListener(async (tabId, info, tab) => {
+    const status = info.status;
+    const active = tab.active;
+    const windowId = tab.windowId;
+    if (status === "complete" && active) {
+      ports[windowId] && ports[windowId][tabId] ?
+      createContextMenuItems(active) :
+      createContextMenuItems();
+    }
+  });
   windows.onFocusChanged.addListener(syncUI);
   windows.onRemoved.addListener(async id => {
     const windowId = await id;
