@@ -869,8 +869,8 @@
               MODE_SOURCE
       }
     };
-    portMsg({contextMenu});
     vars[CONTEXT_NODE] = elm;
+    portMsg({contextMenu});
   };
 
   /**
