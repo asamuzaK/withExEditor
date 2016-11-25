@@ -350,7 +350,7 @@
   /**
    * create DOM of MathML / SVG
    * @param {Object} node - element node
-   ` @param {string} type - math / svg
+   * @param {string} type - math / svg
    * @return {?string} - serialized node string
    */
   const createDomXmlBased = async (node, type) => {
@@ -821,7 +821,6 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            obj = obj && obj.info && obj.info.menuItemId;
             getContent(vars[CONTEXT_NODE]).then(portMsg).catch(logError);
             break;
           case KEY_ACCESS:

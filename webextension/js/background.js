@@ -236,14 +236,20 @@
             }) || null;
             break;
           case MODE_SELECTION:
+            menus[item] = vars[IS_ENABLED] && !vars[EDITABLE_CONTEXT] &&
+              await contextMenus.create({
+                id: item,
+                title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
+                contexts: ["selection"],
+                enabled: !!enable
+              }) || null;
+            break;
           case MODE_SOURCE:
             menus[item] = vars[IS_ENABLED] && !vars[EDITABLE_CONTEXT] &&
               await contextMenus.create({
                 id: item,
                 title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
-                contexts: [
-                  item === MODE_SELECTION && "selection" || "page"
-                ],
+                contexts: ["page"],
                 enabled: !!enable
               }) || null;
             break;
