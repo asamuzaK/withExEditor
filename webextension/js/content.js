@@ -18,6 +18,7 @@
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
+  const MODE_SVG = "modeViewSVG";
   const NS_URI = "nsURI";
   const NS_URI_DEFAULT_ITEMS = 4;
   const ELEMENT_NODE = 1;
@@ -347,14 +348,15 @@
   };
 
   /**
-   * create DOM of MathML
-   * @param {Object} node - element node of MathML
+   * create DOM of MathML / SVG
+   * @param {Object} node - element node
+   ` @param {string} type - math / svg
    * @return {?string} - serialized node string
    */
-  const createDomMathML = async node => {
+  const createDomXmlBased = async (node, type) => {
     let elm, range;
     while (node && node.parentNode && !elm) {
-      node.localName === "math" && (elm = node);
+      node.localName === type && (elm = node);
       node = node.parentNode;
     }
     elm && (
@@ -598,7 +600,9 @@
           contextType.mode = MODE_EDIT_TEXT :
         elm.isContentEditable || await isContentTextNode(elm) ?
           contextType.mode = MODE_EDIT_TEXT :
-          ns.uri === nsURI.math && (contextType.mode = MODE_MATHML);
+        ns.uri === nsURI.math ?
+          contextType.mode = MODE_MATHML :
+          ns.uri === nsURI.svg && (contextType.mode = MODE_SVG);
       }
       else if (modeEdit) {
         ns = await getNodeNS(anchorElm);
@@ -664,7 +668,14 @@
           break;
         case MODE_MATHML:
           sel.isCollapsed && contextType.namespace === nsURI.math &&
-          (obj = await createDomMathML(elm)) && (
+          (obj = await createDomXmlBased(elm, "math")) && (
+            resContent.mode = contextType.mode,
+            resContent.value = obj
+          );
+          break;
+        case MODE_SVG:
+          sel.isCollapsed && contextType.namespace === nsURI.svg &&
+          (obj = await createDomXmlBased(elm, "svg")) && (
             resContent.mode = contextType.mode,
             resContent.value = obj
           );
@@ -854,7 +865,9 @@
       },
       modeViewSource: {
         menuItemId: MODE_SOURCE,
-        mode: elm.namespaceURI === nsURI.math && MODE_MATHML || MODE_SOURCE
+        mode: elm.namespaceURI === nsURI.math && MODE_MATHML ||
+              elm.namespaceURI === nsURI.svg && MODE_SVG ||
+              MODE_SOURCE
       }
     };
     portMsg({contextMenu});

@@ -17,6 +17,9 @@
   "modeViewSource": {
     "message": "ページのソースを $1 で表示"
   },
+  "modeViewSVG": {
+    "message": "SVG のソースを $1 で表示"
+  },
   "optionsAccessKey.placeholder": {
     "message": "アクセスキーを入力"
   },

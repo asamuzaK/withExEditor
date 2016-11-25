@@ -17,6 +17,9 @@
   "modeViewSource": {
     "message": "View Page Source with $1"
   },
+  "modeViewSVG": {
+    "message": "View SVG Source with $1"
+  },
   "optionsAccessKey.placeholder": {
     "message": "Input Access Key"
   },

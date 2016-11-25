@@ -19,6 +19,7 @@
 //  const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
+//  const MODE_SVG = "modeViewSVG";
   const NS_URI_PATH = "../data/nsUri.json";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
@@ -289,8 +290,7 @@
         for (let item of items) {
           menus[item] &&
             contextMenus.update(item, {
-              title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
-              enabled: true
+              title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL)
             });
         }
       }
