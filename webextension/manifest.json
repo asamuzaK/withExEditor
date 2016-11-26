@@ -17,7 +17,7 @@
   },
   "content_scripts": [
     {
-      "all_frames": false,
+      "all_frames": true,
       "matches": ["<all_urls>"],
       "js": ["./js/content.js"],
       "run_at": "document_start"

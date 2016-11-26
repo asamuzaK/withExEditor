@@ -145,20 +145,29 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
-   * @return {Object} - windows.windowId
+   * @return {void}
    */
   const restorePorts = async data => {
     const windowId = (data.windowId === windows.WINDOW_ID_NONE ||
                       data.windowId === 0) &&
                      `${data.windowId}` ||
                      data.windowId;
-    const id = (data.id === tabs.TAB_ID_NONE || data.id === "0") &&
-               `${data.id}` ||
-               data.id;
-    id ?
-      windowId && ports[windowId] && delete ports[windowId][id] :
+    const tabId = (data.tabId === tabs.TAB_ID_NONE || data.tabId === 0) &&
+                  `${data.tabId}` ||
+                  data.tabId;
+    const frameUrl = data.frameUrl === 0 && `${data.frameUrl}` || data.frameUrl;
+    frameUrl ?
+      windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
+        delete ports[windowId][tabId][frameUrl],
+        Object.keys(ports[windowId][tabId]).length === 0 &&
+          restorePorts({windowId, tabId})
+      ) :
+    tabId ?
+      windowId && ports[windowId] && (
+        delete ports[windowId][tabId],
+        Object.keys(ports[windowId]).length === 0 && restorePorts({windowId})
+      ) :
       windowId && delete ports[windowId];
-    return windowId;
   };
 
   /**
@@ -168,15 +177,20 @@
    */
   const portMsg = async msg => {
     if (Object.keys(msg).length > 0) {
-      const items = Object.keys(ports);
-      if (items.length > 0) {
-        for (let item of items) {
-          const conns = ports[item] &&
-                          Object.keys(ports[item]);
-          if (conns && conns.length > 0) {
-            for (let conn of conns) {
-              conn = ports[item][conn];
-              conn && conn.postMessage(msg);
+      const windowIds = Object.keys(ports);
+      if (windowIds.length > 0) {
+        for (let windowId of windowIds) {
+          const tabIds = ports[windowId] && Object.keys(ports[windowId]);
+          if (tabIds && tabIds.length > 0) {
+            for (let tabId of tabIds) {
+              const frameUrls = ports[windowId][tabId] &&
+                                 Object.keys(ports[windowId][tabId]);
+              if (frameUrls && frameUrls.length > 0) {
+                for (let frameUrl of frameUrls) {
+                  const conn = ports[windowId][tabId][frameUrl];
+                  conn && conn.postMessage(msg);
+                }
+              }
             }
           }
         }
@@ -188,11 +202,11 @@
   /**
    * port variables
    * @param {Object} msg - message
-   * @return {Object} - Promise
+   * @return {void}
    */
   const portVars = async msg => {
     const setVars = msg;
-    return portMsg({setVars});
+    portMsg({setVars});
   };
 
   /**
@@ -205,11 +219,13 @@
     const getContent = {info, tab};
     const windowId = (tab.windowId === windows.WINDOW_ID_NONE ||
                       tab.windowId === 0) &&
-                     `${tab.windowId}` ||
-                     tab.windowId;
-    const id = tab.id === tabs.TAB_ID_NONE && `${tab.id}` || tab.id;
-    ports[windowId] && ports[windowId][id] &&
-      ports[windowId][id].postMessage({getContent});
+                     `${tab.windowId}` || tab.windowId;
+    const tabId = (tab.id === tabs.TAB_ID_NONE || tab.id === 0) &&
+                  `${tab.id}` || tab.id;
+    const frameUrl = info.frameUrl;
+    ports[windowId] && ports[windowId][tabId] &&
+    ports[windowId][tabId][frameUrl] &&
+      ports[windowId][tabId][frameUrl].postMessage({getContent});
   };
 
   /* context menu */
@@ -249,7 +265,7 @@
               await contextMenus.create({
                 id: item,
                 title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
-                contexts: ["page"],
+                contexts: ["frame", "image", "page"],
                 enabled: !!enable
               }) || null;
             break;
@@ -466,14 +482,9 @@
    */
   const handleDisconnectedPort = async conn => {
     const windowId = conn.sender.tab.windowId;
-    const id = conn.sender.tab.id;
-    restorePorts({windowId, id}).then(async res => {
-      const items = ports[res] && Object.keys(ports[res]);
-      items && items.length === 0 &&
-        restorePorts({
-          windowId: res
-        });
-    }).catch(logError);
+    const tabId = conn.sender.tab.id;
+    const frameUrl = conn.sender.frameUrl;
+    restorePorts({windowId, tabId, frameUrl});
   };
 
   /**
@@ -483,14 +494,16 @@
    */
   const handlePort = async conn => {
     const windowId = conn.sender.tab.windowId;
-    const id = conn.sender.tab.id;
+    const tabId = conn.sender.tab.id;
+    const frameUrl = conn.sender.url;
     ports[windowId] = ports[windowId] || {};
-    ports[windowId][id] = conn;
+    ports[windowId][tabId] = ports[windowId][tabId] || {};
+    ports[windowId][tabId][frameUrl] = conn;
     conn.onMessage.addListener(handleMsg);
     conn.onDisconnect.addListener(handleDisconnectedPort);
     conn.postMessage({
-      setVars: vars,
-      tabId: id
+      tabId,
+      setVars: vars
     });
   };
 
