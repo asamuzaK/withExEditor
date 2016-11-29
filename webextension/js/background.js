@@ -16,10 +16,8 @@
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
   const MODE_EDIT_TEXT = "modeEditText";
-//  const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
-//  const MODE_SVG = "modeViewSVG";
   const NS_URI_PATH = "../data/nsUri.json";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
@@ -53,6 +51,7 @@
   const tabs = browser.tabs;
   const windows = browser.windows;
 
+  // NOTE: for hybrid
   /* port */
   const port = runtime.connect({name: PORT_BACKGROUND});
 
@@ -87,8 +86,9 @@
     return false;
   };
 
+  /* windows */
   /**
-   * check enabled
+   * check add-on is enabled
    * @return {boolean}
    */
   const checkEnabled = async () => {
@@ -96,6 +96,24 @@
     const isEnabled = !win.incognito || vars[ENABLE_PB];
     vars[IS_ENABLED] = isEnabled;
     return isEnabled;
+  };
+
+  /**
+   * check one of window is incognito
+   * @return {boolean}
+   */
+  const checkWindowIncognito = async () => {
+    const windowIds = await windows.getAll();
+    let isIncognito = false;
+    if (windowIds.length > 0) {
+      for (let windowId of windowIds) {
+        isIncognito = windowId.incognito;
+        if (isIncognito) {
+          break;
+        }
+      }
+    }
+    return isIncognito;
   };
 
   /**
@@ -184,7 +202,7 @@
           if (tabIds && tabIds.length > 0) {
             for (let tabId of tabIds) {
               const frameUrls = ports[windowId][tabId] &&
-                                 Object.keys(ports[windowId][tabId]);
+                                  Object.keys(ports[windowId][tabId]);
               if (frameUrls && frameUrls.length > 0) {
                 for (let frameUrl of frameUrls) {
                   const conn = ports[windowId][tabId][frameUrl];
@@ -195,6 +213,7 @@
           }
         }
       }
+      // NOTE: for hybrid
       port.postMessage(msg);
     }
   };
@@ -232,7 +251,7 @@
   /* context menu items collection */
   const menus = {};
 
-  // NOTE: no "mathml" context type, no "accesskey" feature
+  // NOTE: no "accesskey" feature
   /**
    * create context menu items
    * @param {boolean} enable - enable
@@ -367,6 +386,7 @@
         });
       }).catch(logError);
     }
+    // NOTE: for hybrid
     else {
       port.postMessage({
         getSdkPrefs: res
@@ -374,6 +394,7 @@
     }
   };
 
+  // NOTE: for hybrid
   /**
    * create pref object
    * @param {Object} item - item
@@ -466,6 +487,7 @@
           case OPEN_OPTIONS:
             obj && openOptionsPage();
             break;
+          // NOTE: for hybrid
           case SDK_PREFS:
             setSdkPrefsToStorage(obj);
             break;
@@ -628,9 +650,15 @@
     }
   });
   windows.onFocusChanged.addListener(syncUI);
-  windows.onRemoved.addListener(async id => {
-    const windowId = await id;
-    restorePorts({windowId}).catch(logError);
+  windows.onRemoved.addListener(windowId => {
+    Promise.all([
+      restorePorts({windowId}),
+      checkWindowIncognito().then(isIncognito => {
+        !isIncognito && portMsg({
+          removePrivateTmpFiles: !isIncognito
+        });
+      })
+    ]).catch(logError);
   });
 
   /* startup */
