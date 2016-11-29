@@ -736,7 +736,7 @@
       const namespace = obj.data.namespace || nsURI.html;
       const target = obj.data.target || "";
       const timestamp = obj.data.timestamp || 0;
-      const value = obj.value || "";
+      const value = await (new TextDecoder("utf-8")).decode(obj.value) || "";
       let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
           ns = !html && nsURI.html || "",
           attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS;
