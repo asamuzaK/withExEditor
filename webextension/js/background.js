@@ -163,17 +163,15 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
+   * @param {string} [data.windowId] - windowId
+   * @param {string} [data.tabId] - tabId
+   * @param {string} [data.frameUrl] - frameUrl
    * @return {void}
    */
   const restorePorts = async data => {
-    const windowId = (data.windowId === windows.WINDOW_ID_NONE ||
-                      data.windowId === 0) &&
-                     `${data.windowId}` ||
-                     data.windowId;
-    const tabId = (data.tabId === tabs.TAB_ID_NONE || data.tabId === 0) &&
-                  `${data.tabId}` ||
-                  data.tabId;
-    const frameUrl = data.frameUrl === 0 && `${data.frameUrl}` || data.frameUrl;
+    const windowId = data.windowId;
+    const tabId = data.tabId;
+    const frameUrl = data.frameUrl;
     frameUrl ?
       windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
         delete ports[windowId][tabId][frameUrl],
@@ -190,27 +188,48 @@
 
   /**
    * port message
-   * @param {Object} msg - message
+   * @param {*} msg - message
    * @return {void}
    */
   const portMsg = async msg => {
+    /**
+     * handle ports[windowId][tabId][frameUrl]
+     * @param {string} windowId - windowId
+     * @param {string} tabId - tabId
+     * @return {void}
+     */
+    const handlePortFrameUrl = (windowId, tabId) => {
+      const frameUrls = windowId && tabId &&
+                        ports[windowId] && ports[windowId][tabId] &&
+                          Object.keys(ports[windowId][tabId]);
+      if (frameUrls && frameUrls.length > 0) {
+        for (let frameUrl of frameUrls) {
+          const conn = ports[windowId][tabId][frameUrl];
+          conn && conn.postMessage(msg);
+        }
+      }
+    };
+
+    /**
+     * handle ports[windowId][tabId]
+     * @param {string} windowId - windowId
+     * @return {void}
+     */
+    const handlePortTabId = windowId => {
+      const tabIds = windowId && ports[windowId] &&
+                       Object.keys(ports[windowId]);
+      if (tabIds && tabIds.length > 0) {
+        for (let tabId of tabIds) {
+          handlePortFrameUrl(windowId, tabId);
+        }
+      }
+    };
+
     if (Object.keys(msg).length > 0) {
       const windowIds = Object.keys(ports);
       if (windowIds.length > 0) {
         for (let windowId of windowIds) {
-          const tabIds = ports[windowId] && Object.keys(ports[windowId]);
-          if (tabIds && tabIds.length > 0) {
-            for (let tabId of tabIds) {
-              const frameUrls = ports[windowId][tabId] &&
-                                  Object.keys(ports[windowId][tabId]);
-              if (frameUrls && frameUrls.length > 0) {
-                for (let frameUrl of frameUrls) {
-                  const conn = ports[windowId][tabId][frameUrl];
-                  conn && conn.postMessage(msg);
-                }
-              }
-            }
-          }
+          handlePortTabId(windowId);
         }
       }
       // NOTE: for hybrid
@@ -236,11 +255,8 @@
    */
   const portContextMenu = async (info, tab) => {
     const getContent = {info, tab};
-    const windowId = (tab.windowId === windows.WINDOW_ID_NONE ||
-                      tab.windowId === 0) &&
-                     `${tab.windowId}` || tab.windowId;
-    const tabId = (tab.id === tabs.TAB_ID_NONE || tab.id === 0) &&
-                  `${tab.id}` || tab.id;
+    const windowId = `${tab.windowId}`;
+    const tabId = `${tab.id}`;
     const frameUrl = info.frameUrl;
     ports[windowId] && ports[windowId][tabId] &&
     ports[windowId][tabId][frameUrl] &&
@@ -503,8 +519,8 @@
    * @return {void}
    */
   const handleDisconnectedPort = async conn => {
-    const windowId = conn.sender.tab.windowId;
-    const tabId = conn.sender.tab.id;
+    const windowId = `${conn.sender.tab.windowId}`;
+    const tabId = `${conn.sender.tab.id}`;
     const frameUrl = conn.sender.frameUrl;
     restorePorts({windowId, tabId, frameUrl});
   };
@@ -515,8 +531,8 @@
    * @return {void}
    */
   const handlePort = async conn => {
-    const windowId = conn.sender.tab.windowId;
-    const tabId = conn.sender.tab.id;
+    const windowId = `${conn.sender.tab.windowId}`;
+    const tabId = `${conn.sender.tab.id}`;
     const frameUrl = conn.sender.url;
     ports[windowId] = ports[windowId] || {};
     ports[windowId][tabId] = ports[windowId][tabId] || {};
@@ -633,8 +649,8 @@
   runtime.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(handlePort);
   tabs.onActivated.addListener(async info => {
-    const windowId = info.windowId;
-    const tabId = info.tabId;
+    const windowId = `${info.windowId}`;
+    const tabId = `${info.tabId}`;
     ports[windowId] && ports[windowId][tabId] ?
       createContextMenuItems(true) :
       createContextMenuItems();
@@ -642,17 +658,26 @@
   tabs.onUpdated.addListener(async (tabId, info, tab) => {
     const status = info.status;
     const active = tab.active;
-    const windowId = tab.windowId;
+    const windowId = `${tab.windowId}`;
     if (status === "complete" && active) {
-      ports[windowId] && ports[windowId][tabId] ?
+      ports[windowId] && ports[windowId][`${tabId}`] ?
       createContextMenuItems(active) :
       createContextMenuItems();
     }
   });
+  tabs.onRemoved.addListener(async (tabId, info) => {
+    portMsg({
+      removeTabRelatedStorage: {
+        tabId, info
+      }
+    });
+  });
   windows.onFocusChanged.addListener(syncUI);
   windows.onRemoved.addListener(windowId => {
     Promise.all([
-      restorePorts({windowId}),
+      restorePorts({
+        windowId: `${windowId}`
+      }),
       checkWindowIncognito().then(isIncognito => {
         !isIncognito && portMsg({
           removePrivateTmpFiles: !isIncognito

@@ -48,7 +48,7 @@
   vars[EDITABLE_CONTEXT] = false;
   vars[IS_ENABLED] = false;
   vars[CONTEXT_NODE] = null;
-  vars[TAB_ID] = null;
+  vars[TAB_ID] = "";
 
   /* RegExp */
   const reType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
@@ -159,6 +159,7 @@
     attr && attr.split(" ").forEach(value => {
       const getTmpFile = {
         dataId: value,
+        host: window.location.host,
         tabId: vars[TAB_ID]
       };
       portMsg({getTmpFile});
@@ -625,11 +626,14 @@
     const contextType = await getContextType(elm);
     const resContent = {
       mode: MODE_SOURCE,
-      charset: window.top.document.characterSet,
-      target: null,
-      value: null,
+      charset: document.characterSet,
+      contentType: document.contentType,
+      documentURI: document.documentURI,
+      host: window.location.host,
       namespace: null,
-      tabId: vars[TAB_ID]
+      tabId: vars[TAB_ID],
+      target: null,
+      value: null
     };
     if (elm) {
       const sel = window.getSelection();
