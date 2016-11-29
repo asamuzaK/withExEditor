@@ -631,6 +631,7 @@
       documentURI: document.documentURI,
       host: window.location.host,
       namespace: null,
+      protocol: window.location.protocol,
       tabId: vars[TAB_ID],
       target: null,
       value: null
