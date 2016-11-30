@@ -5,6 +5,9 @@
   "extensionName": {
     "message": "withExEditor"
   },
+  "failGetContent": {
+    "message": "Content could not be obtained."
+  },
   "modeEditText": {
     "message": "Edit Text with $1"
   },

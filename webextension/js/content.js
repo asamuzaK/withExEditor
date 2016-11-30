@@ -4,6 +4,7 @@
 "use strict";
 {
   /* constants */
+  const LABEL = "withExEditor";
   const GET_CONTENT = "getContent";
   const PORT_CONTENT = "portContent";
   const SET_VARS = "setVars";
@@ -14,6 +15,8 @@
   const DATA_ATTR_ID_CTRL = `${DATA_ATTR_ID}_controls`;
   const DATA_ATTR_TS = "data-with_ex_editor_timestamp";
   const DATA_ATTR_TS_NS = `html:${DATA_ATTR_TS}`;
+  const FAIL_GET_CONTENT = "failGetContent";
+  const FILE_EXT = "fileExt";
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
@@ -34,6 +37,7 @@
   const TAB_ID = "tabId";
 
   /* shortcut */
+  const i18n = browser.i18n;
   const runtime = browser.runtime;
   const storage = browser.storage.local;
 
@@ -50,10 +54,14 @@
   vars[IS_ENABLED] = false;
   vars[CONTEXT_NODE] = null;
   vars[INCOGNITO] = false;
+  vars[FILE_EXT] = null;
   vars[TAB_ID] = "";
 
   /* RegExp */
+  const reExt = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/;
+  const rePath = /^.*\/((?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?)?$/;
   const reType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
+  const reXml = /^(?:(?:application\/(?:[\w\-\.]+\+)?|image\/[\w\-\.]+\+)x|text\/(?:ht|x))ml$/;
 
   /**
    * log error
@@ -72,6 +80,40 @@
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
+
+  /* file utils */
+  /**
+   * get file name from URI path
+   * @param {string} uri - URI
+   * @param {string} subst - substitute file name
+   * @return {string} - file name
+   */
+  const getFileNameFromURI = (uri, subst = LABEL) => {
+    const file = isString(uri) && !/^data:/.test(uri) && rePath.exec(uri);
+    return file && file[1] || subst;
+  };
+
+  /**
+   * get file extension from media type
+   * @param {string} media - media type
+   * @param {string} subst - substitute file extension
+   * @return {string} - file extension
+   */
+  const getFileExtension = (media = "text/plain", subst = "txt") => {
+    let ext = reExt.exec(media);
+    if (ext) {
+      const type = ext[1];
+      const subtype = ext[2];
+      const suffix = ext[3] ||
+                     type === "application" && /^(?:json|xml)$/.test(subtype) &&
+                       subtype;
+      ext = suffix ?
+              vars[FILE_EXT][type][suffix][subtype] ||
+              vars[FILE_EXT][type][suffix][suffix] :
+              vars[FILE_EXT][type][subtype];
+    }
+    return `.${ext || subst}`;
+  };
 
   /* class */
   /**
@@ -578,6 +620,147 @@
   };
 
   /**
+   * get file source
+   * @param {Object} data - temporary file data
+   * @param {string} [data.charset] - document.characterSet
+   * @param {string} [data.contentType] - document.contentType
+   * @param {string} [data.documentURI] - document.documentURI
+   * @param {string} [data.protocol] - window.location.protocol
+   * @return {Object|undefined}
+   */
+  const getSource = async data => {
+    const uri = data.documentURI;
+    const protocol = data.protocol;
+    const type = data.contentType;
+    const charset = data.charset;
+    let obj;
+    if (protocol === "file:") {
+      obj = {
+        spawnProcess: {uri, data}
+      };
+    }
+    else {
+      const method = "GET";
+      const mode = "cors";
+      const headers = new Headers();
+      headers.set("Content-Type", type);
+      headers.set("Charset", charset);
+      obj = uri && await fetch(uri, {headers, method, mode}).then(async res => {
+        const value = await res.text();
+        const target = await getFileNameFromURI(uri, "index");
+        const file = target + await getFileExtension(type);
+        return {
+          createTmpFile: {
+            file, target, type,
+            mode: MODE_SOURCE,
+            tabId: data.tabId,
+            host: data.host || LABEL
+          },
+          value
+        };
+      });
+    }
+    return obj || null;
+  };
+
+  /**
+   * strip HTML tags and decode HTML escaped characters
+   * @param {string} v - value
+   * @return {string} - converted value
+   */
+  const convertValue = async v => {
+    while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
+      v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "").
+            replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
+    }
+    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!\-\-[^\-]*\-\->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n").
+             replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  };
+
+  /**
+   * create temporary file data
+   * @param {Object} data - content data
+   * @param {string} [data.contentType] - document.contentType
+   * @param {string} [data.documentURI] - document.documentURI
+   * @param {string} [data.host] - window.location.host
+   * @param {string} [data.mode] - mode
+   * @param {string} [data.tabId] - tabs.Tab.id
+   * @param {string} [data.value] - value
+   * @return {void}
+   */
+  const createTmpFileData = async data => {
+    const mode = data.mode;
+    const host = data.host || LABEL;
+    const tabId = data.tabId;
+    const type = data.contentType;
+    const uri = data.documentURI;
+    let value = data.value, target, tmpFileData;
+    switch (mode) {
+      case MODE_EDIT_TEXT:
+        tmpFileData = (target = data.target) && {
+          createTmpFile: {
+            mode, tabId, host, target,
+            type: "text/plain",
+            file: `${target}.txt`,
+            namespace: data.namespace || ""
+          },
+          value
+        } ||
+        await getSource(data);
+        break;
+      case MODE_MATHML:
+        tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
+          createTmpFile: {
+            mode, tabId, host, target,
+            type: "application/mathml+xml",
+            file: `${target}.mml`
+          },
+          value
+        } ||
+        await getSource(data);
+        break;
+      case MODE_SELECTION:
+        if (value && (target = getFileNameFromURI(uri, "index"))) {
+          tmpFileData = reXml.test(type) && {
+            createTmpFile: {
+              mode, tabId, host, target,
+              type: "application/xml",
+              file: `${target}.xml`
+            },
+            value
+          } ||
+          (value = await convertValue(value).catch(logError)) && {
+            createTmpFile: {
+              mode, tabId, host, target, type,
+              file: target + getFileExtension(type)
+            },
+            value
+          } ||
+          await getSource(data);
+        }
+        else {
+          tmpFileData = await getSource(data);
+        }
+        break;
+      case MODE_SVG:
+        tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
+          createTmpFile: {
+            mode, tabId, host, target,
+            type: "image/svg+xml",
+            file: `${target}.svg`
+          },
+          value
+        } ||
+        await getSource(data);
+        break;
+      default:
+        tmpFileData = await getSource(data);
+    }
+    return tmpFileData ||
+           Promise.reject(`${LABEL}: ${i18n.getMessage(FAIL_GET_CONTENT)}`);
+  };
+
+  /**
    * get context type
    * @param {Object} elm - element
    * @return {Object} - context type data
@@ -626,7 +809,7 @@
    */
   const getContent = async elm => {
     const contextType = await getContextType(elm);
-    const resContent = {
+    const data = {
       mode: MODE_SOURCE,
       charset: document.characterSet,
       contentType: document.contentType,
@@ -647,17 +830,17 @@
         case MODE_EDIT_TEXT:
           if (sel.isCollapsed) {
             isEditControl(elm) && (obj = getId(elm)) ? (
-              resContent.mode = contextType.mode,
-              resContent.target = obj,
-              resContent.value = elm.value || ""
+              data.mode = contextType.mode,
+              data.target = obj,
+              data.value = elm.value || ""
             ) :
             (elm.isContentEditable || await isContentTextNode(elm)) &&
             (obj = getId(elm)) && (
-              resContent.mode = contextType.mode,
-              resContent.target = obj,
-              resContent.value = elm.hasChildNodes() &&
+              data.mode = contextType.mode,
+              data.target = obj,
+              data.value = elm.hasChildNodes() &&
                                  await getTextNode(elm.childNodes) || "",
-              resContent.namespace = contextType.namespace,
+              data.namespace = contextType.namespace,
               setDataAttrs(elm)
             );
           }
@@ -665,11 +848,11 @@
             (isEditControl(anchorElm) || anchorElm.isContentEditable ||
              await isContentTextNode(anchorElm)) &&
             (obj = getId(anchorElm)) && (
-              resContent.mode = contextType.mode,
-              resContent.target = obj,
-              resContent.value = anchorElm.hasChildNodes() &&
+              data.mode = contextType.mode,
+              data.target = obj,
+              data.value = anchorElm.hasChildNodes() &&
                                  await getTextNode(anchorElm.childNodes) || "",
-              resContent.namespace = contextType.namespace,
+              data.namespace = contextType.namespace,
               setDataAttrs(anchorElm)
             );
           }
@@ -677,28 +860,51 @@
         case MODE_MATHML:
           sel.isCollapsed && contextType.namespace === nsURI.math &&
           (obj = await createDomXmlBased(elm, "math")) && (
-            resContent.mode = contextType.mode,
-            resContent.value = obj
+            data.mode = contextType.mode,
+            data.value = obj
           );
           break;
         case MODE_SVG:
           sel.isCollapsed && contextType.namespace === nsURI.svg &&
           (obj = await createDomXmlBased(elm, "svg")) && (
-            resContent.mode = contextType.mode,
-            resContent.value = obj
+            data.mode = contextType.mode,
+            data.value = obj
           );
           break;
         case MODE_SELECTION:
           !sel.isCollapsed && (obj = await createDomFromSelRange(sel)) && (
-            resContent.mode = contextType.mode,
-            resContent.value = obj
+            data.mode = contextType.mode,
+            data.value = obj
           );
           break;
         default:
       }
     }
-    return {resContent};
+    return data;
   };
+
+  /**
+   * port content data
+   * @param {Object} elm - element
+   * @return {Object} - Promise
+   */
+  const portContentData = elm =>
+    getContent(elm).then(createTmpFileData).then(res => {
+      if (res.createTmpFile) {
+        portMsg({
+          createTmpFile: {
+            data: res.createTmpFile,
+            value: res.value
+          }
+        })
+      }
+      else {
+        res.spawnProcess &&
+          portMsg({
+            spawnProcess: res.spawnProcess
+          });
+      }
+    }).catch(logError);
 
   /* sync edited text */
   /**
@@ -830,7 +1036,7 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            getContent(vars[CONTEXT_NODE]).then(portMsg).catch(logError);
+            portContentData(vars[CONTEXT_NODE]);
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -848,6 +1054,7 @@
           case SYNC_TEXT:
             syncText(obj);
             break;
+          case FILE_EXT:
           case TAB_ID:
             vars[item] = obj;
             break;
@@ -901,7 +1108,7 @@
           isEditControl(elm) || elm.isContentEditable ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
           reType.test(document.contentType)
-      ) && getContent(elm).then(portMsg).catch(logError);
+      ) && portContentData(elm);
     }
   };
 
