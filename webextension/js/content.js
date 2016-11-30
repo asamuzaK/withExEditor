@@ -122,12 +122,6 @@
   class KeyCombo {
     /**
      * @param {Object} opt - key settings
-     * @param {string} [opt.key] - key string
-     * @param {boolean} [opt.alt] - altKey
-     * @param {boolean} [opt.ctrl] - ctrlKey
-     * @param {boolean} [opt.meta] - metaKey
-     * @param {boolean} [opt.shift] - shiftKey
-     * @param {boolean} [opt.enabled] - enabled
      */
     constructor(opt = {}) {
       this._key = isString(opt.key) && opt.key.length === 1 && opt.key || "";
@@ -622,11 +616,7 @@
   /**
    * get file source
    * @param {Object} data - temporary file data
-   * @param {string} [data.charset] - document.characterSet
-   * @param {string} [data.contentType] - document.contentType
-   * @param {string} [data.documentURI] - document.documentURI
-   * @param {string} [data.protocol] - window.location.protocol
-   * @return {Object|undefined}
+   * @return {Object}
    */
   const getSource = async data => {
     const uri = data.documentURI;
@@ -680,12 +670,6 @@
   /**
    * create temporary file data
    * @param {Object} data - content data
-   * @param {string} [data.contentType] - document.contentType
-   * @param {string} [data.documentURI] - document.documentURI
-   * @param {string} [data.host] - window.location.host
-   * @param {string} [data.mode] - mode
-   * @param {string} [data.tabId] - tabs.Tab.id
-   * @param {string} [data.value] - value
    * @return {void}
    */
   const createTmpFileData = async data => {

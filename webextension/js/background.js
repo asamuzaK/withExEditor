@@ -164,9 +164,6 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
-   * @param {string} [data.windowId] - windowId
-   * @param {string} [data.tabId] - tabId
-   * @param {string} [data.frameUrl] - frameUrl
    * @return {void}
    */
   const restorePorts = async data => {
