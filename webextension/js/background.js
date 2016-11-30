@@ -8,6 +8,7 @@
 
   const PORT_BACKGROUND = "portBackground";
   const CONTEXT_MENU = "contextMenu";
+  const INCOGNITO = "incognito";
   const OPEN_OPTIONS = "openOptions";
   const SDK_PREFS = "sdkPrefs";
 
@@ -172,9 +173,14 @@
     const windowId = data.windowId;
     const tabId = data.tabId;
     const frameUrl = data.frameUrl;
+    const incognito = !!data.incognito;
     frameUrl ?
       windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
-        delete ports[windowId][tabId][frameUrl],
+        delete ports[windowId][tabId][frameUrl]
+      ) :
+    incognito ?
+      windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
+        delete ports[windowId][tabId][INCOGNITO],
         Object.keys(ports[windowId][tabId]).length === 0 &&
           restorePorts({windowId, tabId})
       ) :
@@ -204,8 +210,10 @@
                           Object.keys(ports[windowId][tabId]);
       if (frameUrls && frameUrls.length > 0) {
         for (let frameUrl of frameUrls) {
-          const conn = ports[windowId][tabId][frameUrl];
-          conn && conn.postMessage(msg);
+          if (frameUrl !== INCOGNITO) {
+            const conn = ports[windowId][tabId][frameUrl];
+            conn && conn.postMessage(msg);
+          }
         }
       }
     };
@@ -534,13 +542,15 @@
     const windowId = `${conn.sender.tab.windowId}`;
     const tabId = `${conn.sender.tab.id}`;
     const frameUrl = conn.sender.url;
+    const incognito = conn.sender.tab.incognito;
     ports[windowId] = ports[windowId] || {};
     ports[windowId][tabId] = ports[windowId][tabId] || {};
     ports[windowId][tabId][frameUrl] = conn;
+    ports[windowId][tabId][INCOGNITO] = incognito;
     conn.onMessage.addListener(handleMsg);
     conn.onDisconnect.addListener(handleDisconnectedPort);
     conn.postMessage({
-      tabId,
+      incognito, tabId,
       setVars: vars
     });
   };
@@ -655,22 +665,34 @@
       createContextMenuItems(true) :
       createContextMenuItems();
   });
-  tabs.onUpdated.addListener(async (tabId, info, tab) => {
+  tabs.onUpdated.addListener(async (id, info, tab) => {
     const status = info.status;
     const active = tab.active;
     const windowId = `${tab.windowId}`;
+    const tabId = `${id}`;
     if (status === "complete" && active) {
-      ports[windowId] && ports[windowId][`${tabId}`] ?
+      ports[windowId] && ports[windowId][tabId] ?
       createContextMenuItems(active) :
       createContextMenuItems();
     }
   });
-  tabs.onRemoved.addListener(async (tabId, info) => {
+  tabs.onRemoved.addListener(async (id, info) => {
+    const windowId = `${info.windowId}`;
+    const tabId = `${id}`;
+    const isWindowClosing = !!info.isWindowClosing;
+    const incognito = ports[windowId] && ports[windowId][tabId] &&
+                        !!ports[windowId][tabId][INCOGNITO];
     portMsg({
       removeTabRelatedStorage: {
-        tabId, info
+        tabId, incognito, info
       }
-    });
+    }).catch(logError);
+    ports[windowId] && ports[windowId][tabId] &&
+    Object.keys(ports[windowId][tabId]).length === 1 &&
+      restorePorts({
+        windowId, tabId,
+        incognito: true
+      }).catch(logError);
   });
   windows.onFocusChanged.addListener(syncUI);
   windows.onRemoved.addListener(windowId => {

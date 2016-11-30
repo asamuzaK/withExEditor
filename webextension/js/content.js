@@ -30,6 +30,7 @@
   const EDITABLE_CONTEXT = "editableContext";
   const IS_ENABLED = "isEnabled";
   const CONTEXT_NODE = "contextNode";
+  const INCOGNITO = "incognito";
   const TAB_ID = "tabId";
 
   /* shortcut */
@@ -48,6 +49,7 @@
   vars[EDITABLE_CONTEXT] = false;
   vars[IS_ENABLED] = false;
   vars[CONTEXT_NODE] = null;
+  vars[INCOGNITO] = false;
   vars[TAB_ID] = "";
 
   /* RegExp */
@@ -630,6 +632,7 @@
       contentType: document.contentType,
       documentURI: document.documentURI,
       host: window.location.host,
+      incognito: vars[INCOGNITO],
       namespace: null,
       protocol: window.location.protocol,
       tabId: vars[TAB_ID],
@@ -822,6 +825,7 @@
             handleMsg(obj);
             break;
           case EDITABLE_CONTEXT:
+          case INCOGNITO:
           case IS_ENABLED:
             vars[item] = !!obj;
             break;
