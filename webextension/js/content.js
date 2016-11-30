@@ -880,7 +880,7 @@
             data: res.createTmpFile,
             value: res.value
           }
-        })
+        });
       }
       else {
         res.spawnProcess &&

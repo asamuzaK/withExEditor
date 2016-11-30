@@ -172,9 +172,8 @@
     const frameUrl = data.frameUrl;
     const incognito = !!data.incognito;
     frameUrl ?
-      windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
-        delete ports[windowId][tabId][frameUrl]
-      ) :
+      windowId && tabId && ports[windowId] && ports[windowId][tabId] &&
+        delete ports[windowId][tabId][frameUrl] :
     incognito ?
       windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
         delete ports[windowId][tabId][INCOGNITO],
@@ -676,13 +675,10 @@
   tabs.onRemoved.addListener(async (id, info) => {
     const windowId = `${info.windowId}`;
     const tabId = `${id}`;
-    const isWindowClosing = !!info.isWindowClosing;
     const incognito = ports[windowId] && ports[windowId][tabId] &&
                         !!ports[windowId][tabId][INCOGNITO];
     portMsg({
-      removeTabRelatedStorage: {
-        tabId, incognito, info
-      }
+      removeTabRelatedStorage: {tabId, incognito, info}
     }).catch(logError);
     ports[windowId] && ports[windowId][tabId] &&
     Object.keys(ports[windowId][tabId]).length === 1 &&
