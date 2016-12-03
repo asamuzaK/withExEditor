@@ -10,6 +10,7 @@
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
 
+  const CHAR = "utf-8";
   const DATA_ATTR_ID = "data-with_ex_editor_id";
   const DATA_ATTR_ID_NS = `html:${DATA_ATTR_ID}`;
   const DATA_ATTR_ID_CTRL = `${DATA_ATTR_ID}_controls`;
@@ -929,7 +930,7 @@
       const namespace = obj.data.namespace || nsURI.html;
       const target = obj.data.target || "";
       const timestamp = obj.data.timestamp || 0;
-      const value = await (new TextDecoder("utf-8")).decode(obj.value) || "";
+      const value = await (new TextDecoder(CHAR)).decode(obj.value) || "";
       let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
           ns = !html && nsURI.html || "",
           attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS;
