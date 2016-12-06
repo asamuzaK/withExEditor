@@ -15,10 +15,13 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 * When browsing a local file, the local file will be opened directly.
 
 ### View MathML Source with *exEditor*
-* Enabled on MathML elements and shows a generated DOM tree in MathML format. It may not be exactly the same as the source of the DOM tree, e.g. the order of the attributes.
+* Enabled on MathML elements and shows a generated DOM tree in MathML format.
+
+### View SVG Source with *exEditor*
+* Enabled on SVG elements and shows a generated DOM tree in SVG format.
 
 ### View Selection Source with *exEditor*
-* Shows a generated DOM tree of the selection in XML format. It may not be exactly the same as the source of the DOM tree, e.g. the order of the attributes.
+* Shows a generated DOM tree of the selection in XML format.
 * If there are multiple ranges in selection, each range will be shown with a comment as a delimiter.
 * If the selection is not DOM parsable, then creates a file that contains only the range of text selected.
 
@@ -33,28 +36,12 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 ### Toolbar Button Icon
 * Choose the icon.
 
-### Editor Path
-* Enter the editor path.
-* When selecting an editor on Mac OS, pick the file under '/Applications/[yourEditor].app/Contents/MacOS/' directory.
+### Manifest Path
+* Enter the application manifest path.
 
 ### Editor Label
 * Enter the label of the editor.
 * Disabled if editor is not selected.
-
-### Command Line Options
-* Command line options of the editor.
-* When using backslash (\\) character, it must be escaped with an extra backslash. ex: C:\\\\Windows
-* If argument contains space(s), quote them with the double quotation mark ("). ex: "Some Arg"
-
-### Put File Path After Command Line Options
-* Some editor requires the file path to be put after the command arguments. Enable this option in that case.
-
-### Run Command In A Shell
-* Spawns a shell and runs a command within that shell.
-* If this option is enabled, you can run a shell script instead of executing the editor directly.
-  1. Create a shell script (batch file) which executes the editor.
-  2. In the 'Editor Path' field, enter the shell script path instead of the editor.
-  3. Enable this option.
 
 ### Access Key
 * Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly.
