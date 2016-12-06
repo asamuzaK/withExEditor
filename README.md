@@ -76,11 +76,3 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 ### Forcibly Remove The Temporary Files
 * The temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
 * It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option.
-
-***
-
-## About Error / Warning Notification
-Error or Warning message will be notified when...
-* Failed to execute the editor.
-* The process of the editor did not exit normally.
-* Failed to remove the temporary files at the end of Private Browsing.
