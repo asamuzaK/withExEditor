@@ -47,18 +47,17 @@ import sys, json, struct, subprocess
 
 # Read a message from stdin and decode it.
 def getMessage():
-  rawLength = sys.stdin.read(4)
+  rawLength = sys.stdin.buffer.read(4)
   if len(rawLength) == 0:
-      sys.exit(0)
-  messageLength = struct.unpack('@I', rawLength)[0]
-  message = sys.stdin.read(messageLength)
-  return json.loads(message)
+    sys.exit(0)
+  message = sys.stdin.buffer.read(struct.unpack('@I', rawLength)[0])
+  return json.loads(message.decode('utf-8'))
 
 cmd = "C:\Program Files\Path\To\YourEditor.exe"
 
 while True:
   file = getMessage()
-  subprocess.call([cmd, file])
+  subprocess.run([cmd, file])
 
 sys.exit()</code></pre>
         </figure>

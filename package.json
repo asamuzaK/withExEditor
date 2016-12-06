@@ -6,9 +6,9 @@
   "author": "asamuzaK",
   "homepage": "https://github.com/asamuzaK/withExEditor",
   "locales": {
-     "ja": {
-       "description": "外部エディタでソースや選択部分を表示、またはテキストを編集"
-     }
+    "ja": {
+      "description": "外部エディタでソースや選択部分を表示、またはテキストを編集"
+    }
   },
   "permissions": {
     "private-browsing": true,
