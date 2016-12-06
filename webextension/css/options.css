@@ -9,16 +9,19 @@ body {
   color: black;
   line-height: 1.5;
 }
+section {
+  margin: 1.5rem 0;
+}
 h1 {
   margin: 0;
   font-size: 1.2rem;
 }
-h1::before {
+header > h1::before {
   display: inline-block;
   margin-right: 0.5rem;
   width: 1.44em;
   height: 1.44em;
-  background-image: url("../../img/icon.svg");
+  background-image: url(../img/icon.svg);
   background-size: 1.44em 1.44em;
   content: "";
   vertical-align: top;
@@ -110,4 +113,16 @@ img {
   margin: auto;
   width: 1.728rem;
   height: 1.728rem;
+}
+figure {
+  margin: 1rem;
+}
+pre {
+  border: 1px solid rgb(128, 128, 128);
+  border-radius: 8px;
+  overflow-x: auto;
+}
+code {
+  display: inline-block;
+  margin: 1rem;
 }

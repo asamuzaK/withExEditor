@@ -23,6 +23,9 @@
   "modeViewSVG": {
     "message": "SVG のソースを $1 で表示"
   },
+  "optionsAccessKey": {
+    "message": ""
+  },
   "optionsAccessKey.placeholder": {
     "message": "アクセスキーを入力"
   },
@@ -35,11 +38,26 @@
   "optionsAccessKeyDetail3": {
     "message": "コンテキストメニューでは設定した「キー」をそのまま押してください。"
   },
+  "optionsAccessKeyDetail4": {
+    "message": "備考： コンテクストメニューでのアクセスキーは、まだWebExtensionsでは実装されていません。"
+  },
   "optionsAccessKeyLabel": {
     "message": "アクセスキー"
   },
   "optionsAccessKeySettings": {
     "message": "アクセスキー設定"
+  },
+  "optionsAppManifestPath": {
+    "message": ""
+  },
+  "optionsAppManifestPath.placeholder": {
+    "message": "マニフェストのパスを入力"
+  },
+  "optionsAppManifestPathDetail": {
+    "message": "アプリケーションマニフェストファイル（JSON）のパスを入力してください。"
+  },
+  "optionsAppManifestPathLabel": {
+    "message": "マニフェストのパス"
   },
   "optionsEditableContextDetail": {
     "message": "コンテンツが編集可能な場合にのみ、コンテキストメニューに表示されます。"
@@ -47,26 +65,8 @@
   "optionsEditableContextLabel": {
     "message": "テキスト編集のみ有効化"
   },
-  "optionsEditorCmdArgs.placeholder": {
-    "message": "コマンドラインオプションを入力"
-  },
-  "optionsEditorCmdArgsDetail": {
-    "message": "エディタのコマンドラインオプションを設定します。"
-  },
-  "optionsEditorCmdArgsDetail2": {
-    "message": "バックスラッシュ（\\）文字にはバックスラッシュを加えてエスケープさせておく必要があります。 例: C:\\\\Windows"
-  },
-  "optionsEditorCmdArgsDetail3": {
-    "message": "空白が含まれる場合は二重引用符（\"）で囲ってください。 例: \"Some Arg\""
-  },
-  "optionsEditorCmdArgsLabel": {
-    "message": "コマンドラインオプション"
-  },
-  "optionsEditorCmdPosDetail": {
-    "message": "いくつかのエディタでは、ファイルを指定する場合はコマンドの最後に置くように求めているものがあります。 そのような場合に有効化してください。"
-  },
-  "optionsEditorCmdPosLabel": {
-    "message": "コマンドラインオプションの後にファイルパスを指定"
+  "optionsEditorName": {
+    "message": ""
   },
   "optionsEditorName.placeholder": {
     "message": "エディタの表示名を変更"
@@ -80,38 +80,8 @@
   "optionsEditorNameLabel": {
     "message": "エディタの表示名"
   },
-  "optionsEditorPath.placeholder": {
-    "message": "エディタのパスを入力"
-  },
-  "optionsEditorPathDetail": {
-    "message": "エディタのフルパスを入力してください。"
-  },
-  "optionsEditorPathDetail2": {
-    "message": "Mac OS では、「/Applications/[yourEditor].app/Contents/MacOS/」内にあるファイルを選択してください。"
-  },
-  "optionsEditorPathLabel": {
-    "message": "エディタのパス"
-  },
   "optionsEditorSettings": {
     "message": "エディタ設定"
-  },
-  "optionsEditorShellDetail": {
-    "message": "シェルを起動し、そのシェル内でコマンドを実行します。"
-  },
-  "optionsEditorShellDetail2": {
-    "message": "このオプションを有効化した場合、エディタを直接起動させる代わりに任意のシェルスクリプトを実行させることができます。"
-  },
-  "optionsEditorShellDetail3": {
-    "message": "エディタを起動するシェルスクリプト（バッチファイル）を作成。"
-  },
-  "optionsEditorShellDetail4": {
-    "message": "「エディタのパス」欄にはエディタの代わりにシェルスクリプトのパスを入力。"
-  },
-  "optionsEditorShellDetail5": {
-    "message": "このオプションを有効化。"
-  },
-  "optionsEditorShellLabel": {
-    "message": "シェルでコマンドを実行"
   },
   "optionsEditorShortCutDetail": {
     "message": "コンテキストメニューを経由せずにエディタを直接起動するには「Ctrl + Shift + キー」（Macは「Cmd + Shift + キー」）を押してください。"
@@ -134,8 +104,14 @@
   "optionsForceRemoveLabel": {
     "message": "一時ファイルを強制的に削除"
   },
+  "optionsIconColor": {
+    "message": ""
+  },
   "optionsIconColor.alt": {
     "message": "カラー"
+  },
+  "optionsIconColorLabel": {
+    "message": ""
   },
   "optionsIconColorLabel.ariaLabel": {
     "message": "カラーアイコン"
@@ -143,17 +119,35 @@
   "optionsIconDetail": {
     "message": "アイコンを選択してください。"
   },
+  "optionsIconGray": {
+    "message": ""
+  },
   "optionsIconGray.alt": {
     "message": "グレー"
+  },
+  "optionsIconGrayLabel": {
+    "message": ""
   },
   "optionsIconGrayLabel.ariaLabel": {
     "message": "グレーアイコン"
   },
+  "optionsIconWhite": {
+    "message": ""
+  },
   "optionsIconWhite.alt": {
     "message": "ホワイト"
   },
+  "optionsIconWhiteLabel": {
+    "message": ""
+  },
   "optionsIconWhiteLabel.ariaLabel": {
     "message": "ホワイトアイコン"
+  },
+  "optionsManualLabel": {
+    "message": "マニュアル"
+  },
+  "optionsManualLabel.href": {
+    "message": "./manual.ja.html"
   },
   "optionsOptionsShortCutDetail": {
     "message": "設定ページを開くには「Ctrl + Alt + キー」（Macは「Cmd + Opt + キー」）を押してください。"
@@ -169,8 +163,5 @@
   },
   "optionsToolbarIconLabel": {
     "message": "ツールバーボタンアイコン"
-  },
-  "warnEditorNotSelected": {
-    "message": "エディタが選択されていません。"
   }
 }

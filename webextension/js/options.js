@@ -5,11 +5,17 @@
 {
   /* constants */
   const PORT_OPTIONS = "portOptions";
+  const CHECK_EXECUTABLE = "checkExecutable";
+  const GET_APP_MANIFEST = "getAppManifest";
+  const RES_APP_MANIFEST = "resAppManifest";
   const RES_EXECUTABLE = "resExecutable";
+
+  const CHAR = "utf-8";
   const DATA_ATTR_I18N = "data-i18n";
   const ELEMENT_NODE = 1;
 
-  const EDITOR_PATH = "editorPath";
+  const APP_MANIFEST = "appManifestPath";
+  const APP_NAME = "appName";
   const EDITOR_NAME = "editorName";
 
   /* shortcuts */
@@ -21,10 +27,11 @@
   const port = runtime.connect({name: PORT_OPTIONS});
 
   /* variables */
-  const vars = {};
-
-  vars[EDITOR_PATH] = null;
-  vars[EDITOR_NAME] = null;
+  const vars = {
+    [APP_MANIFEST]: null,
+    [APP_NAME]: null,
+    [EDITOR_NAME]: null
+  };
 
   /**
    * log error
@@ -46,51 +53,68 @@
 
   /* storage */
   /**
+   * create pref object
+   * @param {Object} elm - element
+   * @param {boolean} bool - executable
+   * @return {Object}
+   */
+  const createPrefObj = async (elm, bool = false) => {
+    const id = elm && elm.id;
+    let pref = null;
+    id && (
+      pref = {
+        [id]: {
+          id,
+          value: elm.value || "",
+          checked: !!elm.checked,
+          app: {
+            executable: bool
+          }
+        }
+      }
+    );
+    return pref;
+  };
+
+  /**
    * synchronize editorName value
-   * @param {string} name - editor name
+   * @param {string} bool - native application is executable
    * @return {void}
    */
-  const synchronizeEditorName = async name => {
-    vars[EDITOR_NAME] && (
-      name && isString(name) ? (
+  const synchronizeEditorName = async (bool = false) => {
+    if (vars[EDITOR_NAME]) {
+      const name = vars[APP_NAME] && vars[APP_NAME].value;
+      bool && name ? (
         vars[EDITOR_NAME].value = name,
         vars[EDITOR_NAME].disabled = false
       ) : (
         vars[EDITOR_NAME].value = "",
         vars[EDITOR_NAME].disabled = true
-      ),
-      storage.set({
-        editorName: {
-          id: EDITOR_NAME,
-          value: name && isString(name) && name || "",
-          checked: false,
-          data: {
-            executable: false
-          }
-        }
-      })
-    );
+      );
+      createPrefObj(vars[EDITOR_NAME]).then(pref => {
+        pref && storage.set(pref);
+      }).catch(logError);
+    }
   };
 
   /**
-   * create pref object
-   * @param {Object} elm - element
-   * @return {Object}
+   * extract app manifest
+   * @param {Array} arr - uint8 array
+   * @return {void}
    */
-  const createPrefObj = async elm => {
-    let pref = null;
-    if (elm && elm.id) {
-      pref = {};
-      pref[elm.id] = {
-        id: elm.id,
-        value: elm.value || "",
-        checked: !!elm.checked,
-        data: {
-          executable: false
-        }
-      };
-    }
-    return pref;
+  const extractAppManifest = async (arr = []) => {
+    const app = await JSON.parse((new TextDecoder(CHAR)).decode(arr));
+    const name = app && app.name;
+    const path = app && app.path;
+    name && path && (
+      vars[APP_NAME].value = name,
+      createPrefObj(vars[APP_NAME]).then(pref => {
+        pref && storage.set(pref);
+      }).catch(logError),
+      port.postMessage({
+        [CHECK_EXECUTABLE]: {path}
+      })
+    );
   };
 
   /**
@@ -106,21 +130,21 @@
         const nodes = document.querySelectorAll(`[name=${elm.name}]`);
         if (nodes instanceof NodeList) {
           for (let node of nodes) {
-            pref = await createPrefObj(node);
+            pref = await createPrefObj(node).catch(logError);
             pref && storage.set(pref);
           }
         }
       }
       else {
-        vars[EDITOR_PATH] && elm === vars[EDITOR_PATH] ?
+        elm === vars[APP_MANIFEST] ?
           port.postMessage({
-            checkExecutable: {
+            [GET_APP_MANIFEST]: {
               path: elm.value
             }
           }) : (
-            pref = await createPrefObj(elm),
-            pref && storage.set(pref)
-          );
+          pref = await createPrefObj(elm).catch(logError),
+          pref && storage.set(pref)
+        );
       }
     }
   };
@@ -149,16 +173,17 @@
       const attrs = {
         ariaLabel: "aria-label",
         alt: "alt",
+        href: "href",
         placeholder: "placeholder",
         title: "title"
       };
       const items = Object.keys(attrs);
       for (let item of items) {
         if (elm.hasAttribute(attrs[item])) {
-          const data = await i18n.getMessage(
+          const attr = await i18n.getMessage(
             `${elm.getAttribute(DATA_ATTR_I18N)}.${item}`
           );
-          data && elm.setAttribute(attrs[item], data);
+          attr && elm.setAttribute(attrs[item], attr);
         }
       }
     }
@@ -207,11 +232,7 @@
               break;
             case "text":
               elm.value = isString(obj.value) && obj.value || "";
-              vars[EDITOR_PATH] && elm === vars[EDITOR_PATH] && elm.value &&
-              obj.data && obj.data.executable && (
-                elm.dataset.executable = "true",
-                vars[EDITOR_NAME] && (vars[EDITOR_NAME].disabled = false)
-              );
+              elm === vars[EDITOR_NAME] && elm.value && (elm.disabled = false);
               break;
             default:
           }
@@ -225,7 +246,8 @@
    * @return {void}
    */
   const setVariables = async () => {
-    vars[EDITOR_PATH] = document.getElementById(EDITOR_PATH);
+    vars[APP_NAME] = document.getElementById(APP_NAME);
+    vars[APP_MANIFEST] = document.getElementById(APP_MANIFEST);
     vars[EDITOR_NAME] = document.getElementById(EDITOR_NAME);
   };
 
@@ -237,21 +259,23 @@
    */
   const handleMsg = async msg => {
     const items = Object.keys(msg);
-    if (items.length === 1) {
-      const item = items[0] === RES_EXECUTABLE && msg[items[0]];
-      if (item) {
-        const bool = !!item.executable;
-        storage.set({
-          editorPath: {
-            id: EDITOR_PATH,
-            value: bool && item.value || "",
-            checked: false,
-            data: {
-              executable: bool
-            }
-          }
-        });
-        synchronizeEditorName(bool && item.name || "");
+    if (items.length > 0) {
+      for (let item of items) {
+        const obj = msg[item];
+        switch (item) {
+          case RES_APP_MANIFEST:
+            extractAppManifest(obj.value).catch(logError);
+            break;
+          case RES_EXECUTABLE:
+            Promise.all([
+              createPrefObj(vars[APP_MANIFEST], obj.executable).then(pref => {
+                storage.set(pref);
+              }),
+              synchronizeEditorName(obj.executable)
+            ]).catch(logError);
+            break;
+          default:
+        }
       }
     }
   };

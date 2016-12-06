@@ -5,8 +5,12 @@
 {
   /* constants */
   const LABEL = "withExEditor";
+  const CREATE_TMP_FILE = "createTmpFile";
   const GET_CONTENT = "getContent";
+  const GET_FILE_PATH = "getFilePath";
   const PORT_CONTENT = "portContent";
+  const PORT_FILE_PATH = "portFilePath";
+  const SEND_APP = "sendApp";
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
 
@@ -46,17 +50,17 @@
   const port = runtime.connect({name: PORT_CONTENT});
 
   /* variables */
-  const vars = {};
-
-  vars[KEY_ACCESS] = "e";
-  vars[KEY_OPEN_OPTIONS] = true;
-  vars[KEY_EXEC_EDITOR] = true;
-  vars[EDITABLE_CONTEXT] = false;
-  vars[IS_ENABLED] = false;
-  vars[CONTEXT_NODE] = null;
-  vars[INCOGNITO] = false;
-  vars[FILE_EXT] = null;
-  vars[TAB_ID] = "";
+  const vars = {
+    [KEY_ACCESS]: "e",
+    [KEY_OPEN_OPTIONS]: true,
+    [KEY_EXEC_EDITOR]: true,
+    [EDITABLE_CONTEXT]: false,
+    [IS_ENABLED]: false,
+    [CONTEXT_NODE]: null,
+    [INCOGNITO]: false,
+    [FILE_EXT]: null,
+    [TAB_ID]: ""
+  };
 
   /* RegExp */
   const reExt = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/;
@@ -627,7 +631,7 @@
     let obj;
     if (protocol === "file:") {
       obj = {
-        spawnProcess: {uri, data}
+        [GET_FILE_PATH]: {uri, data}
       };
     }
     else {
@@ -641,7 +645,7 @@
         const target = await getFileNameFromURI(uri, "index");
         const file = target + await getFileExtension(type);
         return {
-          createTmpFile: {
+          [CREATE_TMP_FILE]: {
             file, target, type,
             mode: MODE_SOURCE,
             tabId: data.tabId,
@@ -683,7 +687,7 @@
     switch (mode) {
       case MODE_EDIT_TEXT:
         tmpFileData = (target = data.target) && {
-          createTmpFile: {
+          [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
             type: "text/plain",
             file: `${target}.txt`,
@@ -695,7 +699,7 @@
         break;
       case MODE_MATHML:
         tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
-          createTmpFile: {
+          [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
             type: "application/mathml+xml",
             file: `${target}.mml`
@@ -707,7 +711,7 @@
       case MODE_SELECTION:
         if (value && (target = getFileNameFromURI(uri, "index"))) {
           tmpFileData = reXml.test(type) && {
-            createTmpFile: {
+            [CREATE_TMP_FILE]: {
               mode, tabId, host, target,
               type: "application/xml",
               file: `${target}.xml`
@@ -715,7 +719,7 @@
             value
           } ||
           (value = await convertValue(value).catch(logError)) && {
-            createTmpFile: {
+            [CREATE_TMP_FILE]: {
               mode, tabId, host, target, type,
               file: target + getFileExtension(type)
             },
@@ -729,7 +733,7 @@
         break;
       case MODE_SVG:
         tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
-          createTmpFile: {
+          [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
             type: "image/svg+xml",
             file: `${target}.svg`
@@ -875,18 +879,18 @@
    */
   const portContentData = elm =>
     getContent(elm).then(createTmpFileData).then(res => {
-      if (res.createTmpFile) {
+      if (res[CREATE_TMP_FILE]) {
         portMsg({
-          createTmpFile: {
-            data: res.createTmpFile,
+          [CREATE_TMP_FILE]: {
+            data: res[CREATE_TMP_FILE],
             value: res.value
           }
         });
       }
       else {
-        res.spawnProcess &&
+        res[GET_FILE_PATH] &&
           portMsg({
-            spawnProcess: res.spawnProcess
+            [GET_FILE_PATH]: res[GET_FILE_PATH]
           });
       }
     }).catch(logError);
@@ -1036,6 +1040,13 @@
             vars[item] = !!obj;
             openOptionsKey.enabled = !!obj;
             break;
+          case PORT_FILE_PATH:
+            obj.path && portMsg({
+              [SEND_APP]: {
+                path: obj.path
+              }
+            });
+            break;
           case SYNC_TEXT:
             syncText(obj);
             break;
@@ -1058,12 +1069,12 @@
     const elm = evt && evt.target;
     const sel = window.getSelection();
     const contextMenu = {
-      modeEditText: {
+      [MODE_EDIT_TEXT]: {
         menuItemId: MODE_EDIT_TEXT,
         enabled: sel.isCollapsed ||
                  sel.anchorNode.parentNode === sel.focusNode.parentNode
       },
-      modeViewSource: {
+      [MODE_SOURCE]: {
         menuItemId: MODE_SOURCE,
         mode: elm.namespaceURI === nsURI.math && MODE_MATHML ||
               elm.namespaceURI === nsURI.svg && MODE_SVG ||

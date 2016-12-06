@@ -8,9 +8,12 @@
   </head>
   <body>
     <header>
-      <h1>withExEditor</h1>
+      <h1 data-i18n="optionsTitle">withExEditor Options</h1>
     </header>
     <main>
+      <p>
+        <a href="./manual.en.html" data-i18n="optionsManualLabel">Manual</a>
+      </p>
       <form id="optionsForm">
         <fieldset id="toolbarIcon">
           <legend data-i18n="optionsToolbarIconLabel">
@@ -55,23 +58,20 @@
           </legend>
           <div>
             <p>
-              <label for="editorPath" class="label"
-                     data-i18n="optionsEditorPathLabel"
-                     aria-details="editorPathDetail">
-                Editor Path
+              <label for="appManifestPath" class="label"
+                     data-i18n="optionsAppManifestPathLabel"
+                     aria-details="appManifestPathDetail">
+                App Manifest Path
               </label>
-              <input type="text" id="editorPath" data-executable="false"
-                     data-i18n="optionsEditorPath"
-                     placeholder="Input Editor Path" />
+              <input type="text" id="appManifestPath" data-executable="false"
+                     data-i18n="optionsAppManifestPath"
+                     placeholder="Input App Manifest Path" />
+              <input type="hidden" id="appName" />
             </p>
-            <details id="editorPathDetail">
+            <details id="appManifestPathDetail">
               <div>
-                <p data-i18n="optionsEditorPathDetail">
-                  Enter the editor path.
-                </p>
-                <p  data-i18n="optionsEditorPathDetail2">
-                  When selecting an editor on Mac OS, pick the file under
-                  '/Applications/[yourEditor].app/Contents/MacOS/' directory.
+                <p data-i18n="optionsAppManifestPathDetail">
+                  Enter the path of application manifest JSON file.
                 </p>
               </div>
             </details>
@@ -93,90 +93,8 @@
                   Enter the label of the editor.
                 </p>
                 <p data-i18n="optionsEditorNameDetail2">
-                  Disabled if editor is not selected.
+                  Disabled if application manifest path field is not filled, or could not find the shell script etc.
                 </p>
-              </div>
-            </details>
-          </div>
-          <div>
-            <p>
-              <label for="editorCmdArgs" class="label"
-                     data-i18n="optionsEditorCmdArgsLabel"
-                     aria-details="editorCmdArgsDetail">
-                Command Line Options
-              </label>
-              <input type="text" id="editorCmdArgs"
-                     data-i18n="optionsEditorCmdArgs"
-                     placeholder="Input Command Line Options" />
-            </p>
-            <details id="editorCmdArgsDetail">
-              <div>
-                <p data-i18n="optionsEditorCmdArgsDetail">
-                  Command line options of the editor.
-                </p>
-                <p data-i18n="optionsEditorCmdArgsDetail2">
-                  When using backslash (\) character, it must be escaped with
-                  an extra backslash.
-                  ex: C:\\Windows
-                </p>
-                <p data-i18n="optionsEditorCmdArgsDetail3">
-                  If argument contains space(s), quote them with the double
-                  quotation mark (").
-                  ex: "Some Arg"
-                </p>
-              </div>
-            </details>
-          </div>
-          <div>
-            <p>
-              <input type="checkbox" id="editorCmdPos" />
-              <label for="editorCmdPos" class="checkboxLabel"
-                     data-i18n="optionsEditorCmdPosLabel"
-                     aria-details="editorCmdPosDetail">
-                Put File Path After Command Line Options
-              </label>
-            </p>
-            <details id="editorCmdPosDetail">
-              <div>
-                <p data-i18n="optionsEditorCmdPosDetail">
-                  Some editor requires the file path to be put after the command
-                  arguments.
-                  Enable this option in that case.
-                </p>
-              </div>
-            </details>
-          </div>
-          <div>
-            <p>
-              <input type="checkbox" id="editorShell" />
-              <label for="editorShell" class="checkboxLabel"
-                     data-i18n="optionsEditorShellLabel"
-                     aria-details="editorShellDetail">
-                Run Command In A Shell
-              </label>
-            </p>
-            <details id="editorShellDetail">
-              <div>
-                <p data-i18n="optionsEditorShellDetail">
-                  Spawns a shell and runs a command within that shell.
-                </p>
-                <p data-i18n="optionsEditorShellDetail2">
-                  If this option is enabled, you can run a shell script instead
-                  of executing the editor directly.
-                </p>
-                <ol>
-                  <li data-i18n="optionsEditorShellDetail3">
-                    Create a shell script (batch file) which executes the
-                    editor.
-                  </li>
-                  <li data-i18n="optionsEditorShellDetail4">
-                    In the 'Editor Path' field, enter the shell script path
-                    instead of the editor.
-                  </li>
-                  <li data-i18n="optionsEditorShellDetail5">
-                    Enable this option.
-                  </li>
-                </ol>
               </div>
             </details>
           </div>
@@ -204,8 +122,11 @@
                 <p data-i18n="optionsAccessKeyDetail2">
                   Choose any key, but it must be a single character.
                 </p>
-                <p data-i18n="optionsAccessKeyDetail3">
+                <!--p data-i18n="optionsAccessKeyDetail3">
                   In the context menu, press 'key' itself.
+                </p-->
+                <p data-i18n="optionsAccessKeyDetail4">
+                  NOTE: accesskey in context menu is not implemented yet in WebExtensions.
                 </p>
               </div>
             </details>

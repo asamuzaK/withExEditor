@@ -7,6 +7,7 @@
   const LABEL = "withExEditor";
 
   const PORT_BACKGROUND = "portBackground";
+  const SEND_APP = "sendApp";
   const CONTEXT_MENU = "contextMenu";
   const INCOGNITO = "incognito";
   const OPEN_OPTIONS = "openOptions";
@@ -23,11 +24,9 @@
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
 
-  const EDITOR_PATH = "editorPath";
+  const APP_MANIFEST = "appManifestPath";
+  const APP_NAME = "appName";
   const EDITOR_NAME = "editorName";
-  const CMD_ARGS = "editorCmdArgs";
-  const CMD_POSITION = "editorCmdPos";
-  const SPAWN_SHELL = "editorShell";
   const KEY_ACCESS = "accessKey";
   const KEY_OPEN_OPTIONS = "optionsShortCut";
   const KEY_EXEC_EDITOR = "editorShortCut";
@@ -40,8 +39,6 @@
   const ICON_PATH = "iconPath";
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "../data/fileExt.json";
-  const SYS_ENV = "sysEnv";
-  const SYS_ENV_PATH = "../data/sysEnv.json";
 
   /* shortcuts */
   const browserAction = browser.browserAction;
@@ -52,30 +49,27 @@
   const tabs = browser.tabs;
   const windows = browser.windows;
 
-  // NOTE: for hybrid
   /* port */
+  // NOTE: for hybrid
   const port = runtime.connect({name: PORT_BACKGROUND});
 
   /* variables */
-  const vars = {};
-
-  vars[EDITOR_PATH] = "";
-  vars[EDITOR_NAME] = "";
-  vars[CMD_ARGS] = "";
-  vars[CMD_POSITION] = false;
-  vars[SPAWN_SHELL] = false;
-  vars[KEY_ACCESS] = "e";
-  vars[KEY_OPEN_OPTIONS] = true;
-  vars[KEY_EXEC_EDITOR] = true;
-  vars[ENABLE_PB] = false;
-  vars[EDITABLE_CONTEXT] = false;
-  vars[FORCE_REMOVE] = true;
-  vars[ID] = runtime.id;
-  vars[IS_ENABLED] = false;
-  vars[IS_EXECUTABLE] = false;
-  vars[ICON_PATH] = `${ICON}#gray`;
-  vars[FILE_EXT] = null;
-  vars[SYS_ENV] = null;
+  const vars = {
+    [APP_MANIFEST]: "",
+    [APP_NAME]: "",
+    [EDITOR_NAME]: "",
+    [KEY_ACCESS]: "e",
+    [KEY_OPEN_OPTIONS]: true,
+    [KEY_EXEC_EDITOR]: true,
+    [ENABLE_PB]: false,
+    [EDITABLE_CONTEXT]: false,
+    [FORCE_REMOVE]: true,
+    [ID]: runtime.id,
+    [IS_ENABLED]: false,
+    [IS_EXECUTABLE]: false,
+    [ICON_PATH]: `${ICON}#gray`,
+    [FILE_EXT]: null
+  };
 
   /**
    * log error
@@ -85,6 +79,17 @@
   const logError = e => {
     e && console.error(e);
     return false;
+  };
+
+  /* native application messaging */
+  /**
+   * send message to native application
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const sendNativeMsg = async msg => {
+    msg && vars[APP_NAME] &&
+      runtime.sendNativeMessage(vars[APP_NAME], msg);
   };
 
   /* windows */
@@ -277,9 +282,9 @@
    * @param {boolean} enable - enable
    * @return {Object} - Promise
    */
-  const createContextMenuItems = async (enable = false) => {
-    const items = [MODE_EDIT_TEXT, MODE_SELECTION, MODE_SOURCE];
-    return contextMenus.removeAll().then(async () => {
+  const createContextMenuItems = (enable = false) =>
+    contextMenus.removeAll().then(async () => {
+      const items = [MODE_EDIT_TEXT, MODE_SELECTION, MODE_SOURCE];
       for (let item of items) {
         switch (item) {
           case MODE_EDIT_TEXT:
@@ -312,7 +317,6 @@
         }
       }
     });
-  };
 
   /**
    * update context menu items
@@ -390,12 +394,15 @@
               vars[ICON_PATH] = obj.value
             );
             break;
+          case APP_NAME:
+            vars[item] = obj.value;
+            break;
           case EDITOR_NAME:
             vars[item] = obj.value;
             break;
-          case EDITOR_PATH:
+          case APP_MANIFEST:
             vars[item] = obj.value;
-            vars[IS_EXECUTABLE] = obj.data && !!obj.data.executable;
+            vars[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
             break;
           default:
         }
@@ -424,9 +431,7 @@
   const createPrefObj = async (item, value) => {
     let pref = null;
     switch (item) {
-      case EDITOR_PATH:
       case EDITOR_NAME:
-      case CMD_ARGS:
       case KEY_ACCESS:
         item === EDITOR_NAME && (vars[item] = value);
         pref = {};
@@ -434,18 +439,16 @@
           id: item,
           value: value || "",
           checked: false,
-          data: {
-            executable: value && item === EDITOR_PATH || false
+          app: {
+            executable: false
           }
         };
         break;
-      case CMD_POSITION:
-      case SPAWN_SHELL:
-      case KEY_OPEN_OPTIONS:
-      case KEY_EXEC_EDITOR:
       case ENABLE_PB:
       case EDITABLE_CONTEXT:
       case FORCE_REMOVE:
+      case KEY_OPEN_OPTIONS:
+      case KEY_EXEC_EDITOR:
         pref = {};
         pref[item] = {
           id: item,
@@ -506,6 +509,9 @@
             break;
           case OPEN_OPTIONS:
             obj && openOptionsPage();
+            break;
+          case SEND_APP:
+            obj.path && sendNativeMsg(obj.path);
             break;
           // NOTE: for hybrid
           case SDK_PREFS:
@@ -570,75 +576,50 @@
               replaceIcon()
             );
             break;
-          case EDITOR_PATH:
-            vars[EDITOR_PATH] = obj.value;
-            vars[IS_EXECUTABLE] = obj.data && !!obj.data.executable;
-            toggleBadge();
-            portVars({
-              editorPath: obj.value
-            });
-            break;
-          case EDITOR_NAME:
-            vars[item] = obj.value;
-            updateContextMenuItems();
-            portVars({
-              editorName: obj.value
-            });
-            break;
-          case CMD_ARGS:
-            vars[item] = obj.value;
-            portVars({
-              editorCmdArgs: obj.value
-            });
-            break;
-          case CMD_POSITION:
+          case FORCE_REMOVE:
+          case KEY_OPEN_OPTIONS:
+          case KEY_EXEC_EDITOR:
             vars[item] = !!obj.checked;
             portVars({
-              editorCmdPos: !!obj.checked
-            });
-            break;
-          case SPAWN_SHELL:
-            vars[item] = !!obj.checked;
-            portVars({
-              editorShell: !!obj.checked
+              [item]: !!obj.checked
             });
             break;
           case KEY_ACCESS:
             vars[item] = obj.value;
             portVars({
-              accessKey: obj.value
+              [item]: obj.value
             });
             break;
-          case KEY_OPEN_OPTIONS:
-            vars[item] = !!obj.checked;
+          case APP_MANIFEST:
+            vars[item] = obj.value;
+            vars[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+            toggleBadge();
             portVars({
-              optionsShortCut: !!obj.checked
+              [item]: obj.value
             });
             break;
-          case KEY_EXEC_EDITOR:
-            vars[item] = !!obj.checked;
+          case APP_NAME:
+            vars[item] = obj.value;
+            break;
+          case EDITOR_NAME:
+            vars[item] = obj.value;
+            updateContextMenuItems();
             portVars({
-              editorShortCut: !!obj.checked
+              [item]: obj.value
             });
             break;
           case ENABLE_PB:
             vars[item] = !!obj.checked;
             syncUI();
             portVars({
-              enablePB: !!obj.checked
+              [item]: !!obj.checked
             });
             break;
           case EDITABLE_CONTEXT:
             vars[item] = !!obj.checked;
             createContextMenuItems();
             portVars({
-              editableContext: !!obj.checked
-            });
-            break;
-          case FORCE_REMOVE:
-            vars[item] = !!obj.checked;
-            portVars({
-              forceRemove: !!obj.checked
+              [item]: !!obj.checked
             });
             break;
           default:
@@ -713,13 +694,6 @@
       fileExt && (
         vars[FILE_EXT] = fileExt,
         portMsg({fileExt})
-      );
-    }),
-    fetch(SYS_ENV_PATH).then(async data => {
-      const sysEnv = await data.json();
-      sysEnv && (
-        vars[SYS_ENV] = sysEnv,
-        portMsg({sysEnv})
       );
     })
   ]).catch(logError);

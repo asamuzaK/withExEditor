@@ -6,7 +6,7 @@
     "message": "withExEditor"
   },
   "failGetContent": {
-    "message": "Content could not be obtained."
+    "message": "Failed to get content."
   },
   "modeEditText": {
     "message": "Edit Text with $1"
@@ -23,6 +23,9 @@
   "modeViewSVG": {
     "message": "View SVG Source with $1"
   },
+  "optionsAccessKey": {
+    "message": ""
+  },
   "optionsAccessKey.placeholder": {
     "message": "Input Access Key"
   },
@@ -35,11 +38,26 @@
   "optionsAccessKeyDetail3": {
     "message": "In the context menu, press 'key' itself."
   },
+  "optionsAccessKeyDetail4": {
+    "message": "NOTE: accesskey in context menu is not implemented yet in WebExtensions."
+  },
   "optionsAccessKeyLabel": {
     "message": "Access Key"
   },
   "optionsAccessKeySettings": {
     "message": "Access Key Settings"
+  },
+  "optionsAppManifestPath": {
+    "message": ""
+  },
+  "optionsAppManifestPath.placeholder": {
+    "message": "Input App Manifest Path"
+  },
+  "optionsAppManifestPathDetail": {
+    "message": "Enter the path of application manifest JSON file."
+  },
+  "optionsAppManifestPathLabel": {
+    "message": "App Manifest Path"
   },
   "optionsEditableContextDetail": {
     "message": "Appears in the context menu only if the content is editable."
@@ -47,26 +65,8 @@
   "optionsEditableContextLabel": {
     "message": "Enable Only When Editing Text"
   },
-  "optionsEditorCmdArgs.placeholder": {
-    "message": "Input Command Line Options"
-  },
-  "optionsEditorCmdArgsDetail": {
-    "message": "Command line options of the editor."
-  },
-  "optionsEditorCmdArgsDetail2": {
-    "message": "When using backslash (\\) character, it must be escaped with an extra backslash. ex: C:\\\\Windows"
-  },
-  "optionsEditorCmdArgsDetail3": {
-    "message": "If argument contains space(s), quote them with the double quotation mark (\"). ex: \"Some Arg\""
-  },
-  "optionsEditorCmdArgsLabel": {
-    "message": "Command Line Options"
-  },
-  "optionsEditorCmdPosDetail": {
-    "message": "Some editor requires the file path to be put after the command arguments. Enable this option in that case."
-  },
-  "optionsEditorCmdPosLabel": {
-    "message": "Put File Path After Command Line Options"
+  "optionsEditorName": {
+    "message": ""
   },
   "optionsEditorName.placeholder": {
     "message": "Rename Editor Label"
@@ -80,38 +80,8 @@
   "optionsEditorNameLabel": {
     "message": "Editor Label"
   },
-  "optionsEditorPath.placeholder": {
-    "message": "Input Editor Path"
-  },
-  "optionsEditorPathDetail": {
-    "message": "Enter the full path of the editor."
-  },
-  "optionsEditorPathDetail2": {
-    "message": "When selecting an editor on Mac OS, pick the file under '/Applications/[yourEditor].app/Contents/MacOS/' directory."
-  },
-  "optionsEditorPathLabel": {
-    "message": "Editor Path"
-  },
   "optionsEditorSettings": {
     "message": "Editor Settings"
-  },
-  "optionsEditorShellDetail": {
-    "message": "Spawns a shell and runs a command within that shell."
-  },
-  "optionsEditorShellDetail2": {
-    "message": "If this option is enabled, you can run a shell script instead of executing the editor directly."
-  },
-  "optionsEditorShellDetail3": {
-    "message": "Create a shell script (batch file) which executes the editor."
-  },
-  "optionsEditorShellDetail4": {
-    "message": "In the 'Editor Path' field, enter the shell script path instead of the editor."
-  },
-  "optionsEditorShellDetail5": {
-    "message": "Enable this option."
-  },
-  "optionsEditorShellLabel": {
-    "message": "Run Command In A Shell"
   },
   "optionsEditorShortCutDetail": {
     "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac)."
@@ -134,8 +104,14 @@
   "optionsForceRemoveLabel": {
     "message": "Forcibly Remove The Temporary Files"
   },
+  "optionsIconColor": {
+    "message": ""
+  },
   "optionsIconColor.alt": {
     "message": "Color"
+  },
+  "optionsIconColorLabel": {
+    "message": ""
   },
   "optionsIconColorLabel.ariaLabel": {
     "message": "Color Icon"
@@ -143,17 +119,35 @@
   "optionsIconDetail": {
     "message": "Choose the icon."
   },
+  "optionsIconGray": {
+    "message": ""
+  },
   "optionsIconGray.alt": {
     "message": "Gray"
+  },
+  "optionsIconGrayLabel": {
+    "message": ""
   },
   "optionsIconGrayLabel.ariaLabel": {
     "message": "Gray Icon"
   },
+  "optionsIconWhite": {
+    "message": ""
+  },
   "optionsIconWhite.alt": {
     "message": "White"
   },
+  "optionsIconWhiteLabel": {
+    "message": ""
+  },
   "optionsIconWhiteLabel.ariaLabel": {
     "message": "White Icon"
+  },
+  "optionsManualLabel": {
+    "message": "Manual"
+  },
+  "optionsManualLabel.href": {
+    "message": "./manual.en.html"
   },
   "optionsOptionsShortCutDetail": {
     "message": "To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac)."
@@ -169,8 +163,5 @@
   },
   "optionsToolbarIconLabel": {
     "message": "Toolbar Button Icon"
-  },
-  "warnEditorNotSelected": {
-    "message": "Editor is not selected."
   }
 }
