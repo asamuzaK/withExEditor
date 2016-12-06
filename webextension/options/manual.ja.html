@@ -42,16 +42,8 @@
         <p>
           以下はpythonスクリプトによるホストの例です。
         </p>
-        <p>
-          Windowsでは、pythonスクリプトを実行するためのシェルスクリプト（バッチファイル）を作成します。
-        </p>
         <figure>
-          <figcaption>シェルスクリプト（Windows）</figcaption>
-          <pre><code>@echo off
-python "C:\path\to\youreditor.py"</code></pre>
-        </figure>
-        <figure>
-          <figcaption>pythonスクリプト（Windows, Linux, Mac）</figcaption>
+          <figcaption>pythonスクリプトの例（Windows, Linux, Mac）：</figcaption>
           <pre><code>#!/usr/bin/env python
 
 import sys, json, struct, subprocess
@@ -76,6 +68,14 @@ sys.exit()</code></pre>
         <p>
           エディタのコマンドラインオプションなどは、適宜、書き加えてください。
         </p>
+        <p>
+          Windowsでは、pythonスクリプトを実行するためのシェルスクリプト（バッチファイル）も作成します。
+        </p>
+        <figure>
+          <figcaption>シェルスクリプトの例（Windows）：</figcaption>
+          <pre><code>@echo off
+python "C:\path\to\youreditor.py"</code></pre>
+        </figure>
       </section>
       <section>
         <h1>アプリケーションマニフェスト</h1>
@@ -83,9 +83,10 @@ sys.exit()</code></pre>
           pythonスクリプト（Windowsの場合はシェルスクリプト）のパスを含むJSON形式のアプリケーションマニフェストを作成します。
         </p>
         <figure>
-          <figcaption>例：</figcaption>
+          <figcaption>マニフェストの例：</figcaption>
           <pre><code>{
   "name": "youreditor",
+  "description": "Host to execute editor"
   "path": "C:\\path\\to\\youreditor.cmd",
   "type": "stdio",
   "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
@@ -97,6 +98,8 @@ sys.exit()</code></pre>
             使用するエディタの名前。小文字の英字と数字、ドット、アンダーバーのみ使用可能です。
             またpythonスクリプトのファイル名と一致している必要があります。
           </dd>
+          <dt>description</dt>
+          <dd>ホストの説明。</dd>
           <dt>path</dt>
           <dd>
             エディタを起動するpythonスクリプト（Windowsではシェルスクリプト）のパス。
