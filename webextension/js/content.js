@@ -10,7 +10,7 @@
   const GET_FILE_PATH = "getFilePath";
   const PORT_CONTENT = "portContent";
   const PORT_FILE_PATH = "portFilePath";
-  const SEND_APP = "sendApp";
+  const PORT_HOST = "portHost";
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
 
@@ -1041,7 +1041,7 @@
             break;
           case PORT_FILE_PATH:
             obj.path && portMsg({
-              [SEND_APP]: {
+              [PORT_HOST]: {
                 path: obj.path
               }
             });

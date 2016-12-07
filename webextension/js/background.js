@@ -6,19 +6,19 @@
   /* constants */
   const LABEL = "withExEditor";
 
-  const PORT_BACKGROUND = "portBackground";
-  const SEND_APP = "sendApp";
   const CONTEXT_MENU = "contextMenu";
-  const INCOGNITO = "incognito";
   const OPEN_OPTIONS = "openOptions";
+  const PORT_HOST = "portHost";
 
   const ICON = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
+  const INCOGNITO = "incognito";
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
+  const FILE_EXT_PATH = "../data/fileExt.json";
   const NS_URI_PATH = "../data/nsUri.json";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
@@ -36,7 +36,6 @@
   const IS_EXECUTABLE = "isExecutable";
   const ICON_PATH = "iconPath";
   const FILE_EXT = "fileExt";
-  const FILE_EXT_PATH = "../data/fileExt.json";
 
   /* shortcuts */
   const browserAction = browser.browserAction;
@@ -114,9 +113,29 @@
 
   /* port */
   // NOTE: for hybrid
-  const port = runtime.connect({name: PORT_BACKGROUND});
+  const hybrid = runtime.connect({name: "portBackground"});
 
-  /* ports collection */
+  let host;
+
+  /**
+   * connect to native application host
+   * @return {void}
+   */
+  const connectHost = async () => {
+    host && host.disconnect();
+    host = runtime.connectNative(vars[APP_NAME]);
+  };
+
+  /**
+   * port message to native application host
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const portHostMsg = async msg => {
+    msg && host && host.postMessage(msg);
+  };
+
+  /* content ports collection */
   const ports = {};
 
   /**
@@ -165,8 +184,8 @@
       if (frameUrls && frameUrls.length > 0) {
         for (let frameUrl of frameUrls) {
           if (frameUrl !== INCOGNITO) {
-            const conn = ports[windowId][tabId][frameUrl];
-            conn && conn.postMessage(msg);
+            const port = ports[windowId][tabId][frameUrl];
+            port && port.postMessage(msg);
           }
         }
       }
@@ -195,7 +214,7 @@
         }
       }
       // NOTE: for hybrid
-      port.postMessage(msg);
+      hybrid.postMessage(msg);
     }
   };
 
@@ -223,16 +242,6 @@
     ports[windowId] && ports[windowId][tabId] &&
     ports[windowId][tabId][frameUrl] &&
       ports[windowId][tabId][frameUrl].postMessage({getContent});
-  };
-
-  /**
-   * send message to native application
-   * @param {*} msg - message
-   * @return {void}
-   */
-  const sendNativeMsg = async msg => {
-    msg && vars[APP_NAME] &&
-      runtime.sendNativeMessage(vars[APP_NAME], msg);
   };
 
   /* icon */
@@ -391,6 +400,7 @@
             break;
           case APP_NAME:
             vars[item] = obj.value;
+            connectHost();
             break;
           case EDITOR_NAME:
             vars[item] = obj.value;
@@ -444,8 +454,8 @@
           case OPEN_OPTIONS:
             obj && openOptionsPage();
             break;
-          case SEND_APP:
-            obj.path && sendNativeMsg(obj.path);
+          case PORT_HOST:
+            obj.path && portHostMsg(obj.path);
             break;
           default:
         }
@@ -455,33 +465,33 @@
 
   /**
    * handle disconnected port
-   * @param {Object} conn - runtime.Port
+   * @param {Object} port - runtime.Port
    * @return {void}
    */
-  const handleDisconnectedPort = async conn => {
-    const windowId = `${conn.sender.tab.windowId}`;
-    const tabId = `${conn.sender.tab.id}`;
-    const frameUrl = conn.sender.frameUrl;
+  const handleDisconnectedPort = async port => {
+    const windowId = `${port.sender.tab.windowId}`;
+    const tabId = `${port.sender.tab.id}`;
+    const frameUrl = port.sender.frameUrl;
     restorePorts({windowId, tabId, frameUrl});
   };
 
   /**
    * handle connected port
-   * @param {Object} conn - runtime.Port
+   * @param {Object} port - runtime.Port
    * @return {void}
    */
-  const handlePort = async conn => {
-    const windowId = `${conn.sender.tab.windowId}`;
-    const tabId = `${conn.sender.tab.id}`;
-    const frameUrl = conn.sender.url;
-    const incognito = conn.sender.tab.incognito;
+  const handlePort = async port => {
+    const windowId = `${port.sender.tab.windowId}`;
+    const tabId = `${port.sender.tab.id}`;
+    const frameUrl = port.sender.url;
+    const incognito = port.sender.tab.incognito;
     ports[windowId] = ports[windowId] || {};
     ports[windowId][tabId] = ports[windowId][tabId] || {};
-    ports[windowId][tabId][frameUrl] = conn;
+    ports[windowId][tabId][frameUrl] = port;
     ports[windowId][tabId][INCOGNITO] = incognito;
-    conn.onMessage.addListener(handleMsg);
-    conn.onDisconnect.addListener(handleDisconnectedPort);
-    conn.postMessage({
+    port.onMessage.addListener(handleMsg);
+    port.onDisconnect.addListener(handleDisconnectedPort);
+    port.postMessage({
       incognito, tabId,
       setVars: vars
     });
@@ -530,6 +540,7 @@
             break;
           case APP_NAME:
             vars[item] = obj.value;
+            connectHost();
             break;
           case EDITOR_NAME:
             vars[item] = obj.value;
@@ -562,7 +573,6 @@
   browserAction.onClicked.addListener(openOptionsPage);
   browser.storage.onChanged.addListener(handleStorageChange);
   contextMenus.onClicked.addListener(portContextMenu);
-  port.onMessage.addListener(handleMsg);
   runtime.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(handlePort);
   tabs.onActivated.addListener(async info => {
@@ -611,6 +621,8 @@
       })
     ]).catch(logError);
   });
+  // NOTE: for hybrid
+  hybrid.onMessage.addListener(handleMsg);
 
   /* startup */
   Promise.all([
