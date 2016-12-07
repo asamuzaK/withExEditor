@@ -32,7 +32,6 @@
   const ENABLE_PB = "enablePB";
   const EDITABLE_CONTEXT = "editableContext";
   const FORCE_REMOVE = "forceRemove";
-  const ID = "id";
   const IS_ENABLED = "isEnabled";
   const IS_EXECUTABLE = "isExecutable";
   const ICON_PATH = "iconPath";
@@ -59,7 +58,6 @@
     [ENABLE_PB]: false,
     [EDITABLE_CONTEXT]: false,
     [FORCE_REMOVE]: true,
-    [ID]: runtime.id,
     [IS_ENABLED]: false,
     [IS_EXECUTABLE]: false,
     [ICON_PATH]: `${ICON}#gray`,
