@@ -5,28 +5,28 @@
 {
   /* constants */
   const LABEL = "withExEditor";
+  const PORT_NAME = "portContent";
+
   const CREATE_TMP_FILE = "createTmpFile";
+  const FAIL_GET_CONTENT = "failGetContent";
   const GET_CONTENT = "getContent";
   const GET_FILE_PATH = "getFilePath";
-  const PORT_CONTENT = "portContent";
   const PORT_FILE_PATH = "portFilePath";
   const PORT_HOST = "portHost";
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
 
-  const CHAR = "utf-8";
   const DATA_ATTR_ID = "data-with_ex_editor_id";
   const DATA_ATTR_ID_NS = `html:${DATA_ATTR_ID}`;
   const DATA_ATTR_ID_CTRL = `${DATA_ATTR_ID}_controls`;
   const DATA_ATTR_TS = "data-with_ex_editor_timestamp";
   const DATA_ATTR_TS_NS = `html:${DATA_ATTR_TS}`;
-  const FAIL_GET_CONTENT = "failGetContent";
-  const FILE_EXT = "fileExt";
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
+  const CHAR = "utf-8";
   const NS_URI = "nsURI";
   const NS_URI_DEFAULT_ITEMS = 4;
   const ELEMENT_NODE = 1;
@@ -38,6 +38,7 @@
   const EDITABLE_CONTEXT = "editableContext";
   const IS_ENABLED = "isEnabled";
   const CONTEXT_NODE = "contextNode";
+  const FILE_EXT = "fileExt";
   const INCOGNITO = "incognito";
   const TAB_ID = "tabId";
 
@@ -174,7 +175,7 @@
   }
 
   /* port */
-  const port = runtime.connect({name: PORT_CONTENT});
+  const port = runtime.connect({name: PORT_NAME});
 
   /**
    * port message

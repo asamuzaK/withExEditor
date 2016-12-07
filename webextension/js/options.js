@@ -4,7 +4,8 @@
 "use strict";
 {
   /* constants */
-  const PORT_OPTIONS = "portOptions";
+  const PORT_NAME = "portOptions";
+
   const CHECK_EXECUTABLE = "checkExecutable";
   const GET_APP_MANIFEST = "getAppManifest";
   const RES_APP_MANIFEST = "resAppManifest";
@@ -49,7 +50,7 @@
     o && (typeof o === "string" || o instanceof String) || false;
 
   /* port */
-  const port = runtime.connect({name: PORT_OPTIONS});
+  const port = runtime.connect({name: PORT_NAME});
 
   /**
    * port message
