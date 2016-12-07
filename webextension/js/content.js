@@ -41,13 +41,10 @@
   const INCOGNITO = "incognito";
   const TAB_ID = "tabId";
 
-  /* shortcut */
+  /* shortcuts */
   const i18n = browser.i18n;
   const runtime = browser.runtime;
   const storage = browser.storage.local;
-
-  /* port */
-  const port = runtime.connect({name: PORT_CONTENT});
 
   /* variables */
   const vars = {
@@ -61,12 +58,6 @@
     [FILE_EXT]: null,
     [TAB_ID]: ""
   };
-
-  /* RegExp */
-  const reExt = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/;
-  const rePath = /^.*\/((?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?)?$/;
-  const reType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
-  const reXml = /^(?:(?:application\/(?:[\w\-\.]+\+)?|image\/[\w\-\.]+\+)x|text\/(?:ht|x))ml$/;
 
   /**
    * log error
@@ -85,6 +76,12 @@
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
+
+  /* RegExp */
+  const reExt = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/;
+  const rePath = /^.*\/((?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?)?$/;
+  const reType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
+  const reXml = /^(?:(?:application\/(?:[\w\-\.]+\+)?|image\/[\w\-\.]+\+)x|text\/(?:ht|x))ml$/;
 
   /* file utils */
   /**
@@ -176,9 +173,11 @@
     }
   }
 
-  /* port message */
+  /* port */
+  const port = runtime.connect({name: PORT_CONTENT});
+
   /**
-   * port content message
+   * port message
    * @param {*} msg - message
    * @return {void}
    */
@@ -187,7 +186,7 @@
   };
 
   /**
-   * port temporary ID value
+   * port temporary ID
    * @param {Object} evt - event
    * @return {void}
    */
@@ -495,7 +494,7 @@
   };
 
   /**
-   * get temporary ID / create temporary ID and add listener
+   * get / create temporary ID and add listener
    * @param {Object} elm - target element
    * @return {?string} - ID
    */
@@ -895,9 +894,9 @@
       }
     }).catch(logError);
 
-  /* sync edited text */
+  /* synchronize edited text */
   /**
-   * sync content editable element text
+   * synchronize content editable element text
    * @param {Object} node - editable element
    * @param {Array} arr - array of values
    * @param {string} ns - namespace URI
@@ -924,7 +923,7 @@
   };
 
   /**
-   * get target element and sync text
+   * get target element and synchronize text
    * @param {Object} obj - sync data object
    * @return {void}
    */

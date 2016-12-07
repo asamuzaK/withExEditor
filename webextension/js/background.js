@@ -11,7 +11,6 @@
   const CONTEXT_MENU = "contextMenu";
   const INCOGNITO = "incognito";
   const OPEN_OPTIONS = "openOptions";
-  const SDK_PREFS = "sdkPrefs";
 
   const ICON = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
@@ -49,10 +48,6 @@
   const tabs = browser.tabs;
   const windows = browser.windows;
 
-  /* port */
-  // NOTE: for hybrid
-  const port = runtime.connect({name: PORT_BACKGROUND});
-
   /* variables */
   const vars = {
     [APP_MANIFEST]: "",
@@ -79,17 +74,6 @@
   const logError = e => {
     e && console.error(e);
     return false;
-  };
-
-  /* native application messaging */
-  /**
-   * send message to native application
-   * @param {*} msg - message
-   * @return {void}
-   */
-  const sendNativeMsg = async msg => {
-    msg && vars[APP_NAME] &&
-      runtime.sendNativeMessage(vars[APP_NAME], msg);
   };
 
   /* windows */
@@ -130,39 +114,10 @@
     vars[IS_ENABLED] && runtime.openOptionsPage();
   };
 
-  /* icon */
-  /**
-   * replace icon
-   * @param {Object} path - icon path
-   * @return {void}
-   */
-  const replaceIcon = async (path = vars[ICON_PATH]) => {
-    browserAction.setIcon({path});
-  };
+  /* port */
+  // NOTE: for hybrid
+  const port = runtime.connect({name: PORT_BACKGROUND});
 
-  /**
-   * toggle icon
-   * @return {void}
-   */
-  const toggleIcon = async () => {
-    vars[IS_ENABLED] ?
-      replaceIcon() :
-      replaceIcon(`${ICON}#off`);
-  };
-
-  /**
-   * toggle badge
-   * @param {boolean} bool - executable
-   * @return {void}
-   */
-  const toggleBadge = async (bool = vars[IS_EXECUTABLE]) => {
-    const color = !bool && WARN_COLOR || "transparent";
-    const text = !bool && WARN_TEXT || "";
-    browserAction.setBadgeBackgroundColor({color});
-    browserAction.setBadgeText({text});
-  };
-
-  /* ports */
   /* ports collection */
   const ports = {};
 
@@ -270,6 +225,48 @@
     ports[windowId] && ports[windowId][tabId] &&
     ports[windowId][tabId][frameUrl] &&
       ports[windowId][tabId][frameUrl].postMessage({getContent});
+  };
+
+  /**
+   * send message to native application
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const sendNativeMsg = async msg => {
+    msg && vars[APP_NAME] &&
+      runtime.sendNativeMessage(vars[APP_NAME], msg);
+  };
+
+  /* icon */
+  /**
+   * replace icon
+   * @param {Object} path - icon path
+   * @return {void}
+   */
+  const replaceIcon = async (path = vars[ICON_PATH]) => {
+    browserAction.setIcon({path});
+  };
+
+  /**
+   * toggle icon
+   * @return {void}
+   */
+  const toggleIcon = async () => {
+    vars[IS_ENABLED] ?
+      replaceIcon() :
+      replaceIcon(`${ICON}#off`);
+  };
+
+  /**
+   * toggle badge
+   * @param {boolean} bool - executable
+   * @return {void}
+   */
+  const toggleBadge = async (bool = vars[IS_EXECUTABLE]) => {
+    const color = !bool && WARN_COLOR || "transparent";
+    const text = !bool && WARN_TEXT || "";
+    browserAction.setBadgeBackgroundColor({color});
+    browserAction.setBadgeText({text});
   };
 
   /* context menu */
@@ -413,69 +410,6 @@
         });
       }).catch(logError);
     }
-    // NOTE: for hybrid
-    else {
-      port.postMessage({
-        getSdkPrefs: res
-      });
-    }
-  };
-
-  // NOTE: for hybrid
-  /**
-   * create pref object
-   * @param {Object} item - item
-   * @param {string|boolean} value - value
-   * @return {Object}
-   */
-  const createPrefObj = async (item, value) => {
-    let pref = null;
-    switch (item) {
-      case EDITOR_NAME:
-      case KEY_ACCESS:
-        item === EDITOR_NAME && (vars[item] = value);
-        pref = {};
-        pref[item] = {
-          id: item,
-          value: value || "",
-          checked: false,
-          app: {
-            executable: false
-          }
-        };
-        break;
-      case ENABLE_PB:
-      case EDITABLE_CONTEXT:
-      case FORCE_REMOVE:
-      case KEY_OPEN_OPTIONS:
-      case KEY_EXEC_EDITOR:
-        pref = {};
-        pref[item] = {
-          id: item,
-          value: "",
-          checked: !!value,
-          data: {
-            executable: false
-          }
-        };
-        break;
-      default:
-    }
-    return pref;
-  };
-
-  /**
-   * set SDK prefs to storage
-   * @param {Object} res - result
-   * @return {void}
-   */
-  const setSdkPrefsToStorage = async res => {
-    const items = Object.keys(res);
-    if (items.length > 0) {
-      for (let item of items) {
-        createPrefObj(item, res[item]).then(setStorage).catch(logError);
-      }
-    }
   };
 
   /* UI */
@@ -490,7 +424,9 @@
       }),
       toggleIcon(),
       toggleBadge()
-    ]));
+    ])).catch(e => {
+      throw e;
+    });
 
   /* handlers */
   /**
@@ -512,10 +448,6 @@
             break;
           case SEND_APP:
             obj.path && sendNativeMsg(obj.path);
-            break;
-          // NOTE: for hybrid
-          case SDK_PREFS:
-            setSdkPrefsToStorage(obj);
             break;
           default:
         }

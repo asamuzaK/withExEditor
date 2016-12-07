@@ -23,9 +23,6 @@
   const runtime = browser.runtime;
   const storage = browser.storage.local;
 
-  /* port */
-  const port = runtime.connect({name: PORT_OPTIONS});
-
   /* variables */
   const vars = {
     [APP_MANIFEST]: null,
@@ -50,6 +47,18 @@
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
+
+  /* port */
+  const port = runtime.connect({name: PORT_OPTIONS});
+
+  /**
+   * port message
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const portMsg = async msg => {
+    msg && port.postMessage(msg);
+  };
 
   /* storage */
   /**
@@ -81,7 +90,7 @@
    * @param {string} bool - native application is executable
    * @return {void}
    */
-  const synchronizeEditorName = async (bool = false) => {
+  const syncEditorName = async (bool = false) => {
     if (vars[EDITOR_NAME]) {
       const name = vars[APP_NAME] && vars[APP_NAME].value;
       bool && name ? (
@@ -108,10 +117,10 @@
     const path = app && app.path;
     name && path && (
       vars[APP_NAME].value = name,
-      createPrefObj(vars[APP_NAME]).then(pref => {
+      createPrefObj(name).then(pref => {
         pref && storage.set(pref);
       }).catch(logError),
-      port.postMessage({
+      portMsg({
         [CHECK_EXECUTABLE]: {path}
       })
     );
@@ -137,7 +146,7 @@
       }
       else {
         elm === vars[APP_MANIFEST] ?
-          port.postMessage({
+          portMsg({
             [GET_APP_MANIFEST]: {
               path: elm.value
             }
@@ -271,7 +280,11 @@
               createPrefObj(vars[APP_MANIFEST], obj.executable).then(pref => {
                 storage.set(pref);
               }),
-              synchronizeEditorName(obj.executable)
+              syncEditorName(obj.executable),
+              /* NOTE: for hybrid */
+              portMsg({
+                removeSdkPrefs: obj.executable
+              })
             ]).catch(logError);
             break;
           default:
@@ -280,7 +293,7 @@
     }
   };
 
-  /* add listener */
+  /* add listeners */
   port.onMessage.addListener(handleMsg);
 
   window.addEventListener("DOMContentLoaded", () => Promise.all([
