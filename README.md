@@ -63,3 +63,110 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 ### Forcibly Remove The Temporary Files
 * The temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
 * It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option.
+
+***
+
+## Manual
+### Important Notice
+Unlike the Jetpack SDK used by prior withExEditor, Mozilla's new add-on ecosystem WebExtensions does not allow to spawn child process from the add-on (that is, external editor can not be executed directly anymore).
+Instead, in WebExtensions, the browser interacts with native application via messages.
+For details, refer to [Native messaging - Mozilla | MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging).
+
+Therefore, to use withExEditor, you need to prepare:
+
+* A host which executes the external editor
+* An application manifest of the host
+
+### Host
+Create a host which executes the editor, and save it in an arbitrary location.
+The host should be able to handle binary data passed in standard input (stdin).
+From withExEditor, "temporary file path", which is created for source view / text edit, will be sent to the host.
+
+The following is an example of a host using a python script.
+
+Python Script Example (Windows / Linux / Mac):
+```
+#!/usr/bin/env python
+# coding: utf-8
+
+import sys, json, struct, subprocess
+
+# Read a message from stdin and decode it.
+def getMessage():
+  rawLength = sys.stdin.buffer.read(4)
+  if len(rawLength) == 0:
+    sys.exit(0)
+  message = sys.stdin.buffer.read(struct.unpack('@I', rawLength)[0])
+  if message:
+    return json.loads(message.decode('utf-8'))
+  else:
+    return false
+
+file = getMessage()
+
+# Command array for subprocess.run()
+cmd = []
+
+# Editor path
+app = "C:\Program Files\Path\To\YourEditor.exe"
+
+# Command line arguments array as appropriate.
+# args = []
+
+if file:
+  cmd.append(app)
+
+  # If you want to put arguments before file, extend cmd here
+  # cmd.extend(args)
+
+  cmd.append(file)
+
+  # If you want to put arguments after file, extend cmd here
+  # cmd.extend(args)
+
+  subprocess.run(cmd)
+
+sys.exit()
+```
+
+On Windows, also create a shell script (batch file) to execute python script.
+
+Shell Script Example (Windows):
+```
+@echo off
+python "C:\path\to\youreditor.py"
+```
+
+### Application manifest
+Create an application manifest in JSON format that contains the path of the host.
+
+Manifest Example:
+```
+{
+  "name": "youreditor",
+  "description": "Host to execute youreditor"
+  "path": "C:\\path\\to\\youreditor.cmd",
+  "type": "stdio",
+  "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
+}
+```
+
+* *name* - The name of the editor to use. Only lowercase letters and numbers, dots, underscores are allowed. - It must also match the filename of the host.
+* *description* - Description of the host.
+* *path* - The path of the host that executes the editor. Note that on Windows, it is necessary to escape backslashes, which is a directory delimiter, by adding an extra backslash. Also on Windows, if you created a host with the python script following the above example, fill in the path of the shell script, not the path of the python script.
+* *type* - Enter "stdio".
+* *allowed_extensions* - An array of addon IDs. Fill in the bracket with "jid1-WiAigu4HIo0Tag@jetpack" which is ID of withExEditor.
+
+Save the manifest with the same file name as the "name" field, the file extension of.json, and the character code of UTF-8 (without BOM).
+Refer to [App manifest location](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#App_manifest_location) where to save the manifest.
+
+On Windows, you also need to set the registry.
+If the path of the manifest is "C:\Users\xxx\youreditor.json", run the following command with cmd.exe.
+Then you can save the registry key.
+
+REG ADD Example (Windows):
+```
+REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\xxx\youreditor.json" /f
+```
+
+After completing the above work, *enter the manifest path in Options page*.
