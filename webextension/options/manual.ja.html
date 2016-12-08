@@ -60,26 +60,23 @@ def getMessage():
   else:
     return false
 
-file = getMessage()
-
-# Command array for subprocess.run()
-cmd = []
-
 # Editor path
 app = "C:\Program Files\Path\To\YourEditor.exe"
 
 # Command line arguments array as appropriate.
 # args = []
 
-if file:
+while True:
+  file = getMessage()
+  cmd = []
   cmd.append(app)
-
-  # If you want to put arguments before file, extend cmd here
+  
+  # If you have arguments and want arguments before file
   # cmd.extend(args)
 
   cmd.append(file)
 
-  # If you want to put arguments after file, extend cmd here
+  # If you have arguments and want arguments after file
   # cmd.extend(args)
 
   subprocess.run(cmd)
