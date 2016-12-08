@@ -2,7 +2,7 @@
 
 # withExEditor
 コンテキストメニュー（右クリック）から、お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。
-(X)HTML、JavaScript、CSS、SVG、XMLなどで使用可能です。
+(X)HTML、JavaScript、CSS、MathML、SVG、XMLなどで使用可能です。
 
 ## アドオンのページ
 [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
@@ -70,7 +70,7 @@
 ### 重要なお知らせ
 これまでのwithExEditorで使用してきたJetpack SDKとは異なり、Mozillaの新しいアドオンのエコシステムWebExtensionsでは、アドオンから子プロセスを生成することはできません（つまり、外部エディタはもう直接起動できません）。
 代わりに、WebExtensionsでは、ブラウザはメッセージを介してネイティブアプリケーションとやりとりする仕組みとなっています。
-詳細については、[Native messaging - Mozilla | MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging)を参照してください。
+詳細については、[Native messaging - Mozilla | MDN](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging)を参照してください。
 
 このため、withExEditorを使うにあたり、ユーザーのみなさんは：
 
@@ -160,7 +160,7 @@ python "C:\path\to\youreditor.py"
 * *allowed_extensions* - アドオンのIDの配列。withExEditorのIDである"jid1-WiAigu4HIo0Tag@jetpack"を[]括弧の中に記入してください。
 
 マニフェストは、 "name"フィールドと同じファイル名、.jsonのファイル拡張子、UTF-8（BOMなし）の文字コードで保存してください。
-保存先については、[App manifest location](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#App_manifest_location)を参照してください。
+保存先については、[App manifest location](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging#App_manifest_location)を参照してください。
 
 Windowsではさらにレジストリも設定する必要があります。
 マニフェストを"C:¥Users¥xxx¥youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
