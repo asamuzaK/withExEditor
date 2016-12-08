@@ -68,22 +68,18 @@
    * @param {boolean} bool - executable
    * @return {Object}
    */
-  const createPrefObj = async (elm, bool = false) => {
+  const createPrefObj = async (elm, bool = false) =>
     const id = elm && elm.id;
-    let pref = null;
-    id && (
-      pref = {
-        [id]: {
-          id,
-          value: elm.value || "",
-          checked: !!elm.checked,
-          app: {
-            executable: bool
-          }
+    return id && {
+      [id]: {
+        id,
+        value: elm.value || "",
+        checked: !!elm.checked,
+        app: {
+          executable: bool
         }
       }
-    );
-    return pref;
+    } || null;
   };
 
   /**
@@ -108,7 +104,7 @@
   };
 
   /**
-   * extract app manifest
+   * extract application manifest
    * @param {Array} arr - uint8 array
    * @return {void}
    */
@@ -224,10 +220,10 @@
   };
 
   /**
-   * set values from storage
+   * set html input values from storage
    * @return {void}
    */
-  const createVariablesFromStorage = async () => {
+  const setValuesFromStorage = async () => {
     const pref = await storage.get() || {};
     const items = Object.keys(pref);
     if (items.length > 0) {
@@ -252,7 +248,7 @@
   };
 
   /**
-   * set default variables value
+   * set variables
    * @return {void}
    */
   const setVariables = async () => {
@@ -299,7 +295,7 @@
 
   window.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtmlLang().then(localizeElm),
-    setVariables().then(createVariablesFromStorage),
+    setVariables().then(setValuesFromStorage),
     addInputChangeListener()
   ]).catch(logError), false);
 }

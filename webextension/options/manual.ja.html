@@ -56,11 +56,12 @@ def getMessage():
   message = sys.stdin.buffer.read(struct.unpack('@I', rawLength)[0])
   return json.loads(message.decode('utf-8'))
 
-cmd = "C:\Program Files\Path\To\YourEditor.exe"
+# Editor path
+app = "C:\Program Files\Path\To\YourEditor.exe"
 
 while True:
   file = getMessage()
-  subprocess.run([cmd, file])
+  subprocess.run([app, file])
 
 sys.exit()</code></pre>
         </figure>
@@ -79,13 +80,13 @@ python "C:\path\to\youreditor.py"</code></pre>
       <section>
         <h1>アプリケーションマニフェスト</h1>
         <p>
-          pythonスクリプト（Windowsの場合はシェルスクリプト）のパスを含むJSON形式のアプリケーションマニフェストを作成します。
+          ホストのパスを含むJSON形式のアプリケーションマニフェストを作成します。
         </p>
         <figure>
           <figcaption>マニフェストの例：</figcaption>
           <pre><code>{
   "name": "youreditor",
-  "description": "Host to execute editor"
+  "description": "Host to execute youreditor"
   "path": "C:\\path\\to\\youreditor.cmd",
   "type": "stdio",
   "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
@@ -95,13 +96,13 @@ python "C:\path\to\youreditor.py"</code></pre>
           <dt>name</dt>
           <dd>
             使用するエディタの名前。小文字の英字と数字、ドット、アンダーバーのみ使用可能です。
-            またpythonスクリプトのファイル名と一致している必要があります。
+            また、ホストのファイル名と一致している必要があります。
           </dd>
           <dt>description</dt>
           <dd>ホストの説明。</dd>
           <dt>path</dt>
           <dd>
-            エディタを起動するpythonスクリプト（Windowsではシェルスクリプト）のパス。
+            エディタを起動するホストのパス。
             Windowsの場合は、ディレクトリの区切りであるバックスラッシュ文字にはさらにバックスラッシュを加えてエスケープさせる必要があることに注意してください。</dd>
           <dt>type</dt>
           <dd>"stdio"を記入してください。</dd>
@@ -117,7 +118,7 @@ python "C:\path\to\youreditor.py"</code></pre>
         </p>
         <p>
           Windowsではさらにレジストリも設定する必要があります。
-          バッチファイルを"C:¥Users¥xxx¥youreditor.cmd"に保存し、マニフェストを"C:¥Users¥xxx¥youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
+          マニフェストを"C:¥Users¥xxx¥youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
         </p>
         <figure>
           <figcaption>REG ADDの例：</figcaption>

@@ -797,7 +797,6 @@
    * @return {Object} - content data
    */
   const getContent = async elm => {
-    const contextType = await getContextType(elm);
     const data = {
       mode: MODE_SOURCE,
       charset: document.characterSet,
@@ -812,6 +811,7 @@
       value: null
     };
     if (elm) {
+      const contextType = await getContextType(elm);
       const sel = window.getSelection();
       const anchorElm = sel.anchorNode && sel.anchorNode.parentNode;
       let obj;

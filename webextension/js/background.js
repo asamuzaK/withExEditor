@@ -144,25 +144,28 @@
    * @return {void}
    */
   const restorePorts = async data => {
-    const windowId = data.windowId;
-    const tabId = data.tabId;
-    const frameUrl = data.frameUrl;
-    const incognito = !!data.incognito;
-    frameUrl ?
-      windowId && tabId && ports[windowId] && ports[windowId][tabId] &&
-        delete ports[windowId][tabId][frameUrl] :
-    incognito ?
-      windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
-        delete ports[windowId][tabId][INCOGNITO],
-        Object.keys(ports[windowId][tabId]).length === 0 &&
-          restorePorts({windowId, tabId})
-      ) :
-    tabId ?
-      windowId && ports[windowId] && (
-        delete ports[windowId][tabId],
-        Object.keys(ports[windowId]).length === 0 && restorePorts({windowId})
-      ) :
-      windowId && delete ports[windowId];
+    if (data) {
+      const windowId = data.windowId;
+      const tabId = data.tabId;
+      const frameUrl = data.frameUrl;
+      const incognito = !!data.incognito;
+      frameUrl ?
+        windowId && tabId && ports[windowId] && ports[windowId][tabId] &&
+          delete ports[windowId][tabId][frameUrl] :
+      incognito ?
+        windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
+          delete ports[windowId][tabId][INCOGNITO],
+          Object.keys(ports[windowId][tabId]).length === 0 &&
+            restorePorts({windowId, tabId})
+        ) :
+      tabId ?
+        windowId && ports[windowId] && (
+          delete ports[windowId][tabId],
+          Object.keys(ports[windowId]).length === 0 &&
+            restorePorts({windowId})
+        ) :
+        windowId && delete ports[windowId];
+    }
   };
 
   /**
@@ -327,7 +330,7 @@
    * @param {Object} type - context type data
    * @return {void}
    */
-  const updateContextMenuItems = async (type = null) => {
+  const updateContextMenuItems = async type => {
     if (type) {
       const items = Object.keys(type);
       if (items.length > 0) {
