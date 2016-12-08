@@ -572,7 +572,7 @@
     }
   };
 
-  /* add listeners */
+  /* listeners */
   browserAction.onClicked.addListener(openOptionsPage);
   browser.storage.onChanged.addListener(handleStorageChange);
   contextMenus.onClicked.addListener(portContextMenu);

@@ -68,7 +68,7 @@
    * @param {boolean} bool - executable
    * @return {Object}
    */
-  const createPrefObj = async (elm, bool = false) =>
+  const createPrefObj = async (elm, bool = false) => {
     const id = elm && elm.id;
     return id && {
       [id]: {
@@ -290,7 +290,7 @@
     }
   };
 
-  /* add listeners */
+  /* listeners */
   port.onMessage.addListener(handleMsg);
 
   window.addEventListener("DOMContentLoaded", () => Promise.all([
