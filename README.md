@@ -83,7 +83,7 @@ Create a host which executes the editor, and save it in an arbitrary location.
 The host should be able to handle binary data passed in standard input (stdin).
 From withExEditor, "temporary file path", which is created for source view / text edit, will be sent to the host.
 
-The following is an example of a host using a python script.
+The following is an example of a host written in Python.
 
 Python Script Example (Windows / Linux / Mac):
 ```
