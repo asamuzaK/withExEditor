@@ -36,8 +36,8 @@
         <h1>ホスト</h1>
         <p>
           使用するエディタを起動するホストを作成し、任意の場所に保存します。
-          ホストは標準入力（stdin）を扱えるものを使用する必要があります。
-          withExEditorからはソース表示やテキスト編集用に作成した一時ファイルのパスを送信します。
+          ホストは標準入力（stdin）で渡されるバイナリデータを扱えるものである必要があります。
+          withExEditorからはソース表示やテキスト編集用に作成した「一時ファイルのパス」をホストに送信します。
         </p>
         <p>
           以下はpythonスクリプトによるホストの例です。
@@ -45,6 +45,8 @@
         <figure>
           <figcaption>pythonスクリプトの例（Windows / Linux / Mac）：</figcaption>
           <pre><code>#!/usr/bin/env python
+
+# coding: utf-8
 
 import sys, json, struct, subprocess
 
@@ -54,14 +56,34 @@ def getMessage():
   if len(rawLength) == 0:
     sys.exit(0)
   message = sys.stdin.buffer.read(struct.unpack('@I', rawLength)[0])
-  return json.loads(message.decode('utf-8'))
+  if message:
+    return json.loads(message.decode('utf-8'))
+  else:
+    return false
+
+file = getMessage()
+
+# Command array for subprocess.run()
+cmd = []
 
 # Editor path
 app = "C:\Program Files\Path\To\YourEditor.exe"
 
-while True:
-  file = getMessage()
-  subprocess.run([app, file])
+# Command line arguments array as appropriate.
+# args = []
+
+if file:
+  cmd.append(app)
+
+  # If you want to put arguments before file, extend cmd here
+  # cmd.extend(args)
+
+  cmd.append(file)
+
+  # If you want to put arguments after file, extend cmd here
+  # cmd.extend(args)
+
+  subprocess.run(cmd)
 
 sys.exit()</code></pre>
         </figure>
@@ -103,7 +125,8 @@ python "C:\path\to\youreditor.py"</code></pre>
           <dt>path</dt>
           <dd>
             エディタを起動するホストのパス。
-            Windowsの場合は、ディレクトリの区切りであるバックスラッシュ文字にはさらにバックスラッシュを加えてエスケープさせる必要があることに注意してください。</dd>
+            Windowsの場合は、ディレクトリの区切りであるバックスラッシュ文字にはさらにバックスラッシュを加えてエスケープさせる必要があることに注意してください。
+            また、上記の例に倣ってpythonスクリプトでホストを作成した場合、Windowsではpythonスクリプトのパスではなく、シェルスクリプトのパスを記入してください。</dd>
           <dt>type</dt>
           <dd>"stdio"を記入してください。</dd>
           <dt>allowed_extensions</dt>
