@@ -39,7 +39,7 @@
     "message": "In the context menu, press 'key' itself."
   },
   "optionsAccessKeyDetail4": {
-    "message": "NOTE: accesskey in context menu is not implemented yet in WebExtensions."
+    "message": "NOTE: accesskey in context menu is not yet implemented in WebExtensions."
   },
   "optionsAccessKeyLabel": {
     "message": "Access Key"
@@ -75,7 +75,7 @@
     "message": "Enter the label of the editor."
   },
   "optionsEditorNameDetail2": {
-    "message": "Disabled if editor is not selected."
+    "message": "Disabled if application manifest path field is not filled, or could not find the host etc."
   },
   "optionsEditorNameLabel": {
     "message": "Editor Label"
@@ -96,13 +96,13 @@
     "message": "Enable During Private Browsing"
   },
   "optionsForceRemoveDetail": {
-    "message": "The temporary files will be forcibly removed both at the end of Private Browsing and at shut down."
+    "message": "Forcibly remove temporary files at the end of Private Browsing or at shut down."
   },
   "optionsForceRemoveDetail2": {
-    "message": "It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option."
+    "message": "Recommended to be checked, though depending on the editor, this option may cause problems if it is enabled."
   },
   "optionsForceRemoveLabel": {
-    "message": "Forcibly Remove The Temporary Files"
+    "message": "Forcibly Remove Temporary Files"
   },
   "optionsIconColor": {
     "message": ""

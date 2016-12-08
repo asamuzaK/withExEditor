@@ -41,12 +41,13 @@ Available with (X)HTML, JavaScript, CSS, MathML, SVG, XML documents.
 
 ### Editor Label
 * Enter the label of the editor.
-* Disabled if editor is not selected.
+* Disabled if application manifest path field is not filled, or could not find the host etc.
 
 ### Access Key
 * Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly.
 * Choose any key, but it must be a single character.
 * In the context menu, press 'key' itself.
+* NOTE: accesskey in context menu is not yet implemented in WebExtensions.
 
 ### Enable Shortcut Key To Open The Options Page
 * To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac).
@@ -60,9 +61,9 @@ Available with (X)HTML, JavaScript, CSS, MathML, SVG, XML documents.
 ### Enable Only When Editing Text
 * Appears in the context menu only if the content is editable.
 
-### Forcibly Remove The Temporary Files
-* The temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
-* It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option.
+### Forcibly Remove Temporary Files
+* Forcibly remove temporary files at the end of Private Browsing or at shut down.
+* Recommended to be checked, though depending on the editor, this option may cause problems if it is enabled.
 
 ***
 
