@@ -155,7 +155,7 @@ Manifest Example:
 * *type* - Enter "stdio".
 * *allowed_extensions* - An array of addon IDs. Fill in the bracket with "jid1-WiAigu4HIo0Tag@jetpack" which is ID of withExEditor.
 
-Save the manifest with the same file name as the "name" field, the file extension of.json, and the character code of UTF-8 (without BOM).
+Save the manifest with the same file name as the "name" field, the file extension of .json, and the character code of UTF-8 (without BOM).
 Refer to [App manifest location](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#App_manifest_location) where to save the manifest.
 
 On Windows, you also need to set the registry.
