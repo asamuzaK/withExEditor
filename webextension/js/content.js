@@ -1065,7 +1065,7 @@
    * @param {Object} evt - Event
    * @return {void}
    */
-  const handleContextMenu = async evt => {
+  const handleContextMenu = evt => {
     const elm = evt && evt.target;
     const sel = window.getSelection();
     const contextMenu = {

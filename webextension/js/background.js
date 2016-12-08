@@ -16,8 +16,10 @@
   const ICON_WHITE = "buttonIconWhite";
   const INCOGNITO = "incognito";
   const MODE_EDIT_TEXT = "modeEditText";
+  const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
+  const MODE_SVG = "modeViewSVG";
   const FILE_EXT_PATH = "../data/fileExt.json";
   const NS_URI_PATH = "../data/nsUri.json";
   const WARN_COLOR = "#C13832";
@@ -60,6 +62,9 @@
     [IS_ENABLED]: false,
     [IS_EXECUTABLE]: false,
     [ICON_PATH]: `${ICON}#gray`,
+    [MODE_SOURCE]: "",
+    [MODE_MATHML]: "",
+    [MODE_SVG]: "",
     [FILE_EXT]: null
   };
 
@@ -283,6 +288,19 @@
   /* context menu items collection */
   const menus = {};
 
+  /**
+   * cache context menu item localized title
+   * @return {void}
+   */
+  const cacheMenuItemTitle = async () => {
+    if (menus[MODE_SOURCE]) {
+      const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
+      for (let item of items) {
+        vars[item] = await i18n.getMessage(item, vars[EDITOR_NAME] || LABEL);
+      }
+    }
+  };
+
   // NOTE: no "accesskey" feature
   /**
    * create context menu items
@@ -316,40 +334,36 @@
               await contextMenus.create({
                 id: item,
                 title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
-                contexts: ["frame", "image", "page"],
+                contexts: ["frame", "page"],
                 enabled: !!enable
               }) || null;
             break;
           default:
         }
       }
-    });
+    }).then(cacheMenuItemTitle);
 
   /**
    * update context menu items
    * @param {Object} type - context type data
    * @return {void}
    */
-  const updateContextMenuItems = async type => {
+  const updateContextMenuItems = type => {
     if (type) {
       const items = Object.keys(type);
       if (items.length > 0) {
         for (let item of items) {
           const obj = type[item];
           const menuItemId = obj.menuItemId;
+          const title = vars[obj.mode] || vars[menuItemId] || "";
+          const enabled = !!obj.enabled;
           switch (item) {
             case MODE_EDIT_TEXT:
-              menus[menuItemId] &&
-                contextMenus.update(menuItemId, {
-                  enabled: !!obj.enabled
-                });
+              menus[menuItemId] && contextMenus.update(menuItemId, {enabled});
               break;
             case MODE_SOURCE:
-              menus[menuItemId] &&
-                contextMenus.update(menuItemId, {
-                  title: i18n.getMessage(obj.mode || menuItemId,
-                                         vars[EDITOR_NAME] || LABEL)
-                });
+              menus[menuItemId] && title &&
+                contextMenus.update(menuItemId, {title});
               break;
             default:
           }
@@ -547,7 +561,7 @@
             break;
           case EDITOR_NAME:
             vars[item] = obj.value;
-            updateContextMenuItems();
+            updateContextMenuItems().then(cacheMenuItemTitle);
             portVars({
               [item]: obj.value
             });
