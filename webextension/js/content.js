@@ -110,10 +110,16 @@
       const suffix = ext[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
                        subtype;
-      ext = suffix ?
-              vars[FILE_EXT][type][suffix][subtype] ||
-              vars[FILE_EXT][type][suffix][suffix] :
-              vars[FILE_EXT][type][subtype];
+      const items = vars[FILE_EXT] && vars[FILE_EXT][type];
+      if (items) {
+        const item = suffix && items[suffix];
+        ext = item ?
+                item[subtype] || item[suffix] :
+                items[subtype]
+      }
+      else {
+        ext = subst;
+      }
     }
     return `.${ext || subst}`;
   };

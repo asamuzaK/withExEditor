@@ -11,7 +11,7 @@
   "browser_action": {
     "browser_style": false,
     "default_icon": "./img/icon.svg#gray",
-    "default_title": "withExEditor"
+    "default_title": "__MSG_extensionName__"
   },
   "commands": {
   },
@@ -34,7 +34,7 @@
   "name": "__MSG_extensionName__",
   "options_ui": {
     "open_in_tab": true,
-    "page": "options/options.html"
+    "page": "./options/options.html"
   },
   "permissions": [
     "<all_urls>",
