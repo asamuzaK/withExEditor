@@ -95,7 +95,7 @@ Windowsでは、pythonスクリプトを実行するためのシェルスクリ�
 ### アプリケーションマニフェスト
 ホストのパスを含むJSON形式のアプリケーションマニフェストを作成します。
 
-[マニフェストの例](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/appManifest.json)
+[マニフェストの例](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/manifest.txt)
 
 * *name* - 使用するエディタの名前。小文字の英字と数字、ドット、アンダーバーのみ使用可能です。また、ホストのファイル名と一致している必要があります。
 * *description* - ホストの説明。

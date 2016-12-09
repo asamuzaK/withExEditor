@@ -94,7 +94,7 @@ On Windows, also create a shell script (batch file) to execute python script.
 ### Application manifest
 Create an application manifest in JSON format that contains the path of the host.
 
-[Manifest Example](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/appManifest.json)
+[Manifest Example](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/manifest.txt)
 
 * *name* - The name of the editor to use. Only lowercase letters and numbers, dots, underscores are allowed. - It must also match the filename of the host.
 * *description* - Description of the host.
