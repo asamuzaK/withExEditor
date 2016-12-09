@@ -84,9 +84,9 @@
 ホストは標準入力（stdin）で渡されるバイナリデータを扱えるものである必要があります。
 withExEditorからはソース表示やテキスト編集用に作成した「一時ファイルのパス」をホストに送信します。
 
-以下はpythonスクリプトによるホストの例です。
+以下はPythonで書いたホストの例です。
 
-Pythonスクリプトの例（Windows / Linux / Mac）：
+Pythonスクリプトによるホストの例：
 ```
 #!/usr/bin/env python
 # coding: utf-8
@@ -125,7 +125,7 @@ while True:
 
   subprocess.run(cmd)
 
-sys.exit()
+sys.exit(0)
 ```
 
 Windowsでは、pythonスクリプトを実行するためのシェルスクリプト（バッチファイル）も作成します。

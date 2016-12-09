@@ -1,0 +1,7 @@
+{
+  "name": "youreditor",
+  "description": "Host to execute youreditor"
+  "path": "C:\\path\\to\\youreditor.cmd",
+  "type": "stdio",
+  "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
+}

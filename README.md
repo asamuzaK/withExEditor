@@ -85,7 +85,7 @@ From withExEditor, "temporary file path", which is created for source view / tex
 
 The following is an example of a host written in Python.
 
-Python Script Example (Windows / Linux / Mac):
+Python Script Example:
 ```
 #!/usr/bin/env python
 # coding: utf-8
@@ -124,7 +124,7 @@ while True:
 
   subprocess.run(cmd)
 
-sys.exit()
+sys.exit(0)
 ```
 
 On Windows, also create a shell script (batch file) to execute python script.

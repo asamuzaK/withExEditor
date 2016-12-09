@@ -1,0 +1,1 @@
+REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\xxx\youreditor.json" /f

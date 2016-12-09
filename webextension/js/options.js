@@ -293,7 +293,7 @@
   /* listeners */
   port.onMessage.addListener(handleMsg);
 
-  window.addEventListener("DOMContentLoaded", () => Promise.all([
+  document.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtmlLang().then(localizeElm),
     setVariables().then(setValuesFromStorage),
     addInputChangeListener()
