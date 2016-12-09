@@ -85,16 +85,69 @@ From withExEditor, "temporary file path", which is created for source view / tex
 
 The following is an example of a host written in Python.
 
-[Python Script Example](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/python.txt)
+Python Script Example:
+```
+#!/usr/bin/env python
+# coding: utf-8
+
+import sys, json, struct, subprocess
+
+# Read a message from stdin and decode it.
+def getMessage():
+  rawLength = sys.stdin.buffer.read(4)
+  if len(rawLength) == 0:
+    sys.exit(0)
+  message = sys.stdin.buffer.read(struct.unpack('@I', rawLength)[0])
+  if message:
+    return json.loads(message.decode('utf-8'))
+  else:
+    return false
+
+# Editor path
+app = "C:\Program Files\Path\To\YourEditor.exe"
+
+# Command line arguments array as appropriate.
+# args = []
+
+while True:
+  file = getMessage()
+  cmd = []
+  cmd.append(app)
+
+  # If you have arguments and want arguments before file
+  # cmd.extend(args)
+
+  cmd.append(file)
+
+  # If you have arguments and want arguments after file
+  # cmd.extend(args)
+
+  subprocess.run(cmd)
+
+sys.exit(0)
+```
 
 On Windows, also create a shell script (batch file) to execute python script.
 
-[Shell Script Example (Windows)](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/shell.txt)
+Shell Script Example (Windows):
+```
+@echo off
+python "C:\path\to\youreditor.py"
+```
 
 ### Application manifest
 Create an application manifest in JSON format that contains the path of the host.
 
-[Manifest Example](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/manifest.txt)
+Manifest Example:
+```
+{
+  "name": "youreditor",
+  "description": "Host to execute youreditor",
+  "path": "C:\\path\\to\\youreditor.cmd",
+  "type": "stdio",
+  "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
+}
+```
 
 * *name* - The name of the editor to use. Only lowercase letters and numbers, dots, underscores are allowed. - It must also match the filename of the host.
 * *description* - Description of the host.
@@ -109,6 +162,9 @@ On Windows, you also need to set the registry.
 If the path of the manifest is "C:\Users\xxx\youreditor.json", run the following command with cmd.exe.
 Then you can save the registry key.
 
-[REG ADD Example (Windows)](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/reg.txt)
+REG ADD Example (Windows):
+```
+REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\xxx\youreditor.json" /f
+```
 
 After completing the above work, *enter the manifest path in Options page*.

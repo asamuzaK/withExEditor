@@ -86,16 +86,69 @@ withExEditorからはソース表示やテキスト編集用に作成した「�
 
 以下はPythonで書いたホストの例です。
 
-[Pythonスクリプトによるホストの例](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/python.txt)
+Pythonスクリプトによるホストの例：
+```
+#!/usr/bin/env python
+# coding: utf-8
+
+import sys, json, struct, subprocess
+
+# Read a message from stdin and decode it.
+def getMessage():
+  rawLength = sys.stdin.buffer.read(4)
+  if len(rawLength) == 0:
+    sys.exit(0)
+  message = sys.stdin.buffer.read(struct.unpack('@I', rawLength)[0])
+  if message:
+    return json.loads(message.decode('utf-8'))
+  else:
+    return false
+
+# Editor path
+app = "C:\Program Files\Path\To\YourEditor.exe"
+
+# Command line arguments array as appropriate.
+# args = []
+
+while True:
+  file = getMessage()
+  cmd = []
+  cmd.append(app)
+
+  # If you have arguments and want arguments before file
+  # cmd.extend(args)
+
+  cmd.append(file)
+
+  # If you have arguments and want arguments after file
+  # cmd.extend(args)
+
+  subprocess.run(cmd)
+
+sys.exit(0)
+```
 
 Windowsでは、pythonスクリプトを実行するためのシェルスクリプト（バッチファイル）も作成します。
 
-[シェルスクリプトの例（Windows）](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/shell.txt)
+シェルスクリプトの例（Windows）：
+```
+@echo off
+python "C:\path\to\youreditor.py"
+```
 
 ### アプリケーションマニフェスト
 ホストのパスを含むJSON形式のアプリケーションマニフェストを作成します。
 
-[マニフェストの例](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/manifest.txt)
+マニフェストの例：
+```
+{
+  "name": "youreditor",
+  "description": "Host to execute youreditor",
+  "path": "C:\\path\\to\\youreditor.cmd",
+  "type": "stdio",
+  "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
+}
+```
 
 * *name* - 使用するエディタの名前。小文字の英字と数字、ドット、アンダーバーのみ使用可能です。また、ホストのファイル名と一致している必要があります。
 * *description* - ホストの説明。
@@ -109,6 +162,9 @@ Windowsでは、pythonスクリプトを実行するためのシェルスクリ�
 Windowsではさらにレジストリも設定する必要があります。
 マニフェストを"C:¥Users¥xxx¥youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
 
-[REG ADDの例（Windows）](https://github.com/asamuzaK/withExEditor/blob/hybrid/webextension/data/reg.txt)
+REG ADDの例（Windows）：
+```
+REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\xxx\youreditor.json" /f
+```
 
 以上の作業を終えたら、*設定ページでマニフェストのパスを入力してください*。
