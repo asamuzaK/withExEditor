@@ -115,7 +115,7 @@
         const item = suffix && items[suffix];
         ext = item ?
                 item[subtype] || item[suffix] :
-                items[subtype]
+                items[subtype];
       }
       else {
         ext = subst;

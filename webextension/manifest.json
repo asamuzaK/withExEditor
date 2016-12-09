@@ -6,11 +6,11 @@
     }
   },
   "background": {
-    "scripts": ["./js/background.js"]
+    "scripts": ["js/background.js"]
   },
   "browser_action": {
     "browser_style": false,
-    "default_icon": "./img/icon.svg#gray",
+    "default_icon": "img/icon.svg#gray",
     "default_title": "__MSG_extensionName__"
   },
   "commands": {
@@ -19,7 +19,7 @@
     {
       "all_frames": true,
       "matches": ["<all_urls>"],
-      "js": ["./js/content.js"],
+      "js": ["js/content.js"],
       "run_at": "document_start"
     }
   ],
@@ -27,14 +27,14 @@
   "description": "__MSG_extensionDescription__",
   "homepage_url": "https://github.com/asamuzaK/withExEditor",
   "icons": {
-    "32": "./img/icon.svg#gray",
-    "64": "./img/icon.svg"
+    "32": "img/icon.svg#gray",
+    "64": "img/icon.svg"
   },
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
   "options_ui": {
     "open_in_tab": true,
-    "page": "./options/options.html"
+    "page": "options/options.html"
   },
   "permissions": [
     "<all_urls>",
