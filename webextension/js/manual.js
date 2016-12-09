@@ -1,4 +1,4 @@
-/*
+/**
  * manual.js
  */
 "use strict";
@@ -7,7 +7,7 @@
     const codes = {
       host: "../data/python.txt",
       shell: "../data/shell.txt",
-      manifest: "../data/appManifest.json",
+      manifest: "../data/manifest.txt",
       reg: "../data/reg.txt"
     }
     const items = Object.keys(codes);
