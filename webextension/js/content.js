@@ -633,20 +633,20 @@
    * @return {Object}
    */
   const getSource = async data => {
-    const uri = data.documentURI;
+    const uri = document.documentURI;
     let obj;
-    if (data.protocol === "file:") {
+    if (window.location.protocol === "file:") {
       obj = {
         [GET_FILE_PATH]: {uri}
       };
     }
     else {
-      const contentType = data.contentType;
+      const contentType = document.contentType;
       const method = "GET";
       const mode = "cors";
       const headers = new Headers();
       headers.set("Content-Type", contentType);
-      headers.set("Charset", data.charset);
+      headers.set("Charset", document.characterSet);
       obj = uri && await fetch(uri, {headers, method, mode}).then(async res => {
         const target = getFileNameFromURI(uri, "index");
         const fileName = target + getFileExtension(contentType);
@@ -689,8 +689,8 @@
     const incognito = data.incognito;
     const tabId = data.tabId;
     const host = data.host;
-    const contentType = data.contentType;
-    const uri = data.documentURI;
+    const contentType = document.contentType;
+    const uri = document.documentURI;
     let value = data.value, target, tmpFileData;
     switch (mode) {
       case MODE_EDIT_TEXT:
@@ -803,11 +803,7 @@
   const getContent = async elm => {
     const data = {
       mode: MODE_SOURCE,
-      charset: document.characterSet,
-      contentType: document.contentType,
-      documentURI: document.documentURI,
       host: window.location.host || LABEL,
-      protocol: window.location.protocol,
       incognito: vars[INCOGNITO],
       tabId: vars[TAB_ID],
       namespaceURI: null,
