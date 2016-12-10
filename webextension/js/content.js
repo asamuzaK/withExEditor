@@ -251,39 +251,42 @@
     const ns = {node: null, name: null, uri: null};
     if (node.namespaceURI) {
       ns.node = node;
-      ns.name = node.localName;
-      ns.uri = node.namespaceURI;
+      ns.localName = node.localName;
+      ns.namespaceURI = node.namespaceURI;
     }
     else {
       while (node && node.parentNode && !ns.node) {
         const obj = node.parentNode;
         node.namespaceURI ? (
           ns.node = node,
-          ns.name = node.localName,
-          ns.uri = node.namespaceURI
+          ns.localName = node.localName,
+          ns.namespaceURI = node.namespaceURI
         ) :
         /^foreignObject$/.test(obj.localName) &&
         (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
          document.documentElement.localName === "html") ? (
           ns.node = node,
-          ns.name = node.localName,
-          ns.uri = obj.hasAttributeNS(nsURI.svg, "requiredExtensions") &&
-                     obj.getAttributeNS(nsURI.svg, "requiredExtensions") ||
-                     nsURI.html
+          ns.localName = node.localName,
+          ns.namespaceURI = obj.hasAttributeNS(nsURI.svg,
+                                               "requiredExtensions") &&
+                            obj.getAttributeNS(nsURI.svg,
+                                               "requiredExtensions") ||
+                            nsURI.html
         ) :
         /^(?:math|svg)$/.test(node.localName) ? (
           ns.node = node,
-          ns.name = node.localName,
-          ns.uri = nsURI.ns[node.localName]
+          ns.localName = node.localName,
+          ns.namespaceURI = nsURI.ns[node.localName]
         ) :
           node = obj;
       }
       !ns.node && (
         node = document.documentElement,
         ns.node = node,
-        ns.name = node.localName,
-        ns.uri = node.hasAttribute("xmlns") && node.getAttribute("xmlns") ||
-                 nsURI[node.localName.toLowerCase()] || ""
+        ns.localName = node.localName,
+        ns.namespaceURI = node.hasAttribute("xmlns") &&
+                          node.getAttribute("xmlns") ||
+                          nsURI[node.localName.toLowerCase()] || ""
       );
     }
     return ns;
@@ -344,7 +347,7 @@
     const localName = node && node.localName;
     const elm = node && document.createElementNS(
       node.namespaceURI || prefix && nsURI[prefix] ||
-      (obj = await getNodeNS(node)) && obj.uri || nsURI.html,
+      (obj = await getNodeNS(node)) && obj.namespaceURI || nsURI.html,
       prefix && `${prefix}:${localName}` || localName
     );
     const childNode = bool && node.hasChildNodes() &&
@@ -434,7 +437,7 @@
         l > 1 && fragment.appendChild(document.createTextNode("\n"));
         if (ancestor.nodeType === ELEMENT_NODE) {
           obj = await getNodeNS(ancestor);
-          if (/^(?:svg|math)$/.test(obj.name)) {
+          if (/^(?:svg|math)$/.test(obj.localName)) {
             if (obj.node === document.documentElement) {
               fragment = null;
               break;
@@ -775,20 +778,20 @@
                         anchorElm.isContentEditable ||
                         await isContentTextNode(anchorElm));
       let ns = await getNodeNS(elm);
-      contextType.namespace = ns.uri;
+      contextType.namespace = ns.namespaceURI;
       if (sel.isCollapsed) {
         isEditControl(elm) ?
           contextType.mode = MODE_EDIT_TEXT :
         elm.isContentEditable || await isContentTextNode(elm) ?
           contextType.mode = MODE_EDIT_TEXT :
-        ns.uri === nsURI.math ?
+        ns.namespaceURI === nsURI.math ?
           contextType.mode = MODE_MATHML :
-          ns.uri === nsURI.svg && (contextType.mode = MODE_SVG);
+          ns.namespaceURI === nsURI.svg && (contextType.mode = MODE_SVG);
       }
       else if (modeEdit) {
         ns = await getNodeNS(anchorElm);
         contextType.mode = MODE_EDIT_TEXT;
-        contextType.namespace = ns.uri;
+        contextType.namespace = ns.namespaceURI;
       }
       else {
         contextType.mode = MODE_SELECTION;
