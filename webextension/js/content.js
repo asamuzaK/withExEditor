@@ -27,6 +27,7 @@
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
   const CHAR = "utf-8";
+  const FILE_EXT = "fileExt";
   const NS_URI = "nsURI";
   const NS_URI_DEFAULT_ITEMS = 4;
   const ELEMENT_NODE = 1;
@@ -38,7 +39,6 @@
   const EDITABLE_CONTEXT = "editableContext";
   const IS_ENABLED = "isEnabled";
   const CONTEXT_NODE = "contextNode";
-  const FILE_EXT = "fileExt";
   const INCOGNITO = "incognito";
   const TAB_ID = "tabId";
 
@@ -56,7 +56,6 @@
     [IS_ENABLED]: false,
     [CONTEXT_NODE]: null,
     [INCOGNITO]: false,
-    [FILE_EXT]: null,
     [TAB_ID]: ""
   };
 
@@ -92,8 +91,29 @@
    * @return {string} - file name
    */
   const getFileNameFromURI = (uri, subst = LABEL) => {
-    const file = isString(uri) && !/^data:/.test(uri) && rePath.exec(uri);
-    return file && file[1] || subst;
+    const name = isString(uri) && !/^data:/.test(uri) && rePath.exec(uri);
+    return name && name[1] || subst;
+  };
+
+  /* file extension */
+  const fileExt = {};
+
+  /**
+   * extend file extension items
+   * @return {void}
+   */
+  const extendFileExt = async () => {
+    if (Object.keys(fileExt).length === 0) {
+      let ext = await storage.get(FILE_EXT);
+      if (Object.keys(ext).length > 0 && (ext = ext[FILE_EXT])) {
+        const items = Object.keys(ext);
+        if (items.length > 0) {
+          for (let item of items) {
+            fileExt[item] = ext[item];
+          }
+        }
+      }
+    }
   };
 
   /**
@@ -110,7 +130,7 @@
       const suffix = ext[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
                        subtype;
-      const items = vars[FILE_EXT] && vars[FILE_EXT][type];
+      const items = fileExt[type];
       if (items) {
         const item = suffix && items[suffix];
         ext = item ?
@@ -126,7 +146,7 @@
 
   /* class */
   /**
-   * key combo class
+   * key combination class
    */
   class KeyCombo {
     /**
@@ -189,7 +209,7 @@
    * @return {void}
    */
   const portMsg = async msg => {
-    Object.keys(msg).length > 0 && port.postMessage(msg);
+    msg && port.postMessage(msg);
   };
 
   /**
@@ -205,9 +225,9 @@
                    elm.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
                    elm.getAttributeNS("", DATA_ATTR_ID_CTRL)
                  );
-    attr && attr.split(" ").forEach(value => {
+    attr && attr.split(" ").forEach(id => {
       const getTmpFile = {
-        dataId: value,
+        dataId: id,
         host: window.location.host,
         tabId: vars[TAB_ID]
       };
@@ -230,12 +250,12 @@
    */
   const extendNsURI = async () => {
     if (Object.keys(nsURI).length <= NS_URI_DEFAULT_ITEMS) {
-      const ns = await storage.get(NS_URI);
-      if (Object.keys(ns).length > 0) {
-        const items = Object.keys(ns[NS_URI]);
+      let ns = await storage.get(NS_URI);
+      if (Object.keys(ns).length > 0 && (ns = ns[NS_URI])) {
+        const items = Object.keys(ns);
         if (items.length > NS_URI_DEFAULT_ITEMS) {
           for (let item of items) {
-            nsURI[item] = ns[NS_URI][item];
+            nsURI[item] = ns[item];
           }
         }
       }
@@ -828,7 +848,7 @@
               data.mode = contextType.mode,
               data.target = obj,
               data.value = elm.hasChildNodes() &&
-                                 await getTextNode(elm.childNodes) || "",
+                             await getTextNode(elm.childNodes) || "",
               data.namespaceURI = contextType.namespaceURI,
               setDataAttrs(elm)
             );
@@ -1108,13 +1128,18 @@
     }
   };
 
-  /* add listeners */
+  /* listeners */
   port.onMessage.addListener(handleMsg);
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
     root.addEventListener("contextmenu", handleContextMenu, false);
     root.addEventListener("keypress", handleKeyPress, false);
-    extendNsURI();
   }, false);
+
+  /* startup */
+  Promise.all([
+    extendFileExt(),
+    extendNsURI()
+  ]).catch(logError);
 }

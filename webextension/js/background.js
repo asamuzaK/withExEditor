@@ -37,7 +37,6 @@
   const IS_ENABLED = "isEnabled";
   const IS_EXECUTABLE = "isExecutable";
   const ICON_PATH = "iconPath";
-  const FILE_EXT = "fileExt";
 
   /* shortcuts */
   const browserAction = browser.browserAction;
@@ -64,8 +63,7 @@
     [ICON_PATH]: `${ICON}#gray`,
     [MODE_SOURCE]: "",
     [MODE_MATHML]: "",
-    [MODE_SVG]: "",
-    [FILE_EXT]: null
+    [MODE_SVG]: ""
   };
 
   /**
@@ -646,14 +644,11 @@
     storage.get().then(setVariablesFromStorage).then(syncUI),
     fetch(NS_URI_PATH).then(async data => {
       const nsURI = await data.json();
-      setStorage({nsURI});
+      nsURI && setStorage({nsURI});
     }),
     fetch(FILE_EXT_PATH).then(async data => {
       const fileExt = await data.json();
-      fileExt && (
-        vars[FILE_EXT] = fileExt,
-        portMsg({fileExt})
-      );
+      fileExt && setStorage({fileExt});
     })
   ]).catch(logError);
 }
