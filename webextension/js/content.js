@@ -690,7 +690,7 @@
     const mode = data.mode;
     const host = data.host || LABEL;
     const tabId = data.tabId;
-    const type = data.contentType;
+    const contentType = data.contentType;
     const uri = data.documentURI;
     let value = data.value, target, tmpFileData;
     switch (mode) {
@@ -698,7 +698,7 @@
         tmpFileData = (target = data.target) && {
           [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
-            type: "text/plain",
+            contentType: "text/plain",
             fileName: `${target}.txt`,
             namespaceURI: data.namespaceURI || ""
           },
@@ -710,7 +710,7 @@
         tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
           [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
-            type: "application/mathml+xml",
+            contentType: "application/mathml+xml",
             fileName: `${target}.mml`
           },
           value
@@ -719,18 +719,18 @@
         break;
       case MODE_SELECTION:
         if (value && (target = getFileNameFromURI(uri, "index"))) {
-          tmpFileData = reXml.test(type) && {
+          tmpFileData = reXml.test(contentType) && {
             [CREATE_TMP_FILE]: {
               mode, tabId, host, target,
-              type: "application/xml",
+              contentType: "application/xml",
               fileName: `${target}.xml`
             },
             value
           } ||
           (value = await convertValue(value).catch(logError)) && {
             [CREATE_TMP_FILE]: {
-              mode, tabId, host, target, type,
-              fileName: target + getFileExtension(type)
+              mode, tabId, host, target, contentType,
+              fileName: target + getFileExtension(contentType)
             },
             value
           } ||
@@ -744,7 +744,7 @@
         tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
           [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
-            type: "image/svg+xml",
+            contentType: "image/svg+xml",
             fileName: `${target}.svg`
           },
           value
