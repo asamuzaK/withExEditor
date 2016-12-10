@@ -634,31 +634,29 @@
    */
   const getSource = async data => {
     const uri = data.documentURI;
-    const protocol = data.protocol;
-    const contentType = data.contentType;
-    const charset = data.charset;
     let obj;
-    if (protocol === "file:") {
+    if (data.protocol === "file:") {
       obj = {
-        [GET_FILE_PATH]: {uri, data}
+        [GET_FILE_PATH]: {uri}
       };
     }
     else {
+      const contentType = data.contentType;
       const method = "GET";
       const mode = "cors";
       const headers = new Headers();
       headers.set("Content-Type", contentType);
-      headers.set("Charset", charset);
+      headers.set("Charset", data.charset);
       obj = uri && await fetch(uri, {headers, method, mode}).then(async res => {
+        const target = getFileNameFromURI(uri, "index");
+        const fileName = target + getFileExtension(contentType);
         const value = await res.text();
-        const target = await getFileNameFromURI(uri, "index");
-        const fileName = target + await getFileExtension(contentType);
         return {
           [CREATE_TMP_FILE]: {
-            fileName, target, contentType,
-            mode: MODE_SOURCE,
+            target, fileName,
+            incognito: data.incognito,
             tabId: data.tabId,
-            host: data.host || LABEL
+            host: data.host
           },
           value
         };
@@ -688,8 +686,9 @@
    */
   const createTmpFileData = async data => {
     const mode = data.mode;
-    const host = data.host || LABEL;
+    const incognito = data.incognito;
     const tabId = data.tabId;
+    const host = data.host;
     const contentType = data.contentType;
     const uri = data.documentURI;
     let value = data.value, target, tmpFileData;
@@ -697,8 +696,7 @@
       case MODE_EDIT_TEXT:
         tmpFileData = (target = data.target) && {
           [CREATE_TMP_FILE]: {
-            mode, tabId, host, target,
-            contentType: "text/plain",
+            incognito, tabId, host, target,
             fileName: `${target}.txt`,
             namespaceURI: data.namespaceURI || ""
           },
@@ -709,8 +707,7 @@
       case MODE_MATHML:
         tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
           [CREATE_TMP_FILE]: {
-            mode, tabId, host, target,
-            contentType: "application/mathml+xml",
+            incognito, tabId, host, target,
             fileName: `${target}.mml`
           },
           value
@@ -721,15 +718,14 @@
         if (value && (target = getFileNameFromURI(uri, "index"))) {
           tmpFileData = reXml.test(contentType) && {
             [CREATE_TMP_FILE]: {
-              mode, tabId, host, target,
-              contentType: "application/xml",
+              incognito, tabId, host, target,
               fileName: `${target}.xml`
             },
             value
           } ||
           (value = await convertValue(value).catch(logError)) && {
             [CREATE_TMP_FILE]: {
-              mode, tabId, host, target, contentType,
+              incognito, tabId, host, target,
               fileName: target + getFileExtension(contentType)
             },
             value
@@ -743,8 +739,7 @@
       case MODE_SVG:
         tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
           [CREATE_TMP_FILE]: {
-            mode, tabId, host, target,
-            contentType: "image/svg+xml",
+            incognito, tabId, host, target,
             fileName: `${target}.svg`
           },
           value
@@ -811,11 +806,11 @@
       charset: document.characterSet,
       contentType: document.contentType,
       documentURI: document.documentURI,
-      host: window.location.host,
-      incognito: vars[INCOGNITO],
-      namespaceURI: null,
+      host: window.location.host || LABEL,
       protocol: window.location.protocol,
+      incognito: vars[INCOGNITO],
       tabId: vars[TAB_ID],
+      namespaceURI: null,
       target: null,
       value: null
     };
@@ -974,7 +969,7 @@
           /^(?:input|textarea)$/.test(elm.localName) ?
             elm.value = value :
           elm.isContentEditable &&
-            syncContentText(elm, value.split("\n"), namespace)
+            syncContentText(elm, value.split("\n"), namespaceURI)
         );
       }
     }
