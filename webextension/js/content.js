@@ -700,7 +700,7 @@
             mode, tabId, host, target,
             type: "text/plain",
             file: `${target}.txt`,
-            namespace: data.namespace || ""
+            namespaceURI: data.namespaceURI || ""
           },
           value
         } ||
@@ -766,7 +766,7 @@
   const getContextType = async elm => {
     const contextType = {
       mode: MODE_SOURCE,
-      namespace: ""
+      namespaceURI: ""
     };
     if (elm) {
       const sel = window.getSelection();
@@ -778,7 +778,7 @@
                         anchorElm.isContentEditable ||
                         await isContentTextNode(anchorElm));
       let ns = await getNodeNS(elm);
-      contextType.namespace = ns.namespaceURI;
+      contextType.namespaceURI = ns.namespaceURI;
       if (sel.isCollapsed) {
         isEditControl(elm) ?
           contextType.mode = MODE_EDIT_TEXT :
@@ -791,7 +791,7 @@
       else if (modeEdit) {
         ns = await getNodeNS(anchorElm);
         contextType.mode = MODE_EDIT_TEXT;
-        contextType.namespace = ns.namespaceURI;
+        contextType.namespaceURI = ns.namespaceURI;
       }
       else {
         contextType.mode = MODE_SELECTION;
@@ -813,7 +813,7 @@
       documentURI: document.documentURI,
       host: window.location.host,
       incognito: vars[INCOGNITO],
-      namespace: null,
+      namespaceURI: null,
       protocol: window.location.protocol,
       tabId: vars[TAB_ID],
       target: null,
@@ -838,7 +838,7 @@
               data.target = obj,
               data.value = elm.hasChildNodes() &&
                                  await getTextNode(elm.childNodes) || "",
-              data.namespace = contextType.namespace,
+              data.namespaceURI = contextType.namespaceURI,
               setDataAttrs(elm)
             );
           }
@@ -850,20 +850,20 @@
               data.target = obj,
               data.value = anchorElm.hasChildNodes() &&
                                  await getTextNode(anchorElm.childNodes) || "",
-              data.namespace = contextType.namespace,
+              data.namespaceURI = contextType.namespaceURI,
               setDataAttrs(anchorElm)
             );
           }
           break;
         case MODE_MATHML:
-          sel.isCollapsed && contextType.namespace === nsURI.math &&
+          sel.isCollapsed && contextType.namespaceURI === nsURI.math &&
           (obj = await createDomXmlBased(elm, "math")) && (
             data.mode = contextType.mode,
             data.value = obj
           );
           break;
         case MODE_SVG:
-          sel.isCollapsed && contextType.namespace === nsURI.svg &&
+          sel.isCollapsed && contextType.namespaceURI === nsURI.svg &&
           (obj = await createDomXmlBased(elm, "svg")) && (
             data.mode = contextType.mode,
             data.value = obj
@@ -940,7 +940,7 @@
   const syncText = async obj => {
     if (obj.tabId === vars[TAB_ID]) {
       const elm = document.activeElement;
-      const namespace = obj.data.namespace || nsURI.html;
+      const namespaceURI = obj.data.namespaceURI || nsURI.html;
       const target = obj.data.target || "";
       const timestamp = obj.data.timestamp || 0;
       const value = await (new TextDecoder(CHAR)).decode(obj.value) || "";
@@ -958,7 +958,7 @@
               (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
                timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
                 id.setAttributeNS(ns, attr, timestamp),
-                syncContentText(id, value.split("\n"), namespace)
+                syncContentText(id, value.split("\n"), namespaceURI)
               )
             );
             break;
