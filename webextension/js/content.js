@@ -1070,7 +1070,6 @@
           case SYNC_TEXT:
             syncText(obj);
             break;
-          case FILE_EXT:
           case TAB_ID:
             vars[item] = obj;
             break;
