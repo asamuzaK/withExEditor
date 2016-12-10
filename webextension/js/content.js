@@ -635,7 +635,7 @@
   const getSource = async data => {
     const uri = data.documentURI;
     const protocol = data.protocol;
-    const type = data.contentType;
+    const contentType = data.contentType;
     const charset = data.charset;
     let obj;
     if (protocol === "file:") {
@@ -647,15 +647,15 @@
       const method = "GET";
       const mode = "cors";
       const headers = new Headers();
-      headers.set("Content-Type", type);
+      headers.set("Content-Type", contentType);
       headers.set("Charset", charset);
       obj = uri && await fetch(uri, {headers, method, mode}).then(async res => {
         const value = await res.text();
         const target = await getFileNameFromURI(uri, "index");
-        const fileName = target + await getFileExtension(type);
+        const fileName = target + await getFileExtension(contentType);
         return {
           [CREATE_TMP_FILE]: {
-            fileName, target, type,
+            fileName, target, contentType,
             mode: MODE_SOURCE,
             tabId: data.tabId,
             host: data.host || LABEL
@@ -849,7 +849,7 @@
               data.mode = contextType.mode,
               data.target = obj,
               data.value = anchorElm.hasChildNodes() &&
-                                 await getTextNode(anchorElm.childNodes) || "",
+                             await getTextNode(anchorElm.childNodes) || "",
               data.namespaceURI = contextType.namespaceURI,
               setDataAttrs(anchorElm)
             );
