@@ -652,10 +652,10 @@
       obj = uri && await fetch(uri, {headers, method, mode}).then(async res => {
         const value = await res.text();
         const target = await getFileNameFromURI(uri, "index");
-        const file = target + await getFileExtension(type);
+        const fileName = target + await getFileExtension(type);
         return {
           [CREATE_TMP_FILE]: {
-            file, target, type,
+            fileName, target, type,
             mode: MODE_SOURCE,
             tabId: data.tabId,
             host: data.host || LABEL
@@ -699,7 +699,7 @@
           [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
             type: "text/plain",
-            file: `${target}.txt`,
+            fileName: `${target}.txt`,
             namespaceURI: data.namespaceURI || ""
           },
           value
@@ -711,7 +711,7 @@
           [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
             type: "application/mathml+xml",
-            file: `${target}.mml`
+            fileName: `${target}.mml`
           },
           value
         } ||
@@ -723,14 +723,14 @@
             [CREATE_TMP_FILE]: {
               mode, tabId, host, target,
               type: "application/xml",
-              file: `${target}.xml`
+              fileName: `${target}.xml`
             },
             value
           } ||
           (value = await convertValue(value).catch(logError)) && {
             [CREATE_TMP_FILE]: {
               mode, tabId, host, target, type,
-              file: target + getFileExtension(type)
+              fileName: target + getFileExtension(type)
             },
             value
           } ||
@@ -745,7 +745,7 @@
           [CREATE_TMP_FILE]: {
             mode, tabId, host, target,
             type: "image/svg+xml",
-            file: `${target}.svg`
+            fileName: `${target}.svg`
           },
           value
         } ||
