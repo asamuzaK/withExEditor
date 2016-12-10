@@ -686,94 +686,6 @@
   };
 
   /**
-   * strip HTML tags and decode HTML escaped characters
-   * @param {string} v - value
-   * @return {string} - converted value
-   */
-  const convertValue = async v => {
-    while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
-      v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "").
-            replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
-    }
-    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!\-\-[^\-]*\-\->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n").
-             replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-  };
-
-  /**
-   * create temporary file data
-   * @param {Object} data - content data
-   * @return {void}
-   */
-  const createTmpFileData = async data => {
-    const mode = data.mode;
-    const incognito = data.incognito;
-    const tabId = data.tabId;
-    const host = data.host;
-    const contentType = document.contentType;
-    const uri = document.documentURI;
-    let value = data.value, target, tmpFileData;
-    switch (mode) {
-      case MODE_EDIT_TEXT:
-        tmpFileData = (target = data.target) && {
-          [CREATE_TMP_FILE]: {
-            incognito, tabId, host, target,
-            fileName: `${target}.txt`,
-            namespaceURI: data.namespaceURI || ""
-          },
-          value
-        } ||
-        await getSource(data);
-        break;
-      case MODE_MATHML:
-        tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
-          [CREATE_TMP_FILE]: {
-            incognito, tabId, host, target,
-            fileName: `${target}.mml`
-          },
-          value
-        } ||
-        await getSource(data);
-        break;
-      case MODE_SELECTION:
-        if (value && (target = getFileNameFromURI(uri, "index"))) {
-          tmpFileData = reXml.test(contentType) && {
-            [CREATE_TMP_FILE]: {
-              incognito, tabId, host, target,
-              fileName: `${target}.xml`
-            },
-            value
-          } ||
-          (value = await convertValue(value).catch(logError)) && {
-            [CREATE_TMP_FILE]: {
-              incognito, tabId, host, target,
-              fileName: target + getFileExtension(contentType)
-            },
-            value
-          } ||
-          await getSource(data);
-        }
-        else {
-          tmpFileData = await getSource(data);
-        }
-        break;
-      case MODE_SVG:
-        tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
-          [CREATE_TMP_FILE]: {
-            incognito, tabId, host, target,
-            fileName: `${target}.svg`
-          },
-          value
-        } ||
-        await getSource(data);
-        break;
-      default:
-        tmpFileData = await getSource(data);
-    }
-    return tmpFileData ||
-           Promise.reject(`${LABEL}: ${i18n.getMessage(FAIL_GET_CONTENT)}`);
-  };
-
-  /**
    * get context type
    * @param {Object} elm - element
    * @return {Object} - context type data
@@ -893,6 +805,94 @@
   };
 
   /**
+   * strip HTML tags and decode HTML escaped characters
+   * @param {string} v - value
+   * @return {string} - converted value
+   */
+  const convertValue = async v => {
+    while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
+      v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "").
+            replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
+    }
+    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!\-\-[^\-]*\-\->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n").
+             replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  };
+
+  /**
+   * create temporary file data
+   * @param {Object} data - content data
+   * @return {void}
+   */
+  const createTmpFileData = async data => {
+    const mode = data.mode;
+    const incognito = data.incognito;
+    const tabId = data.tabId;
+    const host = data.host;
+    const contentType = document.contentType;
+    const uri = document.documentURI;
+    let value = data.value, target, tmpFileData;
+    switch (mode) {
+      case MODE_EDIT_TEXT:
+        tmpFileData = (target = data.target) && {
+          [CREATE_TMP_FILE]: {
+            incognito, tabId, host, target,
+            fileName: `${target}.txt`,
+            namespaceURI: data.namespaceURI || ""
+          },
+          value
+        } ||
+        await getSource(data);
+        break;
+      case MODE_MATHML:
+        tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
+          [CREATE_TMP_FILE]: {
+            incognito, tabId, host, target,
+            fileName: `${target}.mml`
+          },
+          value
+        } ||
+        await getSource(data);
+        break;
+      case MODE_SELECTION:
+        if (value && (target = getFileNameFromURI(uri, "index"))) {
+          tmpFileData = reXml.test(contentType) && {
+            [CREATE_TMP_FILE]: {
+              incognito, tabId, host, target,
+              fileName: `${target}.xml`
+            },
+            value
+          } ||
+          (value = await convertValue(value).catch(logError)) && {
+            [CREATE_TMP_FILE]: {
+              incognito, tabId, host, target,
+              fileName: target + getFileExtension(contentType)
+            },
+            value
+          } ||
+          await getSource(data);
+        }
+        else {
+          tmpFileData = await getSource(data);
+        }
+        break;
+      case MODE_SVG:
+        tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
+          [CREATE_TMP_FILE]: {
+            incognito, tabId, host, target,
+            fileName: `${target}.svg`
+          },
+          value
+        } ||
+        await getSource(data);
+        break;
+      default:
+        tmpFileData = await getSource(data);
+    }
+    return tmpFileData ||
+           Promise.reject(`${LABEL}: ${i18n.getMessage(FAIL_GET_CONTENT)}`);
+  };
+
+  /**
    * port content data
    * @param {Object} elm - element
    * @return {Object} - Promise
@@ -955,17 +955,17 @@
       const target = obj.data.target || "";
       const timestamp = obj.data.timestamp || 0;
       const value = await (new TextDecoder(CHAR)).decode(obj.value) || "";
-      let html = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
-          ns = !html && nsURI.html || "",
-          attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS;
+      let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+          ns = !isHtml && nsURI.html || "",
+          attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS;
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CTRL)) {
         const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CTRL)).split(" ");
         for (let id of arr) {
           if (id === target) {
             (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`)) && (
-              html = !id.namespaceURI || id.namespaceURI === nsURI.html,
-              ns = !html && nsURI.html || "",
-              attr = html && DATA_ATTR_TS || DATA_ATTR_TS_NS,
+              isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html,
+              ns = !isHtml && nsURI.html || "",
+              attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS,
               (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
                timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
                 id.setAttributeNS(ns, attr, timestamp),
