@@ -455,9 +455,7 @@
       }),
       toggleIcon(),
       toggleBadge()
-    ])).catch(e => {
-      throw e;
-    });
+    ])).catch(logError);
 
   /* handlers */
   /**
@@ -472,13 +470,13 @@
         const obj = msg[item];
         switch (item) {
           case CONTEXT_MENU:
-            obj && updateContextMenuItems(obj);
+            obj && updateContextMenuItems(obj).catch(logError);
             break;
           case OPEN_OPTIONS:
-            obj && openOptionsPage();
+            obj && openOptionsPage().catch(logError);
             break;
           case PORT_HOST:
-            obj.path && portHostMsg(obj.path);
+            obj.path && portHostMsg(obj.path).catch(logError);
             break;
           default:
         }
@@ -495,7 +493,7 @@
     const windowId = `${port.sender.tab.windowId}`;
     const tabId = `${port.sender.tab.id}`;
     const frameUrl = port.sender.frameUrl;
-    restorePorts({windowId, tabId, frameUrl});
+    restorePorts({windowId, tabId, frameUrl}).catch(logError);
   };
 
   /**
@@ -536,7 +534,7 @@
           case ICON_WHITE:
             obj.checked && (
               varsLocal[ICON_PATH] = obj.value,
-              replaceIcon()
+              replaceIcon().catch(logError)
             );
             break;
           // NOTE: for hybrid, set varsLocal
@@ -546,26 +544,26 @@
             vars[item] = !!obj.checked;
             portVars({
               [item]: !!obj.checked
-            });
+            }).catch(logError);
             break;
           case KEY_ACCESS:
             vars[item] = obj.value;
             portVars({
               [item]: obj.value
-            });
+            }).catch(logError);
             break;
           case APP_MANIFEST:
             varsLocal[item] = obj.value;
             varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
-            toggleBadge();
+            toggleBadge().catch(logError);
             break;
           case APP_NAME:
             varsLocal[item] = obj.value;
-            connectHost();
+            connectHost().catch(logError);
             break;
           case EDITOR_NAME:
             varsLocal[item] = obj.value;
-            updateContextMenuItems().then(cacheMenuItemTitle);
+            updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
             break;
           case ENABLE_PB:
             varsLocal[item] = !!obj.checked;
@@ -573,10 +571,10 @@
             break;
           case EDITABLE_CONTEXT:
             vars[item] = !!obj.checked;
-            createContextMenuItems();
+            createContextMenuItems().catch(logError);
             portVars({
               [item]: !!obj.checked
-            });
+            }).catch(logError);
             break;
           default:
         }
@@ -624,18 +622,16 @@
       }).catch(logError);
   });
   windows.onFocusChanged.addListener(syncUI);
-  windows.onRemoved.addListener(windowId => {
-    Promise.all([
-      restorePorts({
-        windowId: `${windowId}`
-      }),
-      checkWindowIncognito().then(isIncognito => {
-        !isIncognito && portMsg({
-          removePrivateTmpFiles: !isIncognito
-        });
-      })
-    ]).catch(logError);
-  });
+  windows.onRemoved.addListener(windowId => Promise.all([
+    restorePorts({
+      windowId: `${windowId}`
+    }),
+    checkWindowIncognito().then(isIncognito => {
+      !isIncognito && portMsg({
+        removePrivateTmpFiles: !isIncognito
+      });
+    })
+  ]).catch(logError));
   // NOTE: for hybrid
   hybrid.onMessage.addListener(handleMsg);
 

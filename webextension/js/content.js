@@ -913,7 +913,7 @@
             [GET_FILE_PATH]: res[GET_FILE_PATH]
           });
       }
-    }).catch(logError);
+    });
 
   /* synchronize edited text */
   /**
@@ -1045,7 +1045,7 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            portContentData(vars[CONTEXT_NODE]);
+            portContentData(vars[CONTEXT_NODE]).catch(logError);
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -1065,10 +1065,10 @@
               [PORT_HOST]: {
                 path: obj.path
               }
-            });
+            }).catch(logError);
             break;
           case SYNC_TEXT:
-            syncText(obj);
+            syncText(obj).catch(logError);
             break;
           case TAB_ID:
             vars[item] = obj;
@@ -1101,7 +1101,7 @@
       }
     };
     vars[CONTEXT_NODE] = elm;
-    portMsg({contextMenu});
+    portMsg({contextMenu}).catch(logError);
   };
 
   /**
@@ -1123,7 +1123,7 @@
           isEditControl(elm) || elm.isContentEditable ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
           reType.test(document.contentType)
-      ) && portContentData(elm);
+      ) && portContentData(elm).catch(logError);
     }
   };
 
