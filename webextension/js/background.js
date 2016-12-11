@@ -483,7 +483,7 @@
     ports[windowId] = ports[windowId] || {};
     ports[windowId][tabId] = frameId > 0 && ports[windowId][tabId] || {};
     ports[windowId][tabId][frameUrl] = port;
-    frameId === 0 && ports[windowId][tabId][INCOGNITO] = incognito;
+    frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito);
     port.onMessage.addListener(handleMsg);
     port.postMessage({
       incognito, tabId,
