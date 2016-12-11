@@ -119,7 +119,7 @@
       }).catch(logError),
       portMsg({
         [CHECK_EXECUTABLE]: {path}
-      })
+      }).catch(logError)
     );
   };
 
@@ -136,7 +136,7 @@
         const nodes = document.querySelectorAll(`[name=${elm.name}]`);
         if (nodes instanceof NodeList) {
           for (let node of nodes) {
-            pref = await createPrefObj(node).catch(logError);
+            pref = await createPrefObj(node);
             pref && storage.set(pref);
           }
         }
@@ -148,7 +148,7 @@
               path: elm.value
             }
           }) : (
-          pref = await createPrefObj(elm).catch(logError),
+          pref = await createPrefObj(elm),
           pref && storage.set(pref)
         );
       }

@@ -90,7 +90,7 @@
    * @param {string} subst - substitute file name
    * @return {string} - file name
    */
-  const getFileNameFromURI = (uri, subst = LABEL) => {
+  const getFileNameFromURI = async (uri, subst = LABEL) => {
     const name = isString(uri) && !/^data:/.test(uri) && rePath.exec(uri);
     return name && name[1] || subst;
   };
@@ -122,7 +122,7 @@
    * @param {string} subst - substitute file extension
    * @return {string} - file extension
    */
-  const getFileExtension = (media = "text/plain", subst = "txt") => {
+  const getFileExtension = async (media = "text/plain", subst = "txt") => {
     let ext = reExt.exec(media);
     if (ext) {
       const type = ext[1];
@@ -217,7 +217,7 @@
    * @param {Object} evt - event
    * @return {void}
    */
-  const portTemporaryId = evt => {
+  const portTemporaryId = async evt => {
     const elm = evt && evt.target === evt.currentTarget && evt.target;
     const attr = elm && (
                    elm.hasAttributeNS("", DATA_ATTR_ID) &&
@@ -231,7 +231,7 @@
         host: window.location.host,
         tabId: vars[TAB_ID]
       };
-      portMsg({getTmpFile});
+      portMsg({getTmpFile}).catch(logError);
     });
   };
 
@@ -528,7 +528,7 @@
    * @param {Object} elm - target element
    * @return {?string} - ID
    */
-  const getId = elm => {
+  const getId = async elm => {
     let id = null;
     if (elm) {
       const html = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
@@ -588,7 +588,7 @@
    * @param {Object} elm - element
    * @return {boolean}
    */
-  const isEditControl = elm =>
+  const isEditControl = async elm =>
     elm && (
       /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
       /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
@@ -602,7 +602,7 @@
    */
   const getEditableElm = async node => {
     let elm = null;
-    if (isEditControl(node)) {
+    if (await isEditControl(node)) {
       elm = node;
     }
     else {
@@ -625,7 +625,7 @@
    */
   const setDataAttrs = async elm => {
     if (elm) {
-      const id = getId(elm);
+      const id = await getId(elm);
       const ctrl = await getEditableElm(elm);
       if (ctrl) {
         const arr = ctrl.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
@@ -667,9 +667,9 @@
       const headers = new Headers();
       headers.set("Content-Type", contentType);
       headers.set("Charset", document.characterSet);
-      obj = uri && await fetch(uri, {headers, method, mode}).then(async res => {
-        const target = getFileNameFromURI(uri, "index");
-        const fileName = target + getFileExtension(contentType);
+      obj = await fetch(uri, {headers, method, mode}).then(async res => {
+        const target = await getFileNameFromURI(uri, "index");
+        const fileName = target + await getFileExtension(contentType);
         const value = await res.text();
         return {
           [CREATE_TMP_FILE]: {
@@ -701,13 +701,13 @@
       const modeEdit = !sel.isCollapsed && sel.rangeCount === 1 && anchorElm &&
                        anchorElm === sel.focusNode.parentNode &&
                        anchorElm !== document.documentElement &&
-                       (isEditControl(anchorElm) ||
+                       (await isEditControl(anchorElm) ||
                         anchorElm.isContentEditable ||
                         await isContentTextNode(anchorElm));
       let ns = await getNodeNS(elm);
       contextType.namespaceURI = ns.namespaceURI;
       if (sel.isCollapsed) {
-        isEditControl(elm) ?
+        await isEditControl(elm) ?
           contextType.mode = MODE_EDIT_TEXT :
         elm.isContentEditable || await isContentTextNode(elm) ?
           contextType.mode = MODE_EDIT_TEXT :
@@ -750,13 +750,13 @@
       switch (contextType.mode) {
         case MODE_EDIT_TEXT:
           if (sel.isCollapsed) {
-            isEditControl(elm) && (obj = getId(elm)) ? (
+            await isEditControl(elm) && (obj = await getId(elm)) ? (
               data.mode = contextType.mode,
               data.target = obj,
               data.value = elm.value || ""
             ) :
             (elm.isContentEditable || await isContentTextNode(elm)) &&
-            (obj = getId(elm)) && (
+            (obj = await getId(elm)) && (
               data.mode = contextType.mode,
               data.target = obj,
               data.value = elm.hasChildNodes() &&
@@ -766,9 +766,9 @@
             );
           }
           else {
-            (isEditControl(anchorElm) || anchorElm.isContentEditable ||
+            (await isEditControl(anchorElm) || anchorElm.isContentEditable ||
              await isContentTextNode(anchorElm)) &&
-            (obj = getId(anchorElm)) && (
+            (obj = await getId(anchorElm)) && (
               data.mode = contextType.mode,
               data.target = obj,
               data.value = anchorElm.hasChildNodes() &&
@@ -821,7 +821,7 @@
   /**
    * create temporary file data
    * @param {Object} data - content data
-   * @return {void}
+   * @return {Object} - temporary file data
    */
   const createTmpFileData = async data => {
     const mode = data.mode;
@@ -830,60 +830,59 @@
     const host = data.host;
     const contentType = document.contentType;
     const uri = document.documentURI;
-    let value = data.value, target, tmpFileData;
+    let value = data.value, target, fileName, tmpFileData;
     switch (mode) {
       case MODE_EDIT_TEXT:
-        tmpFileData = (target = data.target) && {
-          [CREATE_TMP_FILE]: {
-            incognito, tabId, host, target,
-            fileName: `${target}.txt`,
-            namespaceURI: data.namespaceURI || ""
-          },
-          value
-        } ||
-        await getSource(data);
-        break;
-      case MODE_MATHML:
-        tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
-          [CREATE_TMP_FILE]: {
-            incognito, tabId, host, target,
-            fileName: `${target}.mml`
-          },
-          value
-        } ||
-        await getSource(data);
-        break;
-      case MODE_SELECTION:
-        if (value && (target = getFileNameFromURI(uri, "index"))) {
-          tmpFileData = reXml.test(contentType) && {
+        target = data.target;
+        if (target) {
+          tmpFileData = {
             [CREATE_TMP_FILE]: {
               incognito, tabId, host, target,
-              fileName: `${target}.xml`
+              fileName: `${target}.txt`,
+              namespaceURI: data.namespaceURI || ""
             },
             value
-          } ||
-          (value = await convertValue(value).catch(logError)) && {
-            [CREATE_TMP_FILE]: {
-              incognito, tabId, host, target,
-              fileName: target + getFileExtension(contentType)
-            },
-            value
-          } ||
-          await getSource(data);
+          };
         }
         else {
           tmpFileData = await getSource(data);
         }
         break;
+      case MODE_MATHML:
       case MODE_SVG:
-        tmpFileData = value && (target = getFileNameFromURI(uri, "index")) && {
-          [CREATE_TMP_FILE]: {
-            incognito, tabId, host, target,
-            fileName: `${target}.svg`
-          },
-          value
-        } ||
-        await getSource(data);
+        if (value && (target = await getFileNameFromURI(uri, "index"))) {
+          fileName = `${target}.${mode === MODE_MATHML && "mml" || "svg"}`;
+          tmpFileData = {
+            [CREATE_TMP_FILE]: {incognito, tabId, host, target, fileName},
+            value
+          };
+        }
+        else {
+          tmpFileData = await getSource(data);
+        }
+        break;
+      case MODE_SELECTION:
+        target = await getFileNameFromURI(uri, "index");
+        if (target && value && reXml.test(contentType)) {
+          tmpFileData = {
+            [CREATE_TMP_FILE]: {
+              incognito, tabId, host, target,
+              fileName: `${target}.xml`
+            },
+            value
+          };
+        }
+        else if (target && value) {
+          value = await convertValue(value);
+          fileName = target + await getFileExtension(contentType);
+          tmpFileData = {
+            [CREATE_TMP_FILE]: {incognito, tabId, host, target, fileName},
+            value
+          };
+        }
+        else {
+          tmpFileData = await getSource(data);
+        }
         break;
       default:
         tmpFileData = await getSource(data);
@@ -905,13 +904,13 @@
             data: res[CREATE_TMP_FILE],
             value: res.value
           }
-        });
+        }).catch(logError);
       }
       else {
         res[GET_FILE_PATH] &&
           portMsg({
             [GET_FILE_PATH]: res[GET_FILE_PATH]
-          });
+          }).catch(logError);
       }
     });
 
@@ -1084,7 +1083,7 @@
    * @param {Object} evt - Event
    * @return {void}
    */
-  const handleContextMenu = evt => {
+  const handleContextMenu = async evt => {
     const elm = evt && evt.target;
     const sel = window.getSelection();
     const contextMenu = {
@@ -1120,7 +1119,7 @@
     else {
       execEditor && elm && (
         vars[EDITABLE_CONTEXT] ?
-          isEditControl(elm) || elm.isContentEditable ||
+          await isEditControl(elm) || elm.isContentEditable ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
           reType.test(document.contentType)
       ) && portContentData(elm).catch(logError);

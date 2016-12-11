@@ -230,12 +230,12 @@
 
   /**
    * port variables
-   * @param {Object} msg - message
-   * @return {void}
+   * @param {*} msg - message
+   * @return {Object} - Promise
    */
   const portVars = async msg => {
     const setVars = msg;
-    portMsg({setVars});
+    return portMsg({setVars});
   };
 
   /**
@@ -266,13 +266,10 @@
 
   /**
    * toggle icon
-   * @return {void}
+   * @return {Object} - Promise
    */
-  const toggleIcon = async () => {
-    vars[IS_ENABLED] ?
-      replaceIcon() :
-      replaceIcon(`${ICON}#off`);
-  };
+  const toggleIcon = () =>
+    replaceIcon(!vars[IS_ENABLED] && `${ICON}#off` || varsLocal[ICON_PATH]);
 
   /**
    * toggle badge
@@ -352,7 +349,7 @@
    * @param {Object} type - context type data
    * @return {void}
    */
-  const updateContextMenuItems = type => {
+  const updateContextMenuItems = async type => {
     if (type) {
       const items = Object.keys(type);
       if (items.length > 0) {
@@ -423,7 +420,7 @@
             break;
           case APP_NAME:
             varsLocal[item] = obj.value;
-            connectHost();
+            connectHost().catch(logError);
             break;
           case EDITOR_NAME:
             varsLocal[item] = obj.value;
@@ -438,7 +435,7 @@
       checkEnabled().then(() => {
         portMsg({
           setVars: vars
-        });
+        }).catch(logError);
       }).catch(logError);
     }
   };
@@ -448,14 +445,13 @@
    * synchronize UI components
    * @return {Object} - Promise
    */
-  const syncUI = () =>
-    checkEnabled().then(() => Promise.all([
-      portMsg({
-        isEnabled: vars[IS_ENABLED]
-      }),
-      toggleIcon(),
-      toggleBadge()
-    ])).catch(logError);
+  const syncUI = () => checkEnabled().then(() => Promise.all([
+    portMsg({
+      isEnabled: vars[IS_ENABLED]
+    }),
+    toggleIcon(),
+    toggleBadge()
+  ])).catch(logError);
 
   /* handlers */
   /**
@@ -487,13 +483,13 @@
   /**
    * handle disconnected port
    * @param {Object} port - runtime.Port
-   * @return {void}
+   * @return {Object} - Promise
    */
   const handleDisconnectedPort = async port => {
     const windowId = `${port.sender.tab.windowId}`;
     const tabId = `${port.sender.tab.id}`;
     const frameUrl = port.sender.frameUrl;
-    restorePorts({windowId, tabId, frameUrl}).catch(logError);
+    return restorePorts({windowId, tabId, frameUrl}).catch(logError);
   };
 
   /**
@@ -592,8 +588,8 @@
     const windowId = `${info.windowId}`;
     const tabId = `${info.tabId}`;
     ports[windowId] && ports[windowId][tabId] ?
-      createContextMenuItems(true) :
-      createContextMenuItems();
+      createContextMenuItems(true).catch(logError) :
+      createContextMenuItems().catch(logError);
   });
   tabs.onUpdated.addListener(async (id, info, tab) => {
     const status = info.status;
@@ -602,8 +598,8 @@
     const tabId = `${id}`;
     if (status === "complete" && active) {
       ports[windowId] && ports[windowId][tabId] ?
-      createContextMenuItems(active) :
-      createContextMenuItems();
+        createContextMenuItems(active).catch(logError) :
+        createContextMenuItems().catch(logError);
     }
   });
   tabs.onRemoved.addListener(async (id, info) => {
@@ -629,7 +625,7 @@
     checkWindowIncognito().then(isIncognito => {
       !isIncognito && portMsg({
         removePrivateTmpFiles: !isIncognito
-      });
+      }).catch(logError);
     })
   ]).catch(logError));
   // NOTE: for hybrid
