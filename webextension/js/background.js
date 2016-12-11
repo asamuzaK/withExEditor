@@ -539,6 +539,7 @@
               replaceIcon()
             );
             break;
+          // NOTE: for hybrid, set varsLocal
           case FORCE_REMOVE:
           case KEY_OPEN_OPTIONS:
           case KEY_EXEC_EDITOR:
