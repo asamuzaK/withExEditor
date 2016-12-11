@@ -154,17 +154,6 @@
     if (data) {
       const windowId = data.windowId;
       const tabId = data.tabId;
-      const frameUrl = data.frameUrl;
-      const incognito = !!data.incognito;
-      frameUrl ?
-        windowId && tabId && ports[windowId] && ports[windowId][tabId] &&
-          delete ports[windowId][tabId][frameUrl] :
-      incognito ?
-        windowId && tabId && ports[windowId] && ports[windowId][tabId] && (
-          delete ports[windowId][tabId][INCOGNITO],
-          Object.keys(ports[windowId][tabId]).length === 0 &&
-            restorePorts({windowId, tabId})
-        ) :
       tabId ?
         windowId && ports[windowId] && (
           delete ports[windowId][tabId],
@@ -481,18 +470,6 @@
   };
 
   /**
-   * handle disconnected port
-   * @param {Object} port - runtime.Port
-   * @return {Object} - Promise
-   */
-  const handleDisconnectedPort = async port => {
-    const windowId = `${port.sender.tab.windowId}`;
-    const tabId = `${port.sender.tab.id}`;
-    const frameUrl = port.sender.frameUrl;
-    return restorePorts({windowId, tabId, frameUrl}).catch(logError);
-  };
-
-  /**
    * handle connected port
    * @param {Object} port - runtime.Port
    * @return {void}
@@ -500,14 +477,14 @@
   const handlePort = async port => {
     const windowId = `${port.sender.tab.windowId}`;
     const tabId = `${port.sender.tab.id}`;
+    const frameId = port.sender.frameId;
     const frameUrl = port.sender.url;
     const incognito = port.sender.tab.incognito;
     ports[windowId] = ports[windowId] || {};
-    ports[windowId][tabId] = ports[windowId][tabId] || {};
+    ports[windowId][tabId] = frameId > 0 && ports[windowId][tabId] || {};
     ports[windowId][tabId][frameUrl] = port;
-    ports[windowId][tabId][INCOGNITO] = incognito;
+    frameId === 0 && ports[windowId][tabId][INCOGNITO] = incognito;
     port.onMessage.addListener(handleMsg);
-    port.onDisconnect.addListener(handleDisconnectedPort);
     port.postMessage({
       incognito, tabId,
       setVars: vars
@@ -611,13 +588,14 @@
       removeTabRelatedStorage: {tabId, incognito, info}
     }).catch(logError);
     ports[windowId] && ports[windowId][tabId] &&
-    Object.keys(ports[windowId][tabId]).length === 1 &&
-      restorePorts({
-        windowId, tabId,
-        incognito: true
-      }).catch(logError);
+      restorePorts({windowId, tabId}).catch(logError);
   });
-  windows.onFocusChanged.addListener(syncUI);
+  windows.onFocusChanged.addListener(windowId =>
+    windowId !== windows.WINDOW_ID_NONE &&
+      windows.getCurrent({populate: true}).then(res =>
+        res.type === "normal" && syncUI()
+      )
+  );
   windows.onRemoved.addListener(windowId => Promise.all([
     restorePorts({
       windowId: `${windowId}`
