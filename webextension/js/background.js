@@ -49,16 +49,20 @@
 
   /* variables */
   const vars = {
-    [APP_MANIFEST]: "",
-    [APP_NAME]: "",
-    [EDITOR_NAME]: "",
     [KEY_ACCESS]: "e",
     [KEY_OPEN_OPTIONS]: true,
     [KEY_EXEC_EDITOR]: true,
-    [ENABLE_PB]: false,
     [EDITABLE_CONTEXT]: false,
+    // NOTE: for hybrid, move to local
     [FORCE_REMOVE]: true,
-    [IS_ENABLED]: false,
+    [IS_ENABLED]: false
+  };
+
+  const varsLocal = {
+    [APP_MANIFEST]: "",
+    [APP_NAME]: "",
+    [EDITOR_NAME]: "",
+    [ENABLE_PB]: false,
     [IS_EXECUTABLE]: false,
     [ICON_PATH]: `${ICON}#gray`,
     [MODE_SOURCE]: "",
@@ -83,7 +87,7 @@
    */
   const checkEnabled = async () => {
     const win = await windows.getCurrent();
-    const isEnabled = !win.incognito || vars[ENABLE_PB];
+    const isEnabled = !win.incognito || varsLocal[ENABLE_PB];
     vars[IS_ENABLED] = isEnabled;
     return isEnabled;
   };
@@ -126,7 +130,7 @@
    */
   const connectHost = async () => {
     host && host.disconnect();
-    host = runtime.connectNative(vars[APP_NAME]);
+    host = runtime.connectNative(varsLocal[APP_NAME]);
   };
 
   /**
@@ -256,7 +260,7 @@
    * @param {Object} path - icon path
    * @return {void}
    */
-  const replaceIcon = async (path = vars[ICON_PATH]) => {
+  const replaceIcon = async (path = varsLocal[ICON_PATH]) => {
     browserAction.setIcon({path});
   };
 
@@ -275,7 +279,7 @@
    * @param {boolean} bool - executable
    * @return {void}
    */
-  const toggleBadge = async (bool = vars[IS_EXECUTABLE]) => {
+  const toggleBadge = async (bool = varsLocal[IS_EXECUTABLE]) => {
     const color = !bool && WARN_COLOR || "transparent";
     const text = !bool && WARN_TEXT || "";
     browserAction.setBadgeBackgroundColor({color});
@@ -293,8 +297,9 @@
   const cacheMenuItemTitle = async () => {
     if (menus[MODE_SOURCE]) {
       const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
+      const label = varsLocal[EDITOR_NAME] || LABEL;
       for (let item of items) {
-        vars[item] = await i18n.getMessage(item, vars[EDITOR_NAME] || LABEL);
+        varsLocal[item] = await i18n.getMessage(item, label);
       }
     }
   };
@@ -308,12 +313,13 @@
   const createContextMenuItems = (enable = false) =>
     contextMenus.removeAll().then(async () => {
       const items = [MODE_EDIT_TEXT, MODE_SELECTION, MODE_SOURCE];
+      const label = varsLocal[EDITOR_NAME] || LABEL;
       for (let item of items) {
         switch (item) {
           case MODE_EDIT_TEXT:
             menus[item] = vars[IS_ENABLED] && await contextMenus.create({
               id: item,
-              title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
+              title: i18n.getMessage(item, label),
               contexts: ["editable"],
               enabled: !!enable
             }) || null;
@@ -322,7 +328,7 @@
             menus[item] = vars[IS_ENABLED] && !vars[EDITABLE_CONTEXT] &&
               await contextMenus.create({
                 id: item,
-                title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
+                title: i18n.getMessage(item, label),
                 contexts: ["selection"],
                 enabled: !!enable
               }) || null;
@@ -331,7 +337,7 @@
             menus[item] = vars[IS_ENABLED] && !vars[EDITABLE_CONTEXT] &&
               await contextMenus.create({
                 id: item,
-                title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL),
+                title: i18n.getMessage(item, label),
                 contexts: ["frame", "page"],
                 enabled: !!enable
               }) || null;
@@ -353,7 +359,7 @@
         for (let item of items) {
           const obj = type[item];
           const menuItemId = obj.menuItemId;
-          const title = vars[obj.mode] || vars[menuItemId] || "";
+          const title = varsLocal[obj.mode] || varsLocal[menuItemId] || "";
           const enabled = !!obj.enabled;
           switch (item) {
             case MODE_EDIT_TEXT:
@@ -374,7 +380,7 @@
         for (let item of items) {
           menus[item] &&
             contextMenus.update(item, {
-              title: i18n.getMessage(item, vars[EDITOR_NAME] || LABEL)
+              title: i18n.getMessage(item, varsLocal[EDITOR_NAME] || LABEL)
             });
         }
       }
@@ -398,31 +404,33 @@
    */
   const setVariablesFromStorage = async res => {
     const items = Object.keys(res);
-    if (items.length > 1) {
+    if (items.length > 0) {
       for (let item of items) {
         const obj = res[item];
         switch (item) {
-          case ENABLE_PB:
           case EDITABLE_CONTEXT:
             vars[item] = !!obj.checked;
+            break;
+          case ENABLE_PB:
+            varsLocal[item] = !!obj.checked;
             break;
           case ICON_COLOR:
           case ICON_GRAY:
           case ICON_WHITE:
             obj.checked && (
-              vars[ICON_PATH] = obj.value
+              varsLocal[ICON_PATH] = obj.value
             );
             break;
           case APP_NAME:
-            vars[item] = obj.value;
+            varsLocal[item] = obj.value;
             connectHost();
             break;
           case EDITOR_NAME:
-            vars[item] = obj.value;
+            varsLocal[item] = obj.value;
             break;
           case APP_MANIFEST:
-            vars[item] = obj.value;
-            vars[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+            varsLocal[item] = obj.value;
+            varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
             break;
           default:
         }
@@ -527,7 +535,7 @@
           case ICON_GRAY:
           case ICON_WHITE:
             obj.checked && (
-              vars[ICON_PATH] = obj.value,
+              varsLocal[ICON_PATH] = obj.value,
               replaceIcon()
             );
             break;
@@ -546,30 +554,21 @@
             });
             break;
           case APP_MANIFEST:
-            vars[item] = obj.value;
-            vars[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+            varsLocal[item] = obj.value;
+            varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
             toggleBadge();
-            portVars({
-              [item]: obj.value
-            });
             break;
           case APP_NAME:
-            vars[item] = obj.value;
+            varsLocal[item] = obj.value;
             connectHost();
             break;
           case EDITOR_NAME:
-            vars[item] = obj.value;
+            varsLocal[item] = obj.value;
             updateContextMenuItems().then(cacheMenuItemTitle);
-            portVars({
-              [item]: obj.value
-            });
             break;
           case ENABLE_PB:
-            vars[item] = !!obj.checked;
+            varsLocal[item] = !!obj.checked;
             syncUI();
-            portVars({
-              [item]: !!obj.checked
-            });
             break;
           case EDITABLE_CONTEXT:
             vars[item] = !!obj.checked;
