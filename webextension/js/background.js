@@ -80,6 +80,14 @@
     return false;
   };
 
+  /**
+   * is string
+   * @param {*} o - object to check
+   * @return {boolean}
+   */
+  const isString = o =>
+    o && (typeof o === "string" || o instanceof String) || false;
+
   /* windows */
   /**
    * check add-on is enabled
@@ -281,54 +289,60 @@
    * @return {void}
    */
   const cacheMenuItemTitle = async () => {
-    if (menus[MODE_SOURCE]) {
+    if (await menus[MODE_SOURCE]) {
       const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
       const label = varsLocal[EDITOR_NAME] || LABEL;
       for (let item of items) {
-        varsLocal[item] = await i18n.getMessage(item, label);
+        varsLocal[item] = i18n.getMessage(item, label);
       }
     }
   };
 
   // NOTE: no "accesskey" feature
   /**
+   * create context menu item
+   * @param {string} id - menu item ID
+   * @param {Array} contexts - contexts
+   * @param {boolean} bool - enabled
+   * @return {Object}
+   */
+  const createMenuItem = async (id, contexts, bool) => {
+    const label = varsLocal[EDITOR_NAME] || LABEL;
+    let menu;
+    if (isString(id) && Array.isArray(contexts)) {
+      menu = await contextMenus.create({
+        id, contexts,
+        title: i18n.getMessage(id, label),
+        enabled: !!bool
+      });
+    }
+    return menu || null;
+  };
+
+  /**
    * create context menu items
-   * @param {boolean} enable - enable
+   * @param {boolean} bool - enabled
    * @return {Object} - Promise
    */
-  const createContextMenuItems = (enable = false) =>
+  const createContextMenuItems = (bool = false) =>
     contextMenus.removeAll().then(async () => {
-      const items = [MODE_EDIT_TEXT, MODE_SELECTION, MODE_SOURCE];
-      const label = varsLocal[EDITOR_NAME] || LABEL;
-      for (let item of items) {
-        switch (item) {
-          case MODE_EDIT_TEXT:
-            menus[item] = vars[IS_ENABLED] && await contextMenus.create({
-              id: item,
-              title: i18n.getMessage(item, label),
-              contexts: ["editable"],
-              enabled: !!enable
-            }) || null;
-            break;
-          case MODE_SELECTION:
-            menus[item] = vars[IS_ENABLED] && !vars[EDITABLE_CONTEXT] &&
-              await contextMenus.create({
-                id: item,
-                title: i18n.getMessage(item, label),
-                contexts: ["selection"],
-                enabled: !!enable
-              }) || null;
-            break;
-          case MODE_SOURCE:
-            menus[item] = vars[IS_ENABLED] && !vars[EDITABLE_CONTEXT] &&
-              await contextMenus.create({
-                id: item,
-                title: i18n.getMessage(item, label),
-                contexts: ["frame", "page"],
-                enabled: !!enable
-              }) || null;
-            break;
-          default:
+      if (vars[IS_ENABLED]) {
+        const items = [MODE_SOURCE, MODE_SELECTION, MODE_EDIT_TEXT];
+        for (let item of items) {
+          switch (item) {
+            case MODE_SOURCE:
+              !vars[EDITABLE_CONTEXT] &&
+                (menus[item] = createMenuItem(item, ["frame", "page"], bool));
+              break;
+            case MODE_SELECTION:
+              !vars[EDITABLE_CONTEXT] &&
+                (menus[item] = createMenuItem(item, ["selection"], bool));
+              break;
+            case MODE_EDIT_TEXT:
+              menus[item] = createMenuItem(item, ["editable"], bool);
+              break;
+            default:
+          }
         }
       }
     }).then(cacheMenuItemTitle);
