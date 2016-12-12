@@ -131,13 +131,13 @@
   const setPrefStorage = async evt => {
     const elm = evt.target;
     if (elm) {
-      let pref;
       if (elm.type === "radio") {
         const nodes = document.querySelectorAll(`[name=${elm.name}]`);
         if (nodes instanceof NodeList) {
           for (let node of nodes) {
-            pref = await createPrefObj(node);
-            pref && storage.set(pref);
+            createPrefObj(node).then(pref => {
+              pref && storage.set(pref);
+            }).catch(logError);
           }
         }
       }
@@ -147,10 +147,10 @@
             [GET_APP_MANIFEST]: {
               path: elm.value
             }
-          }) : (
-          pref = await createPrefObj(elm),
-          pref && storage.set(pref)
-        );
+          }) :
+          createPrefObj(elm).then(pref => {
+            pref && storage.set(pref);
+          }).catch(logError);
       }
     }
   };
@@ -186,7 +186,7 @@
       const items = Object.keys(attrs);
       for (let item of items) {
         if (elm.hasAttribute(attrs[item])) {
-          const attr = await i18n.getMessage(
+          const attr = i18n.getMessage(
             `${elm.getAttribute(DATA_ATTR_I18N)}.${item}`
           );
           attr && elm.setAttribute(attrs[item], attr);
@@ -203,7 +203,7 @@
     const nodes = document.querySelectorAll(`[${DATA_ATTR_I18N}]`);
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        const data = await i18n.getMessage(node.getAttribute(DATA_ATTR_I18N));
+        const data = i18n.getMessage(node.getAttribute(DATA_ATTR_I18N));
         data && (node.textContent = data);
         node.hasAttributes() && localizeAttr(node);
       }
@@ -215,7 +215,7 @@
    * @return {void}
    */
   const localizeHtmlLang = async () => {
-    const lang = await browser.i18n.getUILanguage();
+    const lang = i18n.getUILanguage();
     lang && document.documentElement.setAttribute("lang", lang);
   };
 
