@@ -10,5 +10,8 @@
   },
   "optionsIconGrayLabel.ariaLabel": {
     "message": "Grey Icon"
+  },
+  "optionsLang": {
+    "message": "en-CA"
   }
 }

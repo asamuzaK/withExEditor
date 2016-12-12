@@ -13,6 +13,7 @@
 
   const CHAR = "utf-8";
   const DATA_ATTR_I18N = "data-i18n";
+  const LANG = "optionsLang";
   const ELEMENT_NODE = 1;
 
   const APP_MANIFEST = "appManifestPath";
@@ -215,7 +216,7 @@
    * @return {void}
    */
   const localizeHtmlLang = async () => {
-    const lang = i18n.getUILanguage();
+    const lang = i18n.getMessage(LANG);
     lang && document.documentElement.setAttribute("lang", lang);
   };
 

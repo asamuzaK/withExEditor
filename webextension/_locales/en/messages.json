@@ -143,6 +143,9 @@
   "optionsIconWhiteLabel.ariaLabel": {
     "message": "White Icon"
   },
+  "optionsLang": {
+    "message": "en"
+  },
   "optionsManualLabel": {
     "message": "Manual"
   },
