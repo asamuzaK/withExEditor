@@ -397,64 +397,6 @@
     Object.keys(obj).length > 0 && storage.set(obj);
   };
 
-  /**
-   * set variables from storage
-   * @param {Object} res - result
-   * @return {void}
-   */
-  const setVariablesFromStorage = async res => {
-    const items = Object.keys(res);
-    if (items.length > 0) {
-      for (let item of items) {
-        const obj = res[item];
-        switch (item) {
-          case APP_MANIFEST:
-            varsLocal[item] = obj.value;
-            varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
-            break;
-          case APP_NAME:
-            varsLocal[item] = obj.value;
-            connectHost().catch(logError);
-            break;
-          case EDITABLE_CONTEXT:
-            vars[item] = !!obj.checked;
-            break;
-          case EDITOR_NAME:
-            varsLocal[item] = obj.value;
-            break;
-          case ENABLE_PB:
-            varsLocal[item] = !!obj.checked;
-            break;
-          case FORCE_REMOVE:
-            varsLocal[item] = !!obj.checked;
-            // NOTE: for hybrid
-            portHybridMsg({
-              [FORCE_REMOVE]: varsLocal[FORCE_REMOVE]
-            }).catch(logError);
-            break;
-          case ICON_COLOR:
-          case ICON_GRAY:
-          case ICON_WHITE:
-            obj.checked && (varsLocal[ICON_PATH] = obj.value);
-            break;
-          case KEY_OPEN_OPTIONS:
-          case KEY_EXEC_EDITOR:
-            vars[item] = !!obj.checked;
-            break;
-          case KEY_ACCESS:
-            vars[item] = obj.value;
-            break;
-          default:
-        }
-      }
-      checkEnabled().then(() => {
-        portMsg({
-          setVars: vars
-        }).catch(logError);
-      }).catch(logError);
-    }
-  };
-
   /* UI */
   /**
    * synchronize UI components
@@ -467,6 +409,108 @@
     replaceIcon(!vars[IS_ENABLED] && `${ICON}#off` || varsLocal[ICON_PATH]),
     toggleBadge()
   ])).catch(logError);
+
+  /* set variables */
+  /**
+   * set variable
+   * @param {string} item - item
+   * @param {Object} obj - value object
+   * @param {boolean} bool - changed
+   * @return {void}
+   */
+  const setVariable = async (item, obj, bool = false) => {
+    switch (item) {
+      case APP_MANIFEST:
+        varsLocal[item] = obj.value;
+        varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+        bool && toggleBadge().catch(logError);
+        break;
+      case APP_NAME:
+        varsLocal[item] = obj.value;
+        connectHost().catch(logError);
+        break;
+      case EDITABLE_CONTEXT:
+        vars[item] = !!obj.checked;
+        bool && (
+          createContextMenuItems().catch(logError),
+          portVars({
+            [item]: !!obj.checked
+          }).catch(logError)
+        );
+        break;
+      case EDITOR_NAME:
+        varsLocal[item] = obj.value;
+        bool &&
+          updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
+        break;
+      case ENABLE_PB:
+        varsLocal[item] = !!obj.checked;
+        bool && syncUI();
+        break;
+      case FORCE_REMOVE:
+        varsLocal[item] = !!obj.checked;
+        // NOTE: for hybrid
+        portHybridMsg({
+          [item]: !!obj.checked
+        }).catch(logError);
+        break;
+      case ICON_COLOR:
+      case ICON_GRAY:
+      case ICON_WHITE:
+        obj.checked && (
+          varsLocal[ICON_PATH] = obj.value,
+          bool && replaceIcon().catch(logError)
+        );
+        break;
+      case KEY_OPEN_OPTIONS:
+      case KEY_EXEC_EDITOR:
+        vars[item] = !!obj.checked;
+        bool && portVars({
+          [item]: !!obj.checked
+        }).catch(logError);
+        break;
+      case KEY_ACCESS:
+        vars[item] = obj.value;
+        bool && portVars({
+          [item]: obj.value
+        }).catch(logError);
+        break;
+      default:
+    }
+  };
+
+  /**
+   * set variables from storage
+   * @param {Object} res - result
+   * @return {void}
+   */
+  const setVariablesFromStorage = async res => {
+    const items = Object.keys(res);
+    if (items.length > 0) {
+      for (let item of items) {
+        setVariable(item, res[item], false);
+      }
+      checkEnabled().then(() => {
+        portMsg({
+          setVars: vars
+        }).catch(logError);
+      }).catch(logError);
+    }
+  };
+
+  /**
+   * set variables on storage changed
+   * @param {Object} data - storage.StorageChange
+   * @return {void}
+   */
+  const setVariablesOnStorageChanged = async data => {
+    const items = Object.keys(data);
+    if (items.length > 0) {
+      for (let item of items) {
+        setVariable(item, data[item].newValue, true);
+      }
+    }
+  };
 
   /* handlers */
   /**
@@ -517,78 +561,9 @@
     });
   };
 
-  /**
-   * handle storage changes
-   * @param {Object} data - storage.StorageChange
-   * @return {void}
-   */
-  const handleStorageChange = async data => {
-    const items = Object.keys(data);
-    if (items.length > 0) {
-      for (let item of items) {
-        const obj = data[item].newValue;
-        switch (item) {
-          case APP_MANIFEST:
-            varsLocal[item] = obj.value;
-            varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
-            toggleBadge().catch(logError);
-            break;
-          case APP_NAME:
-            varsLocal[item] = obj.value;
-            connectHost().catch(logError);
-            break;
-          case EDITABLE_CONTEXT:
-            vars[item] = !!obj.checked;
-            createContextMenuItems().catch(logError);
-            portVars({
-              [item]: !!obj.checked
-            }).catch(logError);
-            break;
-          case EDITOR_NAME:
-            varsLocal[item] = obj.value;
-            updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
-            break;
-          case ENABLE_PB:
-            varsLocal[item] = !!obj.checked;
-            syncUI();
-            break;
-          case FORCE_REMOVE:
-            varsLocal[item] = !!obj.checked;
-            // NOTE: for hybrid
-            portHybridMsg({
-              [item]: !!obj.checked
-            }).catch(logError);
-            break;
-          case ICON_COLOR:
-          case ICON_GRAY:
-          case ICON_WHITE:
-            obj.checked && (
-              varsLocal[ICON_PATH] = obj.value,
-              replaceIcon().catch(logError)
-            );
-            break;
-          case KEY_OPEN_OPTIONS:
-          case KEY_EXEC_EDITOR:
-            vars[item] = !!obj.checked;
-            portVars({
-              [item]: !!obj.checked
-            }).catch(logError);
-            break;
-          case KEY_ACCESS:
-            vars[item] = obj.value;
-            portVars({
-              [item]: obj.value
-            }).catch(logError);
-            break;
-          default:
-        }
-      }
-    }
-  };
-
   /* listeners */
   browserAction.onClicked.addListener(openOptionsPage);
-  browser.storage.onChanged.addListener(handleStorageChange);
+  browser.storage.onChanged.addListener(setVariablesOnStorageChanged);
   contextMenus.onClicked.addListener(portContextMenu);
   runtime.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(handlePort);
