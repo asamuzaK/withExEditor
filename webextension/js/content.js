@@ -358,8 +358,8 @@
    */
   const createElm = (node, bool = false) =>
     createElementNS(node).then(async elm => {
-      if (elm && elm.nodeType === ELEMENT_NODE &&
-          bool && node.hasChildNodes()) {
+      if (bool && node && node.hasChildNodes() &&
+          elm && elm.nodeType === ELEMENT_NODE) {
         const fragment = document.createDocumentFragment();
         const nodes = node.childNodes;
         for (let child of nodes) {
