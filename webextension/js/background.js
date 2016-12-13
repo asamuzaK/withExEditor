@@ -419,63 +419,65 @@
    * @return {void}
    */
   const setVariable = async (item, obj, bool = false) => {
-    switch (item) {
-      case APP_MANIFEST:
-        varsLocal[item] = obj.value;
-        varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
-        bool && toggleBadge().catch(logError);
-        break;
-      case APP_NAME:
-        varsLocal[item] = obj.value;
-        connectHost().catch(logError);
-        break;
-      case EDITABLE_CONTEXT:
-        vars[item] = !!obj.checked;
-        bool && (
-          createContextMenuItems().catch(logError),
-          portVars({
+    if (item && obj) {
+      switch (item) {
+        case APP_MANIFEST:
+          varsLocal[item] = obj.value;
+          varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+          bool && toggleBadge().catch(logError);
+          break;
+        case APP_NAME:
+          varsLocal[item] = obj.value;
+          connectHost().catch(logError);
+          break;
+        case EDITABLE_CONTEXT:
+          vars[item] = !!obj.checked;
+          bool && (
+            createContextMenuItems().catch(logError),
+            portVars({
+              [item]: !!obj.checked
+            }).catch(logError)
+          );
+          break;
+        case EDITOR_NAME:
+          varsLocal[item] = obj.value;
+          bool &&
+            updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
+          break;
+        case ENABLE_PB:
+          varsLocal[item] = !!obj.checked;
+          bool && syncUI();
+          break;
+        case FORCE_REMOVE:
+          varsLocal[item] = !!obj.checked;
+          // NOTE: for hybrid
+          portHybridMsg({
             [item]: !!obj.checked
-          }).catch(logError)
-        );
-        break;
-      case EDITOR_NAME:
-        varsLocal[item] = obj.value;
-        bool &&
-          updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
-        break;
-      case ENABLE_PB:
-        varsLocal[item] = !!obj.checked;
-        bool && syncUI();
-        break;
-      case FORCE_REMOVE:
-        varsLocal[item] = !!obj.checked;
-        // NOTE: for hybrid
-        portHybridMsg({
-          [item]: !!obj.checked
-        }).catch(logError);
-        break;
-      case ICON_COLOR:
-      case ICON_GRAY:
-      case ICON_WHITE:
-        obj.checked && (
-          varsLocal[ICON_PATH] = obj.value,
-          bool && replaceIcon().catch(logError)
-        );
-        break;
-      case KEY_OPEN_OPTIONS:
-      case KEY_EXEC_EDITOR:
-        vars[item] = !!obj.checked;
-        bool && portVars({
-          [item]: !!obj.checked
-        }).catch(logError);
-        break;
-      case KEY_ACCESS:
-        vars[item] = obj.value;
-        bool && portVars({
-          [item]: obj.value
-        }).catch(logError);
-        break;
-      default:
+          }).catch(logError);
+          break;
+        case ICON_COLOR:
+        case ICON_GRAY:
+        case ICON_WHITE:
+          obj.checked && (
+            varsLocal[ICON_PATH] = obj.value,
+            bool && replaceIcon().catch(logError)
+          );
+          break;
+        case KEY_OPEN_OPTIONS:
+        case KEY_EXEC_EDITOR:
+          vars[item] = !!obj.checked;
+          bool && portVars({
+            [item]: !!obj.checked
+          }).catch(logError);
+          break;
+        case KEY_ACCESS:
+          vars[item] = obj.value;
+          bool && portVars({
+            [item]: obj.value
+          }).catch(logError);
+          break;
+        default:
+      }
     }
   };
 
