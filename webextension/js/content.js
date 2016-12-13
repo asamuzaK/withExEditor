@@ -387,19 +387,18 @@
   const createDom = async nodes => {
     const fragment = document.createDocumentFragment();
     if (nodes instanceof NodeList) {
-      const l = nodes.length;
-      let i = 0;
-      while (i < l) {
-        let obj = nodes[i];
-        obj.nodeType === ELEMENT_NODE ?
+      for (let node of nodes) {
+        let obj;
+        node.nodeType === ELEMENT_NODE ?
           (obj = await getElement(obj, true)) && obj instanceof Node && (
-            i === 0 && fragment.appendChild(document.createTextNode("\n")),
+            node === node.parentNode.firstChild &&
+              fragment.appendChild(document.createTextNode("\n")),
             fragment.appendChild(obj),
-            i === l - 1 && fragment.appendChild(document.createTextNode("\n"))
+            node === node.parentNode.lastChild &&
+              fragment.appendChild(document.createTextNode("\n")),
           ) :
-        obj.nodeType === TEXT_NODE &&
-          fragment.appendChild(document.createTextNode(obj.nodeValue));
-        i++;
+          node.nodeType === TEXT_NODE &&
+            fragment.appendChild(document.createTextNode(node.nodeValue));
       }
     }
     return fragment;
