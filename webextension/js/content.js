@@ -358,30 +358,20 @@
    */
   const createElm = (node, bool = false) =>
     createElementNS(node).then(async elm => {
-      if (elm && elm.nodeType === ELEMENT_NODE) {
-        /**
-         * append child nodes
-         * @param {Object} nodes - child nodes
-         * @return {Object} - document fragment
-         */
-        const appendChildNodes = async nodes => {
-          const fragment = document.createDocumentFragment();
-          if (nodes instanceof NodeList) {
-            for (let child of nodes) {
-              child.nodeType === ELEMENT_NODE ? (
-                child === child.parentNode.firstChild &&
-                  fragment.appendChild(document.createTextNode("\n")),
-                fragment.appendChild(await createElm(child, true))
-              ) :
-              child.nodeType === TEXT_NODE &&
-                fragment.appendChild(document.createTextNode(child.nodeValue));
-            }
-          }
-          return fragment;
-        };
-
-        bool && node.hasChildNodes() &&
-          elm.appendChild(await appendChildNodes(node.childNodes));
+      if (elm && elm.nodeType === ELEMENT_NODE &&
+          bool && node.hasChildNodes()) {
+        const fragment = document.createDocumentFragment();
+        const nodes = node.childNodes;
+        for (let child of nodes) {
+          child.nodeType === ELEMENT_NODE ? (
+            child === child.parentNode.firstChild &&
+              fragment.appendChild(document.createTextNode("\n")),
+            fragment.appendChild(await createElm(child, true))
+          ) :
+          child.nodeType === TEXT_NODE &&
+            fragment.appendChild(document.createTextNode(child.nodeValue));
+        }
+        elm.appendChild(fragment);
       }
       return elm || document.createTextNode("");
     });
