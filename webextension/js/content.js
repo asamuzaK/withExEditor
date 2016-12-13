@@ -942,7 +942,7 @@
   };
 
   /**
-   * look for target element and synchronize text
+   * get target element and synchronize text
    * @param {Object} obj - sync data object
    * @return {void}
    */
