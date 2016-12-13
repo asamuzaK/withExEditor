@@ -339,7 +339,7 @@
    * @param {boolean} bool - append child nodes
    * @return {Object} - namespaced element or text node
    */
-  const getElement = async (node, bool = false) => {
+  const createElementNS = async (node, bool = false) => {
     /**
      * append child nodes
      * @param {Object} nodes - child nodes
@@ -352,7 +352,7 @@
           child.nodeType === ELEMENT_NODE ? (
             child === child.parentNode.firstChild &&
               fragment.appendChild(document.createTextNode("\n")),
-            child = await getElement(child, true),
+            child = await createElementNS(child, true),
             child instanceof Node && fragment.appendChild(child)
           ) :
           child.nodeType === TEXT_NODE &&
@@ -390,7 +390,7 @@
       for (let node of nodes) {
         let obj;
         node.nodeType === ELEMENT_NODE ?
-          (obj = await getElement(obj, true)) && obj instanceof Node && (
+          (obj = await createElementNS(obj, true)) && obj instanceof Node && (
             node === node.parentNode.firstChild &&
               fragment.appendChild(document.createTextNode("\n")),
             fragment.appendChild(obj),
@@ -410,9 +410,9 @@
    * @param {Object} node - node containing child nodes to append
    * @return {Object} - DOM tree or text node
    */
-  const getDomTree = async (elm, node = null) => {
+  const createDomTree = async (elm, node = null) => {
     let child;
-    elm = await getElement(elm);
+    elm = await createElementNS(elm);
     elm.nodeType === ELEMENT_NODE && node && node.hasChildNodes() &&
     (child = await createDom(node.childNodes)) &&
       elm.appendChild(child);
@@ -434,7 +434,7 @@
     elm && (
       range = document.createRange(),
       range.selectNodeContents(elm),
-      elm = await getDomTree(elm, range.cloneContents())
+      elm = await createDomTree(elm, range.cloneContents())
     );
     return elm && elm.hasChildNodes() &&
              (new XMLSerializer()).serializeToString(elm) || null;
@@ -469,13 +469,13 @@
               );
             }
           }
-          (obj = await getDomTree(ancestor, range.cloneContents())) &&
+          (obj = await createDomTree(ancestor, range.cloneContents())) &&
           obj instanceof Node &&
             fragment.appendChild(obj);
         }
         else {
           ancestor.nodeType === TEXT_NODE &&
-          (obj = await getElement(ancestor.parentNode)) &&
+          (obj = await createElementNS(ancestor.parentNode)) &&
           obj instanceof Node && (
             obj.appendChild(range.cloneContents()),
             fragment.appendChild(obj)
@@ -487,7 +487,7 @@
         i++;
       }
       l > 1 && fragment.hasChildNodes() &&
-      (obj = await getElement(document.documentElement)) &&
+      (obj = await createElementNS(document.documentElement)) &&
       obj instanceof Node && (
         obj.appendChild(fragment),
         fragment = document.createDocumentFragment(),
@@ -651,7 +651,7 @@
    * @param {Object} data - temporary file data
    * @return {Object}
    */
-  const getSource = async data => {
+  const fetchSource = async data => {
     const uri = document.documentURI;
     let obj;
     if (window.location.protocol === "file:") {
@@ -727,11 +727,11 @@
   };
 
   /**
-   * get content data
+   * create content data
    * @param {Object} elm - element
    * @return {Object} - content data
    */
-  const getContent = async elm => {
+  const createContentData = async elm => {
     const data = {
       mode: MODE_SOURCE,
       host: window.location.host || LABEL,
@@ -844,7 +844,7 @@
           };
         }
         else {
-          tmpFileData = await getSource(data);
+          tmpFileData = await fetchSource(data);
         }
         break;
       case MODE_MATHML:
@@ -857,7 +857,7 @@
           };
         }
         else {
-          tmpFileData = await getSource(data);
+          tmpFileData = await fetchSource(data);
         }
         break;
       case MODE_SELECTION:
@@ -880,11 +880,11 @@
           };
         }
         else {
-          tmpFileData = await getSource(data);
+          tmpFileData = await fetchSource(data);
         }
         break;
       default:
-        tmpFileData = await getSource(data);
+        tmpFileData = await fetchSource(data);
     }
     return tmpFileData ||
            Promise.reject(`${LABEL}: ${i18n.getMessage(FAIL_GET_CONTENT)}`);
@@ -896,7 +896,7 @@
    * @return {Object} - Promise
    */
   const portContentData = elm =>
-    getContent(elm).then(createTmpFileData).then(res => {
+    createContentData(elm).then(createTmpFileData).then(res => {
       if (res[CREATE_TMP_FILE]) {
         portMsg({
           [CREATE_TMP_FILE]: {
@@ -942,7 +942,7 @@
   };
 
   /**
-   * get target element and synchronize text
+   * look for target element and synchronize text
    * @param {Object} obj - sync data object
    * @return {void}
    */
