@@ -313,15 +313,15 @@
   };
 
   /**
-   * set attribute NS
+   * set namespaced attribute
    * @param {Object} elm - element to append attributes
    * @param {Object} node - node to get attributes from
    * @return {void}
    */
-  const setAttrNS = async (elm, node) => {
+  const setAttributeNS = async (elm, node) => {
     if (elm && node) {
-      const nodeAttr = node.attributes;
-      for (let attr of nodeAttr) {
+      const attrs = node.attributes;
+      for (let attr of attrs) {
         const prefix = attr.prefix;
         const localName = attr.localName;
         typeof node[attr.name] !== "function" && elm.setAttributeNS(
@@ -336,48 +336,55 @@
   /**
    * create namespaced element
    * @param {Object} node - element node to create element from
-   * @param {boolean} bool - append child nodes
-   * @return {Object} - namespaced element or text node
+   * @return {Object} - namespaced element
    */
-  const createElementNS = async (node, bool = false) => {
-    /**
-     * append child nodes
-     * @param {Object} nodes - child nodes
-     * @return {Object} - document fragment
-     */
-    const appendChildNodes = async nodes => {
-      const fragment = document.createDocumentFragment();
-      if (nodes instanceof NodeList) {
-        for (let child of nodes) {
-          child.nodeType === ELEMENT_NODE ? (
-            child === child.parentNode.firstChild &&
-              fragment.appendChild(document.createTextNode("\n")),
-            child = await createElementNS(child, true),
-            child instanceof Node && fragment.appendChild(child)
-          ) :
-          child.nodeType === TEXT_NODE &&
-            fragment.appendChild(document.createTextNode(child.nodeValue));
-        }
-      }
-      return fragment;
-    };
-
-    let obj;
+  const createElementNS = async node => {
     const prefix = node && node.prefix;
     const localName = node && node.localName;
     const elm = node && document.createElementNS(
       node.namespaceURI || prefix && nsURI[prefix] ||
-      (obj = await getNodeNS(node)) && obj.namespaceURI || nsURI.html,
+      await getNodeNS(node).namespaceURI || nsURI.html,
       prefix && `${prefix}:${localName}` || localName
     );
-    const childNode = bool && node.hasChildNodes() &&
-                        await appendChildNodes(node.childNodes);
-    elm && (
-      node.attributes && await setAttrNS(elm, node),
-      childNode instanceof Node && elm.appendChild(childNode)
-    );
-    return elm || document.createTextNode("");
+    elm && node.attributes && await setAttributeNS(elm, node);
+    return elm || null;
   };
+
+  /**
+   * create element
+   * @param {Object} node - element node to create element from
+   * @param {boolean} bool - append child nodes
+   * @return {Object} - Promise, returns element or text node on fulfill
+   */
+  const createElm = (node, bool = false) =>
+    createElementNS(node).then(async elm => {
+      if (elm && elm.nodeType === ELEMENT_NODE) {
+        /**
+         * append child nodes
+         * @param {Object} nodes - child nodes
+         * @return {Object} - document fragment
+         */
+        const appendChildNodes = async nodes => {
+          const fragment = document.createDocumentFragment();
+          if (nodes instanceof NodeList) {
+            for (let child of nodes) {
+              child.nodeType === ELEMENT_NODE ? (
+                child === child.parentNode.firstChild &&
+                  fragment.appendChild(document.createTextNode("\n")),
+                fragment.appendChild(await createElm(child, true))
+              ) :
+              child.nodeType === TEXT_NODE &&
+                fragment.appendChild(document.createTextNode(child.nodeValue));
+            }
+          }
+          return fragment;
+        };
+
+        bool && node.hasChildNodes() &&
+          elm.appendChild(await appendChildNodes(node.childNodes));
+      }
+      return elm || document.createTextNode("");
+    });
 
   /**
    * create DOM
@@ -388,17 +395,15 @@
     const fragment = document.createDocumentFragment();
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        let obj;
-        node.nodeType === ELEMENT_NODE ?
-          (obj = await createElementNS(obj, true)) && obj instanceof Node && (
-            node === node.parentNode.firstChild &&
-              fragment.appendChild(document.createTextNode("\n")),
-            fragment.appendChild(obj),
-            node === node.parentNode.lastChild &&
-              fragment.appendChild(document.createTextNode("\n")),
-          ) :
-          node.nodeType === TEXT_NODE &&
-            fragment.appendChild(document.createTextNode(node.nodeValue));
+        node.nodeType === ELEMENT_NODE ? (
+          node === node.parentNode.firstChild &&
+            fragment.appendChild(document.createTextNode("\n")),
+          fragment.appendChild(await createElm(node, true)),
+          node === node.parentNode.lastChild &&
+            fragment.appendChild(document.createTextNode("\n"))
+        ) :
+        node.nodeType === TEXT_NODE &&
+          fragment.appendChild(document.createTextNode(node.nodeValue));
       }
     }
     return fragment;
@@ -412,7 +417,7 @@
    */
   const createDomTree = async (elm, node = null) => {
     let child;
-    elm = await createElementNS(elm);
+    elm = await createElm(elm);
     elm.nodeType === ELEMENT_NODE && node && node.hasChildNodes() &&
     (child = await createDom(node.childNodes)) &&
       elm.appendChild(child);
@@ -469,14 +474,14 @@
               );
             }
           }
-          (obj = await createDomTree(ancestor, range.cloneContents())) &&
-          obj instanceof Node &&
-            fragment.appendChild(obj);
+          fragment.appendChild(
+            await createDomTree(ancestor, range.cloneContents())
+          );
         }
         else {
           ancestor.nodeType === TEXT_NODE &&
-          (obj = await createElementNS(ancestor.parentNode)) &&
-          obj instanceof Node && (
+          (obj = await createElm(ancestor.parentNode)) &&
+          obj.nodeType === ELEMENT_NODE && (
             obj.appendChild(range.cloneContents()),
             fragment.appendChild(obj)
           );
@@ -487,8 +492,8 @@
         i++;
       }
       l > 1 && fragment.hasChildNodes() &&
-      (obj = await createElementNS(document.documentElement)) &&
-      obj instanceof Node && (
+      (obj = await createElm(document.documentElement)) &&
+      obj.nodeType === ELEMENT_NODE && (
         obj.appendChild(fragment),
         fragment = document.createDocumentFragment(),
         fragment.appendChild(obj),
@@ -508,15 +513,16 @@
     const arr = [];
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        node.nodeType === TEXT_NODE ?
-          arr.push(node.nodeValue) :
-        node.nodeType === ELEMENT_NODE && (
+        if (node.nodeType === ELEMENT_NODE) {
           node.localName === "br" ?
             arr.push("\n") :
-            node.hasChildNodes() &&
-            (node = await getTextNode(node.childNodes)) &&
-              arr.push(node)
-        );
+          node.hasChildNodes() &&
+          (node = await getTextNode(node.childNodes)) &&
+            arr.push(node);
+        }
+        else {
+          node.nodeType === TEXT_NODE && arr.push(node.nodeValue);
+        }
       }
     }
     return arr.join("");
@@ -530,15 +536,14 @@
   const getId = async elm => {
     let id = null;
     if (elm) {
-      const html = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
-      const ns = !html && nsURI.html || "";
+      const isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
+      const ns = !isHtml && nsURI.html || "";
       elm.hasAttributeNS(ns, DATA_ATTR_ID) ?
         id = elm.getAttributeNS(ns, DATA_ATTR_ID) : (
         id = `withExEditor${window.performance.now()}`.replace(/\./, "_"),
-        !html &&
-          elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html),
-        elm.setAttributeNS(ns, html && DATA_ATTR_ID || DATA_ATTR_ID_NS, id),
-        html && elm.addEventListener("focus", portTemporaryId, false)
+        !isHtml && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html),
+        elm.setAttributeNS(ns, isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS, id),
+        isHtml && elm.addEventListener("focus", portTemporaryId, false)
       );
     }
     return id;
