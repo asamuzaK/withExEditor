@@ -397,7 +397,7 @@
     }),
     replaceIcon(!vars[IS_ENABLED] && `${ICON}#off` || varsLocal[ICON_PATH]),
     toggleBadge()
-  ])).catch(logError);
+  ]));
 
   /* variables */
   /**
@@ -435,7 +435,7 @@
           break;
         case ENABLE_PB:
           varsLocal[item] = !!obj.checked;
-          bool && syncUI();
+          bool && syncUI().catch(logError);
           break;
         case FORCE_REMOVE:
           varsLocal[item] = !!obj.checked;
@@ -572,7 +572,7 @@
     windowId !== windows.WINDOW_ID_NONE &&
       windows.getCurrent({populate: true}).then(res =>
         res.type === "normal" && syncUI()
-      )
+      ).catch(logError)
   );
   windows.onRemoved.addListener(windowId => Promise.all([
     restorePorts({
@@ -584,6 +584,7 @@
       }).catch(logError);
     })
   ]).catch(logError));
+
   // NOTE: for hybrid
   hybrid.onMessage.addListener(handleMsg);
 
