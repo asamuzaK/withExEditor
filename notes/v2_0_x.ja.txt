@@ -1,7 +1,7 @@
 v2.0.0
 新規ならびに更新内容
 <ul>
-<li>Native Messaging APIに移行、アドオンを設定しなおす必要があります</li>
+<li>WebExtensionsのNative Messaging APIに移行、アドオンを設定しなおす必要があります</li>
 <li>新たに設定ページを作成</li>
 <li>新たにSVGのソース表示をサポート</li>
 <li>ツールバーボタンのデフォルト色（初期値）をグレーに変更</li>
