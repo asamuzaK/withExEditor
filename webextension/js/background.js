@@ -262,13 +262,6 @@
   };
 
   /**
-   * toggle icon
-   * @return {Object} - Promise
-   */
-  const toggleIcon = () =>
-    replaceIcon(!vars[IS_ENABLED] && `${ICON}#off` || varsLocal[ICON_PATH]);
-
-  /**
    * toggle badge
    * @param {boolean} bool - executable
    * @return {void}
@@ -309,13 +302,13 @@
   const createMenuItem = async (id, contexts, bool) => {
     const label = varsLocal[EDITOR_NAME] || LABEL;
     let menu;
-    if (isString(id) && Array.isArray(contexts)) {
-      menu = await contextMenus.create({
+    isString(id) && Array.isArray(contexts) && (
+      menu = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, label),
         enabled: !!bool
-      });
-    }
+      })
+    );
     return menu || null;
   };
 
@@ -417,9 +410,7 @@
           case ICON_COLOR:
           case ICON_GRAY:
           case ICON_WHITE:
-            obj.checked && (
-              varsLocal[ICON_PATH] = obj.value
-            );
+            obj.checked && (varsLocal[ICON_PATH] = obj.value);
             break;
           case APP_NAME:
             varsLocal[item] = obj.value;
@@ -452,7 +443,7 @@
     portMsg({
       isEnabled: vars[IS_ENABLED]
     }),
-    toggleIcon(),
+    replaceIcon(!vars[IS_ENABLED] && `${ICON}#off` || varsLocal[ICON_PATH]),
     toggleBadge()
   ])).catch(logError);
 
@@ -587,11 +578,11 @@
     const active = tab.active;
     const windowId = `${tab.windowId}`;
     const tabId = `${id}`;
-    if (status === "complete" && active) {
+    status === "complete" && active && (
       ports[windowId] && ports[windowId][tabId] ?
         createContextMenuItems(active).catch(logError) :
-        createContextMenuItems().catch(logError);
-    }
+        createContextMenuItems().catch(logError)
+    );
   });
   tabs.onRemoved.addListener(async (id, info) => {
     const windowId = `${info.windowId}`;
