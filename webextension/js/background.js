@@ -53,8 +53,6 @@
     [KEY_OPEN_OPTIONS]: true,
     [KEY_EXEC_EDITOR]: true,
     [EDITABLE_CONTEXT]: false,
-    // NOTE: for hybrid, move to local
-    [FORCE_REMOVE]: true,
     [IS_ENABLED]: false
   };
 
@@ -63,6 +61,7 @@
     [APP_NAME]: "",
     [EDITOR_NAME]: "",
     [ENABLE_PB]: false,
+    [FORCE_REMOVE]: true,
     [IS_EXECUTABLE]: false,
     [ICON_PATH]: `${ICON}#gray`,
     [MODE_SOURCE]: "",
@@ -213,16 +212,24 @@
       }
     };
 
-    if (Object.keys(msg).length > 0) {
+    if (msg) {
       const windowIds = Object.keys(ports);
       if (windowIds.length > 0) {
         for (let windowId of windowIds) {
           handlePortTabId(windowId);
         }
       }
-      // NOTE: for hybrid
-      hybrid.postMessage(msg);
     }
+  };
+
+  // NOTE: for hybrid
+  /**
+   * port hybrid message
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const portHybridMsg = async msg => {
+    msg && hybrid.postMessage(msg);
   };
 
   /**
@@ -401,27 +408,41 @@
       for (let item of items) {
         const obj = res[item];
         switch (item) {
+          case APP_MANIFEST:
+            varsLocal[item] = obj.value;
+            varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+            break;
+          case APP_NAME:
+            varsLocal[item] = obj.value;
+            connectHost().catch(logError);
+            break;
           case EDITABLE_CONTEXT:
             vars[item] = !!obj.checked;
             break;
+          case EDITOR_NAME:
+            varsLocal[item] = obj.value;
+            break;
           case ENABLE_PB:
             varsLocal[item] = !!obj.checked;
+            break;
+          case FORCE_REMOVE:
+            varsLocal[item] = !!obj.checked;
+            // NOTE: for hybrid
+            portHybridMsg({
+              [FORCE_REMOVE]: varsLocal[FORCE_REMOVE]
+            }).catch(logError);
             break;
           case ICON_COLOR:
           case ICON_GRAY:
           case ICON_WHITE:
             obj.checked && (varsLocal[ICON_PATH] = obj.value);
             break;
-          case APP_NAME:
-            varsLocal[item] = obj.value;
-            connectHost().catch(logError);
+          case KEY_OPEN_OPTIONS:
+          case KEY_EXEC_EDITOR:
+            vars[item] = !!obj.checked;
             break;
-          case EDITOR_NAME:
-            varsLocal[item] = obj.value;
-            break;
-          case APP_MANIFEST:
-            varsLocal[item] = obj.value;
-            varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+          case KEY_ACCESS:
+            vars[item] = obj.value;
             break;
           default:
         }
@@ -507,6 +528,37 @@
       for (let item of items) {
         const obj = data[item].newValue;
         switch (item) {
+          case APP_MANIFEST:
+            varsLocal[item] = obj.value;
+            varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+            toggleBadge().catch(logError);
+            break;
+          case APP_NAME:
+            varsLocal[item] = obj.value;
+            connectHost().catch(logError);
+            break;
+          case EDITABLE_CONTEXT:
+            vars[item] = !!obj.checked;
+            createContextMenuItems().catch(logError);
+            portVars({
+              [item]: !!obj.checked
+            }).catch(logError);
+            break;
+          case EDITOR_NAME:
+            varsLocal[item] = obj.value;
+            updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
+            break;
+          case ENABLE_PB:
+            varsLocal[item] = !!obj.checked;
+            syncUI();
+            break;
+          case FORCE_REMOVE:
+            varsLocal[item] = !!obj.checked;
+            // NOTE: for hybrid
+            portHybridMsg({
+              [item]: !!obj.checked
+            }).catch(logError);
+            break;
           case ICON_COLOR:
           case ICON_GRAY:
           case ICON_WHITE:
@@ -515,8 +567,6 @@
               replaceIcon().catch(logError)
             );
             break;
-          // NOTE: for hybrid, set varsLocal
-          case FORCE_REMOVE:
           case KEY_OPEN_OPTIONS:
           case KEY_EXEC_EDITOR:
             vars[item] = !!obj.checked;
@@ -528,30 +578,6 @@
             vars[item] = obj.value;
             portVars({
               [item]: obj.value
-            }).catch(logError);
-            break;
-          case APP_MANIFEST:
-            varsLocal[item] = obj.value;
-            varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
-            toggleBadge().catch(logError);
-            break;
-          case APP_NAME:
-            varsLocal[item] = obj.value;
-            connectHost().catch(logError);
-            break;
-          case EDITOR_NAME:
-            varsLocal[item] = obj.value;
-            updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
-            break;
-          case ENABLE_PB:
-            varsLocal[item] = !!obj.checked;
-            syncUI();
-            break;
-          case EDITABLE_CONTEXT:
-            vars[item] = !!obj.checked;
-            createContextMenuItems().catch(logError);
-            portVars({
-              [item]: !!obj.checked
             }).catch(logError);
             break;
           default:
@@ -589,7 +615,7 @@
     const tabId = `${id}`;
     const incognito = ports[windowId] && ports[windowId][tabId] &&
                         !!ports[windowId][tabId][INCOGNITO];
-    portMsg({
+    portHybridMsg({
       removeTabRelatedStorage: {tabId, incognito, info}
     }).catch(logError);
     ports[windowId] && ports[windowId][tabId] &&
@@ -606,7 +632,7 @@
       windowId: `${windowId}`
     }),
     checkWindowIncognito().then(isIncognito => {
-      !isIncognito && portMsg({
+      !isIncognito && portHybridMsg({
         removePrivateTmpFiles: !isIncognito
       }).catch(logError);
     })
