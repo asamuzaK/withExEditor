@@ -126,9 +126,6 @@
   };
 
   /* port */
-  // NOTE: for hybrid
-  const hybrid = runtime.connect({name: "portBackground"});
-
   let host;
 
   /**
@@ -222,16 +219,6 @@
     }
   };
 
-  // NOTE: for hybrid
-  /**
-   * port hybrid message
-   * @param {*} msg - message
-   * @return {void}
-   */
-  const portHybridMsg = async msg => {
-    msg && hybrid.postMessage(msg);
-  };
-
   /**
    * port variables
    * @param {*} msg - message
@@ -256,6 +243,18 @@
     ports[windowId] && ports[windowId][tabId] &&
     ports[windowId][tabId][frameUrl] &&
       ports[windowId][tabId][frameUrl].postMessage({getContent});
+  };
+
+  // NOTE: for hybrid
+  const hybrid = runtime.connect({name: "portBackground"});
+
+  /**
+   * port hybrid message
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const portHybridMsg = async msg => {
+    msg && hybrid.postMessage(msg);
   };
 
   /* icon */
@@ -387,16 +386,6 @@
     }
   };
 
-  /* storage */
-  /**
-   * set storage
-   * @param {Object} obj - object to set
-   * @return {void}
-   */
-  const setStorage = async obj => {
-    Object.keys(obj).length > 0 && storage.set(obj);
-  };
-
   /* UI */
   /**
    * synchronize UI components
@@ -410,7 +399,7 @@
     toggleBadge()
   ])).catch(logError);
 
-  /* set variables */
+  /* variables */
   /**
    * set variable
    * @param {string} item - item
@@ -481,39 +470,6 @@
     }
   };
 
-  /**
-   * set variables from storage
-   * @param {Object} res - result
-   * @return {void}
-   */
-  const setVariablesFromStorage = async res => {
-    const items = Object.keys(res);
-    if (items.length > 0) {
-      for (let item of items) {
-        setVariable(item, res[item], false);
-      }
-      checkEnabled().then(() => {
-        portMsg({
-          setVars: vars
-        }).catch(logError);
-      }).catch(logError);
-    }
-  };
-
-  /**
-   * set variables on storage changed
-   * @param {Object} data - storage.StorageChange
-   * @return {void}
-   */
-  const setVariablesOnStorageChanged = async data => {
-    const items = Object.keys(data);
-    if (items.length > 0) {
-      for (let item of items) {
-        setVariable(item, data[item].newValue, true);
-      }
-    }
-  };
-
   /* handlers */
   /**
    * handle runtime message
@@ -563,9 +519,23 @@
     });
   };
 
+  /**
+   * handle storage changed
+   * @param {Object} data - storage.StorageChange
+   * @return {void}
+   */
+  const handleStorageChanged = async data => {
+    const items = Object.keys(data);
+    if (items.length > 0) {
+      for (let item of items) {
+        setVariable(item, data[item].newValue, true);
+      }
+    }
+  };
+
   /* listeners */
   browserAction.onClicked.addListener(openOptionsPage);
-  browser.storage.onChanged.addListener(setVariablesOnStorageChanged);
+  browser.storage.onChanged.addListener(handleStorageChanged);
   contextMenus.onClicked.addListener(portContextMenu);
   runtime.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(handlePort);
@@ -619,14 +589,23 @@
 
   /* startup */
   Promise.all([
-    storage.get().then(setVariablesFromStorage).then(syncUI),
+    storage.get().then(res => {
+      const items = Object.keys(res);
+      if (items.length > 0) {
+        for (let item of items) {
+          setVariable(item, res[item], false);
+        }
+      }
+    }).then(checkEnabled).then(() => portMsg({
+      setVars: vars
+    })).then(syncUI),
     fetch(NS_URI_PATH).then(async data => {
       const nsURI = await data.json();
-      nsURI && setStorage({nsURI});
+      nsURI && storage.set({nsURI});
     }),
     fetch(FILE_EXT_PATH).then(async data => {
       const fileExt = await data.json();
-      fileExt && setStorage({fileExt});
+      fileExt && storage.set({fileExt});
     })
   ]).catch(logError);
 }
