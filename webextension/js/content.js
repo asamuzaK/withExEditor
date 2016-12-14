@@ -886,27 +886,34 @@
   };
 
   /**
+   * create content data message
+   * @param {Object} res - temporary file data
+   * @return {void}
+   */
+  const createContentDataMsg = async res => {
+    if (res[CREATE_TMP_FILE]) {
+      portMsg({
+        [CREATE_TMP_FILE]: {
+          data: res[CREATE_TMP_FILE],
+          value: res.value
+        }
+      }).catch(logError);
+    }
+    else {
+      res[GET_FILE_PATH] &&
+        portMsg({
+          [GET_FILE_PATH]: res[GET_FILE_PATH]
+        }).catch(logError);
+    }
+  };
+
+  /**
    * port content data
    * @param {Object} elm - element
    * @return {Object} - Promise
    */
   const portContentData = elm =>
-    createContentData(elm).then(createTmpFileData).then(res => {
-      if (res[CREATE_TMP_FILE]) {
-        portMsg({
-          [CREATE_TMP_FILE]: {
-            data: res[CREATE_TMP_FILE],
-            value: res.value
-          }
-        }).catch(logError);
-      }
-      else {
-        res[GET_FILE_PATH] &&
-          portMsg({
-            [GET_FILE_PATH]: res[GET_FILE_PATH]
-          }).catch(logError);
-      }
-    });
+    createContentData(elm).then(createTmpFileData).then(createContentDataMsg);
 
   /* synchronize edited text */
   /**

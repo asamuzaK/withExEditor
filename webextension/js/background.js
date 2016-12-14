@@ -302,17 +302,17 @@
    * create context menu item
    * @param {string} id - menu item ID
    * @param {Array} contexts - contexts
-   * @param {boolean} bool - enabled
+   * @param {boolean} enabled - enabled
    * @return {Object}
    */
-  const createMenuItem = async (id, contexts, bool) => {
+  const createMenuItem = async (id, contexts, enabled = false) => {
     const label = varsLocal[EDITOR_NAME] || LABEL;
     let menu;
     isString(id) && Array.isArray(contexts) && (
       menu = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, label),
-        enabled: !!bool
+        enabled: !!enabled
       })
     );
     return menu || null;
@@ -320,31 +320,40 @@
 
   /**
    * create context menu items
-   * @param {boolean} bool - enabled
-   * @return {Object} - Promise
+   * @param {boolean} enabled - enabled
+   * @return {void}
    */
-  const createContextMenuItems = (bool = false) =>
-    contextMenus.removeAll().then(async () => {
-      if (vars[IS_ENABLED]) {
-        const items = [MODE_SOURCE, MODE_SELECTION, MODE_EDIT_TEXT];
-        for (let item of items) {
-          switch (item) {
-            case MODE_SOURCE:
-              !vars[EDITABLE_CONTEXT] &&
-                (menus[item] = createMenuItem(item, ["frame", "page"], bool));
-              break;
-            case MODE_SELECTION:
-              !vars[EDITABLE_CONTEXT] &&
-                (menus[item] = createMenuItem(item, ["selection"], bool));
-              break;
-            case MODE_EDIT_TEXT:
-              menus[item] = createMenuItem(item, ["editable"], bool);
-              break;
-            default:
-          }
+  const createMenuItems = async enabled => {
+    if (vars[IS_ENABLED]) {
+      const items = [MODE_SOURCE, MODE_SELECTION, MODE_EDIT_TEXT];
+      for (let item of items) {
+        switch (item) {
+          case MODE_SOURCE:
+            !vars[EDITABLE_CONTEXT] &&
+              (menus[item] = createMenuItem(item, ["frame", "page"], enabled));
+            break;
+          case MODE_SELECTION:
+            !vars[EDITABLE_CONTEXT] &&
+              (menus[item] = createMenuItem(item, ["selection"], enabled));
+            break;
+          case MODE_EDIT_TEXT:
+            menus[item] = createMenuItem(item, ["editable"], enabled);
+            break;
+          default:
         }
       }
-    }).then(cacheMenuItemTitle);
+    }
+  };
+
+  /**
+   * restore context menu items
+   * @param {boolean} enabled - enabled
+   * @return {Object} - Promise
+   */
+  const restoreContextMenuItems = enabled =>
+    contextMenus.removeAll().then(() => {
+      createMenuItems(enabled);
+    ).then(cacheMenuItemTitle);
 
   /**
    * update context menu items
@@ -399,21 +408,21 @@
     toggleBadge()
   ]));
 
-  /* variables */
+  /* set variables */
   /**
    * set variable
    * @param {string} item - item
    * @param {Object} obj - value object
-   * @param {boolean} bool - changed
+   * @param {boolean} changed - changed
    * @return {void}
    */
-  const setVariable = async (item, obj, bool = false) => {
+  const setVariable = async (item, obj, changed = false) => {
     if (item && obj) {
       switch (item) {
         case APP_MANIFEST:
           varsLocal[item] = obj.value;
           varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
-          bool && toggleBadge().catch(logError);
+          changed && toggleBadge().catch(logError);
           break;
         case APP_NAME:
           varsLocal[item] = obj.value;
@@ -421,8 +430,8 @@
           break;
         case EDITABLE_CONTEXT:
           vars[item] = !!obj.checked;
-          bool && (
-            createContextMenuItems().catch(logError),
+          changed && (
+            restoreContextMenuItems().catch(logError),
             portVars({
               [item]: !!obj.checked
             }).catch(logError)
@@ -430,12 +439,12 @@
           break;
         case EDITOR_NAME:
           varsLocal[item] = obj.value;
-          bool &&
+          changed &&
             updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
           break;
         case ENABLE_PB:
           varsLocal[item] = !!obj.checked;
-          bool && syncUI().catch(logError);
+          changed && syncUI().catch(logError);
           break;
         case FORCE_REMOVE:
           varsLocal[item] = !!obj.checked;
@@ -449,19 +458,19 @@
         case ICON_WHITE:
           obj.checked && (
             varsLocal[ICON_PATH] = obj.value,
-            bool && replaceIcon().catch(logError)
+            changed && replaceIcon().catch(logError)
           );
           break;
         case KEY_OPEN_OPTIONS:
         case KEY_EXEC_EDITOR:
           vars[item] = !!obj.checked;
-          bool && portVars({
+          changed && portVars({
             [item]: !!obj.checked
           }).catch(logError);
           break;
         case KEY_ACCESS:
           vars[item] = obj.value;
-          bool && portVars({
+          changed && portVars({
             [item]: obj.value
           }).catch(logError);
           break;
@@ -470,7 +479,35 @@
     }
   };
 
+  /**
+   * set variables from storage
+   * @param {Object} res - storage response
+   * @return {void}
+   */
+  const setVariablesFromStorage = async res => {
+    const items = Object.keys(res);
+    if (items.length > 0) {
+      for (let item of items) {
+        setVariable(item, res[item], false);
+      }
+    }
+  };
+
   /* handlers */
+  /**
+   * handle storage changed
+   * @param {Object} data - storage.StorageChange
+   * @return {void}
+   */
+  const handleStorageChanged = async data => {
+    const items = Object.keys(data);
+    if (items.length > 0) {
+      for (let item of items) {
+        setVariable(item, data[item].newValue, true);
+      }
+    }
+  };
+
   /**
    * handle runtime message
    * @param {*} msg - message
@@ -520,44 +557,44 @@
   };
 
   /**
-   * handle storage changed
-   * @param {Object} data - storage.StorageChange
+   * handle active tab
+   * @param {Object} info - activated tab info
    * @return {void}
    */
-  const handleStorageChanged = async data => {
-    const items = Object.keys(data);
-    if (items.length > 0) {
-      for (let item of items) {
-        setVariable(item, data[item].newValue, true);
-      }
-    }
-  };
-
-  /* listeners */
-  browserAction.onClicked.addListener(openOptionsPage);
-  browser.storage.onChanged.addListener(handleStorageChanged);
-  contextMenus.onClicked.addListener(portContextMenu);
-  runtime.onMessage.addListener(handleMsg);
-  runtime.onConnect.addListener(handlePort);
-  tabs.onActivated.addListener(async info => {
+  const handleActiveTab = async info => {
     const windowId = `${info.windowId}`;
     const tabId = `${info.tabId}`;
     ports[windowId] && ports[windowId][tabId] ?
-      createContextMenuItems(true).catch(logError) :
-      createContextMenuItems().catch(logError);
-  });
-  tabs.onUpdated.addListener(async (id, info, tab) => {
+      restoreContextMenuItems(true).catch(logError) :
+      restoreContextMenuItems().catch(logError);
+  };
+
+  /**
+   * handle updated tab
+   * @param {number} id - tabId
+   * @param {Object} info - changed tab info
+   * @param {Object} tab - tabs.Tab
+   * @return {void}
+   */
+  const handleUpdatedTab = async (id, info, tab) => {
     const status = info.status;
     const active = tab.active;
     const windowId = `${tab.windowId}`;
     const tabId = `${id}`;
     status === "complete" && active && (
       ports[windowId] && ports[windowId][tabId] ?
-        createContextMenuItems(active).catch(logError) :
-        createContextMenuItems().catch(logError)
+        restoreContextMenuItems(active).catch(logError) :
+        restoreContextMenuItems().catch(logError)
     );
-  });
-  tabs.onRemoved.addListener(async (id, info) => {
+  };
+
+  /**
+   * handle removed tab
+   * @param {number} id - tabId
+   * @param {Object} info - removed tab info
+   * @return {void}
+   */
+  const handleRemovedTab = async (id, info) => {
     const windowId = `${info.windowId}`;
     const tabId = `${id}`;
     const incognito = ports[windowId] && ports[windowId][tabId] &&
@@ -567,14 +604,25 @@
     }).catch(logError);
     ports[windowId] && ports[windowId][tabId] &&
       restorePorts({windowId, tabId}).catch(logError);
-  });
-  windows.onFocusChanged.addListener(windowId =>
+  };
+
+  /**
+   * handle focus changed window
+   * @param {number} windowId - windowId
+   * @return {Object|boolean} - Promise
+   */
+  const handleFocusChangedWindow = windowId =>
     windowId !== windows.WINDOW_ID_NONE &&
       windows.getCurrent({populate: true}).then(res =>
         res.type === "normal" && syncUI()
-      ).catch(logError)
-  );
-  windows.onRemoved.addListener(windowId => Promise.all([
+      ).catch(logError);
+
+  /**
+   * handle removed window
+   * @param {number} windowId - windowId
+   * @return {Object|boolean} - Promise
+   */
+  const handleRemovedWindow = windowId => Promise.all([
     restorePorts({
       windowId: `${windowId}`
     }),
@@ -583,23 +631,30 @@
         removePrivateTmpFiles: !isIncognito
       }).catch(logError);
     })
-  ]).catch(logError));
+  ]).catch(logError);
+
+  /* listeners */
+  browserAction.onClicked.addListener(openOptionsPage);
+  browser.storage.onChanged.addListener(handleStorageChanged);
+  contextMenus.onClicked.addListener(portContextMenu);
+  runtime.onMessage.addListener(handleMsg);
+  runtime.onConnect.addListener(handlePort);
+  tabs.onActivated.addListener(handleActiveTab);
+  tabs.onUpdated.addListener(handleUpdatedTab);
+  tabs.onRemoved.addListener(handleRemovedTab);
+  windows.onFocusChanged.addListener(handleFocusChangedWindow);
+  windows.onRemoved.addListener(handleRemovedWindow);
 
   // NOTE: for hybrid
   hybrid.onMessage.addListener(handleMsg);
 
   /* startup */
   Promise.all([
-    storage.get().then(res => {
-      const items = Object.keys(res);
-      if (items.length > 0) {
-        for (let item of items) {
-          setVariable(item, res[item], false);
-        }
-      }
-    }).then(checkEnabled).then(() => portMsg({
-      setVars: vars
-    })).then(syncUI),
+    storage.get().then(setVariablesFromStorage).then(checkEnabled).then(() =>
+      portMsg({
+        setVars: vars
+      })
+    ).then(syncUI),
     fetch(NS_URI_PATH).then(async data => {
       const nsURI = await data.json();
       nsURI && storage.set({nsURI});
