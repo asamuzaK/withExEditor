@@ -351,8 +351,8 @@
    * @return {Object} - Promise
    */
   const restoreContextMenuItems = enabled =>
-    contextMenus.removeAll().then(() => {
-      createMenuItems(enabled);
+    contextMenus.removeAll().then(() =>
+      createMenuItems(enabled)
     ).then(cacheMenuItemTitle);
 
   /**
@@ -609,7 +609,7 @@
   /**
    * handle focus changed window
    * @param {number} windowId - windowId
-   * @return {Object|boolean} - Promise
+   * @return {Object|boolean} - Promise or false
    */
   const handleFocusChangedWindow = windowId =>
     windowId !== windows.WINDOW_ID_NONE &&
@@ -620,7 +620,7 @@
   /**
    * handle removed window
    * @param {number} windowId - windowId
-   * @return {Object|boolean} - Promise
+   * @return {Object|boolean} - Promise or false
    */
   const handleRemovedWindow = windowId => Promise.all([
     restorePorts({
