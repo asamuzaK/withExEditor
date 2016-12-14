@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title>withExEditor マニュアル</title>
     <link rel="stylesheet" href="../css/options.css" />
+    <script src="../js/manual.js"></script>
   </head>
   <body>
     <header>
@@ -43,52 +44,14 @@
         </p>
         <figure>
           <figcaption>Pythonスクリプトによるホストの例：</figcaption>
-          <pre><code>#!/usr/bin/env python
-# coding: utf-8
-
-import sys, json, struct, subprocess
-
-# Read a message from stdin and decode it.
-def getMessage():
-  rawLength = sys.stdin.buffer.read(4)
-  if len(rawLength) == 0:
-    sys.exit(0)
-  message = sys.stdin.buffer.read(struct.unpack("@I", rawLength)[0])
-  if message:
-    return json.loads(message.decode("utf-8"))
-  else:
-    return false
-
-# Editor path
-app = "C:\Program Files\Path\To\YourEditor.exe"
-
-# Command line arguments array as appropriate.
-# args = []
-
-while True:
-  file = getMessage()
-  cmd = []
-  cmd.append(app)
-
-  # If you have arguments and want arguments before file
-  # cmd.extend(args)
-
-  cmd.append(file)
-
-  # If you have arguments and want arguments after file
-  # cmd.extend(args)
-
-  subprocess.run(cmd)
-
-sys.exit(0)</code></pre>
+          <pre><code id="python"></code></pre>
         </figure>
         <p>
           Windowsでは、pythonスクリプトを実行するためのシェルスクリプト（バッチファイル）も作成します。
         </p>
         <figure>
           <figcaption>シェルスクリプトの例（Windows）：</figcaption>
-          <pre><code>@echo off
-python "C:\path\to\youreditor.py"</code></pre>
+          <pre><code id="shell"></code></pre>
         </figure>
       </section>
       <section>
@@ -98,13 +61,7 @@ python "C:\path\to\youreditor.py"</code></pre>
         </p>
         <figure>
           <figcaption>マニフェストの例：</figcaption>
-          <pre><code>{
-  "name": "youreditor",
-  "description": "Host to execute youreditor",
-  "path": "C:\\path\\to\\youreditor.cmd",
-  "type": "stdio",
-  "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
-}</code></pre>
+          <pre><code id="manifest"></code></pre>
         </figure>
         <dl>
           <dt>name</dt>
@@ -138,7 +95,7 @@ python "C:\path\to\youreditor.py"</code></pre>
         </p>
         <figure>
           <figcaption>REG ADDの例（Windows）：</figcaption>
-          <pre><code>REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\xxx\youreditor.json" /f</code></pre>
+          <pre><code id="reg"></code></pre>
         </figure>
       </section>
       <p>

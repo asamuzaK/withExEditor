@@ -1,0 +1,6 @@
+{
+  "python": "#!/usr/bin/env python\n# coding: utf-8\n\nimport sys, json, struct, subprocess\n\n# Read a message from stdin and decode it.\ndef getMessage():\n  rawLength = sys.stdin.buffer.read(4)\n  if len(rawLength) == 0:\n    sys.exit(0)\n  message = sys.stdin.buffer.read(struct.unpack(\"@I\", rawLength)[0])\n  if message:\n    return json.loads(message.decode(\"utf-8\"))\n  else:\n    return false\n\n# Editor path\napp = \"C:\\Program Files\\Path\\To\\YourEditor.exe\"\n\n# Command line arguments array as appropriate.\n# args = []\n\nwhile True:\n  file = getMessage()\n  cmd = []\n  cmd.append(app)\n\n  # If you have arguments and want arguments before file\n  # cmd.extend(args)\n\n  cmd.append(file)\n\n  # If you have arguments and want arguments after file\n  # cmd.extend(args)\n\n  subprocess.run(cmd)\n\nsys.exit(0)",
+  "shell": "@echo off\npython \"C:\\path\\to\\youreditor.py\"",
+  "manifest": "{\n  \"name\": \"youreditor\",\n  \"description\": \"Host to execute youreditor\",\n  \"path\": \"C:\\\\path\\\\to\\\\youreditor.cmd\",\n  \"type\": \"stdio\",\n  \"allowed_extensions\": [\"jid1-WiAigu4HIo0Tag@jetpack\"]\n}",
+  "reg": "REG ADD \"HKEY_CURRENT_USER\\SOFTWARE\\Mozilla\\NativeMessagingHosts\\youreditor\" /ve /d \"C:\\Users\\xxx\\youreditor.json\" /f"
+}
