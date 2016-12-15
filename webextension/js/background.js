@@ -608,7 +608,7 @@
       const frameUrl = tab.url;
       const portName = ports[windowId] && ports[windowId][tabId] &&
                        ports[windowId][tabId][frameUrl] &&
-                         ports[windowId][tabId][frameUrl].name
+                         ports[windowId][tabId][frameUrl].name;
       varsLocal[MENU_ENABLED] = portName === PORT_CONTENT;
       info.status === "complete" && tab.active &&
         restoreContextMenu().catch(logError);
