@@ -17,6 +17,7 @@
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
   const INCOGNITO = "incognito";
+  const MENU_ENABLED = "menuEnabled";
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
@@ -66,6 +67,7 @@
     [FORCE_REMOVE]: true,
     [IS_EXECUTABLE]: false,
     [ICON_PATH]: `${ICON}#gray`,
+    [MENU_ENABLED]: false,
     [MODE_SOURCE]: "",
     [MODE_MATHML]: "",
     [MODE_SVG]: ""
@@ -304,17 +306,16 @@
    * create context menu item
    * @param {string} id - menu item ID
    * @param {Array} contexts - contexts
-   * @param {boolean} enabled - enabled
    * @return {Object}
    */
-  const createMenuItem = async (id, contexts, enabled = false) => {
+  const createMenuItem = async (id, contexts) => {
     const label = varsLocal[EDITOR_NAME] || LABEL;
     let menu;
     isString(id) && Array.isArray(contexts) && (
       menu = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, label),
-        enabled: !!enabled
+        enabled: !!varsLocal[MENU_ENABLED]
       })
     );
     return menu || null;
@@ -322,10 +323,9 @@
 
   /**
    * create context menu items
-   * @param {boolean} enabled - enabled
    * @return {void}
    */
-  const createMenuItems = async enabled => {
+  const createMenuItems = async () => {
     if (vars[IS_ENABLED]) {
       const items = Object.keys(menus);
       if (items.length > 0) {
@@ -333,16 +333,16 @@
           switch (item) {
             case MODE_SOURCE:
               !vars[EDITABLE_CONTEXT] && (
-                menus[item] = createMenuItem(item, ["frame", "page"], enabled)
+                menus[item] = createMenuItem(item, ["frame", "page"])
               );
               break;
             case MODE_SELECTION:
               !vars[EDITABLE_CONTEXT] && (
-                menus[item] = createMenuItem(item, ["selection"], enabled)
+                menus[item] = createMenuItem(item, ["selection"])
               );
               break;
             case MODE_EDIT_TEXT:
-              menus[item] = createMenuItem(item, ["editable"], enabled);
+              menus[item] = createMenuItem(item, ["editable"]);
               break;
             default:
           }
@@ -353,12 +353,10 @@
 
   /**
    * restore context menu
-   * @param {boolean} enabled - enabled
    * @return {Object} - Promise
    */
-  const restoreContextMenu = enabled => contextMenus.removeAll().then(() =>
-    createMenuItems(enabled)
-  ).then(cacheMenuItemTitle);
+  const restoreContextMenu = () =>
+    contextMenus.removeAll().then(createMenuItems).then(cacheMenuItemTitle);
 
   /**
    * update context menu
@@ -592,7 +590,8 @@
         }
       }
     }
-    restoreContextMenu(bool).catch(logError);
+    varsLocal[MENU_ENABLED] = bool;
+    restoreContextMenu().catch(logError);
   };
 
   /**
@@ -607,11 +606,12 @@
       const windowId = `${tab.windowId}`;
       const tabId = `${id}`;
       const frameUrl = tab.url;
-      const bool = ports[windowId] && ports[windowId][tabId] &&
-                   ports[windowId][tabId][frameUrl] &&
-                     ports[windowId][tabId][frameUrl].name === PORT_CONTENT;
+      const portName = ports[windowId] && ports[windowId][tabId] &&
+                       ports[windowId][tabId][frameUrl] &&
+                         ports[windowId][tabId][frameUrl].name
+      varsLocal[MENU_ENABLED] = portName === PORT_CONTENT;
       info.status === "complete" && tab.active &&
-        restoreContextMenu(bool).catch(logError);
+        restoreContextMenu().catch(logError);
     }
   };
 
