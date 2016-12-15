@@ -59,12 +59,6 @@
   "optionsAppManifestPathLabel": {
     "message": "App Manifest Path"
   },
-  "optionsEditableContextDetail": {
-    "message": "Appears in the context menu only if the content is editable."
-  },
-  "optionsEditableContextLabel": {
-    "message": "Enable Only When Editing Text"
-  },
   "optionsEditorName": {
     "message": ""
   },
@@ -88,6 +82,12 @@
   },
   "optionsEditorShortCutLabel": {
     "message": "Enable Shortcut Key To Execute The Editor Directly"
+  },
+  "optionsEnableOnlyEditableDetail": {
+    "message": "Appears in the context menu only if the content is editable."
+  },
+  "optionsEnableOnlyEditableLabel": {
+    "message": "Enable Only When Editing Text"
   },
   "optionsEnablePBDetail": {
     "message": "Enables if checked, disables if not."

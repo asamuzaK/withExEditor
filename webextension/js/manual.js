@@ -3,10 +3,10 @@
  */
 "use strict";
 {
-  const CODE_SAMPLE_PATH = "../data/codeSample.json";
+  const PATH_CODE_SAMPLE = "../data/codeSample.json";
 
   document.addEventListener("DOMContentLoaded", () =>
-    fetch(CODE_SAMPLE_PATH).then(async res => {
+    fetch(PATH_CODE_SAMPLE).then(async res => {
       const codes = await res.json();
       const items = Object.keys(codes);
       if (items.length > 0) {

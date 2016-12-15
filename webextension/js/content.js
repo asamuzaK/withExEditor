@@ -33,11 +33,11 @@
   const ELEMENT_NODE = 1;
   const TEXT_NODE = 3;
 
+  const IS_ENABLED = "isEnabled";
   const KEY_ACCESS = "accessKey";
   const KEY_OPEN_OPTIONS = "optionsShortCut";
   const KEY_EXEC_EDITOR = "editorShortCut";
-  const EDITABLE_CONTEXT = "editableContext";
-  const IS_ENABLED = "isEnabled";
+  const ENABLE_ONLY_EDITABLE = "enableOnlyEditable";
   const CONTEXT_NODE = "contextNode";
   const INCOGNITO = "incognito";
   const TAB_ID = "tabId";
@@ -49,11 +49,11 @@
 
   /* variables */
   const vars = {
-    [KEY_ACCESS]: "e",
-    [KEY_OPEN_OPTIONS]: true,
-    [KEY_EXEC_EDITOR]: true,
-    [EDITABLE_CONTEXT]: false,
     [IS_ENABLED]: false,
+    [KEY_ACCESS]: "e",
+    [KEY_EXEC_EDITOR]: true,
+    [KEY_OPEN_OPTIONS]: true,
+    [ENABLE_ONLY_EDITABLE]: false,
     [CONTEXT_NODE]: null,
     [INCOGNITO]: false,
     [TAB_ID]: ""
@@ -1039,7 +1039,7 @@
           case SET_VARS:
             handleMsg(obj);
             break;
-          case EDITABLE_CONTEXT:
+          case ENABLE_ONLY_EDITABLE:
           case INCOGNITO:
           case IS_ENABLED:
             vars[item] = !!obj;
@@ -1119,7 +1119,7 @@
     }
     else {
       execEditor && elm && (
-        vars[EDITABLE_CONTEXT] ?
+        vars[ENABLE_ONLY_EDITABLE] ?
           await isEditControl(elm) || elm.isContentEditable ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
           reType.test(document.contentType)

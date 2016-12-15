@@ -23,23 +23,23 @@
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
-  const FILE_EXT_PATH = "../data/fileExt.json";
-  const NS_URI_PATH = "../data/nsUri.json";
+  const PATH_FILE_EXT = "../data/fileExt.json";
+  const PATH_NS_URI = "../data/nsUri.json";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
 
   const APP_MANIFEST = "appManifestPath";
   const APP_NAME = "appName";
   const EDITOR_NAME = "editorName";
-  const KEY_ACCESS = "accessKey";
-  const KEY_OPEN_OPTIONS = "optionsShortCut";
-  const KEY_EXEC_EDITOR = "editorShortCut";
+  const ENABLE_ONLY_EDITABLE = "enableOnlyEditable";
   const ENABLE_PB = "enablePB";
-  const EDITABLE_CONTEXT = "editableContext";
   const FORCE_REMOVE = "forceRemove";
   const IS_ENABLED = "isEnabled";
   const IS_EXECUTABLE = "isExecutable";
   const ICON_PATH = "iconPath";
+  const KEY_ACCESS = "accessKey";
+  const KEY_EXEC_EDITOR = "editorShortCut";
+  const KEY_OPEN_OPTIONS = "optionsShortCut";
 
   /* shortcuts */
   const browserAction = browser.browserAction;
@@ -52,11 +52,11 @@
 
   /* variables */
   const vars = {
+    [IS_ENABLED]: false,
     [KEY_ACCESS]: "e",
-    [KEY_OPEN_OPTIONS]: true,
     [KEY_EXEC_EDITOR]: true,
-    [EDITABLE_CONTEXT]: false,
-    [IS_ENABLED]: false
+    [KEY_OPEN_OPTIONS]: true,
+    [ENABLE_ONLY_EDITABLE]: false
   };
 
   const varsLocal = {
@@ -65,8 +65,8 @@
     [EDITOR_NAME]: "",
     [ENABLE_PB]: false,
     [FORCE_REMOVE]: true,
-    [IS_EXECUTABLE]: false,
     [ICON_PATH]: `${ICON}#gray`,
+    [IS_EXECUTABLE]: false,
     [MENU_ENABLED]: false,
     [MODE_SOURCE]: "",
     [MODE_MATHML]: "",
@@ -332,12 +332,12 @@
         for (let item of items) {
           switch (item) {
             case MODE_SOURCE:
-              !vars[EDITABLE_CONTEXT] && (
+              !vars[ENABLE_ONLY_EDITABLE] && (
                 menus[item] = createMenuItem(item, ["frame", "page"])
               );
               break;
             case MODE_SELECTION:
-              !vars[EDITABLE_CONTEXT] && (
+              !vars[ENABLE_ONLY_EDITABLE] && (
                 menus[item] = createMenuItem(item, ["selection"])
               );
               break;
@@ -440,7 +440,7 @@
           varsLocal[item] = obj.value;
           connectHost().catch(logError);
           break;
-        case EDITABLE_CONTEXT:
+        case ENABLE_ONLY_EDITABLE:
           vars[item] = !!obj.checked;
           changed && (
             restoreContextMenu().catch(logError),
@@ -682,11 +682,11 @@
         [SET_VARS]: vars
       })
     ),
-    fetch(NS_URI_PATH).then(async data => {
+    fetch(PATH_NS_URI).then(async data => {
       const nsURI = await data.json();
       nsURI && storage.set({nsURI});
     }),
-    fetch(FILE_EXT_PATH).then(async data => {
+    fetch(PATH_FILE_EXT).then(async data => {
       const fileExt = await data.json();
       fileExt && storage.set({fileExt});
     })
