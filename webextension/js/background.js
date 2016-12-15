@@ -8,6 +8,7 @@
 
   const CONTEXT_MENU = "contextMenu";
   const OPEN_OPTIONS = "openOptions";
+  const PORT_CONTENT = "portContent";
   const PORT_HOST = "portHost";
   const SET_VARS = "setVars";
 
@@ -568,11 +569,23 @@
    * @return {void}
    */
   const handleActiveTab = async info => {
-    const windowId = `${info.windowId}`;
-    const tabId = `${info.tabId}`;
-    ports[windowId] && ports[windowId][tabId] ?
-      restoreContextMenuItems(true).catch(logError) :
-      restoreContextMenuItems().catch(logError);
+    let bool = false;
+    if (info) {
+      const windowId = `${info.windowId}`;
+      const tabId = `${info.tabId}`;
+      const items = ports[windowId] && ports[windowId][tabId] &&
+                      Object.keys(ports[windowId][tabId]);
+      if (items && items.length > 0) {
+        for (let item of items) {
+          const obj = ports[windowId][tabId][item];
+          if (obj && obj.name) {
+            bool = obj.name === PORT_CONTENT;
+            break;
+          }
+        }
+      }
+    }
+    restoreContextMenuItems(bool).catch(logError);
   };
 
   /**
@@ -583,15 +596,17 @@
    * @return {void}
    */
   const handleUpdatedTab = async (id, info, tab) => {
-    const status = info.status;
-    const active = tab.active;
-    const windowId = `${tab.windowId}`;
-    const tabId = `${id}`;
-    status === "complete" && active && (
-      ports[windowId] && ports[windowId][tabId] ?
-        restoreContextMenuItems(active).catch(logError) :
-        restoreContextMenuItems().catch(logError)
-    );
+    if (id && info && tab) {
+      const windowId = `${tab.windowId}`;
+      const tabId = `${id}`;
+      const frameUrl = tab.url;
+      const bool = ports[windowId] && ports[windowId][tabId] &&
+                   ports[windowId][tabId][frameUrl] &&
+                   ports[windowId][tabId][frameUrl].name === PORT_CONTENT ||
+                   false;
+      info.status === "complete" && tab.active &&
+        restoreContextMenuItems(bool).catch(logError);
+    }
   };
 
   /**
