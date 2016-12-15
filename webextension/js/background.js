@@ -9,6 +9,7 @@
   const CONTEXT_MENU = "contextMenu";
   const OPEN_OPTIONS = "openOptions";
   const PORT_HOST = "portHost";
+  const SET_VARS = "setVars";
 
   const ICON = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
@@ -89,14 +90,18 @@
 
   /* windows */
   /**
-   * check add-on is enabled
+   * check if add-on can be enabled
+   * @param {Object} win - current window.Window
    * @return {boolean}
    */
-  const checkEnabled = async () => {
-    const win = await windows.getCurrent();
-    const isEnabled = !win.incognito || varsLocal[ENABLE_PB];
-    vars[IS_ENABLED] = isEnabled;
-    return isEnabled;
+  const checkEnable = async (win = null) => {
+    let enable = false;
+    !win && (win = await windows.getCurrent());
+    win && win.type === "normal" && (
+      enable = !win.incognito || varsLocal[ENABLE_PB]
+    );
+    vars[IS_ENABLED] = enable;
+    return enable;
   };
 
   /**
@@ -217,16 +222,6 @@
         }
       }
     }
-  };
-
-  /**
-   * port variables
-   * @param {*} msg - message
-   * @return {Object} - Promise
-   */
-  const portVars = async msg => {
-    const setVars = msg;
-    return portMsg({setVars});
   };
 
   /**
@@ -400,15 +395,26 @@
    * synchronize UI components
    * @return {Object} - Promise
    */
-  const syncUI = () => checkEnabled().then(() => Promise.all([
+  const syncUI = () => Promise.all([
     portMsg({
       isEnabled: vars[IS_ENABLED]
     }),
     replaceIcon(!vars[IS_ENABLED] && `${ICON}#off` || varsLocal[ICON_PATH]),
     toggleBadge()
-  ]));
+  ]);
 
-  /* set variables */
+  /* handle variables */
+  /**
+   * port variable
+   * @param {Object} v - variable
+   * @return {void}
+   */
+  const portVar = async v => {
+    v && portMsg({
+      [SET_VARS]: v
+    }).catch(logError);
+  };
+
   /**
    * set variable
    * @param {string} item - item
@@ -416,7 +422,7 @@
    * @param {boolean} changed - changed
    * @return {void}
    */
-  const setVariable = async (item, obj, changed = false) => {
+  const setVar = async (item, obj, changed = false) => {
     if (item && obj) {
       switch (item) {
         case APP_MANIFEST:
@@ -432,7 +438,7 @@
           vars[item] = !!obj.checked;
           changed && (
             restoreContextMenuItems().catch(logError),
-            portVars({
+            portVar({
               [item]: !!obj.checked
             }).catch(logError)
           );
@@ -464,13 +470,13 @@
         case KEY_OPEN_OPTIONS:
         case KEY_EXEC_EDITOR:
           vars[item] = !!obj.checked;
-          changed && portVars({
+          changed && portVar({
             [item]: !!obj.checked
           }).catch(logError);
           break;
         case KEY_ACCESS:
           vars[item] = obj.value;
-          changed && portVars({
+          changed && portVar({
             [item]: obj.value
           }).catch(logError);
           break;
@@ -484,11 +490,11 @@
    * @param {Object} res - storage response
    * @return {void}
    */
-  const setVariablesFromStorage = async res => {
+  const setVars = async res => {
     const items = Object.keys(res);
     if (items.length > 0) {
       for (let item of items) {
-        setVariable(item, res[item], false);
+        setVar(item, res[item], false);
       }
     }
   };
@@ -503,7 +509,7 @@
     const items = Object.keys(data);
     if (items.length > 0) {
       for (let item of items) {
-        setVariable(item, data[item].newValue, true);
+        setVar(item, data[item].newValue, true);
       }
     }
   };
@@ -552,7 +558,7 @@
     port.onMessage.addListener(handleMsg);
     port.postMessage({
       incognito, tabId,
-      setVars: vars
+      [SET_VARS]: vars
     });
   };
 
@@ -609,13 +615,15 @@
   /**
    * handle focus changed window
    * @param {number} windowId - windowId
-   * @return {Object|boolean} - Promise or false
+   * @return {void}
    */
-  const handleFocusChangedWindow = windowId =>
-    windowId !== windows.WINDOW_ID_NONE &&
-      windows.getCurrent({populate: true}).then(res =>
-        res.type === "normal" && syncUI()
-      ).catch(logError);
+  const handleFocusChangedWindow = async windowId => {
+    if (windowId !== windows.WINDOW_ID_NONE) {
+      const current = await windows.getCurrent();
+      current && current.focused &&
+        checkEnable(current).then(syncUI).catch(logError);
+    }
+  };
 
   /**
    * handle removed window
@@ -626,11 +634,9 @@
     restorePorts({
       windowId: `${windowId}`
     }),
-    checkWindowIncognito().then(isIncognito => {
-      !isIncognito && portHybridMsg({
-        removePrivateTmpFiles: !isIncognito
-      }).catch(logError);
-    })
+    checkWindowIncognito().then(isIncognito => !isIncognito && portHybridMsg({
+      removePrivateTmpFiles: !isIncognito
+    }))
   ]).catch(logError);
 
   /* listeners */
@@ -650,11 +656,11 @@
 
   /* startup */
   Promise.all([
-    storage.get().then(setVariablesFromStorage).then(checkEnabled).then(() =>
+    storage.get().then(setVars).then(checkEnable).then(syncUI).then(() =>
       portMsg({
-        setVars: vars
+        [SET_VARS]: vars
       })
-    ).then(syncUI),
+    ),
     fetch(NS_URI_PATH).then(async data => {
       const nsURI = await data.json();
       nsURI && storage.set({nsURI});
