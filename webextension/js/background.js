@@ -111,16 +111,16 @@
    */
   const checkWindowIncognito = async () => {
     const windowIds = await windows.getAll();
-    let isIncognito = false;
+    let incognito = false;
     if (windowIds.length > 0) {
       for (let windowId of windowIds) {
-        isIncognito = windowId.incognito;
-        if (isIncognito) {
+        incognito = windowId.incognito;
+        if (incognito) {
           break;
         }
       }
     }
-    return isIncognito;
+    return incognito;
   };
 
   /**
@@ -232,13 +232,15 @@
    * @return {void}
    */
   const portContextMenu = async (info, tab) => {
-    const getContent = {info, tab};
-    const windowId = `${tab.windowId}`;
-    const tabId = `${tab.id}`;
-    const frameUrl = info.frameUrl;
-    ports[windowId] && ports[windowId][tabId] &&
-    ports[windowId][tabId][frameUrl] &&
-      ports[windowId][tabId][frameUrl].postMessage({getContent});
+    if (info && tab) {
+      const getContent = {info, tab};
+      const windowId = `${tab.windowId}`;
+      const tabId = `${tab.id}`;
+      const frameUrl = info.frameUrl;
+      ports[windowId] && ports[windowId][tabId] &&
+      ports[windowId][tabId][frameUrl] &&
+        ports[windowId][tabId][frameUrl].postMessage({getContent});
+    }
   };
 
   // NOTE: for hybrid
@@ -277,14 +279,18 @@
 
   /* context menu */
   /* context menu items collection */
-  const menus = {};
+  const menus = {
+    [MODE_SOURCE]: null,
+    [MODE_SELECTION]: null,
+    [MODE_EDIT_TEXT]: null
+  };
 
   /**
-   * cache context menu item localized title
+   * cache localized context menu item title
    * @return {void}
    */
   const cacheMenuItemTitle = async () => {
-    if (await menus[MODE_SOURCE]) {
+    if (menus[MODE_SOURCE]) {
       const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
       const label = varsLocal[EDITOR_NAME] || LABEL;
       for (let item of items) {
@@ -321,42 +327,45 @@
    */
   const createMenuItems = async enabled => {
     if (vars[IS_ENABLED]) {
-      const items = [MODE_SOURCE, MODE_SELECTION, MODE_EDIT_TEXT];
-      for (let item of items) {
-        switch (item) {
-          case MODE_SOURCE:
-            !vars[EDITABLE_CONTEXT] &&
-              (menus[item] = createMenuItem(item, ["frame", "page"], enabled));
-            break;
-          case MODE_SELECTION:
-            !vars[EDITABLE_CONTEXT] &&
-              (menus[item] = createMenuItem(item, ["selection"], enabled));
-            break;
-          case MODE_EDIT_TEXT:
-            menus[item] = createMenuItem(item, ["editable"], enabled);
-            break;
-          default:
+      const items = Object.keys(menus);
+      if (items.length > 0) {
+        for (let item of items) {
+          switch (item) {
+            case MODE_SOURCE:
+              !vars[EDITABLE_CONTEXT] && (
+                menus[item] = createMenuItem(item, ["frame", "page"], enabled)
+              );
+              break;
+            case MODE_SELECTION:
+              !vars[EDITABLE_CONTEXT] && (
+                menus[item] = createMenuItem(item, ["selection"], enabled)
+              );
+              break;
+            case MODE_EDIT_TEXT:
+              menus[item] = createMenuItem(item, ["editable"], enabled);
+              break;
+            default:
+          }
         }
       }
     }
   };
 
   /**
-   * restore context menu items
+   * restore context menu
    * @param {boolean} enabled - enabled
    * @return {Object} - Promise
    */
-  const restoreContextMenuItems = enabled =>
-    contextMenus.removeAll().then(() =>
-      createMenuItems(enabled)
-    ).then(cacheMenuItemTitle);
+  const restoreContextMenu = enabled => contextMenus.removeAll().then(() =>
+    createMenuItems(enabled)
+  ).then(cacheMenuItemTitle);
 
   /**
-   * update context menu items
+   * update context menu
    * @param {Object} type - context type data
    * @return {void}
    */
-  const updateContextMenuItems = async type => {
+  const updateContextMenu = async type => {
     if (type) {
       const items = Object.keys(type);
       if (items.length > 0) {
@@ -382,10 +391,9 @@
       const items = Object.keys(menus);
       if (items.length > 0) {
         for (let item of items) {
-          menus[item] &&
-            contextMenus.update(item, {
-              title: i18n.getMessage(item, varsLocal[EDITOR_NAME] || LABEL)
-            });
+          menus[item] && contextMenus.update(item, {
+            title: i18n.getMessage(item, varsLocal[EDITOR_NAME] || LABEL)
+          });
         }
       }
     }
@@ -394,13 +402,14 @@
   /* UI */
   /**
    * synchronize UI components
+   * @param {boolean} enabled - enabled
    * @return {Object} - Promise
    */
-  const syncUI = () => Promise.all([
+  const syncUI = (enabled = false) => Promise.all([
     portMsg({
-      isEnabled: vars[IS_ENABLED]
+      isEnabled: !!enabled
     }),
-    replaceIcon(!vars[IS_ENABLED] && `${ICON}#off` || varsLocal[ICON_PATH]),
+    replaceIcon(!enabled && `${ICON}#off` || varsLocal[ICON_PATH]),
     toggleBadge()
   ]);
 
@@ -408,13 +417,11 @@
   /**
    * port variable
    * @param {Object} v - variable
-   * @return {void}
+   * @return {Object} - ?Promise
    */
-  const portVar = async v => {
-    v && portMsg({
-      [SET_VARS]: v
-    }).catch(logError);
-  };
+  const portVar = async v => v && portMsg({
+    [SET_VARS]: v
+  }) || null;
 
   /**
    * set variable
@@ -438,7 +445,7 @@
         case EDITABLE_CONTEXT:
           vars[item] = !!obj.checked;
           changed && (
-            restoreContextMenuItems().catch(logError),
+            restoreContextMenu().catch(logError),
             portVar({
               [item]: !!obj.checked
             }).catch(logError)
@@ -447,11 +454,11 @@
         case EDITOR_NAME:
           varsLocal[item] = obj.value;
           changed &&
-            updateContextMenuItems().then(cacheMenuItemTitle).catch(logError);
+            updateContextMenu().then(cacheMenuItemTitle).catch(logError);
           break;
         case ENABLE_PB:
           varsLocal[item] = !!obj.checked;
-          changed && syncUI().catch(logError);
+          changed && checkEnable().then(syncUI).catch(logError);
           break;
         case FORCE_REMOVE:
           varsLocal[item] = !!obj.checked;
@@ -527,7 +534,7 @@
         const obj = msg[item];
         switch (item) {
           case CONTEXT_MENU:
-            obj && updateContextMenuItems(obj).catch(logError);
+            obj && updateContextMenu(obj).catch(logError);
             break;
           case OPEN_OPTIONS:
             obj && openOptionsPage().catch(logError);
@@ -585,7 +592,7 @@
         }
       }
     }
-    restoreContextMenuItems(bool).catch(logError);
+    restoreContextMenu(bool).catch(logError);
   };
 
   /**
@@ -604,7 +611,7 @@
                    ports[windowId][tabId][frameUrl] &&
                      ports[windowId][tabId][frameUrl].name === PORT_CONTENT;
       info.status === "complete" && tab.active &&
-        restoreContextMenuItems(bool).catch(logError);
+        restoreContextMenu(bool).catch(logError);
     }
   };
 
@@ -642,14 +649,14 @@
   /**
    * handle removed window
    * @param {number} windowId - windowId
-   * @return {Object|boolean} - Promise or false
+   * @return {Object} - Promise
    */
   const handleRemovedWindow = windowId => Promise.all([
     restorePorts({
       windowId: `${windowId}`
     }),
-    checkWindowIncognito().then(isIncognito => !isIncognito && portHybridMsg({
-      removePrivateTmpFiles: !isIncognito
+    checkWindowIncognito().then(incognito => !incognito && portHybridMsg({
+      removePrivateTmpFiles: !incognito
     }))
   ]).catch(logError);
 
