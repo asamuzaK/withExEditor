@@ -602,8 +602,7 @@
       const frameUrl = tab.url;
       const bool = ports[windowId] && ports[windowId][tabId] &&
                    ports[windowId][tabId][frameUrl] &&
-                   ports[windowId][tabId][frameUrl].name === PORT_CONTENT ||
-                   false;
+                   ports[windowId][tabId][frameUrl].name === PORT_CONTENT;
       info.status === "complete" && tab.active &&
         restoreContextMenuItems(bool).catch(logError);
     }
