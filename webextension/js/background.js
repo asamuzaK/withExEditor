@@ -292,12 +292,10 @@
    * @return {void}
    */
   const cacheMenuItemTitle = async () => {
-    if (menus[MODE_SOURCE]) {
-      const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-      const label = varsLocal[EDITOR_NAME] || LABEL;
-      for (let item of items) {
-        varsLocal[item] = i18n.getMessage(item, label);
-      }
+    const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
+    const label = varsLocal[EDITOR_NAME] || LABEL;
+    for (let item of items) {
+      varsLocal[item] = i18n.getMessage(item, label);
     }
   };
 
@@ -356,7 +354,7 @@
    * @return {Object} - Promise
    */
   const restoreContextMenu = () =>
-    contextMenus.removeAll().then(createMenuItems).then(cacheMenuItemTitle);
+    contextMenus.removeAll().then(createMenuItems);
 
   /**
    * update context menu
@@ -438,8 +436,8 @@
           break;
         case EDITOR_NAME:
           varsLocal[item] = obj.value;
-          changed &&
-            updateContextMenu().then(cacheMenuItemTitle).catch(logError);
+          cacheMenuItemTitle();
+          changed && updateContextMenu().catch(logError);
           break;
         case ENABLE_ONLY_EDITABLE:
           vars[item] = !!obj.checked;
