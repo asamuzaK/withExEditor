@@ -16,9 +16,10 @@
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
 
+  const CHAR = "utf-8";
   const DATA_ATTR_ID = "data-with_ex_editor_id";
-  const DATA_ATTR_ID_NS = `html:${DATA_ATTR_ID}`;
   const DATA_ATTR_ID_CTRL = `${DATA_ATTR_ID}_controls`;
+  const DATA_ATTR_ID_NS = `html:${DATA_ATTR_ID}`;
   const DATA_ATTR_TS = "data-with_ex_editor_timestamp";
   const DATA_ATTR_TS_NS = `html:${DATA_ATTR_TS}`;
   const MODE_EDIT_TEXT = "modeEditText";
@@ -26,20 +27,20 @@
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
-  const CHAR = "utf-8";
+  const NODE_ELEMENT = 1;
+  const NODE_TEXT = 3;
+
   const FILE_EXT = "fileExt";
   const NS_URI = "nsURI";
   const NS_URI_DEFAULT_ITEMS = 4;
-  const ELEMENT_NODE = 1;
-  const TEXT_NODE = 3;
 
+  const ENABLE_ONLY_EDITABLE = "enableOnlyEditable";
+  const INCOGNITO = "incognito";
   const IS_ENABLED = "isEnabled";
   const KEY_ACCESS = "accessKey";
   const KEY_OPEN_OPTIONS = "optionsShortCut";
   const KEY_EXEC_EDITOR = "editorShortCut";
-  const ENABLE_ONLY_EDITABLE = "enableOnlyEditable";
-  const CONTEXT_NODE = "contextNode";
-  const INCOGNITO = "incognito";
+  const NODE_CONTEXT = "contextNode";
   const TAB_ID = "tabId";
 
   /* shortcuts */
@@ -54,8 +55,8 @@
     [KEY_EXEC_EDITOR]: true,
     [KEY_OPEN_OPTIONS]: true,
     [ENABLE_ONLY_EDITABLE]: false,
-    [CONTEXT_NODE]: null,
     [INCOGNITO]: false,
+    [NODE_CONTEXT]: null,
     [TAB_ID]: ""
   };
 
@@ -143,62 +144,6 @@
     }
     return `.${ext || subst}`;
   };
-
-  /* class */
-  /**
-   * key combination class
-   */
-  class KeyCombo {
-    /**
-     * @param {Object} opt - key settings
-     */
-    constructor(opt = {}) {
-      this._key = isString(opt.key) && opt.key.length === 1 && opt.key || "";
-      this._alt = opt.alt || false;
-      this._ctrl = opt.ctrl || false;
-      this._meta = opt.meta || false;
-      this._shift = opt.shift || false;
-      this._enabled = opt.enabled || false;
-    }
-
-    /* getter / setter */
-    get key() {
-      return this._key;
-    }
-    set key(key) {
-      this._key = isString(key) && key.length === 1 && key || "";
-    }
-    get altKey() {
-      return this._alt;
-    }
-    set altKey(bool) {
-      this._alt = !!bool;
-    }
-    get ctrlKey() {
-      return this._ctrl;
-    }
-    set ctrlKey(bool) {
-      this._ctrl = !!bool;
-    }
-    get metaKey() {
-      return this._meta;
-    }
-    set metaKey(bool) {
-      this._meta = !!bool;
-    }
-    get shiftKey() {
-      return this._shift;
-    }
-    set shiftKey(bool) {
-      this._shift = !!bool;
-    }
-    get enabled() {
-      return this._enabled;
-    }
-    set enabled(bool) {
-      this._enabled = !!bool;
-    }
-  }
 
   /* port */
   const port = runtime.connect({name: PORT_NAME});
@@ -359,16 +304,16 @@
   const createElm = (node, bool = false) =>
     createElementNS(node).then(async elm => {
       if (bool && node && node.hasChildNodes() &&
-          elm && elm.nodeType === ELEMENT_NODE) {
+          elm && elm.nodeType === NODE_ELEMENT) {
         const fragment = document.createDocumentFragment();
         const nodes = node.childNodes;
         for (let child of nodes) {
-          child.nodeType === ELEMENT_NODE ? (
+          child.nodeType === NODE_ELEMENT ? (
             child === child.parentNode.firstChild &&
               fragment.appendChild(document.createTextNode("\n")),
             fragment.appendChild(await createElm(child, true))
           ) :
-          child.nodeType === TEXT_NODE &&
+          child.nodeType === NODE_TEXT &&
             fragment.appendChild(document.createTextNode(child.nodeValue));
         }
         elm.appendChild(fragment);
@@ -385,14 +330,14 @@
     const fragment = document.createDocumentFragment();
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        node.nodeType === ELEMENT_NODE ? (
+        node.nodeType === NODE_ELEMENT ? (
           node === node.parentNode.firstChild &&
             fragment.appendChild(document.createTextNode("\n")),
           fragment.appendChild(await createElm(node, true)),
           node === node.parentNode.lastChild &&
             fragment.appendChild(document.createTextNode("\n"))
         ) :
-        node.nodeType === TEXT_NODE &&
+        node.nodeType === NODE_TEXT &&
           fragment.appendChild(document.createTextNode(node.nodeValue));
       }
     }
@@ -408,7 +353,7 @@
   const createDomTree = async (elm, node = null) => {
     let child;
     elm = await createElm(elm);
-    elm.nodeType === ELEMENT_NODE && node && node.hasChildNodes() &&
+    elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes() &&
     (child = await createDom(node.childNodes)) &&
       elm.appendChild(child);
     return elm;
@@ -449,7 +394,7 @@
         const range = sel.getRangeAt(i);
         const ancestor = range.commonAncestorContainer;
         l > 1 && fragment.appendChild(document.createTextNode("\n"));
-        if (ancestor.nodeType === ELEMENT_NODE) {
+        if (ancestor.nodeType === NODE_ELEMENT) {
           obj = await getNodeNS(ancestor);
           if (/^(?:svg|math)$/.test(obj.localName)) {
             if (obj.node === document.documentElement) {
@@ -469,9 +414,9 @@
           );
         }
         else {
-          ancestor.nodeType === TEXT_NODE &&
+          ancestor.nodeType === NODE_TEXT &&
           (obj = await createElm(ancestor.parentNode)) &&
-          obj.nodeType === ELEMENT_NODE && (
+          obj.nodeType === NODE_ELEMENT && (
             obj.appendChild(range.cloneContents()),
             fragment.appendChild(obj)
           );
@@ -483,7 +428,7 @@
       }
       l > 1 && fragment.hasChildNodes() &&
       (obj = await createElm(document.documentElement)) &&
-      obj.nodeType === ELEMENT_NODE && (
+      obj.nodeType === NODE_ELEMENT && (
         obj.appendChild(fragment),
         fragment = document.createDocumentFragment(),
         fragment.appendChild(obj),
@@ -503,7 +448,7 @@
     const arr = [];
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        if (node.nodeType === ELEMENT_NODE) {
+        if (node.nodeType === NODE_ELEMENT) {
           node.localName === "br" ?
             arr.push("\n") :
           node.hasChildNodes() &&
@@ -511,7 +456,7 @@
             arr.push(node);
         }
         else {
-          node.nodeType === TEXT_NODE && arr.push(node.nodeValue);
+          node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
         }
       }
     }
@@ -568,7 +513,7 @@
         node.namespaceURI !== nsURI.html && node.hasChildNodes()) {
       const nodes = node.childNodes;
       for (let child of nodes) {
-        isText = child.nodeType === TEXT_NODE;
+        isText = child.nodeType === NODE_TEXT;
         if (!isText) {
           break;
         }
@@ -924,7 +869,7 @@
    * @return {void}
    */
   const syncContentText = async (node, arr = [""], ns = nsURI.html) => {
-    if (node && node.nodeType === ELEMENT_NODE && Array.isArray(arr)) {
+    if (node && node.nodeType === NODE_ELEMENT && Array.isArray(arr)) {
       const fragment = document.createDocumentFragment();
       const l = arr.length;
       let i = 0;
@@ -991,16 +936,59 @@
     }
   };
 
-  /* key combo */
-  /* open options key */
-  const openOptionsKey = new KeyCombo({
-    key: vars[KEY_ACCESS],
-    alt: true,
-    ctrl: true,
-    meta: false,
-    shift: false,
-    enabled: vars[KEY_OPEN_OPTIONS]
-  });
+  /* keyboard shortcuts */
+  /* key combination class */
+  class KeyCombo {
+    /**
+     * @param {Object} opt - key settings
+     */
+    constructor(opt = {}) {
+      this._key = isString(opt.key) && opt.key.length === 1 && opt.key || "";
+      this._alt = opt.alt || false;
+      this._ctrl = opt.ctrl || false;
+      this._meta = opt.meta || false;
+      this._shift = opt.shift || false;
+      this._enabled = opt.enabled || false;
+    }
+
+    /* getter / setter */
+    get key() {
+      return this._key;
+    }
+    set key(key) {
+      this._key = isString(key) && key.length === 1 && key || "";
+    }
+    get altKey() {
+      return this._alt;
+    }
+    set altKey(bool) {
+      this._alt = !!bool;
+    }
+    get ctrlKey() {
+      return this._ctrl;
+    }
+    set ctrlKey(bool) {
+      this._ctrl = !!bool;
+    }
+    get metaKey() {
+      return this._meta;
+    }
+    set metaKey(bool) {
+      this._meta = !!bool;
+    }
+    get shiftKey() {
+      return this._shift;
+    }
+    set shiftKey(bool) {
+      this._shift = !!bool;
+    }
+    get enabled() {
+      return this._enabled;
+    }
+    set enabled(bool) {
+      this._enabled = !!bool;
+    }
+  }
 
   /* execute editor key */
   const execEditorKey = new KeyCombo({
@@ -1010,6 +998,16 @@
     meta: false,
     shift: true,
     enabled: vars[KEY_EXEC_EDITOR]
+  });
+
+  /* open options key */
+  const openOptionsKey = new KeyCombo({
+    key: vars[KEY_ACCESS],
+    alt: true,
+    ctrl: true,
+    meta: false,
+    shift: false,
+    enabled: vars[KEY_OPEN_OPTIONS]
   });
 
   /**
@@ -1045,7 +1043,7 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            portContentData(vars[CONTEXT_NODE]).catch(logError);
+            portContentData(vars[NODE_CONTEXT]).catch(logError);
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -1100,7 +1098,7 @@
               MODE_SOURCE
       }
     };
-    vars[CONTEXT_NODE] = elm;
+    vars[NODE_CONTEXT] = elm;
     portMsg({contextMenu}).catch(logError);
   };
 

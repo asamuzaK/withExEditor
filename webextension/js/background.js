@@ -440,6 +440,11 @@
           varsLocal[item] = obj.value;
           connectHost().catch(logError);
           break;
+        case EDITOR_NAME:
+          varsLocal[item] = obj.value;
+          changed &&
+            updateContextMenu().then(cacheMenuItemTitle).catch(logError);
+          break;
         case ENABLE_ONLY_EDITABLE:
           vars[item] = !!obj.checked;
           changed && (
@@ -448,11 +453,6 @@
               [item]: !!obj.checked
             }).catch(logError)
           );
-          break;
-        case EDITOR_NAME:
-          varsLocal[item] = obj.value;
-          changed &&
-            updateContextMenu().then(cacheMenuItemTitle).catch(logError);
           break;
         case ENABLE_PB:
           varsLocal[item] = !!obj.checked;
@@ -473,17 +473,17 @@
             changed && replaceIcon().catch(logError)
           );
           break;
-        case KEY_OPEN_OPTIONS:
-        case KEY_EXEC_EDITOR:
-          vars[item] = !!obj.checked;
-          changed && portVar({
-            [item]: !!obj.checked
-          }).catch(logError);
-          break;
         case KEY_ACCESS:
           vars[item] = obj.value;
           changed && portVar({
             [item]: obj.value
+          }).catch(logError);
+          break;
+        case KEY_EXEC_EDITOR:
+        case KEY_OPEN_OPTIONS:
+          vars[item] = !!obj.checked;
+          changed && portVar({
+            [item]: !!obj.checked
           }).catch(logError);
           break;
         default:
@@ -538,7 +538,7 @@
             obj && openOptionsPage().catch(logError);
             break;
           case PORT_HOST:
-            obj.path && portHostMsg(obj.path).catch(logError);
+            obj && obj.path && portHostMsg(obj.path).catch(logError);
             break;
           default:
         }

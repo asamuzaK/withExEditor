@@ -14,7 +14,7 @@
   const CHAR = "utf-8";
   const DATA_ATTR_I18N = "data-i18n";
   const LANG = "optionsLang";
-  const ELEMENT_NODE = 1;
+  const NODE_ELEMENT = 1;
 
   const APP_MANIFEST = "appManifestPath";
   const APP_NAME = "appName";
@@ -176,7 +176,7 @@
    * @return {void}
    */
   const localizeAttr = async elm => {
-    if (elm && elm.nodeType === ELEMENT_NODE && elm.hasAttributes()) {
+    if (elm && elm.nodeType === NODE_ELEMENT && elm.hasAttributes()) {
       const attrs = {
         ariaLabel: "aria-label",
         alt: "alt",
@@ -279,7 +279,7 @@
                 storage.set(pref);
               }),
               syncEditorName(obj.executable),
-              /* NOTE: for hybrid */
+              // NOTE: for hybrid
               portMsg({
                 removeSdkPrefs: obj.executable
               })
