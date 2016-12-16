@@ -940,20 +940,20 @@
   /* execute editor key combination */
   const execEditorKey = {
     key: vars[KEY_ACCESS],
-    alt: false,
-    ctrl: true,
-    meta: false,
-    shift: true,
+    altKey: false,
+    ctrlKey: true,
+    metaKey: false,
+    shiftKey: true,
     enabled: vars[KEY_EXEC_EDITOR]
   };
 
   /* open options key combination */
   const openOptionsKey = {
     key: vars[KEY_ACCESS],
-    alt: true,
-    ctrl: true,
-    meta: false,
-    shift: false,
+    altKey: true,
+    ctrlKey: true,
+    metaKey: false,
+    shiftKey: false,
     enabled: vars[KEY_OPEN_OPTIONS]
   };
 
@@ -964,8 +964,8 @@
    * @return {boolean}
    */
   const keyComboMatches = async (evt, key) =>
-    vars[IS_ENABLED] && key.enabled && key.key &&
-    evt.key && evt.key.toLowerCase() === key.key.toLowerCase() &&
+    vars[IS_ENABLED] && key.enabled && key.key && evt.key &&
+    evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
 
