@@ -1055,15 +1055,14 @@
    * @return {void}
    */
   const handleKeyPress = async evt => {
-    const elm = evt && evt.target;
-    const sel = window.getSelection();
     const openOptions = await keyComboMatches(evt, openOptionsKey);
-    const execEditor = await keyComboMatches(evt, execEditorKey);
     if (openOptions) {
       portMsg({openOptions});
     }
     else {
-      execEditor && elm && (
+      const elm = evt && evt.target;
+      const sel = window.getSelection();
+      await keyComboMatches(evt, execEditorKey) && elm && (
         vars[ENABLE_ONLY_EDITABLE] ?
           await isEditControl(elm) || elm.isContentEditable ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
