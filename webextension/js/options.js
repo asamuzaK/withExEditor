@@ -19,6 +19,7 @@
   const APP_MANIFEST = "appManifestPath";
   const APP_NAME = "appName";
   const EDITOR_NAME = "editorName";
+  const KEY_ACCESS = "accessKey";
 
   /* shortcuts */
   const i18n = browser.i18n;
@@ -29,7 +30,8 @@
   const vars = {
     [APP_MANIFEST]: null,
     [APP_NAME]: null,
-    [EDITOR_NAME]: null
+    [EDITOR_NAME]: null,
+    [KEY_ACCESS]: null
   };
 
   /**
@@ -64,12 +66,21 @@
 
   /* storage */
   /**
-   * create pref object
+   * set storage
+   * @param {Object} pref - pref
+   * @return {void}
+   */
+  const setStorage = async pref => {
+    pref && storage.set(pref);
+  };
+
+  /**
+   * create pref
    * @param {Object} elm - element
    * @param {boolean} bool - executable
    * @return {Object}
    */
-  const createPrefObj = async (elm, bool = false) => {
+  const createPref = async (elm, bool = false) => {
     const id = elm && elm.id;
     return id && {
       [id]: {
@@ -98,9 +109,7 @@
         vars[EDITOR_NAME].value = "",
         vars[EDITOR_NAME].disabled = true
       );
-      createPrefObj(vars[EDITOR_NAME]).then(pref => {
-        pref && storage.set(pref);
-      }).catch(logError);
+      createPref(vars[EDITOR_NAME]).then(setStorage).catch(logError);
     }
   };
 
@@ -115,9 +124,7 @@
     const path = app && app.path;
     name && path && (
       vars[APP_NAME].value = name,
-      createPrefObj(name).then(pref => {
-        pref && storage.set(pref);
-      }).catch(logError),
+      createPref(name).then(setStorage).catch(logError),
       portMsg({
         [CHECK_EXECUTABLE]: {path}
       }).catch(logError)
@@ -136,22 +143,26 @@
         const nodes = document.querySelectorAll(`[name=${elm.name}]`);
         if (nodes instanceof NodeList) {
           for (let node of nodes) {
-            createPrefObj(node).then(pref => {
-              pref && storage.set(pref);
-            }).catch(logError);
+            createPref(node).then(setStorage).catch(logError);
           }
         }
       }
       else {
-        elm === vars[APP_MANIFEST] ?
-          portMsg({
-            [GET_APP_MANIFEST]: {
-              path: elm.value
-            }
-          }) :
-          createPrefObj(elm).then(pref => {
-            pref && storage.set(pref);
-          }).catch(logError);
+        switch (elm.id) {
+          case APP_MANIFEST:
+            portMsg({
+              [GET_APP_MANIFEST]: {
+                path: elm.value
+              }
+            });
+            break;
+          case KEY_ACCESS:
+            (elm.value === "" || elm.value.length === 1) &&
+              createPref(elm).then(setStorage).catch(logError);
+            break;
+          default:
+            createPref(elm).then(setStorage).catch(logError);
+        }
       }
     }
   };
@@ -256,6 +267,7 @@
     vars[APP_NAME] = document.getElementById(APP_NAME);
     vars[APP_MANIFEST] = document.getElementById(APP_MANIFEST);
     vars[EDITOR_NAME] = document.getElementById(EDITOR_NAME);
+    vars[KEY_ACCESS] = document.getElementById(KEY_ACCESS);
   };
 
   /* handler */
@@ -275,9 +287,7 @@
             break;
           case RES_EXECUTABLE:
             Promise.all([
-              createPrefObj(vars[APP_MANIFEST], obj.executable).then(pref => {
-                storage.set(pref);
-              }),
+              createPref(vars[APP_MANIFEST], obj.executable).then(setStorage),
               syncEditorName(obj.executable),
               // NOTE: for hybrid
               portMsg({

@@ -937,78 +937,25 @@
   };
 
   /* keyboard shortcuts */
-  /* key combination class */
-  class KeyCombo {
-    /**
-     * @param {Object} opt - key settings
-     */
-    constructor(opt = {}) {
-      this._key = isString(opt.key) && opt.key.length === 1 && opt.key || "";
-      this._alt = opt.alt || false;
-      this._ctrl = opt.ctrl || false;
-      this._meta = opt.meta || false;
-      this._shift = opt.shift || false;
-      this._enabled = opt.enabled || false;
-    }
-
-    /* getter / setter */
-    get key() {
-      return this._key;
-    }
-    set key(key) {
-      this._key = isString(key) && key.length === 1 && key || "";
-    }
-    get altKey() {
-      return this._alt;
-    }
-    set altKey(bool) {
-      this._alt = !!bool;
-    }
-    get ctrlKey() {
-      return this._ctrl;
-    }
-    set ctrlKey(bool) {
-      this._ctrl = !!bool;
-    }
-    get metaKey() {
-      return this._meta;
-    }
-    set metaKey(bool) {
-      this._meta = !!bool;
-    }
-    get shiftKey() {
-      return this._shift;
-    }
-    set shiftKey(bool) {
-      this._shift = !!bool;
-    }
-    get enabled() {
-      return this._enabled;
-    }
-    set enabled(bool) {
-      this._enabled = !!bool;
-    }
-  }
-
-  /* execute editor key */
-  const execEditorKey = new KeyCombo({
+  /* execute editor key combination */
+  const execEditorKey = {
     key: vars[KEY_ACCESS],
     alt: false,
     ctrl: true,
     meta: false,
     shift: true,
     enabled: vars[KEY_EXEC_EDITOR]
-  });
+  };
 
-  /* open options key */
-  const openOptionsKey = new KeyCombo({
+  /* open options key combination */
+  const openOptionsKey = {
     key: vars[KEY_ACCESS],
     alt: true,
     ctrl: true,
     meta: false,
     shift: false,
     enabled: vars[KEY_OPEN_OPTIONS]
-  });
+  };
 
   /**
    * key combination matches
@@ -1017,7 +964,7 @@
    * @return {boolean}
    */
   const keyComboMatches = async (evt, key) =>
-    vars[IS_ENABLED] && key.enabled &&
+    vars[IS_ENABLED] && key.enabled && key.key &&
     evt.key && evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
@@ -1047,8 +994,8 @@
             break;
           case KEY_ACCESS:
             vars[item] = obj;
-            openOptionsKey.key = obj;
             execEditorKey.key = obj;
+            openOptionsKey.key = obj;
             break;
           case KEY_EXEC_EDITOR:
             vars[item] = !!obj;
