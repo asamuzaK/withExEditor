@@ -436,7 +436,7 @@
           break;
         case EDITOR_NAME:
           varsLocal[item] = obj.value;
-          cacheMenuItemTitle();
+          cacheMenuItemTitle().catch(logError);
           changed && updateContextMenu().catch(logError);
           break;
         case ENABLE_ONLY_EDITABLE:
