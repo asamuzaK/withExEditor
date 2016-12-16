@@ -404,9 +404,7 @@
    * @return {Object} - Promise
    */
   const syncUI = (enabled = false) => Promise.all([
-    portMsg({
-      isEnabled: !!enabled
-    }),
+    portMsg({isEnabled: !!enabled}),
     replaceIcon(!enabled && `${ICON}#off` || varsLocal[ICON_PATH]),
     toggleBadge()
   ]);
@@ -417,9 +415,7 @@
    * @param {Object} v - variable
    * @return {Object} - ?Promise
    */
-  const portVar = async v => v && portMsg({
-    [SET_VARS]: v
-  }) || null;
+  const portVar = async v => v && portMsg({[SET_VARS]: v}) || null;
 
   /**
    * set variable
@@ -449,9 +445,7 @@
           vars[item] = !!obj.checked;
           changed && (
             restoreContextMenu().catch(logError),
-            portVar({
-              [item]: !!obj.checked
-            }).catch(logError)
+            portVar({[item]: !!obj.checked}).catch(logError)
           );
           break;
         case ENABLE_PB:
@@ -461,9 +455,7 @@
         case FORCE_REMOVE:
           varsLocal[item] = !!obj.checked;
           // NOTE: for hybrid
-          portHybridMsg({
-            [item]: !!obj.checked
-          }).catch(logError);
+          portHybridMsg({[item]: !!obj.checked}).catch(logError);
           break;
         case ICON_COLOR:
         case ICON_GRAY:
@@ -475,16 +467,12 @@
           break;
         case KEY_ACCESS:
           vars[item] = obj.value;
-          changed && portVar({
-            [item]: obj.value
-          }).catch(logError);
+          changed && portVar({[item]: obj.value}).catch(logError);
           break;
         case KEY_EXEC_EDITOR:
         case KEY_OPEN_OPTIONS:
           vars[item] = !!obj.checked;
-          changed && portVar({
-            [item]: !!obj.checked
-          }).catch(logError);
+          changed && portVar({[item]: !!obj.checked}).catch(logError);
           break;
         default:
       }
@@ -626,11 +614,12 @@
     const tabId = `${id}`;
     const incognito = ports[windowId] && ports[windowId][tabId] &&
                         !!ports[windowId][tabId][INCOGNITO];
+    ports[windowId] && ports[windowId][tabId] &&
+      restorePorts({windowId, tabId}).catch(logError);
+    // NOTE: for hybrid
     portHybridMsg({
       removeTabRelatedStorage: {tabId, incognito, info}
     }).catch(logError);
-    ports[windowId] && ports[windowId][tabId] &&
-      restorePorts({windowId, tabId}).catch(logError);
   };
 
   /**
@@ -652,12 +641,11 @@
    * @return {Object} - Promise
    */
   const handleRemovedWindow = windowId => Promise.all([
-    restorePorts({
-      windowId: `${windowId}`
-    }),
-    checkWindowIncognito().then(incognito => !incognito && portHybridMsg({
-      removePrivateTmpFiles: !incognito
-    }))
+    restorePorts({windowId: `${windowId}`}),
+    // NOTE: for hybrid
+    checkWindowIncognito().then(incognito =>
+      !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
+    )
   ]).catch(logError);
 
   /* listeners */
@@ -678,9 +666,7 @@
   /* startup */
   Promise.all([
     storage.get().then(setVars).then(checkEnable).then(syncUI).then(() =>
-      portMsg({
-        [SET_VARS]: vars
-      })
+      portMsg({[SET_VARS]: vars})
     ),
     fetch(PATH_NS_URI).then(async data => {
       const nsURI = await data.json();

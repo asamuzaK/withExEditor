@@ -290,9 +290,7 @@
               createPref(vars[APP_MANIFEST], obj.executable).then(setStorage),
               syncEditorName(obj.executable),
               // NOTE: for hybrid
-              portMsg({
-                removeSdkPrefs: obj.executable
-              })
+              portMsg({removeSdkPrefs: obj.executable})
             ]).catch(logError);
             break;
           default:

@@ -846,9 +846,7 @@
     }
     else {
       res[GET_FILE_PATH] &&
-        portMsg({
-          [GET_FILE_PATH]: res[GET_FILE_PATH]
-        }).catch(logError);
+        portMsg({[GET_FILE_PATH]: res[GET_FILE_PATH]}).catch(logError);
     }
   };
 
@@ -1081,8 +1079,5 @@
   }, false);
 
   /* startup */
-  Promise.all([
-    extendFileExt(),
-    extendNsURI()
-  ]).catch(logError);
+  Promise.all([extendFileExt(), extendNsURI()]).catch(logError);
 }
