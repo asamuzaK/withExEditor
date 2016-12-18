@@ -67,7 +67,7 @@ Available with (X)HTML, JavaScript, CSS, MathML, SVG, XML documents.
 
 ***
 
-## Manual
+## Application Manifest Manual
 ### Important Notice
 Unlike the Jetpack SDK used by prior withExEditor, Mozilla's new add-on ecosystem WebExtensions does not allow to spawn child process from the add-on (that is, external editor can not be executed directly anymore).
 Instead, in WebExtensions, the browser interacts with native application via messages.
