@@ -88,7 +88,7 @@
         value: elm.value || "",
         checked: !!elm.checked,
         app: {
-          executable: bool
+          executable: !!bool
         }
       }
     } || null;
@@ -97,20 +97,21 @@
   /**
    * synchronize editorName value
    * @param {string} bool - native application is executable
-   * @return {void}
+   * @return {Object} - vars[EDITOR_NAME]
    */
   const syncEditorName = async (bool = false) => {
-    if (vars[EDITOR_NAME]) {
+    const elm = vars[EDITOR_NAME];
+    if (elm) {
       const name = vars[APP_NAME] && vars[APP_NAME].value;
       bool && name ? (
-        vars[EDITOR_NAME].value = name,
-        vars[EDITOR_NAME].disabled = false
+        elm.value = name,
+        elm.disabled = false
       ) : (
-        vars[EDITOR_NAME].value = "",
-        vars[EDITOR_NAME].disabled = true
+        elm.value = "",
+        elm.disabled = true
       );
-      createPref(vars[EDITOR_NAME]).then(setStorage).catch(logError);
     }
+    return elm || null;
   };
 
   /**
@@ -288,7 +289,7 @@
           case RES_EXECUTABLE:
             Promise.all([
               createPref(vars[APP_MANIFEST], obj.executable).then(setStorage),
-              syncEditorName(obj.executable),
+              syncEditorName(obj.executable).then(createPref).then(setStorage),
               // NOTE: for hybrid
               portMsg({removeSdkPrefs: obj.executable})
             ]).catch(logError);
