@@ -587,7 +587,7 @@
   };
 
   /**
-   * get file source
+   * fetch file source
    * @param {Object} data - temporary file data
    * @return {Object}
    */
