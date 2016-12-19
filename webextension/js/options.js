@@ -209,27 +209,22 @@
   };
 
   /**
-   * localize element content
+   * localize html
    * @return {void}
    */
-  const localizeElm = async () => {
-    const nodes = document.querySelectorAll(`[${DATA_ATTR_I18N}]`);
-    if (nodes instanceof NodeList) {
-      for (let node of nodes) {
-        const data = i18n.getMessage(node.getAttribute(DATA_ATTR_I18N));
-        data && (node.textContent = data);
-        node.hasAttributes() && localizeAttr(node);
+  const localizeHtml = async () => {
+    const lang = i18n.getMessage(LANG);
+    if (lang) {
+      document.documentElement.setAttribute("lang", lang);
+      const nodes = document.querySelectorAll(`[${DATA_ATTR_I18N}]`);
+      if (nodes instanceof NodeList) {
+        for (let node of nodes) {
+          const data = i18n.getMessage(node.getAttribute(DATA_ATTR_I18N));
+          data && (node.textContent = data);
+          node.hasAttributes() && localizeAttr(node);
+        }
       }
     }
-  };
-
-  /**
-   * localize html lang property
-   * @return {void}
-   */
-  const localizeHtmlLang = async () => {
-    const lang = i18n.getMessage(LANG);
-    lang && document.documentElement.setAttribute("lang", lang);
   };
 
   /**
@@ -306,7 +301,7 @@
   port.onMessage.addListener(handleMsg);
 
   document.addEventListener("DOMContentLoaded", () => Promise.all([
-    localizeHtmlLang().then(localizeElm),
+    localizeHtml(),
     setVariables().then(setValuesFromStorage),
     addInputChangeListener()
   ]).catch(logError), false);
