@@ -114,12 +114,12 @@ while True:
   cmd = []
   cmd.append(app)
 
-  # If you have arguments and want arguments before file
+  # If you want arguments before file
   # cmd.extend(args)
 
   cmd.append(file)
 
-  # If you have arguments and want arguments after file
+  # If you want arguments after file
   # cmd.extend(args)
 
   subprocess.run(cmd)
