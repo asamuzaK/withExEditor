@@ -265,10 +265,12 @@
    * @return {void}
    */
   const setVariables = async () => {
-    vars[APP_NAME] = document.getElementById(APP_NAME);
-    vars[APP_MANIFEST] = document.getElementById(APP_MANIFEST);
-    vars[EDITOR_NAME] = document.getElementById(EDITOR_NAME);
-    vars[KEY_ACCESS] = document.getElementById(KEY_ACCESS);
+    const items = Object.keys(vars);
+    if (items.length > 0) {
+      for (let item of items) {
+        vars[item] = document.getElementById(item);
+      }
+    }
   };
 
   /* handler */
