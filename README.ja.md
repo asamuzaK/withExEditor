@@ -97,7 +97,7 @@ import sys, json, struct, subprocess
 def getMessage():
   rawLength = sys.stdin.buffer.read(4)
   if len(rawLength) == 0:
-    sys.exit(0)
+    sys.exit()
   message = sys.stdin.buffer.read(struct.unpack("@I", rawLength)[0])
   if message:
     return json.loads(message.decode("utf-8"))
@@ -125,7 +125,7 @@ while True:
 
   subprocess.run(cmd)
 
-sys.exit(0)
+sys.exit()
 ```
 
 Windowsでは、pythonスクリプトを実行するためのシェルスクリプト（バッチファイル）も作成します。
