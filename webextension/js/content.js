@@ -587,9 +587,9 @@
   };
 
   /**
-   * fetch file source
-   * @param {Object} data - temporary file data
-   * @return {Object}
+   * fetch file source and create temporary file data
+   * @param {Object} data - content data
+   * @return {Object} - temporary file data
    */
   const fetchSource = async data => {
     const uri = document.documentURI;
