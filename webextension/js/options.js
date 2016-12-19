@@ -238,8 +238,8 @@
    */
   const setValuesFromStorage = async () => {
     const pref = await storage.get() || {};
-    const items = Object.keys(pref);
-    if (items.length > 0) {
+    const items = pref && Object.keys(pref);
+    if (items && items.length > 0) {
       for (let item of items) {
         const obj = pref[item];
         const elm = document.getElementById(obj.id);
