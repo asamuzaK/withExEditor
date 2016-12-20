@@ -77,10 +77,10 @@
   /**
    * create pref
    * @param {Object} elm - element
-   * @param {boolean} bool - executable
+   * @param {boolean} executable - executable
    * @return {Object}
    */
-  const createPref = async (elm, bool = false) => {
+  const createPref = async (elm, executable = false) => {
     const id = elm && elm.id;
     return id && {
       [id]: {
@@ -88,7 +88,7 @@
         value: elm.value || "",
         checked: !!elm.checked,
         app: {
-          executable: !!bool
+          executable: !!executable
         }
       }
     } || null;
@@ -96,14 +96,14 @@
 
   /**
    * synchronize editorName value
-   * @param {string} bool - native application is executable
+   * @param {string} executable - executable
    * @return {Object} - vars[EDITOR_NAME]
    */
-  const syncEditorName = async (bool = false) => {
+  const syncEditorName = async (executable = false) => {
     const elm = vars[EDITOR_NAME];
     if (elm) {
       const name = vars[APP_NAME] && vars[APP_NAME].value;
-      bool && name ? (
+      executable && name ? (
         elm.value = name,
         elm.disabled = false
       ) : (

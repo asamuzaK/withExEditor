@@ -283,12 +283,12 @@
   /**
    * create element
    * @param {Object} node - element node to create element from
-   * @param {boolean} bool - append child nodes
+   * @param {boolean} append - append child nodes
    * @return {Object} - Promise, returns element or text node on fulfill
    */
-  const createElm = (node, bool = false) =>
+  const createElm = (node, append = false) =>
     createElementNS(node).then(async elm => {
-      if (bool && node && node.hasChildNodes() &&
+      if (append && node && node.hasChildNodes() &&
           elm && elm.nodeType === NODE_ELEMENT) {
         const fragment = document.createDocumentFragment();
         const nodes = node.childNodes;

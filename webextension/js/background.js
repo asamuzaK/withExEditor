@@ -269,12 +269,12 @@
 
   /**
    * toggle badge
-   * @param {boolean} bool - executable
+   * @param {boolean} executable - executable
    * @return {void}
    */
-  const toggleBadge = async (bool = varsLocal[IS_EXECUTABLE]) => {
-    const color = !bool && WARN_COLOR || "transparent";
-    const text = !bool && WARN_TEXT || "";
+  const toggleBadge = async (executable = varsLocal[IS_EXECUTABLE]) => {
+    const color = !executable && WARN_COLOR || "transparent";
+    const text = !executable && WARN_TEXT || "";
     browserAction.setBadgeBackgroundColor({color});
     browserAction.setBadgeText({text});
   };
