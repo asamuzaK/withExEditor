@@ -78,27 +78,6 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
-  /**
-   * extend object items
-   * @param {Object} obj - object to extend items
-   * @param {string} key - storage key
-   * @param {number} len - default items length
-   * @return {void}
-   */
-  const extObjItems = async (obj, key, len = 0) => {
-    if (obj && key && Object.keys(obj).length <= len) {
-      let ext = await storage.get(key);
-      if (ext && Object.keys(ext).length > 0 && (ext = ext[key])) {
-        const items = Object.keys(ext);
-        if (items && items.length > len) {
-          for (let item of items) {
-            obj[item] = ext[item];
-          }
-        }
-      }
-    }
-  };
-
   /* RegExp */
   const reExt = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/;
   const rePath = /^.*\/((?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?)?$/;
@@ -951,6 +930,28 @@
     evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
+
+  /* storage */
+  /**
+   * extend object items from storage
+   * @param {Object} obj - object to extend items
+   * @param {string} key - storage key
+   * @param {number} len - default items length
+   * @return {void}
+   */
+  const extObjItems = async (obj, key, len = 0) => {
+    if (obj && key && Object.keys(obj).length <= len) {
+      let ext = await storage.get(key);
+      if (ext && Object.keys(ext).length > 0 && (ext = ext[key])) {
+        const items = Object.keys(ext);
+        if (items && items.length > len) {
+          for (let item of items) {
+            obj[item] = ext[item];
+          }
+        }
+      }
+    }
+  };
 
   /* handlers */
   /**
