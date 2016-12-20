@@ -78,6 +78,27 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
+  /**
+   * extend object items
+   * @param {Object} obj - object to extend items
+   * @param {string} key - storage key
+   * @param {number} len - default items length
+   * @return {void}
+   */
+  const extObjItems = async (obj, key, len = 0) => {
+    if (obj && key && Object.keys(obj).length <= len) {
+      let ext = await storage.get(key);
+      if (ext && Object.keys(ext).length > 0 && (ext = ext[key])) {
+        const items = Object.keys(ext);
+        if (items && items.length > len) {
+          for (let item of items) {
+            obj[item] = ext[item];
+          }
+        }
+      }
+    }
+  };
+
   /* RegExp */
   const reExt = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/;
   const rePath = /^.*\/((?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?)?$/;
@@ -98,24 +119,6 @@
 
   /* file extension */
   const fileExt = {};
-
-  /**
-   * extend file extension items
-   * @return {void}
-   */
-  const extendFileExt = async () => {
-    if (Object.keys(fileExt).length === 0) {
-      let ext = await storage.get(FILE_EXT);
-      if (Object.keys(ext).length > 0 && (ext = ext[FILE_EXT])) {
-        const items = Object.keys(ext);
-        if (items.length > 0) {
-          for (let item of items) {
-            fileExt[item] = ext[item];
-          }
-        }
-      }
-    }
-  };
 
   /**
    * get file extension from media type
@@ -187,24 +190,6 @@
     math: "http://www.w3.org/1998/Math/MathML",
     svg: "http://www.w3.org/2000/svg",
     xmlns: "http://www.w3.org/2000/xmlns/"
-  };
-
-  /**
-   * extend nsURI namespace items
-   * @return {void}
-   */
-  const extendNsURI = async () => {
-    if (Object.keys(nsURI).length <= NS_URI_DEFAULT_ITEMS) {
-      let ns = await storage.get(NS_URI);
-      if (Object.keys(ns).length > 0 && (ns = ns[NS_URI])) {
-        const items = Object.keys(ns);
-        if (items.length > NS_URI_DEFAULT_ITEMS) {
-          for (let item of items) {
-            nsURI[item] = ns[item];
-          }
-        }
-      }
-    }
   };
 
   /**
@@ -1079,5 +1064,8 @@
   }, false);
 
   /* startup */
-  Promise.all([extendFileExt(), extendNsURI()]).catch(logError);
+  Promise.all([
+    extObjItems(fileExt, FILE_EXT, 0),
+    extObjItems(nsURI, NS_URI, NS_URI_DEFAULT_ITEMS)
+  ]).catch(logError);
 }
