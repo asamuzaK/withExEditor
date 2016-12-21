@@ -541,22 +541,20 @@
     if (elm) {
       const id = await getId(elm);
       const ctrl = await getEditableElm(elm);
-      if (ctrl) {
+      if (id && ctrl) {
         const arr = ctrl.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
                       (ctrl.getAttributeNS("", DATA_ATTR_ID_CTRL)).split(" ");
-        if (id) {
-          if (arr) {
-            arr.push(id);
-            ctrl.setAttributeNS(
-              "",
-              DATA_ATTR_ID_CTRL,
-              (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
-            );
-          }
-          else {
-            ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, id);
-            ctrl.addEventListener("focus", portTemporaryId, false);
-          }
+        if (arr) {
+          arr.push(id);
+          ctrl.setAttributeNS(
+            "",
+            DATA_ATTR_ID_CTRL,
+            (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
+          );
+        }
+        else {
+          ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, id);
+          ctrl.addEventListener("focus", portTemporaryId, false);
         }
       }
     }
