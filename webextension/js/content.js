@@ -623,8 +623,8 @@
           contextType.mode = MODE_SVG;
         }
         else {
-          elm.isContentEditable || await isEditControl(elm) ||
-          await isContentTextNode(elm) &&
+          (elm.isContentEditable || await isEditControl(elm) ||
+           await isContentTextNode(elm)) &&
             (contextType.mode = MODE_EDIT_TEXT);
         }
       }
