@@ -419,14 +419,11 @@
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
         if (node.nodeType === NODE_ELEMENT) {
-          if (node.localName === "br") {
-            arr.push("\n");
-          }
-          else {
+          node.localName === "br" ?
+            arr.push("\n") :
             node.hasChildNodes() &&
             (node = await getTextNode(node.childNodes)) &&
               arr.push(node);
-          }
         }
         else {
           node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
@@ -815,18 +812,15 @@
    * @return {void}
    */
   const createContentDataMsg = async res => {
-    if (res[CREATE_TMP_FILE]) {
+    res[CREATE_TMP_FILE] ?
       portMsg({
         [CREATE_TMP_FILE]: {
           data: res[CREATE_TMP_FILE],
           value: res.value
         }
-      }).catch(logError);
-    }
-    else {
+      }).catch(logError) :
       res[GET_FILE_PATH] &&
         portMsg({[GET_FILE_PATH]: res[GET_FILE_PATH]}).catch(logError);
-    }
   };
 
   /**
@@ -839,15 +833,16 @@
 
   /* synchronize edited text */
   /**
-   * synchronize content editable element text
+   * replace content editable element text
    * @param {Object} node - editable element
-   * @param {Array} arr - array of values
+   * @param {string} value - value
    * @param {string} ns - namespace URI
    * @return {void}
    */
-  const syncContentText = async (node, arr = [""], ns = nsURI.html) => {
-    if (node && node.nodeType === NODE_ELEMENT && Array.isArray(arr)) {
+  const replaceContent = async (node, value = "", ns = nsURI.html) => {
+    if (node && node.nodeType === NODE_ELEMENT) {
       const fragment = document.createDocumentFragment();
+      const arr = value && value.split("\n") || [""];
       const l = arr.length;
       let i = 0;
       while (i < l) {
@@ -878,42 +873,38 @@
       const timestamp = obj.data.timestamp || 0;
       const value = await (new TextDecoder(CHAR)).decode(obj.value) || "";
       let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
-          ns = !isHtml && nsURI.html || "",
-          attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS;
+          ns = !isHtml && nsURI.html || "";
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CTRL)) {
         const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CTRL)).split(" ");
         for (let id of arr) {
-          if (id === target) {
-            (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`)) && (
-              isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html,
-              ns = !isHtml && nsURI.html || "",
-              attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS,
-              (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
-               timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
-                id.setAttributeNS(ns, attr, timestamp),
-                syncContentText(
-                  id, value.split("\n"), namespaceURI
-                ).catch(logError)
-              )
+          if (id === target &&
+              (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
+            isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
+            ns = !isHtml && nsURI.html || "";
+            (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
+             timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
+              id.setAttributeNS(
+                ns, isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS, timestamp
+              ),
+              replaceContent(id, value, namespaceURI).catch(logError)
             );
             break;
           }
         }
       }
-      else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-               elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
-               (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
-                timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
-        elm.setAttributeNS(ns, attr, timestamp);
-        if (/^(?:input|textarea)$/.test(elm.localName)) {
-          elm.value = value;
-        }
-        else {
-          elm.isContentEditable &&
-            syncContentText(
-              elm, value.split("\n"), namespaceURI
-            ).catch(logError);
-        }
+      else {
+        elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
+        elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
+        (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
+         timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
+          elm.setAttributeNS(
+            ns, isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS, timestamp
+          ),
+          /^(?:input|textarea)$/.test(elm.localName) ?
+            elm.value = value :
+            elm.isContentEditable &&
+              replaceContent(elm, value, namespaceURI).catch(logError)
+        );
       }
     }
   };
