@@ -508,6 +508,37 @@
   };
 
   /**
+   * handle connected port
+   * @param {Object} port - runtime.Port
+   * @return {void}
+   */
+  const handlePort = async port => {
+    const windowId = `${port.sender.tab.windowId}`;
+    const tabId = `${port.sender.tab.id}`;
+    const frameId = port.sender.frameId;
+    const frameUrl = port.sender.url;
+    const incognito = port.sender.tab.incognito;
+    ports[windowId] = ports[windowId] || {};
+    ports[windowId][tabId] = ports[windowId][tabId] || {};
+    ports[windowId][tabId][frameUrl] = port;
+    frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito);
+    port.onMessage.addListener(handleMsg);
+    port.postMessage({
+      incognito, tabId,
+      [SET_VARS]: vars
+    });
+  };
+
+  /**
+   * handle runtime update
+   * @param {Object} details - install details
+   * @return {void}
+   */
+  const handleRuntimeUpdate = async details => {
+    details && details.reason === "update" && runtime.reload();
+  };
+
+  /**
    * handle runtime message
    * @param {*} msg - message
    * @return {void}
@@ -531,28 +562,6 @@
         }
       }
     }
-  };
-
-  /**
-   * handle connected port
-   * @param {Object} port - runtime.Port
-   * @return {void}
-   */
-  const handlePort = async port => {
-    const windowId = `${port.sender.tab.windowId}`;
-    const tabId = `${port.sender.tab.id}`;
-    const frameId = port.sender.frameId;
-    const frameUrl = port.sender.url;
-    const incognito = port.sender.tab.incognito;
-    ports[windowId] = ports[windowId] || {};
-    ports[windowId][tabId] = ports[windowId][tabId] || {};
-    ports[windowId][tabId][frameUrl] = port;
-    frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito);
-    port.onMessage.addListener(handleMsg);
-    port.postMessage({
-      incognito, tabId,
-      [SET_VARS]: vars
-    });
   };
 
   /**
@@ -651,8 +660,9 @@
   browserAction.onClicked.addListener(openOptionsPage);
   browser.storage.onChanged.addListener(handleStorageChanged);
   contextMenus.onClicked.addListener(portContextMenu);
-  runtime.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(handlePort);
+  runtime.onInstalled.addListener(handleRuntimeUpdate);
+  runtime.onMessage.addListener(handleMsg);
   tabs.onActivated.addListener(handleActiveTab);
   tabs.onUpdated.addListener(handleUpdatedTab);
   tabs.onRemoved.addListener(handleRemovedTab);
