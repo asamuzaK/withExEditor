@@ -547,8 +547,7 @@
         if (arr) {
           arr.push(id);
           ctrl.setAttributeNS(
-            "",
-            DATA_ATTR_ID_CTRL,
+            "", DATA_ATTR_ID_CTRL,
             (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
           );
         }
