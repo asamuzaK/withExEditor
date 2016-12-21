@@ -116,9 +116,7 @@
       const items = fileExt[type];
       if (items) {
         const item = suffix && items[suffix];
-        ext = item ?
-                item[subtype] || item[suffix] :
-                items[subtype];
+        ext = item && (item[subtype] || item[suffix]) || items[subtype];
       }
       else {
         ext = subst;
@@ -185,29 +183,33 @@
     }
     else {
       while (node && node.parentNode && !ns.node) {
-        const obj = node.parentNode;
-        node.namespaceURI ? (
-          ns.node = node,
-          ns.localName = node.localName,
-          ns.namespaceURI = node.namespaceURI
-        ) :
-        /^foreignObject$/.test(obj.localName) &&
-        (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
-         document.documentElement.localName === "html") ? (
-          ns.node = node,
-          ns.localName = node.localName,
-          ns.namespaceURI = obj.hasAttributeNS(nsURI.svg,
-                                               "requiredExtensions") &&
-                            obj.getAttributeNS(nsURI.svg,
-                                               "requiredExtensions") ||
-                            nsURI.html
-        ) :
-        /^(?:math|svg)$/.test(node.localName) ? (
-          ns.node = node,
-          ns.localName = node.localName,
-          ns.namespaceURI = nsURI.ns[node.localName]
-        ) :
-          node = obj;
+        if (node.namespaceURI) {
+          ns.node = node;
+          ns.localName = node.localName;
+          ns.namespaceURI = node.namespaceURI;
+        }
+        else if (/^(?:math|svg)$/.test(node.localName)) {
+          ns.node = node;
+          ns.localName = node.localName;
+          ns.namespaceURI = nsURI.ns[node.localName];
+        }
+        else {
+          const obj = node.parentNode;
+          if (/^foreignObject$/.test(obj.localName) &&
+              (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
+               document.documentElement.localName === "html")) {
+            ns.node = node;
+            ns.localName = node.localName;
+            ns.namespaceURI = obj.hasAttributeNS(nsURI.svg,
+                                                 "requiredExtensions") &&
+                              obj.getAttributeNS(nsURI.svg,
+                                                 "requiredExtensions") ||
+                              nsURI.html;
+          }
+          else {
+            node = obj;
+          }
+        }
       }
       !ns.node && (
         node = document.documentElement,
@@ -272,13 +274,15 @@
         const fragment = document.createDocumentFragment();
         const nodes = node.childNodes;
         for (let child of nodes) {
-          child.nodeType === NODE_ELEMENT ? (
+          if (child.nodeType === NODE_ELEMENT) {
             child === child.parentNode.firstChild &&
-              fragment.appendChild(document.createTextNode("\n")),
-            fragment.appendChild(await createElm(child, true))
-          ) :
-          child.nodeType === NODE_TEXT &&
-            fragment.appendChild(document.createTextNode(child.nodeValue));
+              fragment.appendChild(document.createTextNode("\n"));
+            fragment.appendChild(await createElm(child, true));
+          }
+          else {
+            child.nodeType === NODE_TEXT &&
+              fragment.appendChild(document.createTextNode(child.nodeValue));
+          }
         }
         elm.appendChild(fragment);
       }
@@ -294,15 +298,17 @@
     const fragment = document.createDocumentFragment();
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        node.nodeType === NODE_ELEMENT ? (
+        if (node.nodeType === NODE_ELEMENT) {
           node === node.parentNode.firstChild &&
-            fragment.appendChild(document.createTextNode("\n")),
-          fragment.appendChild(await createElm(node, true)),
+            fragment.appendChild(document.createTextNode("\n"));
+          fragment.appendChild(await createElm(node, true));
           node === node.parentNode.lastChild &&
-            fragment.appendChild(document.createTextNode("\n"))
-        ) :
-        node.nodeType === NODE_TEXT &&
-          fragment.appendChild(document.createTextNode(node.nodeValue));
+            fragment.appendChild(document.createTextNode("\n"));
+        }
+        else {
+          node.nodeType === NODE_TEXT &&
+            fragment.appendChild(document.createTextNode(node.nodeValue));
+        }
       }
     }
     return fragment;
@@ -413,11 +419,14 @@
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
         if (node.nodeType === NODE_ELEMENT) {
-          node.localName === "br" ?
-            arr.push("\n") :
-          node.hasChildNodes() &&
-          (node = await getTextNode(node.childNodes)) &&
-            arr.push(node);
+          if (node.localName === "br") {
+            arr.push("\n");
+          }
+          else {
+            node.hasChildNodes() &&
+            (node = await getTextNode(node.childNodes)) &&
+              arr.push(node);
+          }
         }
         else {
           node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
@@ -437,13 +446,15 @@
     if (elm) {
       const isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
       const ns = !isHtml && nsURI.html || "";
-      elm.hasAttributeNS(ns, DATA_ATTR_ID) ?
-        id = elm.getAttributeNS(ns, DATA_ATTR_ID) : (
-        id = `withExEditor${window.performance.now()}`.replace(/\./, "_"),
-        !isHtml && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html),
-        elm.setAttributeNS(ns, isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS, id),
-        isHtml && elm.addEventListener("focus", portTemporaryId, false)
-      );
+      if (elm.hasAttributeNS(ns, DATA_ATTR_ID)) {
+        id = elm.getAttributeNS(ns, DATA_ATTR_ID);
+      }
+      else {
+        id = `withExEditor${window.performance.now()}`.replace(/\./, "_");
+        !isHtml && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html);
+        elm.setAttributeNS(ns, isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS, id);
+        isHtml && elm.addEventListener("focus", portTemporaryId, false);
+      }
     }
     return id;
   };
@@ -533,19 +544,20 @@
       if (ctrl) {
         const arr = ctrl.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
                       (ctrl.getAttributeNS("", DATA_ATTR_ID_CTRL)).split(" ");
-        id && (
-          arr ? (
-            arr.push(id),
+        if (id) {
+          if (arr) {
+            arr.push(id);
             ctrl.setAttributeNS(
               "",
               DATA_ATTR_ID_CTRL,
               (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
-            )
-          ) : (
-            ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, id),
-            ctrl.addEventListener("focus", portTemporaryId, false)
-          )
-        );
+            );
+          }
+          else {
+            ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, id);
+            ctrl.addEventListener("focus", portTemporaryId, false);
+          }
+        }
       }
     }
   };
@@ -610,13 +622,17 @@
       let ns = await getNodeNS(elm);
       contextType.namespaceURI = ns.namespaceURI;
       if (sel.isCollapsed) {
-        await isEditControl(elm) ?
-          contextType.mode = MODE_EDIT_TEXT :
-        elm.isContentEditable || await isContentTextNode(elm) ?
-          contextType.mode = MODE_EDIT_TEXT :
-        ns.namespaceURI === nsURI.math ?
-          contextType.mode = MODE_MATHML :
-          ns.namespaceURI === nsURI.svg && (contextType.mode = MODE_SVG);
+        if (ns.namespaceURI === nsURI.math) {
+          contextType.mode = MODE_MATHML;
+        }
+        else if (ns.namespaceURI === nsURI.svg) {
+          contextType.mode = MODE_SVG;
+        }
+        else {
+          elm.isContentEditable || await isEditControl(elm) ||
+          await isContentTextNode(elm) &&
+            (contextType.mode = MODE_EDIT_TEXT);
+        }
       }
       else if (modeEdit) {
         ns = await getNodeNS(anchorElm);
@@ -653,20 +669,22 @@
       switch (contextType.mode) {
         case MODE_EDIT_TEXT:
           if (sel.isCollapsed) {
-            await isEditControl(elm) && (obj = await getId(elm)) ? (
-              data.mode = contextType.mode,
-              data.target = obj,
-              data.value = elm.value || ""
-            ) :
-            (elm.isContentEditable || await isContentTextNode(elm)) &&
-            (obj = await getId(elm)) && (
-              data.mode = contextType.mode,
-              data.target = obj,
-              data.value = elm.hasChildNodes() &&
-                             await getTextNode(elm.childNodes) || "",
-              data.namespaceURI = contextType.namespaceURI,
-              setDataAttrs(elm)
-            );
+            if (await isEditControl(elm) && (obj = await getId(elm))) {
+              data.mode = contextType.mode;
+              data.target = obj;
+              data.value = elm.value || "";
+            }
+            else {
+              (elm.isContentEditable || await isContentTextNode(elm)) &&
+              (obj = await getId(elm)) && (
+                data.mode = contextType.mode,
+                data.target = obj,
+                data.value = elm.hasChildNodes() &&
+                               await getTextNode(elm.childNodes) || "",
+                data.namespaceURI = contextType.namespaceURI,
+                setDataAttrs(elm)
+              );
+            }
           }
           else {
             (await isEditControl(anchorElm) || anchorElm.isContentEditable ||
@@ -883,17 +901,18 @@
           }
         }
       }
-      else {
-        elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-        elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
-        (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
-         timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
-          elm.setAttributeNS(ns, attr, timestamp),
-          /^(?:input|textarea)$/.test(elm.localName) ?
-            elm.value = value :
+      else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
+               elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
+               (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
+                timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
+        elm.setAttributeNS(ns, attr, timestamp);
+        if (/^(?:input|textarea)$/.test(elm.localName)) {
+          elm.value = value;
+        }
+        else {
           elm.isContentEditable &&
-            syncContentText(elm, value.split("\n"), namespaceURI)
-        );
+            syncContentText(elm, value.split("\n"), namespaceURI);
+        }
       }
     }
   };
@@ -1047,10 +1066,11 @@
       const elm = evt && evt.target;
       const sel = window.getSelection();
       await keyComboMatches(evt, execEditorKey) && elm && (
-        vars[ENABLE_ONLY_EDITABLE] ?
-          await isEditControl(elm) || elm.isContentEditable ||
-          sel.anchorNode === sel.focusNode && await isContentTextNode(elm) :
-          reType.test(document.contentType)
+        vars[ENABLE_ONLY_EDITABLE] && (
+          elm.isContentEditable || await isEditControl(elm) ||
+          sel.anchorNode === sel.focusNode && await isContentTextNode(elm)
+        ) ||
+        reType.test(document.contentType)
       ) && portContentData(elm).catch(logError);
     }
   };

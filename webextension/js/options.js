@@ -96,13 +96,14 @@
     if (elm) {
       const app = document.getElementById(APP_NAME);
       const name = app && app.value;
-      executable && name ? (
-        elm.value = name,
-        elm.disabled = false
-      ) : (
-        elm.value = "",
-        elm.disabled = true
-      );
+      if (executable && name) {
+        elm.value = name;
+        elm.disabled = false;
+      }
+      else {
+        elm.value = "";
+        elm.disabled = true;
+      }
     }
     return elm || null;
   };

@@ -100,9 +100,8 @@
   const checkEnable = async (win = null) => {
     let enable = false;
     !win && (win = await windows.getCurrent());
-    win && win.type === "normal" && (
-      enable = !win.incognito || varsLocal[ENABLE_PB]
-    );
+    win && win.type === "normal" &&
+      (enable = !win.incognito || varsLocal[ENABLE_PB]);
     vars[IS_ENABLED] = enable;
     return enable;
   };
@@ -167,13 +166,16 @@
     if (data) {
       const windowId = data.windowId;
       const tabId = data.tabId;
-      tabId ?
+      if (tabId) {
         windowId && ports[windowId] && (
           delete ports[windowId][tabId],
           Object.keys(ports[windowId]).length === 0 &&
             restorePorts({windowId})
-        ) :
+        );
+      }
+      else {
         windowId && delete ports[windowId];
+      }
     }
   };
 
@@ -331,14 +333,12 @@
         for (let item of items) {
           switch (item) {
             case MODE_SOURCE:
-              !vars[ENABLE_ONLY_EDITABLE] && (
-                menus[item] = createMenuItem(item, ["frame", "page"])
-              );
+              !vars[ENABLE_ONLY_EDITABLE] &&
+                (menus[item] = createMenuItem(item, ["frame", "page"]));
               break;
             case MODE_SELECTION:
-              !vars[ENABLE_ONLY_EDITABLE] && (
-                menus[item] = createMenuItem(item, ["selection"])
-              );
+              !vars[ENABLE_ONLY_EDITABLE] &&
+                (menus[item] = createMenuItem(item, ["selection"]));
               break;
             case MODE_EDIT_TEXT:
               menus[item] = createMenuItem(item, ["editable"]);
