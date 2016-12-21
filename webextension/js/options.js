@@ -138,7 +138,7 @@
       if (elm.type === "radio") {
         const nodes = document.querySelectorAll(`[name=${elm.name}]`);
         if (nodes instanceof NodeList) {
-          for (let node of nodes) {
+          for (const node of nodes) {
             createPref(node).then(setStorage).catch(logError);
           }
         }
@@ -171,7 +171,7 @@
   const addInputChangeListener = async () => {
     const nodes = document.querySelectorAll("input");
     if (nodes instanceof NodeList) {
-      for (let node of nodes) {
+      for (const node of nodes) {
         node.addEventListener("change", setPrefStorage, false);
       }
     }
@@ -192,7 +192,7 @@
         title: "title"
       };
       const items = Object.keys(attrs);
-      for (let item of items) {
+      for (const item of items) {
         if (elm.hasAttribute(attrs[item])) {
           const attr = i18n.getMessage(
             `${elm.getAttribute(DATA_ATTR_I18N)}.${item}`
@@ -213,7 +213,7 @@
       document.documentElement.setAttribute("lang", lang);
       const nodes = document.querySelectorAll(`[${DATA_ATTR_I18N}]`);
       if (nodes instanceof NodeList) {
-        for (let node of nodes) {
+        for (const node of nodes) {
           const data = i18n.getMessage(node.getAttribute(DATA_ATTR_I18N));
           data && (node.textContent = data);
           node.hasAttributes() && localizeAttr(node);
@@ -230,7 +230,7 @@
     const pref = await storage.get() || {};
     const items = pref && Object.keys(pref);
     if (items && items.length > 0) {
-      for (let item of items) {
+      for (const item of items) {
         const obj = pref[item];
         const elm = document.getElementById(obj.id);
         if (elm) {
@@ -260,7 +260,7 @@
   const handleMsg = async msg => {
     const items = Object.keys(msg);
     if (items.length > 0) {
-      for (let item of items) {
+      for (const item of items) {
         const obj = msg[item];
         switch (item) {
           case RES_APP_MANIFEST:

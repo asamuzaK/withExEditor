@@ -232,7 +232,7 @@
   const setAttributeNS = async (elm, node) => {
     if (elm && node) {
       const attrs = node.attributes;
-      for (let attr of attrs) {
+      for (const attr of attrs) {
         const prefix = attr.prefix;
         const localName = attr.localName;
         typeof node[attr.name] !== "function" && elm.setAttributeNS(
@@ -273,7 +273,7 @@
           elm && elm.nodeType === NODE_ELEMENT) {
         const fragment = document.createDocumentFragment();
         const nodes = node.childNodes;
-        for (let child of nodes) {
+        for (const child of nodes) {
           if (child.nodeType === NODE_ELEMENT) {
             child === child.parentNode.firstChild &&
               fragment.appendChild(document.createTextNode("\n"));
@@ -297,7 +297,7 @@
   const createDom = async nodes => {
     const fragment = document.createDocumentFragment();
     if (nodes instanceof NodeList) {
-      for (let node of nodes) {
+      for (const node of nodes) {
         if (node.nodeType === NODE_ELEMENT) {
           node === node.parentNode.firstChild &&
             fragment.appendChild(document.createTextNode("\n"));
@@ -484,7 +484,7 @@
     if (isText && node && node.namespaceURI &&
         node.namespaceURI !== nsURI.html && node.hasChildNodes()) {
       const nodes = node.childNodes;
-      for (let child of nodes) {
+      for (const child of nodes) {
         isText = child.nodeType === NODE_TEXT;
         if (!isText) {
           break;
@@ -956,7 +956,7 @@
       if (ext && Object.keys(ext).length > 0 && (ext = ext[key])) {
         const items = Object.keys(ext);
         if (items && items.length > len) {
-          for (let item of items) {
+          for (const item of items) {
             obj[item] = ext[item];
           }
         }
@@ -973,8 +973,8 @@
   const handleMsg = async msg => {
     const items = Object.keys(msg);
     if (items.length > 0) {
-      for (let item of items) {
-        let obj = msg[item];
+      for (const item of items) {
+        const obj = msg[item];
         switch (item) {
           case SET_VARS:
             handleMsg(obj);

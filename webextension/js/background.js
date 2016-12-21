@@ -114,7 +114,7 @@
     const windowIds = await windows.getAll();
     let incognito = false;
     if (windowIds.length > 0) {
-      for (let windowId of windowIds) {
+      for (const windowId of windowIds) {
         incognito = windowId.incognito;
         if (incognito) {
           break;
@@ -196,7 +196,7 @@
                         ports[windowId] && ports[windowId][tabId] &&
                           Object.keys(ports[windowId][tabId]);
       if (frameUrls && frameUrls.length > 0) {
-        for (let frameUrl of frameUrls) {
+        for (const frameUrl of frameUrls) {
           if (frameUrl !== INCOGNITO) {
             const port = ports[windowId][tabId][frameUrl];
             port && port.postMessage(msg);
@@ -214,7 +214,7 @@
       const tabIds = windowId && ports[windowId] &&
                        Object.keys(ports[windowId]);
       if (tabIds && tabIds.length > 0) {
-        for (let tabId of tabIds) {
+        for (const tabId of tabIds) {
           handlePortFrameUrl(windowId, tabId);
         }
       }
@@ -223,7 +223,7 @@
     if (msg) {
       const windowIds = Object.keys(ports);
       if (windowIds.length > 0) {
-        for (let windowId of windowIds) {
+        for (const windowId of windowIds) {
           handlePortTabId(windowId);
         }
       }
@@ -297,7 +297,7 @@
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
     const label = varsLocal[EDITOR_NAME] || LABEL;
-    for (let item of items) {
+    for (const item of items) {
       varsLocal[item] = i18n.getMessage(item, label);
     }
   };
@@ -330,7 +330,7 @@
     if (vars[IS_ENABLED]) {
       const items = Object.keys(menus);
       if (items.length > 0) {
-        for (let item of items) {
+        for (const item of items) {
           switch (item) {
             case MODE_SOURCE:
               !vars[ENABLE_ONLY_EDITABLE] &&
@@ -366,7 +366,7 @@
     if (type) {
       const items = Object.keys(type);
       if (items.length > 0) {
-        for (let item of items) {
+        for (const item of items) {
           const obj = type[item];
           const menuItemId = obj.menuItemId;
           const title = varsLocal[obj.mode] || varsLocal[menuItemId] || "";
@@ -387,7 +387,7 @@
     else {
       const items = Object.keys(menus);
       if (items.length > 0) {
-        for (let item of items) {
+        for (const item of items) {
           menus[item] && contextMenus.update(item, {
             title: i18n.getMessage(item, varsLocal[EDITOR_NAME] || LABEL)
           });
@@ -486,7 +486,7 @@
   const setVars = async res => {
     const items = Object.keys(res);
     if (items.length > 0) {
-      for (let item of items) {
+      for (const item of items) {
         setVar(item, res[item], false);
       }
     }
@@ -501,7 +501,7 @@
   const handleStorageChanged = async data => {
     const items = Object.keys(data);
     if (items.length > 0) {
-      for (let item of items) {
+      for (const item of items) {
         setVar(item, data[item].newValue, true);
       }
     }
@@ -515,7 +515,7 @@
   const handleMsg = async msg => {
     const items = Object.keys(msg);
     if (items.length > 0) {
-      for (let item of items) {
+      for (const item of items) {
         const obj = msg[item];
         switch (item) {
           case CONTEXT_MENU:
@@ -568,7 +568,7 @@
       const items = ports[windowId] && ports[windowId][tabId] &&
                       Object.keys(ports[windowId][tabId]);
       if (items && items.length > 0) {
-        for (let item of items) {
+        for (const item of items) {
           const obj = ports[windowId][tabId][item];
           if (obj && obj.name) {
             bool = obj.name === PORT_CONTENT;
