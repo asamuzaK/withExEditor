@@ -891,7 +891,9 @@
               (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
                timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
                 id.setAttributeNS(ns, attr, timestamp),
-                syncContentText(id, value.split("\n"), namespaceURI)
+                syncContentText(
+                  id, value.split("\n"), namespaceURI
+                ).catch(logError)
               )
             );
             break;
@@ -908,7 +910,9 @@
         }
         else {
           elm.isContentEditable &&
-            syncContentText(elm, value.split("\n"), namespaceURI);
+            syncContentText(
+              elm, value.split("\n"), namespaceURI
+            ).catch(logError);
         }
       }
     }
