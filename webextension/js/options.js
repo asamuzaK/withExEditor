@@ -26,14 +26,6 @@
   const runtime = browser.runtime;
   const storage = browser.storage.local;
 
-  /* variables */
-  const vars = {
-    [APP_MANIFEST]: null,
-    [APP_NAME]: null,
-    [EDITOR_NAME]: null,
-    [KEY_ACCESS]: null
-  };
-
   /**
    * log error
    * @param {Object} e - Error
@@ -97,12 +89,13 @@
   /**
    * synchronize editorName value
    * @param {string} executable - executable
-   * @return {Object} - vars[EDITOR_NAME]
+   * @return {Object} - element
    */
   const syncEditorName = async (executable = false) => {
-    const elm = vars[EDITOR_NAME];
+    const elm = document.getElementById(EDITOR_NAME);
     if (elm) {
-      const name = vars[APP_NAME] && vars[APP_NAME].value;
+      const app = document.getElementById(APP_NAME);
+      const name = app && app.value;
       executable && name ? (
         elm.value = name,
         elm.disabled = false
@@ -116,14 +109,14 @@
 
   /**
    * extract application manifest
-   * @param {Array} arr - uint8 array
+   * @param {Array} arr - Uint8Array
    * @return {void}
    */
   const extractAppManifest = async (arr = []) => {
     const app = await JSON.parse((new TextDecoder(CHAR)).decode(arr));
     const name = app && app.name;
     const path = app && app.path;
-    const elm = vars[APP_NAME];
+    const elm = document.getElementById(APP_NAME);
     name && path && elm && (
       elm.value = name,
       createPref(elm).then(setStorage).catch(logError),
@@ -247,24 +240,12 @@
               break;
             case "text":
               elm.value = isString(obj.value) && obj.value || "";
-              elm === vars[EDITOR_NAME] && elm.value && (elm.disabled = false);
+              elm === document.getElementById(EDITOR_NAME) && elm.value &&
+                (elm.disabled = false);
               break;
             default:
           }
         }
-      }
-    }
-  };
-
-  /**
-   * set variables
-   * @return {void}
-   */
-  const setVariables = async () => {
-    const items = Object.keys(vars);
-    if (items.length > 0) {
-      for (let item of items) {
-        vars[item] = document.getElementById(item);
       }
     }
   };
@@ -286,7 +267,9 @@
             break;
           case RES_EXECUTABLE:
             Promise.all([
-              createPref(vars[APP_MANIFEST], obj.executable).then(setStorage),
+              createPref(
+                document.getElementById(APP_MANIFEST), obj.executable
+              ).then(setStorage),
               syncEditorName(obj.executable).then(createPref).then(setStorage),
               // NOTE: for hybrid
               portMsg({removeSdkPrefs: obj.executable})
@@ -303,7 +286,7 @@
 
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtml(),
-    setVariables().then(setValuesFromStorage),
+    setValuesFromStorage(),
     addInputChangeListener()
   ]).catch(logError), false);
 }
