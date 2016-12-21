@@ -123,9 +123,10 @@
     const app = await JSON.parse((new TextDecoder(CHAR)).decode(arr));
     const name = app && app.name;
     const path = app && app.path;
-    name && path && (
-      vars[APP_NAME].value = name,
-      createPref(name).then(setStorage).catch(logError),
+    const elm = vars[APP_NAME];
+    name && path && elm && (
+      elm.value = name,
+      createPref(elm).then(setStorage).catch(logError),
       portMsg({
         [CHECK_EXECUTABLE]: {path}
       }).catch(logError)

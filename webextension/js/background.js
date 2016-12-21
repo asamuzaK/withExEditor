@@ -134,15 +134,16 @@
   };
 
   /* port */
-  let host;
+  let host = null;
 
   /**
    * connect to native application host
    * @return {void}
    */
   const connectHost = async () => {
+    const name = varsLocal[APP_NAME];
     host && host.disconnect();
-    host = runtime.connectNative(varsLocal[APP_NAME]);
+    host = name && runtime.connectNative(name) || null;
   };
 
   /**
@@ -428,11 +429,11 @@
         case APP_MANIFEST:
           varsLocal[item] = obj.value;
           varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+          obj.app.executable && connectHost().catch(logError);
           changed && toggleBadge().catch(logError);
           break;
         case APP_NAME:
           varsLocal[item] = obj.value;
-          connectHost().catch(logError);
           break;
         case EDITOR_NAME:
           varsLocal[item] = obj.value;
