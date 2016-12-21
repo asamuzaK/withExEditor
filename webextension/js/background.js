@@ -140,9 +140,10 @@
    * @return {void}
    */
   const connectHost = async () => {
+    const executable = varsLocal[IS_EXECUTABLE];
     const name = varsLocal[APP_NAME];
     host && host.disconnect();
-    host = name && runtime.connectNative(name) || null;
+    host = executable && name && runtime.connectNative(name) || null;
   };
 
   /**
@@ -429,7 +430,7 @@
         case APP_MANIFEST:
           varsLocal[item] = obj.value;
           varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
-          obj.app.executable && connectHost().catch(logError);
+          connectHost().catch(logError);
           changed && toggleBadge().catch(logError);
           break;
         case APP_NAME:
