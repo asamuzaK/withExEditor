@@ -612,15 +612,15 @@
       let ns = await getNodeNS(elm);
       contextType.namespaceURI = ns.namespaceURI;
       if (sel.isCollapsed) {
-        if (ns.namespaceURI === nsURI.math) {
+        if (elm.isContentEditable || await isEditControl(elm) ||
+            await isContentTextNode(elm)) {
+          contextType.mode = MODE_EDIT_TEXT;
+        }
+        else if (ns.namespaceURI === nsURI.math) {
           contextType.mode = MODE_MATHML;
         }
         else if (ns.namespaceURI === nsURI.svg) {
           contextType.mode = MODE_SVG;
-        }
-        else if (elm.isContentEditable || await isEditControl(elm) ||
-                 await isContentTextNode(elm)) {
-          contextType.mode = MODE_EDIT_TEXT;
         }
       }
       else if (modeEdit) {
