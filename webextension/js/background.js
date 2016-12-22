@@ -333,25 +333,23 @@
    * @return {void}
    */
   const createMenuItems = async () => {
-    if (vars[IS_ENABLED]) {
-      const items = Object.keys(menus);
-      if (items.length > 0) {
-        for (const item of items) {
-          switch (item) {
-            case MODE_SOURCE:
-              !vars[ENABLE_ONLY_EDITABLE] &&
-                (menus[item] = createMenuItem(item, ["frame", "page"]));
-              break;
-            case MODE_SELECTION:
-              !vars[ENABLE_ONLY_EDITABLE] &&
-                (menus[item] = createMenuItem(item, ["selection"]));
-              break;
-            case MODE_EDIT_TEXT:
-              menus[item] = createMenuItem(item, ["editable"]);
-              break;
-            default:
-          }
-        }
+    const enabled = vars[IS_ENABLED];
+    const onlyEdit = vars[ENABLE_ONLY_EDITABLE];
+    const items = Object.keys(menus);
+    for (const item of items) {
+      switch (item) {
+        case MODE_SOURCE:
+          menus[item] = enabled && !onlyEdit &&
+                        createMenuItem(item, ["frame", "page"]) || null;
+          break;
+        case MODE_SELECTION:
+          menus[item] = enabled && !onlyEdit &&
+                        createMenuItem(item, ["selection"]) || null;
+          break;
+        case MODE_EDIT_TEXT:
+          menus[item] = enabled && createMenuItem(item, ["editable"]) || null;
+          break;
+        default:
       }
     }
   };
