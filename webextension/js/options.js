@@ -193,12 +193,11 @@
       };
       const items = Object.keys(attrs);
       for (const item of items) {
-        if (elm.hasAttribute(attrs[item])) {
-          const attr = i18n.getMessage(
-            `${elm.getAttribute(DATA_ATTR_I18N)}.${item}`
-          );
-          attr && elm.setAttribute(attrs[item], attr);
-        }
+        const attr = attrs[item];
+        const value = i18n.getMessage(
+          `${elm.getAttribute(DATA_ATTR_I18N)}.${item}`
+        );
+        elm.hasAttribute(attr) && value && elm.setAttribute(attr, value);
       }
     }
   };
