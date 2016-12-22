@@ -173,8 +173,8 @@
             restorePorts({windowId})
         );
       }
-      else {
-        windowId && delete ports[windowId];
+      else if (windowId) {
+        delete ports[windowId];
       }
     }
   };
@@ -325,14 +325,14 @@
     for (const item of items) {
       menus[item] = null;
       switch (item) {
-        case MODE_SOURCE:
-          bool && createMenuItem(item, ["frame", "page"]).catch(logError);
+        case MODE_EDIT_TEXT:
+          enabled && createMenuItem(item, ["editable"]).catch(logError);
           break;
         case MODE_SELECTION:
           bool && createMenuItem(item, ["selection"]).catch(logError);
           break;
-        case MODE_EDIT_TEXT:
-          enabled && createMenuItem(item, ["editable"]).catch(logError);
+        case MODE_SOURCE:
+          bool && createMenuItem(item, ["frame", "page"]).catch(logError);
           break;
         default:
       }
@@ -358,17 +358,13 @@
         for (const item of items) {
           const obj = type[item];
           const menuItemId = obj.menuItemId;
-          const title = varsLoc[obj.mode] || varsLoc[menuItemId] || "";
-          const enabled = !!obj.enabled;
-          switch (item) {
-            case MODE_EDIT_TEXT:
-              menus[menuItemId] && contextMenus.update(menuItemId, {enabled});
-              break;
-            case MODE_SOURCE:
-              menus[menuItemId] && title &&
-                contextMenus.update(menuItemId, {title});
-              break;
-            default:
+          if (item === MODE_SOURCE && menus[menuItemId]) {
+            const title = varsLoc[obj.mode] || varsLoc[menuItemId];
+            title && contextMenus.update(menuItemId, {title});
+          }
+          else if (item === MODE_EDIT_TEXT && menus[menuItemId]) {
+            const enabled = !!obj.enabled;
+            contextMenus.update(menuItemId, {enabled});
           }
         }
       }

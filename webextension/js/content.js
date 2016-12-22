@@ -279,9 +279,8 @@
               fragment.appendChild(document.createTextNode("\n"));
             fragment.appendChild(await createElm(child, true));
           }
-          else {
-            child.nodeType === NODE_TEXT &&
-              fragment.appendChild(document.createTextNode(child.nodeValue));
+          else if (child.nodeType === NODE_TEXT) {
+            fragment.appendChild(document.createTextNode(child.nodeValue));
           }
         }
         elm.appendChild(fragment);
@@ -305,9 +304,8 @@
           node === node.parentNode.lastChild &&
             fragment.appendChild(document.createTextNode("\n"));
         }
-        else {
-          node.nodeType === NODE_TEXT &&
-            fragment.appendChild(document.createTextNode(node.nodeValue));
+        else if (node.nodeType === NODE_TEXT) {
+          fragment.appendChild(document.createTextNode(node.nodeValue));
         }
       }
     }
@@ -371,25 +369,21 @@
               fragment = null;
               break;
             }
-            else {
-              obj.node.parentNode && (
-                obj = obj.node.parentNode,
-                range.setStart(obj, 0),
-                range.setEnd(obj, obj.childNodes.length)
-              );
+            else if (obj.node.parentNode) {
+              obj = obj.node.parentNode;
+              range.setStart(obj, 0);
+              range.setEnd(obj, obj.childNodes.length);
             }
           }
           fragment.appendChild(
             await createDomTree(ancestor, range.cloneContents())
           );
         }
-        else {
-          ancestor.nodeType === NODE_TEXT &&
-          (obj = await createElm(ancestor.parentNode)) &&
-          obj.nodeType === NODE_ELEMENT && (
-            obj.appendChild(range.cloneContents()),
-            fragment.appendChild(obj)
-          );
+        else if (ancestor.nodeType === NODE_TEXT &&
+                 (obj = await createElm(ancestor.parentNode)) &&
+                 obj.nodeType === NODE_ELEMENT) {
+          obj.appendChild(range.cloneContents());
+          fragment.appendChild(obj);
         }
         fragment.appendChild(document.createTextNode("\n"));
         l > 1 && i < l - 1 &&
@@ -419,14 +413,16 @@
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
         if (node.nodeType === NODE_ELEMENT) {
-          node.localName === "br" ?
-            arr.push("\n") :
-            node.hasChildNodes() &&
-            (node = await getTextNode(node.childNodes)) &&
-              arr.push(node);
+          if (node.localName === "br") {
+            arr.push("\n");
+          }
+          else if (node.hasChildNodes() &&
+                   (node = await getTextNode(node.childNodes))) {
+            arr.push(node);
+          }
         }
-        else {
-          node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
+        else if (node.nodeType === NODE_TEXT) {
+          arr.push(node.nodeValue);
         }
       }
     }
@@ -622,10 +618,9 @@
         else if (ns.namespaceURI === nsURI.svg) {
           contextType.mode = MODE_SVG;
         }
-        else {
-          (elm.isContentEditable || await isEditControl(elm) ||
-           await isContentTextNode(elm)) &&
-            (contextType.mode = MODE_EDIT_TEXT);
+        else if (elm.isContentEditable || await isEditControl(elm) ||
+                 await isContentTextNode(elm)) {
+          contextType.mode = MODE_EDIT_TEXT;
         }
       }
       else if (modeEdit) {
@@ -668,29 +663,26 @@
               data.target = obj;
               data.value = elm.value || "";
             }
-            else {
-              (elm.isContentEditable || await isContentTextNode(elm)) &&
-              (obj = await getId(elm)) && (
-                data.mode = contextType.mode,
-                data.target = obj,
-                data.value = elm.hasChildNodes() &&
-                               await getTextNode(elm.childNodes) || "",
-                data.namespaceURI = contextType.namespaceURI,
-                setDataAttrs(elm)
-              );
+            else if ((elm.isContentEditable || await isContentTextNode(elm)) &&
+                     (obj = await getId(elm))) {
+              data.mode = contextType.mode;
+              data.target = obj;
+              data.value = elm.hasChildNodes() &&
+                             await getTextNode(elm.childNodes) || "";
+              data.namespaceURI = contextType.namespaceURI;
+              setDataAttrs(elm);
             }
           }
-          else {
-            (await isEditControl(anchorElm) || anchorElm.isContentEditable ||
-             await isContentTextNode(anchorElm)) &&
-            (obj = await getId(anchorElm)) && (
-              data.mode = contextType.mode,
-              data.target = obj,
-              data.value = anchorElm.hasChildNodes() &&
-                             await getTextNode(anchorElm.childNodes) || "",
-              data.namespaceURI = contextType.namespaceURI,
-              setDataAttrs(anchorElm)
-            );
+          else if ((anchorElm.isContentEditable ||
+                    await isEditControl(anchorElm) ||
+                    await isContentTextNode(anchorElm)) &&
+                   (obj = await getId(anchorElm))) {
+            data.mode = contextType.mode;
+            data.target = obj;
+            data.value = anchorElm.hasChildNodes() &&
+                           await getTextNode(anchorElm.childNodes) || "";
+            data.namespaceURI = contextType.namespaceURI;
+            setDataAttrs(anchorElm);
           }
           break;
         case MODE_MATHML:
@@ -892,19 +884,19 @@
           }
         }
       }
-      else {
-        elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-        elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
-        (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
-         timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
-          elm.setAttributeNS(
-            ns, isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS, timestamp
-          ),
-          /^(?:input|textarea)$/.test(elm.localName) ?
-            elm.value = value :
-            elm.isContentEditable &&
-              replaceContent(elm, value, namespaceURI).catch(logError)
+      else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
+               elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
+               (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
+                timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
+        elm.setAttributeNS(
+          ns, isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS, timestamp
         );
+        if (/^(?:input|textarea)$/.test(elm.localName)) {
+          elm.value = value;
+        }
+        else if (elm.isContentEditable) {
+          replaceContent(elm, value, namespaceURI).catch(logError);
+        }
       }
     }
   };
