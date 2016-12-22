@@ -35,7 +35,7 @@
   const ENABLE_PB = "enablePB";
   const FORCE_REMOVE = "forceRemove";
   const IS_ENABLED = "isEnabled";
-  const IS_EXECUTABLE = "isExecutable";
+  const IS_EXEC = "isExecutable";
   const ICON_PATH = "iconPath";
   const KEY_ACCESS = "accessKey";
   const KEY_EXEC_EDITOR = "editorShortCut";
@@ -59,14 +59,14 @@
     [ENABLE_ONLY_EDITABLE]: false
   };
 
-  const varsLocal = {
+  const varsLoc = {
     [APP_MANIFEST]: "",
     [APP_NAME]: "",
     [EDITOR_NAME]: "",
     [ENABLE_PB]: false,
     [FORCE_REMOVE]: true,
     [ICON_PATH]: `${ICON}#gray`,
-    [IS_EXECUTABLE]: false,
+    [IS_EXEC]: false,
     [MENU_ENABLED]: false,
     [MODE_SOURCE]: "",
     [MODE_MATHML]: "",
@@ -101,7 +101,7 @@
     let enable = false;
     !win && (win = await windows.getCurrent());
     win && win.type === "normal" &&
-      (enable = !win.incognito || varsLocal[ENABLE_PB]);
+      (enable = !win.incognito || varsLoc[ENABLE_PB]);
     vars[IS_ENABLED] = enable;
     return enable;
   };
@@ -140,10 +140,9 @@
    * @return {void}
    */
   const connectHost = async () => {
-    const executable = varsLocal[IS_EXECUTABLE];
-    const name = varsLocal[APP_NAME];
+    const name = varsLoc[APP_NAME];
     host && host.disconnect();
-    host = executable && name && runtime.connectNative(name) || null;
+    host = varsLoc[IS_EXEC] && name && runtime.connectNative(name) || null;
   };
 
   /**
@@ -181,18 +180,14 @@
   };
 
   /**
-   * port message
+   * handle ports[windowId][tabId][frameUrl]
    * @param {*} msg - message
+   * @param {string} windowId - windowId
+   * @param {string} tabId - tabId
    * @return {void}
    */
-  const portMsg = async msg => {
-    /**
-     * handle ports[windowId][tabId][frameUrl]
-     * @param {string} windowId - windowId
-     * @param {string} tabId - tabId
-     * @return {void}
-     */
-    const handlePortFrameUrl = (windowId, tabId) => {
+  const handlePortFrameUrl = (msg, windowId, tabId) => {
+    if (msg) {
       const frameUrls = windowId && tabId &&
                         ports[windowId] && ports[windowId][tabId] &&
                           Object.keys(ports[windowId][tabId]);
@@ -204,28 +199,38 @@
           }
         }
       }
-    };
+    }
+  };
 
-    /**
-     * handle ports[windowId][tabId]
-     * @param {string} windowId - windowId
-     * @return {void}
-     */
-    const handlePortTabId = windowId => {
+  /**
+   * handle ports[windowId][tabId]
+   * @param {*} msg - message
+   * @param {string} windowId - windowId
+   * @return {void}
+   */
+  const handlePortTabId = (msg, windowId) => {
+    if (msg) {
       const tabIds = windowId && ports[windowId] &&
                        Object.keys(ports[windowId]);
       if (tabIds && tabIds.length > 0) {
         for (const tabId of tabIds) {
-          handlePortFrameUrl(windowId, tabId);
+          handlePortFrameUrl(msg, windowId, tabId);
         }
       }
-    };
+    }
+  };
 
+  /**
+   * port message
+   * @param {*} msg - message
+   * @return {void}
+   */
+  const portMsg = async msg => {
     if (msg) {
       const windowIds = Object.keys(ports);
       if (windowIds.length > 0) {
         for (const windowId of windowIds) {
-          handlePortTabId(windowId);
+          handlePortTabId(msg, windowId);
         }
       }
     }
@@ -267,7 +272,7 @@
    * @param {Object} path - icon path
    * @return {void}
    */
-  const replaceIcon = async (path = varsLocal[ICON_PATH]) => {
+  const replaceIcon = async (path = varsLoc[ICON_PATH]) => {
     browserAction.setIcon({path});
   };
 
@@ -276,7 +281,7 @@
    * @param {boolean} executable - executable
    * @return {void}
    */
-  const toggleBadge = async (executable = varsLocal[IS_EXECUTABLE]) => {
+  const toggleBadge = async (executable = varsLoc[IS_EXEC]) => {
     const color = !executable && WARN_COLOR || "transparent";
     const text = !executable && WARN_TEXT || "";
     browserAction.setBadgeBackgroundColor({color});
@@ -297,9 +302,9 @@
    */
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-    const label = varsLocal[EDITOR_NAME] || LABEL;
+    const label = varsLoc[EDITOR_NAME] || LABEL;
     for (const item of items) {
-      varsLocal[item] = i18n.getMessage(item, label);
+      varsLoc[item] = i18n.getMessage(item, label);
     }
   };
 
@@ -311,13 +316,13 @@
    * @return {Object}
    */
   const createMenuItem = async (id, contexts) => {
-    const label = varsLocal[EDITOR_NAME] || LABEL;
+    const label = varsLoc[EDITOR_NAME] || LABEL;
     let menu;
     isString(id) && Array.isArray(contexts) && (
       menu = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, label),
-        enabled: !!varsLocal[MENU_ENABLED]
+        enabled: !!varsLoc[MENU_ENABLED]
       })
     );
     return menu || null;
@@ -370,7 +375,7 @@
         for (const item of items) {
           const obj = type[item];
           const menuItemId = obj.menuItemId;
-          const title = varsLocal[obj.mode] || varsLocal[menuItemId] || "";
+          const title = varsLoc[obj.mode] || varsLoc[menuItemId] || "";
           const enabled = !!obj.enabled;
           switch (item) {
             case MODE_EDIT_TEXT:
@@ -390,7 +395,7 @@
       if (items.length > 0) {
         for (const item of items) {
           menus[item] && contextMenus.update(item, {
-            title: i18n.getMessage(item, varsLocal[EDITOR_NAME] || LABEL)
+            title: i18n.getMessage(item, varsLoc[EDITOR_NAME] || LABEL)
           });
         }
       }
@@ -405,7 +410,7 @@
    */
   const syncUI = (enabled = false) => Promise.all([
     portMsg({isEnabled: !!enabled}),
-    replaceIcon(!enabled && `${ICON}#off` || varsLocal[ICON_PATH]),
+    replaceIcon(!enabled && `${ICON}#off` || varsLoc[ICON_PATH]),
     toggleBadge()
   ]);
 
@@ -428,16 +433,16 @@
     if (item && obj) {
       switch (item) {
         case APP_MANIFEST:
-          varsLocal[item] = obj.value;
-          varsLocal[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+          varsLoc[item] = obj.value;
+          varsLoc[IS_EXEC] = obj.app && !!obj.app.executable;
           connectHost().catch(logError);
           changed && toggleBadge().catch(logError);
           break;
         case APP_NAME:
-          varsLocal[item] = obj.value;
+          varsLoc[item] = obj.value;
           break;
         case EDITOR_NAME:
-          varsLocal[item] = obj.value;
+          varsLoc[item] = obj.value;
           cacheMenuItemTitle().catch(logError);
           changed && updateContextMenu().catch(logError);
           break;
@@ -449,11 +454,11 @@
           );
           break;
         case ENABLE_PB:
-          varsLocal[item] = !!obj.checked;
+          varsLoc[item] = !!obj.checked;
           changed && checkEnable().then(syncUI).catch(logError);
           break;
         case FORCE_REMOVE:
-          varsLocal[item] = !!obj.checked;
+          varsLoc[item] = !!obj.checked;
           // NOTE: for hybrid
           portHybridMsg({[item]: !!obj.checked}).catch(logError);
           break;
@@ -461,7 +466,7 @@
         case ICON_GRAY:
         case ICON_WHITE:
           obj.checked && (
-            varsLocal[ICON_PATH] = obj.value,
+            varsLoc[ICON_PATH] = obj.value,
             changed && replaceIcon().catch(logError)
           );
           break;
@@ -587,7 +592,7 @@
         }
       }
     }
-    varsLocal[MENU_ENABLED] = bool;
+    varsLoc[MENU_ENABLED] = bool;
     restoreContextMenu().catch(logError);
   };
 
@@ -606,7 +611,7 @@
       const portName = ports[windowId] && ports[windowId][tabId] &&
                        ports[windowId][tabId][frameUrl] &&
                          ports[windowId][tabId][frameUrl].name;
-      varsLocal[MENU_ENABLED] = portName === PORT_CONTENT;
+      varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
       info.status === "complete" && tab.active &&
         restoreContextMenu().catch(logError);
     }
