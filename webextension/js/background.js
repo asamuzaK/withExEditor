@@ -297,15 +297,13 @@
   };
 
   /**
-   * cache localized context menu item title
+   * update context menu items collection
+   * @param {Object} data - item data
    * @return {void}
    */
-  const cacheMenuItemTitle = async () => {
-    const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-    const label = varsLoc[EDITOR_NAME] || LABEL;
-    for (const item of items) {
-      varsLoc[item] = i18n.getMessage(item, label);
-    }
+  const updateMenus = async data => {
+    const id = data && data.id;
+    isString(id) && menus[id] && (menus[id] = data.menu || null);
   };
 
   // NOTE: no "accesskey" feature
@@ -313,19 +311,20 @@
    * create context menu item
    * @param {string} id - menu item ID
    * @param {Array} contexts - contexts
+   * @param {boolean} create - create menu item
    * @return {Object}
    */
-  const createMenuItem = async (id, contexts) => {
+  const createMenuItem = async (id, contexts, create) => {
     const label = varsLoc[EDITOR_NAME] || LABEL;
-    let menu;
-    isString(id) && Array.isArray(contexts) && (
+    let menu = null
+    create && isString(id) && Array.isArray(contexts) && (
       menu = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, label),
         enabled: !!varsLoc[MENU_ENABLED]
       })
     );
-    return menu || null;
+    return {id, menu};
   };
 
   /**
@@ -334,20 +333,21 @@
    */
   const createMenuItems = async () => {
     const enabled = vars[IS_ENABLED];
-    const onlyEdit = vars[ENABLE_ONLY_EDITABLE];
+    const bool = enabled && !vars[ENABLE_ONLY_EDITABLE];
     const items = Object.keys(menus);
     for (const item of items) {
       switch (item) {
         case MODE_SOURCE:
-          menus[item] = enabled && !onlyEdit &&
-                        createMenuItem(item, ["frame", "page"]) || null;
+          createMenuItem(item, ["frame", "page"], bool).then(updateMenus).
+            catch(logError);
           break;
         case MODE_SELECTION:
-          menus[item] = enabled && !onlyEdit &&
-                        createMenuItem(item, ["selection"]) || null;
+          createMenuItem(item, ["selection"], bool).then(updateMenus).
+            catch(logError);
           break;
         case MODE_EDIT_TEXT:
-          menus[item] = enabled && createMenuItem(item, ["editable"]) || null;
+          createMenuItem(item, ["editable"], enabled).then(updateMenus).
+            catch(logError);
           break;
         default:
       }
@@ -397,6 +397,18 @@
           });
         }
       }
+    }
+  };
+
+  /**
+   * cache localized context menu item title
+   * @return {void}
+   */
+  const cacheMenuItemTitle = async () => {
+    const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
+    const label = varsLoc[EDITOR_NAME] || LABEL;
+    for (const item of items) {
+      varsLoc[item] = i18n.getMessage(item, label);
     }
   };
 
