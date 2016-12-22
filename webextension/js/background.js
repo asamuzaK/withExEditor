@@ -296,35 +296,22 @@
     [MODE_EDIT_TEXT]: null
   };
 
-  /**
-   * update context menu items collection
-   * @param {Object} data - item data
-   * @return {void}
-   */
-  const updateMenus = async data => {
-    const id = data && data.id;
-    isString(id) && menus[id] && (menus[id] = data.menu || null);
-  };
-
   // NOTE: no "accesskey" feature
   /**
    * create context menu item
    * @param {string} id - menu item ID
    * @param {Array} contexts - contexts
-   * @param {boolean} create - create menu item
-   * @return {Object}
+   * @return {void}
    */
-  const createMenuItem = async (id, contexts, create) => {
+  const createMenuItem = async (id, contexts) => {
     const label = varsLoc[EDITOR_NAME] || LABEL;
-    let menu = null
-    create && isString(id) && Array.isArray(contexts) && (
-      menu = contextMenus.create({
+    isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
+      menus[id] = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, label),
         enabled: !!varsLoc[MENU_ENABLED]
       })
     );
-    return {id, menu};
   };
 
   /**
@@ -336,18 +323,16 @@
     const bool = enabled && !vars[ENABLE_ONLY_EDITABLE];
     const items = Object.keys(menus);
     for (const item of items) {
+      menus[item] = null;
       switch (item) {
         case MODE_SOURCE:
-          createMenuItem(item, ["frame", "page"], bool).then(updateMenus).
-            catch(logError);
+          bool && createMenuItem(item, ["frame", "page"]).catch(logError);
           break;
         case MODE_SELECTION:
-          createMenuItem(item, ["selection"], bool).then(updateMenus).
-            catch(logError);
+          bool && createMenuItem(item, ["selection"]).catch(logError);
           break;
         case MODE_EDIT_TEXT:
-          createMenuItem(item, ["editable"], enabled).then(updateMenus).
-            catch(logError);
+          enabled && createMenuItem(item, ["editable"]).catch(logError);
           break;
         default:
       }
@@ -524,28 +509,6 @@
   };
 
   /**
-   * handle connected port
-   * @param {Object} port - runtime.Port
-   * @return {void}
-   */
-  const handlePort = async port => {
-    const windowId = `${port.sender.tab.windowId}`;
-    const tabId = `${port.sender.tab.id}`;
-    const frameId = port.sender.frameId;
-    const frameUrl = port.sender.url;
-    const incognito = port.sender.tab.incognito;
-    ports[windowId] = ports[windowId] || {};
-    ports[windowId][tabId] = ports[windowId][tabId] || {};
-    ports[windowId][tabId][frameUrl] = port;
-    frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito);
-    port.onMessage.addListener(handleMsg);
-    port.postMessage({
-      incognito, tabId,
-      [SET_VARS]: vars
-    });
-  };
-
-  /**
    * handle runtime update
    * @param {Object} details - install details
    * @return {void}
@@ -578,6 +541,28 @@
         }
       }
     }
+  };
+
+  /**
+   * handle connected port
+   * @param {Object} port - runtime.Port
+   * @return {void}
+   */
+  const handlePort = async port => {
+    const windowId = `${port.sender.tab.windowId}`;
+    const tabId = `${port.sender.tab.id}`;
+    const frameId = port.sender.frameId;
+    const frameUrl = port.sender.url;
+    const incognito = port.sender.tab.incognito;
+    ports[windowId] = ports[windowId] || {};
+    ports[windowId][tabId] = ports[windowId][tabId] || {};
+    ports[windowId][tabId][frameUrl] = port;
+    frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito);
+    port.onMessage.addListener(handleMsg);
+    port.postMessage({
+      incognito, tabId,
+      [SET_VARS]: vars
+    });
   };
 
   /**
