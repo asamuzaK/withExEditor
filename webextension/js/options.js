@@ -191,12 +191,11 @@
         placeholder: "placeholder",
         title: "title"
       };
+      const dataAttr = elm.getAttribute(DATA_ATTR_I18N);
       const items = Object.keys(attrs);
       for (const item of items) {
         const attr = attrs[item];
-        const value = i18n.getMessage(
-          `${elm.getAttribute(DATA_ATTR_I18N)}.${item}`
-        );
+        const value = i18n.getMessage(`${dataAttr}.${item}`);
         elm.hasAttribute(attr) && value && elm.setAttribute(attr, value);
       }
     }
