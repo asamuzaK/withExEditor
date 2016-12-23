@@ -260,21 +260,18 @@
     if (items && items.length > 0) {
       for (const item of items) {
         const obj = msg[item];
-        switch (item) {
-          case RES_APP_MANIFEST:
-            extractAppManifest(obj.value).catch(logError);
-            break;
-          case RES_EXECUTABLE:
-            Promise.all([
-              createPref(
-                document.getElementById(APP_MANIFEST), obj.executable
-              ).then(setStorage),
-              syncEditorName(obj.executable).then(createPref).then(setStorage),
-              // NOTE: for hybrid
-              portMsg({removeSdkPrefs: obj.executable})
-            ]).catch(logError);
-            break;
-          default:
+        if (item === RES_APP_MANIFEST) {
+          extractAppManifest(obj.value).catch(logError);
+        }
+        else if (item === RES_EXECUTABLE) {
+          Promise.all([
+            createPref(
+              document.getElementById(APP_MANIFEST), obj.executable
+            ).then(setStorage),
+            syncEditorName(obj.executable).then(createPref).then(setStorage),
+            // NOTE: for hybrid
+            portMsg({removeSdkPrefs: obj.executable})
+          ]).catch(logError);
         }
       }
     }
