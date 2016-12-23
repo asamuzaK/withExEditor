@@ -265,7 +265,7 @@
    * create element
    * @param {Object} node - element node to create element from
    * @param {boolean} append - append child nodes
-   * @return {Object} - Promise, returns element or text node on fulfill
+   * @return {Object} - Promise.<Object>, element or text node
    */
   const createElm = (node, append = false) =>
     createElementNS(node).then(async elm => {

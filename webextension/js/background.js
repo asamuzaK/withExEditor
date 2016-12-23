@@ -397,7 +397,7 @@
   /**
    * synchronize UI components
    * @param {boolean} enabled - enabled
-   * @return {Object} - Promise
+   * @return {Object} - Promise.<Array.<*>>
    */
   const syncUI = (enabled = false) => Promise.all([
     portMsg({isEnabled: !!enabled}),
@@ -643,7 +643,7 @@
   /**
    * handle removed window
    * @param {number} windowId - windowId
-   * @return {Object} - Promise
+   * @return {Object} - Promise.<Array.<*>>
    */
   const handleRemovedWindow = windowId => Promise.all([
     restorePorts({windowId: `${windowId}`}),
