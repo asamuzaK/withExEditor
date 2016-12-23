@@ -195,8 +195,8 @@
       const items = Object.keys(attrs);
       for (const item of items) {
         const attr = attrs[item];
-        const value = i18n.getMessage(`${dataAttr}.${item}`);
-        elm.hasAttribute(attr) && value && elm.setAttribute(attr, value);
+        elm.hasAttribute(attr) &&
+          elm.setAttribute(attr, i18n.getMessage(`${dataAttr}.${item}`));
       }
     }
   };
