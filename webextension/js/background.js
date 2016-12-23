@@ -520,7 +520,7 @@
    */
   const handleMsg = async msg => {
     const items = Object.keys(msg);
-    if (items.length > 0) {
+    if (items && items.length > 0) {
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
