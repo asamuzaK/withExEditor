@@ -3,17 +3,34 @@
  */
 "use strict";
 {
+  /* constant */
   const PATH_CODE_SAMPLE = "../data/codeSample.json";
 
-  document.addEventListener("DOMContentLoaded", () =>
-    fetch(PATH_CODE_SAMPLE).then(async res => {
-      const codes = await res.json();
-      const items = Object.keys(codes);
-      if (items.length > 0) {
-        for (const item of items) {
-          const target = document.getElementById(item);
-          target && (target.textContent = codes[item]);
-        }
+  /**
+   * log error
+   * @param {Object} e - Error
+   * @return {boolean} - false
+   */
+  const logError = e => {
+    e && console.error(e);
+    return false;
+  };
+
+  /**
+   * insert code sample to html
+   * @return {Object} - Promise
+   */
+  const insertCodeSample = () => fetch(PATH_CODE_SAMPLE).then(async res => {
+    const codes = await res.json();
+    const items = Object.keys(codes);
+    if (items && items.length > 0) {
+      for (const item of items) {
+        const target = document.getElementById(item);
+        target && (target.textContent = codes[item]);
       }
-    }), false);
+    }
+  }).catch(logError);
+
+  /* listener */
+  document.addEventListener("DOMContentLoaded", insertCodeSample, false);
 }
