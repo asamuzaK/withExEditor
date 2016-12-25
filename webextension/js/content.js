@@ -8,7 +8,6 @@
   const PORT_NAME = "portContent";
 
   const CREATE_TMP_FILE = "createTmpFile";
-  const FAIL_GET_CONTENT = "failGetContent";
   const GET_CONTENT = "getContent";
   const GET_FILE_PATH = "getFilePath";
   const PORT_FILE_PATH = "portFilePath";
@@ -44,7 +43,6 @@
   const TAB_ID = "tabId";
 
   /* shortcuts */
-  const i18n = browser.i18n;
   const runtime = browser.runtime;
   const storage = browser.storage.local;
 
