@@ -133,7 +133,7 @@
    * @return {void}
    */
   const setPrefStorage = async evt => {
-    const elm = evt.target;
+    const elm = evt && evt.target;
     if (elm) {
       if (elm.type === "radio") {
         const nodes = document.querySelectorAll(`[name=${elm.name}]`);
