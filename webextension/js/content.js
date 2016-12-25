@@ -78,12 +78,6 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
-  /* RegExp */
-  const reExt = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/;
-  const rePath = /^.*\/((?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?)?$/;
-  const reType = /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/;
-  const reXml = /^(?:(?:application\/(?:[\w\-\.]+\+)?|image\/[\w\-\.]+\+)x|text\/(?:ht|x))ml$/;
-
   /* file utils */
   /**
    * get file name from URI path
@@ -92,7 +86,8 @@
    * @return {string} - file name
    */
   const getFileNameFromURI = async (uri, subst = LABEL) => {
-    const name = isString(uri) && !/^data:/.test(uri) && rePath.exec(uri);
+    const name = isString(uri) && !/^data:/.test(uri) &&
+                   /^.*\/((?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?)?$/.exec(uri);
     return name && name[1] || subst;
   };
 
@@ -106,7 +101,7 @@
    * @return {string} - file extension
    */
   const getFileExtension = async (media = "text/plain", subst = "txt") => {
-    let ext = reExt.exec(media);
+    let ext = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/.exec(media);
     if (ext) {
       const type = ext[1];
       const subtype = ext[2];
@@ -770,7 +765,7 @@
         break;
       case MODE_SELECTION:
         target = await getFileNameFromURI(uri, "index");
-        if (target && value && reXml.test(contentType)) {
+        if (target && value && /^(?:(?:application\/(?:[\w\-\.]+\+)?|image\/[\w\-\.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
           tmpFileData = {
             [CREATE_TMP_FILE]: {
               incognito, tabId, host, target,
@@ -1055,7 +1050,7 @@
           elm.isContentEditable || await isEditControl(elm) ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm)
         ) ||
-        reType.test(document.contentType)
+        /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/.test(document.contentType)
       ) && portContentData(elm).catch(logError);
     }
   };
