@@ -765,7 +765,8 @@
         break;
       case MODE_SELECTION:
         target = await getFileNameFromURI(uri, "index");
-        if (target && value && /^(?:(?:application\/(?:[\w\-\.]+\+)?|image\/[\w\-\.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
+        if (target && value &&
+            /^(?:(?:application\/(?:[\w\-\.]+\+)?|image\/[\w\-\.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
           tmpFileData = {
             [CREATE_TMP_FILE]: {
               incognito, tabId, host, target,
