@@ -794,8 +794,7 @@
       default:
         tmpFileData = await fetchSource(data);
     }
-    return tmpFileData ||
-           Promise.reject(`${LABEL}: ${i18n.getMessage(FAIL_GET_CONTENT)}`);
+    return tmpFileData || null;
   };
 
   /**
@@ -804,15 +803,17 @@
    * @return {void}
    */
   const createContentDataMsg = async res => {
-    res[CREATE_TMP_FILE] ?
-      portMsg({
-        [CREATE_TMP_FILE]: {
-          data: res[CREATE_TMP_FILE],
-          value: res.value
-        }
-      }).catch(logError) :
-      res[GET_FILE_PATH] &&
-        portMsg({[GET_FILE_PATH]: res[GET_FILE_PATH]}).catch(logError);
+    res && (
+      res[CREATE_TMP_FILE] ?
+        portMsg({
+          [CREATE_TMP_FILE]: {
+            data: res[CREATE_TMP_FILE],
+            value: res.value
+          }
+        }).catch(logError) :
+        res[GET_FILE_PATH] &&
+          portMsg({[GET_FILE_PATH]: res[GET_FILE_PATH]}).catch(logError)
+    );
   };
 
   /**
