@@ -466,11 +466,11 @@
     Array.isArray(arr) && (arr.map(i => i || "")).join("");
 
   /**
-   * get text node
-   * @param {Object} nodes - child nodes
+   * get text
+   * @param {Object} nodes - nodes
    * @return {Object} - Promise.<string>, text
    */
-  const getTextNode = async nodes => {
+  const getText = async nodes => {
     const arr = [];
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
@@ -481,7 +481,7 @@
             }
             else {
               node.hasChildNodes() &&
-                arr.push(getTextNode(node.childNodes).catch(logError));
+                arr.push(getText(node.childNodes).catch(logError));
             }
             break;
           case NODE_TEXT:
@@ -681,11 +681,16 @@
             await isContentTextNode(elm)) {
           contextType.mode = MODE_EDIT_TEXT;
         }
-        else if (ns.namespaceURI === nsURI.math) {
-          contextType.mode = MODE_MATHML;
-        }
-        else if (ns.namespaceURI === nsURI.svg) {
-          contextType.mode = MODE_SVG;
+        else {
+          switch (ns.namespaceURI) {
+            case nsURI.math:
+              contextType.mode = MODE_MATHML;
+              break;
+            case nsURI.svg:
+              contextType.mode = MODE_SVG;
+              break;
+            default:
+          }
         }
       }
       else if (modeEdit) {
@@ -723,31 +728,31 @@
       switch (contextType.mode) {
         case MODE_EDIT_TEXT:
           if (sel.isCollapsed) {
-            if (await isEditControl(elm) && (obj = await getId(elm))) {
-              data.mode = contextType.mode;
-              data.target = obj;
-              data.value = elm.value || "";
-            }
-            else if ((elm.isContentEditable || await isContentTextNode(elm)) &&
-                     (obj = await getId(elm))) {
-              data.mode = contextType.mode;
-              data.target = obj;
-              data.value = elm.hasChildNodes() &&
-                           await getTextNode(elm.childNodes).catch(logError) ||
-                           "";
-              data.namespaceURI = contextType.namespaceURI;
-              setDataAttrs(elm);
+            obj = await getId(elm);
+            if (obj) {
+              if (await isEditControl(elm)) {
+                data.mode = contextType.mode;
+                data.target = obj;
+                data.value = elm.value || "";
+              }
+              else if (elm.isContentEditable || await isContentTextNode(elm)) {
+                data.mode = contextType.mode;
+                data.target = obj;
+                data.value = elm.hasChildNodes() &&
+                             await getText(elm.childNodes).catch(logError) ||
+                             "";
+                data.namespaceURI = contextType.namespaceURI;
+                setDataAttrs(elm);
+              }
             }
           }
-          else if ((parent.isContentEditable ||
-                    await isEditControl(parent) ||
+          else if ((parent.isContentEditable || await isEditControl(parent) ||
                     await isContentTextNode(parent)) &&
                    (obj = await getId(parent))) {
             data.mode = contextType.mode;
             data.target = obj;
             data.value = parent.hasChildNodes() &&
-                         await getTextNode(parent.childNodes).catch(logError) ||
-                         "";
+                         await getText(parent.childNodes).catch(logError) || "";
             data.namespaceURI = contextType.namespaceURI;
             setDataAttrs(parent);
           }
