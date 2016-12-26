@@ -365,10 +365,10 @@
 
   /**
    * create selection fragment
-   * @param {Array.<Array>} arr - array of nodes array
+   * @param {Array} arr - array of nodes array
    * @return {Object} - document fragment
    */
-  const createSelFrag = async (arr = []) => {
+  const createSelFrag = async arr => {
     let frag;
     if (Array.isArray(arr) && arr.length > 0) {
       frag = document.createDocumentFragment();
