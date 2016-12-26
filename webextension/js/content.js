@@ -364,6 +364,71 @@
   };
 
   /**
+   * create selection fragment
+   * @param {Array.<Array>} arr - array of nodes array
+   * @return {Object} - Promise<Object>, document fragment
+   */
+  const createSelFrag = async (arr = []) => {
+    let frag;
+    if (Array.isArray(arr) && arr.length > 0) {
+      frag = document.createDocumentFragment();
+      for (const i of arr) {
+        if (!Array.isArray(i)) {
+          return null;
+        }
+        for (const j of i) {
+          j && frag.appendChild(j);
+        }
+      }
+    }
+    return frag || null;
+  };
+
+  /**
+   * create range array
+   * @param {Object} range - range
+   * @param {number} index - index
+   * @param {number} count - range count
+   * @return {Object} - Promise.<Array>, range array
+   */
+  const createRangeArr = async (range, index, count) => {
+    const arr = [];
+    if (range) {
+      const ancestor = range.commonAncestorContainer;
+      let obj;
+      count > 1 && arr.push(document.createTextNode("\n"));
+      switch (ancestor.nodeType) {
+        case NODE_ELEMENT:
+          obj = await getNodeNS(ancestor);
+          if (/^(?:svg|math)$/.test(obj.localName)) {
+            if (obj.node === document.documentElement) {
+              return null;
+            }
+            obj.node.parentNode && (
+              obj = obj.node.parentNode,
+              range.setStart(obj, 0),
+              range.setEnd(obj, obj.childNodes.length)
+            );
+          }
+          arr.push(createDomTree(ancestor, range.cloneContents()));
+          break;
+        case NODE_TEXT:
+          obj = await createElm(ancestor.parentNode);
+          obj.nodeType === NODE_ELEMENT && (
+            obj.appendChild(range.cloneContents()),
+            arr.push(obj)
+          );
+          break;
+        default:
+      }
+      arr.push(document.createTextNode("\n"));
+      count > 1 && index < count - 1 &&
+        arr.push(document.createComment("Next Range"));
+    }
+    return Promise.all(arr);
+  };
+
+  /**
    * create DOM from selection range
    * @param {Object} sel - selection
    * @return {?string} - serialized node string
@@ -375,41 +440,11 @@
       const l = sel.rangeCount;
       let i = 0, obj;
       while (i < l) {
-        const range = sel.getRangeAt(i);
-        const ancestor = range.commonAncestorContainer;
-        l > 1 && arr.push(document.createTextNode("\n"));
-        switch (ancestor.nodeType) {
-          case NODE_ELEMENT:
-            obj = await getNodeNS(ancestor);
-            if (/^(?:svg|math)$/.test(obj.localName)) {
-              if (obj.node === document.documentElement) {
-                return null;
-              }
-              obj.node.parentNode && (
-                obj = obj.node.parentNode,
-                range.setStart(obj, 0),
-                range.setEnd(obj, obj.childNodes.length)
-              );
-            }
-            arr.push(createDomTree(ancestor, range.cloneContents()));
-            break;
-          case NODE_TEXT:
-            obj = await createElm(ancestor.parentNode);
-            obj.nodeType === NODE_ELEMENT && (
-              obj.appendChild(range.cloneContents()),
-              arr.push(obj)
-            );
-            break;
-          default:
-        }
-        arr.push(document.createTextNode("\n"));
-        l > 1 && i < l - 1 &&
-          arr.push(document.createComment("Next Range"));
+        arr.push(createRangeArr(sel.getRangeAt(i), i, l).catch(logError));
         i++;
       }
-      l > 1 &&
-      (frag = await Promise.all(arr).then(createFrag).catch(logError)) &&
-      frag.hasChildNodes() &&
+      frag = await Promise.all(arr).then(createSelFrag).catch(logError);
+      l > 1 && frag && frag.hasChildNodes() &&
       (obj = await createElm(document.documentElement)) &&
       obj.nodeType === NODE_ELEMENT && (
         obj.appendChild(frag),
