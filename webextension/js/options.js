@@ -221,6 +221,29 @@
   };
 
   /**
+   * set HTML input value
+   * @param {Object} data - storage data
+   * @return {void}
+   */
+  const setHtmlInputValue = async data => {
+    const elm = data && data.id && document.getElementById(data.id);
+    if (elm) {
+      switch (elm.type) {
+        case "checkbox":
+        case "radio":
+          elm.checked = !!data.checked;
+          break;
+        case "text":
+          elm.value = isString(data.value) && data.value || "";
+          elm === document.getElementById(EDITOR_NAME) && elm.value &&
+            (elm.disabled = false);
+          break;
+        default:
+      }
+    }
+  };
+
+  /**
    * set html input values from storage
    * @return {void}
    */
@@ -229,22 +252,7 @@
     const items = pref && Object.keys(pref);
     if (items && items.length > 0) {
       for (const item of items) {
-        const obj = pref[item];
-        const elm = document.getElementById(obj.id);
-        if (elm) {
-          switch (elm.type) {
-            case "checkbox":
-            case "radio":
-              elm.checked = !!obj.checked;
-              break;
-            case "text":
-              elm.value = isString(obj.value) && obj.value || "";
-              elm === document.getElementById(EDITOR_NAME) && elm.value &&
-                (elm.disabled = false);
-              break;
-            default:
-          }
-        }
+        setHtmlInputValue(pref[item]);
       }
     }
   };
@@ -260,18 +268,21 @@
     if (items && items.length > 0) {
       for (const item of items) {
         const obj = msg[item];
-        if (item === RES_APP_MANIFEST) {
-          extractAppManifest(obj.value).catch(logError);
-        }
-        else if (item === RES_EXECUTABLE) {
-          Promise.all([
-            createPref(
-              document.getElementById(APP_MANIFEST), obj.executable
-            ).then(setStorage),
-            syncEditorName(obj.executable).then(createPref).then(setStorage),
-            // NOTE: for hybrid
-            portMsg({removeSdkPrefs: obj.executable})
-          ]).catch(logError);
+        switch (item) {
+          case RES_APP_MANIFEST:
+            extractAppManifest(obj.value).catch(logError);
+            break;
+          case RES_EXECUTABLE:
+            Promise.all([
+              createPref(
+                document.getElementById(APP_MANIFEST), obj.executable
+              ).then(setStorage),
+              syncEditorName(obj.executable).then(createPref).then(setStorage),
+              // NOTE: for hybrid
+              portMsg({removeSdkPrefs: obj.executable})
+            ]).catch(logError);
+            break;
+          default:
         }
       }
     }

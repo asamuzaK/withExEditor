@@ -255,6 +255,20 @@
   };
 
   /**
+   * create document fragment
+   * @param {Object} nodes - array containing nodes
+   * @return {Object} - fragment
+   */
+  const createFragment = async (nodes = []) => {
+    const fragment = document.createDocumentFragment();
+    Array.isArray(nodes) && nodes.forEach(node => {
+      (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
+        fragment.appendChild(node);
+    });
+    return fragment;
+  };
+
+  /**
    * create element
    * @param {Object} node - element node to create element from
    * @param {boolean} append - append child nodes
@@ -264,19 +278,24 @@
     createElementNS(node).then(async elm => {
       if (append && node && node.hasChildNodes() &&
           elm && elm.nodeType === NODE_ELEMENT) {
-        const fragment = document.createDocumentFragment();
         const nodes = node.childNodes;
+        const arr = [];
+        let fragment = null;
         for (const child of nodes) {
-          if (child.nodeType === NODE_ELEMENT) {
-            child === child.parentNode.firstChild &&
-              fragment.appendChild(document.createTextNode("\n"));
-            fragment.appendChild(await createElm(child, true));
-          }
-          else if (child.nodeType === NODE_TEXT) {
-            fragment.appendChild(document.createTextNode(child.nodeValue));
+          switch (child.nodeType) {
+            case NODE_ELEMENT:
+              child === child.parentNode.firstChild &&
+                arr.push(document.createTextNode("\n"));
+              arr.push(createElm(child, true));
+              break;
+            case NODE_TEXT:
+              arr.push(document.createTextNode(child.nodeValue));
+              break;
+            default:
           }
         }
-        elm.appendChild(fragment);
+        fragment = await Promise.all(arr).then(createFragment).catch(logError);
+        fragment && elm.appendChild(fragment);
       }
       return elm || document.createTextNode("");
     });
@@ -284,25 +303,28 @@
   /**
    * create DOM
    * @param {Object} nodes - child nodes
-   * @return {Object} - document fragment
+   * @return {Object} - Promise.<Object>, document fragment
    */
   const createDom = async nodes => {
-    const fragment = document.createDocumentFragment();
+    const arr = [];
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
-        if (node.nodeType === NODE_ELEMENT) {
-          node === node.parentNode.firstChild &&
-            fragment.appendChild(document.createTextNode("\n"));
-          fragment.appendChild(await createElm(node, true));
-          node === node.parentNode.lastChild &&
-            fragment.appendChild(document.createTextNode("\n"));
-        }
-        else if (node.nodeType === NODE_TEXT) {
-          fragment.appendChild(document.createTextNode(node.nodeValue));
+        switch (node.nodeType) {
+          case NODE_ELEMENT:
+            node === node.parentNode.firstChild &&
+              arr.push(document.createTextNode("\n"));
+            arr.push(createElm(node, true));
+            node === node.parentNode.lastChild &&
+              arr.push(document.createTextNode("\n"));
+            break;
+          case NODE_TEXT:
+            arr.push(document.createTextNode(node.nodeValue));
+            break;
+          default:
         }
       }
     }
-    return fragment;
+    return Promise.all(arr).then(createFragment).catch(logError);
   };
 
   /**
@@ -355,34 +377,38 @@
         const range = sel.getRangeAt(i);
         const ancestor = range.commonAncestorContainer;
         l > 1 && fragment.appendChild(document.createTextNode("\n"));
-        if (ancestor.nodeType === NODE_ELEMENT) {
-          obj = await getNodeNS(ancestor);
-          if (/^(?:svg|math)$/.test(obj.localName)) {
-            if (obj.node === document.documentElement) {
-              fragment = null;
-              break;
+        switch (ancestor.nodeType) {
+          case NODE_ELEMENT:
+            obj = await getNodeNS(ancestor);
+            if (/^(?:svg|math)$/.test(obj.localName)) {
+              if (obj.node === document.documentElement) {
+                return null;
+              }
+              obj.node.parentNode && (
+                obj = obj.node.parentNode,
+                range.setStart(obj, 0),
+                range.setEnd(obj, obj.childNodes.length)
+              );
             }
-            else if (obj.node.parentNode) {
-              obj = obj.node.parentNode;
-              range.setStart(obj, 0);
-              range.setEnd(obj, obj.childNodes.length);
-            }
-          }
-          fragment.appendChild(
-            await createDomTree(ancestor, range.cloneContents())
-          );
-        }
-        else if (ancestor.nodeType === NODE_TEXT &&
-                 (obj = await createElm(ancestor.parentNode)) &&
-                 obj.nodeType === NODE_ELEMENT) {
-          obj.appendChild(range.cloneContents());
-          fragment.appendChild(obj);
+            fragment.appendChild(
+              await createDomTree(ancestor, range.cloneContents())
+            );
+            break;
+          case NODE_TEXT:
+            obj = await createElm(ancestor.parentNode);
+            obj.nodeType === NODE_ELEMENT && (
+              obj.appendChild(range.cloneContents()),
+              fragment.appendChild(obj)
+            );
+            break;
+          default:
         }
         fragment.appendChild(document.createTextNode("\n"));
         l > 1 && i < l - 1 &&
           fragment.appendChild(document.createComment("Next Range"));
         i++;
       }
+      
       l > 1 && fragment.hasChildNodes() &&
       (obj = await createElm(document.documentElement)) &&
       obj.nodeType === NODE_ELEMENT && (
@@ -405,17 +431,20 @@
     const arr = [];
     if (nodes instanceof NodeList) {
       for (let node of nodes) {
-        if (node.nodeType === NODE_ELEMENT) {
-          if (node.localName === "br") {
-            arr.push("\n");
-          }
-          else if (node.hasChildNodes() &&
-                   (node = await getTextNode(node.childNodes))) {
-            arr.push(node);
-          }
-        }
-        else if (node.nodeType === NODE_TEXT) {
-          arr.push(node.nodeValue);
+        switch (node.nodeType) {
+          case NODE_ELEMENT:
+            if (node.localName === "br") {
+              arr.push("\n");
+            }
+            else if (node.hasChildNodes() &&
+                     (node = await getTextNode(node.childNodes))) {
+              arr.push(node);
+            }
+            break;
+          case NODE_TEXT:
+            arr.push(node.nodeValue);
+            break;
+          default:
         }
       }
     }

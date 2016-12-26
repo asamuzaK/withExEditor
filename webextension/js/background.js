@@ -358,13 +358,15 @@
         for (const item of items) {
           const obj = type[item];
           const menuItemId = obj.menuItemId;
-          if (item === MODE_SOURCE && menus[menuItemId]) {
-            const title = varsLoc[obj.mode] || varsLoc[menuItemId];
-            title && contextMenus.update(menuItemId, {title});
-          }
-          else if (item === MODE_EDIT_TEXT && menus[menuItemId]) {
-            const enabled = !!obj.enabled;
-            contextMenus.update(menuItemId, {enabled});
+          if (menus[menuItemId]) {
+            if (item === MODE_SOURCE) {
+              const title = varsLoc[obj.mode] || varsLoc[menuItemId];
+              title && contextMenus.update(menuItemId, {title});
+            }
+            else if (item === MODE_EDIT_TEXT) {
+              const enabled = !!obj.enabled;
+              contextMenus.update(menuItemId, {enabled});
+            }
           }
         }
       }
