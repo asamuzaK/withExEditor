@@ -369,14 +369,15 @@
    * @return {?string} - serialized node string
    */
   const createDomFromSelRange = async sel => {
-    let frag = document.createDocumentFragment();
+    const arr = [];
+    let frag;
     if (sel && sel.rangeCount) {
       const l = sel.rangeCount;
       let i = 0, obj;
       while (i < l) {
         const range = sel.getRangeAt(i);
         const ancestor = range.commonAncestorContainer;
-        l > 1 && frag.appendChild(document.createTextNode("\n"));
+        l > 1 && arr.push(document.createTextNode("\n"));
         switch (ancestor.nodeType) {
           case NODE_ELEMENT:
             obj = await getNodeNS(ancestor);
@@ -390,25 +391,25 @@
                 range.setEnd(obj, obj.childNodes.length)
               );
             }
-            frag.appendChild(
-              await createDomTree(ancestor, range.cloneContents())
-            );
+            arr.push(createDomTree(ancestor, range.cloneContents()));
             break;
           case NODE_TEXT:
             obj = await createElm(ancestor.parentNode);
             obj.nodeType === NODE_ELEMENT && (
               obj.appendChild(range.cloneContents()),
-              frag.appendChild(obj)
+              arr.push(obj)
             );
             break;
           default:
         }
-        frag.appendChild(document.createTextNode("\n"));
+        arr.push(document.createTextNode("\n"));
         l > 1 && i < l - 1 &&
-          frag.appendChild(document.createComment("Next Range"));
+          arr.push(document.createComment("Next Range"));
         i++;
       }
-      l > 1 && frag.hasChildNodes() &&
+      l > 1 &&
+      (frag = await Promise.all(arr).then(createFrag).catch(logError)) &&
+      frag.hasChildNodes() &&
       (obj = await createElm(document.documentElement)) &&
       obj.nodeType === NODE_ELEMENT && (
         obj.appendChild(frag),
@@ -422,9 +423,18 @@
   };
 
   /**
+   * join array
+   * @param {Array} arr - array
+   * @return {string} - string
+   */
+  const joinArr = async (arr =[]) => {
+    return Array.isArray(arr) && (arr.map(i => i || "")).join("");
+  };
+
+  /**
    * get text node
    * @param {Object} nodes - child nodes
-   * @return {string} - text
+   * @return {Object} - Promise.<string>, text
    */
   const getTextNode = async nodes => {
     const arr = [];
@@ -435,9 +445,9 @@
             if (node.localName === "br") {
               arr.push("\n");
             }
-            else if (node.hasChildNodes() &&
-                     (node = await getTextNode(node.childNodes))) {
-              arr.push(node);
+            else {
+              node.hasChildNodes() &&
+                arr.push(getTextNode(node.childNodes).catch(logError));
             }
             break;
           case NODE_TEXT:
@@ -447,7 +457,7 @@
         }
       }
     }
-    return arr.join("");
+    return Promise.all(arr).then(joinArr);
   };
 
   /**
@@ -623,13 +633,13 @@
     };
     if (elm) {
       const sel = window.getSelection();
-      const anchorElm = sel.anchorNode && sel.anchorNode.parentNode;
-      const modeEdit = !sel.isCollapsed && sel.rangeCount === 1 && anchorElm &&
-                       anchorElm === sel.focusNode.parentNode &&
-                       anchorElm !== document.documentElement &&
-                       (await isEditControl(anchorElm) ||
-                        anchorElm.isContentEditable ||
-                        await isContentTextNode(anchorElm));
+      const parent = sel.anchorNode && sel.anchorNode.parentNode;
+      const modeEdit = !sel.isCollapsed && sel.rangeCount === 1 && parent &&
+                       parent === sel.focusNode.parentNode &&
+                       parent !== document.documentElement &&
+                       (await isEditControl(parent) ||
+                        parent.isContentEditable ||
+                        await isContentTextNode(parent));
       let ns = await getNodeNS(elm);
       contextType.namespaceURI = ns.namespaceURI;
       if (sel.isCollapsed) {
@@ -645,7 +655,7 @@
         }
       }
       else if (modeEdit) {
-        ns = await getNodeNS(anchorElm);
+        ns = await getNodeNS(parent);
         contextType.mode = MODE_EDIT_TEXT;
         contextType.namespaceURI = ns.namespaceURI;
       }
@@ -674,7 +684,7 @@
     if (elm) {
       const contextType = await getContextType(elm);
       const sel = window.getSelection();
-      const anchorElm = sel.anchorNode && sel.anchorNode.parentNode;
+      const parent = sel.anchorNode && sel.anchorNode.parentNode;
       let obj;
       switch (contextType.mode) {
         case MODE_EDIT_TEXT:
@@ -689,21 +699,23 @@
               data.mode = contextType.mode;
               data.target = obj;
               data.value = elm.hasChildNodes() &&
-                             await getTextNode(elm.childNodes) || "";
+                           await getTextNode(elm.childNodes).catch(logError) ||
+                           "";
               data.namespaceURI = contextType.namespaceURI;
               setDataAttrs(elm);
             }
           }
-          else if ((anchorElm.isContentEditable ||
-                    await isEditControl(anchorElm) ||
-                    await isContentTextNode(anchorElm)) &&
-                   (obj = await getId(anchorElm))) {
+          else if ((parent.isContentEditable ||
+                    await isEditControl(parent) ||
+                    await isContentTextNode(parent)) &&
+                   (obj = await getId(parent))) {
             data.mode = contextType.mode;
             data.target = obj;
-            data.value = anchorElm.hasChildNodes() &&
-                           await getTextNode(anchorElm.childNodes) || "";
+            data.value = parent.hasChildNodes() &&
+                         await getTextNode(parent.childNodes).catch(logError) ||
+                         "";
             data.namespaceURI = contextType.namespaceURI;
-            setDataAttrs(anchorElm);
+            setDataAttrs(parent);
           }
           break;
         case MODE_MATHML:
