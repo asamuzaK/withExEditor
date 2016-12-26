@@ -256,16 +256,16 @@
 
   /**
    * create document fragment
-   * @param {Object} nodes - array containing nodes
+   * @param {Object} nodes - nodes array
    * @return {Object} - document fragment
    */
   const createFrag = async (nodes = []) => {
-    const fragment = document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
     Array.isArray(nodes) && nodes.forEach(node => {
       (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
-        fragment.appendChild(node);
+        frag.appendChild(node);
     });
-    return fragment;
+    return frag;
   };
 
   /**
@@ -369,14 +369,14 @@
    * @return {?string} - serialized node string
    */
   const createDomFromSelRange = async sel => {
-    let fragment = document.createDocumentFragment();
+    let frag = document.createDocumentFragment();
     if (sel && sel.rangeCount) {
       const l = sel.rangeCount;
       let i = 0, obj;
       while (i < l) {
         const range = sel.getRangeAt(i);
         const ancestor = range.commonAncestorContainer;
-        l > 1 && fragment.appendChild(document.createTextNode("\n"));
+        l > 1 && frag.appendChild(document.createTextNode("\n"));
         switch (ancestor.nodeType) {
           case NODE_ELEMENT:
             obj = await getNodeNS(ancestor);
@@ -390,7 +390,7 @@
                 range.setEnd(obj, obj.childNodes.length)
               );
             }
-            fragment.appendChild(
+            frag.appendChild(
               await createDomTree(ancestor, range.cloneContents())
             );
             break;
@@ -398,27 +398,27 @@
             obj = await createElm(ancestor.parentNode);
             obj.nodeType === NODE_ELEMENT && (
               obj.appendChild(range.cloneContents()),
-              fragment.appendChild(obj)
+              frag.appendChild(obj)
             );
             break;
           default:
         }
-        fragment.appendChild(document.createTextNode("\n"));
+        frag.appendChild(document.createTextNode("\n"));
         l > 1 && i < l - 1 &&
-          fragment.appendChild(document.createComment("Next Range"));
+          frag.appendChild(document.createComment("Next Range"));
         i++;
       }
-      l > 1 && fragment.hasChildNodes() &&
+      l > 1 && frag.hasChildNodes() &&
       (obj = await createElm(document.documentElement)) &&
       obj.nodeType === NODE_ELEMENT && (
-        obj.appendChild(fragment),
-        fragment = document.createDocumentFragment(),
-        fragment.appendChild(obj),
-        fragment.appendChild(document.createTextNode("\n"))
+        obj.appendChild(frag),
+        frag = document.createDocumentFragment(),
+        frag.appendChild(obj),
+        frag.appendChild(document.createTextNode("\n"))
       );
     }
-    return fragment && fragment.hasChildNodes() &&
-             (new XMLSerializer()).serializeToString(fragment) || null;
+    return frag && frag.hasChildNodes() &&
+             (new XMLSerializer()).serializeToString(frag) || null;
   };
 
   /**
@@ -856,14 +856,14 @@
    */
   const replaceContent = async (node, value = "", ns = nsURI.html) => {
     if (node && node.nodeType === NODE_ELEMENT) {
-      const fragment = document.createDocumentFragment();
+      const frag = document.createDocumentFragment();
       const arr = value && value.split("\n") || [""];
       const l = arr.length;
       let i = 0;
       while (i < l) {
-        fragment.appendChild(document.createTextNode(arr[i]));
+        frag.appendChild(document.createTextNode(arr[i]));
         i < l - 1 && ns === nsURI.html &&
-          fragment.appendChild(document.createElementNS(ns, "br"));
+          frag.appendChild(document.createElementNS(ns, "br"));
         i++;
       }
       if (node.hasChildNodes()) {
@@ -871,7 +871,7 @@
           node.removeChild(node.firstChild);
         }
       }
-      node.appendChild(fragment);
+      node.appendChild(frag);
     }
   };
 
