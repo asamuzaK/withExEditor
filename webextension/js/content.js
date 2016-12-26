@@ -366,7 +366,7 @@
   /**
    * create selection fragment
    * @param {Array.<Array>} arr - array of nodes array
-   * @return {Object} - Promise<Object>, document fragment
+   * @return {Object} - document fragment
    */
   const createSelFrag = async (arr = []) => {
     let frag;
