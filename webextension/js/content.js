@@ -464,8 +464,8 @@
    * @param {Array} arr - array
    * @return {string} - string
    */
-  const joinArr = async (arr = []) =>
-    Array.isArray(arr) && (arr.map(i => i || "")).join("");
+  const joinArr = async arr =>
+    Array.isArray(arr) && (arr.map(i => i || "")).join("") || "";
 
   /**
    * get text
