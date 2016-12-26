@@ -257,9 +257,9 @@
   /**
    * create document fragment
    * @param {Object} nodes - array containing nodes
-   * @return {Object} - fragment
+   * @return {Object} - document fragment
    */
-  const createFragment = async (nodes = []) => {
+  const createFrag = async (nodes = []) => {
     const fragment = document.createDocumentFragment();
     Array.isArray(nodes) && nodes.forEach(node => {
       (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
@@ -280,7 +280,7 @@
           elm && elm.nodeType === NODE_ELEMENT) {
         const nodes = node.childNodes;
         const arr = [];
-        let fragment = null;
+        let frag;
         for (const child of nodes) {
           switch (child.nodeType) {
             case NODE_ELEMENT:
@@ -294,8 +294,8 @@
             default:
           }
         }
-        fragment = await Promise.all(arr).then(createFragment).catch(logError);
-        fragment && elm.appendChild(fragment);
+        (frag = await Promise.all(arr).then(createFrag).catch(logError)) &&
+          elm.appendChild(frag);
       }
       return elm || document.createTextNode("");
     });
@@ -324,7 +324,7 @@
         }
       }
     }
-    return Promise.all(arr).then(createFragment).catch(logError);
+    return Promise.all(arr).then(createFrag);
   };
 
   /**
@@ -337,7 +337,7 @@
     let child;
     elm = await createElm(elm);
     elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes() &&
-    (child = await createDom(node.childNodes)) &&
+    (child = await createDom(node.childNodes).catch(logError)) &&
       elm.appendChild(child);
     return elm;
   };
@@ -408,7 +408,6 @@
           fragment.appendChild(document.createComment("Next Range"));
         i++;
       }
-      
       l > 1 && fragment.hasChildNodes() &&
       (obj = await createElm(document.documentElement)) &&
       obj.nodeType === NODE_ELEMENT && (
