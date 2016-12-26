@@ -287,6 +287,8 @@
               child === child.parentNode.firstChild &&
                 arr.push(document.createTextNode("\n"));
               arr.push(createElm(child, true));
+              child === child.parentNode.lastChild &&
+                arr.push(document.createTextNode("\n"));
               break;
             case NODE_TEXT:
               arr.push(document.createTextNode(child.nodeValue));
