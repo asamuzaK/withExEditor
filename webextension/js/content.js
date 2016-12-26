@@ -427,9 +427,8 @@
    * @param {Array} arr - array
    * @return {string} - string
    */
-  const joinArr = async (arr =[]) => {
-    return Array.isArray(arr) && (arr.map(i => i || "")).join("");
-  };
+  const joinArr = async (arr = []) =>
+    Array.isArray(arr) && (arr.map(i => i || "")).join("");
 
   /**
    * get text node
@@ -439,7 +438,7 @@
   const getTextNode = async nodes => {
     const arr = [];
     if (nodes instanceof NodeList) {
-      for (let node of nodes) {
+      for (const node of nodes) {
         switch (node.nodeType) {
           case NODE_ELEMENT:
             if (node.localName === "br") {
