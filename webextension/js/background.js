@@ -86,7 +86,7 @@
   /**
    * is string
    * @param {*} o - object to check
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
@@ -95,7 +95,7 @@
   /**
    * check if add-on can be enabled
    * @param {Object} win - current window.Window
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const checkEnable = async (win = null) => {
     let enable = false;
@@ -108,7 +108,7 @@
 
   /**
    * check one of window is incognito
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const checkWindowIncognito = async () => {
     const windowIds = await windows.getAll();

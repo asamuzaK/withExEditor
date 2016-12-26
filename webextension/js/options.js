@@ -39,7 +39,7 @@
   /**
    * is string
    * @param {*} o - object to check
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
@@ -70,7 +70,7 @@
    * create pref
    * @param {Object} elm - element
    * @param {boolean} executable - executable
-   * @return {Object}
+   * @return {Object} - pref data
    */
   const createPref = async (elm, executable = false) => {
     const id = elm && elm.id;

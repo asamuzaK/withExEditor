@@ -71,7 +71,7 @@
   /**
    * is string
    * @param {*} o - object to check
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
@@ -522,7 +522,7 @@
   /**
    * node or ancestor is editable
    * @param {Object} node - element node
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const isEditable = async node => {
     let editable = false, elm = node;
@@ -540,7 +540,7 @@
   /**
    * node content is text node
    * @param {Object} node - element node
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const isContentTextNode = async node => {
     let isText = await isEditable(node);
@@ -560,7 +560,7 @@
   /**
    * is text edit control element
    * @param {Object} elm - element
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const isEditControl = async elm =>
     elm && (
@@ -1002,7 +1002,7 @@
    * key combination matches
    * @param {Object} evt - Event
    * @param {Object} key - KeyCombo
-   * @return {boolean}
+   * @return {boolean} - result
    */
   const keyComboMatches = async (evt, key) =>
     vars[IS_ENABLED] && key.enabled && key.key && evt.key &&
