@@ -98,12 +98,12 @@
    * @return {boolean} - result
    */
   const checkEnable = async (win = null) => {
-    let enable = false;
+    let enable;
     !win && (win = await windows.getCurrent());
     win && win.type === "normal" &&
       (enable = !win.incognito || varsLoc[ENABLE_PB]);
     vars[IS_ENABLED] = enable;
-    return enable;
+    return enable || false;
   };
 
   /**
@@ -112,7 +112,7 @@
    */
   const checkWindowIncognito = async () => {
     const windowIds = await windows.getAll();
-    let incognito = false;
+    let incognito;
     if (windowIds.length > 0) {
       for (const windowId of windowIds) {
         incognito = windowId.incognito;
@@ -121,7 +121,7 @@
         }
       }
     }
-    return incognito;
+    return incognito || false;
   };
 
   /**

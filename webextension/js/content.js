@@ -259,7 +259,7 @@
    * @param {Object} nodes - nodes array
    * @return {Object} - document fragment
    */
-  const createFrag = async (nodes = []) => {
+  const createFrag = async nodes => {
     const frag = document.createDocumentFragment();
     Array.isArray(nodes) && nodes.forEach(node => {
       (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
@@ -436,9 +436,9 @@
    * @return {?string} - serialized node string
    */
   const createDomFromSelRange = async sel => {
-    const arr = [];
     let frag;
     if (sel && sel.rangeCount) {
+      const arr = [];
       const l = sel.rangeCount;
       let i = 0, obj;
       while (i < l) {
@@ -502,7 +502,7 @@
    * @return {?string} - ID
    */
   const getId = async elm => {
-    let id = null;
+    let id;
     if (elm) {
       const isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
       const ns = !isHtml && nsURI.html || "";
@@ -516,7 +516,7 @@
         isHtml && elm.addEventListener("focus", portTemporaryId, false);
       }
     }
-    return id;
+    return id || null;
   };
 
   /**
@@ -525,7 +525,7 @@
    * @return {boolean} - result
    */
   const isEditable = async node => {
-    let editable = false, elm = node;
+    let elm = node, editable;
     while (elm && elm.parentNode) {
       if (typeof elm.isContentEditable === "boolean" &&
           (!elm.namespaceURI || elm.namespaceURI === nsURI.html)) {
@@ -534,7 +534,7 @@
       }
       elm = elm.parentNode;
     }
-    return editable;
+    return editable || false;
   };
 
   /**
@@ -575,7 +575,7 @@
    * @return {Object} - editable element
    */
   const getEditableElm = async node => {
-    let elm = null;
+    let elm;
     if (await isEditControl(node)) {
       elm = node;
     }
@@ -589,7 +589,7 @@
         node = node.parentNode;
       }
     }
-    return elm;
+    return elm || null;
   };
 
   /**
@@ -669,13 +669,6 @@
     };
     if (elm) {
       const sel = window.getSelection();
-      const parent = sel.anchorNode && sel.anchorNode.parentNode;
-      const modeEdit = !sel.isCollapsed && sel.rangeCount === 1 && parent &&
-                       parent === sel.focusNode.parentNode &&
-                       parent !== document.documentElement &&
-                       (await isEditControl(parent) ||
-                        parent.isContentEditable ||
-                        await isContentTextNode(parent));
       let ns = await getNodeNS(elm);
       contextType.namespaceURI = ns.namespaceURI;
       if (sel.isCollapsed) {
@@ -695,13 +688,20 @@
           }
         }
       }
-      else if (modeEdit) {
-        ns = await getNodeNS(parent);
-        contextType.mode = MODE_EDIT_TEXT;
-        contextType.namespaceURI = ns.namespaceURI;
-      }
       else {
-        contextType.mode = MODE_SELECTION;
+        const parent = sel.anchorNode && sel.anchorNode.parentNode;
+        if (!sel.isCollapsed && sel.rangeCount === 1 && parent &&
+            parent === sel.focusNode.parentNode &&
+            parent !== document.documentElement &&
+            (await isEditControl(parent) || parent.isContentEditable ||
+             await isContentTextNode(parent))) {
+          ns = await getNodeNS(parent);
+          contextType.mode = MODE_EDIT_TEXT;
+          contextType.namespaceURI = ns.namespaceURI;
+        }
+        else {
+          contextType.mode = MODE_SELECTION;
+        }
       }
     }
     return contextType;
