@@ -85,7 +85,7 @@
    */
   const getFileNameFromURI = async (uri, subst = LABEL) => {
     const name = isString(uri) && !/^data:/.test(uri) &&
-                   /^.*\/((?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!\$&'\(\)\*\+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-\.~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*)?)?$/.exec(uri);
+                   /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-.~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-.~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*)?)?$/.exec(uri);
     return name && name[1] || subst;
   };
 
@@ -99,7 +99,7 @@
    * @return {string} - file extension
    */
   const getFileExtension = async (media = "text/plain", subst = "txt") => {
-    let ext = /^(application|image|text)\/([\w\-\.]+)(?:\+(json|xml))?$/.exec(media);
+    let ext = /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
     if (ext) {
       const type = ext[1];
       const subtype = ext[2];
@@ -795,7 +795,7 @@
       v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "").
             replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
     }
-    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!\-\-[^\-]*\-\->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n").
+    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--[^-]*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n").
              replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
   };
 
@@ -845,7 +845,7 @@
       case MODE_SELECTION:
         target = await getFileNameFromURI(uri, "index");
         if (target && value &&
-            /^(?:(?:application\/(?:[\w\-\.]+\+)?|image\/[\w\-\.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
+            /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
           tmpFileData = {
             [CREATE_TMP_FILE]: {
               incognito, tabId, host, target,
@@ -1130,7 +1130,7 @@
           elm.isContentEditable || await isEditControl(elm) ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm)
         ) ||
-        /^(?:application\/(?:(?:[\w\-\.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-\.]+\+xml|text\/[\w\-\.]+)$/.test(document.contentType)
+        /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)
       ) && portContentData(elm).catch(logError);
     }
   };
