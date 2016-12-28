@@ -69,14 +69,13 @@ Available with (X)HTML, JavaScript, CSS, MathML, SVG, XML documents.
 
 ## Application Manifest Manual
 ### Important Notice
-Unlike the Jetpack SDK used by prior withExEditor, Mozilla's new add-on ecosystem WebExtensions does not allow to spawn child process from the add-on (that is, external editor can not be executed directly anymore).
-Instead, in WebExtensions, the browser interacts with native application via messages.
-For details, refer to [Native messaging - Mozilla | MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging).
-
+In Mozilla's new add-on ecosystem WebExtensions, the browser interacts with native application via messages (that is, external editor can not be executed directly anymore).
 Therefore, to use withExEditor, you need to prepare:
 
 * A host which executes the external editor
 * An application manifest of the host
+
+For details, refer to [Native messaging - Mozilla | MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging).
 
 ### Host
 Create a host which executes the editor, and save it in an arbitrary location.
@@ -149,9 +148,9 @@ Manifest Example:
 }
 ```
 
-* *name* - The name of the editor to use. Only lowercase letters and numbers, dots, underscores are allowed. - It must also match the filename of the host.
+* *name* - The name of the editor to use. Only lowercase letters and numbers, dots, underscores are allowed. It must also match the filename of the host.
 * *description* - Description of the host.
-* *path* - The path of the host that executes the editor. Note that on Windows, it is necessary to escape backslashes, which is a directory delimiter, by adding an extra backslash. Also on Windows, if you created a host with the python script following the above example, fill in the path of the shell script, not the path of the python script.
+* *path* - The path of the host that executes the editor. If you created a host with the python script following the above example, fill in the path of the python script. Note that on Windows, it is necessary to escape backslashes, which is a directory delimiter, by adding an extra backslash. Also on Windows, if you created a host with the python, fill in the path of the shell script, not the path of the python script.
 * *type* - Enter "stdio".
 * *allowed_extensions* - An array of addon IDs. Fill in the bracket with "jid1-WiAigu4HIo0Tag@jetpack" which is ID of withExEditor.
 

@@ -68,16 +68,15 @@
 
 ## アプリケーションマニフェストマニュアル
 ### 重要なお知らせ
-これまでのwithExEditorで使用してきたJetpack SDKとは異なり、Mozillaの新しいアドオンのエコシステムWebExtensionsでは、アドオンから子プロセスを生成することはできません（つまり、外部エディタはもう直接起動できません）。
-代わりに、WebExtensionsでは、ブラウザはメッセージを介してネイティブアプリケーションとやりとりする仕組みとなっています。
-詳細については、[Native messaging - Mozilla | MDN](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging)を参照してください。
-
+Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラウザはメッセージを介してネイティブアプリケーションとやりとりする仕組みとなっています（つまり、外部エディタはもう直接起動できません）。
 このため、withExEditorを使うにあたり、ユーザーのみなさんは：
 
 * 外部エディタを起動するためのホスト
 * ホストのアプリケーションマニフェスト
 
 を準備する必要があります。
+
+詳細については、[Native messaging - Mozilla | MDN](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging)を参照してください。
 
 ### ホスト
 使用するエディタを起動するホストを作成し、任意の場所に保存します。
@@ -152,7 +151,7 @@ python "C:\path\to\youreditor.py"
 
 * *name* - 使用するエディタの名前。小文字の英字と数字、ドット、アンダーバーのみ使用可能です。また、ホストのファイル名と一致している必要があります。
 * *description* - ホストの説明。
-* *path* - エディタを起動するホストのパス。Windowsの場合は、ディレクトリの区切りであるバックスラッシュ文字にはさらにバックスラッシュを加えてエスケープさせる必要があることに注意してください。また、上記の例に倣ってpythonスクリプトでホストを作成した場合、Windowsではpythonスクリプトのパスではなく、シェルスクリプトのパスを記入してください。
+* *path* - エディタを起動するホストのパス。上記の例に倣ってpythonスクリプトでホストを作成した場合、pythonスクリプトのパスを記入してください。Windowsの場合は、ディレクトリの区切りであるバックスラッシュ文字にはさらにバックスラッシュを加えてエスケープさせる必要があることに注意してください。また、Windowsでは、上記pythonスクリプトでホストを作成した場合にはpythonスクリプトのパスではなくシェルスクリプトのパスを記入してください。
 * *type* - "stdio"を記入してください。
 * *allowed_extensions* - アドオンのIDの配列。withExEditorのIDである"jid1-WiAigu4HIo0Tag@jetpack"を[]括弧の中に記入してください。
 
