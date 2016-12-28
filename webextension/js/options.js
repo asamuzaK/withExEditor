@@ -248,7 +248,7 @@
    * @return {void}
    */
   const setValuesFromStorage = async () => {
-    const pref = await storage.get() || {};
+    const pref = await storage.get();
     const items = pref && Object.keys(pref);
     if (items && items.length > 0) {
       for (const item of items) {
@@ -264,7 +264,7 @@
    * @return {void}
    */
   const handleMsg = async msg => {
-    const items = Object.keys(msg);
+    const items = msg && Object.keys(msg);
     if (items && items.length > 0) {
       for (const item of items) {
         const obj = msg[item];

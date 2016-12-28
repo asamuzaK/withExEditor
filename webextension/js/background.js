@@ -113,7 +113,7 @@
   const checkWindowIncognito = async () => {
     const windowIds = await windows.getAll();
     let incognito;
-    if (windowIds.length > 0) {
+    if (windowIds && windowIds.length > 0) {
       for (const windowId of windowIds) {
         incognito = windowId.incognito;
         if (incognito) {
@@ -483,8 +483,8 @@
    * @return {void}
    */
   const setVars = async res => {
-    const items = Object.keys(res);
-    if (items.length > 0) {
+    const items = res && Object.keys(res);
+    if (items && items.length > 0) {
       for (const item of items) {
         setVar(item, res[item], false);
       }
@@ -498,8 +498,8 @@
    * @return {void}
    */
   const handleStorageChanged = async data => {
-    const items = Object.keys(data);
-    if (items.length > 0) {
+    const items = data && Object.keys(data);
+    if (items && items.length > 0) {
       for (const item of items) {
         setVar(item, data[item].newValue, true);
       }
@@ -521,7 +521,7 @@
    * @return {void}
    */
   const handleMsg = async msg => {
-    const items = Object.keys(msg);
+    const items = msg && Object.keys(msg);
     if (items && items.length > 0) {
       for (const item of items) {
         const obj = msg[item];

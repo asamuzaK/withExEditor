@@ -223,8 +223,8 @@
    * @return {void}
    */
   const setAttributeNS = async (elm, node) => {
-    if (elm && node) {
-      const attrs = node.attributes;
+    const attrs = node && node.attributes;
+    if (elm && node && attrs) {
       for (const attr of attrs) {
         const prefix = attr.prefix;
         const localName = attr.localName;
@@ -1039,7 +1039,7 @@
    * @return {void}
    */
   const handleMsg = async msg => {
-    const items = Object.keys(msg);
+    const items = msg && Object.keys(msg);
     if (items && items.length > 0) {
       for (const item of items) {
         const obj = msg[item];

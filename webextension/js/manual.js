@@ -22,7 +22,7 @@
    */
   const insertCodeSample = () => fetch(PATH_CODE_SAMPLE).then(async res => {
     const codes = await res.json();
-    const items = Object.keys(codes);
+    const items = codes && Object.keys(codes);
     if (items && items.length > 0) {
       for (const item of items) {
         const target = document.getElementById(item);
