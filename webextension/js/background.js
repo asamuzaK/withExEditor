@@ -12,6 +12,8 @@
   const PORT_HOST = "portHost";
   const SET_VARS = "setVars";
 
+  const FILE_EXT = "fileExt";
+  const FILE_EXT_PATH = "../data/fileExt.json";
   const ICON = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
@@ -23,8 +25,8 @@
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
-  const PATH_FILE_EXT = "../data/fileExt.json";
-  const PATH_NS_URI = "../data/nsUri.json";
+  const NS_URI = "nsUri";
+  const NS_URI_PATH = "../data/nsUri.json";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
 
@@ -479,33 +481,34 @@
 
   /**
    * set variables from storage
-   * @param {Object} res - storage response
+   * @param {Object} data - storage data
    * @return {void}
    */
-  const setVars = async res => {
-    const items = res && Object.keys(res);
-    if (items && items.length > 0) {
-      for (const item of items) {
-        setVar(item, res[item], false);
-      }
-    }
-  };
-
-  /* handlers */
-  /**
-   * handle storage changed
-   * @param {Object} data - storage.StorageChange
-   * @return {void}
-   */
-  const handleStorageChanged = async data => {
+  const setVars = async data => {
     const items = data && Object.keys(data);
     if (items && items.length > 0) {
       for (const item of items) {
-        setVar(item, data[item].newValue, true);
+        const obj = data[item];
+        setVar(item, obj.newValue || obj, !!obj.newValue);
       }
     }
   };
 
+  /**
+   * fetch static data and set storage
+   * @param {string} path - data path
+   * @param {string} key - key
+   * @return {Object} - Promise.<void|boolean>
+   */
+  const setStorage = async (path, key) =>
+    isString(path) && isString(key) && fetch(path).then(async res => {
+      const data = await res.json();
+      data && storage.set({
+        [key]: data
+      });
+    });
+
+  /* handlers */
   /**
    * handle runtime update
    * @param {Object} details - install details
@@ -657,7 +660,7 @@
 
   /* listeners */
   browserAction.onClicked.addListener(openOptionsPage);
-  browser.storage.onChanged.addListener(handleStorageChanged);
+  browser.storage.onChanged.addListener(setVars);
   contextMenus.onClicked.addListener(portContextMenu);
   runtime.onConnect.addListener(handlePort);
   runtime.onInstalled.addListener(handleRuntimeUpdate);
@@ -676,13 +679,7 @@
     storage.get().then(setVars).then(checkEnable).then(syncUI).then(() =>
       portMsg({[SET_VARS]: vars})
     ),
-    fetch(PATH_NS_URI).then(async data => {
-      const nsURI = await data.json();
-      nsURI && storage.set({nsURI});
-    }),
-    fetch(PATH_FILE_EXT).then(async data => {
-      const fileExt = await data.json();
-      fileExt && storage.set({fileExt});
-    })
+    setStorage(NS_URI_PATH, NS_URI),
+    setStorage(FILE_EXT_PATH, FILE_EXT)
   ]).catch(logError);
 }
