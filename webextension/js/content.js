@@ -28,6 +28,7 @@
   const MODE_SVG = "modeViewSVG";
   const NODE_ELEMENT = 1;
   const NODE_TEXT = 3;
+  const NODE_COMMENT = 8;
 
   const FILE_EXT = "fileExt";
   const NS_URI = "nsURI";
@@ -380,7 +381,8 @@
         }
         for (const node of i) {
           node &&
-          (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
+          (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT ||
+           node.nodeType === NODE_COMMENT) &&
             frag.appendChild(node);
         }
       }
