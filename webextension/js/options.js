@@ -14,6 +14,7 @@
   const CHAR = "utf-8";
   const DATA_ATTR_I18N = "data-i18n";
   const LANG = "optionsLang";
+  const NODE_ELEMENT = Node.ELEMENT_NODE;
 
   const APP_MANIFEST = "appManifestPath";
   const APP_NAME = "appName";
@@ -182,7 +183,7 @@
    * @return {void}
    */
   const localizeAttr = async elm => {
-    if (elm && elm.nodeType === Node.ELEMENT_NODE && elm.hasAttributes()) {
+    if (elm && elm.nodeType === NODE_ELEMENT && elm.hasAttributes()) {
       const attrs = {
         ariaLabel: "aria-label",
         alt: "alt",

@@ -26,6 +26,9 @@
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
+  const NODE_COMMENT = Node.COMMENT_NODE;
+  const NODE_ELEMENT = Node.ELEMENT_NODE;
+  const NODE_TEXT = Node.TEXT_NODE;
 
   const FILE_EXT = "fileExt";
   const NS_URI = "nsURI";
@@ -260,8 +263,7 @@
   const createFrag = async nodes => {
     const frag = document.createDocumentFragment();
     Array.isArray(nodes) && nodes.forEach(node => {
-      (node.nodeType === Node.ELEMENT_NODE ||
-       node.nodeType === Node.TEXT_NODE) &&
+      (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
         frag.appendChild(node);
     });
     return frag;
@@ -276,20 +278,20 @@
   const createElm = (node, append = false) =>
     createElementNS(node).then(async elm => {
       if (node && node.hasChildNodes() && append &&
-          elm && elm.nodeType === Node.ELEMENT_NODE) {
+          elm && elm.nodeType === NODE_ELEMENT) {
         const nodes = node.childNodes;
         const arr = [];
         let frag;
         for (const child of nodes) {
           switch (child.nodeType) {
-            case Node.ELEMENT_NODE:
+            case NODE_ELEMENT:
               child === child.parentNode.firstChild &&
                 arr.push(document.createTextNode("\n"));
               arr.push(createElm(child, true));
               child === child.parentNode.lastChild &&
                 arr.push(document.createTextNode("\n"));
               break;
-            case Node.TEXT_NODE:
+            case NODE_TEXT:
               arr.push(document.createTextNode(child.nodeValue));
               break;
             default:
@@ -309,21 +311,21 @@
    */
   const createDomTree = async (elm, node) => {
     elm = await createElm(elm);
-    if (elm.nodeType === Node.ELEMENT_NODE && node && node.hasChildNodes()) {
+    if (elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes()) {
       const arr = [];
       const nodes = node.childNodes;
       let frag;
       if (nodes instanceof NodeList) {
         for (const child of nodes) {
           switch (child.nodeType) {
-            case Node.ELEMENT_NODE:
+            case NODE_ELEMENT:
               child === child.parentNode.firstChild &&
                 arr.push(document.createTextNode("\n"));
               arr.push(createElm(child, true));
               child === child.parentNode.lastChild &&
                 arr.push(document.createTextNode("\n"));
               break;
-            case Node.TEXT_NODE:
+            case NODE_TEXT:
               arr.push(document.createTextNode(child.nodeValue));
               break;
             default:
@@ -372,9 +374,8 @@
         }
         for (const node of nodes) {
           node && (
-            node.nodeType === Node.ELEMENT_NODE ||
-            node.nodeType === Node.TEXT_NODE ||
-            node.nodeType === Node.COMMENT_NODE
+            node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT ||
+            node.nodeType === NODE_COMMENT
           ) &&
             frag.appendChild(node);
         }
@@ -397,7 +398,7 @@
       let obj;
       count > 1 && arr.push(document.createTextNode("\n"));
       switch (ancestor.nodeType) {
-        case Node.ELEMENT_NODE:
+        case NODE_ELEMENT:
           obj = await getNodeNS(ancestor);
           if (/^(?:svg|math)$/.test(obj.localName)) {
             if (obj.node === document.documentElement) {
@@ -411,9 +412,9 @@
           }
           arr.push(createDomTree(ancestor, range.cloneContents()));
           break;
-        case Node.TEXT_NODE:
+        case NODE_TEXT:
           obj = await createElm(ancestor.parentNode);
-          obj.nodeType === Node.ELEMENT_NODE && (
+          obj.nodeType === NODE_ELEMENT && (
             obj.appendChild(range.cloneContents()),
             arr.push(obj)
           );
@@ -445,7 +446,7 @@
       frag = await Promise.all(arr).then(createSelFrag);
       l > 1 && frag && frag.hasChildNodes() &&
       (obj = await createElm(document.documentElement)) &&
-      obj.nodeType === Node.ELEMENT_NODE && (
+      obj.nodeType === NODE_ELEMENT && (
         obj.appendChild(frag),
         frag = document.createDocumentFragment(),
         frag.appendChild(obj),
@@ -474,7 +475,7 @@
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
         switch (node.nodeType) {
-          case Node.ELEMENT_NODE:
+          case NODE_ELEMENT:
             if (node.localName === "br") {
               arr.push("\n");
             }
@@ -483,7 +484,7 @@
                 arr.push(getText(node.childNodes));
             }
             break;
-          case Node.TEXT_NODE:
+          case NODE_TEXT:
             arr.push(node.nodeValue);
             break;
           default:
@@ -545,7 +546,7 @@
         node.namespaceURI !== nsURI.html && node.hasChildNodes()) {
       const nodes = node.childNodes;
       for (const child of nodes) {
-        isText = child.nodeType === Node.TEXT_NODE;
+        isText = child.nodeType === NODE_TEXT;
         if (!isText) {
           break;
         }
@@ -904,7 +905,7 @@
    * @return {void}
    */
   const replaceContent = async (node, value = "", ns = nsURI.html) => {
-    if (node && node.nodeType === Node.ELEMENT_NODE) {
+    if (node && node.nodeType === NODE_ELEMENT) {
       const frag = document.createDocumentFragment();
       const arr = value && value.split("\n") || [""];
       const l = arr.length;
