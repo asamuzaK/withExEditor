@@ -4,7 +4,7 @@
 "use strict";
 {
   /* constant */
-  const PATH_CODE_SAMPLE = "../data/codeSample.json";
+  const CODE_SAMPLE_PATH = "../data/codeSample.json";
 
   /**
    * log error
@@ -20,7 +20,7 @@
    * insert code sample to html
    * @return {Object} - Promise
    */
-  const insertCodeSample = () => fetch(PATH_CODE_SAMPLE).then(async res => {
+  const insertCodeSample = () => fetch(CODE_SAMPLE_PATH).then(async res => {
     const codes = await res.json();
     const items = codes && Object.keys(codes);
     if (items && items.length > 0) {
