@@ -297,38 +297,11 @@
             default:
           }
         }
-        (frag = await Promise.all(arr).then(createFrag).catch(logError)) &&
+        (frag = await Promise.all(arr).then(createFrag)) &&
           elm.appendChild(frag);
       }
       return elm || document.createTextNode("");
     });
-
-  /**
-   * create node array
-   * @param {Object} nodes - nodes
-   * @return {Object} - Promise.<Array>
-   */
-  const createNodeArr = async nodes => {
-    const arr = [];
-    if (nodes instanceof NodeList) {
-      for (const node of nodes) {
-        switch (node.nodeType) {
-          case NODE_ELEMENT:
-            node === node.parentNode.firstChild &&
-              arr.push(document.createTextNode("\n"));
-            arr.push(createElm(node, true));
-            node === node.parentNode.lastChild &&
-              arr.push(document.createTextNode("\n"));
-            break;
-          case NODE_TEXT:
-            arr.push(document.createTextNode(node.nodeValue));
-            break;
-          default:
-        }
-      }
-    }
-    return Promise.all(arr);
-  };
 
   /**
    * create DOM tree
@@ -336,12 +309,32 @@
    * @param {Object} node - node containing child nodes to append
    * @return {Object} - DOM tree or text node
    */
-  const createDomTree = async (elm, node = null) => {
+  const createDomTree = async (elm, node) => {
     elm = await createElm(elm);
-    elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes() &&
-    (node = await createNodeArr(node.childNodes).
-                    then(createFrag).catch(logError)) &&
-      elm.appendChild(node);
+    if (elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes()) {
+      const arr = [];
+      const nodes = node.childNodes;
+      let frag;
+      if (nodes instanceof NodeList) {
+        for (const child of nodes) {
+          switch (child.nodeType) {
+            case NODE_ELEMENT:
+              child === child.parentNode.firstChild &&
+                arr.push(document.createTextNode("\n"));
+              arr.push(createElm(child, true));
+              child === child.parentNode.lastChild &&
+                arr.push(document.createTextNode("\n"));
+              break;
+            case NODE_TEXT:
+              arr.push(document.createTextNode(child.nodeValue));
+              break;
+            default:
+          }
+        }
+      }
+      (frag = await Promise.all(arr).then(createFrag)) &&
+        elm.appendChild(frag);
+    }
     return elm;
   };
 
@@ -446,10 +439,10 @@
       const l = sel.rangeCount;
       let i = 0, obj;
       while (i < l) {
-        arr.push(createRangeArr(sel.getRangeAt(i), i, l).catch(logError));
+        arr.push(createRangeArr(sel.getRangeAt(i), i, l));
         i++;
       }
-      frag = await Promise.all(arr).then(createSelFrag).catch(logError);
+      frag = await Promise.all(arr).then(createSelFrag);
       l > 1 && frag && frag.hasChildNodes() &&
       (obj = await createElm(document.documentElement)) &&
       obj.nodeType === NODE_ELEMENT && (
@@ -487,7 +480,7 @@
             }
             else {
               node.hasChildNodes() &&
-                arr.push(getText(node.childNodes).catch(logError));
+                arr.push(getText(node.childNodes));
             }
             break;
           case NODE_TEXT:
@@ -745,8 +738,7 @@
                 data.mode = contextType.mode;
                 data.target = obj;
                 data.value = elm.hasChildNodes() &&
-                             await getText(elm.childNodes).catch(logError) ||
-                             "";
+                             await getText(elm.childNodes) || "";
                 data.namespaceURI = contextType.namespaceURI;
                 setDataAttrs(elm);
               }
@@ -758,7 +750,7 @@
             data.mode = contextType.mode;
             data.target = obj;
             data.value = parent.hasChildNodes() &&
-                         await getText(parent.childNodes).catch(logError) || "";
+                         await getText(parent.childNodes) || "";
             data.namespaceURI = contextType.namespaceURI;
             setDataAttrs(parent);
           }
