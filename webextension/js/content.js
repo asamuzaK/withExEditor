@@ -368,11 +368,11 @@
     let frag;
     if (Array.isArray(arr) && arr.length > 0) {
       frag = document.createDocumentFragment();
-      for (const i of arr) {
-        if (!Array.isArray(i)) {
+      for (const nodes of arr) {
+        if (!Array.isArray(nodes)) {
           return null;
         }
-        for (const node of i) {
+        for (const node of nodes) {
           node &&
           (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT ||
            node.nodeType === NODE_COMMENT) &&
