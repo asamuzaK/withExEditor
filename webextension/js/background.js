@@ -182,57 +182,40 @@
   };
 
   /**
-   * handle ports[windowId][tabId][frameUrl]
+   * port message
    * @param {*} msg - message
    * @param {string} windowId - windowId
    * @param {string} tabId - tabId
    * @return {void}
    */
-  const handlePortFrameUrl = (msg, windowId, tabId) => {
+  const portMsg = async (msg, windowId, tabId) => {
     if (msg) {
-      const frameUrls = windowId && tabId &&
-                        ports[windowId] && ports[windowId][tabId] &&
-                          Object.keys(ports[windowId][tabId]);
-      if (frameUrls && frameUrls.length > 0) {
-        for (const frameUrl of frameUrls) {
-          if (frameUrl !== INCOGNITO) {
-            const port = ports[windowId][tabId][frameUrl];
-            port && port.postMessage(msg);
+      if (windowId && tabId) {
+        const frameUrls = ports[windowId] && ports[windowId][tabId] &&
+                            Object.keys(ports[windowId][tabId]);
+        if (frameUrls && frameUrls.length > 0) {
+          for (const frameUrl of frameUrls) {
+            if (frameUrl !== INCOGNITO) {
+              const port = ports[windowId][tabId][frameUrl];
+              port && port.postMessage(msg);
+            }
           }
         }
       }
-    }
-  };
-
-  /**
-   * handle ports[windowId][tabId]
-   * @param {*} msg - message
-   * @param {string} windowId - windowId
-   * @return {void}
-   */
-  const handlePortTabId = (msg, windowId) => {
-    if (msg) {
-      const tabIds = windowId && ports[windowId] &&
-                       Object.keys(ports[windowId]);
-      if (tabIds && tabIds.length > 0) {
-        for (const tabId of tabIds) {
-          handlePortFrameUrl(msg, windowId, tabId);
+      else if (windowId) {
+        const tabIds = ports[windowId] && Object.keys(ports[windowId]);
+        if (tabIds && tabIds.length > 0) {
+          for (tabId of tabIds) {
+            portMsg(msg, windowId, tabId);
+          }
         }
       }
-    }
-  };
-
-  /**
-   * port message
-   * @param {*} msg - message
-   * @return {void}
-   */
-  const portMsg = async msg => {
-    if (msg) {
-      const windowIds = Object.keys(ports);
-      if (windowIds.length > 0) {
-        for (const windowId of windowIds) {
-          handlePortTabId(msg, windowId);
+      else {
+        const windowIds = Object.keys(ports);
+        if (windowIds.length > 0) {
+          for (windowId of windowIds) {
+            portMsg(msg, windowId);
+          }
         }
       }
     }
