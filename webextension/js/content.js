@@ -276,7 +276,7 @@
    */
   const createElm = (node, append = false) =>
     createElementNS(node).then(async elm => {
-      if (append && node && node.hasChildNodes() &&
+      if (node && node.hasChildNodes() && append &&
           elm && elm.nodeType === NODE_ELEMENT) {
         const nodes = node.childNodes;
         const arr = [];
@@ -303,11 +303,11 @@
     });
 
   /**
-   * create DOM
-   * @param {Object} nodes - child nodes
-   * @return {Object} - Promise.<Object>, document fragment
+   * create node array
+   * @param {Object} nodes - nodes
+   * @return {Object} - Promise.<Array>
    */
-  const createDom = async nodes => {
+  const createNodeArr = async nodes => {
     const arr = [];
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
@@ -326,7 +326,7 @@
         }
       }
     }
-    return Promise.all(arr).then(createFrag);
+    return Promise.all(arr);
   };
 
   /**
@@ -336,11 +336,11 @@
    * @return {Object} - DOM tree or text node
    */
   const createDomTree = async (elm, node = null) => {
-    let child;
     elm = await createElm(elm);
     elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes() &&
-    (child = await createDom(node.childNodes).catch(logError)) &&
-      elm.appendChild(child);
+    (node = await createNodeArr(node.childNodes).
+                    then(createFrag).catch(logError)) &&
+      elm.appendChild(node);
     return elm;
   };
 
@@ -378,8 +378,10 @@
         if (!Array.isArray(i)) {
           return null;
         }
-        for (const j of i) {
-          j && frag.appendChild(j);
+        for (const node of i) {
+          node &&
+          (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
+            frag.appendChild(node);
         }
       }
     }
