@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg"
      xmlns:cc="http://creativecommons.org/ns#"
      xmlns:dc="http://purl.org/dc/elements/1.1/"
-     xmlns:html="http://www.w3.org/1999/xhtml"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      height="128" width="128" viewBox="0 0 128 128">
   <metadata>
@@ -13,7 +12,12 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <html:link rel="stylesheet" href="../css/icon.css"/>
+  <style>
+    g:not(#color):not(:target),
+    g:target ~ #color {
+      display: none;
+    }
+  </style>
   <symbol id="frame">
     <path d="m20 4c-8.726 0-16 7.274-16 16v88c0 8.7256 7.2744 16 16
              16h64c8.7256 0 16-7.2744 16-16v-88c0-8.726-7.274-16-16-16h-64zm0
