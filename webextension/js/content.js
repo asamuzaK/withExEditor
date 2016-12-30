@@ -1085,7 +1085,7 @@
   };
 
   /**
-   * handle context menu event
+   * handle contextmenu event
    * @param {Object} evt - Event
    * @return {void}
    */
@@ -1117,7 +1117,7 @@
   const handleKeyPress = async evt => {
     const openOptions = await keyComboMatches(evt, openOptionsKey);
     if (openOptions) {
-      portMsg({openOptions});
+      portMsg({openOptions}).catch(logError);
     }
     else {
       const elm = evt && evt.target;
@@ -1133,7 +1133,7 @@
   };
 
   /* listeners */
-  port.onMessage.addListener(handleMsg);
+  port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;

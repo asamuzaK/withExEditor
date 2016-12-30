@@ -128,11 +128,10 @@
 
   /**
    * open options page
-   * @return {void}
+   * @return {Object} - ?Promise
    */
-  const openOptionsPage = async () => {
-    vars[IS_ENABLED] && runtime.openOptionsPage();
-  };
+  const openOptionsPage = async () =>
+    vars[IS_ENABLED] && runtime.openOptionsPage() || null;
 
   /* port */
   let host = null;
@@ -472,7 +471,7 @@
     if (items && items.length > 0) {
       for (const item of items) {
         const obj = data[item];
-        setVar(item, obj.newValue || obj, !!obj.newValue);
+        setVar(item, obj.newValue || obj, !!obj.newValue).catch(logError);
       }
     }
   };
@@ -480,26 +479,25 @@
   /**
    * fetch static data and set storage
    * @param {string} path - data path
-   * @param {string} key - key
-   * @return {Object} - Promise.<void|boolean>
+   * @param {string} key - storage key
+   * @return {Object} - ?Promise
    */
   const setStorage = async (path, key) =>
     isString(path) && isString(key) && fetch(path).then(async res => {
       const data = await res.json();
-      data && storage.set({
+      return data && storage.set({
         [key]: data
       });
-    });
+    }) || null;
 
   /* handlers */
   /**
    * handle runtime update
    * @param {Object} details - install details
-   * @return {void}
+   * @return {Object} - ?Promise
    */
-  const handleRuntimeUpdate = async details => {
-    details && details.reason === "update" && runtime.reload();
-  };
+  const handleRuntimeUpdate = async details =>
+    details && details.reason === "update" && runtime.reload() || null;
 
   /**
    * handle runtime message
@@ -542,7 +540,7 @@
     ports[windowId][tabId] = ports[windowId][tabId] || {};
     ports[windowId][tabId][frameUrl] = port;
     frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito);
-    port.onMessage.addListener(handleMsg);
+    port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
     port.postMessage({
       incognito, tabId,
       [SET_VARS]: vars
@@ -555,7 +553,7 @@
    * @return {void}
    */
   const handleActiveTab = async info => {
-    let bool = false;
+    let bool;
     if (info) {
       const windowId = `${info.windowId}`;
       const tabId = `${info.tabId}`;
@@ -571,8 +569,7 @@
         }
       }
     }
-    varsLoc[MENU_ENABLED] = bool;
-    restoreContextMenu().catch(logError);
+    varsLoc[MENU_ENABLED] = bool || false;
   };
 
   /**
@@ -580,9 +577,10 @@
    * @param {number} id - tabId
    * @param {Object} info - changed tab info
    * @param {Object} tab - tabs.Tab
-   * @return {void}
+   * @return {Object} - ?Promise
    */
   const handleUpdatedTab = async (id, info, tab) => {
+    let bool;
     if (id && info && tab) {
       const windowId = `${tab.windowId}`;
       const tabId = `${id}`;
@@ -591,9 +589,9 @@
                        ports[windowId][tabId][frameUrl] &&
                          ports[windowId][tabId][frameUrl].name;
       varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
-      info.status === "complete" && tab.active &&
-        restoreContextMenu().catch(logError);
+      bool = info.status === "complete" && tab.active;
     }
+    return bool && restoreContextMenu() || null;
   };
 
   /**
@@ -618,14 +616,13 @@
   /**
    * handle focus changed window
    * @param {number} windowId - windowId
-   * @return {void}
+   * @return {Object} - ?Promise
    */
   const handleFocusChangedWindow = async windowId => {
-    if (windowId !== windows.WINDOW_ID_NONE) {
-      const current = await windows.getCurrent();
-      current && current.focused &&
-        checkEnable(current).then(syncUI).catch(logError);
-    }
+    const current = windowId !== windows.WINDOW_ID_NONE &&
+                      await windows.getCurrent();
+    return current && current.focused &&
+           checkEnable(current).then(syncUI) || null;
   };
 
   /**
@@ -639,23 +636,37 @@
     checkWindowIncognito().then(incognito =>
       !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
     )
-  ]).catch(logError);
+  ]);
 
   /* listeners */
-  browserAction.onClicked.addListener(openOptionsPage);
-  browser.storage.onChanged.addListener(setVars);
-  contextMenus.onClicked.addListener(portContextMenu);
-  runtime.onConnect.addListener(handlePort);
-  runtime.onInstalled.addListener(handleRuntimeUpdate);
-  runtime.onMessage.addListener(handleMsg);
-  tabs.onActivated.addListener(handleActiveTab);
-  tabs.onUpdated.addListener(handleUpdatedTab);
-  tabs.onRemoved.addListener(handleRemovedTab);
-  windows.onFocusChanged.addListener(handleFocusChangedWindow);
-  windows.onRemoved.addListener(handleRemovedWindow);
+  browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
+  browser.storage.onChanged.addListener(data => setVars(data).catch(logError));
+  contextMenus.onClicked.addListener((info, tab) =>
+    portContextMenu(info, tab).catch(logError)
+  );
+  runtime.onConnect.addListener(port => handlePort(port).catch(logError));
+  runtime.onInstalled.addListener(details =>
+    handleRuntimeUpdate(details).catch(logError)
+  );
+  runtime.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  tabs.onActivated.addListener(info =>
+    handleActiveTab(info).then(restoreContextMenu).catch(logError)
+  );
+  tabs.onUpdated.addListener((id, info, tab) =>
+    handleUpdatedTab(id, info, tab).catch(logError)
+  );
+  tabs.onRemoved.addListener((id, info) =>
+    handleRemovedTab(id, info).catch(logError)
+  );
+  windows.onFocusChanged.addListener(windowId =>
+    handleFocusChangedWindow(windowId).catch(logError)
+  );
+  windows.onRemoved.addListener(windowId =>
+    handleRemovedWindow(windowId).catch(logError)
+  );
 
   // NOTE: for hybrid
-  hybrid.onMessage.addListener(handleMsg);
+  hybrid.onMessage.addListener(msg => handleMsg(msg).catch(logError));
 
   /* startup */
   Promise.all([
