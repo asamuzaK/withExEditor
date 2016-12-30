@@ -1,0 +1,9 @@
+@charset "UTF-8";
+/**
+ * icon.css
+ */
+
+g:not(#color):not(:target),
+g:target ~ #color {
+  display: none;
+}
