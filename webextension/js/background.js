@@ -487,7 +487,7 @@
       const data = await res.json();
       return data && storage.set({
         [key]: data
-      });
+      }) || null;
     }) || null;
 
   /* handlers */
