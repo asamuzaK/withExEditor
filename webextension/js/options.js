@@ -60,11 +60,9 @@
   /**
    * set storage
    * @param {Object} pref - pref
-   * @return {void}
+   * @return {Object} - ?Promise
    */
-  const setStorage = async pref => {
-    pref && storage.set(pref);
-  };
+  const setStorage = async pref => pref && storage.set(pref) || null;
 
   /**
    * create pref
@@ -289,7 +287,7 @@
   };
 
   /* listeners */
-  port.onMessage.addListener(handleMsg);
+  port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
 
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtml(),
