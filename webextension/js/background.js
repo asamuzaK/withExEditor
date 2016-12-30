@@ -232,9 +232,9 @@
       const windowId = `${tab.windowId}`;
       const tabId = `${tab.id}`;
       const frameUrl = info.frameUrl;
-      ports[windowId] && ports[windowId][tabId] &&
-      ports[windowId][tabId][frameUrl] &&
-        ports[windowId][tabId][frameUrl].postMessage({getContent});
+      const port = ports[windowId] && ports[windowId][tabId] &&
+                     ports[windowId][tabId][frameUrl];
+      port && port.postMessage({getContent});
     }
   };
 
