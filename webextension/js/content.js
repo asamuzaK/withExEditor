@@ -106,7 +106,7 @@
       const subtype = ext[2];
       const suffix = ext[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
-                       subtype;
+                     subtype;
       const items = fileExt[type];
       if (items) {
         const item = suffix && items[suffix];
