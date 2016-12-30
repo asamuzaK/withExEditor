@@ -100,21 +100,17 @@
    * @return {string} - file extension
    */
   const getFileExtension = async (media = "text/plain", subst = "txt") => {
-    let ext = /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
-    if (ext) {
-      const type = ext[1];
-      const subtype = ext[2];
-      const suffix = ext[3] ||
+    const arr = /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
+    let ext;
+    if (arr) {
+      const type = arr[1];
+      const subtype = arr[2];
+      const suffix = arr[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
-                     subtype;
+                       subtype;
       const items = fileExt[type];
-      if (items) {
-        const item = suffix && items[suffix];
-        ext = item && (item[subtype] || item[suffix]) || items[subtype];
-      }
-      else {
-        ext = subst;
-      }
+      const item = items && suffix && items[suffix];
+      ext = item && (item[subtype] || item[suffix]) || items[subtype];
     }
     return `.${ext || subst}`;
   };
