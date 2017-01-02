@@ -100,12 +100,12 @@
    * @return {boolean} - result
    */
   const checkEnable = async (win = null) => {
-    let enable;
+    let enable = false;
     !win && (win = await windows.getCurrent());
     win && win.type === "normal" &&
       (enable = !win.incognito || varsLoc[ENABLE_PB]);
     vars[IS_ENABLED] = enable;
-    return enable || false;
+    return enable;
   };
 
   /**

@@ -219,7 +219,7 @@
   };
 
   /**
-   * set HTML input value
+   * set html input value
    * @param {Object} data - storage data
    * @return {void}
    */
