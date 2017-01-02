@@ -148,7 +148,7 @@
               [GET_APP_MANIFEST]: {
                 path: elm.value
               }
-            });
+            }).catch(logError);
             break;
           case KEY_ACCESS:
             (elm.value === "" || elm.value.length === 1) &&

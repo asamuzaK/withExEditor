@@ -1038,7 +1038,7 @@
         const obj = msg[item];
         switch (item) {
           case SET_VARS:
-            handleMsg(obj);
+            handleMsg(obj).catch(logError);
             break;
           case ENABLE_ONLY_EDITABLE:
           case INCOGNITO:
