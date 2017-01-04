@@ -250,7 +250,7 @@
     const items = pref && Object.keys(pref);
     if (items && items.length > 0) {
       for (const item of items) {
-        setHtmlInputValue(pref[item]);
+        setHtmlInputValue(pref[item]).catch(logError);
       }
     }
   };
