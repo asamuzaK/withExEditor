@@ -60,7 +60,7 @@
   /**
    * set storage
    * @param {Object} pref - pref
-   * @return {Object} - ?Promise
+   * @return {Object} - ?Promise.<void>
    */
   const setStorage = async pref => pref && storage.set(pref) || null;
 

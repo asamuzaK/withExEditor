@@ -18,7 +18,7 @@
 
   /**
    * insert code sample to html
-   * @return {Object} - Promise
+   * @return {Object} - Promise.<void>
    */
   const insertCodeSample = () => fetch(CODE_SAMPLE_PATH).then(async res => {
     const codes = await res.json();
