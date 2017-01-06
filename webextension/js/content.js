@@ -267,35 +267,35 @@
    * create element
    * @param {Object} node - element node to create element from
    * @param {boolean} append - append child nodes
-   * @return {Object} - Promise.<Object>, element or text node
+   * @return {Object} - element or text node
    */
-  const createElm = (node, append = false) =>
-    createElementNS(node).then(async elm => {
-      if (node && node.hasChildNodes() && append &&
-          elm && elm.nodeType === NODE_ELEMENT) {
-        const nodes = node.childNodes;
-        const arr = [];
-        let frag;
-        for (const child of nodes) {
-          switch (child.nodeType) {
-            case NODE_ELEMENT:
-              child === child.parentNode.firstChild &&
-                arr.push(document.createTextNode("\n"));
-              arr.push(createElm(child, true));
-              child === child.parentNode.lastChild &&
-                arr.push(document.createTextNode("\n"));
-              break;
-            case NODE_TEXT:
-              arr.push(document.createTextNode(child.nodeValue));
-              break;
-            default:
-          }
+  const createElm = async (node, append = false) => {
+    const elm = await createElementNS(node);
+    if (node && node.hasChildNodes() && append &&
+        elm && elm.nodeType === NODE_ELEMENT) {
+      const nodes = node.childNodes;
+      const arr = [];
+      let frag;
+      for (const child of nodes) {
+        switch (child.nodeType) {
+          case NODE_ELEMENT:
+            child === child.parentNode.firstChild &&
+              arr.push(document.createTextNode("\n"));
+            arr.push(createElm(child, true));
+            child === child.parentNode.lastChild &&
+              arr.push(document.createTextNode("\n"));
+            break;
+          case NODE_TEXT:
+            arr.push(document.createTextNode(child.nodeValue));
+            break;
+          default:
         }
-        (frag = await Promise.all(arr).then(createFrag)) &&
-          elm.appendChild(frag);
       }
-      return elm || document.createTextNode("");
-    });
+      (frag = await Promise.all(arr).then(createFrag)) &&
+        elm.appendChild(frag);
+    }
+    return elm || document.createTextNode("");
+  };
 
   /**
    * create DOM tree
