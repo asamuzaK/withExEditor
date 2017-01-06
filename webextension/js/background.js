@@ -322,7 +322,7 @@
 
   /**
    * restore context menu
-   * @return {Object} - Promise
+   * @return {Object} - Promise.<void>
    */
   const restoreContextMenu = () =>
     contextMenus.removeAll().then(createMenuItems);
@@ -475,7 +475,7 @@
    * fetch static data and set storage
    * @param {string} path - data path
    * @param {string} key - storage key
-   * @return {Object} - ?Promise
+   * @return {Object} - ?Promise.<void>
    */
   const setStorage = async (path, key) =>
     isString(path) && isString(key) && fetch(path).then(async res => {
@@ -611,7 +611,7 @@
   /**
    * handle focus changed window
    * @param {number} windowId - windowId
-   * @return {Object} - ?Promise
+   * @return {Object} - ?Promise.<Array.<*>>
    */
   const handleFocusChangedWindow = async windowId => {
     const current = windowId !== windows.WINDOW_ID_NONE &&

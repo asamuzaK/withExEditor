@@ -883,7 +883,7 @@
   /**
    * port content data
    * @param {Object} elm - element
-   * @return {Object} - Promise
+   * @return {Object} - Promise.<void>
    */
   const portContentData = elm =>
     createContentData(elm).then(createTmpFileData).then(createContentDataMsg);
