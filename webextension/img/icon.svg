@@ -1,8 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg"
-     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:cc="http://creativecommons.org/ns#"
      xmlns:dc="http://purl.org/dc/elements/1.1/"
-     xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      height="128" width="128" viewBox="0 0 128 128">
   <metadata>
     <rdf:RDF>
@@ -13,12 +12,12 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <style><![CDATA[
+  <style>
     g:not(#color):not(:target),
     g:target ~ #color {
       display: none;
     }
-  ]]></style>
+  </style>
   <symbol id="frame">
     <path d="m20 4c-8.726 0-16 7.274-16 16v88c0 8.7256 7.2744 16 16
              16h64c8.7256 0 16-7.2744 16-16v-88c0-8.726-7.274-16-16-16h-64zm0
@@ -29,19 +28,19 @@
     <path d="m0 0v24h12l12-12-12-12z" transform="translate(60,85) rotate(135)"/>
   </symbol>
   <g id="gray" fill="#4C4C4C">
-    <use xlink:href="#frame"/>
-    <use xlink:href="#pen"/>
+    <use href="#frame"/>
+    <use href="#pen"/>
   </g>
   <g id="white" fill="#FFF">
-    <use xlink:href="#frame"/>
-    <use xlink:href="#pen"/>
+    <use href="#frame"/>
+    <use href="#pen"/>
   </g>
   <g id="off" fill="ButtonShadow">
-    <use xlink:href="#frame"/>
-    <use xlink:href="#pen"/>
+    <use href="#frame"/>
+    <use href="#pen"/>
   </g>
   <g id="color">
-    <use xlink:href="#frame" fill="#002147"/>
-    <use xlink:href="#pen" fill="#E66000"/>
+    <use href="#frame" fill="#002147"/>
+    <use href="#pen" fill="#E66000"/>
   </g>
 </svg>

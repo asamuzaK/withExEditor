@@ -1,0 +1,17 @@
+{
+  "optionsIconColor.alt": {
+    "message": "Colour"
+  },
+  "optionsIconColorLabel.ariaLabel": {
+    "message": "Colour Icon"
+  },
+  "optionsIconGray.alt": {
+    "message": "Grey"
+  },
+  "optionsIconGrayLabel.ariaLabel": {
+    "message": "Grey Icon"
+  },
+  "optionsLang": {
+    "message": "en-GB"
+  }
+}

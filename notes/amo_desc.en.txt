@@ -1,0 +1,10 @@
+Firefox add-on to View Source, View Selection, and Edit Texts with the external editor which you like, from the context menu.
+Available with (X)HTML, JavaScript, CSS, MathML, SVG, XML documents.
+
+In Mozilla's new add-on ecosystem WebExtensions, the browser interacts with native application via messages (that is, external editor can not be executed directly anymore).
+Therefore, to use withExEditor, you need to prepare:
+<ul>
+<li>A host which executes the external editor</li>
+<li>An application manifest of the host</li>
+</ul>
+Host and application manifest setup manual is included in the add-on package.

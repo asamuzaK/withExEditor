@@ -5,81 +5,10 @@
   "description": "View Source, View Selection, and Edit Texts with the external editor",
   "author": "asamuzaK",
   "homepage": "https://github.com/asamuzaK/withExEditor",
-  "preferences": [
-    {
-      "type": "file",
-      "name": "WithExEditorPrefsFile",
-      "title": "Select An Editor"
-    },
-    {
-      "type": "string",
-      "name": "WithExEditorPrefsPath",
-      "title": "Or Enter Editor Path",
-      "value": ""
-    },
-    {
-      "type": "string",
-      "name": "WithExEditorPrefsCmdArgs",
-      "title": "Command Line Options",
-      "value": ""
-    },
-    {
-      "type": "bool",
-      "name": "WithExEditorPrefsCmdPos",
-      "title": "Put File Path After Command Line Options"
-    },
-    {
-      "type": "bool",
-      "name": "WithExEditorPrefsShell",
-      "title": "Run Command In A Shell"
-    },
-    {
-      "type": "string",
-      "name": "WithExEditorPrefsAccessKey",
-      "title": "Access Key",
-      "value": "e"
-    },
-    {
-      "type": "bool",
-      "name": "WithExEditorPrefsHotkey",
-      "title": "Enable Shortcut Key To Open / Close The Options Panel",
-      "description": "Ctrl+Alt+key (Cmd+Opt+key on Mac)",
-      "value": true
-    },
-    {
-      "type": "bool",
-      "name": "WithExEditorPrefsExecEditor",
-      "title": "Enable Shortcut Key To Execute The Editor Directly",
-      "description": "Ctrl+Shift+key (Cmd+Shift+key on Mac)",
-      "value": true
-    },
-    {
-      "type": "bool",
-      "name": "WithExEditorPrefsEnablePB",
-      "title": "Enable During Private Browsing"
-    },
-    {
-      "type": "bool",
-      "name": "WithExEditorPrefsContext",
-      "title": "Enable Only When Editing Text"
-    },
-    {
-      "type": "bool",
-      "name": "WithExEditorPrefsForceRemove",
-      "title": "Forcibly Remove The Temporary Files",
-      "value": true
-    },
-    {
-      "type": "control",
-      "name": "WithExEditorPrefsPanel",
-      "title": "Other Options",
-      "label": "Open Options Panel"
-    }
-  ],
   "locales": {
-     "ja": {
-       "description": "外部エディタでソースや選択部分を表示、またはテキストを編集"
-     }
+    "ja": {
+      "description": "外部エディタでソースや選択部分を表示、またはテキストを編集"
+    }
   },
   "permissions": {
     "private-browsing": true,
@@ -88,8 +17,9 @@
   "engines": {
     "firefox": ">=52.0a1 <=*"
   },
+  "hasEmbeddedWebExtension": true,
   "icon": "icon.png",
   "main": "lib/main.js",
   "license": "MPL 2.0",
-  "version": "1.9.0"
+  "version": "2.0.0-b38"
 }

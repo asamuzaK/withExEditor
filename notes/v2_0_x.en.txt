@@ -1,0 +1,15 @@
+v2.0.0
+New And Updated Features
+<ul>
+<li>Migrate to WebExtensions' Native Messaging API, you need to set up add-on again</li>
+<li>New Options page</li>
+<li>Added view SVG source menu</li>
+<li>Default color of the toolbar icon changed to `gray`</li>
+<li>Behavior of `Ctrl + Alt + key` shortcut key changed, it opens the Options page</li>
+</ul>
+
+Code Refactoring
+<ul>
+<li>Embedded `WebExtensions`</li>
+<li>Rewrote functions with `async / await`</li>
+</ul>

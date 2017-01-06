@@ -1,0 +1,167 @@
+{
+  "extensionDescription": {
+    "message": "外部エディタでソースや選択部分を表示、またはテキストを編集"
+  },
+  "extensionName": {
+    "message": "withExEditor"
+  },
+  "modeEditText": {
+    "message": "テキストを $1 で編集"
+  },
+  "modeViewMathML": {
+    "message": "MathML のソースを $1 で表示"
+  },
+  "modeViewSelection": {
+    "message": "選択した部分のソースを $1 で表示"
+  },
+  "modeViewSource": {
+    "message": "ページのソースを $1 で表示"
+  },
+  "modeViewSVG": {
+    "message": "SVG のソースを $1 で表示"
+  },
+  "optionsAccessKey": {
+    "message": ""
+  },
+  "optionsAccessKey.placeholder": {
+    "message": "アクセスキーを入力"
+  },
+  "optionsAccessKeyDetail": {
+    "message": "コンテキストメニュー、設定ページを開くショートカット、および直接エディタを実行するためのショートカットで共通して使用するアクセスキーを設定します。"
+  },
+  "optionsAccessKeyDetail2": {
+    "message": "アクセスキーは任意のキーに変更可能です。ただし、一文字である必要があります。"
+  },
+  "optionsAccessKeyDetail3": {
+    "message": "コンテキストメニューでは設定した「キー」をそのまま押してください。"
+  },
+  "optionsAccessKeyDetail4": {
+    "message": "備考： コンテクストメニューでのアクセスキーは、まだWebExtensionsでは実装されていません。"
+  },
+  "optionsAccessKeyLabel": {
+    "message": "アクセスキー"
+  },
+  "optionsAccessKeySettings": {
+    "message": "アクセスキー設定"
+  },
+  "optionsAppManifestPath": {
+    "message": ""
+  },
+  "optionsAppManifestPath.placeholder": {
+    "message": "マニフェストのパスを入力"
+  },
+  "optionsAppManifestPathDetail": {
+    "message": "アプリケーションマニフェストファイル（JSON）のパスを入力してください。"
+  },
+  "optionsAppManifestPathLabel": {
+    "message": "マニフェストのパス"
+  },
+  "optionsEditorName": {
+    "message": ""
+  },
+  "optionsEditorName.placeholder": {
+    "message": "エディタの表示名を変更"
+  },
+  "optionsEditorNameDetail": {
+    "message": "エディタの表示名を入力してください。"
+  },
+  "optionsEditorNameDetail2": {
+    "message": "アプリケーションマニフェストのパスが未入力の場合やホストが見つからなかった場合などには無効となります。"
+  },
+  "optionsEditorNameLabel": {
+    "message": "エディタの表示名"
+  },
+  "optionsEditorSettings": {
+    "message": "エディタ設定"
+  },
+  "optionsEditorShortCutDetail": {
+    "message": "コンテキストメニューを経由せずにエディタを直接起動するには「Ctrl + Shift + キー」（Macは「Cmd + Shift + キー」）を押してください。"
+  },
+  "optionsEditorShortCutLabel": {
+    "message": "エディタを直接起動するショートカットキーを有効化"
+  },
+  "optionsEnableOnlyEditableDetail": {
+    "message": "コンテンツが編集可能な場合にのみ、コンテキストメニューに表示されます。"
+  },
+  "optionsEnableOnlyEditableLabel": {
+    "message": "テキスト編集のみ有効化"
+  },
+  "optionsEnablePBDetail": {
+    "message": "チェックを入れると有効、チェックを外すと無効です。"
+  },
+  "optionsEnablePBLabel": {
+    "message": "プライベートブラウジング中も有効化"
+  },
+  "optionsForceRemoveDetail": {
+    "message": "プライベートブラウジングの終了時やブラウザの終了時に一時ファイルを強制的に削除します。"
+  },
+  "optionsForceRemoveDetail2": {
+    "message": "チェックを入れておくことを推奨しますが、エディタによってはこのオプションを有効にすると不具合が起こる可能性があります。"
+  },
+  "optionsForceRemoveLabel": {
+    "message": "一時ファイルを強制的に削除"
+  },
+  "optionsIconColor": {
+    "message": ""
+  },
+  "optionsIconColor.alt": {
+    "message": "カラー"
+  },
+  "optionsIconColorLabel": {
+    "message": ""
+  },
+  "optionsIconColorLabel.ariaLabel": {
+    "message": "カラーアイコン"
+  },
+  "optionsIconDetail": {
+    "message": "アイコンを選択してください。"
+  },
+  "optionsIconGray": {
+    "message": ""
+  },
+  "optionsIconGray.alt": {
+    "message": "グレー"
+  },
+  "optionsIconGrayLabel": {
+    "message": ""
+  },
+  "optionsIconGrayLabel.ariaLabel": {
+    "message": "グレーアイコン"
+  },
+  "optionsIconWhite": {
+    "message": ""
+  },
+  "optionsIconWhite.alt": {
+    "message": "ホワイト"
+  },
+  "optionsIconWhiteLabel": {
+    "message": ""
+  },
+  "optionsIconWhiteLabel.ariaLabel": {
+    "message": "ホワイトアイコン"
+  },
+  "optionsLang": {
+    "message": "ja"
+  },
+  "optionsManualLabel": {
+    "message": "マニュアル"
+  },
+  "optionsManualLabel.href": {
+    "message": "./manual.ja.html"
+  },
+  "optionsOptionsShortCutDetail": {
+    "message": "設定ページを開くには「Ctrl + Alt + キー」（Macは「Cmd + Opt + キー」）を押してください。"
+  },
+  "optionsOptionsShortCutLabel": {
+    "message": "設定ページを開くショートカットキーを有効化"
+  },
+  "optionsOtherSettings": {
+    "message": "その他"
+  },
+  "optionsTitle": {
+    "message": "withExEditor 設定"
+  },
+  "optionsToolbarIconLabel": {
+    "message": "ツールバーボタンアイコン"
+  }
+}

@@ -1,0 +1,15 @@
+v2.0.0
+新規ならびに更新内容
+<ul>
+<li>WebExtensionsのNative Messaging APIに移行、アドオンを設定しなおす必要があります</li>
+<li>新たに設定ページを作成</li>
+<li>SVGのソース表示をメニューに追加</li>
+<li>ツールバーボタンのデフォルト色（初期値）をグレーに変更</li>
+<li>「Ctrl + Alt + キー」のショートカットは設定ページを開くよう変更</li>
+</ul>
+
+コード変更点
+<ul>
+<li>「WebExtensions」を埋め込み</li>
+<li>「async / await」で関数を書き直し</li>
+</ul>

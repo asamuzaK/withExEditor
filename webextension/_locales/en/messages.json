@@ -1,0 +1,167 @@
+{
+  "extensionDescription": {
+    "message": "View Source, View Selection, and Edit Text with the external editor"
+  },
+  "extensionName": {
+    "message": "withExEditor"
+  },
+  "modeEditText": {
+    "message": "Edit Text with $1"
+  },
+  "modeViewMathML": {
+    "message": "View MathML Source with $1"
+  },
+  "modeViewSelection": {
+    "message": "View Selection Source with $1"
+  },
+  "modeViewSource": {
+    "message": "View Page Source with $1"
+  },
+  "modeViewSVG": {
+    "message": "View SVG Source with $1"
+  },
+  "optionsAccessKey": {
+    "message": ""
+  },
+  "optionsAccessKey.placeholder": {
+    "message": "Input Access Key"
+  },
+  "optionsAccessKeyDetail": {
+    "message": "Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly."
+  },
+  "optionsAccessKeyDetail2": {
+    "message": "Choose any key, but it must be a single character."
+  },
+  "optionsAccessKeyDetail3": {
+    "message": "In the context menu, press 'key' itself."
+  },
+  "optionsAccessKeyDetail4": {
+    "message": "NOTE: accesskey in context menu is not yet implemented in WebExtensions."
+  },
+  "optionsAccessKeyLabel": {
+    "message": "Access Key"
+  },
+  "optionsAccessKeySettings": {
+    "message": "Access Key Settings"
+  },
+  "optionsAppManifestPath": {
+    "message": ""
+  },
+  "optionsAppManifestPath.placeholder": {
+    "message": "Input App Manifest Path"
+  },
+  "optionsAppManifestPathDetail": {
+    "message": "Enter the path of application manifest JSON file."
+  },
+  "optionsAppManifestPathLabel": {
+    "message": "App Manifest Path"
+  },
+  "optionsEditorName": {
+    "message": ""
+  },
+  "optionsEditorName.placeholder": {
+    "message": "Rename Editor Label"
+  },
+  "optionsEditorNameDetail": {
+    "message": "Enter the label of the editor."
+  },
+  "optionsEditorNameDetail2": {
+    "message": "Disabled if application manifest path field is not filled, or could not find the host etc."
+  },
+  "optionsEditorNameLabel": {
+    "message": "Editor Label"
+  },
+  "optionsEditorSettings": {
+    "message": "Editor Settings"
+  },
+  "optionsEditorShortCutDetail": {
+    "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac)."
+  },
+  "optionsEditorShortCutLabel": {
+    "message": "Enable Shortcut Key To Execute The Editor Directly"
+  },
+  "optionsEnableOnlyEditableDetail": {
+    "message": "Appears in the context menu only if the content is editable."
+  },
+  "optionsEnableOnlyEditableLabel": {
+    "message": "Enable Only When Editing Text"
+  },
+  "optionsEnablePBDetail": {
+    "message": "Enables if checked, disables if not."
+  },
+  "optionsEnablePBLabel": {
+    "message": "Enable During Private Browsing"
+  },
+  "optionsForceRemoveDetail": {
+    "message": "Forcibly remove temporary files at the end of Private Browsing or at shut down."
+  },
+  "optionsForceRemoveDetail2": {
+    "message": "Recommended to be checked, though depending on the editor, this option may cause problems if it is enabled."
+  },
+  "optionsForceRemoveLabel": {
+    "message": "Forcibly Remove Temporary Files"
+  },
+  "optionsIconColor": {
+    "message": ""
+  },
+  "optionsIconColor.alt": {
+    "message": "Color"
+  },
+  "optionsIconColorLabel": {
+    "message": ""
+  },
+  "optionsIconColorLabel.ariaLabel": {
+    "message": "Color Icon"
+  },
+  "optionsIconDetail": {
+    "message": "Choose the icon."
+  },
+  "optionsIconGray": {
+    "message": ""
+  },
+  "optionsIconGray.alt": {
+    "message": "Gray"
+  },
+  "optionsIconGrayLabel": {
+    "message": ""
+  },
+  "optionsIconGrayLabel.ariaLabel": {
+    "message": "Gray Icon"
+  },
+  "optionsIconWhite": {
+    "message": ""
+  },
+  "optionsIconWhite.alt": {
+    "message": "White"
+  },
+  "optionsIconWhiteLabel": {
+    "message": ""
+  },
+  "optionsIconWhiteLabel.ariaLabel": {
+    "message": "White Icon"
+  },
+  "optionsLang": {
+    "message": "en"
+  },
+  "optionsManualLabel": {
+    "message": "Manual"
+  },
+  "optionsManualLabel.href": {
+    "message": "./manual.en.html"
+  },
+  "optionsOptionsShortCutDetail": {
+    "message": "To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac)."
+  },
+  "optionsOptionsShortCutLabel": {
+    "message": "Enable Shortcut Key To Open The Options Page"
+  },
+  "optionsOtherSettings": {
+    "message": "Other Settings"
+  },
+  "optionsTitle": {
+    "message": "withExEditor Options"
+  },
+  "optionsToolbarIconLabel": {
+    "message": "Toolbar Button Icon"
+  }
+}

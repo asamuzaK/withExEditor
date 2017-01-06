@@ -2,7 +2,7 @@ EN | [JA](./README.ja.md)
 
 # withExEditor
 Firefox add-on to View Source, View Selection, and Edit Texts with the external editor which you like, from the context menu.
-Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
+Available with (X)HTML, JavaScript, CSS, MathML, SVG, XML documents.
 
 ## Add-on Page
 [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
@@ -15,10 +15,13 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 * When browsing a local file, the local file will be opened directly.
 
 ### View MathML Source with *exEditor*
-* Enabled on MathML elements and shows a generated DOM tree in MathML format. It may not be exactly the same as the source of the DOM tree, e.g. the order of the attributes.
+* Enabled on MathML elements and shows a generated DOM tree in MathML format.
+
+### View SVG Source with *exEditor*
+* Enabled on SVG elements and shows a generated DOM tree in SVG format.
 
 ### View Selection Source with *exEditor*
-* Shows a generated DOM tree of the selection in XML format. It may not be exactly the same as the source of the DOM tree, e.g. the order of the attributes.
+* Shows a generated DOM tree of the selection in XML format.
 * If there are multiple ranges in selection, each range will be shown with a comment as a delimiter.
 * If the selection is not DOM parsable, then creates a file that contains only the range of text selected.
 
@@ -28,41 +31,29 @@ Available with (X)HTML, JavaScript, CSS, SVG, XML documents.
 
 ***
 
-## Options In Add-on Manager
+## Options
 
-### Select An Editor
-* Select the editor which you want to use.
-Or, you can enter the editor path directly in the input field below.
-* When selecting an editor on Mac OS X, pick the file under `/Applications/[yourEditor].app/Contents/MacOS/` directory.
+### Toolbar Button Icon
+* Choose the icon.
 
-### Command Line Options
-* Command line options of the editor.
-* When using backslash (`\`) character, it must be escaped with an extra backslash.
-ex: `C:\\Windows`
-* If argument contains space(s), quote them with the double quotation mark (`"`).
-ex: `"Some Arg"`
+### Manifest Path
+* Enter the application manifest path.
 
-### Put File Path After Command Line Options
-* Some editor requires the file path to be put after the command arguments.
-Enable this option in that case.
-
-### Run Command In A Shell
-* Spawns a shell and runs a command within that shell.
-* If this option is enabled, you can run a shell script instead of executing the editor directly.
-  1. Create a shell script (batch file) which executes the editor.
-  2. In `Select An Editor` option, pick that shell script instead of the editor.
-  3. Enable this option.
+### Editor Label
+* Enter the label of the editor.
+* Disabled if application manifest path field is not filled, or could not find the host etc.
 
 ### Access Key
-* Access key commonly used for the context menu, the shortcut for toolbar button options panel, and the shortcut for executing the editor directly.
+* Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly.
 * Choose any key, but it must be a single character.
-* In the context menu, press `key` itself.
+* In the context menu, press 'key' itself.
+* NOTE: accesskey in context menu is not yet implemented in WebExtensions.
 
-### Enable Shortcut Key To Open / Close The Options Panel
-* To open / close the panel from the toolbar button, press `Ctrl + Alt + key` (`Cmd + Opt + key` on Mac).
+### Enable Shortcut Key To Open The Options Page
+* To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac).
 
 ### Enable Shortcut Key To Execute The Editor Directly
-* To execute the editor without going through the context menu, press `Ctrl + Shift + key` (`Cmd + Shift + key` on Mac).
+* To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac).
 
 ### Enable During Private Browsing
 * Enables if checked, disables if not.
@@ -70,22 +61,109 @@ Enable this option in that case.
 ### Enable Only When Editing Text
 * Appears in the context menu only if the content is editable.
 
-### Forcibly Remove The Temporary Files
-* The temporary files will be forcibly removed both at the end of Private Browsing and at shut down.
-* It is recommended to be checked, but depending on the setting of the editor, there is a possibility that trouble occurs if you enable this option.
-
-### Other Options
-* You can customize the other options from the options panel.
+### Forcibly Remove Temporary Files
+* Forcibly remove temporary files at the end of Private Browsing or at shut down.
+* Recommended to be checked, though depending on the editor, this option may cause problems if it is enabled.
 
 ***
 
-## Options In Toolbar Button
-* You can choose the icon color, you can rename the label of the editor, and you can open Add-on Manager from here.
+## Application Manifest Manual
+### Important Notice
+In Mozilla's new add-on ecosystem WebExtensions, the browser interacts with native application via messages (that is, external editor can not be executed directly anymore).
+Therefore, to use withExEditor, you need to prepare:
 
-***
+* A host which executes the external editor
+* An application manifest of the host
 
-## About Error / Warning Notification
-Error or Warning message will be notified when...
-* Failed to execute the editor.
-* The process of the editor did not exit normally.
-* Failed to remove the temporary files at the end of Private Browsing.
+For details, refer to [Native messaging - Mozilla | MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging).
+
+### Host
+Create a host which executes the editor, and save it in an arbitrary location.
+The host should be able to handle binary data passed in standard input (stdin).
+From withExEditor, "temporary file path", which is created for source view / text edit, will be sent to the host.
+
+The following is an example of a host written in Python.
+
+Python Script Example:
+```
+#!/usr/bin/env python
+# coding: utf-8
+
+import sys, json, struct, subprocess
+
+# Read a message from stdin and decode it.
+def getMessage():
+  rawLength = sys.stdin.buffer.read(4)
+  if len(rawLength) == 0:
+    sys.exit()
+  message = sys.stdin.buffer.read(struct.unpack("@I", rawLength)[0])
+  if message:
+    return json.loads(message.decode("utf-8"))
+  else:
+    return false
+
+# Editor path
+app = "C:\Program Files\Path\To\YourEditor.exe"
+
+# Command line arguments array as appropriate.
+# args = []
+
+while True:
+  file = getMessage()
+  cmd = []
+  cmd.append(app)
+
+  # If you want arguments before file
+  # cmd.extend(args)
+
+  cmd.append(file)
+
+  # If you want arguments after file
+  # cmd.extend(args)
+
+  subprocess.run(cmd)
+
+sys.exit()
+```
+
+On Windows, also create a shell script (batch file) to execute python script.
+
+Shell Script Example (Windows):
+```
+@echo off
+python "C:\path\to\youreditor.py"
+```
+
+### Application manifest
+Create an application manifest in JSON format that contains the path of the host.
+
+Manifest Example:
+```
+{
+  "name": "youreditor",
+  "description": "Host to execute youreditor",
+  "path": "C:\\path\\to\\youreditor.cmd",
+  "type": "stdio",
+  "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
+}
+```
+
+* *name* - The name of the editor to use. Only lowercase letters and numbers, dots, underscores are allowed. It must also match the filename of the host.
+* *description* - Description of the host.
+* *path* - The path of the host that executes the editor. If you created a host with the python script following the above example, fill in the path of the python script. Note that on Windows, it is necessary to escape backslashes, which is a directory delimiter, by adding an extra backslash. Also on Windows, if you created a host with the python, fill in the path of the shell script, not the path of the python script.
+* *type* - Enter "stdio".
+* *allowed_extensions* - An array of addon IDs. Fill in the bracket with "jid1-WiAigu4HIo0Tag@jetpack" which is ID of withExEditor.
+
+Save the manifest with the same file name as the "name" field, the file extension of .json, and the character code of UTF-8 (without BOM).
+Refer to [App manifest location](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#App_manifest_location) where to save the manifest.
+
+On Windows, you also need to set the registry.
+If the path of the manifest is "C:\Users\xxx\youreditor.json", run the following command with cmd.exe.
+Then you can save the registry key.
+
+REG ADD Example (Windows):
+```
+REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\xxx\youreditor.json" /f
+```
+
+After completing the above work, *enter the manifest path in Options page*.
