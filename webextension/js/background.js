@@ -58,7 +58,7 @@
     [KEY_ACCESS]: "e",
     [KEY_EXEC_EDITOR]: true,
     [KEY_OPEN_OPTIONS]: true,
-    [ENABLE_ONLY_EDITABLE]: false
+    [ENABLE_ONLY_EDITABLE]: false,
   };
 
   const varsLoc = {
@@ -72,7 +72,7 @@
     [MENU_ENABLED]: false,
     [MODE_SOURCE]: "",
     [MODE_MATHML]: "",
-    [MODE_SVG]: ""
+    [MODE_SVG]: "",
   };
 
   /**
@@ -115,7 +115,7 @@
   const checkWindowIncognito = async () => {
     const windowIds = await windows.getAll();
     let incognito;
-    if (windowIds && windowIds.length > 0) {
+    if (windowIds && windowIds.length) {
       for (const windowId of windowIds) {
         incognito = windowId.incognito;
         if (incognito) {
@@ -173,8 +173,7 @@
           Object.keys(ports[windowId]).length === 0 &&
             restorePorts({windowId})
         );
-      }
-      else if (windowId) {
+      } else if (windowId) {
         delete ports[windowId];
       }
     }
@@ -192,7 +191,7 @@
       if (windowId && tabId) {
         const frameUrls = ports[windowId] && ports[windowId][tabId] &&
                             Object.keys(ports[windowId][tabId]);
-        if (frameUrls && frameUrls.length > 0) {
+        if (frameUrls && frameUrls.length) {
           for (const frameUrl of frameUrls) {
             if (frameUrl !== INCOGNITO) {
               const port = ports[windowId][tabId][frameUrl];
@@ -200,18 +199,16 @@
             }
           }
         }
-      }
-      else if (windowId) {
+      } else if (windowId) {
         const tabIds = ports[windowId] && Object.keys(ports[windowId]);
-        if (tabIds && tabIds.length > 0) {
+        if (tabIds && tabIds.length) {
           for (tabId of tabIds) {
             portMsg(msg, windowId, tabId);
           }
         }
-      }
-      else {
+      } else {
         const windowIds = Object.keys(ports);
-        if (windowIds.length > 0) {
+        if (windowIds.length) {
           for (windowId of windowIds) {
             portMsg(msg, windowId);
           }
@@ -277,7 +274,7 @@
   const menus = {
     [MODE_SOURCE]: null,
     [MODE_SELECTION]: null,
-    [MODE_EDIT_TEXT]: null
+    [MODE_EDIT_TEXT]: null,
   };
 
   // NOTE: no "accesskey" feature
@@ -293,7 +290,7 @@
       menus[id] = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, label),
-        enabled: !!varsLoc[MENU_ENABLED]
+        enabled: !!varsLoc[MENU_ENABLED],
       })
     );
   };
@@ -338,7 +335,7 @@
   const updateContextMenu = async type => {
     if (type) {
       const items = Object.keys(type);
-      if (items.length > 0) {
+      if (items.length) {
         for (const item of items) {
           const obj = type[item];
           const menuItemId = obj.menuItemId;
@@ -346,21 +343,19 @@
             if (item === MODE_SOURCE) {
               const title = varsLoc[obj.mode] || varsLoc[menuItemId];
               title && contextMenus.update(menuItemId, {title});
-            }
-            else if (item === MODE_EDIT_TEXT) {
+            } else if (item === MODE_EDIT_TEXT) {
               const enabled = !!obj.enabled;
               contextMenus.update(menuItemId, {enabled});
             }
           }
         }
       }
-    }
-    else {
+    } else {
       const items = Object.keys(menus);
-      if (items.length > 0) {
+      if (items.length) {
         for (const item of items) {
           menus[item] && contextMenus.update(item, {
-            title: i18n.getMessage(item, varsLoc[EDITOR_NAME] || LABEL)
+            title: i18n.getMessage(item, varsLoc[EDITOR_NAME] || LABEL),
           });
         }
       }
@@ -388,7 +383,7 @@
   const syncUI = (enabled = false) => Promise.all([
     portMsg({isEnabled: !!enabled}),
     replaceIcon(!enabled && `${ICON}#off` || varsLoc[ICON_PATH]),
-    toggleBadge()
+    toggleBadge(),
   ]);
 
   /* handle variables */
@@ -468,7 +463,7 @@
    */
   const setVars = async data => {
     const items = data && Object.keys(data);
-    if (items && items.length > 0) {
+    if (items && items.length) {
       for (const item of items) {
         const obj = data[item];
         setVar(item, obj.newValue || obj, !!obj.newValue).catch(logError);
@@ -486,7 +481,7 @@
     isString(path) && isString(key) && fetch(path).then(async res => {
       const data = await res.json();
       return data && storage.set({
-        [key]: data
+        [key]: data,
       }) || null;
     }) || null;
 
@@ -506,7 +501,7 @@
    */
   const handleMsg = async msg => {
     const items = msg && Object.keys(msg);
-    if (items && items.length > 0) {
+    if (items && items.length) {
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
@@ -543,7 +538,7 @@
     port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
     port.postMessage({
       incognito, tabId,
-      [SET_VARS]: vars
+      [SET_VARS]: vars,
     });
   };
 
@@ -559,7 +554,7 @@
       const tabId = `${info.tabId}`;
       const items = ports[windowId] && ports[windowId][tabId] &&
                       Object.keys(ports[windowId][tabId]);
-      if (items && items.length > 0) {
+      if (items && items.length) {
         for (const item of items) {
           const obj = ports[windowId][tabId][item];
           if (obj && obj.name) {
@@ -609,7 +604,7 @@
       restorePorts({windowId, tabId}).catch(logError);
     // NOTE: for hybrid
     portHybridMsg({
-      removeTabRelatedStorage: {tabId, incognito, info}
+      removeTabRelatedStorage: {tabId, incognito, info},
     }).catch(logError);
   };
 
@@ -635,7 +630,7 @@
     // NOTE: for hybrid
     checkWindowIncognito().then(incognito =>
       !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
-    )
+    ),
   ]);
 
   /* listeners */
@@ -674,6 +669,6 @@
       portMsg({[SET_VARS]: vars})
     ),
     setStorage(NS_URI_PATH, NS_URI),
-    setStorage(FILE_EXT_PATH, FILE_EXT)
+    setStorage(FILE_EXT_PATH, FILE_EXT),
   ]).catch(logError);
 }

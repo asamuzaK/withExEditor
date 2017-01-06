@@ -56,7 +56,7 @@
     [ENABLE_ONLY_EDITABLE]: false,
     [INCOGNITO]: false,
     [NODE_CONTEXT]: null,
-    [TAB_ID]: ""
+    [TAB_ID]: "",
   };
 
   /**
@@ -103,8 +103,7 @@
     const arr = /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
     let ext;
     if (arr) {
-      const type = arr[1];
-      const subtype = arr[2];
+      const [type, subtype] = arr;
       const suffix = arr[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
                        subtype;
@@ -144,7 +143,7 @@
       const getTmpFile = {
         dataId: id,
         host: window.location.host,
-        tabId: vars[TAB_ID]
+        tabId: vars[TAB_ID],
       };
       portMsg({getTmpFile}).catch(logError);
     });
@@ -156,7 +155,7 @@
     html: "http://www.w3.org/1999/xhtml",
     math: "http://www.w3.org/1998/Math/MathML",
     svg: "http://www.w3.org/2000/svg",
-    xmlns: "http://www.w3.org/2000/xmlns/"
+    xmlns: "http://www.w3.org/2000/xmlns/",
   };
 
   /**
@@ -170,22 +169,19 @@
       ns.node = node;
       ns.localName = node.localName;
       ns.namespaceURI = node.namespaceURI;
-    }
-    else {
+    } else {
       while (node && node.parentNode && !ns.node) {
         if (node.namespaceURI) {
           ns.node = node;
           ns.localName = node.localName;
           ns.namespaceURI = node.namespaceURI;
-        }
-        else if (/^(?:math|svg)$/.test(node.localName)) {
+        } else if (/^(?:math|svg)$/.test(node.localName)) {
           ns.node = node;
           ns.localName = node.localName;
           ns.namespaceURI = nsURI.ns[node.localName];
-        }
-        else {
+        } else {
           const obj = node.parentNode;
-          if (/^foreignObject$/.test(obj.localName) &&
+          if (obj.localName === "foreignObject" &&
               (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
                document.documentElement.localName === "html")) {
             ns.node = node;
@@ -195,8 +191,7 @@
                               obj.getAttributeNS(nsURI.svg,
                                                  "requiredExtensions") ||
                               nsURI.html;
-          }
-          else {
+          } else {
             node = obj;
           }
         }
@@ -362,7 +357,7 @@
    */
   const createSelFrag = async arr => {
     let frag;
-    if (Array.isArray(arr) && arr.length > 0) {
+    if (Array.isArray(arr) && arr.length) {
       frag = document.createDocumentFragment();
       for (const nodes of arr) {
         if (!Array.isArray(nodes)) {
@@ -474,8 +469,7 @@
           case NODE_ELEMENT:
             if (node.localName === "br") {
               arr.push("\n");
-            }
-            else {
+            } else {
               node.hasChildNodes() &&
                 arr.push(getText(node.childNodes));
             }
@@ -502,8 +496,7 @@
       const ns = !isHtml && nsURI.html || "";
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID)) {
         id = elm.getAttributeNS(ns, DATA_ATTR_ID);
-      }
-      else {
+      } else {
         id = `withExEditor${window.performance.now()}`.replace(/\./, "_");
         !isHtml && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html);
         elm.setAttributeNS(ns, isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS, id);
@@ -556,12 +549,23 @@
    * @param {Object} elm - element
    * @return {boolean} - result
    */
-  const isEditControl = async elm =>
-    elm && (
-      /^input$/.test(elm.localName) && elm.hasAttribute("type") &&
-      /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) ||
-      /^textarea$/.test(elm.localName)
-    ) || false;
+  const isEditControl = async elm => {
+    let bool;
+    if (elm) {
+      switch (elm.localName) {
+        case "textarea":
+          bool = true;
+          break;
+        case "input":
+          bool = elm.hasAttribute("type") ?
+                   /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) :
+                   true;
+          break;
+        default:
+      }
+    }
+    return bool || false;
+  };
 
   /**
    * get editable element from ancestor
@@ -572,8 +576,7 @@
     let elm;
     if (await isEditControl(node)) {
       elm = node;
-    }
-    else {
+    } else {
       while (node && node.parentNode) {
         if (typeof node.isContentEditable === "boolean" &&
             (!node.namespaceURI || node.namespaceURI === nsURI.html)) {
@@ -604,8 +607,7 @@
             "", DATA_ATTR_ID_CTRL,
             (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
           );
-        }
-        else {
+        } else {
           ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, id);
           ctrl.addEventListener("focus", portTemporaryId, false);
         }
@@ -623,10 +625,9 @@
     let obj;
     if (window.location.protocol === "file:") {
       obj = {
-        [GET_FILE_PATH]: {uri}
+        [GET_FILE_PATH]: {uri},
       };
-    }
-    else {
+    } else {
       const contentType = document.contentType;
       const method = "GET";
       const mode = "cors";
@@ -642,9 +643,9 @@
             target, fileName,
             incognito: data.incognito,
             tabId: data.tabId,
-            host: data.host
+            host: data.host,
           },
-          value
+          value,
         };
       });
     }
@@ -659,7 +660,7 @@
   const getContextType = async elm => {
     const contextType = {
       mode: MODE_SOURCE,
-      namespaceURI: ""
+      namespaceURI: "",
     };
     if (elm) {
       const sel = window.getSelection();
@@ -669,8 +670,7 @@
         if (elm.isContentEditable || await isEditControl(elm) ||
             await isContentTextNode(elm)) {
           contextType.mode = MODE_EDIT_TEXT;
-        }
-        else {
+        } else {
           switch (ns.namespaceURI) {
             case nsURI.math:
               contextType.mode = MODE_MATHML;
@@ -681,8 +681,7 @@
             default:
           }
         }
-      }
-      else {
+      } else {
         const parent = sel.anchorNode && sel.anchorNode.parentNode;
         if (!sel.isCollapsed && sel.rangeCount === 1 && parent &&
             parent === sel.focusNode.parentNode &&
@@ -692,8 +691,7 @@
           ns = await getNodeNS(parent);
           contextType.mode = MODE_EDIT_TEXT;
           contextType.namespaceURI = ns.namespaceURI;
-        }
-        else {
+        } else {
           contextType.mode = MODE_SELECTION;
         }
       }
@@ -714,7 +712,7 @@
       tabId: vars[TAB_ID],
       namespaceURI: null,
       target: null,
-      value: null
+      value: null,
     };
     if (elm) {
       const contextType = await getContextType(elm);
@@ -730,8 +728,8 @@
                 data.mode = contextType.mode;
                 data.target = obj;
                 data.value = elm.value || "";
-              }
-              else if (elm.isContentEditable || await isContentTextNode(elm)) {
+              } else if (elm.isContentEditable ||
+                         await isContentTextNode(elm)) {
                 data.mode = contextType.mode;
                 data.target = obj;
                 data.value = elm.hasChildNodes() &&
@@ -740,10 +738,9 @@
                 setDataAttrs(elm);
               }
             }
-          }
-          else if ((parent.isContentEditable || await isEditControl(parent) ||
-                    await isContentTextNode(parent)) &&
-                   (obj = await getId(parent))) {
+          } else if ((parent.isContentEditable || await isEditControl(parent) ||
+                      await isContentTextNode(parent)) &&
+                     (obj = await getId(parent))) {
             data.mode = contextType.mode;
             data.target = obj;
             data.value = parent.hasChildNodes() &&
@@ -785,11 +782,11 @@
    */
   const convertValue = async v => {
     while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
-      v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "").
-            replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
+      v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "")
+            .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
     }
-    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n").
-             replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
+             .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
   };
 
   /**
@@ -813,12 +810,11 @@
             [CREATE_TMP_FILE]: {
               incognito, tabId, host, target,
               fileName: `${target}.txt`,
-              namespaceURI: data.namespaceURI || ""
+              namespaceURI: data.namespaceURI || "",
             },
-            value
+            value,
           };
-        }
-        else {
+        } else {
           tmpFileData = await fetchSource(data);
         }
         break;
@@ -828,10 +824,9 @@
           fileName = `${target}.${mode === MODE_MATHML && "mml" || "svg"}`;
           tmpFileData = {
             [CREATE_TMP_FILE]: {incognito, tabId, host, target, fileName},
-            value
+            value,
           };
-        }
-        else {
+        } else {
           tmpFileData = await fetchSource(data);
         }
         break;
@@ -842,20 +837,18 @@
           tmpFileData = {
             [CREATE_TMP_FILE]: {
               incognito, tabId, host, target,
-              fileName: `${target}.xml`
+              fileName: `${target}.xml`,
             },
-            value
+            value,
           };
-        }
-        else if (target && value) {
+        } else if (target && value) {
           value = await convertValue(value);
           fileName = target + await getFileExtension(contentType);
           tmpFileData = {
             [CREATE_TMP_FILE]: {incognito, tabId, host, target, fileName},
-            value
+            value,
           };
-        }
-        else {
+        } else {
           tmpFileData = await fetchSource(data);
         }
         break;
@@ -876,8 +869,8 @@
         portMsg({
           [CREATE_TMP_FILE]: {
             data: res[CREATE_TMP_FILE],
-            value: res.value
-          }
+            value: res.value,
+          },
         }).catch(logError) :
         res[GET_FILE_PATH] &&
           portMsg({[GET_FILE_PATH]: res[GET_FILE_PATH]}).catch(logError)
@@ -952,18 +945,16 @@
             break;
           }
         }
-      }
-      else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-               elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
-               (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
-                timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
+      } else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
+                 elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
+                 (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
+                  timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
         elm.setAttributeNS(
           ns, isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS, timestamp
         );
         if (/^(?:input|textarea)$/.test(elm.localName)) {
           elm.value = value;
-        }
-        else if (elm.isContentEditable) {
+        } else if (elm.isContentEditable) {
           replaceContent(elm, value, namespaceURI).catch(logError);
         }
       }
@@ -978,7 +969,7 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: true,
-    enabled: vars[KEY_EXEC_EDITOR]
+    enabled: vars[KEY_EXEC_EDITOR],
   };
 
   /* open options key combination */
@@ -988,7 +979,7 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: false,
-    enabled: vars[KEY_OPEN_OPTIONS]
+    enabled: vars[KEY_OPEN_OPTIONS],
   };
 
   /**
@@ -1014,7 +1005,7 @@
   const extObjItems = async (obj, key, len = 0) => {
     if (obj && key && Object.keys(obj).length <= len) {
       let ext = await storage.get(key);
-      if (ext && Object.keys(ext).length > 0 && (ext = ext[key])) {
+      if (ext && Object.keys(ext).length && (ext = ext[key])) {
         const items = Object.keys(ext);
         if (items && items.length > len) {
           for (const item of items) {
@@ -1033,7 +1024,7 @@
    */
   const handleMsg = async msg => {
     const items = msg && Object.keys(msg);
-    if (items && items.length > 0) {
+    if (items && items.length) {
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
@@ -1064,8 +1055,8 @@
           case PORT_FILE_PATH:
             obj.path && portMsg({
               [PORT_HOST]: {
-                path: obj.path
-              }
+                path: obj.path,
+              },
             }).catch(logError);
             break;
           case SYNC_TEXT:
@@ -1092,14 +1083,14 @@
       [MODE_EDIT_TEXT]: {
         menuItemId: MODE_EDIT_TEXT,
         enabled: sel.isCollapsed ||
-                 sel.anchorNode.parentNode === sel.focusNode.parentNode
+                 sel.anchorNode.parentNode === sel.focusNode.parentNode,
       },
       [MODE_SOURCE]: {
         menuItemId: MODE_SOURCE,
         mode: elm.namespaceURI === nsURI.math && MODE_MATHML ||
               elm.namespaceURI === nsURI.svg && MODE_SVG ||
-              MODE_SOURCE
-      }
+              MODE_SOURCE,
+      },
     };
     vars[NODE_CONTEXT] = elm;
     portMsg({contextMenu}).catch(logError);
@@ -1114,8 +1105,7 @@
     const openOptions = await keyComboMatches(evt, openOptionsKey);
     if (openOptions) {
       portMsg({openOptions}).catch(logError);
-    }
-    else {
+    } else {
       const elm = evt && evt.target;
       const sel = window.getSelection();
       await keyComboMatches(evt, execEditorKey) && elm && (
@@ -1140,6 +1130,6 @@
   /* startup */
   Promise.all([
     extObjItems(fileExt, FILE_EXT, 0),
-    extObjItems(nsURI, NS_URI, NS_URI_DEFAULT_ITEMS)
+    extObjItems(nsURI, NS_URI, NS_URI_DEFAULT_ITEMS),
   ]).catch(logError);
 }

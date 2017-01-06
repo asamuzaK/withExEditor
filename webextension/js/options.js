@@ -78,9 +78,9 @@
         value: elm.value || "",
         checked: !!elm.checked,
         app: {
-          executable: !!executable
-        }
-      }
+          executable: !!executable,
+        },
+      },
     } || null;
   };
 
@@ -97,8 +97,7 @@
       if (executable && name) {
         elm.value = name;
         elm.disabled = false;
-      }
-      else {
+      } else {
         elm.value = "";
         elm.disabled = true;
       }
@@ -120,7 +119,7 @@
       elm.value = name,
       createPref(elm).then(setStorage).catch(logError),
       portMsg({
-        [CHECK_EXECUTABLE]: {path}
+        [CHECK_EXECUTABLE]: {path},
       }).catch(logError)
     );
   };
@@ -140,14 +139,13 @@
             createPref(node).then(setStorage).catch(logError);
           }
         }
-      }
-      else {
+      } else {
         switch (elm.id) {
           case APP_MANIFEST:
             portMsg({
               [GET_APP_MANIFEST]: {
-                path: elm.value
-              }
+                path: elm.value,
+              },
             }).catch(logError);
             break;
           case KEY_ACCESS:
@@ -187,7 +185,7 @@
         alt: "alt",
         href: "href",
         placeholder: "placeholder",
-        title: "title"
+        title: "title",
       };
       const dataAttr = elm.getAttribute(DATA_ATTR_I18N);
       const items = Object.keys(attrs);
@@ -248,7 +246,7 @@
   const setValuesFromStorage = async () => {
     const pref = await storage.get();
     const items = pref && Object.keys(pref);
-    if (items && items.length > 0) {
+    if (items && items.length) {
       for (const item of items) {
         setHtmlInputValue(pref[item]).catch(logError);
       }
@@ -263,7 +261,7 @@
    */
   const handleMsg = async msg => {
     const items = msg && Object.keys(msg);
-    if (items && items.length > 0) {
+    if (items && items.length) {
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
@@ -277,7 +275,7 @@
               ).then(setStorage),
               syncEditorName(obj.executable).then(createPref).then(setStorage),
               // NOTE: for hybrid
-              portMsg({removeSdkPrefs: obj.executable})
+              portMsg({removeSdkPrefs: obj.executable}),
             ]).catch(logError);
             break;
           default:
@@ -292,6 +290,6 @@
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtml(),
     setValuesFromStorage(),
-    addInputChangeListener()
+    addInputChangeListener(),
   ]).catch(logError), false);
 }

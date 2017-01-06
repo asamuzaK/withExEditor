@@ -23,7 +23,7 @@
   const insertCodeSample = () => fetch(CODE_SAMPLE_PATH).then(async res => {
     const codes = await res.json();
     const items = codes && Object.keys(codes);
-    if (items && items.length > 0) {
+    if (items && items.length) {
       for (const item of items) {
         const target = document.getElementById(item);
         target && (target.textContent = codes[item]);
