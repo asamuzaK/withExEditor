@@ -803,10 +803,10 @@
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
     const {mode, incognito, tabId, host} = data;
-    let {value} = data, target, fileName, tmpFileData;
+    let {target, value} = data, fileName, tmpFileData;
     switch (mode) {
       case MODE_EDIT_TEXT:
-        tmpFileData = ({target} = data) && {
+        tmpFileData = target && {
           [CREATE_TMP_FILE]: {
             incognito, tabId, host, target,
             fileName: `${target}.txt`,
