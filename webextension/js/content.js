@@ -172,6 +172,7 @@
       ns.localName = node.localName;
       ns.namespaceURI = node.namespaceURI;
     } else {
+      const root = document.documentElement;
       while (node && node.parentNode && !ns.node) {
         if (node.namespaceURI) {
           ns.node = node;
@@ -185,7 +186,7 @@
           const obj = node.parentNode;
           if (obj.localName === "foreignObject" &&
               (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
-               document.documentElement.localName === "html")) {
+               root.localName === "html")) {
             ns.node = node;
             ns.localName = node.localName;
             ns.namespaceURI = obj.hasAttributeNS(nsURI.svg,
@@ -199,7 +200,7 @@
         }
       }
       !ns.node && (
-        node = document.documentElement,
+        node = root,
         ns.node = node,
         ns.localName = node.localName,
         ns.namespaceURI = node.hasAttribute("xmlns") &&
@@ -236,14 +237,16 @@
    * @return {Object} - namespaced element
    */
   const createElementNS = async node => {
-    const prefix = node && node.prefix;
-    const localName = node && node.localName;
-    const elm = node && document.createElementNS(
-      node.namespaceURI || prefix && nsURI[prefix] ||
-      await getNodeNS(node).namespaceURI || nsURI.html,
-      prefix && `${prefix}:${localName}` || localName
-    );
-    elm && node.attributes && await setAttributeNS(elm, node);
+    let elm;
+    if (node) {
+      const {prefix, localName} = node;
+      elm = document.createElementNS(
+        node.namespaceURI || prefix && nsURI[prefix] ||
+        await getNodeNS(node).namespaceURI || nsURI.html,
+        prefix && `${prefix}:${localName}` || localName
+      );
+      elm && node.attributes && await setAttributeNS(elm, node);
+    }
     return elm || null;
   };
 
@@ -268,29 +271,32 @@
    * @return {Object} - element or text node
    */
   const createElm = async (node, append = false) => {
-    const elm = await createElementNS(node);
-    if (node && node.hasChildNodes() && append &&
-        elm && elm.nodeType === NODE_ELEMENT) {
-      const nodes = node.childNodes;
-      const arr = [];
-      let frag;
-      for (const child of nodes) {
-        switch (child.nodeType) {
-          case NODE_ELEMENT:
-            child === child.parentNode.firstChild &&
-              arr.push(document.createTextNode("\n"));
-            arr.push(createElm(child, true));
-            child === child.parentNode.lastChild &&
-              arr.push(document.createTextNode("\n"));
-            break;
-          case NODE_TEXT:
-            arr.push(document.createTextNode(child.nodeValue));
-            break;
-          default:
+    let elm;
+    if (node) {
+      elm = await createElementNS(node);
+      if (node.hasChildNodes() && append &&
+          elm && elm.nodeType === NODE_ELEMENT) {
+        const nodes = node.childNodes;
+        const arr = [];
+        let frag;
+        for (const child of nodes) {
+          switch (child.nodeType) {
+            case NODE_ELEMENT:
+              child === child.parentNode.firstChild &&
+                arr.push(document.createTextNode("\n"));
+              arr.push(createElm(child, true));
+              child === child.parentNode.lastChild &&
+                arr.push(document.createTextNode("\n"));
+              break;
+            case NODE_TEXT:
+              arr.push(document.createTextNode(child.nodeValue));
+              break;
+            default:
+          }
         }
+        (frag = await Promise.all(arr).then(createFrag)) &&
+          elm.appendChild(frag);
       }
-      (frag = await Promise.all(arr).then(createFrag)) &&
-        elm.appendChild(frag);
     }
     return elm || document.createTextNode("");
   };
@@ -622,19 +628,18 @@
    * @return {Object} - temporary file data
    */
   const fetchSource = async data => {
-    const uri = document.documentURI;
+    const {characterSet, contentType, documentURI: uri} = document;
     let obj;
     if (window.location.protocol === "file:") {
       obj = {
         [GET_FILE_PATH]: {uri},
       };
     } else {
-      const {contentType} = document;
       const method = "GET";
       const mode = "cors";
       const headers = new Headers();
       headers.set("Content-Type", contentType);
-      headers.set("Charset", document.characterSet);
+      headers.set("Charset", characterSet);
       obj = await fetch(uri, {headers, method, mode}).then(async res => {
         const target = await getFileNameFromURI(uri, "index");
         const fileName = target + await getFileExtension(contentType);
@@ -796,9 +801,8 @@
    * @return {Object} - temporary file data
    */
   const createTmpFileData = async data => {
+    const {contentType, documentURI: uri} = document;
     const {mode, incognito, tabId, host} = data;
-    const {contentType} = document;
-    const uri = document.documentURI;
     let {value} = data, target, fileName, tmpFileData;
     switch (mode) {
       case MODE_EDIT_TEXT:

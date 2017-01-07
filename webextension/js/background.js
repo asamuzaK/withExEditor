@@ -219,10 +219,10 @@
    */
   const portContextMenu = async (info, tab) => {
     if (info && tab) {
+      const {frameUrl} = info;
       const getContent = {info, tab};
       const windowId = `${tab.windowId}`;
       const tabId = `${tab.id}`;
-      const {frameUrl} = info;
       const port = ports[windowId] && ports[windowId][tabId] &&
                      ports[windowId][tabId][frameUrl];
       port && port.postMessage({getContent});
@@ -498,17 +498,19 @@
     if (items && items.length) {
       for (const item of items) {
         const obj = msg[item];
-        switch (item) {
-          case CONTEXT_MENU:
-            obj && updateContextMenu(obj).catch(logError);
-            break;
-          case OPEN_OPTIONS:
-            obj && openOptionsPage().catch(logError);
-            break;
-          case PORT_HOST:
-            obj && obj.path && portHostMsg(obj.path).catch(logError);
-            break;
-          default:
+        if (obj) {
+          switch (item) {
+            case CONTEXT_MENU:
+              updateContextMenu(obj).catch(logError);
+              break;
+            case OPEN_OPTIONS:
+              openOptionsPage().catch(logError);
+              break;
+            case PORT_HOST:
+              obj.path && portHostMsg(obj.path).catch(logError);
+              break;
+            default:
+          }
         }
       }
     }
@@ -520,9 +522,9 @@
    * @return {void}
    */
   const handlePort = async port => {
+    const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
     const windowId = `${port.sender.tab.windowId}`;
     const tabId = `${port.sender.tab.id}`;
-    const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
     ports[windowId] = ports[windowId] || {};
     ports[windowId][tabId] = ports[windowId][tabId] || {};
     ports[windowId][tabId][frameUrl] = port;
