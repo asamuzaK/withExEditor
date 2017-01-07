@@ -44,7 +44,7 @@
   const TAB_ID = "tabId";
 
   /* shortcuts */
-  const runtime = browser.runtime;
+  const {runtime} = browser;
   const storage = browser.storage.local;
 
   /* variables */
@@ -103,8 +103,7 @@
     const arr = /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
     let ext;
     if (arr) {
-      const type = arr[1];
-      const subtype = arr[2];
+      const [, type, subtype] = arr;
       const suffix = arr[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
                        subtype;
@@ -221,8 +220,7 @@
     const attrs = node && node.attributes;
     if (elm && node && attrs) {
       for (const attr of attrs) {
-        const prefix = attr.prefix;
-        const localName = attr.localName;
+        const {prefix, localName} = attr;
         typeof node[attr.name] !== "function" && elm.setAttributeNS(
           attr.namespaceURI || prefix && nsURI[prefix] || "",
           prefix && `${prefix}:${localName}` || localName,
@@ -631,7 +629,7 @@
         [GET_FILE_PATH]: {uri},
       };
     } else {
-      const contentType = document.contentType;
+      const {contentType} = document;
       const method = "GET";
       const mode = "cors";
       const headers = new Headers();
@@ -798,28 +796,20 @@
    * @return {Object} - temporary file data
    */
   const createTmpFileData = async data => {
-    const mode = data.mode;
-    const incognito = data.incognito;
-    const tabId = data.tabId;
-    const host = data.host;
-    const contentType = document.contentType;
+    const {mode, incognito, tabId, host} = data;
+    const {contentType} = document;
     const uri = document.documentURI;
-    let value = data.value, target, fileName, tmpFileData;
+    let {value} = data, target, fileName, tmpFileData;
     switch (mode) {
       case MODE_EDIT_TEXT:
-        target = data.target;
-        if (target) {
-          tmpFileData = {
-            [CREATE_TMP_FILE]: {
-              incognito, tabId, host, target,
-              fileName: `${target}.txt`,
-              namespaceURI: data.namespaceURI || "",
-            },
-            value,
-          };
-        } else {
-          tmpFileData = await fetchSource(data);
-        }
+        tmpFileData = ({target} = data) && {
+          [CREATE_TMP_FILE]: {
+            incognito, tabId, host, target,
+            fileName: `${target}.txt`,
+            namespaceURI: data.namespaceURI || "",
+          },
+          value,
+        } || await fetchSource(data);
         break;
       case MODE_MATHML:
       case MODE_SVG:

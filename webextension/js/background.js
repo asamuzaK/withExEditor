@@ -44,13 +44,8 @@
   const KEY_OPEN_OPTIONS = "optionsShortCut";
 
   /* shortcuts */
-  const browserAction = browser.browserAction;
-  const contextMenus = browser.contextMenus;
-  const i18n = browser.i18n;
-  const runtime = browser.runtime;
+  const {browserAction, contextMenus, i18n, runtime, tabs, windows} = browser;
   const storage = browser.storage.local;
-  const tabs = browser.tabs;
-  const windows = browser.windows;
 
   /* variables */
   const vars = {
@@ -114,16 +109,16 @@
    */
   const checkWindowIncognito = async () => {
     const windowIds = await windows.getAll();
-    let incognito;
+    let incog;
     if (windowIds && windowIds.length) {
       for (const windowId of windowIds) {
-        incognito = windowId.incognito;
-        if (incognito) {
+        incog = windowId.incognito;
+        if (incog) {
           break;
         }
       }
     }
-    return incognito || false;
+    return incog || false;
   };
 
   /**
@@ -165,15 +160,14 @@
    */
   const restorePorts = async data => {
     if (data) {
-      const windowId = data.windowId;
-      const tabId = data.tabId;
+      const {windowId, tabId} = data;
       if (tabId) {
-        windowId && ports[windowId] && (
+        ports[windowId] && (
           delete ports[windowId][tabId],
           Object.keys(ports[windowId]).length === 0 &&
             restorePorts({windowId})
         );
-      } else if (windowId) {
+      } else {
         delete ports[windowId];
       }
     }
@@ -228,7 +222,7 @@
       const getContent = {info, tab};
       const windowId = `${tab.windowId}`;
       const tabId = `${tab.id}`;
-      const frameUrl = info.frameUrl;
+      const {frameUrl} = info;
       const port = ports[windowId] && ports[windowId][tabId] &&
                      ports[windowId][tabId][frameUrl];
       port && port.postMessage({getContent});
@@ -338,7 +332,7 @@
       if (items.length) {
         for (const item of items) {
           const obj = type[item];
-          const menuItemId = obj.menuItemId;
+          const {menuItemId} = obj;
           if (menus[menuItemId]) {
             if (item === MODE_SOURCE) {
               const title = varsLoc[obj.mode] || varsLoc[menuItemId];
@@ -528,9 +522,7 @@
   const handlePort = async port => {
     const windowId = `${port.sender.tab.windowId}`;
     const tabId = `${port.sender.tab.id}`;
-    const frameId = port.sender.frameId;
-    const frameUrl = port.sender.url;
-    const incognito = port.sender.tab.incognito;
+    const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
     ports[windowId] = ports[windowId] || {};
     ports[windowId][tabId] = ports[windowId][tabId] || {};
     ports[windowId][tabId][frameUrl] = port;

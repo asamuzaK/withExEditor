@@ -22,8 +22,7 @@
   const KEY_ACCESS = "accessKey";
 
   /* shortcuts */
-  const i18n = browser.i18n;
-  const runtime = browser.runtime;
+  const {i18n, runtime} = browser;
   const storage = browser.storage.local;
 
   /**
