@@ -3,6 +3,10 @@
  */
 "use strict";
 {
+  /* api */
+  const {i18n, runtime} = browser;
+  const storage = browser.storage.local;
+
   /* constants */
   const PORT_NAME = "portOptions";
 
@@ -20,10 +24,6 @@
   const APP_NAME = "appName";
   const EDITOR_NAME = "editorName";
   const KEY_ACCESS = "accessKey";
-
-  /* shortcuts */
-  const {i18n, runtime} = browser;
-  const storage = browser.storage.local;
 
   /**
    * log error

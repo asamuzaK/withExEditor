@@ -3,6 +3,10 @@
  */
 "use strict";
 {
+  /* api */
+  const {browserAction, contextMenus, i18n, runtime, tabs, windows} = browser;
+  const storage = browser.storage.local;
+
   /* constants */
   const LABEL = "withExEditor";
 
@@ -42,10 +46,6 @@
   const KEY_ACCESS = "accessKey";
   const KEY_EXEC_EDITOR = "editorShortCut";
   const KEY_OPEN_OPTIONS = "optionsShortCut";
-
-  /* shortcuts */
-  const {browserAction, contextMenus, i18n, runtime, tabs, windows} = browser;
-  const storage = browser.storage.local;
 
   /* variables */
   const vars = {

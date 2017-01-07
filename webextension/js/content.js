@@ -3,6 +3,10 @@
  */
 "use strict";
 {
+  /* api */
+  const {runtime} = browser;
+  const storage = browser.storage.local;
+
   /* constants */
   const LABEL = "withExEditor";
   const PORT_NAME = "portContent";
@@ -42,10 +46,6 @@
   const KEY_EXEC_EDITOR = "editorShortCut";
   const NODE_CONTEXT = "contextNode";
   const TAB_ID = "tabId";
-
-  /* shortcuts */
-  const {runtime} = browser;
-  const storage = browser.storage.local;
 
   /* variables */
   const vars = {
