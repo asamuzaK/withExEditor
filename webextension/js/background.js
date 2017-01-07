@@ -123,7 +123,7 @@
 
   /**
    * open options page
-   * @return {Object} - ?Promise
+   * @return {Object} - ?Promise.<void>
    */
   const openOptionsPage = async () =>
     vars[IS_ENABLED] && runtime.openOptionsPage() || null;
@@ -221,11 +221,14 @@
     if (info && tab) {
       const {frameUrl} = info;
       const getContent = {info, tab};
-      const windowId = `${tab.windowId}`;
-      const tabId = `${tab.id}`;
-      const port = ports[windowId] && ports[windowId][tabId] &&
-                     ports[windowId][tabId][frameUrl];
-      port && port.postMessage({getContent});
+      let {windowId, id: tabId} = tab;
+      windowId = Number.isInteger(windowId) && `${windowId}`;
+      tabId = Number.isInteger(tabId) && `${tabId}`;
+      if (windowId && tabId) {
+        const port = ports[windowId] && ports[windowId][tabId] &&
+                       ports[windowId][tabId][frameUrl];
+        port && port.postMessage({getContent});
+      }
     }
   };
 
@@ -384,7 +387,7 @@
   /**
    * port variable
    * @param {Object} v - variable
-   * @return {Object} - ?Promise
+   * @return {Object} - ?Promise.<void>
    */
   const portVar = async v => v && portMsg({[SET_VARS]: v}) || null;
 
@@ -483,7 +486,7 @@
   /**
    * handle runtime update
    * @param {Object} details - install details
-   * @return {Object} - ?Promise
+   * @return {?Function} - reload
    */
   const handleRuntimeUpdate = async details =>
     details && details.reason === "update" && runtime.reload() || null;
@@ -522,18 +525,23 @@
    * @return {void}
    */
   const handlePort = async port => {
-    const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
-    const windowId = `${port.sender.tab.windowId}`;
-    const tabId = `${port.sender.tab.id}`;
-    ports[windowId] = ports[windowId] || {};
-    ports[windowId][tabId] = ports[windowId][tabId] || {};
-    ports[windowId][tabId][frameUrl] = port;
-    frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito);
-    port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
-    port.postMessage({
-      incognito, tabId,
-      [SET_VARS]: vars,
-    });
+    if (port && port.sender && port.sender.tab) {
+      const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
+      let {windowId, id: tabId} = port.sender.tab;
+      windowId = Number.isInteger(windowId) && `${windowId}`;
+      tabId = Number.isInteger(tabId) && `${tabId}`;
+      windowId && tabId && (
+        ports[windowId] = ports[windowId] || {},
+        ports[windowId][tabId] = ports[windowId][tabId] || {},
+        ports[windowId][tabId][frameUrl] = port,
+        frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito),
+        port.onMessage.addListener(msg => handleMsg(msg).catch(logError)),
+        port.postMessage({
+          incognito, tabId,
+          [SET_VARS]: vars,
+        })
+      );
+    }
   };
 
   /**
@@ -544,16 +552,19 @@
   const handleActiveTab = async info => {
     let bool;
     if (info) {
-      const windowId = `${info.windowId}`;
-      const tabId = `${info.tabId}`;
-      const items = ports[windowId] && ports[windowId][tabId] &&
-                      Object.keys(ports[windowId][tabId]);
-      if (items && items.length) {
-        for (const item of items) {
-          const obj = ports[windowId][tabId][item];
-          if (obj && obj.name) {
-            bool = obj.name === PORT_CONTENT;
-            break;
+      let {windowId, tabId} = info;
+      windowId = Number.isInteger(windowId) && `${windowId}`;
+      tabId = Number.isInteger(tabId) && `${tabId}`;
+      if (windowId && tabId) {
+        const items = ports[windowId] && ports[windowId][tabId] &&
+                        Object.keys(ports[windowId][tabId]);
+        if (items && items.length) {
+          for (const item of items) {
+            const obj = ports[windowId][tabId][item];
+            if (obj && obj.name) {
+              bool = obj.name === PORT_CONTENT;
+              break;
+            }
           }
         }
       }
@@ -566,20 +577,22 @@
    * @param {number} id - tabId
    * @param {Object} info - changed tab info
    * @param {Object} tab - tabs.Tab
-   * @return {Object} - ?Promise
+   * @return {Object} - ?Promise.<void>
    */
   const handleUpdatedTab = async (id, info, tab) => {
-    let bool;
-    if (id && info && tab) {
-      const windowId = `${tab.windowId}`;
-      const tabId = `${id}`;
+    const tabId = Number.isInteger(id) && `${id}`;
+    let bool, portName;
+    if (tab) {
       const frameUrl = tab.url;
-      const portName = ports[windowId] && ports[windowId][tabId] &&
-                       ports[windowId][tabId][frameUrl] &&
-                         ports[windowId][tabId][frameUrl].name;
-      varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
-      bool = info.status === "complete" && tab.active;
+      let {windowId} = tab;
+      windowId = Number.isInteger(windowId) && `${windowId}`;
+      bool = info && info.status === "complete" && tab.active;
+      portName = windowId && tabId && frameUrl &&
+                 ports[windowId] && ports[windowId][tabId] &&
+                 ports[windowId][tabId][frameUrl] &&
+                   ports[windowId][tabId][frameUrl].name;
     }
+    varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
     return bool && restoreContextMenu() || null;
   };
 
@@ -587,19 +600,23 @@
    * handle removed tab
    * @param {number} id - tabId
    * @param {Object} info - removed tab info
-   * @return {void}
+   * @return {Object} - ?Promise.<Array.<*>>
    */
   const handleRemovedTab = async (id, info) => {
-    const windowId = `${info.windowId}`;
-    const tabId = `${id}`;
-    const incognito = ports[windowId] && ports[windowId][tabId] &&
-                        !!ports[windowId][tabId][INCOGNITO];
-    ports[windowId] && ports[windowId][tabId] &&
-      restorePorts({windowId, tabId}).catch(logError);
-    // NOTE: for hybrid
-    portHybridMsg({
-      removeTabRelatedStorage: {tabId, incognito, info},
-    }).catch(logError);
+    const tabId = Number.isInteger(id) && `${id}`;
+    let {windowId} = info, incognito;
+    windowId = Number.isInteger(windowId) && `${windowId}`;
+    if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
+      incognito = !!ports[windowId][tabId][INCOGNITO];
+      return Promise.all([
+        restorePorts({windowId, tabId}),
+        // NOTE: for hybrid
+        portHybridMsg({
+          removeTabRelatedStorage: {tabId, incognito, info},
+        }),
+      ]).catch(logError);
+    }
+    return null;
   };
 
   /**
@@ -620,7 +637,8 @@
    * @return {Object} - Promise.<Array.<*>>
    */
   const handleRemovedWindow = windowId => Promise.all([
-    restorePorts({windowId: `${windowId}`}),
+    () =>
+      Number.isInteger(windowId) && restorePorts({windowId: `${windowId}`}),
     // NOTE: for hybrid
     checkWindowIncognito().then(incognito =>
       !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
