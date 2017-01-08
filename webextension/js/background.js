@@ -88,6 +88,14 @@
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
 
+  /**
+   * stringify positive integer including zero
+   * @param {number} i - integer
+   * @return {?string} - stringified integer
+   */
+  const stringifyPosInt = i =>
+    Number.isSafeInteger(i) && i >= 0 && `${i}` || null;
+
   /* windows */
   /**
    * check if add-on can be enabled
@@ -161,14 +169,12 @@
   const restorePorts = async data => {
     if (data) {
       const {windowId, tabId} = data;
-      if (tabId) {
-        ports[windowId] && (
-          delete ports[windowId][tabId],
-          Object.keys(ports[windowId]).length === 0 &&
-            restorePorts({windowId})
-        );
+      if (windowId && tabId && ports[windowId]) {
+        delete ports[windowId][tabId];
+        Object.keys(ports[windowId]).length === 0 &&
+          restorePorts({windowId});
       } else {
-        delete ports[windowId];
+        windowId && delete ports[windowId];
       }
     }
   };
@@ -222,8 +228,8 @@
       const {frameUrl} = info;
       const getContent = {info, tab};
       let {windowId, id: tabId} = tab;
-      windowId = Number.isInteger(windowId) && `${windowId}`;
-      tabId = Number.isInteger(tabId) && `${tabId}`;
+      windowId = stringifyPosInt(windowId);
+      tabId = stringifyPosInt(tabId);
       if (windowId && tabId) {
         const port = ports[windowId] && ports[windowId][tabId] &&
                        ports[windowId][tabId][frameUrl];
@@ -528,8 +534,8 @@
     if (port && port.sender && port.sender.tab) {
       const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
       let {windowId, id: tabId} = port.sender.tab;
-      windowId = Number.isInteger(windowId) && `${windowId}`;
-      tabId = Number.isInteger(tabId) && `${tabId}`;
+      windowId = stringifyPosInt(windowId);
+      tabId = stringifyPosInt(tabId);
       windowId && tabId && (
         ports[windowId] = ports[windowId] || {},
         ports[windowId][tabId] = ports[windowId][tabId] || {},
@@ -553,8 +559,8 @@
     let bool;
     if (info) {
       let {windowId, tabId} = info;
-      windowId = Number.isInteger(windowId) && `${windowId}`;
-      tabId = Number.isInteger(tabId) && `${tabId}`;
+      windowId = stringifyPosInt(windowId);
+      tabId = stringifyPosInt(tabId);
       if (windowId && tabId) {
         const items = ports[windowId] && ports[windowId][tabId] &&
                         Object.keys(ports[windowId][tabId]);
@@ -580,12 +586,12 @@
    * @return {Object} - ?Promise.<void>
    */
   const handleUpdatedTab = async (id, info, tab) => {
-    const tabId = Number.isInteger(id) && `${id}`;
+    const tabId = stringifyPosInt(id);
     let bool, portName;
     if (tab) {
       const frameUrl = tab.url;
       let {windowId} = tab;
-      windowId = Number.isInteger(windowId) && `${windowId}`;
+      windowId = stringifyPosInt(windowId);
       bool = info && info.status === "complete" && tab.active;
       portName = windowId && tabId && frameUrl &&
                  ports[windowId] && ports[windowId][tabId] &&
@@ -603,9 +609,9 @@
    * @return {Object} - ?Promise.<Array.<*>>
    */
   const handleRemovedTab = async (id, info) => {
-    const tabId = Number.isInteger(id) && `${id}`;
+    const tabId = stringifyPosInt(id);
     let {windowId} = info, incognito;
-    windowId = Number.isInteger(windowId) && `${windowId}`;
+    windowId = stringifyPosInt(windowId);
     if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
       incognito = !!ports[windowId][tabId][INCOGNITO];
       return Promise.all([
@@ -637,8 +643,7 @@
    * @return {Object} - Promise.<Array.<*>>
    */
   const handleRemovedWindow = windowId => Promise.all([
-    () =>
-      Number.isInteger(windowId) && restorePorts({windowId: `${windowId}`}),
+    restorePorts({windowId: stringifyPosInt(windowId)}),
     // NOTE: for hybrid
     checkWindowIncognito().then(incognito =>
       !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
