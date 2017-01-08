@@ -93,7 +93,7 @@
    * @param {number} i - integer
    * @return {?string} - stringified integer
    */
-  const stringifyPosInt = i =>
+  const stringifyPositiveInt = i =>
     Number.isSafeInteger(i) && i >= 0 && `${i}` || null;
 
   /* windows */
@@ -218,18 +218,18 @@
   };
 
   /**
-   * port context menu
+   * port context menu data
    * @param {Object} info - contextMenus.OnClickData
    * @param {Object} tab - tabs.Tab
    * @return {void}
    */
-  const portContextMenu = async (info, tab) => {
+  const portContextMenuData = async (info, tab) => {
     if (info && tab) {
       const {frameUrl} = info;
       const getContent = {info, tab};
       let {windowId, id: tabId} = tab;
-      windowId = stringifyPosInt(windowId);
-      tabId = stringifyPosInt(tabId);
+      windowId = stringifyPositiveInt(windowId);
+      tabId = stringifyPositiveInt(tabId);
       if (windowId && tabId) {
         const port = ports[windowId] && ports[windowId][tabId] &&
                        ports[windowId][tabId][frameUrl];
@@ -242,7 +242,7 @@
   const hybrid = runtime.connect({name: "portBackground"});
 
   /**
-   * port hybrid message
+   * port message to hybrid
    * @param {*} msg - message
    * @return {void}
    */
@@ -490,11 +490,11 @@
 
   /* handlers */
   /**
-   * handle runtime update
+   * reload runtime
    * @param {Object} details - install details
    * @return {?Function} - reload
    */
-  const handleRuntimeUpdate = async details =>
+  const reloadRuntime = async details =>
     details && details.reason === "update" && runtime.reload() || null;
 
   /**
@@ -534,8 +534,8 @@
     if (port && port.sender && port.sender.tab) {
       const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
       let {windowId, id: tabId} = port.sender.tab;
-      windowId = stringifyPosInt(windowId);
-      tabId = stringifyPosInt(tabId);
+      windowId = stringifyPositiveInt(windowId);
+      tabId = stringifyPositiveInt(tabId);
       windowId && tabId && (
         ports[windowId] = ports[windowId] || {},
         ports[windowId][tabId] = ports[windowId][tabId] || {},
@@ -551,16 +551,16 @@
   };
 
   /**
-   * handle active tab
+   * handle tab activated
    * @param {Object} info - activated tab info
    * @return {void}
    */
-  const handleActiveTab = async info => {
+  const onTabActivated = async info => {
     let bool;
     if (info) {
       let {windowId, tabId} = info;
-      windowId = stringifyPosInt(windowId);
-      tabId = stringifyPosInt(tabId);
+      windowId = stringifyPositiveInt(windowId);
+      tabId = stringifyPositiveInt(tabId);
       if (windowId && tabId) {
         const items = ports[windowId] && ports[windowId][tabId] &&
                         Object.keys(ports[windowId][tabId]);
@@ -579,19 +579,19 @@
   };
 
   /**
-   * handle updated tab
+   * handle tab updated
    * @param {number} id - tabId
    * @param {Object} info - changed tab info
    * @param {Object} tab - tabs.Tab
    * @return {Object} - ?Promise.<void>
    */
-  const handleUpdatedTab = async (id, info, tab) => {
-    const tabId = stringifyPosInt(id);
+  const onTabUpdated = async (id, info, tab) => {
+    const tabId = stringifyPositiveInt(id);
     let bool, portName;
     if (tab) {
       const frameUrl = tab.url;
       let {windowId} = tab;
-      windowId = stringifyPosInt(windowId);
+      windowId = stringifyPositiveInt(windowId);
       bool = info && info.status === "complete" && tab.active;
       portName = windowId && tabId && frameUrl &&
                  ports[windowId] && ports[windowId][tabId] &&
@@ -603,15 +603,15 @@
   };
 
   /**
-   * handle removed tab
+   * handle tab removed
    * @param {number} id - tabId
    * @param {Object} info - removed tab info
    * @return {Object} - ?Promise.<Array.<*>>
    */
-  const handleRemovedTab = async (id, info) => {
-    const tabId = stringifyPosInt(id);
+  const onTabRemoved = async (id, info) => {
+    const tabId = stringifyPositiveInt(id);
     let {windowId} = info, incognito;
-    windowId = stringifyPosInt(windowId);
+    windowId = stringifyPositiveInt(windowId);
     if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
       incognito = !!ports[windowId][tabId][INCOGNITO];
       return Promise.all([
@@ -626,11 +626,11 @@
   };
 
   /**
-   * handle focus changed window
+   * handle window focus changed
    * @param {number} windowId - windowId
    * @return {Object} - ?Promise.<Array.<*>>
    */
-  const handleFocusChangedWindow = async windowId => {
+  const onWindowFocusChanged = async windowId => {
     const current = windowId !== windows.WINDOW_ID_NONE &&
                       await windows.getCurrent();
     return current && current.focused &&
@@ -638,12 +638,12 @@
   };
 
   /**
-   * handle removed window
+   * handle window removed
    * @param {number} windowId - windowId
    * @return {Object} - Promise.<Array.<*>>
    */
-  const handleRemovedWindow = windowId => Promise.all([
-    restorePorts({windowId: stringifyPosInt(windowId)}),
+  const onWindowRemoved = windowId => Promise.all([
+    restorePorts({windowId: stringifyPositiveInt(windowId)}),
     // NOTE: for hybrid
     checkWindowIncognito().then(incognito =>
       !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
@@ -654,27 +654,27 @@
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
   browser.storage.onChanged.addListener(data => setVars(data).catch(logError));
   contextMenus.onClicked.addListener((info, tab) =>
-    portContextMenu(info, tab).catch(logError)
+    portContextMenuData(info, tab).catch(logError)
   );
   runtime.onConnect.addListener(port => handlePort(port).catch(logError));
   runtime.onInstalled.addListener(details =>
-    handleRuntimeUpdate(details).catch(logError)
+    reloadRuntime(details).catch(logError)
   );
   runtime.onMessage.addListener(msg => handleMsg(msg).catch(logError));
   tabs.onActivated.addListener(info =>
-    handleActiveTab(info).then(restoreContextMenu).catch(logError)
+    onTabActivated(info).then(restoreContextMenu).catch(logError)
   );
   tabs.onUpdated.addListener((id, info, tab) =>
-    handleUpdatedTab(id, info, tab).catch(logError)
+    onTabUpdated(id, info, tab).catch(logError)
   );
   tabs.onRemoved.addListener((id, info) =>
-    handleRemovedTab(id, info).catch(logError)
+    onTabRemoved(id, info).catch(logError)
   );
   windows.onFocusChanged.addListener(windowId =>
-    handleFocusChangedWindow(windowId).catch(logError)
+    onWindowFocusChanged(windowId).catch(logError)
   );
   windows.onRemoved.addListener(windowId =>
-    handleRemovedWindow(windowId).catch(logError)
+    onWindowRemoved(windowId).catch(logError)
   );
 
   // NOTE: for hybrid
