@@ -587,18 +587,18 @@
    */
   const onTabUpdated = async (id, info, tab) => {
     const tabId = stringifyPositiveInt(id);
-    let bool, portName;
+    let bool, name;
     if (tab) {
       const frameUrl = tab.url;
       let {windowId} = tab;
       windowId = stringifyPositiveInt(windowId);
       bool = info && info.status === "complete" && tab.active;
-      portName = windowId && tabId && frameUrl &&
-                 ports[windowId] && ports[windowId][tabId] &&
-                 ports[windowId][tabId][frameUrl] &&
-                   ports[windowId][tabId][frameUrl].name;
+      name = windowId && tabId && frameUrl &&
+             ports[windowId] && ports[windowId][tabId] &&
+             ports[windowId][tabId][frameUrl] &&
+               ports[windowId][tabId][frameUrl].name;
     }
-    varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
+    varsLoc[MENU_ENABLED] = name === PORT_CONTENT;
     return bool && restoreContextMenu() || null;
   };
 
