@@ -130,11 +130,11 @@
 
   /**
    * port temporary ID
-   * @param {Object} evt - event
+   * @param {!Object} evt - Event
    * @return {void}
    */
   const portTemporaryId = async evt => {
-    const elm = evt && evt.target === evt.currentTarget && evt.target;
+    const elm = evt.target === evt.currentTarget && evt.target;
     const attr = elm && (
                    elm.hasAttributeNS("", DATA_ATTR_ID) &&
                    elm.getAttributeNS("", DATA_ATTR_ID) ||
@@ -986,7 +986,7 @@
    * @return {boolean} - result
    */
   const keyComboMatches = async (evt, key) =>
-    vars[IS_ENABLED] && key.enabled && key.key && evt.key &&
+    vars[IS_ENABLED] && evt && key && key.enabled && key.key && evt.key &&
     evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
@@ -1070,11 +1070,11 @@
 
   /**
    * handle contextmenu event
-   * @param {Object} evt - Event
+   * @param {!Object} evt - Event
    * @return {void}
    */
   const handleContextMenu = async evt => {
-    const elm = evt && evt.target;
+    const elm = evt.target;
     const sel = window.getSelection();
     const contextMenu = {
       [MODE_EDIT_TEXT]: {
@@ -1095,7 +1095,7 @@
 
   /**
    * handle keypress event
-   * @param {Object} evt - Event
+   * @param {!Object} evt - Event
    * @return {void}
    */
   const handleKeyPress = async evt => {
@@ -1103,9 +1103,9 @@
     if (openOptions) {
       portMsg({openOptions}).catch(logError);
     } else {
-      const elm = evt && evt.target;
+      const elm = evt.target;
       const sel = window.getSelection();
-      await keyComboMatches(evt, execEditorKey) && elm && (
+      await keyComboMatches(evt, execEditorKey) && (
         vars[ENABLE_ONLY_EDITABLE] && (
           elm.isContentEditable || await isEditControl(elm) ||
           sel.anchorNode === sel.focusNode && await isContentTextNode(elm)

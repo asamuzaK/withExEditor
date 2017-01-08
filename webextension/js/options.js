@@ -125,35 +125,33 @@
 
   /**
    * set pref storage
-   * @param {Object} evt - Event
+   * @param {!Object} evt - Event
    * @return {void}
    */
   const setPrefStorage = async evt => {
-    const elm = evt && evt.target;
-    if (elm) {
-      if (elm.type === "radio") {
-        const nodes = document.querySelectorAll(`[name=${elm.name}]`);
-        if (nodes instanceof NodeList) {
-          for (const node of nodes) {
-            createPref(node).then(setStorage).catch(logError);
-          }
+    const elm = evt.target;
+    if (elm.type === "radio") {
+      const nodes = document.querySelectorAll(`[name=${elm.name}]`);
+      if (nodes instanceof NodeList) {
+        for (const node of nodes) {
+          createPref(node).then(setStorage).catch(logError);
         }
-      } else {
-        switch (elm.id) {
-          case APP_MANIFEST:
-            portMsg({
-              [GET_APP_MANIFEST]: {
-                path: elm.value,
-              },
-            }).catch(logError);
-            break;
-          case KEY_ACCESS:
-            (elm.value === "" || elm.value.length === 1) &&
-              createPref(elm).then(setStorage).catch(logError);
-            break;
-          default:
+      }
+    } else {
+      switch (elm.id) {
+        case APP_MANIFEST:
+          portMsg({
+            [GET_APP_MANIFEST]: {
+              path: elm.value,
+            },
+          }).catch(logError);
+          break;
+        case KEY_ACCESS:
+          (elm.value === "" || elm.value.length === 1) &&
             createPref(elm).then(setStorage).catch(logError);
-        }
+          break;
+        default:
+          createPref(elm).then(setStorage).catch(logError);
       }
     }
   };

@@ -91,7 +91,7 @@
   /**
    * stringify positive integer
    * @param {number} i - integer
-   * @param {boolean} zero - treat zero as a positive integer
+   * @param {boolean} zero - treat 0 as a positive integer
    * @return {?string} - stringified integer
    */
   const stringifyPositiveInt = (i, zero = false) =>
@@ -167,16 +167,14 @@
    * @param {Object} data - disconnected port data
    * @return {void}
    */
-  const restorePorts = async data => {
-    if (data) {
-      const {windowId, tabId} = data;
-      if (windowId && tabId && ports[windowId]) {
-        delete ports[windowId][tabId];
-        Object.keys(ports[windowId]).length === 0 &&
-          restorePorts({windowId});
-      } else {
-        windowId && delete ports[windowId];
-      }
+  const restorePorts = async (data = {}) => {
+    const {windowId, tabId} = data;
+    if (windowId && tabId && ports[windowId]) {
+      delete ports[windowId][tabId];
+      Object.keys(ports[windowId]).length === 0 &&
+        restorePorts({windowId});
+    } else {
+      windowId && delete ports[windowId];
     }
   };
 
@@ -220,22 +218,20 @@
 
   /**
    * port context menu data
-   * @param {Object} info - contextMenus.OnClickData
-   * @param {Object} tab - tabs.Tab
+   * @param {!Object} info - contextMenus.OnClickData
+   * @param {!Object} tab - tabs.Tab
    * @return {void}
    */
   const portContextMenuData = async (info, tab) => {
-    if (info && tab) {
-      const {frameUrl} = info;
-      const getContent = {info, tab};
-      let {windowId, id: tabId} = tab;
-      windowId = stringifyPositiveInt(windowId, true);
-      tabId = stringifyPositiveInt(tabId, true);
-      if (windowId && tabId) {
-        const port = ports[windowId] && ports[windowId][tabId] &&
-                       ports[windowId][tabId][frameUrl];
-        port && port.postMessage({getContent});
-      }
+    const {frameUrl} = info;
+    const getContent = {info, tab};
+    let {windowId, id: tabId} = tab;
+    windowId = stringifyPositiveInt(windowId, true);
+    tabId = stringifyPositiveInt(tabId, true);
+    if (windowId && tabId) {
+      const port = ports[windowId] && ports[windowId][tabId] &&
+                     ports[windowId][tabId][frameUrl];
+      port && port.postMessage({getContent});
     }
   };
 
@@ -492,11 +488,11 @@
   /* handlers */
   /**
    * reload runtime
-   * @param {Object} details - install details
+   * @param {!Object} details - install details
    * @return {?Function} - reload
    */
   const reloadRuntime = async details =>
-    details && details.reason === "update" && runtime.reload() || null;
+    details.reason === "update" && runtime.reload() || null;
 
   /**
    * handle runtime message
@@ -528,50 +524,45 @@
 
   /**
    * handle connected port
-   * @param {Object} port - runtime.Port
+   * @param {!Object} port - runtime.Port
    * @return {void}
    */
   const handlePort = async port => {
-    if (port && port.sender && port.sender.tab) {
-      const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
-      let {windowId, id: tabId} = port.sender.tab;
-      windowId = stringifyPositiveInt(windowId, true);
-      tabId = stringifyPositiveInt(tabId, true);
-      windowId && tabId && (
-        ports[windowId] = ports[windowId] || {},
-        ports[windowId][tabId] = ports[windowId][tabId] || {},
-        ports[windowId][tabId][frameUrl] = port,
-        frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito),
-        port.onMessage.addListener(msg => handleMsg(msg).catch(logError)),
-        port.postMessage({
-          incognito, tabId,
-          [SET_VARS]: vars,
-        })
-      );
-    }
+    const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
+    let {windowId, id: tabId} = port.sender.tab;
+    windowId = stringifyPositiveInt(windowId, true);
+    tabId = stringifyPositiveInt(tabId, true);
+    windowId && tabId && (
+      ports[windowId] = ports[windowId] || {},
+      ports[windowId][tabId] = ports[windowId][tabId] || {},
+      ports[windowId][tabId][frameUrl] = port,
+      frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito),
+      port.onMessage.addListener(msg => handleMsg(msg).catch(logError)),
+      port.postMessage({
+        incognito, tabId,
+        [SET_VARS]: vars,
+      })
+    );
   };
 
   /**
    * handle tab activated
-   * @param {Object} info - activated tab info
+   * @param {!Object} info - activated tab info
    * @return {void}
    */
   const onTabActivated = async info => {
-    let bool;
-    if (info) {
-      let {windowId, tabId} = info;
-      windowId = stringifyPositiveInt(windowId, true);
-      tabId = stringifyPositiveInt(tabId, true);
-      if (windowId && tabId) {
-        const items = ports[windowId] && ports[windowId][tabId] &&
-                        Object.keys(ports[windowId][tabId]);
-        if (items && items.length) {
-          for (const item of items) {
-            const obj = ports[windowId][tabId][item];
-            if (obj && obj.name) {
-              bool = obj.name === PORT_CONTENT;
-              break;
-            }
+    let {windowId, tabId} = info, bool;
+    windowId = stringifyPositiveInt(windowId, true);
+    tabId = stringifyPositiveInt(tabId, true);
+    if (windowId && tabId) {
+      const items = ports[windowId] && ports[windowId][tabId] &&
+                      Object.keys(ports[windowId][tabId]);
+      if (items && items.length) {
+        for (const item of items) {
+          const obj = ports[windowId][tabId][item];
+          if (obj && obj.name) {
+            bool = obj.name === PORT_CONTENT;
+            break;
           }
         }
       }
@@ -581,32 +572,31 @@
 
   /**
    * handle tab updated
-   * @param {number} id - tabId
-   * @param {Object} info - changed tab info
-   * @param {Object} tab - tabs.Tab
-   * @return {Object} - ?Promise.<void>
+   * @param {!number} id - tabId
+   * @param {!Object} info - changed tab info
+   * @param {!Object} tab - tabs.Tab
+   * @return {boolean} - tab status completed
    */
   const onTabUpdated = async (id, info, tab) => {
-    const tabId = stringifyPositiveInt(id, true);
-    let bool, name;
-    if (tab) {
+    const bool = info.status === "complete" && tab.active;
+    if (bool) {
+      const tabId = stringifyPositiveInt(id, true);
       const frameUrl = tab.url;
-      let {windowId} = tab;
+      let {windowId} = tab, portName;
       windowId = stringifyPositiveInt(windowId, true);
-      bool = info && info.status === "complete" && tab.active;
-      name = windowId && tabId && frameUrl &&
-             ports[windowId] && ports[windowId][tabId] &&
-             ports[windowId][tabId][frameUrl] &&
-               ports[windowId][tabId][frameUrl].name;
+      windowId && tabId && frameUrl &&
+      ports[windowId] && ports[windowId][tabId] &&
+      ports[windowId][tabId][frameUrl] &&
+        (portName = ports[windowId][tabId][frameUrl].name);
+      varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
     }
-    varsLoc[MENU_ENABLED] = name === PORT_CONTENT;
-    return bool && restoreContextMenu() || null;
+    return bool;
   };
 
   /**
    * handle tab removed
-   * @param {number} id - tabId
-   * @param {Object} info - removed tab info
+   * @param {!number} id - tabId
+   * @param {!Object} info - removed tab info
    * @return {Object} - ?Promise.<Array.<*>>
    */
   const onTabRemoved = async (id, info) => {
@@ -621,26 +611,25 @@
         portHybridMsg({
           removeTabRelatedStorage: {tabId, incognito, info},
         }),
-      ]).catch(logError);
+      ]);
     }
     return null;
   };
 
   /**
    * handle window focus changed
-   * @param {number} windowId - windowId
-   * @return {Object} - ?Promise.<Array.<*>>
+   * @param {!number} windowId - windowId
+   * @return {void}
    */
   const onWindowFocusChanged = async windowId => {
     const current = windowId !== windows.WINDOW_ID_NONE &&
                       await windows.getCurrent();
-    return current && current.focused &&
-           checkEnable(current).then(syncUI) || null;
+    current && current.focused && checkEnable(current).then(syncUI);
   };
 
   /**
    * handle window removed
-   * @param {number} windowId - windowId
+   * @param {!number} windowId - windowId
    * @return {Object} - Promise.<Array.<*>>
    */
   const onWindowRemoved = windowId => Promise.all([
@@ -666,7 +655,9 @@
     onTabActivated(info).then(restoreContextMenu).catch(logError)
   );
   tabs.onUpdated.addListener((id, info, tab) =>
-    onTabUpdated(id, info, tab).catch(logError)
+    onTabUpdated(id, info, tab).then(bool =>
+      bool && restoreContextMenu()
+    ).catch(logError)
   );
   tabs.onRemoved.addListener((id, info) =>
     onTabRemoved(id, info).catch(logError)
