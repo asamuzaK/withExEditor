@@ -89,12 +89,13 @@
     o && (typeof o === "string" || o instanceof String) || false;
 
   /**
-   * stringify positive integer including zero
+   * stringify positive integer
    * @param {number} i - integer
+   * @param {boolean} zero - treat zero as a positive integer
    * @return {?string} - stringified integer
    */
-  const stringifyPositiveInt = i =>
-    Number.isSafeInteger(i) && i >= 0 && `${i}` || null;
+  const stringifyPositiveInt = (i, zero = false) =>
+    Number.isSafeInteger(i) && (zero && i >= 0 || i > 0) && `${i}` || null;
 
   /* windows */
   /**
@@ -228,8 +229,8 @@
       const {frameUrl} = info;
       const getContent = {info, tab};
       let {windowId, id: tabId} = tab;
-      windowId = stringifyPositiveInt(windowId);
-      tabId = stringifyPositiveInt(tabId);
+      windowId = stringifyPositiveInt(windowId, true);
+      tabId = stringifyPositiveInt(tabId, true);
       if (windowId && tabId) {
         const port = ports[windowId] && ports[windowId][tabId] &&
                        ports[windowId][tabId][frameUrl];
@@ -534,8 +535,8 @@
     if (port && port.sender && port.sender.tab) {
       const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
       let {windowId, id: tabId} = port.sender.tab;
-      windowId = stringifyPositiveInt(windowId);
-      tabId = stringifyPositiveInt(tabId);
+      windowId = stringifyPositiveInt(windowId, true);
+      tabId = stringifyPositiveInt(tabId, true);
       windowId && tabId && (
         ports[windowId] = ports[windowId] || {},
         ports[windowId][tabId] = ports[windowId][tabId] || {},
@@ -559,8 +560,8 @@
     let bool;
     if (info) {
       let {windowId, tabId} = info;
-      windowId = stringifyPositiveInt(windowId);
-      tabId = stringifyPositiveInt(tabId);
+      windowId = stringifyPositiveInt(windowId, true);
+      tabId = stringifyPositiveInt(tabId, true);
       if (windowId && tabId) {
         const items = ports[windowId] && ports[windowId][tabId] &&
                         Object.keys(ports[windowId][tabId]);
@@ -586,12 +587,12 @@
    * @return {Object} - ?Promise.<void>
    */
   const onTabUpdated = async (id, info, tab) => {
-    const tabId = stringifyPositiveInt(id);
+    const tabId = stringifyPositiveInt(id, true);
     let bool, name;
     if (tab) {
       const frameUrl = tab.url;
       let {windowId} = tab;
-      windowId = stringifyPositiveInt(windowId);
+      windowId = stringifyPositiveInt(windowId, true);
       bool = info && info.status === "complete" && tab.active;
       name = windowId && tabId && frameUrl &&
              ports[windowId] && ports[windowId][tabId] &&
@@ -609,9 +610,9 @@
    * @return {Object} - ?Promise.<Array.<*>>
    */
   const onTabRemoved = async (id, info) => {
-    const tabId = stringifyPositiveInt(id);
+    const tabId = stringifyPositiveInt(id, true);
     let {windowId} = info, incognito;
-    windowId = stringifyPositiveInt(windowId);
+    windowId = stringifyPositiveInt(windowId, true);
     if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
       incognito = !!ports[windowId][tabId][INCOGNITO];
       return Promise.all([
@@ -643,7 +644,7 @@
    * @return {Object} - Promise.<Array.<*>>
    */
   const onWindowRemoved = windowId => Promise.all([
-    restorePorts({windowId: stringifyPositiveInt(windowId)}),
+    restorePorts({windowId: stringifyPositiveInt(windowId, true)}),
     // NOTE: for hybrid
     checkWindowIncognito().then(incognito =>
       !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
