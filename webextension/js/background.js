@@ -104,9 +104,9 @@
    */
   const checkEnable = async () => {
     const win = await windows.getCurrent();
-    const enable = win && win.type === "normal" &&
-                   (!win.incognito || varsLoc[ENABLE_PB]) || false;
-    vars[IS_ENABLED] = enable;
+    const enable = vars[IS_ENABLED] = win && win.type === "normal" && (
+      !win.incognito || varsLoc[ENABLE_PB]
+    ) || false;
     return enable;
   };
 
