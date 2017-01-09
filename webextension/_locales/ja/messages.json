@@ -81,7 +81,7 @@
     "message": "エディタを直接起動するショートカットキーを有効化"
   },
   "optionsEnableOnlyEditableDetail": {
-    "message": "コンテンツが編集可能な場合にのみ、コンテキストメニューに表示されます。"
+    "message": "コンテンツが編集可能な場合にのみ有効化します。"
   },
   "optionsEnableOnlyEditableLabel": {
     "message": "テキスト編集のみ有効化"

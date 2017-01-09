@@ -81,7 +81,7 @@
     "message": "Enable Shortcut Key To Execute The Editor Directly"
   },
   "optionsEnableOnlyEditableDetail": {
-    "message": "Appears in the context menu only if the content is editable."
+    "message": "Enables only when the content is editable."
   },
   "optionsEnableOnlyEditableLabel": {
     "message": "Enable Only When Editing Text"
