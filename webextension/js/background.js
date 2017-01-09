@@ -601,30 +601,31 @@
    */
   const onTabRemoved = async (id, info) => {
     const tabId = stringifyPositiveInt(id, true);
-    let {windowId} = info, incognito;
+    let {windowId} = info, incognito, func;
     windowId = stringifyPositiveInt(windowId, true);
     if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
       incognito = !!ports[windowId][tabId][INCOGNITO];
-      return Promise.all([
-        restorePorts({windowId, tabId}),
-        // NOTE: for hybrid
-        portHybridMsg({
-          removeTabRelatedStorage: {tabId, incognito, info},
-        }),
-      ]);
+      func = Promise.all([
+               restorePorts({windowId, tabId}),
+               // NOTE: for hybrid
+               portHybridMsg({
+                 removeTabRelatedStorage: {tabId, incognito, info},
+               }),
+             ]);
     }
-    return null;
+    return func || null;
   };
 
   /**
    * handle window focus changed
    * @param {!number} windowId - windowId
-   * @return {void}
+   * @return {Object} - ?Promise.<Array.<*>>
    */
   const onWindowFocusChanged = async windowId => {
     const current = windowId !== windows.WINDOW_ID_NONE &&
                       await windows.getCurrent();
-    current && current.focused && checkEnable(current).then(syncUI);
+    return current && current.focused &&
+           checkEnable(current).then(syncUI) || null;
   };
 
   /**
