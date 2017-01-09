@@ -1071,10 +1071,10 @@
   /**
    * handle contextmenu event
    * @param {!Object} evt - Event
-   * @return {void}
+   * @return {Object} - Promise.<void>
    */
   const handleContextMenu = async evt => {
-    const elm = evt.target;
+    const elm = vars[NODE_CONTEXT] = evt.target;
     const sel = window.getSelection();
     const contextMenu = {
       [MODE_EDIT_TEXT]: {
@@ -1089,16 +1089,16 @@
               MODE_SOURCE,
       },
     };
-    vars[NODE_CONTEXT] = elm;
-    portMsg({contextMenu}).catch(logError);
+    return portMsg({contextMenu});
   };
 
   /**
    * handle keypress event
    * @param {!Object} evt - Event
-   * @return {void}
+   * @return {Object} - ?Promise.<void>
    */
   const handleKeyPress = async evt => {
+    let func;
     if (vars[IS_ENABLED]) {
       if (await keyComboMatches(evt, execEditorKey)) {
         const elm = evt.target;
@@ -1111,12 +1111,13 @@
         } else {
           bool = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
         }
-        bool && portContentData(elm).catch(logError);
+        bool && (func = portContentData(elm));
       } else {
         const openOptions = await keyComboMatches(evt, openOptionsKey);
-        openOptions && portMsg({openOptions}).catch(logError);
+        openOptions && (func = portMsg({openOptions}));
       }
     }
+    return func || null;
   };
 
   /* listeners */
@@ -1124,8 +1125,12 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
-    root.addEventListener("contextmenu", handleContextMenu, false);
-    root.addEventListener("keypress", handleKeyPress, false);
+    root.addEventListener(
+      "contextmenu", evt => handleContextMenu(evt).catch(logError), false
+    );
+    root.addEventListener(
+      "keypress", evt => handleKeyPress(evt).catch(logError), false
+    );
   }, false);
 
   /* startup */
