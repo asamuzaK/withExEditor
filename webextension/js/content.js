@@ -214,7 +214,7 @@
   /**
    * set namespaced attribute
    * @param {Object} elm - element to append attributes
-   * @param {Object} node - node to get attributes from
+   * @param {Object} node - element node to get attributes from
    * @return {void}
    */
   const setAttributeNS = async (elm, node) => {
@@ -245,7 +245,7 @@
         await getNodeNS(node).namespaceURI || nsURI.html,
         prefix && `${prefix}:${localName}` || localName
       );
-      elm && node.attributes && await setAttributeNS(elm, node);
+      node.attributes && await setAttributeNS(elm, node);
     }
     return elm || null;
   };
@@ -304,27 +304,27 @@
   /**
    * create DOM tree
    * @param {Object} elm - container element of the DOM tree
-   * @param {Object} node - node containing child nodes to append
+   * @param {Object} clone - clone node containing child nodes to append
    * @return {Object} - DOM tree or text node
    */
-  const createDomTree = async (elm, node) => {
+  const createDomTree = async (elm, clone) => {
     elm = await createElm(elm);
-    if (elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes()) {
+    if (elm.nodeType === NODE_ELEMENT && clone && clone.hasChildNodes()) {
       const arr = [];
-      const nodes = node.childNodes;
+      const nodes = clone.childNodes;
       let frag;
       if (nodes instanceof NodeList) {
-        for (const child of nodes) {
-          switch (child.nodeType) {
+        for (const node of nodes) {
+          switch (node.nodeType) {
             case NODE_ELEMENT:
-              child === child.parentNode.firstChild &&
+              node === node.parentNode.firstChild &&
                 arr.push(document.createTextNode("\n"));
-              arr.push(createElm(child, true));
-              child === child.parentNode.lastChild &&
+              arr.push(createElm(node, true));
+              node === node.parentNode.lastChild &&
                 arr.push(document.createTextNode("\n"));
               break;
             case NODE_TEXT:
-              arr.push(document.createTextNode(child.nodeValue));
+              arr.push(document.createTextNode(node.nodeValue));
               break;
             default:
           }
@@ -986,7 +986,7 @@
    * @return {boolean} - result
    */
   const keyComboMatches = async (evt, key) =>
-    vars[IS_ENABLED] && evt && key && key.enabled && key.key && evt.key &&
+    evt && key && key.enabled && key.key && evt.key &&
     evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
@@ -1099,19 +1099,23 @@
    * @return {void}
    */
   const handleKeyPress = async evt => {
-    const openOptions = await keyComboMatches(evt, openOptionsKey);
-    if (openOptions) {
-      portMsg({openOptions}).catch(logError);
-    } else {
-      const elm = evt.target;
-      const sel = window.getSelection();
-      await keyComboMatches(evt, execEditorKey) && (
-        vars[ENABLE_ONLY_EDITABLE] && (
-          elm.isContentEditable || await isEditControl(elm) ||
-          sel.anchorNode === sel.focusNode && await isContentTextNode(elm)
-        ) ||
-        /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)
-      ) && portContentData(elm).catch(logError);
+    if (vars[IS_ENABLED]) {
+      if (await keyComboMatches(evt, execEditorKey)) {
+        const elm = evt.target;
+        let bool;
+        if (vars[ENABLE_ONLY_EDITABLE]) {
+          const sel = window.getSelection();
+          bool = elm.isContentEditable || await isEditControl(elm) ||
+                 sel.anchorNode === sel.focusNode &&
+                   await isContentTextNode(elm);
+        } else {
+          bool = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
+        }
+        bool && portContentData(elm).catch(logError);
+      } else {
+        const openOptions = await keyComboMatches(evt, openOptionsKey);
+        openOptions && portMsg({openOptions}).catch(logError);
+      }
     }
   };
 
