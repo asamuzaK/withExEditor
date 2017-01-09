@@ -238,7 +238,7 @@
    * @param {Object} node - element node to create element from
    * @return {Object} - namespaced element
    */
-  const createElementNS = async node => {
+  const createElm = async node => {
     let elm;
     if (node) {
       const {prefix, localName} = node;
@@ -253,7 +253,7 @@
   };
 
   /**
-   * create document fragment
+   * create document fragment from nodes array
    * @param {Object} nodes - nodes array
    * @return {Object} - document fragment
    */
@@ -267,26 +267,23 @@
   };
 
   /**
-   * create element
-   * @param {Object} node - element node to create element from
-   * @param {boolean} append - append child nodes
+   * append child nodes
+   * @param {Object} elm - container element
+   * @param {Object} node - node containing child nodes to append
    * @return {Object} - element or text node
    */
-  const createElm = async (node, append = false) => {
-    let elm;
-    if (node) {
-      elm = await createElementNS(node);
-      if (node.hasChildNodes() && append &&
-          elm && elm.nodeType === NODE_ELEMENT) {
-        const nodes = node.childNodes;
-        const arr = [];
-        let frag;
+  const appendChild = async (elm, node) => {
+    elm = await createElm(elm);
+    if (elm && elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes()) {
+      const arr = [];
+      const nodes = node.childNodes;
+      if (nodes instanceof NodeList) {
         for (const child of nodes) {
           switch (child.nodeType) {
             case NODE_ELEMENT:
               child === child.parentNode.firstChild &&
                 arr.push(document.createTextNode("\n"));
-              arr.push(createElm(child, true));
+              arr.push(createElm(child).then(obj => appendChild(obj, child)));
               child === child.parentNode.lastChild &&
                 arr.push(document.createTextNode("\n"));
               break;
@@ -296,46 +293,10 @@
             default:
           }
         }
-        (frag = await Promise.all(arr).then(createFrag)) &&
-          elm.appendChild(frag);
       }
+      elm.appendChild(await Promise.all(arr).then(createFrag));
     }
     return elm || document.createTextNode("");
-  };
-
-  /**
-   * create DOM tree
-   * @param {Object} elm - container element of the DOM tree
-   * @param {Object} clone - clone node containing child nodes to append
-   * @return {Object} - DOM tree or text node
-   */
-  const createDomTree = async (elm, clone) => {
-    elm = await createElm(elm);
-    if (elm.nodeType === NODE_ELEMENT && clone && clone.hasChildNodes()) {
-      const arr = [];
-      const nodes = clone.childNodes;
-      let frag;
-      if (nodes instanceof NodeList) {
-        for (const node of nodes) {
-          switch (node.nodeType) {
-            case NODE_ELEMENT:
-              node === node.parentNode.firstChild &&
-                arr.push(document.createTextNode("\n"));
-              arr.push(createElm(node, true));
-              node === node.parentNode.lastChild &&
-                arr.push(document.createTextNode("\n"));
-              break;
-            case NODE_TEXT:
-              arr.push(document.createTextNode(node.nodeValue));
-              break;
-            default:
-          }
-        }
-      }
-      (frag = await Promise.all(arr).then(createFrag)) &&
-        elm.appendChild(frag);
-    }
-    return elm;
   };
 
   /**
@@ -353,7 +314,7 @@
     elm && (
       range = document.createRange(),
       range.selectNodeContents(elm),
-      elm = await createDomTree(elm, range.cloneContents())
+      elm = await appendChild(elm, range.cloneContents())
     );
     return elm && elm.hasChildNodes() &&
              (new XMLSerializer()).serializeToString(elm) || null;
@@ -410,7 +371,7 @@
               range.setEnd(obj, obj.childNodes.length)
             );
           }
-          arr.push(createDomTree(ancestor, range.cloneContents()));
+          arr.push(appendChild(ancestor, range.cloneContents()));
           break;
         case NODE_TEXT:
           obj = await createElm(ancestor.parentNode);
