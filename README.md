@@ -59,7 +59,7 @@ Available with (X)HTML, JavaScript, CSS, MathML, SVG, XML documents.
 * Enables if checked, disables if not.
 
 ### Enable Only When Editing Text
-* Appears in the context menu only if the content is editable.
+* Enables only when the content is editable.
 
 ### Forcibly Remove Temporary Files
 * Forcibly remove temporary files at the end of Private Browsing or at shut down.
