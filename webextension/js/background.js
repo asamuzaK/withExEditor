@@ -165,17 +165,19 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
-   * @return {void}
+   * @return {Object} - Promise.<Array<*>>
    */
   const restorePorts = async (data = {}) => {
+    const func = [];
     const {windowId, tabId} = data;
     if (windowId && tabId && ports[windowId]) {
       delete ports[windowId][tabId];
       Object.keys(ports[windowId]).length === 0 &&
-        restorePorts({windowId});
+        func.push(restorePorts({windowId}));
     } else {
       windowId && delete ports[windowId];
     }
+    return Promise.all(func);
   };
 
   /**
