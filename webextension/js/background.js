@@ -559,7 +559,7 @@
   /**
    * handle tab activated
    * @param {!Object} info - activated tab info
-   * @return {Object} - Promise.<Promise.<Array.<*>>>
+   * @return {Object} - Promise.<Array.<*>>
    */
   const onTabActivated = async info => {
     let {windowId, tabId} = info, bool;
