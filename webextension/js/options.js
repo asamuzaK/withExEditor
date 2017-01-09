@@ -107,53 +107,57 @@
   /**
    * extract application manifest
    * @param {Array} arr - Uint8Array
-   * @return {void}
+   * @return {Object} - Promise.<Array.<*>>
    */
   const extractAppManifest = async (arr = []) => {
+    const func = [];
     const app = await JSON.parse((new TextDecoder(CHAR)).decode(arr));
     const name = app && app.name;
     const path = app && app.path;
     const elm = document.getElementById(APP_NAME);
     name && path && elm && (
       elm.value = name,
-      createPref(elm).then(setStorage).catch(logError),
-      portMsg({
+      func.push(createPref(elm).then(setStorage)),
+      func.push(portMsg({
         [CHECK_EXECUTABLE]: {path},
-      }).catch(logError)
+      }))
     );
+    return Promise.all(func);
   };
 
   /**
    * set pref storage
    * @param {!Object} evt - Event
-   * @return {void}
+   * @return {Object} - Promise.<Array.<*>>
    */
   const setPrefStorage = async evt => {
+    const func = [];
     const elm = evt.target;
     if (elm.type === "radio") {
       const nodes = document.querySelectorAll(`[name=${elm.name}]`);
       if (nodes instanceof NodeList) {
         for (const node of nodes) {
-          createPref(node).then(setStorage).catch(logError);
+          func.push(createPref(node).then(setStorage));
         }
       }
     } else {
       switch (elm.id) {
         case APP_MANIFEST:
-          portMsg({
+          func.push(portMsg({
             [GET_APP_MANIFEST]: {
               path: elm.value,
             },
-          }).catch(logError);
+          }));
           break;
         case KEY_ACCESS:
           (elm.value === "" || elm.value.length === 1) &&
-            createPref(elm).then(setStorage).catch(logError);
+            func.push(createPref(elm).then(setStorage));
           break;
         default:
-          createPref(elm).then(setStorage).catch(logError);
+          func.push(createPref(elm).then(setStorage));
       }
     }
+    return Promise.all(func).catch(logError);
   };
 
   /* html */
@@ -238,16 +242,18 @@
 
   /**
    * set html input values from storage
-   * @return {void}
+   * @return {Object} - Promise.<Array.<*>>
    */
   const setValuesFromStorage = async () => {
+    const func = [];
     const pref = await storage.get();
     const items = pref && Object.keys(pref);
     if (items && items.length) {
       for (const item of items) {
-        setHtmlInputValue(pref[item]).catch(logError);
+        func.push(setHtmlInputValue(pref[item]));
       }
     }
+    return Promise.all(func);
   };
 
   /* handler */
@@ -282,11 +288,11 @@
         }
       }
     }
-    return Promise.all(func);
+    return Promise.all(func).catch(logError);
   };
 
   /* listeners */
-  port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  port.onMessage.addListener(handleMsg);
 
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtml(),

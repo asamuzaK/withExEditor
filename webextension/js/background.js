@@ -476,7 +476,7 @@
         func.push(setVar(item, obj.newValue || obj, !!obj.newValue));
       }
     }
-    return Promise.all(func);
+    return Promise.all(func).catch(logError);
   };
 
   /**
@@ -530,7 +530,7 @@
         }
       }
     }
-    return Promise.all(func);
+    return Promise.all(func).catch(logError);
   };
 
   /**
@@ -548,7 +548,7 @@
       ports[windowId][tabId] = ports[windowId][tabId] || {},
       ports[windowId][tabId][frameUrl] = port,
       frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito),
-      port.onMessage.addListener(msg => handleMsg(msg).catch(logError)),
+      port.onMessage.addListener(handleMsg),
       port.postMessage({
         incognito, tabId,
         [SET_VARS]: vars,
@@ -559,7 +559,7 @@
   /**
    * handle tab activated
    * @param {!Object} info - activated tab info
-   * @return {void}
+   * @return {Object} - Promise.<Promise.<Array.<*>>>
    */
   const onTabActivated = async info => {
     let {windowId, tabId} = info, bool;
@@ -579,6 +579,7 @@
       }
     }
     varsLoc[MENU_ENABLED] = bool || false;
+    return restoreContextMenu().catch(logError);
   };
 
   /**
@@ -586,9 +587,10 @@
    * @param {!number} id - tabId
    * @param {!Object} info - changed tab info
    * @param {!Object} tab - tabs.Tab
-   * @return {boolean} - tab status completed
+   * @return {Object} - Promise.<Array.<*>>
    */
   const onTabUpdated = async (id, info, tab) => {
+    const func = [];
     const bool = info.status === "complete" && tab.active;
     if (bool) {
       const tabId = stringifyPositiveInt(id, true);
@@ -601,7 +603,8 @@
         (portName = ports[windowId][tabId][frameUrl].name);
       varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
     }
-    return bool;
+    bool && func.push(restoreContextMenu());
+    return Promise.all(func).catch(logError);
   };
 
   /**
@@ -623,19 +626,21 @@
         removeTabRelatedStorage: {tabId, incognito, info},
       }));
     }
-    return Promise.all(func);
+    return Promise.all(func).catch(logError);
   };
 
   /**
    * handle window focus changed
    * @param {!number} windowId - windowId
-   * @return {Object} - ?Promise.<Array.<*>>
+   * @return {Object} - Promise.<Array.<*>>
    */
   const onWindowFocusChanged = async windowId => {
+    const func = [];
     const current = windowId !== windows.WINDOW_ID_NONE &&
                       await windows.getCurrent();
-    return current && current.focused &&
-           checkEnable(current).then(syncUI) || null;
+    current && current.focused &&
+      func.push(checkEnable(current).then(syncUI));
+    return Promise.all(func).catch(logError);
   };
 
   /**
@@ -649,11 +654,11 @@
     checkWindowIncognito().then(incognito =>
       !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
     ),
-  ]);
+  ]).catch(logError);
 
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
-  browser.storage.onChanged.addListener(data => setVars(data).catch(logError));
+  browser.storage.onChanged.addListener(setVars);
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
   );
@@ -661,27 +666,15 @@
   runtime.onInstalled.addListener(details =>
     reloadRuntime(details).catch(logError)
   );
-  runtime.onMessage.addListener(msg => handleMsg(msg).catch(logError));
-  tabs.onActivated.addListener(info =>
-    onTabActivated(info).then(restoreContextMenu).catch(logError)
-  );
-  tabs.onUpdated.addListener((id, info, tab) =>
-    onTabUpdated(id, info, tab).then(bool =>
-      bool && restoreContextMenu()
-    ).catch(logError)
-  );
-  tabs.onRemoved.addListener((id, info) =>
-    onTabRemoved(id, info).catch(logError)
-  );
-  windows.onFocusChanged.addListener(windowId =>
-    onWindowFocusChanged(windowId).catch(logError)
-  );
-  windows.onRemoved.addListener(windowId =>
-    onWindowRemoved(windowId).catch(logError)
-  );
+  runtime.onMessage.addListener(handleMsg);
+  tabs.onActivated.addListener(onTabActivated);
+  tabs.onUpdated.addListener(onTabUpdated);
+  tabs.onRemoved.addListener(onTabRemoved);
+  windows.onFocusChanged.addListener(onWindowFocusChanged);
+  windows.onRemoved.addListener(onWindowRemoved);
 
   // NOTE: for hybrid
-  hybrid.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  hybrid.onMessage.addListener(handleMsg);
 
   /* startup */
   Promise.all([

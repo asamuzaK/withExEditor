@@ -131,9 +131,10 @@
   /**
    * port temporary ID
    * @param {!Object} evt - Event
-   * @return {void}
+   * @return {Object} - Promise.<Array.<*>>
    */
   const portTemporaryId = async evt => {
+    const func = [];
     const elm = evt.target === evt.currentTarget && evt.target;
     const attr = elm && (
                    elm.hasAttributeNS("", DATA_ATTR_ID) &&
@@ -147,8 +148,9 @@
         host: window.location.host,
         tabId: vars[TAB_ID],
       };
-      portMsg({getTmpFile}).catch(logError);
+      func.push(portMsg({getTmpFile}));
     });
+    return Promise.all(func);
   };
 
   /* get content source */
@@ -858,26 +860,28 @@
   /**
    * create content data message
    * @param {Object} res - temporary file data
-   * @return {void}
+   * @return {Object} - Promise.<Array.<*>>
    */
   const createContentDataMsg = async res => {
+    const func = [];
     res && (
       res[CREATE_TMP_FILE] ?
-        portMsg({
+        func.push(portMsg({
           [CREATE_TMP_FILE]: {
             data: res[CREATE_TMP_FILE],
             value: res.value,
           },
-        }).catch(logError) :
+        })) :
         res[GET_FILE_PATH] &&
-          portMsg({[GET_FILE_PATH]: res[GET_FILE_PATH]}).catch(logError)
+          func.push(portMsg({[GET_FILE_PATH]: res[GET_FILE_PATH]}))
     );
+    return Promise.all(func);
   };
 
   /**
    * port content data
    * @param {Object} elm - element
-   * @return {Object} - Promise.<void>
+   * @return {Object} - Promise.<Array.<*>>
    */
   const portContentData = elm =>
     createContentData(elm).then(createTmpFileData).then(createContentDataMsg);
@@ -914,9 +918,10 @@
   /**
    * get target element and synchronize text
    * @param {Object} obj - sync data object
-   * @return {void}
+   * @return {Object} - Promise.<Array.<*>>
    */
   const syncText = async obj => {
+    const func = [];
     if (obj.tabId === vars[TAB_ID]) {
       const elm = document.activeElement;
       const namespaceURI = obj.data.namespaceURI || nsURI.html;
@@ -937,7 +942,7 @@
               id.setAttributeNS(
                 ns, isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS, timestamp
               ),
-              replaceContent(id, value, namespaceURI).catch(logError)
+              func.push(replaceContent(id, value, namespaceURI))
             );
             break;
           }
@@ -952,10 +957,11 @@
         if (/^(?:input|textarea)$/.test(elm.localName)) {
           elm.value = value;
         } else if (elm.isContentEditable) {
-          replaceContent(elm, value, namespaceURI).catch(logError);
+          func.push(replaceContent(elm, value, namespaceURI));
         }
       }
     }
+    return Promise.all(func);
   };
 
   /* keyboard shortcuts */
@@ -1091,16 +1097,16 @@
               MODE_SOURCE,
       },
     };
-    return portMsg({contextMenu});
+    return portMsg({contextMenu}).catch(logError);
   };
 
   /**
    * handle keypress event
    * @param {!Object} evt - Event
-   * @return {Object} - ?Promise.<void>
+   * @return {Object} - Promise.<Array.<*>>
    */
   const handleKeyPress = async evt => {
-    let func;
+    const func = [];
     if (vars[IS_ENABLED]) {
       if (await keyComboMatches(evt, execEditorKey)) {
         const elm = evt.target;
@@ -1113,13 +1119,13 @@
         } else {
           bool = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
         }
-        bool && (func = portContentData(elm));
+        bool && func.push(portContentData(elm));
       } else {
         const openOptions = await keyComboMatches(evt, openOptionsKey);
-        openOptions && (func = portMsg({openOptions}));
+        openOptions && func.push(portMsg({openOptions}));
       }
     }
-    return func || null;
+    return Promise.all(func).catch(logError);
   };
 
   /* listeners */
@@ -1127,12 +1133,8 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
-    root.addEventListener(
-      "contextmenu", evt => handleContextMenu(evt).catch(logError), false
-    );
-    root.addEventListener(
-      "keypress", evt => handleKeyPress(evt).catch(logError), false
-    );
+    root.addEventListener("contextmenu", handleContextMenu, false);
+    root.addEventListener("keypress", handleKeyPress, false);
   }, false);
 
   /* startup */
