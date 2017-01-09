@@ -100,14 +100,12 @@
   /* windows */
   /**
    * check if add-on can be enabled
-   * @param {Object} win - current window.Window
    * @return {boolean} - result
    */
-  const checkEnable = async (win = null) => {
-    let enable = false;
-    !win && (win = await windows.getCurrent());
-    win && win.type === "normal" &&
-      (enable = !win.incognito || varsLoc[ENABLE_PB]);
+  const checkEnable = async () => {
+    const win = await windows.getCurrent();
+    const enable = win && win.type === "normal" &&
+                   (!win.incognito || varsLoc[ENABLE_PB]) || false;
     vars[IS_ENABLED] = enable;
     return enable;
   };
@@ -476,7 +474,7 @@
         func.push(setVar(item, obj.newValue || obj, !!obj.newValue));
       }
     }
-    return Promise.all(func).catch(logError);
+    return Promise.all(func);
   };
 
   /**
@@ -592,17 +590,15 @@
   const onTabUpdated = async (id, info, tab) => {
     const func = [];
     const bool = info.status === "complete" && tab.active;
-    if (bool) {
-      const tabId = stringifyPositiveInt(id, true);
-      const frameUrl = tab.url;
-      let {windowId} = tab, portName;
-      windowId = stringifyPositiveInt(windowId, true);
-      windowId && tabId && frameUrl &&
-      ports[windowId] && ports[windowId][tabId] &&
-      ports[windowId][tabId][frameUrl] &&
-        (portName = ports[windowId][tabId][frameUrl].name);
-      varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
-    }
+    const tabId = stringifyPositiveInt(id, true);
+    const frameUrl = tab.url;
+    let {windowId} = tab, portName;
+    windowId = stringifyPositiveInt(windowId, true);
+    windowId && tabId && frameUrl &&
+    ports[windowId] && ports[windowId][tabId] &&
+    ports[windowId][tabId][frameUrl] &&
+      (portName = ports[windowId][tabId][frameUrl].name);
+    varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
     bool && func.push(restoreContextMenu());
     return Promise.all(func).catch(logError);
   };
@@ -632,16 +628,11 @@
   /**
    * handle window focus changed
    * @param {!number} windowId - windowId
-   * @return {Object} - Promise.<Array.<*>>
+   * @return {Object} - ?Promise.<Array.<*>>
    */
-  const onWindowFocusChanged = async windowId => {
-    const func = [];
-    const current = windowId !== windows.WINDOW_ID_NONE &&
-                      await windows.getCurrent();
-    current && current.focused &&
-      func.push(checkEnable(current).then(syncUI));
-    return Promise.all(func).catch(logError);
-  };
+  const onWindowFocusChanged = async windowId =>
+    windowId !== windows.WINDOW_ID_NONE &&
+      checkEnable().then(syncUI).catch(logError) || null;
 
   /**
    * handle window removed
@@ -658,7 +649,7 @@
 
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
-  browser.storage.onChanged.addListener(setVars);
+  browser.storage.onChanged.addListener(data => setVars(data).catch(logError));
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
   );
