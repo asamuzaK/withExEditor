@@ -599,23 +599,22 @@
    * handle tab removed
    * @param {!number} id - tabId
    * @param {!Object} info - removed tab info
-   * @return {Object} - ?Promise.<Array.<*>>
+   * @return {Object} - Promise.<Array.<*>>
    */
   const onTabRemoved = async (id, info) => {
+    const func = [];
     const tabId = stringifyPositiveInt(id, true);
-    let {windowId} = info, incognito, func;
+    let {windowId} = info;
     windowId = stringifyPositiveInt(windowId, true);
     if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
-      incognito = !!ports[windowId][tabId][INCOGNITO];
-      func = Promise.all([
-        restorePorts({windowId, tabId}),
-        // NOTE: for hybrid
-        portHybridMsg({
-          removeTabRelatedStorage: {tabId, incognito, info},
-        }),
-      ]);
+      const incognito = !!ports[windowId][tabId][INCOGNITO];
+      func.push(restorePorts({windowId, tabId}));
+      // NOTE: for hybrid
+      func.push(portHybridMsg({
+        removeTabRelatedStorage: {tabId, incognito, info},
+      }));
     }
-    return func || null;
+    return Promise.all(func);
   };
 
   /**
