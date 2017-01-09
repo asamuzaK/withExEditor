@@ -299,9 +299,10 @@
 
   /**
    * create context menu items
-   * @return {void}
+   * @return {Object} - Promise.<Array.<*>>
    */
   const createMenuItems = async () => {
+    const func = [];
     const enabled = vars[IS_ENABLED];
     const bool = enabled && !vars[ENABLE_ONLY_EDITABLE];
     const items = Object.keys(menus);
@@ -309,22 +310,23 @@
       menus[item] = null;
       switch (item) {
         case MODE_EDIT_TEXT:
-          enabled && createMenuItem(item, ["editable"]).catch(logError);
+          enabled && func.push(createMenuItem(item, ["editable"]));
           break;
         case MODE_SELECTION:
-          bool && createMenuItem(item, ["selection"]).catch(logError);
+          bool && func.push(createMenuItem(item, ["selection"]));
           break;
         case MODE_SOURCE:
-          bool && createMenuItem(item, ["frame", "page"]).catch(logError);
+          bool && func.push(createMenuItem(item, ["frame", "page"]));
           break;
         default:
       }
     }
+    return Promise.all(func);
   };
 
   /**
    * restore context menu
-   * @return {Object} - Promise.<void>
+   * @return {Object} - Promise.<Array.<*>>
    */
   const restoreContextMenu = () =>
     contextMenus.removeAll().then(createMenuItems);
@@ -401,76 +403,80 @@
    * @param {string} item - item
    * @param {Object} obj - value object
    * @param {boolean} changed - changed
-   * @return {void}
+   * @return {Object} - Promise.<Array<*>>
    */
   const setVar = async (item, obj, changed = false) => {
+    const func = [];
     if (item && obj) {
       switch (item) {
         case APP_MANIFEST:
           varsLoc[item] = obj.value;
           varsLoc[IS_EXEC] = obj.app && !!obj.app.executable;
-          connectHost().catch(logError);
-          changed && toggleBadge().catch(logError);
+          func.push(connectHost());
+          changed && func.push(toggleBadge());
           break;
         case APP_NAME:
           varsLoc[item] = obj.value;
           break;
         case EDITOR_NAME:
           varsLoc[item] = obj.value;
-          cacheMenuItemTitle().catch(logError);
-          changed && updateContextMenu().catch(logError);
+          func.push(cacheMenuItemTitle());
+          changed && func.push(updateContextMenu());
           break;
         case ENABLE_ONLY_EDITABLE:
           vars[item] = !!obj.checked;
           changed && (
-            restoreContextMenu().catch(logError),
-            portVar({[item]: !!obj.checked}).catch(logError)
+            func.push(restoreContextMenu()),
+            func.push(portVar({[item]: !!obj.checked}))
           );
           break;
         case ENABLE_PB:
           varsLoc[item] = !!obj.checked;
-          changed && checkEnable().then(syncUI).catch(logError);
+          changed && func.push(checkEnable().then(syncUI));
           break;
         case FORCE_REMOVE:
           varsLoc[item] = !!obj.checked;
           // NOTE: for hybrid
-          portHybridMsg({[item]: !!obj.checked}).catch(logError);
+          func.push(portHybridMsg({[item]: !!obj.checked}));
           break;
         case ICON_COLOR:
         case ICON_GRAY:
         case ICON_WHITE:
           obj.checked && (
             varsLoc[ICON_PATH] = obj.value,
-            changed && replaceIcon().catch(logError)
+            changed && func.push(replaceIcon())
           );
           break;
         case KEY_ACCESS:
           vars[item] = obj.value;
-          changed && portVar({[item]: obj.value}).catch(logError);
+          changed && func.push(portVar({[item]: obj.value}));
           break;
         case KEY_EXEC_EDITOR:
         case KEY_OPEN_OPTIONS:
           vars[item] = !!obj.checked;
-          changed && portVar({[item]: !!obj.checked}).catch(logError);
+          changed && func.push(portVar({[item]: !!obj.checked}));
           break;
         default:
       }
     }
+    return Promise.all(func);
   };
 
   /**
    * set variables from storage
    * @param {Object} data - storage data
-   * @return {void}
+   * @return {Object} - Promise.<Array<*>>
    */
   const setVars = async data => {
+    const func = [];
     const items = data && Object.keys(data);
     if (items && items.length) {
       for (const item of items) {
         const obj = data[item];
-        setVar(item, obj.newValue || obj, !!obj.newValue).catch(logError);
+        func.push(setVar(item, obj.newValue || obj, !!obj.newValue));
       }
     }
+    return Promise.all(func);
   };
 
   /**
@@ -491,10 +497,11 @@
   /**
    * reload runtime
    * @param {!Object} details - install details
-   * @return {?Function} - reload
+   * @return {void}
    */
-  const reloadRuntime = async details =>
-    details.reason === "update" && runtime.reload() || null;
+  const reloadRuntime = async details => {
+    details.reason === "update" && runtime.reload();
+  };
 
   /**
    * handle runtime message
