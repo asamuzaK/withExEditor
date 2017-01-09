@@ -254,31 +254,35 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @return {void}
+   * @return {Object} - Promise.<Array<*>>
    */
   const handleMsg = async msg => {
+    const func = [];
     const items = msg && Object.keys(msg);
     if (items && items.length) {
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
           case RES_APP_MANIFEST:
-            extractAppManifest(obj.value).catch(logError);
+            func.push(extractAppManifest(obj.value));
             break;
           case RES_EXECUTABLE:
-            Promise.all([
+            func.push(
               createPref(
                 document.getElementById(APP_MANIFEST), obj.executable
-              ).then(setStorage),
-              syncEditorName(obj.executable).then(createPref).then(setStorage),
-              // NOTE: for hybrid
-              portMsg({removeSdkPrefs: obj.executable}),
-            ]).catch(logError);
+              ).then(setStorage)
+            );
+            func.push(
+              syncEditorName(obj.executable).then(createPref).then(setStorage)
+            );
+            // NOTE: for hybrid
+            func.push(portMsg({removeSdkPrefs: obj.executable}));
             break;
           default:
         }
       }
     }
+    return Promise.all(func);
   };
 
   /* listeners */

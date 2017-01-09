@@ -497,9 +497,10 @@
   /**
    * handle runtime message
    * @param {*} msg - message
-   * @return {void}
+   * @return {Object} - Promise.<Array<*>>
    */
   const handleMsg = async msg => {
+    const func = [];
     const items = msg && Object.keys(msg);
     if (items && items.length) {
       for (const item of items) {
@@ -507,19 +508,20 @@
         if (obj) {
           switch (item) {
             case CONTEXT_MENU:
-              updateContextMenu(obj).catch(logError);
+              func.push(updateContextMenu(obj));
               break;
             case OPEN_OPTIONS:
-              openOptionsPage().catch(logError);
+              func.push(openOptionsPage());
               break;
             case PORT_HOST:
-              obj.path && portHostMsg(obj.path).catch(logError);
+              obj.path && func.push(portHostMsg(obj.path));
               break;
             default:
           }
         }
       }
     }
+    return Promise.all(func);
   };
 
   /**
@@ -606,12 +608,12 @@
     if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
       incognito = !!ports[windowId][tabId][INCOGNITO];
       func = Promise.all([
-               restorePorts({windowId, tabId}),
-               // NOTE: for hybrid
-               portHybridMsg({
-                 removeTabRelatedStorage: {tabId, incognito, info},
-               }),
-             ]);
+        restorePorts({windowId, tabId}),
+        // NOTE: for hybrid
+        portHybridMsg({
+          removeTabRelatedStorage: {tabId, incognito, info},
+        }),
+      ]);
     }
     return func || null;
   };

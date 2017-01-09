@@ -1017,16 +1017,17 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @return {void}
+   * @return {Object} - Promise.<Array<*>>
    */
   const handleMsg = async msg => {
+    const func = [];
     const items = msg && Object.keys(msg);
     if (items && items.length) {
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
           case SET_VARS:
-            handleMsg(obj).catch(logError);
+            func.push(handleMsg(obj));
             break;
           case ENABLE_ONLY_EDITABLE:
           case INCOGNITO:
@@ -1034,7 +1035,7 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            portContentData(vars[NODE_CONTEXT]).catch(logError);
+            func.push(portContentData(vars[NODE_CONTEXT]));
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -1050,14 +1051,14 @@
             openOptionsKey.enabled = !!obj;
             break;
           case PORT_FILE_PATH:
-            obj.path && portMsg({
+            obj.path && func.push(portMsg({
               [PORT_HOST]: {
                 path: obj.path,
               },
-            }).catch(logError);
+            }));
             break;
           case SYNC_TEXT:
-            syncText(obj).catch(logError);
+            func.push(syncText(obj));
             break;
           case TAB_ID:
             vars[item] = obj;
@@ -1066,6 +1067,7 @@
         }
       }
     }
+    return Promise.all(func);
   };
 
   /**
