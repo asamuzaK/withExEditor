@@ -469,7 +469,8 @@
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID)) {
         id = elm.getAttributeNS(ns, DATA_ATTR_ID);
       } else {
-        id = `withExEditor${window.performance.now()}`.replace(/\./, "_");
+        id = `${LABEL}_${elm.id || window.performance.now()}`
+               .replace(/[-:.]/g, "_");
         !isHtml && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html);
         elm.setAttributeNS(ns, isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS, id);
         isHtml && elm.addEventListener("focus", portTemporaryId, false);
