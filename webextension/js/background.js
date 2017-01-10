@@ -494,15 +494,6 @@
 
   /* handlers */
   /**
-   * reload runtime
-   * @param {!Object} details - install details
-   * @return {void}
-   */
-  const reloadRuntime = async details => {
-    details.reason === "update" && runtime.reload();
-  };
-
-  /**
    * handle runtime message
    * @param {*} msg - message
    * @return {Object} - Promise.<Array<*>>
@@ -655,9 +646,6 @@
     portContextMenuData(info, tab).catch(logError)
   );
   runtime.onConnect.addListener(port => handlePort(port).catch(logError));
-  runtime.onInstalled.addListener(details =>
-    reloadRuntime(details).catch(logError)
-  );
   runtime.onMessage.addListener(handleMsg);
   tabs.onActivated.addListener(onTabActivated);
   tabs.onUpdated.addListener(onTabUpdated);
