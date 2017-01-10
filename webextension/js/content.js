@@ -146,6 +146,7 @@
       const getTmpFile = {
         target,
         host: window.location.host,
+        incognito: vars[INCOGNITO],
         tabId: vars[TAB_ID],
       };
       func.push(portMsg({getTmpFile}));

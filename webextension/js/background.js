@@ -483,7 +483,7 @@
    * @param {string} key - storage key
    * @return {Object} - ?Promise.<void>
    */
-  const setStorage = async (path, key) =>
+  const storeData = async (path, key) =>
     isString(path) && isString(key) && fetch(path).then(async res => {
       const data = await res.json();
       return data && storage.set({
@@ -672,7 +672,7 @@
     storage.get().then(setVars).then(checkEnable).then(syncUI).then(() =>
       portMsg({[SET_VARS]: vars})
     ),
-    setStorage(NS_URI_PATH, NS_URI),
-    setStorage(FILE_EXT_PATH, FILE_EXT),
+    storeData(NS_URI_PATH, NS_URI),
+    storeData(FILE_EXT_PATH, FILE_EXT),
   ]).catch(logError);
 }
