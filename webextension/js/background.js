@@ -461,7 +461,7 @@
   };
 
   /**
-   * set variables from storage
+   * set variables
    * @param {Object} data - storage data
    * @return {Object} - Promise.<Array<*>>
    */
@@ -477,6 +477,7 @@
     return Promise.all(func);
   };
 
+  /* storage */
   /**
    * fetch static data and set storage
    * @param {string} path - data path
