@@ -881,14 +881,12 @@
   const syncText = async (obj = {}) => {
     const func = [];
     const {data, tabId, target} = obj;
-    let {value} = obj;
     if (data && target && tabId === vars[TAB_ID]) {
+      const {namespaceURI, timestamp} = data;
+      const value = await (new TextDecoder(CHAR)).decode(obj.value) || "";
       const elm = document.activeElement;
-      let {namespaceURI, timestamp} = data,
-          isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+      let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
           ns = !isHtml && nsURI.html || "", attr;
-      value = await (new TextDecoder(CHAR)).decode(value) || "";
-      !timestamp && (timestamp = 0);
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CTRL)) {
         const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CTRL)).split(" ");
         for (let id of arr) {
