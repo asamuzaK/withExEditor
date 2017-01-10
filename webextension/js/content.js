@@ -142,9 +142,9 @@
                    elm.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
                    elm.getAttributeNS("", DATA_ATTR_ID_CTRL)
                  );
-    attr && attr.split(" ").forEach(id => {
+    attr && attr.split(" ").forEach(target => {
       const getTmpFile = {
-        dataId: id,
+        target,
         host: window.location.host,
         tabId: vars[TAB_ID],
       };
@@ -599,6 +599,7 @@
         [GET_FILE_PATH]: {uri},
       };
     } else {
+      const {host, incognito, tabId} = data;
       const method = "GET";
       const mode = "cors";
       const headers = new Headers();
@@ -609,12 +610,7 @@
         const fileName = target + await getFileExtension(contentType);
         const value = await res.text();
         return {
-          [CREATE_TMP_FILE]: {
-            target, fileName,
-            incognito: data.incognito,
-            tabId: data.tabId,
-            host: data.host,
-          },
+          [CREATE_TMP_FILE]: {fileName, host, incognito, tabId, target},
           value,
         };
       });
@@ -760,19 +756,40 @@
   };
 
   /**
+   * create content data message
+   * @param {Object} data - temporary file data
+   * @return {Object} - Promise.<Array.<*>>
+   */
+  const createContentDataMsg = async data => {
+    const func = [];
+    data && (
+      data[CREATE_TMP_FILE] ?
+        func.push(portMsg({
+          [CREATE_TMP_FILE]: {
+            data: data[CREATE_TMP_FILE],
+            value: data.value,
+          },
+        })) :
+        data[GET_FILE_PATH] &&
+          func.push(portMsg({[GET_FILE_PATH]: data[GET_FILE_PATH]}))
+    );
+    return Promise.all(func);
+  };
+
+  /**
    * create temporary file data
    * @param {Object} data - content data
    * @return {Object} - temporary file data
    */
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
-    const {mode, incognito, tabId, host} = data;
+    const {host, incognito, mode, tabId} = data;
     let {target, value} = data, fileName, tmpFileData;
     switch (mode) {
       case MODE_EDIT_TEXT:
         tmpFileData = target && {
           [CREATE_TMP_FILE]: {
-            incognito, tabId, host, target,
+            host, incognito, tabId, target,
             fileName: `${target}.txt`,
             namespaceURI: data.namespaceURI || "",
           },
@@ -784,7 +801,7 @@
         if (value && (target = await getFileNameFromURI(uri, "index"))) {
           fileName = `${target}.${mode === MODE_MATHML && "mml" || "svg"}`;
           tmpFileData = {
-            [CREATE_TMP_FILE]: {incognito, tabId, host, target, fileName},
+            [CREATE_TMP_FILE]: {fileName, host, incognito, tabId, target},
             value,
           };
         } else {
@@ -797,7 +814,7 @@
             /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
           tmpFileData = {
             [CREATE_TMP_FILE]: {
-              incognito, tabId, host, target,
+              host, incognito, tabId, target,
               fileName: `${target}.xml`,
             },
             value,
@@ -806,7 +823,7 @@
           value = await convertValue(value);
           fileName = target + await getFileExtension(contentType);
           tmpFileData = {
-            [CREATE_TMP_FILE]: {incognito, tabId, host, target, fileName},
+            [CREATE_TMP_FILE]: {fileName, host, incognito, tabId, target},
             value,
           };
         } else {
@@ -817,27 +834,6 @@
         tmpFileData = await fetchSource(data);
     }
     return tmpFileData || null;
-  };
-
-  /**
-   * create content data message
-   * @param {Object} res - temporary file data
-   * @return {Object} - Promise.<Array.<*>>
-   */
-  const createContentDataMsg = async res => {
-    const func = [];
-    res && (
-      res[CREATE_TMP_FILE] ?
-        func.push(portMsg({
-          [CREATE_TMP_FILE]: {
-            data: res[CREATE_TMP_FILE],
-            value: res.value,
-          },
-        })) :
-        res[GET_FILE_PATH] &&
-          func.push(portMsg({[GET_FILE_PATH]: res[GET_FILE_PATH]}))
-    );
-    return Promise.all(func);
   };
 
   /**
@@ -882,16 +878,17 @@
    * @param {Object} obj - sync data object
    * @return {Object} - Promise.<Array.<*>>
    */
-  const syncText = async obj => {
+  const syncText = async (obj = {}) => {
     const func = [];
-    if (obj.tabId === vars[TAB_ID]) {
+    const {data, tabId, target} = obj;
+    let {value} = obj;
+    if (data && target && tabId === vars[TAB_ID]) {
       const elm = document.activeElement;
-      const namespaceURI = obj.data.namespaceURI || nsURI.html;
-      const target = obj.data.target || "";
-      const timestamp = obj.data.timestamp || 0;
-      const value = await (new TextDecoder(CHAR)).decode(obj.value) || "";
-      let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
-          ns = !isHtml && nsURI.html || "";
+      let {namespaceURI, timestamp} = data,
+          isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+          ns = !isHtml && nsURI.html || "", attr;
+      value = await (new TextDecoder(CHAR)).decode(value) || "";
+      !timestamp && (timestamp = 0);
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CTRL)) {
         const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CTRL)).split(" ");
         for (let id of arr) {
@@ -899,11 +896,10 @@
               (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
             isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
             ns = !isHtml && nsURI.html || "";
+            attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS;
             (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
              timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
-              id.setAttributeNS(
-                ns, isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS, timestamp
-              ),
+              id.setAttributeNS(ns, attr, timestamp),
               func.push(replaceContent(id, value, namespaceURI))
             );
             break;
@@ -913,13 +909,13 @@
                  elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
                  (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
                   timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
-        elm.setAttributeNS(
-          ns, isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS, timestamp
-        );
+        attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS;
+        elm.setAttributeNS(ns, attr, timestamp);
         if (/^(?:input|textarea)$/.test(elm.localName)) {
           elm.value = value;
-        } else if (elm.isContentEditable) {
-          func.push(replaceContent(elm, value, namespaceURI));
+        } else {
+          elm.isContentEditable &&
+            func.push(replaceContent(elm, value, namespaceURI));
         }
       }
     }
