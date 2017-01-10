@@ -175,7 +175,7 @@
       ns.namespaceURI = node.namespaceURI;
     } else {
       const root = document.documentElement;
-      while (node && node.parentNode && !ns.node) {
+      while (node && node !== root && !ns.node) {
         if (node.namespaceURI) {
           ns.node = node;
           ns.localName = node.localName;
@@ -306,16 +306,17 @@
    * @return {?string} - serialized node string
    */
   const createDomXmlBased = async (node, type) => {
-    let elm, range;
-    while (node && node.parentNode && !elm) {
+    const root = document.documentElement;
+    let elm;
+    while (node && node !== root && !elm) {
       node.localName === type && (elm = node);
       node = node.parentNode;
     }
-    elm && (
-      range = document.createRange(),
-      range.selectNodeContents(elm),
-      elm = await appendChild(elm, range.cloneContents())
-    );
+    if (elm) {
+      const range = document.createRange();
+      range.selectNodeContents(elm);
+      elm = await appendChild(elm, range.cloneContents());
+    }
     return elm && elm.hasChildNodes() &&
              (new XMLSerializer()).serializeToString(elm) || null;
   };
