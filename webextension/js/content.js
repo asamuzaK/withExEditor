@@ -264,7 +264,7 @@
    * @param {number} len - default items length
    * @return {void}
    */
-  const extObjItems = async (obj, key, len = 0) => {
+  const extendObjItems = async (obj, key, len = 0) => {
     if (obj && key && Object.keys(obj).length <= len) {
       let ext = await storage.get(key);
       if (ext && Object.keys(ext).length && (ext = ext[key])) {
@@ -558,8 +558,7 @@
             if (node.localName === "br") {
               arr.push("\n");
             } else {
-              node.hasChildNodes() &&
-                arr.push(getText(node.childNodes));
+              node.hasChildNodes() && arr.push(getText(node.childNodes));
             }
             break;
           case NODE_TEXT:
@@ -1190,7 +1189,7 @@
 
   /* startup */
   Promise.all([
-    extObjItems(fileExt, FILE_EXT, 0),
-    extObjItems(nsURI, NS_URI, NS_URI_DEFAULT_ITEMS),
+    extendObjItems(fileExt, FILE_EXT, 0),
+    extendObjItems(nsURI, NS_URI, NS_URI_DEFAULT_ITEMS),
   ]).catch(logError);
 }
