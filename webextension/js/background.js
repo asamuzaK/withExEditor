@@ -392,8 +392,8 @@
    */
   const setVar = async (item, obj, changed = false) => {
     const func = [];
-    const hasPorts = Object.keys(ports).length;
     if (item && obj) {
+      const hasPorts = Object.keys(ports).length;
       switch (item) {
         case APP_MANIFEST:
           varsLoc[item] = obj.value;
@@ -451,10 +451,10 @@
    * @param {Object} data - storage data
    * @return {Object} - Promise.<Array<*>>
    */
-  const setVars = async data => {
+  const setVars = async (data = {})=> {
     const func = [];
-    const items = data && Object.keys(data);
-    if (items && items.length) {
+    const items = Object.keys(data);
+    if (items.length) {
       for (const item of items) {
         const obj = data[item];
         func.push(setVar(item, obj.newValue || obj, !!obj.newValue));
@@ -465,12 +465,12 @@
 
   /* storage */
   /**
-   * fetch static data and set storage
+   * fetch and store data to share
    * @param {string} path - data path
    * @param {string} key - storage key
    * @return {Object} - ?Promise.<void>
    */
-  const storeData = async (path, key) =>
+  const storeSharedData = async (path, key) =>
     isString(path) && isString(key) && fetch(path).then(async res => {
       const data = await res.json();
       return data && storage.set({
@@ -654,7 +654,7 @@
   /* startup */
   Promise.all([
     storage.get().then(setVars).then(syncUI),
-    storeData(NS_URI_PATH, NS_URI),
-    storeData(FILE_EXT_PATH, FILE_EXT),
+    storeSharedData(NS_URI_PATH, NS_URI),
+    storeSharedData(FILE_EXT_PATH, FILE_EXT),
   ]).catch(logError);
 }
