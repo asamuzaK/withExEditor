@@ -31,6 +31,8 @@
   const MODE_SVG = "modeViewSVG";
   const NS_URI = "nsUri";
   const NS_URI_PATH = "../data/nsUri.json";
+  const TMP_FILES = "tmpFiles";
+  const TMP_FILES_PB = "tmpFilesPb";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
 
@@ -360,7 +362,6 @@
   /* UI */
   /**
    * synchronize UI components
-   * @param {boolean} enabled - enabled
    * @return {Object} - ?Promise.<Array.<*>>
    */
   const syncUI = async () => {
@@ -451,7 +452,7 @@
    * @param {Object} data - storage data
    * @return {Object} - Promise.<Array<*>>
    */
-  const setVars = async (data = {})=> {
+  const setVars = async (data = {}) => {
     const func = [];
     const items = Object.keys(data);
     if (items.length) {
@@ -612,27 +613,32 @@
 
   /**
    * handle window focus changed
-   * @param {!number} windowId - windowId
-   * @return {Object} - ?Promise.<Array.<*>>
+   * @return {Object} - Promise.<?Array.<*>>
    */
-  const onWindowFocusChanged = async windowId =>
-    windowId !== windows.WINDOW_ID_NONE &&
+  const onWindowFocusChanged = () =>
     windows.getAll({windowTypes: ["normal"]}).then(arr =>
       arr.length && syncUI() || null
-    ).catch(logError) || null;
+    ).catch(logError);
 
   /**
    * handle window removed
    * @param {!number} windowId - windowId
    * @return {Object} - Promise.<Array.<*>>
    */
-  const onWindowRemoved = windowId => Promise.all([
-    restorePorts({windowId: stringifyPositiveInt(windowId, true)}),
-    // NOTE: for hybrid
-    checkWindowIncognito().then(incognito =>
-      !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
-    ),
-  ]).catch(logError);
+  const onWindowRemoved = async windowId => {
+    const func = [];
+    const win = await windows.getAll({windowTypes: ["normal"]});
+    if (win.length) {
+      func.push(restorePorts({windowId: stringifyPositiveInt(windowId, true)}));
+      // NOTE: for hybrid
+      func.push(checkWindowIncognito().then(incognito =>
+        !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
+      ));
+    } else {
+      func.push(storage.remove([TMP_FILES, TMP_FILES_PB]));
+    }
+    return Promise.all(func).catch(logError);
+  };
 
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
@@ -654,6 +660,7 @@
   /* startup */
   Promise.all([
     storage.get().then(setVars).then(syncUI),
+    storage.set({[TMP_FILES]: {}, [TMP_FILES_PB]: {}}),
     storeSharedData(NS_URI_PATH, NS_URI),
     storeSharedData(FILE_EXT_PATH, FILE_EXT),
   ]).catch(logError);
