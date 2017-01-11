@@ -11,9 +11,12 @@
   const LABEL = "withExEditor";
   const PORT_NAME = "portContent";
 
+  const CONTEXT_MENU = "contextMenu";
   const CREATE_TMP_FILE = "createTmpFile";
   const GET_CONTENT = "getContent";
   const GET_FILE_PATH = "getFilePath";
+  const GET_TMP_FILE = "getTmpFile";
+  const OPEN_OPTIONS = "openOptions";
   const PORT_FILE_PATH = "portFilePath";
   const PORT_HOST = "portHost";
   const SET_VARS = "setVars";
@@ -33,6 +36,8 @@
   const NODE_COMMENT = Node.COMMENT_NODE;
   const NODE_ELEMENT = Node.ELEMENT_NODE;
   const NODE_TEXT = Node.TEXT_NODE;
+  const TMP_FILES = "tmpFiles";
+  const TMP_FILES_PB = "tmpFilesPb";
 
   const FILE_EXT = "fileExt";
   const NS_URI = "nsURI";
@@ -46,6 +51,7 @@
   const KEY_EXEC_EDITOR = "editorShortCut";
   const NODE_CONTEXT = "contextNode";
   const TAB_ID = "tabId";
+  const WIN_ID = "windowId";
 
   /* variables */
   const vars = {
@@ -57,6 +63,7 @@
     [INCOGNITO]: false,
     [NODE_CONTEXT]: null,
     [TAB_ID]: "",
+    [WIN_ID]: "",
   };
 
   /**
@@ -76,6 +83,28 @@
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
+
+  /**
+   * strip HTML tags and decode HTML escaped characters
+   * @param {string} v - value
+   * @return {string} - converted value
+   */
+  const convertValue = async v => {
+    while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
+      v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "")
+            .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
+    }
+    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
+             .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  };
+
+  /**
+   * join array
+   * @param {Array} arr - array
+   * @return {string} - string
+   */
+  const joinArr = async arr =>
+    Array.isArray(arr) && (arr.map(i => i || "")).join("") || "";
 
   /* file utils */
   /**
@@ -129,32 +158,127 @@
   };
 
   /**
-   * port temporary ID
+   * port temporary file data
+   * @param {string} data - temporary file data
+   * @return {Object} - ?Promise.<void>
+   */
+  const portTmpFileData = async data =>
+    data && portMsg({[GET_TMP_FILE]: data}) || null;
+
+  /**
+   * get temporary file data from storage
+   * @param {string} target - target ID
+   * @return {Object} - temporary file data
+   */
+  const getTmpFileData = async target => {
+    const {incognito, tabId, windowId} = vars;
+    const {host} = window.location;
+    const dir = incognito && TMP_FILES_PB || TMP_FILES;
+    const keys = await storage.get(dir);
+    let data;
+    if (keys && windowId && tabId && host && target &&
+        keys[dir] && keys[dir][windowId] &&
+        keys[dir][windowId][tabId] &&
+        keys[dir][windowId][tabId][host] &&
+        keys[dir][windowId][tabId][host][target]) {
+      const {path} = keys[dir][windowId][tabId][host][target];
+      data = {dir, host, incognito, path, tabId, target, windowId};
+    }
+    return data || null;
+  };
+
+  /**
+   * port temporary file data to get temporary file
    * @param {!Object} evt - Event
    * @return {Object} - Promise.<Array.<*>>
    */
-  const portTemporaryId = async evt => {
+  const requestTmpFile = async evt => {
     const func = [];
     const elm = evt.target === evt.currentTarget && evt.target;
-    const attr = elm && (
-                   elm.hasAttributeNS("", DATA_ATTR_ID) &&
-                   elm.getAttributeNS("", DATA_ATTR_ID) ||
-                   elm.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
-                   elm.getAttributeNS("", DATA_ATTR_ID_CTRL)
-                 );
-    attr && attr.split(" ").forEach(target => {
-      const getTmpFile = {
-        target,
-        host: window.location.host,
-        incognito: vars[INCOGNITO],
-        tabId: vars[TAB_ID],
-      };
-      func.push(portMsg({getTmpFile}));
-    });
-    return Promise.all(func);
+    const attrs = elm && (
+      elm.hasAttributeNS("", DATA_ATTR_ID) &&
+      elm.getAttributeNS("", DATA_ATTR_ID) ||
+      elm.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
+      elm.getAttributeNS("", DATA_ATTR_ID_CTRL)
+    );
+    attrs && attrs.split(" ").forEach(target =>
+      func.push(getTmpFileData(target).then(portTmpFileData))
+    );
+    return Promise.all(func).catch(logError);
   };
 
-  /* get content source */
+  /* storage */
+  /**
+   * store temporary file data
+   * @param {Object} data - temporary file data
+   * @return {Object} - ?Promise.<void>
+   */
+  const storeTmpFileData = async (data = {}) => {
+    let func;
+    if (data[CREATE_TMP_FILE]) {
+      const {dir, host, mode, tabId, target, windowId} = data[CREATE_TMP_FILE];
+      if (mode === MODE_EDIT_TEXT) {
+        const keys = await storage.get(dir);
+        if (keys) {
+          keys[dir] = keys[dir] || {};
+          keys[dir][windowId] = keys[dir][windowId] || {};
+          keys[dir][windowId][tabId] = keys[dir][windowId][tabId] || {};
+          keys[dir][windowId][tabId][host] = keys[dir][windowId][tabId][host] ||
+                                             {};
+          keys[dir][windowId][tabId][host][target] = data[CREATE_TMP_FILE];
+          func = storage.set(keys);
+        }
+      }
+    }
+    return func || null;
+  };
+
+  /**
+   * update temporary file data
+   * @param {Object} obj - temporary file data object
+   * @return {Object} - ?Promise.<void>
+   */
+  const updateTmpFileData = async (obj = {}) => {
+    const {path, data} = obj;
+    let func;
+    if (data) {
+      const {dir, host, mode, tabId, target, windowId} = data;
+      if (mode === MODE_EDIT_TEXT) {
+        const keys = await storage.get(dir);
+        if (keys && keys[dir] && keys[dir][windowId] &&
+            keys[dir][windowId][tabId] && keys[dir][windowId][tabId][host] &&
+            keys[dir][windowId][tabId][host][target]) {
+          path && (data.path = path);
+          keys[dir][windowId][tabId][host][target] = data;
+          func = storage.set(keys);
+        }
+      }
+    }
+    return func || null;
+  };
+
+  /**
+   * extend object items from storage
+   * @param {Object} obj - object to extend items
+   * @param {string} key - storage key
+   * @param {number} len - default items length
+   * @return {void}
+   */
+  const extObjItems = async (obj, key, len = 0) => {
+    if (obj && key && Object.keys(obj).length <= len) {
+      let ext = await storage.get(key);
+      if (ext && Object.keys(ext).length && (ext = ext[key])) {
+        const items = Object.keys(ext);
+        if (items && items.length > len) {
+          for (const item of items) {
+            obj[item] = ext[item];
+          }
+        }
+      }
+    }
+  };
+
+  /* serialize content */
   /* namespace URI */
   const nsURI = {
     html: "http://www.w3.org/1999/xhtml",
@@ -421,14 +545,6 @@
   };
 
   /**
-   * join array
-   * @param {Array} arr - array
-   * @return {string} - string
-   */
-  const joinArr = async arr =>
-    Array.isArray(arr) && (arr.map(i => i || "")).join("") || "";
-
-  /**
    * get text
    * @param {Object} nodes - nodes
    * @return {Object} - Promise.<string>, text
@@ -473,7 +589,7 @@
                .replace(/[-:.]/g, "_");
         !isHtml && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html);
         elm.setAttributeNS(ns, isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS, id);
-        isHtml && elm.addEventListener("focus", portTemporaryId, false);
+        isHtml && elm.addEventListener("focus", requestTmpFile, false);
       }
     }
     return id || null;
@@ -582,10 +698,32 @@
           );
         } else {
           ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, id);
-          ctrl.addEventListener("focus", portTemporaryId, false);
+          ctrl.addEventListener("focus", requestTmpFile, false);
         }
       }
     }
+  };
+
+  /* temporary file data */
+  /**
+   * create content data message
+   * @param {Object} data - temporary file data
+   * @return {Object} - Promise.<Array.<*>>
+   */
+  const createContentDataMsg = async data => {
+    const func = [];
+    data && (
+      data[CREATE_TMP_FILE] ?
+        func.push(portMsg({
+          [CREATE_TMP_FILE]: {
+            data: data[CREATE_TMP_FILE],
+            value: data.value,
+          },
+        })) :
+        data[GET_FILE_PATH] &&
+          func.push(portMsg({[GET_FILE_PATH]: data[GET_FILE_PATH]}))
+    );
+    return Promise.all(func);
   };
 
   /**
@@ -601,23 +739,89 @@
         [GET_FILE_PATH]: {uri},
       };
     } else {
-      const {host, incognito, tabId} = data;
+      const {dir, host, incognito, mode, tabId, windowId} = data;
       const method = "GET";
-      const mode = "cors";
+      const cors = "cors";
       const headers = new Headers();
       headers.set("Content-Type", contentType);
       headers.set("Charset", characterSet);
-      obj = await fetch(uri, {headers, method, mode}).then(async res => {
+      obj = await fetch(uri, {cors, headers, method}).then(async res => {
         const target = await getFileNameFromURI(uri, "index");
         const fileName = target + await getFileExtension(contentType);
         const value = await res.text();
         return {
-          [CREATE_TMP_FILE]: {fileName, host, incognito, tabId, target},
+          [CREATE_TMP_FILE]: {
+            dir, fileName, host, incognito, mode, tabId, target, windowId,
+          },
           value,
         };
       });
     }
     return obj || null;
+  };
+
+  /**
+   * create temporary file data
+   * @param {Object} data - content data
+   * @return {Object} - temporary file data
+   */
+  const createTmpFileData = async data => {
+    const {contentType, documentURI: uri} = document;
+    const {dir, host, incognito, mode, tabId, windowId} = data;
+    let {target, value} = data, fileName, tmpFileData;
+    switch (mode) {
+      case MODE_EDIT_TEXT:
+        tmpFileData = target && {
+          [CREATE_TMP_FILE]: {
+            dir, host, incognito, mode, tabId, target, windowId,
+            fileName: `${target}.txt`,
+            namespaceURI: data.namespaceURI || "",
+          },
+          value,
+        } || await fetchSource(data);
+        break;
+      case MODE_MATHML:
+      case MODE_SVG:
+        if (value && (target = await getFileNameFromURI(uri, "index"))) {
+          fileName = `${target}.${mode === MODE_MATHML && "mml" || "svg"}`;
+          tmpFileData = {
+            [CREATE_TMP_FILE]: {
+              dir, fileName, host, incognito, mode, tabId, target, windowId,
+            },
+            value,
+          };
+        } else {
+          tmpFileData = await fetchSource(data);
+        }
+        break;
+      case MODE_SELECTION:
+        target = await getFileNameFromURI(uri, "index");
+        if (target && value &&
+            /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
+          tmpFileData = {
+            [CREATE_TMP_FILE]: {
+              dir, host, incognito, mode, tabId, target, windowId,
+              fileName: `${target}.xml`,
+            },
+            value,
+          };
+        } else if (target && value) {
+          value = await convertValue(value);
+          fileName = target + await getFileExtension(contentType);
+          tmpFileData = {
+            [CREATE_TMP_FILE]: {
+              dir, fileName, host, incognito, mode, tabId, target, windowId,
+            },
+            value,
+          };
+        } else {
+          tmpFileData = await fetchSource(data);
+        }
+        break;
+      default:
+        tmpFileData = await fetchSource(data);
+    }
+    return tmpFileData || null;
   };
 
   /**
@@ -675,9 +879,11 @@
   const createContentData = async elm => {
     const data = {
       mode: MODE_SOURCE,
+      dir: vars[INCOGNITO] && TMP_FILES_PB || TMP_FILES,
       host: window.location.host || LABEL,
       incognito: vars[INCOGNITO],
       tabId: vars[TAB_ID],
+      windowId: vars[WIN_ID],
       namespaceURI: null,
       target: null,
       value: null,
@@ -744,107 +950,15 @@
   };
 
   /**
-   * strip HTML tags and decode HTML escaped characters
-   * @param {string} v - value
-   * @return {string} - converted value
-   */
-  const convertValue = async v => {
-    while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
-      v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "")
-            .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
-    }
-    return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
-             .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-  };
-
-  /**
-   * create content data message
-   * @param {Object} data - temporary file data
-   * @return {Object} - Promise.<Array.<*>>
-   */
-  const createContentDataMsg = async data => {
-    const func = [];
-    data && (
-      data[CREATE_TMP_FILE] ?
-        func.push(portMsg({
-          [CREATE_TMP_FILE]: {
-            data: data[CREATE_TMP_FILE],
-            value: data.value,
-          },
-        })) :
-        data[GET_FILE_PATH] &&
-          func.push(portMsg({[GET_FILE_PATH]: data[GET_FILE_PATH]}))
-    );
-    return Promise.all(func);
-  };
-
-  /**
-   * create temporary file data
-   * @param {Object} data - content data
-   * @return {Object} - temporary file data
-   */
-  const createTmpFileData = async data => {
-    const {contentType, documentURI: uri} = document;
-    const {host, incognito, mode, tabId} = data;
-    let {target, value} = data, fileName, tmpFileData;
-    switch (mode) {
-      case MODE_EDIT_TEXT:
-        tmpFileData = target && {
-          [CREATE_TMP_FILE]: {
-            host, incognito, tabId, target,
-            fileName: `${target}.txt`,
-            namespaceURI: data.namespaceURI || "",
-          },
-          value,
-        } || await fetchSource(data);
-        break;
-      case MODE_MATHML:
-      case MODE_SVG:
-        if (value && (target = await getFileNameFromURI(uri, "index"))) {
-          fileName = `${target}.${mode === MODE_MATHML && "mml" || "svg"}`;
-          tmpFileData = {
-            [CREATE_TMP_FILE]: {fileName, host, incognito, tabId, target},
-            value,
-          };
-        } else {
-          tmpFileData = await fetchSource(data);
-        }
-        break;
-      case MODE_SELECTION:
-        target = await getFileNameFromURI(uri, "index");
-        if (target && value &&
-            /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
-          tmpFileData = {
-            [CREATE_TMP_FILE]: {
-              host, incognito, tabId, target,
-              fileName: `${target}.xml`,
-            },
-            value,
-          };
-        } else if (target && value) {
-          value = await convertValue(value);
-          fileName = target + await getFileExtension(contentType);
-          tmpFileData = {
-            [CREATE_TMP_FILE]: {fileName, host, incognito, tabId, target},
-            value,
-          };
-        } else {
-          tmpFileData = await fetchSource(data);
-        }
-        break;
-      default:
-        tmpFileData = await fetchSource(data);
-    }
-    return tmpFileData || null;
-  };
-
-  /**
    * port content data
    * @param {Object} elm - element
    * @return {Object} - Promise.<Array.<*>>
    */
   const portContentData = elm =>
-    createContentData(elm).then(createTmpFileData).then(createContentDataMsg);
+    createContentData(elm).then(createTmpFileData).then(data => Promise.all([
+      createContentDataMsg(data),
+      storeTmpFileData(data),
+    ]));
 
   /* synchronize edited text */
   /**
@@ -955,28 +1069,6 @@
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
 
-  /* storage */
-  /**
-   * extend object items from storage
-   * @param {Object} obj - object to extend items
-   * @param {string} key - storage key
-   * @param {number} len - default items length
-   * @return {void}
-   */
-  const extObjItems = async (obj, key, len = 0) => {
-    if (obj && key && Object.keys(obj).length <= len) {
-      let ext = await storage.get(key);
-      if (ext && Object.keys(ext).length && (ext = ext[key])) {
-        const items = Object.keys(ext);
-        if (items && items.length > len) {
-          for (const item of items) {
-            obj[item] = ext[item];
-          }
-        }
-      }
-    }
-  };
-
   /* handlers */
   /**
    * handle message
@@ -1015,6 +1107,7 @@
             openOptionsKey.enabled = !!obj;
             break;
           case PORT_FILE_PATH:
+            func.push(updateTmpFileData(obj));
             obj.path && func.push(portMsg({
               [PORT_HOST]: {
                 path: obj.path,
@@ -1025,6 +1118,7 @@
             func.push(syncText(obj));
             break;
           case TAB_ID:
+          case WIN_ID:
             vars[item] = obj;
             break;
           default:
@@ -1042,7 +1136,7 @@
   const handleContextMenu = async evt => {
     const elm = vars[NODE_CONTEXT] = evt.target;
     const sel = window.getSelection();
-    const contextMenu = {
+    const item = {
       [MODE_EDIT_TEXT]: {
         menuItemId: MODE_EDIT_TEXT,
         enabled: sel.isCollapsed ||
@@ -1051,11 +1145,10 @@
       [MODE_SOURCE]: {
         menuItemId: MODE_SOURCE,
         mode: elm.namespaceURI === nsURI.math && MODE_MATHML ||
-              elm.namespaceURI === nsURI.svg && MODE_SVG ||
-              MODE_SOURCE,
+              elm.namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE,
       },
     };
-    return portMsg({contextMenu}).catch(logError);
+    return portMsg({[CONTEXT_MENU]: item}).catch(logError);
   };
 
   /**
@@ -1079,8 +1172,8 @@
         }
         bool && func.push(portContentData(elm));
       } else {
-        const openOptions = await keyComboMatches(evt, openOptionsKey);
-        openOptions && func.push(portMsg({openOptions}));
+        const openOpt = await keyComboMatches(evt, openOptionsKey);
+        openOpt && func.push(portMsg({[OPEN_OPTIONS]: openOpt}));
       }
     }
     return Promise.all(func).catch(logError);

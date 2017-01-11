@@ -466,6 +466,20 @@
 
   /* storage */
   /**
+   * remove tab related storage
+   * @param {Object} data - removed tab data
+   * @return {Object} - ?Promise.<void>
+   */
+  const removeTabRelatedStorage = async (data = {}) => {
+    const {incognito, tabId, windowId} = data;
+    const dir = incognito && TMP_FILES_PB || TMP_FILES;
+    const keys = await storage.get(dir);
+    const bool = keys && keys[dir] && keys[dir][windowId] &&
+                   delete keys[dir][windowId][tabId];
+    return bool && storage.set({[dir]: keys}) || null;
+  };
+
+  /**
    * fetch and store data to share
    * @param {string} path - data path
    * @param {string} key - storage key
@@ -534,7 +548,7 @@
       frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito),
       port.onMessage.addListener(handleMsg),
       port.postMessage({
-        incognito, tabId,
+        incognito, tabId, windowId,
         [SET_VARS]: vars,
       })
     );
@@ -603,6 +617,7 @@
     if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
       const incognito = !!ports[windowId][tabId][INCOGNITO];
       func.push(restorePorts({windowId, tabId}));
+      func.push(removeTabRelatedStorage({incognito, tabId, windowId}));
       // NOTE: for hybrid
       func.push(portHybridMsg({
         removeTabRelatedStorage: {tabId, incognito, info},
@@ -630,9 +645,12 @@
     const win = await windows.getAll({windowTypes: ["normal"]});
     if (win.length) {
       func.push(restorePorts({windowId: stringifyPositiveInt(windowId, true)}));
-      // NOTE: for hybrid
       func.push(checkWindowIncognito().then(incognito =>
-        !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
+        !incognito && Promise.all([
+          storage.set({[TMP_FILES_PB]: {}}),
+          // NOTE: for hybrid
+          portHybridMsg({removePrivateTmpFiles: !incognito}),
+        ]) || null
       ));
     } else {
       func.push(storage.remove([TMP_FILES, TMP_FILES_PB]));
