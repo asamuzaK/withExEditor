@@ -382,11 +382,11 @@
    * @param {boolean} enabled - enabled
    * @return {Object} - Promise.<Array.<*>>
    */
-  const syncUI = (enabled = false) => Promise.all([
-    portMsg({isEnabled: !!enabled}),
+  const syncUI = () => checkEnabled().then(enabled => Promise.all([
+    portMsg({[IS_ENABLED]: !!enabled}),
     replaceIcon(!enabled && `${ICON}#off` || varsLoc[ICON_PATH]),
     toggleBadge(),
-  ]);
+  ]));
 
   /* handle variables */
   /**
@@ -405,6 +405,7 @@
    */
   const setVar = async (item, obj, changed = false) => {
     const func = [];
+    const hasPorts = Object.keys(ports).length;
     if (item && obj) {
       switch (item) {
         case APP_MANIFEST:
@@ -423,14 +424,12 @@
           break;
         case ENABLE_ONLY_EDITABLE:
           vars[item] = !!obj.checked;
-          changed && (
-            func.push(restoreContextMenu()),
-            func.push(portVar({[item]: !!obj.checked}))
-          );
+          hasPorts && func.push(portVar({[item]: !!obj.checked}));
+          changed && func.push(restoreContextMenu());
           break;
         case ENABLE_PB:
           varsLoc[item] = !!obj.checked;
-          changed && func.push(checkEnable().then(syncUI));
+          changed && func.push(syncUI());
           break;
         case FORCE_REMOVE:
           varsLoc[item] = !!obj.checked;
@@ -447,12 +446,12 @@
           break;
         case KEY_ACCESS:
           vars[item] = obj.value;
-          changed && func.push(portVar({[item]: obj.value}));
+          hasPorts && func.push(portVar({[item]: obj.value}));
           break;
         case KEY_EXEC_EDITOR:
         case KEY_OPEN_OPTIONS:
           vars[item] = !!obj.checked;
-          changed && func.push(portVar({[item]: !!obj.checked}));
+          hasPorts && func.push(portVar({[item]: !!obj.checked}));
           break;
         default:
       }
@@ -624,7 +623,7 @@
    */
   const onWindowFocusChanged = async windowId =>
     windowId !== windows.WINDOW_ID_NONE &&
-      checkEnable().then(syncUI).catch(logError) || null;
+      syncUI().catch(logError) || null;
 
   /**
    * handle window removed
@@ -658,9 +657,7 @@
 
   /* startup */
   Promise.all([
-    storage.get().then(setVars).then(checkEnable).then(syncUI).then(() =>
-      portMsg({[SET_VARS]: vars})
-    ),
+    storage.get().then(setVars).then(syncUI),
     storeData(NS_URI_PATH, NS_URI),
     storeData(FILE_EXT_PATH, FILE_EXT),
   ]).catch(logError);
