@@ -128,13 +128,6 @@
     return incog || false;
   };
 
-  /**
-   * open options page
-   * @return {Object} - ?Promise.<void>
-   */
-  const openOptionsPage = async () =>
-    vars[IS_ENABLED] && runtime.openOptionsPage() || null;
-
   /* port */
   let host = null;
 
@@ -382,7 +375,7 @@
    * @param {boolean} enabled - enabled
    * @return {Object} - Promise.<Array.<*>>
    */
-  const syncUI = () => checkEnabled().then(enabled => Promise.all([
+  const syncUI = () => checkEnable().then(enabled => Promise.all([
     portMsg({[IS_ENABLED]: !!enabled}),
     replaceIcon(!enabled && `${ICON}#off` || varsLoc[ICON_PATH]),
     toggleBadge(),
@@ -492,6 +485,13 @@
     }) || null;
 
   /* handlers */
+  /**
+   * open options page
+   * @return {Object} - ?Promise.<void>
+   */
+  const openOptionsPage = async () =>
+    vars[IS_ENABLED] && runtime.openOptionsPage() || null;
+
   /**
    * handle runtime message
    * @param {*} msg - message
