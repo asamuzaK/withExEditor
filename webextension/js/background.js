@@ -476,7 +476,7 @@
     const keys = await storage.get(dir);
     const bool = keys && keys[dir] && keys[dir][windowId] &&
                    delete keys[dir][windowId][tabId];
-    return bool && storage.set({[dir]: keys}) || null;
+    return bool && storage.set(keys) || null;
   };
 
   /**
