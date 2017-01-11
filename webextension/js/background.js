@@ -99,18 +99,6 @@
 
   /* windows */
   /**
-   * check if add-on can be enabled
-   * @return {boolean} - result
-   */
-  const checkEnable = async () => {
-    const win = await windows.getCurrent();
-    const enable = vars[IS_ENABLED] = win && win.type === "normal" && (
-      !win.incognito || varsLoc[ENABLE_PB]
-    ) || false;
-    return enable;
-  };
-
-  /**
    * check one of window is incognito
    * @return {boolean} - result
    */
@@ -373,13 +361,19 @@
   /**
    * synchronize UI components
    * @param {boolean} enabled - enabled
-   * @return {Object} - Promise.<Array.<*>>
+   * @return {Object} - ?Promise.<Array.<*>>
    */
-  const syncUI = () => checkEnable().then(enabled => Promise.all([
-    portMsg({[IS_ENABLED]: !!enabled}),
-    replaceIcon(!enabled && `${ICON}#off` || varsLoc[ICON_PATH]),
-    toggleBadge(),
-  ]));
+  const syncUI = async () => {
+    const win = await windows.getCurrent({windowTypes: ["normal"]});
+    const enabled = vars[IS_ENABLED] = win && (
+      !win.incognito || varsLoc[ENABLE_PB]
+    ) || false;
+    return win && Promise.all([
+      portMsg({[IS_ENABLED]: !!enabled}),
+      replaceIcon(!enabled && `${ICON}#off` || varsLoc[ICON_PATH]),
+      toggleBadge(),
+    ]) || null;
+  };
 
   /* handle variables */
   /**
@@ -623,7 +617,9 @@
    */
   const onWindowFocusChanged = async windowId =>
     windowId !== windows.WINDOW_ID_NONE &&
-      syncUI().catch(logError) || null;
+    windows.getAll({windowTypes: ["normal"]}).then(arr =>
+      arr.length && syncUI() || null
+    ).catch(logError) || null;
 
   /**
    * handle window removed
