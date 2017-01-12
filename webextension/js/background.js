@@ -31,8 +31,6 @@
   const MODE_SVG = "modeViewSVG";
   const NS_URI = "nsUri";
   const NS_URI_PATH = "../data/nsUri.json";
-  const TMP_FILES = "tmpFiles";
-  const TMP_FILES_PB = "tmpFilesPb";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
 
@@ -466,20 +464,6 @@
 
   /* storage */
   /**
-   * remove tab related storage
-   * @param {Object} data - removed tab data
-   * @return {Object} - ?Promise.<void>
-   */
-  const removeTabRelatedStorage = async (data = {}) => {
-    const {incognito, tabId, windowId} = data;
-    const dir = incognito && TMP_FILES_PB || TMP_FILES;
-    const keys = await storage.get(dir);
-    const bool = keys && keys[dir] && keys[dir][windowId] &&
-                   delete keys[dir][windowId][tabId];
-    return bool && storage.set(keys) || null;
-  };
-
-  /**
    * fetch and store data to share
    * @param {string} path - data path
    * @param {string} key - storage key
@@ -607,23 +591,14 @@
    * handle tab removed
    * @param {!number} id - tabId
    * @param {!Object} info - removed tab info
-   * @return {Object} - Promise.<Array.<*>>
+   * @return {Object} - ?Promise.<Array.<*>>
    */
   const onTabRemoved = async (id, info) => {
-    const func = [];
     const tabId = stringifyPositiveInt(id, true);
     let {windowId} = info;
     windowId = stringifyPositiveInt(windowId, true);
-    if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
-      const incognito = !!ports[windowId][tabId][INCOGNITO];
-      func.push(restorePorts({windowId, tabId}));
-      func.push(removeTabRelatedStorage({incognito, tabId, windowId}));
-      // NOTE: for hybrid
-      func.push(portHybridMsg({
-        removeTabRelatedStorage: {tabId, incognito, info},
-      }));
-    }
-    return Promise.all(func).catch(logError);
+    return windowId && tabId && ports[windowId] && ports[windowId][tabId] &&
+           restorePorts({windowId, tabId}) || null;
   };
 
   /**
@@ -646,14 +621,9 @@
     if (win.length) {
       func.push(restorePorts({windowId: stringifyPositiveInt(windowId, true)}));
       func.push(checkWindowIncognito().then(incognito =>
-        !incognito && Promise.all([
-          storage.set({[TMP_FILES_PB]: {}}),
-          // NOTE: for hybrid
-          portHybridMsg({removePrivateTmpFiles: !incognito}),
-        ]) || null
+        // NOTE: for hybrid
+        !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
       ));
-    } else {
-      func.push(storage.remove([TMP_FILES, TMP_FILES_PB]));
     }
     return Promise.all(func).catch(logError);
   };
@@ -668,7 +638,9 @@
   runtime.onMessage.addListener(handleMsg);
   tabs.onActivated.addListener(onTabActivated);
   tabs.onUpdated.addListener(onTabUpdated);
-  tabs.onRemoved.addListener(onTabRemoved);
+  tabs.onRemoved.addListener((id, info) =>
+    onTabRemoved(id, info).catch(logError)
+  );
   windows.onFocusChanged.addListener(onWindowFocusChanged);
   windows.onRemoved.addListener(onWindowRemoved);
 
@@ -678,7 +650,6 @@
   /* startup */
   Promise.all([
     storage.get().then(setVars).then(syncUI),
-    storage.set({[TMP_FILES]: {}, [TMP_FILES_PB]: {}}),
     storeSharedData(NS_URI_PATH, NS_URI),
     storeSharedData(FILE_EXT_PATH, FILE_EXT),
   ]).catch(logError);

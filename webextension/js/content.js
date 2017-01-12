@@ -157,34 +157,17 @@
     msg && port.postMessage(msg);
   };
 
-  /**
-   * port temporary file data
-   * @param {string} data - temporary file data
-   * @return {Object} - ?Promise.<void>
-   */
-  const portTmpFileData = async data =>
-    data && portMsg({[GET_TMP_FILE]: data}) || null;
+  /* data IDs */
+  const dataIds = {};
 
   /**
-   * get temporary file data from storage
-   * @param {string} target - target ID
-   * @return {Object} - temporary file data
+   * port temporary file data
+   * @param {string} dataId - data ID
+   * @return {Object} - ?Promise.<void>
    */
-  const getTmpFileData = async target => {
-    const {incognito, tabId, windowId} = vars;
-    const {host} = window.location;
-    const dir = incognito && TMP_FILES_PB || TMP_FILES;
-    const keys = await storage.get(dir);
-    let data;
-    if (keys && windowId && tabId && host && target &&
-        keys[dir] && keys[dir][windowId] &&
-        keys[dir][windowId][tabId] &&
-        keys[dir][windowId][tabId][host] &&
-        keys[dir][windowId][tabId][host][target]) {
-      const {path} = keys[dir][windowId][tabId][host][target];
-      data = {dir, host, incognito, path, tabId, target, windowId};
-    }
-    return data || null;
+  const portTmpFileData = async dataId => {
+    const data = dataId && dataIds[dataId];
+    return data && portMsg({[GET_TMP_FILE]: data}) || null;
   };
 
   /**
@@ -201,79 +184,39 @@
       elm.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
       elm.getAttributeNS("", DATA_ATTR_ID_CTRL)
     );
-    attrs && attrs.split(" ").forEach(target =>
-      func.push(getTmpFileData(target).then(portTmpFileData))
+    attrs && attrs.split(" ").forEach(dataId =>
+      func.push(portTmpFileData(dataId))
     );
     return Promise.all(func).catch(logError);
   };
 
-  /* storage */
   /**
    * store temporary file data
    * @param {Object} data - temporary file data
-   * @return {Object} - ?Promise.<void>
+   * @return {void}
    */
   const storeTmpFileData = async (data = {}) => {
-    let func;
-    if (data[CREATE_TMP_FILE]) {
-      const {dir, host, mode, tabId, target, windowId} = data[CREATE_TMP_FILE];
-      if (mode === MODE_EDIT_TEXT) {
-        const keys = await storage.get(dir);
-        if (keys) {
-          keys[dir] = keys[dir] || {};
-          keys[dir][windowId] = keys[dir][windowId] || {};
-          keys[dir][windowId][tabId] = keys[dir][windowId][tabId] || {};
-          keys[dir][windowId][tabId][host] = keys[dir][windowId][tabId][host] ||
-                                             {};
-          keys[dir][windowId][tabId][host][target] = data[CREATE_TMP_FILE];
-          func = storage.set(keys);
-        }
-      }
+    if (data[CREATE_TMP_FILE] && (data = data[CREATE_TMP_FILE])) {
+      const {dataId, mode} = data;
+      mode === MODE_EDIT_TEXT && (dataIds[dataId] = data);
     }
-    return func || null;
   };
 
   /**
    * update temporary file data
    * @param {Object} obj - temporary file data object
-   * @return {Object} - ?Promise.<void>
+   * @return {void}
    */
   const updateTmpFileData = async (obj = {}) => {
     const {path, data} = obj;
-    let func;
     if (data) {
-      const {dir, host, mode, tabId, target, windowId} = data;
+      const {dataId, mode} = data;
       if (mode === MODE_EDIT_TEXT) {
-        const keys = await storage.get(dir);
-        if (keys && keys[dir] && keys[dir][windowId] &&
-            keys[dir][windowId][tabId] && keys[dir][windowId][tabId][host] &&
-            keys[dir][windowId][tabId][host][target]) {
-          path && (data.path = path);
-          keys[dir][windowId][tabId][host][target] = data;
-          func = storage.set(keys);
-        }
-      }
-    }
-    return func || null;
-  };
-
-  /**
-   * extend object items from storage
-   * @param {Object} obj - object to extend items
-   * @param {string} key - storage key
-   * @param {number} len - default items length
-   * @return {void}
-   */
-  const extendObjItems = async (obj, key, len = 0) => {
-    if (obj && key && Object.keys(obj).length <= len) {
-      let ext = await storage.get(key);
-      if (ext && Object.keys(ext).length && (ext = ext[key])) {
-        const items = Object.keys(ext);
-        if (items && items.length > len) {
-          for (const item of items) {
-            obj[item] = ext[item];
-          }
-        }
+        const keys = dataIds[dataId];
+        keys && path && (
+          data.path = path,
+          dataIds[dataId] = data
+        );
       }
     }
   };
@@ -745,12 +688,12 @@
       headers.set("Content-Type", contentType);
       headers.set("Charset", characterSet);
       obj = await fetch(uri, {cors, headers, method}).then(async res => {
-        const target = await getFileNameFromURI(uri, "index");
-        const fileName = target + await getFileExtension(contentType);
+        const dataId = await getFileNameFromURI(uri, "index");
+        const fileName = dataId + await getFileExtension(contentType);
         const value = await res.text();
         return {
           [CREATE_TMP_FILE]: {
-            dir, fileName, host, incognito, mode, tabId, target, windowId,
+            dataId, dir, fileName, host, incognito, mode, tabId, windowId,
           },
           value,
         };
@@ -767,59 +710,58 @@
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
     const {dir, host, incognito, mode, tabId, windowId} = data;
-    let {target, value} = data, fileName, tmpFileData;
+    let {dataId, value, namespaceURI} = data, fileName, tmpFileData;
+    namespaceURI = namespaceURI || "";
     switch (mode) {
       case MODE_EDIT_TEXT:
-        tmpFileData = target && {
-          [CREATE_TMP_FILE]: {
-            dir, host, incognito, mode, tabId, target, windowId,
-            fileName: `${target}.txt`,
-            namespaceURI: data.namespaceURI || "",
-          },
-          value,
-        } || await fetchSource(data);
+        if (dataId) {
+          fileName = `${dataId}.txt`;
+          tmpFileData = {
+            [CREATE_TMP_FILE]: {
+              dataId, dir, fileName, host, incognito, mode, namespaceURI,
+              tabId, windowId,
+            },
+            value,
+          };
+        }
         break;
       case MODE_MATHML:
       case MODE_SVG:
-        if (value && (target = await getFileNameFromURI(uri, "index"))) {
-          fileName = `${target}.${mode === MODE_MATHML && "mml" || "svg"}`;
+        if (value && (dataId = await getFileNameFromURI(uri, "index"))) {
+          fileName = `${dataId}.${mode === MODE_MATHML && "mml" || "svg"}`;
           tmpFileData = {
             [CREATE_TMP_FILE]: {
-              dir, fileName, host, incognito, mode, tabId, target, windowId,
+              dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
           };
-        } else {
-          tmpFileData = await fetchSource(data);
         }
         break;
       case MODE_SELECTION:
-        target = await getFileNameFromURI(uri, "index");
-        if (target && value &&
+        dataId = await getFileNameFromURI(uri, "index");
+        if (dataId && value &&
             /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
+          fileName = `${dataId}.xml`;
           tmpFileData = {
             [CREATE_TMP_FILE]: {
-              dir, host, incognito, mode, tabId, target, windowId,
-              fileName: `${target}.xml`,
+              dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
           };
-        } else if (target && value) {
+        } else if (dataId && value) {
           value = await convertValue(value);
-          fileName = target + await getFileExtension(contentType);
+          fileName = dataId + await getFileExtension(contentType);
           tmpFileData = {
             [CREATE_TMP_FILE]: {
-              dir, fileName, host, incognito, mode, tabId, target, windowId,
+              dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
           };
-        } else {
-          tmpFileData = await fetchSource(data);
         }
         break;
       default:
-        tmpFileData = await fetchSource(data);
     }
+    !tmpFileData && (tmpFileData = await fetchSource(data));
     return tmpFileData || null;
   };
 
@@ -884,7 +826,7 @@
       tabId: vars[TAB_ID],
       windowId: vars[WIN_ID],
       namespaceURI: null,
-      target: null,
+      dataId: null,
       value: null,
     };
     if (elm) {
@@ -899,12 +841,12 @@
             if (obj) {
               if (await isEditControl(elm)) {
                 data.mode = contextType.mode;
-                data.target = obj;
+                data.dataId = obj;
                 data.value = elm.value || "";
               } else if (elm.isContentEditable ||
                          await isContentTextNode(elm)) {
                 data.mode = contextType.mode;
-                data.target = obj;
+                data.dataId = obj;
                 data.value = elm.hasChildNodes() &&
                              await getText(elm.childNodes) || "";
                 data.namespaceURI = contextType.namespaceURI;
@@ -915,7 +857,7 @@
                       await isContentTextNode(parent)) &&
                      (obj = await getId(parent))) {
             data.mode = contextType.mode;
-            data.target = obj;
+            data.dataId = obj;
             data.value = parent.hasChildNodes() &&
                          await getText(parent.childNodes) || "";
             data.namespaceURI = contextType.namespaceURI;
@@ -995,8 +937,8 @@
    */
   const syncText = async (obj = {}) => {
     const func = [];
-    const {data, tabId, target} = obj;
-    if (data && target && tabId === vars[TAB_ID]) {
+    const {data, dataId, tabId} = obj;
+    if (data && dataId && tabId === vars[TAB_ID]) {
       const {namespaceURI, timestamp} = data;
       const value = await (new TextDecoder(CHAR)).decode(obj.value) || "";
       const elm = document.activeElement;
@@ -1005,7 +947,7 @@
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CTRL)) {
         const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CTRL)).split(" ");
         for (let id of arr) {
-          if (id === target &&
+          if (id === dataId &&
               (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
             isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
             ns = !isHtml && nsURI.html || "";
@@ -1019,7 +961,7 @@
           }
         }
       } else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-                 elm.getAttributeNS(ns, DATA_ATTR_ID) === target &&
+                 elm.getAttributeNS(ns, DATA_ATTR_ID) === dataId &&
                  (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
                   timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
         attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS;
@@ -1067,6 +1009,28 @@
     evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
+
+  /* storage */
+  /**
+   * extend object items from storage
+   * @param {Object} obj - object to extend items
+   * @param {string} key - storage key
+   * @param {number} len - default items length
+   * @return {void}
+   */
+  const extendObjItems = async (obj, key, len = 0) => {
+    if (obj && key && Object.keys(obj).length <= len) {
+      let ext = await storage.get(key);
+      if (ext && Object.keys(ext).length && (ext = ext[key])) {
+        const items = Object.keys(ext);
+        if (items && items.length > len) {
+          for (const item of items) {
+            obj[item] = ext[item];
+          }
+        }
+      }
+    }
+  };
 
   /* handlers */
   /**
