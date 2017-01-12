@@ -236,7 +236,7 @@
    * @return {Object} - namespace data
    */
   const getNodeNS = async node => {
-    const ns = {node: null, name: null, uri: null};
+    const ns = {node: null, name: null, namespaceURI: null};
     if (node.namespaceURI) {
       ns.node = node;
       ns.localName = node.localName;
@@ -370,20 +370,21 @@
   /**
    * create DOM of MathML / SVG
    * @param {Object} node - element node
-   * @param {string} type - math / svg
    * @return {?string} - serialized node string
    */
-  const createDomXmlBased = async (node, type) => {
-    const root = document.documentElement;
+  const createDomXmlBased = async node => {
     let elm;
-    while (node && node !== root && !elm) {
-      node.localName === type && (elm = node);
-      node = node.parentNode;
-    }
-    if (elm) {
-      const range = document.createRange();
-      range.selectNodeContents(elm);
-      elm = await appendChild(elm, range.cloneContents());
+    if (node) {
+      const root = document.documentElement;
+      while (node && node !== root && !elm) {
+        /^(?:math|svg)$/.test(node.localName) && (elm = node);
+        node = node.parentNode;
+      }
+      if (elm) {
+        const range = document.createRange();
+        range.selectNodeContents(elm);
+        elm = await appendChild(elm, range.cloneContents());
+      }
     }
     return elm && elm.hasChildNodes() &&
              (new XMLSerializer()).serializeToString(elm) || null;
@@ -767,110 +768,58 @@
   };
 
   /**
-   * get context type
-   * @param {Object} elm - element
-   * @return {Object} - context type data
-   */
-  const getContextType = async elm => {
-    const contextType = {
-      mode: MODE_SOURCE,
-      namespaceURI: "",
-    };
-    if (elm) {
-      const sel = window.getSelection();
-      let ns = await getNodeNS(elm);
-      contextType.namespaceURI = ns.namespaceURI;
-      if (sel.isCollapsed) {
-        if (elm.isContentEditable || await isEditControl(elm) ||
-            await isContentTextNode(elm)) {
-          contextType.mode = MODE_EDIT_TEXT;
-        } else {
-          switch (ns.namespaceURI) {
-            case nsURI.math:
-              contextType.mode = MODE_MATHML;
-              break;
-            case nsURI.svg:
-              contextType.mode = MODE_SVG;
-              break;
-            default:
-          }
-        }
-      } else {
-        const parent = sel.anchorNode && sel.anchorNode.parentNode;
-        if (!sel.isCollapsed && sel.rangeCount === 1 && parent &&
-            parent === sel.focusNode.parentNode &&
-            parent !== document.documentElement &&
-            (await isEditControl(parent) || parent.isContentEditable ||
-             await isContentTextNode(parent))) {
-          ns = await getNodeNS(parent);
-          contextType.mode = MODE_EDIT_TEXT;
-          contextType.namespaceURI = ns.namespaceURI;
-        } else {
-          contextType.mode = MODE_SELECTION;
-        }
-      }
-    }
-    return contextType;
-  };
-
-  /**
    * create content data
    * @param {Object} elm - element
+   * @param {string} mode - context mode
    * @return {Object} - content data
    */
-  const createContentData = async elm => {
+  const createContentData = async (elm, mode) => {
     const {incognito, tabId, windowId} = vars;
     const data = {
       incognito, tabId, windowId,
       mode: MODE_SOURCE,
       dir: incognito && TMP_FILES_PB || TMP_FILES,
       host: window.location.host || LABEL,
-      namespaceURI: null,
       dataId: null,
+      namespaceURI: null,
       value: null,
     };
-    if (elm) {
-      const contextType = await getContextType(elm);
-      const sel = window.getSelection();
+    const sel = window.getSelection();
+    if (elm && mode) {
       let obj;
-      switch (contextType.mode) {
+      switch (mode) {
         case MODE_EDIT_TEXT:
-          !sel.isCollapsed && sel.anchorNode &&
-            (elm = sel.anchorNode.parentNode);
-          if (sel.isCollapsed && await isEditControl(elm)) {
-            obj = await getId(elm);
-            if (obj) {
-              data.mode = contextType.mode;
+          obj = await getId(elm);
+          if (obj) {
+            if (sel.isCollapsed && await isEditControl(elm)) {
+              data.mode = mode;
               data.dataId = obj;
               data.value = elm.value || "";
-            }
-          } else if (elm.isContentEditable || await isEditControl(elm) ||
-                     await isContentTextNode(elm)) {
-            obj = await getId(elm);
-            if (obj) {
-              data.mode = contextType.mode;
+            } else {
+              !elm.isContentEditable && !sel.isCollapsed && sel.anchorNode &&
+                (elm = sel.anchorNode.parentNode);
+              data.mode = mode;
               data.dataId = obj;
               data.value = elm.hasChildNodes() &&
                            await getText(elm.childNodes) || "";
-              data.namespaceURI = contextType.namespaceURI;
+              data.namespaceURI = elm.namespaceURI ||
+                                  await getNodeNS(elm).namespaceURI;
               setDataAttrs(elm);
             }
           }
           break;
         case MODE_MATHML:
         case MODE_SVG:
-          obj = sel.isCollapsed && (
-            contextType.namespaceURI === nsURI.math && "math" ||
-            contextType.namespaceURI === nsURI.svg && "svg"
-          );
-          if (obj && (obj = await createDomXmlBased(elm, obj))) {
-            data.mode = contextType.mode;
+          obj = await createDomXmlBased(elm);
+          if (obj) {
+            data.mode = mode;
             data.value = obj;
           }
           break;
         case MODE_SELECTION:
-          if (!sel.isCollapsed && (obj = await createDomFromSelRange(sel))) {
-            data.mode = contextType.mode;
+          obj = await createDomFromSelRange(sel);
+          if (obj) {
+            data.mode = mode;
             data.value = obj;
           }
           break;
@@ -883,13 +832,58 @@
   /**
    * port content data
    * @param {Object} elm - element
+   * @param {string} mode - context mode
    * @return {Object} - Promise.<Array.<*>>
    */
-  const portContentData = elm =>
-    createContentData(elm).then(createTmpFileData).then(data => Promise.all([
-      createContentDataMsg(data),
-      storeTmpFileData(data),
-    ]));
+  const portContent = (elm, mode) =>
+    createContentData(elm, mode).then(createTmpFileData).then(data =>
+      Promise.all([
+        createContentDataMsg(data),
+        storeTmpFileData(data),
+      ]));
+
+  /**
+   * get context mode
+   * @param {Object} elm - element
+   * @return {string} - context mode
+   */
+  const getContextMode = async elm => {
+    let mode = MODE_SOURCE;
+    if (elm) {
+      const sel = window.getSelection();
+      if (sel.isCollapsed) {
+        if (elm.isContentEditable || await isEditControl(elm) ||
+            await isContentTextNode(elm)) {
+          mode = MODE_EDIT_TEXT;
+        } else {
+          switch (elm.namespaceURI) {
+            case nsURI.math:
+              mode = MODE_MATHML;
+              break;
+            case nsURI.svg:
+              mode = MODE_SVG;
+              break;
+            default:
+          }
+        }
+      } else {
+        elm = sel.anchorNode.nodeType === NODE_TEXT &&
+              sel.anchorNode.parentNode ||
+              sel.focusNode.nodeType === NODE_TEXT &&
+              sel.focusNode.parentNode || elm;
+        if (sel.rangeCount === 1 &&
+            sel.anchorNode.parentNode === sel.focusNode.parentNode &&
+            elm !== document.documentElement &&
+            (await isEditControl(elm) || elm.isContentEditable ||
+             await isContentTextNode(elm))) {
+          mode = MODE_EDIT_TEXT;
+        } else {
+          mode = MODE_SELECTION;
+        }
+      }
+    }
+    return mode;
+  };
 
   /* synchronize edited text */
   /**
@@ -1044,7 +1038,13 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            func.push(portContentData(vars[NODE_CONTEXT]));
+            if (obj.info.menuItemId === MODE_SOURCE) {
+              func.push(getContextMode(vars[NODE_CONTEXT]).then(mode =>
+                portContent(vars[NODE_CONTEXT], mode)
+              ));
+            } else {
+              func.push(portContent(vars[NODE_CONTEXT], obj.info.menuItemId));
+            }
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -1113,17 +1113,12 @@
     const func = [];
     if (vars[IS_ENABLED]) {
       if (await keyComboMatches(evt, execEditorKey)) {
-        const elm = evt.target;
-        let bool;
-        if (vars[ENABLE_ONLY_EDITABLE]) {
-          const sel = window.getSelection();
-          bool = elm.isContentEditable || await isEditControl(elm) ||
-                 sel.anchorNode === sel.focusNode &&
-                   await isContentTextNode(elm);
-        } else {
-          bool = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
+        if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
+          const elm = evt.target;
+          const mode = await getContextMode(elm);
+          (!vars[ENABLE_ONLY_EDITABLE] || mode === MODE_EDIT_TEXT) &&
+            func.push(portContent(elm, mode));
         }
-        bool && func.push(portContentData(elm));
       } else {
         const openOpt = await keyComboMatches(evt, openOptionsKey);
         openOpt && func.push(portMsg({[OPEN_OPTIONS]: openOpt}));
