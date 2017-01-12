@@ -213,10 +213,10 @@
       const {dataId, mode} = data;
       if (mode === MODE_EDIT_TEXT) {
         const keys = dataIds[dataId];
-        keys && path && (
-          data.path = path,
-          dataIds[dataId] = data
-        );
+        if (keys && path) {
+          data.path = path;
+          dataIds[dataId] = data;
+        }
       }
     }
   };
@@ -269,14 +269,14 @@
           }
         }
       }
-      !ns.node && (
-        node = root,
-        ns.node = node,
-        ns.localName = node.localName,
+      if (!ns.node) {
+        node = root;
+        ns.node = node;
+        ns.localName = node.localName;
         ns.namespaceURI = node.hasAttribute("xmlns") &&
                           node.getAttribute("xmlns") ||
-                          nsURI[node.localName.toLowerCase()] || ""
-      );
+                          nsURI[node.localName.toLowerCase()] || "";
+      }
     }
     return ns;
   };
@@ -403,11 +403,11 @@
           return null;
         }
         for (const node of nodes) {
-          node && (
-            node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT ||
-            node.nodeType === NODE_COMMENT
-          ) &&
+          if (node && (node.nodeType === NODE_ELEMENT ||
+                       node.nodeType === NODE_TEXT ||
+                       node.nodeType === NODE_COMMENT)) {
             frag.appendChild(node);
+          }
         }
       }
     }
@@ -434,20 +434,19 @@
             if (obj.node === document.documentElement) {
               return null;
             }
-            obj.node.parentNode && (
-              obj = obj.node.parentNode,
-              range.setStart(obj, 0),
-              range.setEnd(obj, obj.childNodes.length)
-            );
+            if (obj.node.parentNode && (obj = obj.node.parentNode)) {
+              range.setStart(obj, 0);
+              range.setEnd(obj, obj.childNodes.length);
+            }
           }
           arr.push(appendChild(ancestor, range.cloneContents()));
           break;
         case NODE_TEXT:
           obj = await createElm(ancestor.parentNode);
-          obj.nodeType === NODE_ELEMENT && (
-            obj.appendChild(range.cloneContents()),
-            arr.push(obj)
-          );
+          if (obj.nodeType === NODE_ELEMENT) {
+            obj.appendChild(range.cloneContents());
+            arr.push(obj);
+          }
           break;
         default:
       }
@@ -474,14 +473,14 @@
         i++;
       }
       frag = await Promise.all(arr).then(createSelFrag);
-      l > 1 && frag && frag.hasChildNodes() &&
-      (obj = await createElm(document.documentElement)) &&
-      obj.nodeType === NODE_ELEMENT && (
-        obj.appendChild(frag),
-        frag = document.createDocumentFragment(),
-        frag.appendChild(obj),
-        frag.appendChild(document.createTextNode("\n"))
-      );
+      if (l > 1 && frag && frag.hasChildNodes() &&
+          (obj = await createElm(document.documentElement)) &&
+          obj.nodeType === NODE_ELEMENT) {
+        obj.appendChild(frag);
+        frag = document.createDocumentFragment();
+        frag.appendChild(obj);
+        frag.appendChild(document.createTextNode("\n"));
+      }
     }
     return frag && frag.hasChildNodes() &&
              (new XMLSerializer()).serializeToString(frag) || null;
@@ -654,17 +653,19 @@
    */
   const createContentDataMsg = async data => {
     const func = [];
-    data && (
-      data[CREATE_TMP_FILE] ?
+    if (data) {
+      if (data[CREATE_TMP_FILE]) {
         func.push(portMsg({
           [CREATE_TMP_FILE]: {
             data: data[CREATE_TMP_FILE],
             value: data.value,
           },
-        })) :
+        }));
+      } else {
         data[GET_FILE_PATH] &&
-          func.push(portMsg({[GET_FILE_PATH]: data[GET_FILE_PATH]}))
-    );
+          func.push(portMsg({[GET_FILE_PATH]: data[GET_FILE_PATH]}));
+      }
+    }
     return Promise.all(func);
   };
 
@@ -818,13 +819,12 @@
    * @return {Object} - content data
    */
   const createContentData = async elm => {
+    const {incognito, tabId, windowId} = vars;
     const data = {
+      incognito, tabId, windowId,
       mode: MODE_SOURCE,
-      dir: vars[INCOGNITO] && TMP_FILES_PB || TMP_FILES,
+      dir: incognito && TMP_FILES_PB || TMP_FILES,
       host: window.location.host || LABEL,
-      incognito: vars[INCOGNITO],
-      tabId: vars[TAB_ID],
-      windowId: vars[WIN_ID],
       namespaceURI: null,
       dataId: null,
       value: null,
@@ -832,57 +832,47 @@
     if (elm) {
       const contextType = await getContextType(elm);
       const sel = window.getSelection();
-      const parent = sel.anchorNode && sel.anchorNode.parentNode;
       let obj;
       switch (contextType.mode) {
         case MODE_EDIT_TEXT:
-          if (sel.isCollapsed) {
+          !sel.isCollapsed && sel.anchorNode &&
+            (elm = sel.anchorNode.parentNode);
+          if (sel.isCollapsed && await isEditControl(elm)) {
             obj = await getId(elm);
             if (obj) {
-              if (await isEditControl(elm)) {
-                data.mode = contextType.mode;
-                data.dataId = obj;
-                data.value = elm.value || "";
-              } else if (elm.isContentEditable ||
-                         await isContentTextNode(elm)) {
-                data.mode = contextType.mode;
-                data.dataId = obj;
-                data.value = elm.hasChildNodes() &&
-                             await getText(elm.childNodes) || "";
-                data.namespaceURI = contextType.namespaceURI;
-                setDataAttrs(elm);
-              }
+              data.mode = contextType.mode;
+              data.dataId = obj;
+              data.value = elm.value || "";
             }
-          } else if ((parent.isContentEditable || await isEditControl(parent) ||
-                      await isContentTextNode(parent)) &&
-                     (obj = await getId(parent))) {
-            data.mode = contextType.mode;
-            data.dataId = obj;
-            data.value = parent.hasChildNodes() &&
-                         await getText(parent.childNodes) || "";
-            data.namespaceURI = contextType.namespaceURI;
-            setDataAttrs(parent);
+          } else if (elm.isContentEditable || await isEditControl(elm) ||
+                     await isContentTextNode(elm)) {
+            obj = await getId(elm);
+            if (obj) {
+              data.mode = contextType.mode;
+              data.dataId = obj;
+              data.value = elm.hasChildNodes() &&
+                           await getText(elm.childNodes) || "";
+              data.namespaceURI = contextType.namespaceURI;
+              setDataAttrs(elm);
+            }
           }
           break;
         case MODE_MATHML:
-          sel.isCollapsed && contextType.namespaceURI === nsURI.math &&
-          (obj = await createDomXmlBased(elm, "math")) && (
-            data.mode = contextType.mode,
-            data.value = obj
-          );
-          break;
         case MODE_SVG:
-          sel.isCollapsed && contextType.namespaceURI === nsURI.svg &&
-          (obj = await createDomXmlBased(elm, "svg")) && (
-            data.mode = contextType.mode,
-            data.value = obj
+          obj = sel.isCollapsed && (
+            contextType.namespaceURI === nsURI.math && "math" ||
+            contextType.namespaceURI === nsURI.svg && "svg"
           );
+          if (obj && (obj = await createDomXmlBased(elm, obj))) {
+            data.mode = contextType.mode;
+            data.value = obj;
+          }
           break;
         case MODE_SELECTION:
-          !sel.isCollapsed && (obj = await createDomFromSelRange(sel)) && (
-            data.mode = contextType.mode,
-            data.value = obj
-          );
+          if (!sel.isCollapsed && (obj = await createDomFromSelRange(sel))) {
+            data.mode = contextType.mode;
+            data.value = obj;
+          }
           break;
         default:
       }
@@ -952,11 +942,11 @@
             isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
             ns = !isHtml && nsURI.html || "";
             attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS;
-            (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
-             timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) && (
-              id.setAttributeNS(ns, attr, timestamp),
-              func.push(replaceContent(id, value, namespaceURI))
-            );
+            if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
+                timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
+              id.setAttributeNS(ns, attr, timestamp);
+              func.push(replaceContent(id, value, namespaceURI));
+            }
             break;
           }
         }

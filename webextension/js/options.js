@@ -115,13 +115,13 @@
     const name = app && app.name;
     const path = app && app.path;
     const elm = document.getElementById(APP_NAME);
-    name && path && elm && (
-      elm.value = name,
-      func.push(createPref(elm).then(setStorage)),
+    if (name && path && elm) {
+      elm.value = name;
+      func.push(createPref(elm).then(setStorage));
       func.push(portMsg({
         [CHECK_EXECUTABLE]: {path},
-      }))
-    );
+      }));
+    }
     return Promise.all(func);
   };
 

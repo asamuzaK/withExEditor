@@ -425,10 +425,10 @@
         case ICON_COLOR:
         case ICON_GRAY:
         case ICON_WHITE:
-          obj.checked && (
-            varsLoc[ICON_PATH] = obj.value,
-            changed && func.push(replaceIcon())
-          );
+          if (obj.checked) {
+            varsLoc[ICON_PATH] = obj.value;
+            changed && func.push(replaceIcon());
+          }
           break;
         case KEY_ACCESS:
           vars[item] = obj.value;
@@ -521,21 +521,20 @@
    * @return {void}
    */
   const handlePort = async port => {
-    const {frameId, url: frameUrl, tab: {incognito}} = port.sender;
+    const {url: frameUrl, tab: {incognito}} = port.sender;
     let {windowId, id: tabId} = port.sender.tab;
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
-    windowId && tabId && (
-      ports[windowId] = ports[windowId] || {},
-      ports[windowId][tabId] = ports[windowId][tabId] || {},
-      ports[windowId][tabId][frameUrl] = port,
-      frameId === 0 && (ports[windowId][tabId][INCOGNITO] = incognito),
-      port.onMessage.addListener(handleMsg),
+    if (windowId && tabId && frameUrl) {
+      ports[windowId] = ports[windowId] || {};
+      ports[windowId][tabId] = ports[windowId][tabId] || {};
+      ports[windowId][tabId][frameUrl] = port;
+      port.onMessage.addListener(handleMsg);
       port.postMessage({
         incognito, tabId, windowId,
         [SET_VARS]: vars,
-      })
-    );
+      });
+    }
   };
 
   /**
