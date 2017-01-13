@@ -179,16 +179,18 @@
    */
   const requestTmpFile = async evt => {
     const func = [];
-    const elm = evt.target === evt.currentTarget && evt.target;
-    const attrs = elm && (
-      elm.hasAttributeNS("", DATA_ATTR_ID) &&
-      elm.getAttributeNS("", DATA_ATTR_ID) ||
-      elm.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
-      elm.getAttributeNS("", DATA_ATTR_ID_CTRL)
-    );
-    attrs && attrs.split(" ").forEach(dataId =>
-      func.push(portTmpFileData(dataId))
-    );
+    if (evt.target === evt.currentTarget) {
+      const {target} = evt;
+      const attrs = target && (
+        target.hasAttributeNS("", DATA_ATTR_ID) &&
+        target.getAttributeNS("", DATA_ATTR_ID) ||
+        target.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
+        target.getAttributeNS("", DATA_ATTR_ID_CTRL)
+      );
+      attrs && attrs.split(" ").forEach(dataId =>
+        func.push(portTmpFileData(dataId))
+      );
+    }
     return Promise.all(func).catch(logError);
   };
 
@@ -1124,10 +1126,10 @@
     if (vars[IS_ENABLED]) {
       if (await keyComboMatches(evt, execEditorKey)) {
         if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
-          const elm = evt.target;
-          const mode = await getContextMode(elm);
+          const {target} = evt;
+          const mode = await getContextMode(target);
           (!vars[ENABLE_ONLY_EDITABLE] || mode === MODE_EDIT_TEXT) &&
-            func.push(portContent(elm, mode));
+            func.push(portContent(target, mode));
         }
       } else {
         const openOpt = await keyComboMatches(evt, openOptionsKey);
