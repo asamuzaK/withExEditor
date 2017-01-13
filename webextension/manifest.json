@@ -13,13 +13,11 @@
     "default_icon": "img/icon.svg#gray",
     "default_title": "__MSG_extensionName__"
   },
-  "commands": {
-  },
   "content_scripts": [
     {
       "all_frames": true,
-      "matches": ["<all_urls>"],
       "js": ["js/content.js"],
+      "matches": ["<all_urls>"],
       "run_at": "document_start"
     }
   ],
