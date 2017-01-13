@@ -290,11 +290,11 @@
     const attrs = node && node.attributes;
     if (elm && node && attrs) {
       for (const attr of attrs) {
-        const {localName, prefix} = attr;
-        typeof node[attr.name] !== "function" && elm.setAttributeNS(
-          attr.namespaceURI || prefix && nsURI[prefix] || "",
+        const {localName, name, namespaceURI, prefix, value} = attr;
+        typeof node[name] !== "function" && elm.setAttributeNS(
+          namespaceURI || prefix && nsURI[prefix] || "",
           prefix && `${prefix}:${localName}` || localName,
-          attr.value
+          value
         );
       }
     }
@@ -308,13 +308,13 @@
   const createElm = async node => {
     let elm;
     if (node) {
-      const {localName, prefix} = node;
+      const {attributes, localName, namespaceURI, prefix} = node;
       elm = document.createElementNS(
-        node.namespaceURI || prefix && nsURI[prefix] ||
+        namespaceURI || prefix && nsURI[prefix] ||
         await getNodeNS(node).namespaceURI || nsURI.html,
         prefix && `${prefix}:${localName}` || localName
       );
-      node.attributes && await setAttributeNS(elm, node);
+      attributes && await setAttributeNS(elm, node);
     }
     return elm || null;
   };
