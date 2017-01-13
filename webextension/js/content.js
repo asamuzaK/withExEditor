@@ -49,7 +49,8 @@
   const KEY_ACCESS = "accessKey";
   const KEY_OPEN_OPTIONS = "optionsShortCut";
   const KEY_EXEC_EDITOR = "editorShortCut";
-  const NODE_CONTEXT = "contextNode";
+  const CONTEXT_MODE = "contextMode";
+  const CONTEXT_NODE = "contextNode";
   const TAB_ID = "tabId";
   const WIN_ID = "windowId";
 
@@ -61,7 +62,8 @@
     [KEY_OPEN_OPTIONS]: true,
     [ENABLE_ONLY_EDITABLE]: false,
     [INCOGNITO]: false,
-    [NODE_CONTEXT]: null,
+    [CONTEXT_MODE]: null,
+    [CONTEXT_NODE]: null,
     [TAB_ID]: "",
     [WIN_ID]: "",
   };
@@ -885,17 +887,17 @@
   };
 
   /**
-   * handle context menu item clicked info
+   * handle context menu clicked info
    * @param {Object} info - context menu info
    * @returns {Object} - Promise.<Array.<*>>
    */
   const menuClickedInfo = async (info = {}) => {
     const func = [];
     const {menuItemId} = info;
-    const elm = vars[NODE_CONTEXT];
-    menuItemId === MODE_SOURCE &&
-    func.push(getContextMode(elm).then(mode => portContent(elm, mode))) ||
-    func.push(portContent(menuItemId));
+    const elm = vars[CONTEXT_NODE];
+    const mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
+    mode && func.push(portContent(elm, mode)) ||
+    func.push(getContextMode(elm).then(m => portContent(elm, m)));
     return Promise.all(func);
   };
 
@@ -1093,7 +1095,10 @@
    * @returns {Object} - Promise.<void>
    */
   const handleContextMenu = async evt => {
-    const elm = vars[NODE_CONTEXT] = evt.target;
+    const {target} = evt;
+    const {namespaceURI} = target;
+    const mode = namespaceURI === nsURI.math && MODE_MATHML ||
+                 namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
     const sel = window.getSelection();
     const item = {
       [MODE_EDIT_TEXT]: {
@@ -1102,11 +1107,12 @@
                  sel.anchorNode.parentNode === sel.focusNode.parentNode,
       },
       [MODE_SOURCE]: {
+        mode,
         menuItemId: MODE_SOURCE,
-        mode: elm.namespaceURI === nsURI.math && MODE_MATHML ||
-              elm.namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE,
       },
     };
+    vars[CONTEXT_MODE] = mode;
+    vars[CONTEXT_NODE] = target;
     return portMsg({[CONTEXT_MENU]: item}).catch(logError);
   };
 
