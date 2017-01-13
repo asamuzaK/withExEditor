@@ -208,7 +208,7 @@
    * @return {void}
    */
   const updateTmpFileData = async (obj = {}) => {
-    const {path, data} = obj;
+    const {data, path} = obj;
     if (data) {
       const {dataId, mode} = data;
       if (mode === MODE_EDIT_TEXT) {
@@ -270,12 +270,11 @@
         }
       }
       if (!ns.node) {
-        node = root;
-        ns.node = node;
-        ns.localName = node.localName;
-        ns.namespaceURI = node.hasAttribute("xmlns") &&
-                          node.getAttribute("xmlns") ||
-                          nsURI[node.localName.toLowerCase()] || "";
+        ns.node = root;
+        ns.localName = root.localName;
+        ns.namespaceURI = root.hasAttribute("xmlns") &&
+                          root.getAttribute("xmlns") ||
+                          nsURI[root.localName.toLowerCase()] || "";
       }
     }
     return ns;
@@ -291,7 +290,7 @@
     const attrs = node && node.attributes;
     if (elm && node && attrs) {
       for (const attr of attrs) {
-        const {prefix, localName} = attr;
+        const {localName, prefix} = attr;
         typeof node[attr.name] !== "function" && elm.setAttributeNS(
           attr.namespaceURI || prefix && nsURI[prefix] || "",
           prefix && `${prefix}:${localName}` || localName,
@@ -309,7 +308,7 @@
   const createElm = async node => {
     let elm;
     if (node) {
-      const {prefix, localName} = node;
+      const {localName, prefix} = node;
       elm = document.createElementNS(
         node.namespaceURI || prefix && nsURI[prefix] ||
         await getNodeNS(node).namespaceURI || nsURI.html,
@@ -712,7 +711,7 @@
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
     const {dir, host, incognito, mode, tabId, windowId} = data;
-    let {dataId, value, namespaceURI} = data, fileName, tmpFileData;
+    let {dataId, namespaceURI, value} = data, fileName, tmpFileData;
     namespaceURI = namespaceURI || "";
     switch (mode) {
       case MODE_EDIT_TEXT:
@@ -1053,7 +1052,7 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            obj.info && func.push(menuClickedInfo(obj.info));
+            func.push(menuClickedInfo(obj.info));
             break;
           case KEY_ACCESS:
             vars[item] = obj;

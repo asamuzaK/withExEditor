@@ -148,7 +148,7 @@
    */
   const restorePorts = async (data = {}) => {
     const func = [];
-    const {windowId, tabId} = data;
+    const {tabId, windowId} = data;
     if (windowId && tabId && ports[windowId]) {
       delete ports[windowId][tabId];
       Object.keys(ports[windowId]).length === 0 &&
@@ -543,7 +543,7 @@
    * @return {Object} - Promise.<Array.<*>>
    */
   const onTabActivated = async info => {
-    let {windowId, tabId} = info, bool;
+    let {tabId, windowId} = info, bool;
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
     if (windowId && tabId) {
