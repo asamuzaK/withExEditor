@@ -885,6 +885,21 @@
     return mode;
   };
 
+  /**
+   * handle context menu item clicked info
+   * @param {Object} info - context menu info
+   * @return {Object} - Promise.<Array.<*>>
+   */
+  const menuClickedInfo = async (info = {}) => {
+    const func = [];
+    const {menuItemId} = info;
+    const elm = vars[NODE_CONTEXT];
+    menuItemId === MODE_SOURCE &&
+    func.push(getContextMode(elm).then(mode => portContent(elm, mode))) ||
+    func.push(portContent(menuItemId));
+    return Promise.all(func);
+  };
+
   /* synchronize edited text */
   /**
    * replace content editable element text
@@ -1038,13 +1053,7 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            if (obj.info.menuItemId === MODE_SOURCE) {
-              func.push(getContextMode(vars[NODE_CONTEXT]).then(mode =>
-                portContent(vars[NODE_CONTEXT], mode)
-              ));
-            } else {
-              func.push(portContent(vars[NODE_CONTEXT], obj.info.menuItemId));
-            }
+            obj.info && func.push(menuClickedInfo(obj.info));
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -1062,9 +1071,7 @@
           case PORT_FILE_PATH:
             func.push(updateTmpFileData(obj));
             obj.path && func.push(portMsg({
-              [PORT_HOST]: {
-                path: obj.path,
-              },
+              [PORT_HOST]: {path: obj.path},
             }));
             break;
           case SYNC_TEXT:
