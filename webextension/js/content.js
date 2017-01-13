@@ -887,18 +887,16 @@
   };
 
   /**
-   * handle context menu clicked info
+   * determine port content process
    * @param {Object} info - context menu info
    * @returns {Object} - Promise.<Array.<*>>
    */
-  const menuClickedInfo = async (info = {}) => {
-    const func = [];
+  const determinePortProc = async (info = {}) => {
     const {menuItemId} = info;
     const elm = vars[CONTEXT_NODE];
     const mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
-    mode && func.push(portContent(elm, mode)) ||
-    func.push(getContextMode(elm).then(m => portContent(elm, m)));
-    return Promise.all(func);
+    return mode && portContent(elm, mode) ||
+           getContextMode(elm).then(m => portContent(elm, m));
   };
 
   /* synchronize edited text */
@@ -1054,7 +1052,7 @@
             vars[item] = !!obj;
             break;
           case GET_CONTENT:
-            func.push(menuClickedInfo(obj.info));
+            func.push(determinePortProc(obj.info));
             break;
           case KEY_ACCESS:
             vars[item] = obj;
