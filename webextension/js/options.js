@@ -74,11 +74,11 @@
     return id && {
       [id]: {
         id,
-        value: elm.value || "",
-        checked: !!elm.checked,
         app: {
           executable: !!executable,
         },
+        checked: !!elm.checked,
+        value: elm.value || "",
       },
     } || null;
   };
@@ -112,15 +112,16 @@
   const extractAppManifest = async (arr = []) => {
     const func = [];
     const app = await JSON.parse((new TextDecoder(CHAR)).decode(arr));
-    const name = app && app.name;
-    const path = app && app.path;
-    const elm = document.getElementById(APP_NAME);
-    if (name && path && elm) {
-      elm.value = name;
-      func.push(createPref(elm).then(setStorage));
-      func.push(portMsg({
-        [CHECK_EXECUTABLE]: {path},
-      }));
+    if (app) {
+      const {name, path} = app;
+      const elm = document.getElementById(APP_NAME);
+      if (elm && name && path) {
+        elm.value = name;
+        func.push(createPref(elm).then(setStorage));
+        func.push(portMsg({
+          [CHECK_EXECUTABLE]: {path},
+        }));
+      }
     }
     return Promise.all(func);
   };
@@ -182,8 +183,8 @@
   const localizeAttr = async elm => {
     if (elm && elm.nodeType === NODE_ELEMENT && elm.hasAttributes()) {
       const attrs = {
-        ariaLabel: "aria-label",
         alt: "alt",
+        ariaLabel: "aria-label",
         href: "href",
         placeholder: "placeholder",
         title: "title",
