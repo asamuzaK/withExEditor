@@ -179,14 +179,12 @@
    */
   const requestTmpFile = async evt => {
     const func = [];
-    if (evt.target === evt.currentTarget) {
-      const {target} = evt;
-      const attrs = target && (
-        target.hasAttributeNS("", DATA_ATTR_ID) &&
-        target.getAttributeNS("", DATA_ATTR_ID) ||
-        target.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
-        target.getAttributeNS("", DATA_ATTR_ID_CTRL)
-      );
+    const {target, currentTarget} = evt;
+    if (target === currentTarget) {
+      const attrs = target.hasAttributeNS("", DATA_ATTR_ID) &&
+                    target.getAttributeNS("", DATA_ATTR_ID) ||
+                    target.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
+                    target.getAttributeNS("", DATA_ATTR_ID_CTRL;
       attrs && attrs.split(" ").forEach(dataId =>
         func.push(portTmpFileData(dataId))
       );
