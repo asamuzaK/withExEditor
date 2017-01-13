@@ -9,7 +9,7 @@
   /**
    * log error
    * @param {!Object} e - Error
-   * @return {boolean} - false
+   * @returns {boolean} - false
    */
   const logError = e => {
     console.error(e);
@@ -18,7 +18,7 @@
 
   /**
    * insert code sample to html
-   * @return {Object} - Promise.<void>
+   * @returns {Object} - Promise.<void>
    */
   const insertCodeSample = () => fetch(CODE_SAMPLE_PATH).then(async res => {
     const codes = await res.json();

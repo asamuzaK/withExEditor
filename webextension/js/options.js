@@ -28,7 +28,7 @@
   /**
    * log error
    * @param {!Object} e - Error
-   * @return {boolean} - false
+   * @returns {boolean} - false
    */
   const logError = e => {
     console.error(e);
@@ -38,7 +38,7 @@
   /**
    * is string
    * @param {*} o - object to check
-   * @return {boolean} - result
+   * @returns {boolean} - result
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
@@ -49,7 +49,7 @@
   /**
    * port message
    * @param {*} msg - message
-   * @return {void}
+   * @returns {void}
    */
   const portMsg = async msg => {
     msg && port.postMessage(msg);
@@ -59,7 +59,7 @@
   /**
    * set storage
    * @param {Object} pref - pref
-   * @return {Object} - ?Promise.<void>
+   * @returns {Object} - ?Promise.<void>
    */
   const setStorage = async pref => pref && storage.set(pref) || null;
 
@@ -67,7 +67,7 @@
    * create pref
    * @param {Object} elm - element
    * @param {boolean} executable - executable
-   * @return {Object} - pref data
+   * @returns {Object} - pref data
    */
   const createPref = async (elm, executable = false) => {
     const id = elm && elm.id;
@@ -86,7 +86,7 @@
   /**
    * synchronize editorName value
    * @param {string} executable - executable
-   * @return {Object} - element
+   * @returns {Object} - element
    */
   const syncEditorName = async (executable = false) => {
     const elm = document.getElementById(EDITOR_NAME);
@@ -107,7 +107,7 @@
   /**
    * extract application manifest
    * @param {Array} arr - Uint8Array
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const extractAppManifest = async (arr = []) => {
     const func = [];
@@ -129,7 +129,7 @@
   /**
    * set pref storage
    * @param {!Object} evt - Event
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const setPrefStorage = async evt => {
     const func = [];
@@ -164,7 +164,7 @@
   /* html */
   /**
    * add event listener to input elements
-   * @return {void}
+   * @returns {void}
    */
   const addInputChangeListener = async () => {
     const nodes = document.querySelectorAll("input");
@@ -178,7 +178,7 @@
   /**
    * localize attribute value
    * @param {Object} elm - element
-   * @return {void}
+   * @returns {void}
    */
   const localizeAttr = async elm => {
     if (elm && elm.nodeType === NODE_ELEMENT && elm.hasAttributes()) {
@@ -201,7 +201,7 @@
 
   /**
    * localize html
-   * @return {void}
+   * @returns {void}
    */
   const localizeHtml = async () => {
     const lang = i18n.getMessage(LANG);
@@ -221,7 +221,7 @@
   /**
    * set html input value
    * @param {Object} data - storage data
-   * @return {void}
+   * @returns {void}
    */
   const setHtmlInputValue = async data => {
     const elm = data && data.id && document.getElementById(data.id);
@@ -243,7 +243,7 @@
 
   /**
    * set html input values from storage
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const setValuesFromStorage = async () => {
     const func = [];
@@ -261,7 +261,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @return {Object} - Promise.<Array<*>>
+   * @returns {Object} - Promise.<Array<*>>
    */
   const handleMsg = async msg => {
     const func = [];

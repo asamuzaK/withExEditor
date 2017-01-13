@@ -69,7 +69,7 @@
   /**
    * log error
    * @param {!Object} e - Error
-   * @return {boolean} - false
+   * @returns {boolean} - false
    */
   const logError = e => {
     console.error(e);
@@ -79,7 +79,7 @@
   /**
    * is string
    * @param {*} o - object to check
-   * @return {boolean} - result
+   * @returns {boolean} - result
    */
   const isString = o =>
     o && (typeof o === "string" || o instanceof String) || false;
@@ -87,7 +87,7 @@
   /**
    * strip HTML tags and decode HTML escaped characters
    * @param {string} v - value
-   * @return {string} - converted value
+   * @returns {string} - converted value
    */
   const convertValue = async v => {
     while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
@@ -101,7 +101,7 @@
   /**
    * join array
    * @param {Array} arr - array
-   * @return {string} - string
+   * @returns {string} - string
    */
   const joinArr = async arr =>
     Array.isArray(arr) && (arr.map(i => i || "")).join("") || "";
@@ -111,7 +111,7 @@
    * get file name from URI path
    * @param {string} uri - URI
    * @param {string} subst - substitute file name
-   * @return {string} - file name
+   * @returns {string} - file name
    */
   const getFileNameFromURI = async (uri, subst = LABEL) => {
     const name = isString(uri) && !/^data:/.test(uri) &&
@@ -126,7 +126,7 @@
    * get file extension from media type
    * @param {string} media - media type
    * @param {string} subst - substitute file extension
-   * @return {string} - file extension
+   * @returns {string} - file extension
    */
   const getFileExtension = async (media = "text/plain", subst = "txt") => {
     const arr = /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
@@ -151,7 +151,7 @@
   /**
    * port message
    * @param {*} msg - message
-   * @return {void}
+   * @returns {void}
    */
   const portMsg = async msg => {
     msg && port.postMessage(msg);
@@ -163,7 +163,7 @@
   /**
    * port temporary file data
    * @param {string} dataId - data ID
-   * @return {Object} - ?Promise.<void>
+   * @returns {Object} - ?Promise.<void>
    */
   const portTmpFileData = async dataId => {
     const data = dataId && dataIds[dataId];
@@ -173,7 +173,7 @@
   /**
    * port temporary file data to get temporary file
    * @param {!Object} evt - Event
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const requestTmpFile = async evt => {
     const func = [];
@@ -193,7 +193,7 @@
   /**
    * store temporary file data
    * @param {Object} data - temporary file data
-   * @return {void}
+   * @returns {void}
    */
   const storeTmpFileData = async (data = {}) => {
     if (data[CREATE_TMP_FILE] && (data = data[CREATE_TMP_FILE])) {
@@ -205,7 +205,7 @@
   /**
    * update temporary file data
    * @param {Object} obj - temporary file data object
-   * @return {void}
+   * @returns {void}
    */
   const updateTmpFileData = async (obj = {}) => {
     const {data, path} = obj;
@@ -233,7 +233,7 @@
   /**
    * get namespace of node from ancestor
    * @param {Object} node - element node
-   * @return {Object} - namespace data
+   * @returns {Object} - namespace data
    */
   const getNodeNS = async node => {
     const ns = {node: null, name: null, namespaceURI: null};
@@ -284,7 +284,7 @@
    * set namespaced attribute
    * @param {Object} elm - element to append attributes
    * @param {Object} node - element node to get attributes from
-   * @return {void}
+   * @returns {void}
    */
   const setAttributeNS = async (elm, node) => {
     const attrs = node && node.attributes;
@@ -303,7 +303,7 @@
   /**
    * create namespaced element
    * @param {Object} node - element node to create element from
-   * @return {Object} - namespaced element
+   * @returns {Object} - namespaced element
    */
   const createElm = async node => {
     let elm;
@@ -322,7 +322,7 @@
   /**
    * create document fragment from nodes array
    * @param {Object} nodes - nodes array
-   * @return {Object} - document fragment
+   * @returns {Object} - document fragment
    */
   const createFrag = async nodes => {
     const frag = document.createDocumentFragment();
@@ -337,7 +337,7 @@
    * append child nodes
    * @param {Object} elm - container element
    * @param {Object} node - node containing child nodes to append
-   * @return {Object} - element or text node
+   * @returns {Object} - element or text node
    */
   const appendChild = async (elm, node) => {
     elm = await createElm(elm);
@@ -369,7 +369,7 @@
   /**
    * create DOM of MathML / SVG
    * @param {Object} node - element node
-   * @return {?string} - serialized node string
+   * @returns {?string} - serialized node string
    */
   const createDomXmlBased = async node => {
     let elm;
@@ -392,7 +392,7 @@
   /**
    * create selection fragment
    * @param {Array} arr - array of nodes array
-   * @return {Object} - document fragment
+   * @returns {Object} - document fragment
    */
   const createSelFrag = async arr => {
     let frag;
@@ -419,7 +419,7 @@
    * @param {Object} range - range
    * @param {number} index - index
    * @param {number} count - range count
-   * @return {Object} - Promise.<Array>, range array
+   * @returns {Object} - Promise.<Array>, range array
    */
   const createRangeArr = async (range, index, count) => {
     const arr = [];
@@ -460,7 +460,7 @@
   /**
    * create DOM from selection range
    * @param {Object} sel - selection
-   * @return {?string} - serialized node string
+   * @returns {?string} - serialized node string
    */
   const createDomFromSelRange = async sel => {
     let frag;
@@ -489,7 +489,7 @@
   /**
    * get text
    * @param {Object} nodes - nodes
-   * @return {Object} - Promise.<string>, text
+   * @returns {Object} - Promise.<string>, text
    */
   const getText = async nodes => {
     const arr = [];
@@ -516,7 +516,7 @@
   /**
    * get / create temporary ID and add listener
    * @param {Object} elm - target element
-   * @return {?string} - ID
+   * @returns {?string} - ID
    */
   const getId = async elm => {
     let id;
@@ -539,7 +539,7 @@
   /**
    * node or ancestor is editable
    * @param {Object} node - element node
-   * @return {boolean} - result
+   * @returns {boolean} - result
    */
   const isEditable = async node => {
     let elm = node, editable;
@@ -557,7 +557,7 @@
   /**
    * node content is text node
    * @param {Object} node - element node
-   * @return {boolean} - result
+   * @returns {boolean} - result
    */
   const isContentTextNode = async node => {
     let isText = await isEditable(node);
@@ -577,7 +577,7 @@
   /**
    * is text edit control element
    * @param {Object} elm - element
-   * @return {boolean} - result
+   * @returns {boolean} - result
    */
   const isEditControl = async elm => {
     let bool;
@@ -600,7 +600,7 @@
   /**
    * get editable element from ancestor
    * @param {Object} node - node
-   * @return {Object} - editable element
+   * @returns {Object} - editable element
    */
   const getEditableElm = async node => {
     let elm;
@@ -622,7 +622,7 @@
   /**
    * set data attribute and add listener
    * @param {Object} elm - element
-   * @return {void}
+   * @returns {void}
    */
   const setDataAttrs = async elm => {
     if (elm) {
@@ -649,7 +649,7 @@
   /**
    * create content data message
    * @param {Object} data - temporary file data
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const createContentDataMsg = async data => {
     const func = [];
@@ -672,7 +672,7 @@
   /**
    * fetch file source and create temporary file data
    * @param {Object} data - content data
-   * @return {Object} - temporary file data
+   * @returns {Object} - temporary file data
    */
   const fetchSource = async data => {
     const {characterSet, contentType, documentURI: uri} = document;
@@ -706,7 +706,7 @@
   /**
    * create temporary file data
    * @param {Object} data - content data
-   * @return {Object} - temporary file data
+   * @returns {Object} - temporary file data
    */
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
@@ -770,7 +770,7 @@
    * create content data
    * @param {Object} elm - element
    * @param {string} mode - context mode
-   * @return {Object} - content data
+   * @returns {Object} - content data
    */
   const createContentData = async (elm, mode) => {
     const {incognito, tabId, windowId} = vars;
@@ -832,7 +832,7 @@
    * port content data
    * @param {Object} elm - element
    * @param {string} mode - context mode
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const portContent = (elm, mode) =>
     createContentData(elm, mode).then(createTmpFileData).then(data =>
@@ -844,7 +844,7 @@
   /**
    * get context mode
    * @param {Object} elm - element
-   * @return {string} - context mode
+   * @returns {string} - context mode
    */
   const getContextMode = async elm => {
     let mode = MODE_SOURCE;
@@ -887,7 +887,7 @@
   /**
    * handle context menu item clicked info
    * @param {Object} info - context menu info
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const menuClickedInfo = async (info = {}) => {
     const func = [];
@@ -905,7 +905,7 @@
    * @param {Object} node - editable element
    * @param {string} value - value
    * @param {string} ns - namespace URI
-   * @return {void}
+   * @returns {void}
    */
   const replaceContent = async (node, value = "", ns = nsURI.html) => {
     if (node && node.nodeType === NODE_ELEMENT) {
@@ -931,7 +931,7 @@
   /**
    * get target element and synchronize text
    * @param {Object} obj - sync data object
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const syncText = async (obj = {}) => {
     const func = [];
@@ -1000,7 +1000,7 @@
    * key combination matches
    * @param {Object} evt - Event
    * @param {Object} key - KeyCombo
-   * @return {boolean} - result
+   * @returns {boolean} - result
    */
   const keyComboMatches = async (evt, key) =>
     evt && key && key.enabled && key.key && evt.key &&
@@ -1014,7 +1014,7 @@
    * @param {Object} obj - object to extend items
    * @param {string} key - storage key
    * @param {number} len - default items length
-   * @return {void}
+   * @returns {void}
    */
   const extendObjItems = async (obj, key, len = 0) => {
     if (obj && key && Object.keys(obj).length <= len) {
@@ -1034,7 +1034,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @return {Object} - Promise.<Array<*>>
+   * @returns {Object} - Promise.<Array<*>>
    */
   const handleMsg = async msg => {
     const func = [];
@@ -1090,7 +1090,7 @@
   /**
    * handle contextmenu event
    * @param {!Object} evt - Event
-   * @return {Object} - Promise.<void>
+   * @returns {Object} - Promise.<void>
    */
   const handleContextMenu = async evt => {
     const elm = vars[NODE_CONTEXT] = evt.target;
@@ -1113,7 +1113,7 @@
   /**
    * handle keypress event
    * @param {!Object} evt - Event
-   * @return {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const handleKeyPress = async evt => {
     const func = [];
