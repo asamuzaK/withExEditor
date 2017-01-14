@@ -387,8 +387,7 @@
         elm = await appendChild(elm, range.cloneContents());
       }
     }
-    return elm && elm.hasChildNodes() &&
-             (new XMLSerializer()).serializeToString(elm) || null;
+    return elm && (new XMLSerializer()).serializeToString(elm) || null;
   };
 
   /**
@@ -484,8 +483,7 @@
         frag.appendChild(document.createTextNode("\n"));
       }
     }
-    return frag && frag.hasChildNodes() &&
-             (new XMLSerializer()).serializeToString(frag) || null;
+    return frag && (new XMLSerializer()).serializeToString(frag) || null;
   };
 
   /**
@@ -584,14 +582,13 @@
   const isEditControl = async elm => {
     let bool;
     if (elm) {
-      switch (elm.localName) {
+      const {localName, type} = elm;
+      switch (localName) {
         case "textarea":
           bool = true;
           break;
         case "input":
-          bool = elm.hasAttribute("type") ?
-                   /^(?:(?:emai|te|ur)l|search|text)$/.test(elm.getAttribute("type")) :
-                   true;
+          bool = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
           break;
         default:
       }
@@ -1094,24 +1091,30 @@
    */
   const handleContextMenu = async evt => {
     const {target} = evt;
-    const {namespaceURI} = target;
+    const {localName, namespaceURI, type} = target;
+    const {anchorNode, focusNode, isCollapsed} = window.getSelection();
     const mode = namespaceURI === nsURI.math && MODE_MATHML ||
                  namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
-    const sel = window.getSelection();
-    const item = {
-      [MODE_EDIT_TEXT]: {
-        menuItemId: MODE_EDIT_TEXT,
-        enabled: sel.isCollapsed ||
-                 sel.anchorNode.parentNode === sel.focusNode.parentNode,
-      },
-      [MODE_SOURCE]: {
-        mode,
-        menuItemId: MODE_SOURCE,
-      },
-    };
+    let enabled;
+    if (localName === "input") {
+      enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
+    } else {
+      enabled = isCollapsed || anchorNode.parentNode === focusNode.parentNode;
+    }
     vars[CONTEXT_MODE] = mode;
     vars[CONTEXT_NODE] = target;
-    return portMsg({[CONTEXT_MENU]: item}).catch(logError);
+    return portMsg({
+      [CONTEXT_MENU]: {
+        [MODE_EDIT_TEXT]: {
+          enabled,
+          menuItemId: MODE_EDIT_TEXT,
+        },
+        [MODE_SOURCE]: {
+          mode,
+          menuItemId: MODE_SOURCE,
+        },
+      },
+    }).catch(logError);
   };
 
   /**
