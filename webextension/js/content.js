@@ -400,15 +400,22 @@
     if (Array.isArray(arr) && arr.length) {
       frag = document.createDocumentFragment();
       for (const nodes of arr) {
-        if (!Array.isArray(nodes)) {
-          return null;
-        }
-        for (const node of nodes) {
-          if (node && (node.nodeType === NODE_ELEMENT ||
-                       node.nodeType === NODE_TEXT ||
-                       node.nodeType === NODE_COMMENT)) {
-            frag.appendChild(node);
+        if (Array.isArray(nodes)) {
+          for (const node of nodes) {
+            if (node) {
+              switch (node.nodeType) {
+                case NODE_ELEMENT:
+                case NODE_TEXT:
+                case NODE_COMMENT:
+                  frag.appendChild(node);
+                  break;
+                default:
+              }
+            }
           }
+        } else {
+          frag = null;
+          break;
         }
       }
     }
