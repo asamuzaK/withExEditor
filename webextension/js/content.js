@@ -584,7 +584,6 @@
       bool = localName === "textarea" ||
              localName === "input" &&
                (!type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type));
-      }
     }
     return bool || false;
   };
