@@ -223,8 +223,9 @@
    * @param {Object} data - storage data
    * @returns {void}
    */
-  const setHtmlInputValue = async data => {
-    const elm = data && data.id && document.getElementById(data.id);
+  const setHtmlInputValue = async (data = {}) => {
+    const {id} = data;
+    const elm = id && document.getElementById(id);
     if (elm) {
       switch (elm.type) {
         case "checkbox":

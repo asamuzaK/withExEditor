@@ -288,10 +288,10 @@
    * @param {Object} node - element node to get attributes from
    * @returns {void}
    */
-  const setAttributeNS = async (elm, node) => {
-    const attrs = node && node.attributes;
-    if (elm && node && attrs) {
-      for (const attr of attrs) {
+  const setAttributeNS = async (elm, node = {}) => {
+    const {attributes} = node;
+    if (elm && attributes) {
+      for (const attr of attributes) {
         const {localName, name, namespaceURI, prefix, value} = attr;
         typeof node[name] !== "function" && elm.setAttributeNS(
           namespaceURI || prefix && nsURI[prefix] || "",
@@ -348,18 +348,16 @@
       const nodes = node.childNodes;
       if (nodes instanceof NodeList) {
         for (const child of nodes) {
-          switch (child.nodeType) {
-            case NODE_ELEMENT:
-              child === child.parentNode.firstChild &&
-                arr.push(document.createTextNode("\n"));
-              arr.push(createElm(child).then(obj => appendChild(obj, child)));
-              child === child.parentNode.lastChild &&
-                arr.push(document.createTextNode("\n"));
-              break;
-            case NODE_TEXT:
-              arr.push(document.createTextNode(child.nodeValue));
-              break;
-            default:
+          const {nodeType, nodeValue, parentNode} = child;
+          if (nodeType === NODE_ELEMENT) {
+            child === parentNode.firstChild &&
+              arr.push(document.createTextNode("\n"));
+            arr.push(createElm(child).then(obj => appendChild(obj, child)));
+            child === parentNode.lastChild &&
+              arr.push(document.createTextNode("\n"));
+          } else {
+            nodeType === NODE_TEXT &&
+              arr.push(document.createTextNode(nodeValue));
           }
         }
       }
@@ -423,7 +421,7 @@
    * @param {Object} range - range
    * @param {number} index - index
    * @param {number} count - range count
-   * @returns {Object} - Promise.<Array>, range array
+   * @returns {Object} - ?Promise.<Array>, range array
    */
   const createRangeArr = async (range, index, count) => {
     const arr = [];
@@ -498,18 +496,14 @@
     const arr = [];
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
-        switch (node.nodeType) {
-          case NODE_ELEMENT:
-            if (node.localName === "br") {
-              arr.push("\n");
-            } else {
-              node.hasChildNodes() && arr.push(getText(node.childNodes));
-            }
-            break;
-          case NODE_TEXT:
-            arr.push(node.nodeValue);
-            break;
-          default:
+        if (node.nodeType === NODE_ELEMENT) {
+          if (node.localName === "br") {
+            arr.push("\n");
+          } else {
+            node.hasChildNodes() && arr.push(getText(node.childNodes));
+          }
+        } else {
+          node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
         }
       }
     }
@@ -522,21 +516,22 @@
    * @returns {?string} - ID
    */
   const getId = async elm => {
-    let id;
+    let dataId;
     if (elm) {
       const isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
       const ns = !isHtml && nsURI.html || "";
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID)) {
-        id = elm.getAttributeNS(ns, DATA_ATTR_ID);
+        dataId = elm.getAttributeNS(ns, DATA_ATTR_ID);
       } else {
-        id = `${LABEL}_${elm.id || window.performance.now()}`
-               .replace(/[-:.]/g, "_");
+        const attr = isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS;
+        dataId = `${LABEL}_${elm.id || window.performance.now()}`
+                   .replace(/[-:.]/g, "_");
         !isHtml && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html);
-        elm.setAttributeNS(ns, isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS, id);
+        elm.setAttributeNS(ns, attr, dataId);
         isHtml && elm.addEventListener("focus", requestTmpFile, false);
       }
     }
-    return id || null;
+    return dataId || null;
   };
 
   /**
@@ -846,31 +841,26 @@
   const getContextMode = async elm => {
     let mode = MODE_SOURCE;
     if (elm) {
-      const sel = window.getSelection();
-      if (sel.isCollapsed) {
+      const {
+        anchorNode, focusNode, isCollapsed, rangeCount,
+      } = window.getSelection();
+      if (isCollapsed) {
         if (elm.isContentEditable || await isEditControl(elm) ||
             await isContentTextNode(elm)) {
           mode = MODE_EDIT_TEXT;
         } else {
-          switch (elm.namespaceURI) {
-            case nsURI.math:
-              mode = MODE_MATHML;
-              break;
-            case nsURI.svg:
-              mode = MODE_SVG;
-              break;
-            default:
-          }
+          elm.namespaceURI === nsURI.math && (mode = MODE_MATHML) ||
+          elm.namespaceURI === nsURI.svg && (mode = MODE_SVG);
         }
       } else {
-        elm = sel.anchorNode.nodeType === NODE_TEXT &&
-              sel.anchorNode.parentNode ||
-              sel.focusNode.nodeType === NODE_TEXT &&
-              sel.focusNode.parentNode || elm;
-        if (sel.rangeCount === 1 &&
-            sel.anchorNode.parentNode === sel.focusNode.parentNode &&
+        elm = anchorNode.nodeType === NODE_TEXT &&
+              anchorNode.parentNode ||
+              focusNode.nodeType === NODE_TEXT &&
+              focusNode.parentNode || elm;
+        if (rangeCount === 1 &&
+            anchorNode.parentNode === focusNode.parentNode &&
             elm !== document.documentElement &&
-            (await isEditControl(elm) || elm.isContentEditable ||
+            (elm.isContentEditable || await isEditControl(elm) ||
              await isContentTextNode(elm))) {
           mode = MODE_EDIT_TEXT;
         } else {
