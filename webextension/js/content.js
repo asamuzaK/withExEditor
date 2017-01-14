@@ -403,14 +403,10 @@
         if (Array.isArray(nodes)) {
           for (const node of nodes) {
             if (node) {
-              switch (node.nodeType) {
-                case NODE_ELEMENT:
-                case NODE_TEXT:
-                case NODE_COMMENT:
-                  frag.appendChild(node);
-                  break;
-                default:
-              }
+              const {nodeType} = node;
+              (nodeType === NODE_ELEMENT || nodeType === NODE_TEXT ||
+               nodeType === NODE_COMMENT) &&
+                frag.appendChild(node);
             }
           }
         } else {
