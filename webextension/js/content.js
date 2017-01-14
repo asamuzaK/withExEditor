@@ -586,14 +586,9 @@
     let bool;
     if (elm) {
       const {localName, type} = elm;
-      switch (localName) {
-        case "textarea":
-          bool = true;
-          break;
-        case "input":
-          bool = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
-          break;
-        default:
+      bool = localName === "textarea" ||
+             localName === "input" &&
+               (!type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type));
       }
     }
     return bool || false;
