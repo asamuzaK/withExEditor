@@ -184,7 +184,7 @@
       const attrs = target.hasAttributeNS("", DATA_ATTR_ID) &&
                     target.getAttributeNS("", DATA_ATTR_ID) ||
                     target.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
-                    target.getAttributeNS("", DATA_ATTR_ID_CTRL;
+                    target.getAttributeNS("", DATA_ATTR_ID_CTRL);
       attrs && attrs.split(" ").forEach(dataId =>
         func.push(portTmpFileData(dataId))
       );
