@@ -838,33 +838,25 @@
    * @returns {string} - context mode
    */
   const getContextMode = async elm => {
+    const {
+      anchorNode, focusNode, isCollapsed, rangeCount,
+    } = window.getSelection();
     let mode = MODE_SOURCE;
     if (elm) {
-      const {
-        anchorNode, focusNode, isCollapsed, rangeCount,
-      } = window.getSelection();
-      if (isCollapsed) {
-        if (elm.isContentEditable || await isEditControl(elm) ||
-            await isContentTextNode(elm)) {
-          mode = MODE_EDIT_TEXT;
-        } else {
-          elm.namespaceURI === nsURI.math && (mode = MODE_MATHML) ||
-          elm.namespaceURI === nsURI.svg && (mode = MODE_SVG);
-        }
+      elm = !isCollapsed &&
+            (anchorNode.nodeType === NODE_TEXT && anchorNode.parentNode ||
+             focusNode.nodeType === NODE_TEXT && focusNode.parentNode) || elm;
+      if ((elm.isContentEditable || await isEditControl(elm) ||
+           await isContentTextNode(elm)) &&
+          (isCollapsed || rangeCount === 1 &&
+                          anchorNode.parentNode === focusNode.parentNode &&
+                          elm !== document.documentElement)) {
+        mode = MODE_EDIT_TEXT;
+      } else if (isCollapsed) {
+        elm.namespaceURI === nsURI.math && (mode = MODE_MATHML) ||
+        elm.namespaceURI === nsURI.svg && (mode = MODE_SVG);
       } else {
-        elm = anchorNode.nodeType === NODE_TEXT &&
-              anchorNode.parentNode ||
-              focusNode.nodeType === NODE_TEXT &&
-              focusNode.parentNode || elm;
-        if (rangeCount === 1 &&
-            anchorNode.parentNode === focusNode.parentNode &&
-            elm !== document.documentElement &&
-            (elm.isContentEditable || await isEditControl(elm) ||
-             await isContentTextNode(elm))) {
-          mode = MODE_EDIT_TEXT;
-        } else {
-          mode = MODE_SELECTION;
-        }
+        mode = MODE_SELECTION;
       }
     }
     return mode;
