@@ -521,14 +521,15 @@
    * @returns {void}
    */
   const handlePort = async port => {
-    const {url: frameUrl, tab: {incognito}} = port.sender;
-    let {windowId, id: tabId} = port.sender.tab;
+    const {url, tab} = port.sender;
+    const {incognito} = tab;
+    let {windowId, id: tabId} = tab;
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
-    if (windowId && tabId && frameUrl) {
+    if (windowId && tabId && url) {
       ports[windowId] = ports[windowId] || {};
       ports[windowId][tabId] = ports[windowId][tabId] || {};
-      ports[windowId][tabId][frameUrl] = port;
+      ports[windowId][tabId][url] = port;
       port.onMessage.addListener(handleMsg);
       port.postMessage({
         incognito, tabId, windowId,
@@ -571,10 +572,10 @@
    * @returns {Object} - Promise.<Array.<*>>
    */
   const onTabUpdated = async (id, info, tab) => {
+    const {active, frameUrl} = tab;
     const func = [];
-    const bool = info.status === "complete" && tab.active;
+    const bool = info.status === "complete" && active;
     const tabId = stringifyPositiveInt(id, true);
-    const frameUrl = tab.url;
     let {windowId} = tab, portName;
     windowId = stringifyPositiveInt(windowId, true);
     windowId && tabId && frameUrl &&
