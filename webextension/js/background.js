@@ -526,7 +526,7 @@
    * @returns {void}
    */
   const handlePort = async port => {
-    const {url, tab} = port.sender;
+    const {tab, url} = port.sender;
     const {incognito} = tab;
     let {windowId, id: tabId} = tab;
     windowId = stringifyPositiveInt(windowId, true);
