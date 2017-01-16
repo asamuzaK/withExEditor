@@ -23,7 +23,6 @@
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
-  const MENU_ENABLED = "menuEnabled";
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
@@ -41,11 +40,12 @@
   const ENABLE_PB = "enablePB";
   const FORCE_REMOVE = "forceRemove";
   const IS_ENABLED = "isEnabled";
-  const IS_EXEC = "isExecutable";
+  const IS_EXECUTABLE = "isExecutable";
   const ICON_PATH = "iconPath";
   const KEY_ACCESS = "accessKey";
   const KEY_EXEC_EDITOR = "editorShortCut";
   const KEY_OPEN_OPTIONS = "optionsShortCut";
+  const MENU_ENABLED = "menuEnabled";
 
   /* variables */
   const vars = {
@@ -56,14 +56,14 @@
     [ENABLE_ONLY_EDITABLE]: false,
   };
 
-  const varsLoc = {
+  const varsL = {
     [APP_MANIFEST]: "",
     [APP_NAME]: "",
     [EDITOR_NAME]: "",
     [ENABLE_PB]: false,
     [FORCE_REMOVE]: true,
     [ICON_PATH]: `${ICON}#gray`,
-    [IS_EXEC]: false,
+    [IS_EXECUTABLE]: false,
     [MENU_ENABLED]: false,
     [MODE_SOURCE]: "",
     [MODE_MATHML]: "",
@@ -124,9 +124,9 @@
    * @returns {void}
    */
   const connectHost = async () => {
-    const name = varsLoc[APP_NAME];
+    const name = varsL[APP_NAME];
     host && host.disconnect();
-    host = varsLoc[IS_EXEC] && name && runtime.connectNative(name) || null;
+    host = varsL[IS_EXECUTABLE] && name && runtime.connectNative(name) || null;
   };
 
   /**
@@ -234,7 +234,7 @@
    * @param {Object} path - icon path
    * @returns {Object} - Promise.<void>
    */
-  const replaceIcon = async (path = varsLoc[ICON_PATH]) =>
+  const replaceIcon = async (path = varsL[ICON_PATH]) =>
     browserAction.setIcon({path});
 
   /**
@@ -242,7 +242,7 @@
    * @param {boolean} executable - executable
    * @returns {Object} - Promise.<Array.<void>>
    */
-  const toggleBadge = async (executable = varsLoc[IS_EXEC]) => {
+  const toggleBadge = async (executable = varsL[IS_EXECUTABLE]) => {
     const color = !executable && WARN_COLOR || "transparent";
     const text = !executable && WARN_TEXT || "";
     return Promise.all([
@@ -268,12 +268,12 @@
    * @returns {void}
    */
   const createMenuItem = async (id, contexts) => {
-    const label = varsLoc[EDITOR_NAME] || LABEL;
+    const label = varsL[EDITOR_NAME] || LABEL;
     isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
       menus[id] = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, label),
-        enabled: !!varsLoc[MENU_ENABLED],
+        enabled: !!varsL[MENU_ENABLED],
       })
     );
   };
@@ -328,7 +328,7 @@
           const {menuItemId} = obj;
           if (menus[menuItemId]) {
             if (item === MODE_SOURCE) {
-              const title = varsLoc[obj.mode] || varsLoc[menuItemId];
+              const title = varsL[obj.mode] || varsL[menuItemId];
               title && contextMenus.update(menuItemId, {title});
             } else if (item === MODE_EDIT_TEXT) {
               const enabled = !!obj.enabled;
@@ -342,7 +342,7 @@
       if (items.length) {
         for (const item of items) {
           menus[item] && contextMenus.update(item, {
-            title: i18n.getMessage(item, varsLoc[EDITOR_NAME] || LABEL),
+            title: i18n.getMessage(item, varsL[EDITOR_NAME] || LABEL),
           });
         }
       }
@@ -355,9 +355,9 @@
    */
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-    const label = varsLoc[EDITOR_NAME] || LABEL;
+    const label = varsL[EDITOR_NAME] || LABEL;
     for (const item of items) {
-      varsLoc[item] = i18n.getMessage(item, label);
+      varsL[item] = i18n.getMessage(item, label);
     }
   };
 
@@ -369,11 +369,11 @@
   const syncUI = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
     const enabled = vars[IS_ENABLED] = win && (
-      !win.incognito || varsLoc[ENABLE_PB]
+      !win.incognito || varsL[ENABLE_PB]
     ) || false;
     return win && Promise.all([
       portMsg({[IS_ENABLED]: !!enabled}),
-      replaceIcon(!enabled && `${ICON}#off` || varsLoc[ICON_PATH]),
+      replaceIcon(!enabled && `${ICON}#off` || varsL[ICON_PATH]),
       toggleBadge(),
     ]) || null;
   };
@@ -399,16 +399,16 @@
       const hasPorts = Object.keys(ports).length;
       switch (item) {
         case APP_MANIFEST:
-          varsLoc[item] = obj.value;
-          varsLoc[IS_EXEC] = obj.app && !!obj.app.executable;
+          varsL[item] = obj.value;
+          varsL[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
           func.push(connectHost());
           changed && func.push(toggleBadge());
           break;
         case APP_NAME:
-          varsLoc[item] = obj.value;
+          varsL[item] = obj.value;
           break;
         case EDITOR_NAME:
-          varsLoc[item] = obj.value;
+          varsL[item] = obj.value;
           func.push(cacheMenuItemTitle());
           changed && func.push(updateContextMenu());
           break;
@@ -418,11 +418,11 @@
           changed && func.push(restoreContextMenu());
           break;
         case ENABLE_PB:
-          varsLoc[item] = !!obj.checked;
+          varsL[item] = !!obj.checked;
           changed && func.push(syncUI());
           break;
         case FORCE_REMOVE:
-          varsLoc[item] = !!obj.checked;
+          varsL[item] = !!obj.checked;
           // NOTE: for hybrid
           func.push(portHybridMsg({[item]: !!obj.checked}));
           break;
@@ -430,7 +430,7 @@
         case ICON_GRAY:
         case ICON_WHITE:
           if (obj.checked) {
-            varsLoc[ICON_PATH] = obj.value;
+            varsL[ICON_PATH] = obj.value;
             changed && func.push(replaceIcon());
           }
           break;
@@ -564,7 +564,7 @@
         }
       }
     }
-    varsLoc[MENU_ENABLED] = bool || false;
+    varsL[MENU_ENABLED] = bool || false;
     return restoreContextMenu().catch(logError);
   };
 
@@ -580,13 +580,13 @@
     let func;
     if (active) {
       const tabId = stringifyPositiveInt(id, true);
-      let {windowId} = tab, name;
+      let {windowId} = tab;
       windowId = stringifyPositiveInt(windowId, true);
-      windowId && tabId && url &&
-      ports[windowId] && ports[windowId][tabId] &&
-      ports[windowId][tabId][url] &&
-        ({name} = ports[windowId][tabId][url]);
-      varsLoc[MENU_ENABLED] = name === PORT_CONTENT;
+      varsL[MENU_ENABLED] = windowId && tabId && url &&
+                            ports[windowId] && ports[windowId][tabId] &&
+                            ports[windowId][tabId][url] &&
+                            ports[windowId][tabId][url].name === PORT_CONTENT ||
+                            false;
       func = info.status === "complete" && restoreContextMenu();
     }
     return func || null;
