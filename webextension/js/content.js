@@ -613,9 +613,7 @@
         const arr = ctrl.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
                       (ctrl.getAttributeNS("", DATA_ATTR_ID_CTRL)).split(" ");
         if (arr) {
-          const attr = arr.push(dataId) && (
-                         arr.filter((v, i, o) => o.indexOf(v) === i)
-                       ).join(" ");
+          const attr = arr.push(dataId) && [...(new Set(arr))].join(" ");
           attr && ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, attr);
         } else {
           ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, dataId);
