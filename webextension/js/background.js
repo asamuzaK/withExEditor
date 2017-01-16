@@ -85,8 +85,7 @@
    * @param {*} o - object to check
    * @returns {boolean} - result
    */
-  const isString = o =>
-    o && (typeof o === "string" || o instanceof String) || false;
+  const isString = o => typeof o === "string" || o instanceof String;
 
   /**
    * stringify positive integer
