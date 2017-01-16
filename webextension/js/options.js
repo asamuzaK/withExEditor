@@ -131,30 +131,31 @@
    * @returns {Object} - Promise.<Array.<*>>
    */
   const setPrefStorage = async evt => {
+    const {target} = evt;
+    const {id, name, type, value} = target;
     const func = [];
-    const elm = evt.target;
-    if (elm.type === "radio") {
-      const nodes = document.querySelectorAll(`[name=${elm.name}]`);
+    if (type === "radio") {
+      const nodes = document.querySelectorAll(`[name=${name}]`);
       if (nodes instanceof NodeList) {
         for (const node of nodes) {
           func.push(createPref(node).then(setStorage));
         }
       }
     } else {
-      switch (elm.id) {
+      switch (id) {
         case APP_MANIFEST:
           func.push(portMsg({
             [GET_APP_MANIFEST]: {
-              path: elm.value,
+              path: value,
             },
           }));
           break;
         case KEY_ACCESS:
-          (elm.value === "" || elm.value.length === 1) &&
-            func.push(createPref(elm).then(setStorage));
+          (value === "" || value.length === 1) &&
+            func.push(createPref(target).then(setStorage));
           break;
         default:
-          func.push(createPref(elm).then(setStorage));
+          func.push(createPref(target).then(setStorage));
       }
     }
     return Promise.all(func).catch(logError);
