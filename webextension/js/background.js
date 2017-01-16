@@ -11,6 +11,7 @@
   const LABEL = "withExEditor";
 
   const CONTEXT_MENU = "contextMenu";
+  const GET_CONTENT = "getContent";
   const OPEN_OPTIONS = "openOptions";
   const PORT_CONTENT = "portContent";
   const PORT_HOST = "portHost";
@@ -202,14 +203,15 @@
    */
   const portContextMenuData = async (info, tab) => {
     const {frameUrl} = info;
-    const getContent = {info, tab};
     let {windowId, id: tabId} = tab;
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
     if (windowId && tabId) {
       const port = ports[windowId] && ports[windowId][tabId] &&
                      ports[windowId][tabId][frameUrl];
-      port && port.postMessage({getContent});
+      port && port.postMessage({
+        [GET_CONTENT]: {info, tab},
+      });
     }
   };
 
