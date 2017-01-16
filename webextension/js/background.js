@@ -259,8 +259,7 @@
     [MODE_EDIT_TEXT]: null,
   };
 
-  // TODO: implement accesskey
-  // Issue #18 <https://github.com/asamuzaK/withExEditor/issues/18>
+  // TODO: implement accesskey, Issue #18
   /**
    * create context menu item
    * @param {string} id - menu item ID
@@ -312,8 +311,7 @@
   const restoreContextMenu = () =>
     contextMenus.removeAll().then(createMenuItems);
 
-  // FIXME: sometimes, update does not make it in time
-  // Issue #20 <https://github.com/asamuzaK/withExEditor/issues/20>
+  // FIXME: sometimes, update does not make it in time, Issue #20
   /**
    * update context menu
    * @param {Object} type - context type data
