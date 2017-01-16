@@ -83,8 +83,7 @@
    * @param {*} o - object to check
    * @returns {boolean} - result
    */
-  const isString = o =>
-    o && (typeof o === "string" || o instanceof String) || false;
+  const isString = o => typeof o === "string" || o instanceof String;
 
   /**
    * strip HTML tags and decode HTML escaped characters
@@ -99,14 +98,6 @@
     return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
              .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
   };
-
-  /**
-   * join array
-   * @param {Array} arr - array
-   * @returns {string} - string
-   */
-  const joinArr = async arr =>
-    Array.isArray(arr) && (arr.map(i => i || "")).join("") || "";
 
   /* file utils */
   /**
@@ -476,8 +467,7 @@
       }
       frag = await Promise.all(arr).then(createSelFrag);
       if (l > 1 && frag && frag.hasChildNodes() &&
-          (obj = await createElm(document.documentElement)) &&
-          obj.nodeType === NODE_ELEMENT) {
+          (obj = await createElm(document.documentElement))) {
         obj.appendChild(frag);
         frag = document.createDocumentFragment();
         frag.appendChild(obj);
@@ -507,7 +497,7 @@
         }
       }
     }
-    return Promise.all(arr).then(joinArr);
+    return Promise.all(arr).then(a => a.join(""));
   };
 
   /**
@@ -617,19 +607,18 @@
    */
   const setDataAttrs = async elm => {
     if (elm) {
-      const id = await getId(elm);
+      const dataId = await getId(elm);
       const ctrl = await getEditableElm(elm);
-      if (id && ctrl) {
+      if (dataId && ctrl) {
         const arr = ctrl.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
                       (ctrl.getAttributeNS("", DATA_ATTR_ID_CTRL)).split(" ");
         if (arr) {
-          arr.push(id);
-          ctrl.setAttributeNS(
-            "", DATA_ATTR_ID_CTRL,
-            (arr.filter((v, i, o) => o.indexOf(v) === i)).join(" ")
-          );
+          const attr = arr.push(dataId) && (
+                         arr.filter((v, i, o) => o.indexOf(v) === i)
+                       ).join(" ");
+          attr && ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, attr);
         } else {
-          ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, id);
+          ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, dataId);
           ctrl.addEventListener("focus", requestTmpFile, false);
         }
       }
@@ -775,19 +764,20 @@
       value: null,
     };
     const sel = window.getSelection();
+    const {anchorNode, isCollapsed} = sel;
     if (elm && mode) {
       let obj;
       switch (mode) {
         case MODE_EDIT_TEXT:
           obj = await getId(elm);
           if (obj) {
-            if (sel.isCollapsed && await isEditControl(elm)) {
+            if (isCollapsed && await isEditControl(elm)) {
               data.mode = mode;
               data.dataId = obj;
               data.value = elm.value || "";
             } else {
-              !elm.isContentEditable && !sel.isCollapsed && sel.anchorNode &&
-                (elm = sel.anchorNode.parentNode);
+              !elm.isContentEditable && !isCollapsed && anchorNode &&
+                (elm = anchorNode.parentNode);
               data.mode = mode;
               data.dataId = obj;
               data.value = elm.hasChildNodes() &&
