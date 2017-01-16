@@ -22,7 +22,6 @@
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
   const ICON_WHITE = "buttonIconWhite";
-  const INCOGNITO = "incognito";
   const MENU_ENABLED = "menuEnabled";
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
@@ -622,9 +621,9 @@
     const win = await windows.getAll({windowTypes: ["normal"]});
     if (win.length) {
       func.push(restorePorts({windowId: stringifyPositiveInt(windowId, true)}));
-      func.push(checkWindowIncognito().then(incognito =>
+      func.push(checkWindowIncognito().then(bool =>
         // NOTE: for hybrid
-        !incognito && portHybridMsg({removePrivateTmpFiles: !incognito})
+        !bool && portHybridMsg({removePrivateTmpFiles: !bool})
       ));
     }
     return Promise.all(func).catch(logError);
