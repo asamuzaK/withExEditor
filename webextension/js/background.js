@@ -174,10 +174,8 @@
                             Object.keys(ports[windowId][tabId]);
         if (frameUrls && frameUrls.length) {
           for (const frameUrl of frameUrls) {
-            if (frameUrl !== INCOGNITO) {
-              const port = ports[windowId][tabId][frameUrl];
-              port && port.postMessage(msg);
-            }
+            const port = ports[windowId][tabId][frameUrl];
+            port && port.postMessage(msg);
           }
         }
       } else if (windowId) {
@@ -581,13 +579,13 @@
     const func = [];
     const bool = info.status === "complete" && active;
     const tabId = stringifyPositiveInt(id, true);
-    let {windowId} = tab, portName;
+    let {windowId} = tab, name;
     windowId = stringifyPositiveInt(windowId, true);
     windowId && tabId && url &&
     ports[windowId] && ports[windowId][tabId] &&
     ports[windowId][tabId][url] &&
-      (portName = ports[windowId][tabId][url].name);
-    varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
+      ({name} = ports[windowId][tabId][url]);
+    varsLoc[MENU_ENABLED] = name === PORT_CONTENT;
     bool && func.push(restoreContextMenu());
     return Promise.all(func).catch(logError);
   };
