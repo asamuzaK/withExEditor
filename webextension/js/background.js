@@ -144,19 +144,19 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
-   * @returns {Object} - Promise.<Array<*>>
+   * @returns {Object} - ?Promise.<void>
    */
   const restorePorts = async (data = {}) => {
-    const func = [];
     const {tabId, windowId} = data;
+    let func;
     if (windowId && tabId && ports[windowId]) {
       delete ports[windowId][tabId];
       Object.keys(ports[windowId]).length === 0 &&
-        func.push(restorePorts({windowId}));
+        (func = restorePorts({windowId}));
     } else {
       windowId && delete ports[windowId];
     }
-    return Promise.all(func);
+    return func || null;
   };
 
   /**
@@ -240,7 +240,7 @@
   /**
    * toggle badge
    * @param {boolean} executable - executable
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<void>>
    */
   const toggleBadge = async (executable = varsLoc[IS_EXEC]) => {
     const color = !executable && WARN_COLOR || "transparent";
@@ -280,7 +280,7 @@
 
   /**
    * create context menu items
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<void>>
    */
   const createMenuItems = async () => {
     const func = [];
@@ -307,7 +307,7 @@
 
   /**
    * restore context menu
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<void>>
    */
   const restoreContextMenu = () =>
     contextMenus.removeAll().then(createMenuItems);
@@ -391,7 +391,7 @@
    * @param {string} item - item
    * @param {Object} obj - value object
    * @param {boolean} changed - changed
-   * @returns {Object} - Promise.<Array<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const setVar = async (item, obj, changed = false) => {
     const func = [];
@@ -452,7 +452,7 @@
   /**
    * set variables
    * @param {Object} data - storage data
-   * @returns {Object} - Promise.<Array<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const setVars = async (data = {}) => {
     const func = [];
@@ -492,7 +492,7 @@
   /**
    * handle runtime message
    * @param {*} msg - message
-   * @returns {Object} - Promise.<Array<*>>
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const handleMsg = async msg => {
     const func = [];
@@ -545,7 +545,7 @@
   /**
    * handle tab activated
    * @param {!Object} info - activated tab info
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<void>>
    */
   const onTabActivated = async info => {
     let {tabId, windowId} = info, bool;
@@ -573,12 +573,10 @@
    * @param {!number} id - tabId
    * @param {!Object} info - changed tab info
    * @param {!Object} tab - tabs.Tab
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - ?Promise.<Array.<void>>
    */
   const onTabUpdated = async (id, info, tab) => {
     const {active, url} = tab;
-    const func = [];
-    const bool = info.status === "complete" && active;
     const tabId = stringifyPositiveInt(id, true);
     let {windowId} = tab, name;
     windowId = stringifyPositiveInt(windowId, true);
@@ -587,8 +585,7 @@
     ports[windowId][tabId][url] &&
       ({name} = ports[windowId][tabId][url]);
     varsLoc[MENU_ENABLED] = name === PORT_CONTENT;
-    bool && func.push(restoreContextMenu());
-    return Promise.all(func).catch(logError);
+    return info.status === "complete" && active && restoreContextMenu() || null;
   };
 
   /**
@@ -641,7 +638,9 @@
   runtime.onConnect.addListener(port => handlePort(port).catch(logError));
   runtime.onMessage.addListener(handleMsg);
   tabs.onActivated.addListener(onTabActivated);
-  tabs.onUpdated.addListener(onTabUpdated);
+  tabs.onUpdated.addListener((id, info, tab) =>
+    onTabUpdated(id, info, tab).catch(logError)
+  );
   tabs.onRemoved.addListener((id, info) =>
     onTabRemoved(id, info).catch(logError)
   );
