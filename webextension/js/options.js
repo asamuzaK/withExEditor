@@ -243,7 +243,7 @@
 
   /**
    * set html input values from storage
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array.<void>>
    */
   const setValuesFromStorage = async () => {
     const func = [];

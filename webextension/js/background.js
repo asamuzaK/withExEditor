@@ -490,7 +490,7 @@
     vars[IS_ENABLED] && runtime.openOptionsPage() || null;
 
   /**
-   * handle runtime message
+   * handle message
    * @param {*} msg - message
    * @returns {Object} - Promise.<Array.<*>>
    */
