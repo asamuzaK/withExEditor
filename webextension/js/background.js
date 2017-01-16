@@ -587,7 +587,7 @@
       ports[windowId][tabId][url] &&
         ({name} = ports[windowId][tabId][url]);
       varsLoc[MENU_ENABLED] = name === PORT_CONTENT;
-      func = info.status === "complete" && active && restoreContextMenu();
+      func = info.status === "complete" && restoreContextMenu();
     }
     return func || null;
   };
