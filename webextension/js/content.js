@@ -629,24 +629,23 @@
   /**
    * create content data message
    * @param {Object} data - temporary file data
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - message
    */
   const createContentDataMsg = async data => {
-    const func = [];
+    let msg;
     if (data) {
       if (data[CREATE_TMP_FILE]) {
-        func.push(portMsg({
+        msg = {
           [CREATE_TMP_FILE]: {
             data: data[CREATE_TMP_FILE],
             value: data.value,
           },
-        }));
+        };
       } else {
-        data[GET_FILE_PATH] &&
-          func.push(portMsg({[GET_FILE_PATH]: data[GET_FILE_PATH]}));
+        data[GET_FILE_PATH] && (msg = {[GET_FILE_PATH]: data[GET_FILE_PATH]});
       }
     }
-    return Promise.all(func);
+    return msg || null;
   };
 
   /**
@@ -818,7 +817,7 @@
   const portContent = (elm, mode) =>
     createContentData(elm, mode).then(createTmpFileData).then(data =>
       Promise.all([
-        createContentDataMsg(data),
+        createContentDataMsg(data).then(msg => msg && portMsg(msg) || null),
         storeTmpFileData(data),
       ]));
 
