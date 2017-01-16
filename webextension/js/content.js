@@ -43,12 +43,12 @@
   const NS_URI = "nsURI";
   const NS_URI_DEFAULT_ITEMS = 4;
 
-  const ENABLE_ONLY_EDITABLE = "enableOnlyEditable";
   const INCOGNITO = "incognito";
   const IS_ENABLED = "isEnabled";
   const KEY_ACCESS = "accessKey";
   const KEY_OPEN_OPTIONS = "optionsShortCut";
   const KEY_EXEC_EDITOR = "editorShortCut";
+  const ONLY_EDITABLE = "enableOnlyEditable";
   const CONTEXT_MODE = "contextMode";
   const CONTEXT_NODE = "contextNode";
   const TAB_ID = "tabId";
@@ -56,14 +56,14 @@
 
   /* variables */
   const vars = {
+    [CONTEXT_MODE]: null,
+    [CONTEXT_NODE]: null,
+    [INCOGNITO]: false,
     [IS_ENABLED]: false,
     [KEY_ACCESS]: "e",
     [KEY_EXEC_EDITOR]: true,
     [KEY_OPEN_OPTIONS]: true,
-    [ENABLE_ONLY_EDITABLE]: false,
-    [INCOGNITO]: false,
-    [CONTEXT_MODE]: null,
-    [CONTEXT_NODE]: null,
+    [ONLY_EDITABLE]: false,
     [TAB_ID]: "",
     [WIN_ID]: "",
   };
@@ -1009,7 +1009,7 @@
           case SET_VARS:
             func.push(handleMsg(obj));
             break;
-          case ENABLE_ONLY_EDITABLE:
+          case ONLY_EDITABLE:
           case INCOGNITO:
           case IS_ENABLED:
             vars[item] = !!obj;
@@ -1095,7 +1095,7 @@
         if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
           const {target} = evt;
           const mode = await getContextMode(target);
-          (!vars[ENABLE_ONLY_EDITABLE] || mode === MODE_EDIT_TEXT) &&
+          (!vars[ONLY_EDITABLE] || mode === MODE_EDIT_TEXT) &&
             func.push(portContent(target, mode));
         }
       } else {

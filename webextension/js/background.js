@@ -36,7 +36,7 @@
   const APP_MANIFEST = "appManifestPath";
   const APP_NAME = "appName";
   const EDITOR_NAME = "editorName";
-  const ENABLE_ONLY_EDITABLE = "enableOnlyEditable";
+  const ONLY_EDITABLE = "enableOnlyEditable";
   const ENABLE_PB = "enablePB";
   const FORCE_REMOVE = "forceRemove";
   const IS_ENABLED = "isEnabled";
@@ -53,7 +53,7 @@
     [KEY_ACCESS]: "e",
     [KEY_EXEC_EDITOR]: true,
     [KEY_OPEN_OPTIONS]: true,
-    [ENABLE_ONLY_EDITABLE]: false,
+    [ONLY_EDITABLE]: false,
   };
 
   const varsL = {
@@ -285,7 +285,7 @@
   const createMenuItems = async () => {
     const func = [];
     const enabled = vars[IS_ENABLED];
-    const bool = enabled && !vars[ENABLE_ONLY_EDITABLE];
+    const bool = enabled && !vars[ONLY_EDITABLE];
     const items = Object.keys(menus);
     for (const item of items) {
       menus[item] = null;
@@ -412,7 +412,7 @@
           func.push(cacheMenuItemTitle());
           changed && func.push(updateContextMenu());
           break;
-        case ENABLE_ONLY_EDITABLE:
+        case ONLY_EDITABLE:
           vars[item] = !!obj.checked;
           hasPorts && func.push(portVar({[item]: !!obj.checked}));
           changed && func.push(restoreContextMenu());
