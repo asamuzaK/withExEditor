@@ -577,16 +577,16 @@
    * @returns {Object} - Promise.<Array.<*>>
    */
   const onTabUpdated = async (id, info, tab) => {
-    const {active, frameUrl} = tab;
+    const {active, url} = tab;
     const func = [];
     const bool = info.status === "complete" && active;
     const tabId = stringifyPositiveInt(id, true);
     let {windowId} = tab, portName;
     windowId = stringifyPositiveInt(windowId, true);
-    windowId && tabId && frameUrl &&
+    windowId && tabId && url &&
     ports[windowId] && ports[windowId][tabId] &&
-    ports[windowId][tabId][frameUrl] &&
-      (portName = ports[windowId][tabId][frameUrl].name);
+    ports[windowId][tabId][url] &&
+      (portName = ports[windowId][tabId][url].name);
     varsLoc[MENU_ENABLED] = portName === PORT_CONTENT;
     bool && func.push(restoreContextMenu());
     return Promise.all(func).catch(logError);
