@@ -99,11 +99,11 @@
 
   /* windows */
   /**
-   * check one of window is incognito
+   * check if any of windows is incognito
    * @returns {boolean} - result
    */
   const checkWindowIncognito = async () => {
-    const windowIds = await windows.getAll();
+    const windowIds = await windows.getAll({windowTypes: "normal"});
     let incog;
     if (windowIds && windowIds.length) {
       for (const windowId of windowIds) {
@@ -117,10 +117,11 @@
   };
 
   /* port */
+  /* native application host */
   let host = null;
 
   /**
-   * connect to native application host
+   * connect to host
    * @returns {void}
    */
   const connectHost = async () => {
@@ -130,7 +131,7 @@
   };
 
   /**
-   * port message to native application host
+   * port message to host
    * @param {*} msg - message
    * @returns {void}
    */
@@ -217,6 +218,7 @@
   };
 
   // NOTE: for hybrid
+  /* hybrid */
   const hybrid = runtime.connect({name: "portBackground"});
 
   /**
@@ -258,7 +260,8 @@
     [MODE_EDIT_TEXT]: null,
   };
 
-  // NOTE: no "accesskey" feature
+  // TODO: implement accesskey
+  // Issue #18 <https://github.com/asamuzaK/withExEditor/issues/18>
   /**
    * create context menu item
    * @param {string} id - menu item ID
@@ -310,6 +313,8 @@
   const restoreContextMenu = () =>
     contextMenus.removeAll().then(createMenuItems);
 
+  // FIXME: update sometime do not make in time
+  // Issue #20 <https://github.com/asamuzaK/withExEditor/issues/20>
   /**
    * update context menu
    * @param {Object} type - context type data
