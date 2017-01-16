@@ -487,11 +487,8 @@
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
         if (node.nodeType === NODE_ELEMENT) {
-          if (node.localName === "br") {
-            arr.push("\n");
-          } else {
-            node.hasChildNodes() && arr.push(getText(node.childNodes));
-          }
+          node.localName === "br" && arr.push("\n") ||
+          node.hasChildNodes() && arr.push(getText(node.childNodes));
         } else {
           node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
         }
@@ -927,12 +924,9 @@
                   timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
         attr = isHtml && DATA_ATTR_TS || DATA_ATTR_TS_NS;
         elm.setAttributeNS(ns, attr, timestamp);
-        if (/^(?:input|textarea)$/.test(elm.localName)) {
-          elm.value = value;
-        } else {
-          elm.isContentEditable &&
-            func.push(replaceContent(elm, value, namespaceURI));
-        }
+        /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value) ||
+        elm.isContentEditable &&
+          func.push(replaceContent(elm, value, namespaceURI));
       }
     }
     return Promise.all(func);
