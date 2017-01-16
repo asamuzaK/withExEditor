@@ -232,22 +232,23 @@
   /**
    * replace icon
    * @param {Object} path - icon path
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
-  const replaceIcon = async (path = varsLoc[ICON_PATH]) => {
+  const replaceIcon = async (path = varsLoc[ICON_PATH]) =>
     browserAction.setIcon({path});
-  };
 
   /**
    * toggle badge
    * @param {boolean} executable - executable
-   * @returns {void}
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const toggleBadge = async (executable = varsLoc[IS_EXEC]) => {
     const color = !executable && WARN_COLOR || "transparent";
     const text = !executable && WARN_TEXT || "";
-    browserAction.setBadgeBackgroundColor({color});
-    browserAction.setBadgeText({text});
+    return Promise.all([
+      browserAction.setBadgeBackgroundColor({color}),
+      browserAction.setBadgeText({text}),
+    ]);
   };
 
   /* context menu */
