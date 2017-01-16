@@ -309,7 +309,7 @@
   const restoreContextMenu = () =>
     contextMenus.removeAll().then(createMenuItems);
 
-  // FIXME: update sometime do not make in time
+  // FIXME: sometimes, update does not make it in time
   // Issue #20 <https://github.com/asamuzaK/withExEditor/issues/20>
   /**
    * update context menu
