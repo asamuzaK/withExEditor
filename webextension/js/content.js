@@ -274,6 +274,28 @@
   };
 
   /**
+   * get namespace prefix
+   * @param {Object} elm - element
+   * @param {string} ns - namespace URI
+   * @param {string} prefix - namespace prefix
+   * @returns {string} - namespace prefix
+   */
+  const getXmlnsPrefix = async (elm = {}, ns = nsURI.html,
+                                prefix = "xmlns:html") => {
+    const {attributes} = elm;
+    if (attributes.length) {
+      for (const item of attributes) {
+        const {name, value} = item;
+        if (value === ns) {
+          prefix = name;
+          break;
+        }
+      }
+    }
+    return prefix;
+  };
+
+  /**
    * set namespaced attribute
    * @param {Object} elm - element to append attributes
    * @param {Object} node - element node to get attributes from
@@ -511,9 +533,10 @@
         dataId = elm.getAttributeNS(ns, DATA_ATTR_ID);
       } else {
         const attr = isHtml && DATA_ATTR_ID || DATA_ATTR_ID_NS;
+        const nsPrefix = ns && await getXmlnsPrefix(elm, ns, "xmlns:html");
         dataId = `${LABEL}_${elm.id || window.performance.now()}`
                    .replace(/[-:.]/g, "_");
-        !isHtml && elm.setAttributeNS(nsURI.xmlns, "xmlns:html", nsURI.html);
+        nsPrefix && elm.setAttributeNS(nsURI.xmlns, nsPrefix, ns);
         elm.setAttributeNS(ns, attr, dataId);
         isHtml && elm.addEventListener("focus", requestTmpFile, false);
       }
