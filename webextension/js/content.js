@@ -27,6 +27,7 @@
   const DATA_ATTR_ID_CTRL = `${DATA_ATTR_ID}_controls`;
   const DATA_ATTR_PREFIX = "data-with_ex_editor_prefix";
   const DATA_ATTR_TS = "data-with_ex_editor_timestamp";
+  const HTML = "html";
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
@@ -248,7 +249,7 @@
           const obj = node.parentNode;
           if (obj.localName === "foreignObject" &&
               (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
-               root.localName === "html")) {
+               root.localName === HTML)) {
             ns.node = node;
             ns.localName = node.localName;
             ns.namespaceURI = obj.hasAttributeNS(nsURI.svg,
@@ -279,7 +280,7 @@
    * @param {string} prefix - namespace prefix
    * @returns {string} - namespace prefix
    */
-  const getXmlnsPrefix = async (elm, ns = nsURI.html, prefix = "html") => {
+  const getXmlnsPrefix = async (elm, ns = nsURI.html, prefix = HTML) => {
     if (elm) {
       const {attributes} = elm;
       const arr = [];
@@ -554,20 +555,19 @@
   const getId = async elm => {
     let dataId;
     if (elm) {
-      const key = "html";
-      const isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI[key];
-      const ns = !isHtml && nsURI[key] || "";
+      const isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
+      const ns = !isHtml && nsURI.html || "";
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID)) {
         dataId = elm.getAttributeNS(ns, DATA_ATTR_ID);
       } else {
-        const nsPrefix = ns && await getXmlnsPrefix(elm, ns, key);
+        const nsPrefix = ns && await getXmlnsPrefix(elm, ns, HTML);
         let attr;
         if (ns) {
           nsPrefix && elm.setAttributeNS(nsURI.xmlns, `xmlns:${nsPrefix}`, ns);
-          attr = `${nsPrefix || key}:${DATA_ATTR_PREFIX}`;
-          elm.setAttributeNS(ns, attr, nsPrefix || key);
+          attr = `${nsPrefix || HTML}:${DATA_ATTR_PREFIX}`;
+          elm.setAttributeNS(ns, attr, nsPrefix || HTML);
         }
-        attr = isHtml && DATA_ATTR_ID || `${nsPrefix || key}:${DATA_ATTR_ID}`;
+        attr = isHtml && DATA_ATTR_ID || `${nsPrefix || HTML}:${DATA_ATTR_ID}`;
         dataId = `${LABEL}_${elm.id || window.performance.now()}`
                    .replace(/[-:.]/g, "_");
         elm.setAttributeNS(ns, attr, dataId);
@@ -965,7 +965,7 @@
               (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
             isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
             ns = !isHtml && nsURI.html || "";
-            nsPrefix = id.getAttributeNS(ns, DATA_ATTR_PREFIX) || "html";
+            nsPrefix = id.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
             attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
             if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
                 timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
@@ -979,7 +979,7 @@
                  elm.getAttributeNS(ns, DATA_ATTR_ID) === dataId &&
                  (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
                   timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
-        nsPrefix = elm.getAttributeNS(ns, DATA_ATTR_PREFIX) || "html";
+        nsPrefix = elm.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
         attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
         elm.setAttributeNS(ns, attr, timestamp);
         /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value) ||
