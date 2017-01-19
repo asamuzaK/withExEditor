@@ -300,7 +300,6 @@
         }
       }
       arr.length === 1 && (prefix = await Promise.all(arr).then(a => {
-        console.log(a);
         const [p] = a;
         return p !== prefix && p || null;
       }));
@@ -320,12 +319,13 @@
       for (const attr of attributes) {
         const {localName, name, namespaceURI, prefix, value} = attr;
         if (typeof node[name] !== "function") {
+          let ns;
           if (/:/.test(localName)) {
             const [, p] = /^(.+):/.exec(localName);
             if (p === "xmlns") {
               elm.setAttributeNS(nsURI.xmlns, localName, value);
             } else {
-              let n = node, ns;
+              let n = node;
               while (n && n.parentNode && !ns) {
                 n.hasAttributeNS("", `xmlns:${p}`) &&
                   (ns = n.getAttributeNS("", `xmlns:${p}`));
@@ -334,11 +334,9 @@
               ns && elm.setAttributeNS(ns, localName, value);
             }
           } else {
-            elm.setAttributeNS(
-              namespaceURI || prefix && nsURI[prefix] || "",
-              prefix && `${prefix}:${localName}` || localName,
-              value
-            );
+            const attrName = prefix && `${prefix}:${localName}` || localName;
+            ns = namespaceURI || prefix && nsURI[prefix] || "";
+            elm.setAttributeNS(ns, attrName, value);
           }
         }
       }
@@ -354,11 +352,10 @@
     let elm;
     if (node) {
       const {attributes, localName, namespaceURI, prefix} = node;
-      elm = document.createElementNS(
-        namespaceURI || prefix && nsURI[prefix] ||
-        await getNodeNS(node).namespaceURI || nsURI.html,
-        prefix && `${prefix}:${localName}` || localName
-      );
+      const ns = namespaceURI || prefix && nsURI[prefix] ||
+                 await getNodeNS(node).namespaceURI || nsURI.html;
+      const name = prefix && `${prefix}:${localName}` || localName;
+      elm = document.createElementNS(ns, name);
       attributes && await setAttributeNS(elm, node);
     }
     return elm || null;
@@ -570,8 +567,7 @@
           attr = `${nsPrefix || key}:${DATA_ATTR_PREFIX}`;
           elm.setAttributeNS(ns, attr, nsPrefix || key);
         }
-        attr = isHtml && DATA_ATTR_ID ||
-               `${nsPrefix || key}:${DATA_ATTR_ID}`;
+        attr = isHtml && DATA_ATTR_ID || `${nsPrefix || key}:${DATA_ATTR_ID}`;
         dataId = `${LABEL}_${elm.id || window.performance.now()}`
                    .replace(/[-:.]/g, "_");
         elm.setAttributeNS(ns, attr, dataId);
