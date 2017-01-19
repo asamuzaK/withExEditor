@@ -23,10 +23,11 @@
   const SYNC_TEXT = "syncText";
 
   const CHAR = "utf-8";
-  const DATA_ATTR_ID = "data-with_ex_editor_id";
-  const DATA_ATTR_ID_CTRL = `${DATA_ATTR_ID}_controls`;
-  const DATA_ATTR_PREFIX = "data-with_ex_editor_prefix";
-  const DATA_ATTR_TS = "data-with_ex_editor_timestamp";
+  const DATA_ATTR = "data-with_ex_editor";
+  const DATA_ATTR_ID = `${DATA_ATTR}_id`;
+  const DATA_ATTR_ID_CTRL = `${DATA_ATTR}_id_controls`;
+  const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
+  const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
   const HTML = "html";
   const MODE_EDIT_TEXT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
