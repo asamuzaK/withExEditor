@@ -8,51 +8,48 @@
   const storage = browser.storage.local;
 
   /* constants */
-  const LABEL = "withExEditor";
-
+  const APP_MANIFEST = "appManifestPath";
+  const APP_NAME = "appName";
   const CONTEXT_MENU = "contextMenu";
-  const GET_CONTENT = "getContent";
-  const OPEN_OPTIONS = "openOptions";
-  const PORT_CONTENT = "portContent";
-  const PORT_HOST = "portHost";
-  const SET_VARS = "setVars";
-
+  const EDITOR_NAME = "editorName";
+  const ENABLE_PB = "enablePB";
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "../data/fileExt.json";
+  const FORCE_REMOVE = "forceRemove";
+  const GET_CONTENT = "getContent";
   const ICON = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
+  const ICON_PATH = "iconPath";
   const ICON_WHITE = "buttonIconWhite";
-  const MODE_EDIT_TEXT = "modeEditText";
+  const IS_ENABLED = "isEnabled";
+  const IS_EXECUTABLE = "isExecutable";
+  const KEY_ACCESS = "accessKey";
+  const KEY_EDITOR = "editorShortCut";
+  const KEY_OPTIONS = "optionsShortCut";
+  const LABEL = "withExEditor";
+  const MENU_ENABLED = "menuEnabled";
+  const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
   const NS_URI = "nsUri";
   const NS_URI_PATH = "../data/nsUri.json";
+  const ONLY_EDITABLE = "enableOnlyEditable";
+  const OPEN_OPTIONS = "openOptions";
+  const PORT_CONTENT = "portContent";
+  const PORT_HOST = "portHost";
+  const SET_VARS = "setVars";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
-
-  const APP_MANIFEST = "appManifestPath";
-  const APP_NAME = "appName";
-  const EDITOR_NAME = "editorName";
-  const ONLY_EDITABLE = "enableOnlyEditable";
-  const ENABLE_PB = "enablePB";
-  const FORCE_REMOVE = "forceRemove";
-  const IS_ENABLED = "isEnabled";
-  const IS_EXECUTABLE = "isExecutable";
-  const ICON_PATH = "iconPath";
-  const KEY_ACCESS = "accessKey";
-  const KEY_EXEC_EDITOR = "editorShortCut";
-  const KEY_OPEN_OPTIONS = "optionsShortCut";
-  const MENU_ENABLED = "menuEnabled";
 
   /* variables */
   const vars = {
     [IS_ENABLED]: false,
     [KEY_ACCESS]: "e",
-    [KEY_EXEC_EDITOR]: true,
-    [KEY_OPEN_OPTIONS]: true,
+    [KEY_EDITOR]: true,
+    [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
   };
 
@@ -65,8 +62,8 @@
     [ICON_PATH]: `${ICON}#gray`,
     [IS_EXECUTABLE]: false,
     [MENU_ENABLED]: false,
-    [MODE_SOURCE]: "",
     [MODE_MATHML]: "",
+    [MODE_SOURCE]: "",
     [MODE_SVG]: "",
   };
 
@@ -256,7 +253,7 @@
   const menus = {
     [MODE_SOURCE]: null,
     [MODE_SELECTION]: null,
-    [MODE_EDIT_TEXT]: null,
+    [MODE_EDIT]: null,
   };
 
   // TODO: implement accesskey, Issue #18
@@ -289,7 +286,7 @@
     for (const item of items) {
       menus[item] = null;
       switch (item) {
-        case MODE_EDIT_TEXT:
+        case MODE_EDIT:
           enabled && func.push(createMenuItem(item, ["editable"]));
           break;
         case MODE_SELECTION:
@@ -328,7 +325,7 @@
             if (item === MODE_SOURCE) {
               const title = varsL[obj.mode] || varsL[menuItemId];
               title && contextMenus.update(menuItemId, {title});
-            } else if (item === MODE_EDIT_TEXT) {
+            } else if (item === MODE_EDIT) {
               const enabled = !!obj.enabled;
               contextMenus.update(menuItemId, {enabled});
             }
@@ -436,8 +433,8 @@
           vars[item] = obj.value;
           hasPorts && func.push(portVar({[item]: obj.value}));
           break;
-        case KEY_EXEC_EDITOR:
-        case KEY_OPEN_OPTIONS:
+        case KEY_EDITOR:
+        case KEY_OPTIONS:
           vars[item] = !!obj.checked;
           hasPorts && func.push(portVar({[item]: !!obj.checked}));
           break;

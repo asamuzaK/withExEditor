@@ -8,28 +8,30 @@
   const storage = browser.storage.local;
 
   /* constants */
-  const LABEL = "withExEditor";
-  const PORT_NAME = "portContent";
-
+  const CHAR = "utf-8";
   const CONTEXT_MENU = "contextMenu";
+  const CONTEXT_MODE = "contextMode";
+  const CONTEXT_NODE = "contextNode";
   const CREATE_TMP_FILE = "createTmpFile";
+  const DATA_ATTR = "data-with_ex_editor";
+  const DATA_ATTR_CTRLS = `${DATA_ATTR}_controls`;
+  const DATA_ATTR_ID = `${DATA_ATTR}_id`;
+  const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
+  const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
+  const FILE_EXT = "fileExt";
   const GET_CONTENT = "getContent";
   const GET_FILE_PATH = "getFilePath";
   const GET_TMP_FILE = "getTmpFile";
-  const OPEN_OPTIONS = "openOptions";
-  const PORT_FILE_PATH = "portFilePath";
-  const PORT_HOST = "portHost";
-  const SET_VARS = "setVars";
-  const SYNC_TEXT = "syncText";
-
-  const CHAR = "utf-8";
-  const DATA_ATTR = "data-with_ex_editor";
-  const DATA_ATTR_ID = `${DATA_ATTR}_id`;
-  const DATA_ATTR_ID_CTRL = `${DATA_ATTR}_id_controls`;
-  const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
-  const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
   const HTML = "html";
-  const MODE_EDIT_TEXT = "modeEditText";
+  const ID_TAB = "tabId";
+  const ID_WIN = "windowId";
+  const INCOGNITO = "incognito";
+  const IS_ENABLED = "isEnabled";
+  const KEY_ACCESS = "accessKey";
+  const KEY_EDITOR = "editorShortCut";
+  const KEY_OPTIONS = "optionsShortCut";
+  const LABEL = "withExEditor";
+  const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
@@ -37,36 +39,30 @@
   const NODE_COMMENT = Node.COMMENT_NODE;
   const NODE_ELEMENT = Node.ELEMENT_NODE;
   const NODE_TEXT = Node.TEXT_NODE;
-  const TMP_FILES = "tmpFiles";
-  const TMP_FILES_PB = "tmpFilesPb";
-
-  const FILE_EXT = "fileExt";
   const NS_URI = "nsURI";
   const NS_URI_DEFAULT_ITEMS = 4;
-
-  const INCOGNITO = "incognito";
-  const IS_ENABLED = "isEnabled";
-  const KEY_ACCESS = "accessKey";
-  const KEY_OPEN_OPTIONS = "optionsShortCut";
-  const KEY_EXEC_EDITOR = "editorShortCut";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const CONTEXT_MODE = "contextMode";
-  const CONTEXT_NODE = "contextNode";
-  const TAB_ID = "tabId";
-  const WIN_ID = "windowId";
+  const OPEN_OPTIONS = "openOptions";
+  const PORT_FILE_PATH = "portFilePath";
+  const PORT_HOST = "portHost";
+  const PORT_NAME = "portContent";
+  const SET_VARS = "setVars";
+  const SYNC_TEXT = "syncText";
+  const TMP_FILES = "tmpFiles";
+  const TMP_FILES_PB = "tmpFilesPb";
 
   /* variables */
   const vars = {
     [CONTEXT_MODE]: null,
     [CONTEXT_NODE]: null,
+    [ID_TAB]: "",
+    [ID_WIN]: "",
     [INCOGNITO]: false,
     [IS_ENABLED]: false,
     [KEY_ACCESS]: "e",
-    [KEY_EXEC_EDITOR]: true,
-    [KEY_OPEN_OPTIONS]: true,
+    [KEY_EDITOR]: true,
+    [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
-    [TAB_ID]: "",
-    [WIN_ID]: "",
   };
 
   /**
@@ -175,8 +171,8 @@
     if (target === currentTarget) {
       const attrs = target.hasAttributeNS("", DATA_ATTR_ID) &&
                     target.getAttributeNS("", DATA_ATTR_ID) ||
-                    target.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
-                    target.getAttributeNS("", DATA_ATTR_ID_CTRL);
+                    target.hasAttributeNS("", DATA_ATTR_CTRLS) &&
+                    target.getAttributeNS("", DATA_ATTR_CTRLS);
       attrs && attrs.split(" ").forEach(dataId =>
         func.push(portTmpFileData(dataId))
       );
@@ -192,7 +188,7 @@
   const storeTmpFileData = async (data = {}) => {
     if (data[CREATE_TMP_FILE] && (data = data[CREATE_TMP_FILE])) {
       const {dataId, mode} = data;
-      mode === MODE_EDIT_TEXT && (dataIds[dataId] = data);
+      mode === MODE_EDIT && (dataIds[dataId] = data);
     }
   };
 
@@ -205,7 +201,7 @@
     const {data, path} = obj;
     if (data) {
       const {dataId, mode} = data;
-      if (mode === MODE_EDIT_TEXT) {
+      if (mode === MODE_EDIT) {
         const keys = dataIds[dataId];
         if (keys && path) {
           data.path = path;
@@ -664,13 +660,13 @@
       const dataId = await getId(elm);
       const ctrl = await getEditableElm(elm);
       if (dataId && ctrl) {
-        const arr = ctrl.hasAttributeNS("", DATA_ATTR_ID_CTRL) &&
-                      (ctrl.getAttributeNS("", DATA_ATTR_ID_CTRL)).split(" ");
+        const arr = ctrl.hasAttributeNS("", DATA_ATTR_CTRLS) &&
+                      (ctrl.getAttributeNS("", DATA_ATTR_CTRLS)).split(" ");
         if (arr) {
           const attr = arr.push(dataId) && [...(new Set(arr))].join(" ");
-          attr && ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, attr);
+          attr && ctrl.setAttributeNS("", DATA_ATTR_CTRLS, attr);
         } else {
-          ctrl.setAttributeNS("", DATA_ATTR_ID_CTRL, dataId);
+          ctrl.setAttributeNS("", DATA_ATTR_CTRLS, dataId);
           ctrl.addEventListener("focus", requestTmpFile, false);
         }
       }
@@ -745,7 +741,7 @@
     let {dataId, namespaceURI, value} = data, fileName, tmpFileData;
     namespaceURI = namespaceURI || "";
     switch (mode) {
-      case MODE_EDIT_TEXT:
+      case MODE_EDIT:
         if (dataId) {
           fileName = `${dataId}.txt`;
           tmpFileData = {
@@ -819,7 +815,7 @@
     if (elm && mode) {
       let obj;
       switch (mode) {
-        case MODE_EDIT_TEXT:
+        case MODE_EDIT:
           obj = await getId(elm);
           if (obj) {
             if (isCollapsed && await isEditControl(elm)) {
@@ -892,7 +888,7 @@
           (isCollapsed || rangeCount === 1 &&
                           anchorNode.parentNode === focusNode.parentNode &&
                           elm !== document.documentElement)) {
-        mode = MODE_EDIT_TEXT;
+        mode = MODE_EDIT;
       } else if (isCollapsed) {
         elm.namespaceURI === nsURI.math && (mode = MODE_MATHML) ||
         elm.namespaceURI === nsURI.svg && (mode = MODE_SVG);
@@ -953,15 +949,15 @@
   const syncText = async (obj = {}) => {
     const func = [];
     const {data, dataId, tabId} = obj;
-    if (data && dataId && tabId === vars[TAB_ID]) {
+    if (data && dataId && tabId === vars[ID_TAB]) {
       const {namespaceURI, timestamp} = data;
       const elm = document.activeElement;
       let {value} = obj,
           isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
           ns = !isHtml && nsURI.html || "", attr, nsPrefix;
       value = await (new TextDecoder(CHAR)).decode(value) || "";
-      if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CTRL)) {
-        const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CTRL)).split(" ");
+      if (elm.hasAttributeNS(ns, DATA_ATTR_CTRLS)) {
+        const arr = (elm.getAttributeNS(ns, DATA_ATTR_CTRLS)).split(" ");
         for (let id of arr) {
           if (id === dataId &&
               (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
@@ -1000,7 +996,7 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: true,
-    enabled: vars[KEY_EXEC_EDITOR],
+    enabled: vars[KEY_EDITOR],
   };
 
   /* open options key combination */
@@ -1010,7 +1006,7 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: false,
-    enabled: vars[KEY_OPEN_OPTIONS],
+    enabled: vars[KEY_OPTIONS],
   };
 
   /**
@@ -1076,11 +1072,11 @@
             execEditorKey.key = obj;
             openOptionsKey.key = obj;
             break;
-          case KEY_EXEC_EDITOR:
+          case KEY_EDITOR:
             vars[item] = !!obj;
             execEditorKey.enabled = !!obj;
             break;
-          case KEY_OPEN_OPTIONS:
+          case KEY_OPTIONS:
             vars[item] = !!obj;
             openOptionsKey.enabled = !!obj;
             break;
@@ -1093,8 +1089,8 @@
           case SYNC_TEXT:
             func.push(syncText(obj));
             break;
-          case TAB_ID:
-          case WIN_ID:
+          case ID_TAB:
+          case ID_WIN:
             vars[item] = obj;
             break;
           default:
@@ -1125,9 +1121,9 @@
     vars[CONTEXT_NODE] = target;
     return portMsg({
       [CONTEXT_MENU]: {
-        [MODE_EDIT_TEXT]: {
+        [MODE_EDIT]: {
           enabled,
-          menuItemId: MODE_EDIT_TEXT,
+          menuItemId: MODE_EDIT,
         },
         [MODE_SOURCE]: {
           mode,
@@ -1149,7 +1145,7 @@
         if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
           const {target} = evt;
           const mode = await getContextMode(target);
-          (!vars[ONLY_EDITABLE] || mode === MODE_EDIT_TEXT) &&
+          (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) &&
             func.push(portContent(target, mode));
         }
       } else {

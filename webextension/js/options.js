@@ -8,22 +8,19 @@
   const storage = browser.storage.local;
 
   /* constants */
-  const PORT_NAME = "portOptions";
-
-  const CHECK_EXECUTABLE = "checkExecutable";
-  const GET_APP_MANIFEST = "getAppManifest";
-  const RES_APP_MANIFEST = "resAppManifest";
-  const RES_EXECUTABLE = "resExecutable";
-
-  const CHAR = "utf-8";
-  const DATA_ATTR_I18N = "data-i18n";
-  const LANG = "optionsLang";
-  const NODE_ELEMENT = Node.ELEMENT_NODE;
-
   const APP_MANIFEST = "appManifestPath";
   const APP_NAME = "appName";
+  const CHAR = "utf-8";
+  const CHECK_EXECUTABLE = "checkExecutable";
+  const DATA_ATTR_I18N = "data-i18n";
   const EDITOR_NAME = "editorName";
+  const GET_APP_MANIFEST = "getAppManifest";
   const KEY_ACCESS = "accessKey";
+  const LANG = "optionsLang";
+  const NODE_ELEMENT = Node.ELEMENT_NODE;
+  const PORT_NAME = "portOptions";
+  const RES_APP_MANIFEST = "resAppManifest";
+  const RES_EXECUTABLE = "resExecutable";
 
   /**
    * log error
