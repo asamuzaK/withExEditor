@@ -955,10 +955,11 @@
     const {data, dataId, tabId} = obj;
     if (data && dataId && tabId === vars[TAB_ID]) {
       const {namespaceURI, timestamp} = data;
-      const value = await (new TextDecoder(CHAR)).decode(obj.value) || "";
       const elm = document.activeElement;
-      let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+      let {value} = obj,
+          isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
           ns = !isHtml && nsURI.html || "", attr, nsPrefix;
+      value = await (new TextDecoder(CHAR)).decode(value) || "";
       if (elm.hasAttributeNS(ns, DATA_ATTR_ID_CTRL)) {
         const arr = (elm.getAttributeNS(ns, DATA_ATTR_ID_CTRL)).split(" ");
         for (let id of arr) {
@@ -983,9 +984,9 @@
         nsPrefix = elm.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
         attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
         elm.setAttributeNS(ns, attr, timestamp);
-        /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value) ||
         elm.isContentEditable &&
-          func.push(replaceContent(elm, value, namespaceURI));
+        func.push(replaceContent(elm, value, namespaceURI)) ||
+        /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value);
       }
     }
     return Promise.all(func);
