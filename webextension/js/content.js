@@ -47,9 +47,12 @@
   const PORT_HOST = "portHost";
   const PORT_NAME = "portContent";
   const SET_VARS = "setVars";
+  const SUBST = "index";
   const SYNC_TEXT = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
+  const W3C = "http://www.w3.org/";
+  const XMLNS = "xmlns";
 
   /* variables */
   const vars = {
@@ -214,10 +217,10 @@
   /* serialize content */
   /* namespace URI */
   const nsURI = {
-    html: "http://www.w3.org/1999/xhtml",
-    math: "http://www.w3.org/1998/Math/MathML",
-    svg: "http://www.w3.org/2000/svg",
-    xmlns: "http://www.w3.org/2000/xmlns/",
+    html: `${W3C}1999/xhtml`,
+    math: `${W3C}1998/Math/MathML`,
+    svg: `${W3C}2000/svg`,
+    xmlns: `${W3C}2000/xmlns/`,
   };
 
   /**
@@ -226,7 +229,7 @@
    * @returns {Object} - namespace data
    */
   const getNodeNS = async node => {
-    const ns = {node: null, name: null, namespaceURI: null};
+    const ns = {node: null, localName: null, namespaceURI: null};
     if (node.namespaceURI) {
       ns.node = node;
       ns.localName = node.localName;
@@ -234,36 +237,35 @@
     } else {
       const root = document.documentElement;
       while (node && node !== root && !ns.node) {
-        if (node.namespaceURI) {
+        const {localName, parentNode, namespaceURI} = node;
+        if (namespaceURI) {
           ns.node = node;
-          ns.localName = node.localName;
-          ns.namespaceURI = node.namespaceURI;
-        } else if (/^(?:math|svg)$/.test(node.localName)) {
+          ns.localName = localName;
+          ns.namespaceURI = namespaceURI;
+        } else if (/^(?:math|svg)$/.test(localName)) {
           ns.node = node;
-          ns.localName = node.localName;
-          ns.namespaceURI = nsURI.ns[node.localName];
+          ns.localName = localName;
+          ns.namespaceURI = nsURI.ns[localName];
         } else {
-          const obj = node.parentNode;
-          if (obj.localName === "foreignObject" &&
-              (obj.hasAttributeNS(nsURI.svg, "requiredExtensions") ||
+          const attr = "requiredExtensions";
+          if (parentNode.localName === "foreignObject" &&
+              (parentNode.hasAttributeNS(nsURI.svg, attr) ||
                root.localName === HTML)) {
             ns.node = node;
-            ns.localName = node.localName;
-            ns.namespaceURI = obj.hasAttributeNS(nsURI.svg,
-                                                 "requiredExtensions") &&
-                              obj.getAttributeNS(nsURI.svg,
-                                                 "requiredExtensions") ||
+            ns.localName = localName;
+            ns.namespaceURI = parentNode.hasAttributeNS(nsURI.svg, attr) &&
+                              parentNode.getAttributeNS(nsURI.svg, attr) ||
                               nsURI.html;
           } else {
-            node = obj;
+            node = parentNode;
           }
         }
       }
       if (!ns.node) {
         ns.node = root;
         ns.localName = root.localName;
-        ns.namespaceURI = root.hasAttribute("xmlns") &&
-                          root.getAttribute("xmlns") ||
+        ns.namespaceURI = root.hasAttribute(XMLNS) &&
+                          root.getAttribute(XMLNS) ||
                           nsURI[root.localName.toLowerCase()] || "";
       }
     }
@@ -320,7 +322,7 @@
           let ns;
           if (/:/.test(localName)) {
             const [, p] = /^(.+):/.exec(localName);
-            if (p === "xmlns") {
+            if (p === XMLNS) {
               elm.setAttributeNS(nsURI.xmlns, localName, value);
             } else {
               let n = node;
@@ -716,7 +718,7 @@
       headers.set("Content-Type", contentType);
       headers.set("Charset", characterSet);
       obj = await fetch(uri, {cors, headers, method}).then(async res => {
-        const dataId = await getFileNameFromURI(uri, "index");
+        const dataId = await getFileNameFromURI(uri, SUBST);
         const fileName = dataId + await getFileExtension(contentType);
         const value = await res.text();
         return {
@@ -755,7 +757,7 @@
         break;
       case MODE_MATHML:
       case MODE_SVG:
-        if (value && (dataId = await getFileNameFromURI(uri, "index"))) {
+        if (value && (dataId = await getFileNameFromURI(uri, SUBST))) {
           fileName = `${dataId}.${mode === MODE_MATHML && "mml" || "svg"}`;
           tmpFileData = {
             [CREATE_TMP_FILE]: {
@@ -766,7 +768,7 @@
         }
         break;
       case MODE_SELECTION:
-        dataId = await getFileNameFromURI(uri, "index");
+        dataId = await getFileNameFromURI(uri, SUBST);
         if (dataId && value &&
             /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
           fileName = `${dataId}.xml`;
