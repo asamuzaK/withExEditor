@@ -784,12 +784,12 @@
       };
     } else {
       const method = "GET";
-      const cors = "cors";
-      const head = new Headers({
+      const mode = "cors";
+      const headers = new Headers({
         Charset: characterSet,
         "Content-Type": contentType,
       });
-      const res = await fetch(uri, {cors, head, method});
+      const res = await fetch(uri, {headers, method, mode});
       if (res) {
         const {dir, host, incognito, mode, tabId, windowId} = data;
         const [type] = (res.headers.get("Content-Type")).split(";");
