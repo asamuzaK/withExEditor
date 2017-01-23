@@ -714,8 +714,8 @@
       const method = "GET";
       const cors = "cors";
       const head = new Headers({
-        "Content-Type": contentType,
         Charset: characterSet,
+        "Content-Type": contentType,
       });
       const res = await fetch(uri, {cors, head, method}).catch(logError);
       if (res) {
