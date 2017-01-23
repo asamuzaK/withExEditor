@@ -40,7 +40,6 @@
   const NODE_ELEMENT = Node.ELEMENT_NODE;
   const NODE_TEXT = Node.TEXT_NODE;
   const NS_URI = "nsURI";
-  const NS_URI_DEFAULT_ITEMS = 4;
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPEN_OPTIONS = "openOptions";
   const PORT_FILE_PATH = "portFilePath";
@@ -99,6 +98,28 @@
              .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
   };
 
+  /* storage */
+  /**
+   * extend object items from storage
+   * @param {Object} obj - object to extend items
+   * @param {string} key - storage key
+   * @returns {Object} - extended object
+   */
+  const extendObjItems = async (obj, key) => {
+    if (obj && key) {
+      let ext = await storage.get(key);
+      if (ext && Object.keys(ext).length && (ext = ext[key])) {
+        const items = Object.keys(ext);
+        if (items && items.length) {
+          for (const item of items) {
+            obj[item] = ext[item];
+          }
+        }
+      }
+    }
+    return obj;
+  };
+
   /* file utils */
   /**
    * get file name from URI path
@@ -113,7 +134,35 @@
   };
 
   /* file extension */
-  const fileExt = {};
+  const fileExt = {
+    application: {
+      ecmascript: "js",
+      javascript: "js",
+      json: {
+        ld: "jsonld",
+        json: "json",
+      },
+      xml: {
+        mathml: "mml",
+        xhtml: "xhtml",
+        xml: "xml",
+        xslt: "xsl",
+      }
+    },
+    image: {
+      xml: {
+        svg: "svg",
+      }
+    },
+    text: {
+      css: "css",
+      ecmascript: "js",
+      javascript: "js",
+      html: "html",
+      plain: "txt",
+      xml: "xml",
+    },
+  };
 
   /**
    * get file extension from media type
@@ -132,7 +181,15 @@
       const items = fileExt[type];
       if (items) {
         const item = suffix && items[suffix];
-        ext = item && (item[subtype] || item[suffix]) || items[subtype];
+        if (item) {
+          ext = item[subtype] ||
+                await extendObjItems(fileExt, FILE_EXT).then(obj =>
+                  obj[type][suffix][subtype]
+                ) ||
+                item[suffix];
+        } else {
+          ext = items[subtype];
+        }
       }
     }
     return `.${ext || subst}`;
@@ -266,7 +323,10 @@
         ns.localName = root.localName;
         ns.namespaceURI = root.hasAttribute(XMLNS) &&
                           root.getAttribute(XMLNS) ||
-                          nsURI[root.localName.toLowerCase()] || "";
+                          nsURI[root.localName.toLowerCase()] ||
+                          await extendObjItems(nsURI, NS_URI).then(obj =>
+                            obj[root.localName.toLowerCase()]
+                          ) || "";
       }
     }
     return ns;
@@ -311,10 +371,11 @@
    * set namespaced attribute
    * @param {Object} elm - element to append attributes
    * @param {Object} node - element node to get attributes from
-   * @returns {void}
+   * @returns {Object} - Promise.<Array.<void>>
    */
   const setAttributeNS = async (elm, node = {}) => {
     const {attributes} = node;
+    const func = [];
     if (elm && attributes && attributes.length) {
       for (const attr of attributes) {
         const {localName, name, namespaceURI, prefix, value} = attr;
@@ -323,7 +384,7 @@
           if (/:/.test(localName)) {
             const [, p] = /^(.+):/.exec(localName);
             if (p === XMLNS) {
-              elm.setAttributeNS(nsURI.xmlns, localName, value);
+              func.push(elm.setAttributeNS(nsURI.xmlns, localName, value));
             } else {
               let n = node;
               while (n && n.parentNode && !ns) {
@@ -331,16 +392,21 @@
                   (ns = n.getAttributeNS("", `xmlns:${p}`));
                 n = n.parentNode;
               }
-              ns && elm.setAttributeNS(ns, localName, value);
+              ns && func.push(elm.setAttributeNS(ns, localName, value));
             }
           } else {
             const attrName = prefix && `${prefix}:${localName}` || localName;
             ns = namespaceURI || prefix && nsURI[prefix] || "";
-            elm.setAttributeNS(ns, attrName, value);
+            (ns || !prefix) &&
+            func.push(elm.setAttributeNS(ns, attrName, value)) ||
+            func.push(extendObjItems(nsURI, NS_URI).then(obj =>
+              elm.setAttributeNS(obj[prefix] || "", attrName, value)
+            ));
           }
         }
       }
     }
+    return Promise.all(func);
   };
 
   /**
@@ -352,7 +418,11 @@
     let elm;
     if (node) {
       const {attributes, localName, namespaceURI, prefix} = node;
-      const ns = namespaceURI || prefix && nsURI[prefix] ||
+      const ns = namespaceURI ||
+                 prefix && (
+                   nsURI[prefix] ||
+                   await extendObjItems(nsURI, NS_URI).then(obj => obj[prefix])
+                 ) ||
                  await getNodeNS(node).namespaceURI || nsURI.html;
       const name = prefix && `${prefix}:${localName}` || localName;
       elm = document.createElementNS(ns, name);
@@ -717,7 +787,7 @@
         Charset: characterSet,
         "Content-Type": contentType,
       });
-      const res = await fetch(uri, {cors, head, method}).catch(logError);
+      const res = await fetch(uri, {cors, head, method});
       if (res) {
         const {dir, host, incognito, mode, tabId, windowId} = data;
         const [type] = (res.headers.get("Content-Type")).split(";");
@@ -1026,28 +1096,6 @@
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
 
-  /* storage */
-  /**
-   * extend object items from storage
-   * @param {Object} obj - object to extend items
-   * @param {string} key - storage key
-   * @param {number} len - default items length
-   * @returns {void}
-   */
-  const extendObjItems = async (obj, key, len = 0) => {
-    if (obj && key && Object.keys(obj).length <= len) {
-      let ext = await storage.get(key);
-      if (ext && Object.keys(ext).length && (ext = ext[key])) {
-        const items = Object.keys(ext);
-        if (items && items.length > len) {
-          for (const item of items) {
-            obj[item] = ext[item];
-          }
-        }
-      }
-    }
-  };
-
   /* handlers */
   /**
    * handle message
@@ -1169,10 +1217,4 @@
     root.addEventListener("contextmenu", handleContextMenu, false);
     root.addEventListener("keypress", handleKeyPress, false);
   }, false);
-
-  /* startup */
-  Promise.all([
-    extendObjItems(fileExt, FILE_EXT, 0),
-    extendObjItems(nsURI, NS_URI, NS_URI_DEFAULT_ITEMS),
-  ]).catch(logError);
 }
