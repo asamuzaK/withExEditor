@@ -51,7 +51,7 @@
     "cache-manifest": "appcache",
     "css": "css",
     "csv": "csv",
-    "ecmascript": "es",
+    "ecmascript": "js",
     "javascript": "js",
     "javascript1.0": "js",
     "javascript1.1": "js",
