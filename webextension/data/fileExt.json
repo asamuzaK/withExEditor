@@ -1,6 +1,6 @@
 {
   "application": {
-    "ecmascript": "js",
+    "ecmascript": "es",
     "javascript": "js",
     "x-ecmascript": "js",
     "x-javascript": "js",
@@ -51,7 +51,7 @@
     "cache-manifest": "appcache",
     "css": "css",
     "csv": "csv",
-    "ecmascript": "js",
+    "ecmascript": "es",
     "javascript": "js",
     "javascript1.0": "js",
     "javascript1.1": "js",

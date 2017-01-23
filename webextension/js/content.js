@@ -136,7 +136,7 @@
   /* file extension */
   const fileExt = {
     application: {
-      ecmascript: "js",
+      ecmascript: "es",
       javascript: "js",
       json: {
         ld: "jsonld",
@@ -156,7 +156,6 @@
     },
     text: {
       css: "css",
-      ecmascript: "js",
       javascript: "js",
       html: "html",
       plain: "txt",
@@ -188,7 +187,10 @@
                 ) ||
                 item[suffix];
         } else {
-          ext = items[subtype];
+          ext = items[subtype] ||
+                await extendObjItems(fileExt, FILE_EXT).then(obj =>
+                  obj[type][subtype]
+                );
         }
       }
     }
