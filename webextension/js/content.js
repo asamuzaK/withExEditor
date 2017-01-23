@@ -146,12 +146,12 @@
         xhtml: "xhtml",
         xml: "xml",
         xslt: "xsl",
-      }
+      },
     },
     image: {
       xml: {
         svg: "svg",
-      }
+      },
     },
     text: {
       css: "css",
@@ -782,13 +782,11 @@
         [GET_FILE_PATH]: {uri},
       };
     } else {
-      const method = "GET";
-      const mode = "cors";
       const headers = new Headers({
         Charset: characterSet,
         "Content-Type": contentType,
       });
-      const res = await fetch(uri, {headers, method, mode});
+      const res = await fetch(uri, {headers, method: "GET", mode: "cors"});
       if (res) {
         const {dir, host, incognito, mode, tabId, windowId} = data;
         const [type] = (res.headers.get("Content-Type")).split(";");
