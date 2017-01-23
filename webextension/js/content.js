@@ -324,9 +324,9 @@
         ns.localName = root.localName;
         ns.namespaceURI = root.hasAttribute(XMLNS) &&
                           root.getAttribute(XMLNS) ||
-                          nsURI[root.localName.toLowerCase()] ||
+                          nsURI[root.localName] ||
                           await extendObjItems(nsURI, NS_URI).then(obj =>
-                            obj[root.localName.toLowerCase()]
+                            obj[root.localName]
                           ) || "";
       }
     }
