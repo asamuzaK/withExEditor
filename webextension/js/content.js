@@ -138,7 +138,6 @@
     application: {
       javascript: "js",
       json: {
-        ld: "jsonld",
         json: "json",
       },
       xml: {
