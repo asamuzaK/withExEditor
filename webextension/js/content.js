@@ -136,7 +136,6 @@
   /* file extension */
   const fileExt = {
     application: {
-      ecmascript: "es",
       javascript: "js",
       json: {
         ld: "jsonld",
