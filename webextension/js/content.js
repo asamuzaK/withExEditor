@@ -714,12 +714,14 @@
       const {dir, host, incognito, mode, tabId, windowId} = data;
       const method = "GET";
       const cors = "cors";
-      const headers = new Headers();
-      headers.set("Content-Type", contentType);
-      headers.set("Charset", characterSet);
-      obj = await fetch(uri, {cors, headers, method}).then(async res => {
+      const head = new Headers();
+      head.set("Content-Type", contentType);
+      head.set("Charset", characterSet);
+      obj = await fetch(uri, {cors, head, method}).then(async res => {
+        const {headers} = res;
+        const [type] = (headers.get("Content-Type")).split(";");
         const dataId = await getFileNameFromURI(uri, SUBST);
-        const fileName = dataId + await getFileExtension(contentType);
+        const fileName = dataId + await getFileExtension(type);
         const value = await res.text();
         return {
           [CREATE_TMP_FILE]: {
