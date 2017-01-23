@@ -711,25 +711,26 @@
         [GET_FILE_PATH]: {uri},
       };
     } else {
-      const {dir, host, incognito, mode, tabId, windowId} = data;
       const method = "GET";
       const cors = "cors";
-      const head = new Headers();
-      head.set("Content-Type", contentType);
-      head.set("Charset", characterSet);
-      obj = await fetch(uri, {cors, head, method}).then(async res => {
-        const {headers} = res;
-        const [type] = (headers.get("Content-Type")).split(";");
+      const head = new Headers({
+        "Content-Type": contentType,
+        Charset: characterSet,
+      });
+      const res = await fetch(uri, {cors, head, method}).catch(logError);
+      if (res) {
+        const {dir, host, incognito, mode, tabId, windowId} = data;
+        const [type] = (res.headers.get("Content-Type")).split(";");
         const dataId = await getFileNameFromURI(uri, SUBST);
         const fileName = dataId + await getFileExtension(type);
         const value = await res.text();
-        return {
+        obj = {
           [CREATE_TMP_FILE]: {
             dataId, dir, fileName, host, incognito, mode, tabId, windowId,
           },
           value,
         };
-      });
+      }
     }
     return obj || null;
   };
