@@ -15,6 +15,9 @@
         <h1>重要なお知らせ</h1>
         <p>
           Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラウザはメッセージを介してネイティブアプリケーションとやりとりする仕組みとなっています（つまり、外部エディタはもう直接起動できません）。
+          詳細については、<a href="https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging">Native messaging - Mozilla | MDN</a>を参照してください。
+        </p>
+        <p>
           このため、withExEditorを使うにあたり、ユーザーのみなさんは：
         </p>
         <ul>
@@ -28,19 +31,16 @@
         <p>
           を準備する必要があります。
         </p>
-        <p>
-          詳細については、<a href="https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging">Native messaging - Mozilla | MDN</a>を参照してください。
-        </p>
       </section>
       <section>
         <h1>ホスト</h1>
         <p>
           使用するエディタを起動するホストを作成し、任意の場所に保存します。
-          ホストは標準入力（stdin）で渡されるバイナリデータを扱えるものである必要があります。
           withExEditorからはソース表示やテキスト編集用に作成した「一時ファイルのパス」をホストに送信します。
         </p>
         <p>
           以下はPythonで書いたホストの例です。
+          ホストはPythonでなくてもかまいませんが、標準入力（stdin）で渡されるバイナリデータを扱えるものである必要があります。
         </p>
         <figure>
           <figcaption>Pythonスクリプトによるホストの例：</figcaption>
@@ -89,11 +89,13 @@
         </dl>
         <p>
           マニフェストは、 "name"フィールドと同じファイル名、.jsonのファイル拡張子、UTF-8（BOMなし）の文字コードで保存してください。
-          保存先については、<a href="https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging#App_manifest_location">App manifest location</a>を参照してください。
+          Windowsの場合、JSONファイルを任意の場所に保存します。
+          余談ですが、"C:\Users\YourUserName\withExEditorHosts"といったフォルダを作成し、pythonスクリプト、シェルスクリプト、JSONファイルをそのフォルダにまとめて保存しておくと管理が楽になると思います。
+          Linux、Macでの保存先については、<a href="https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging#App_manifest_location">App manifest location</a>を参照してください。
         </p>
         <p>
           Windowsではさらにレジストリも設定する必要があります。
-          マニフェストを"C:¥Users¥xxx¥youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
+          マニフェストを"C:\Users\YourUserName\withExEditorHosts\youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
         </p>
         <figure>
           <figcaption>REG ADDの例（Windows）：</figcaption>
