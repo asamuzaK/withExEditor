@@ -161,12 +161,13 @@ On Windows, save the JSON file in an arbitrary place.
 On Linux and Mac, refer to [App manifest location](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#App_manifest_location) where to save the manifest.
 
 On Windows, you also need to set the registry.
-If the path of the manifest is "C:\Users\xxx\youreditor.json", run the following command with cmd.exe.
+If the path of the manifest is "C:\Users\YourUserName\withExEditorHosts\youreditor.json", run the following command with cmd.exe.
 Then you can save the registry key.
+Note that the key is the same as JSON file name.
 
 REG ADD Example (Windows):
 ```
-REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\xxx\youreditor.json" /f
+REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\YourUserName\withExEditorHosts\youreditor.json" /f
 ```
 
 After completing the above work, *enter the manifest path in Options page*.
