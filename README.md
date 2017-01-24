@@ -70,19 +70,21 @@ Available with (X)HTML, JavaScript, CSS, MathML, SVG, XML documents.
 ## Application Manifest Manual
 ### Important Notice
 In Mozilla's new add-on ecosystem WebExtensions, the browser interacts with native application via messages (that is, external editor can not be executed directly anymore).
+For details, refer to [Native messaging - Mozilla | MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging).
+
 Therefore, to use withExEditor, you need to prepare:
 
 * A host which executes the external editor
 * An application manifest of the host
 
-For details, refer to [Native messaging - Mozilla | MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging).
-
 ### Host
 Create a host which executes the editor, and save it in an arbitrary location.
-The host should be able to handle binary data passed in standard input (stdin).
 From withExEditor, "temporary file path", which is created for source view / text edit, will be sent to the host.
 
 The following is an example of a host written in Python.
+The host does not have to be Python, but it needs to be able to handle binary data passed in standard input (stdin).
+
+As an aside, on Windows, it should be easier to manage if you create a folder like "C:\Users\YourUserName\withExEditorHosts" and save the python script, shell script, JSON file in that folder.
 
 Python Script Example:
 ```
@@ -155,7 +157,8 @@ Manifest Example:
 * *allowed_extensions* - An array of addon IDs. Fill in the bracket with "jid1-WiAigu4HIo0Tag@jetpack" which is ID of withExEditor.
 
 Save the manifest with the same file name as the "name" field, the file extension of .json, and the character code of UTF-8 (without BOM).
-Refer to [App manifest location](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#App_manifest_location) where to save the manifest.
+On Windows, save the JSON file in an arbitrary place.
+On Linux and Mac, refer to [App manifest location](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#App_manifest_location) where to save the manifest.
 
 On Windows, you also need to set the registry.
 If the path of the manifest is "C:\Users\xxx\youreditor.json", run the following command with cmd.exe.

@@ -70,6 +70,8 @@
 ## アプリケーションマニフェストマニュアル
 ### 重要なお知らせ
 Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラウザはメッセージを介してネイティブアプリケーションとやりとりする仕組みとなっています（つまり、外部エディタはもう直接起動できません）。
+詳細については、[Native messaging - Mozilla | MDN](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging)を参照してください。
+
 このため、withExEditorを使うにあたり、ユーザーのみなさんは：
 
 * 外部エディタを起動するためのホスト
@@ -77,14 +79,14 @@ Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラ
 
 を準備する必要があります。
 
-詳細については、[Native messaging - Mozilla | MDN](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging)を参照してください。
-
 ### ホスト
 使用するエディタを起動するホストを作成し、任意の場所に保存します。
-ホストは標準入力（stdin）で渡されるバイナリデータを扱えるものである必要があります。
 withExEditorからはソース表示やテキスト編集用に作成した「一時ファイルのパス」をホストに送信します。
 
 以下はPythonで書いたホストの例です。
+ホストはPythonでなくてもかまいませんが、標準入力（stdin）で渡されるバイナリデータを扱えるものである必要があります。
+
+余談ですが、Windowsの場合、"C:\Users\YourUserName\withExEditorHosts"といったフォルダを作成し、pythonスクリプト、シェルスクリプト、JSONファイルをそのフォルダにまとめて保存すると管理が楽になると思います。
 
 Pythonスクリプトによるホストの例：
 ```
@@ -157,14 +159,16 @@ python "C:\path\to\youreditor.py"
 * *allowed_extensions* - アドオンのIDの配列。withExEditorのIDである"jid1-WiAigu4HIo0Tag@jetpack"を[]括弧の中に記入してください。
 
 マニフェストは、 "name"フィールドと同じファイル名、.jsonのファイル拡張子、UTF-8（BOMなし）の文字コードで保存してください。
-保存先については、[App manifest location](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging#App_manifest_location)を参照してください。
+Windowsの場合、JSONファイルを任意の場所に保存します。
+Linux、Macでの保存先については、[App manifest location](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging#App_manifest_location)を参照してください。
 
 Windowsではさらにレジストリも設定する必要があります。
-マニフェストを"C:¥Users¥xxx¥youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
+マニフェストを"C:\Users\YourUserName\withExEditorHosts\youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
+キーがJSONのファイル名と同じであることに注意してください。
 
 REG ADDの例（Windows）：
 ```
-REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\xxx\youreditor.json" /f
+REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\youreditor" /ve /d "C:\Users\YourUserName\withExEditorHosts\youreditor.json" /f
 ```
 
 以上の作業を終えたら、*設定ページでマニフェストのパスを入力してください*。
