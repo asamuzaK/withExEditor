@@ -163,7 +163,7 @@ On Linux and Mac, refer to [App manifest location](https://developer.mozilla.org
 On Windows, you also need to set the registry.
 If the path of the manifest is "C:\Users\YourUserName\withExEditorHosts\youreditor.json", run the following command with cmd.exe.
 Then you can save the registry key.
-Note that the key is the same as JSON file name.
+Note that the key is the same as the name field in JSON.
 
 REG ADD Example (Windows):
 ```

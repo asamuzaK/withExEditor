@@ -164,7 +164,7 @@ Linux、Macでの保存先については、[App manifest location](https://deve
 
 Windowsではさらにレジストリも設定する必要があります。
 マニフェストを"C:\Users\YourUserName\withExEditorHosts\youreditor.json"に保存したと仮定した場合、cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
-キーがJSONのファイル名と同じであることに注意してください。
+キーがJSONのnameフィールドの値と同じであることに注意してください。
 
 REG ADDの例（Windows）：
 ```
