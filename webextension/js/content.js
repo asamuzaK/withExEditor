@@ -45,6 +45,7 @@
   const PORT_FILE_PATH = "portFilePath";
   const PORT_HOST = "portHost";
   const PORT_NAME = "portContent";
+  const RANGE_SEP = "Next Range";
   const SET_VARS = "setVars";
   const SUBST = "index";
   const SYNC_TEXT = "syncText";
@@ -564,7 +565,7 @@
       }
       arr.push(document.createTextNode("\n"));
       count > 1 && index < count - 1 &&
-        arr.push(document.createComment("Next Range"));
+        arr.push(document.createComment(RANGE_SEP));
     }
     return Promise.all(arr);
   };
