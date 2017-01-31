@@ -44,31 +44,31 @@
   "optionsAccessKeySettings": {
     "message": "Access Key Settings"
   },
-  "optionsAppManifestPath": {
+  "optionsEditorConfigPath": {
     "message": ""
   },
-  "optionsAppManifestPath.placeholder": {
-    "message": "Input App Manifest Path"
+  "optionsEditorConfigPath.placeholder": {
+    "message": "Input Editor Config Path"
   },
-  "optionsAppManifestPathDetail": {
-    "message": "Enter the path of application manifest JSON file."
+  "optionsEditorConfigPathDetail": {
+    "message": "Enter the path of editor configuration JSON file."
   },
-  "optionsAppManifestPathLabel": {
-    "message": "App Manifest Path"
+  "optionsEditorConfigPathLabel": {
+    "message": "Editor Config Path"
   },
-  "optionsEditorName": {
+  "optionsEditorLabel": {
     "message": ""
   },
-  "optionsEditorName.placeholder": {
+  "optionsEditorLabel.placeholder": {
     "message": "Rename Editor Label"
   },
-  "optionsEditorNameDetail": {
+  "optionsEditorLabelDetail": {
     "message": "Enter the label of the editor."
   },
-  "optionsEditorNameDetail2": {
+  "optionsEditorLabelDetail2": {
     "message": "Disabled if application manifest path field is not filled, or could not find the host etc."
   },
-  "optionsEditorNameLabel": {
+  "optionsEditorLabelLabel": {
     "message": "Editor Label"
   },
   "optionsEditorSettings": {
@@ -91,15 +91,6 @@
   },
   "optionsEnablePBLabel": {
     "message": "Enable During Private Browsing"
-  },
-  "optionsForceRemoveDetail": {
-    "message": "Forcibly remove temporary files at the end of Private Browsing or at shut down."
-  },
-  "optionsForceRemoveDetail2": {
-    "message": "Recommended to be checked, though depending on the editor, this option may cause problems if it is enabled."
-  },
-  "optionsForceRemoveLabel": {
-    "message": "Forcibly Remove Temporary Files"
   },
   "optionsIconColor": {
     "message": ""

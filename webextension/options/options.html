@@ -60,20 +60,20 @@
           </legend>
           <div>
             <p>
-              <label for="appManifestPath" class="label"
-                     data-i18n="optionsAppManifestPathLabel"
-                     aria-details="appManifestPathDetail">
-                App Manifest Path
+              <label for="editorConfigPath" class="label"
+                     data-i18n="optionsEditorConfigPathLabel"
+                     aria-details="editorConfigPathDetail">
+                Editor Config Path
               </label>
-              <input type="text" id="appManifestPath" data-executable="false"
-                     data-i18n="optionsAppManifestPath"
-                     placeholder="Input App Manifest Path" />
-              <input type="hidden" id="appName" />
+              <input type="text" id="editorConfigPath" data-executable="false"
+                     data-i18n="optionsEditorConfigPath"
+                     placeholder="Input Editor Config Path" />
+              <input type="hidden" id="editorName" />
             </p>
-            <details id="appManifestPathDetail">
+            <details id="editorConfigPathDetail">
               <div>
-                <p data-i18n="optionsAppManifestPathDetail">
-                  Enter the path of application manifest JSON file.
+                <p data-i18n="optionsEditorConfigPathDetail">
+                  Enter the path of editor configuration JSON file.
                 </p>
                 <p>
                   <a href="./manual.en.html" data-i18n="optionsManualLabel">
@@ -85,22 +85,22 @@
           </div>
           <div>
             <p>
-              <label for="editorName" class="label"
-                     data-i18n="optionsEditorNameLabel"
-                     aria-details="editorNameDetail">
+              <label for="editorLabel" class="label"
+                     data-i18n="optionsEditorLabelLabel"
+                     aria-details="editorLabelDetail">
                 Editor Label
               </label>
-              <input type="text" id="editorName" disabled="disabled"
-                     data-i18n="optionsEditorName"
+              <input type="text" id="editorLabel" disabled="disabled"
+                     data-i18n="optionsEditorLabel"
                      placeholder="Rename Editor Label" />
             </p>
-            <details id="editorNameDetail">
+            <details id="editorLabelDetail">
               <div>
-                <p data-i18n="optionsEditorNameDetail">
+                <p data-i18n="optionsEditorLabelDetail">
                   Enter the label of the editor.
                 </p>
-                <p data-i18n="optionsEditorNameDetail2">
-                  Disabled if application manifest path field is not filled, or could not find the host etc.
+                <p data-i18n="optionsEditorLabelDetail2">
+                  Disabled if editor config path field is not filled, or could not find the host etc.
                 </p>
               </div>
             </details>
@@ -209,26 +209,6 @@
               <div>
                 <p data-i18n="optionsEnableOnlyEditableDetail">
                   Enables only when the content is editable.
-                </p>
-              </div>
-            </details>
-          </div>
-          <div>
-            <p>
-              <input type="checkbox" id="forceRemove" checked="checked" />
-              <label for="forceRemove" class="checkboxLabel"
-                     data-i18n="optionsForceRemoveLabel"
-                     aria-details="forceRemoveDetail">
-                Forcibly Remove Temporary Files
-              </label>
-            </p>
-            <details id="forceRemoveDetail">
-              <div>
-                <p data-i18n="optionsForceRemoveDetail">
-                  Forcibly remove temporary files at the end of Private Browsing or at shut down.
-                </p>
-                <p data-i18n="optionsForceRemoveDetail2">
-                  Recommended to be checked, though depending on the editor, this option may cause problems if it is enabled.
                 </p>
               </div>
             </details>

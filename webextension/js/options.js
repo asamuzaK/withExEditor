@@ -8,19 +8,16 @@
   const storage = browser.storage.local;
 
   /* constants */
-  const APP_MANIFEST = "appManifestPath";
-  const APP_NAME = "appName";
-  const CHAR = "utf-8";
-  const CHECK_EXECUTABLE = "checkExecutable";
   const DATA_ATTR_I18N = "data-i18n";
-  const EDITOR_NAME = "editorName";
-  const GET_APP_MANIFEST = "getAppManifest";
+  const EDITOR_CONFIG = "editorConfigPath";
+  const EDITOR_CONFIG_GET = "getEditorConfig";
+  const EDITOR_CONFIG_RES = "resEditorConfig";
+  const EDITOR_FILE_NAME = "editorFileName";
+  const EDITOR_LABEL = "editorLabel";
   const KEY_ACCESS = "accessKey";
   const LANG = "optionsLang";
   const NODE_ELEMENT = Node.ELEMENT_NODE;
   const PORT_NAME = "portOptions";
-  const RES_APP_MANIFEST = "resAppManifest";
-  const RES_EXECUTABLE = "resExecutable";
 
   /**
    * log error
@@ -80,44 +77,28 @@
   };
 
   /**
-   * synchronize editorName value
-   * @param {string} executable - executable
-   * @returns {Object} - element
+   * extract editor config
+   * @param {string} obj - editor config object
+   * @returns {Object} - Promise.<Array.<void>>
    */
-  const syncEditorName = async (executable = false) => {
-    const elm = document.getElementById(EDITOR_NAME);
-    if (elm) {
-      const app = document.getElementById(APP_NAME);
-      const name = app && app.value;
-      if (executable && name) {
-        elm.value = name;
-        elm.disabled = false;
-      } else {
-        elm.value = "";
-        elm.disabled = true;
-      }
-    }
-    return elm || null;
-  };
-
-  /**
-   * extract application manifest
-   * @param {Array} arr - Uint8Array
-   * @returns {Object} - Promise.<Array.<*>>
-   */
-  const extractAppManifest = async (arr = []) => {
+  const extractEditorConfig = async (obj = {}) => {
+    const {editorName, executable} = obj;
+    const editor = document.getElementById(EDITOR_CONFIG);
+    const name = document.getElementById(EDITOR_FILE_NAME);
+    const label = document.getElementById(EDITOR_LABEL);
     const func = [];
-    const app = await JSON.parse((new TextDecoder(CHAR)).decode(arr));
-    if (app) {
-      const {name, path} = app;
-      const elm = document.getElementById(APP_NAME);
-      if (elm && name && path) {
-        elm.value = name;
-        func.push(createPref(elm).then(setStorage));
-        func.push(portMsg({
-          [CHECK_EXECUTABLE]: {path},
-        }));
+    if (editor && name && label) {
+      name.value = editorName || "";
+      if (executable && name.value) {
+        label.value = name.value;
+        label.disabled = false;
+      } else {
+        label.value = "";
+        label.disabled = true;
       }
+      func.push(createPref(editor, executable).then(setStorage));
+      func.push(createPref(name).then(setStorage));
+      func.push(createPref(label).then(setStorage));
     }
     return Promise.all(func);
   };
@@ -140,12 +121,8 @@
       }
     } else {
       switch (id) {
-        case APP_MANIFEST:
-          func.push(portMsg({
-            [GET_APP_MANIFEST]: {
-              path: value,
-            },
-          }));
+        case EDITOR_CONFIG:
+          func.push(portMsg({[EDITOR_CONFIG_GET]: value}));
           break;
         case KEY_ACCESS:
           (value === "" || value.length === 1) &&
@@ -231,7 +208,7 @@
           break;
         case "text":
           elm.value = isString(data.value) && data.value || "";
-          elm === document.getElementById(EDITOR_NAME) && elm.value &&
+          elm === document.getElementById(EDITOR_LABEL) && elm.value &&
             (elm.disabled = false);
           break;
         default:
@@ -266,24 +243,12 @@
     const items = msg && Object.keys(msg);
     if (items && items.length) {
       for (const item of items) {
-        const obj = msg[item];
-        switch (item) {
-          case RES_APP_MANIFEST:
-            func.push(extractAppManifest(obj.value));
-            break;
-          case RES_EXECUTABLE:
-            func.push(
-              createPref(
-                document.getElementById(APP_MANIFEST), obj.executable
-              ).then(setStorage)
-            );
-            func.push(
-              syncEditorName(obj.executable).then(createPref).then(setStorage)
-            );
-            // NOTE: for hybrid
-            func.push(portMsg({removeSdkPrefs: obj.executable}));
-            break;
-          default:
+        if (item === EDITOR_CONFIG_RES) {
+          const obj = msg[item];
+          func.push(extractEditorConfig(obj));
+          // NOTE: for hybrid
+          func.push(portMsg({removeSdkPrefs: obj.executable}));
+          break;
         }
       }
     }

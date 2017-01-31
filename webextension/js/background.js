@@ -8,15 +8,15 @@
   const storage = browser.storage.local;
 
   /* constants */
-  const APP_MANIFEST = "appManifestPath";
-  const APP_NAME = "appName";
+  const CONTENT_GET = "getContent";
   const CONTEXT_MENU = "contextMenu";
-  const EDITOR_NAME = "editorName";
+  const EDITOR_CONFIG = "editorConfigPath";
+  const EDITOR_CONFIG_GET = "getEditorConfig";
+  const EDITOR_CONFIG_RES = "resEditorConfig";
+  const EDITOR_LABEL = "editorLabel";
   const ENABLE_PB = "enablePB";
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "../data/fileExt.json";
-  const FORCE_REMOVE = "forceRemove";
-  const GET_CONTENT = "getContent";
   const ICON = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
@@ -28,6 +28,7 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
+  const LOCAL_FILE_VIEW = "viewLocalFile";
   const MENU_ENABLED = "menuEnabled";
   const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
@@ -39,8 +40,12 @@
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPEN_OPTIONS = "openOptions";
   const PORT_CONTENT = "portContent";
-  const PORT_HOST = "portHost";
+  const PORT_HOST = "withexeditorhost";
   const SET_VARS = "setVars";
+  const SYNC_TEXT = "syncText";
+  const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
+  const TMP_FILE_CREATE = "createTmpFile";
+  const TMP_FILE_GET = "getTmpFile";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
 
@@ -54,11 +59,8 @@
   };
 
   const varsL = {
-    [APP_MANIFEST]: "",
-    [APP_NAME]: "",
-    [EDITOR_NAME]: "",
+    [EDITOR_LABEL]: "",
     [ENABLE_PB]: false,
-    [FORCE_REMOVE]: true,
     [ICON_PATH]: `${ICON}#gray`,
     [IS_EXECUTABLE]: false,
     [MENU_ENABLED]: false,
@@ -113,17 +115,20 @@
   };
 
   /* port */
+  // NOTE: for hybrid
+  /* hybrid */
+  const hybrid = runtime.connect({name: "portBackground"});
+
   /* native application host */
-  let host = null;
+  let host = runtime.connectNative(PORT_HOST);
 
   /**
    * connect to host
    * @returns {void}
    */
   const connectHost = async () => {
-    const name = varsL[APP_NAME];
     host && host.disconnect();
-    host = varsL[IS_EXECUTABLE] && name && runtime.connectNative(name) || null;
+    host = varsL[IS_EXECUTABLE] && runtime.connectNative(PORT_HOST) || null;
   };
 
   /**
@@ -207,22 +212,26 @@
       const port = ports[windowId] && ports[windowId][tabId] &&
                      ports[windowId][tabId][frameUrl];
       port && port.postMessage({
-        [GET_CONTENT]: {info, tab},
+        [CONTENT_GET]: {info, tab},
       });
     }
   };
 
-  // NOTE: for hybrid
-  /* hybrid */
-  const hybrid = runtime.connect({name: "portBackground"});
-
   /**
-   * port message to hybrid
+   * port sync text
    * @param {*} msg - message
-   * @returns {void}
+   * @returns {Object} - ?Promise.<void>
    */
-  const portHybridMsg = async msg => {
-    msg && hybrid.postMessage(msg);
+  const portSyncText = async msg => {
+    let func;
+    if (msg) {
+      const {data} = msg;
+      if (data) {
+        const {tabId, windowId} = data;
+        func = portMsg({[SYNC_TEXT]: msg}, windowId, tabId);
+      }
+    }
+    return func || null;
   };
 
   /* icon */
@@ -264,7 +273,7 @@
    * @returns {void}
    */
   const createMenuItem = async (id, contexts) => {
-    const label = varsL[EDITOR_NAME] || LABEL;
+    const label = varsL[EDITOR_LABEL] || LABEL;
     isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
       menus[id] = contextMenus.create({
         id, contexts,
@@ -337,7 +346,7 @@
       if (items.length) {
         for (const item of items) {
           menus[item] && contextMenus.update(item, {
-            title: i18n.getMessage(item, varsL[EDITOR_NAME] || LABEL),
+            title: i18n.getMessage(item, varsL[EDITOR_LABEL] || LABEL),
           });
         }
       }
@@ -350,7 +359,7 @@
    */
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-    const label = varsL[EDITOR_NAME] || LABEL;
+    const label = varsL[EDITOR_LABEL] || LABEL;
     for (const item of items) {
       varsL[item] = i18n.getMessage(item, label);
     }
@@ -393,16 +402,13 @@
     if (item && obj) {
       const hasPorts = Object.keys(ports).length;
       switch (item) {
-        case APP_MANIFEST:
+        case EDITOR_CONFIG:
           varsL[item] = obj.value;
           varsL[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
           func.push(connectHost());
           changed && func.push(toggleBadge());
           break;
-        case APP_NAME:
-          varsL[item] = obj.value;
-          break;
-        case EDITOR_NAME:
+        case EDITOR_LABEL:
           varsL[item] = obj.value;
           func.push(cacheMenuItemTitle());
           changed && func.push(updateContextMenu());
@@ -415,11 +421,6 @@
         case ENABLE_PB:
           varsL[item] = !!obj.checked;
           changed && func.push(syncUI());
-          break;
-        case FORCE_REMOVE:
-          varsL[item] = !!obj.checked;
-          // NOTE: for hybrid
-          func.push(portHybridMsg({[item]: !!obj.checked}));
           break;
         case ICON_COLOR:
         case ICON_GRAY:
@@ -500,12 +501,25 @@
             case CONTEXT_MENU:
               func.push(updateContextMenu(obj));
               break;
+            case EDITOR_CONFIG_GET:
+              func.push(portHostMsg({[item]: obj}));
+              break;
+            case EDITOR_CONFIG_RES:
+              func.push(portMsg({[item]: obj}));
+              break;
             case OPEN_OPTIONS:
               func.push(openOptionsPage());
               break;
-            case PORT_HOST:
-              obj.path && func.push(portHostMsg(obj.path));
+            case LOCAL_FILE_VIEW:
+            case TMP_FILE_CREATE:
+            case TMP_FILE_GET:
+              host && func.push(portHostMsg({[item]: obj}));
               break;
+            case SYNC_TEXT:
+              func.push(portSyncText(obj));
+              break;
+            case PROCESS_MAIN:
+              console.log(obj);
             default:
           }
         }
@@ -621,8 +635,7 @@
     if (win.length) {
       func.push(restorePorts({windowId: stringifyPositiveInt(windowId, true)}));
       func.push(checkWindowIncognito().then(bool =>
-        // NOTE: for hybrid
-        !bool && portHybridMsg({removePrivateTmpFiles: !bool})
+        !bool && portHostMsg({[TMP_FILES_PB_REMOVE]: !bool})
       ));
     }
     return Promise.all(func).catch(logError);

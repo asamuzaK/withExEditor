@@ -9,19 +9,16 @@
 
   /* constants */
   const CHAR = "utf-8";
+  const CONTENT_GET = "getContent";
   const CONTEXT_MENU = "contextMenu";
   const CONTEXT_MODE = "contextMode";
   const CONTEXT_NODE = "contextNode";
-  const CREATE_TMP_FILE = "createTmpFile";
   const DATA_ATTR = "data-with_ex_editor";
   const DATA_ATTR_CTRLS = `${DATA_ATTR}_controls`;
   const DATA_ATTR_ID = `${DATA_ATTR}_id`;
   const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
   const FILE_EXT = "fileExt";
-  const GET_CONTENT = "getContent";
-  const GET_FILE_PATH = "getFilePath";
-  const GET_TMP_FILE = "getTmpFile";
   const HTML = "html";
   const ID_TAB = "tabId";
   const ID_WIN = "windowId";
@@ -31,6 +28,7 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
+  const LOCAL_FILE_VIEW = "viewLocalFile";
   const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
@@ -42,8 +40,7 @@
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPEN_OPTIONS = "openOptions";
-  const PORT_FILE_PATH = "portFilePath";
-  const PORT_HOST = "portHost";
+  const PORT_FILE_DATA = "portFileData";
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
   const SET_VARS = "setVars";
@@ -51,6 +48,8 @@
   const SYNC_TEXT = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
+  const TMP_FILE_CREATE = "createTmpFile";
+  const TMP_FILE_GET = "getTmpFile";
   const W3C = "http://www.w3.org/";
   const XMLNS = "xmlns";
 
@@ -218,7 +217,7 @@
    */
   const portTmpFileData = async dataId => {
     const data = dataId && dataIds[dataId];
-    return data && portMsg({[GET_TMP_FILE]: data}) || null;
+    return data && portMsg({[TMP_FILE_GET]: data}) || null;
   };
 
   /**
@@ -247,7 +246,7 @@
    * @returns {void}
    */
   const storeTmpFileData = async (data = {}) => {
-    if (data[CREATE_TMP_FILE] && (data = data[CREATE_TMP_FILE])) {
+    if (data[TMP_FILE_CREATE] && (data = data[TMP_FILE_CREATE])) {
       const {dataId, mode} = data;
       mode === MODE_EDIT && (dataIds[dataId] = data);
     }
@@ -259,13 +258,13 @@
    * @returns {void}
    */
   const updateTmpFileData = async (obj = {}) => {
-    const {data, path} = obj;
+    const {data, filePath} = obj;
     if (data) {
       const {dataId, mode} = data;
       if (mode === MODE_EDIT) {
         const keys = dataIds[dataId];
-        if (keys && path) {
-          data.path = path;
+        if (keys && filePath) {
+          data.filePath = filePath;
           dataIds[dataId] = data;
         }
       }
@@ -755,15 +754,16 @@
   const createContentDataMsg = async data => {
     let msg;
     if (data) {
-      if (data[CREATE_TMP_FILE]) {
+      if (data[TMP_FILE_CREATE]) {
         msg = {
-          [CREATE_TMP_FILE]: {
-            data: data[CREATE_TMP_FILE],
+          [TMP_FILE_CREATE]: {
+            data: data[TMP_FILE_CREATE],
             value: data.value,
           },
         };
       } else {
-        data[GET_FILE_PATH] && (msg = {[GET_FILE_PATH]: data[GET_FILE_PATH]});
+        data[LOCAL_FILE_VIEW] &&
+          (msg = {[LOCAL_FILE_VIEW]: data[LOCAL_FILE_VIEW]});
       }
     }
     return msg || null;
@@ -779,7 +779,7 @@
     let obj;
     if (window.location.protocol === "file:") {
       obj = {
-        [GET_FILE_PATH]: {uri},
+        [LOCAL_FILE_VIEW]: {uri},
       };
     } else {
       const headers = new Headers({
@@ -794,7 +794,7 @@
         const fileName = dataId + await getFileExtension(type);
         const value = await res.text();
         obj = {
-          [CREATE_TMP_FILE]: {
+          [TMP_FILE_CREATE]: {
             dataId, dir, fileName, host, incognito, mode, tabId, windowId,
           },
           value,
@@ -819,7 +819,7 @@
         if (dataId) {
           fileName = `${dataId}.txt`;
           tmpFileData = {
-            [CREATE_TMP_FILE]: {
+            [TMP_FILE_CREATE]: {
               dataId, dir, fileName, host, incognito, mode, namespaceURI,
               tabId, windowId,
             },
@@ -832,7 +832,7 @@
         if (value && (dataId = await getFileNameFromURI(uri, SUBST))) {
           fileName = `${dataId}.${mode === MODE_MATHML && "mml" || "svg"}`;
           tmpFileData = {
-            [CREATE_TMP_FILE]: {
+            [TMP_FILE_CREATE]: {
               dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
@@ -845,7 +845,7 @@
             /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
           fileName = `${dataId}.xml`;
           tmpFileData = {
-            [CREATE_TMP_FILE]: {
+            [TMP_FILE_CREATE]: {
               dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
@@ -854,7 +854,7 @@
           value = await convertValue(value);
           fileName = dataId + await getFileExtension(contentType);
           tmpFileData = {
-            [CREATE_TMP_FILE]: {
+            [TMP_FILE_CREATE]: {
               dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
@@ -1116,7 +1116,7 @@
           case IS_ENABLED:
             vars[item] = !!obj;
             break;
-          case GET_CONTENT:
+          case CONTENT_GET:
             func.push(determinePortProc(obj.info));
             break;
           case KEY_ACCESS:
@@ -1132,11 +1132,8 @@
             vars[item] = !!obj;
             openOptionsKey.enabled = !!obj;
             break;
-          case PORT_FILE_PATH:
+          case PORT_FILE_DATA:
             func.push(updateTmpFileData(obj));
-            obj.path && func.push(portMsg({
-              [PORT_HOST]: {path: obj.path},
-            }));
             break;
           case SYNC_TEXT:
             func.push(syncText(obj));
