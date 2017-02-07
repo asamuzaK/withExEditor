@@ -1,0 +1,25 @@
+{
+  "name": "withexeditor",
+  "title": "withExEditor",
+  "id": "jid1-WiAigu4HIo0Tag@jetpack",
+  "description": "View Source, View Selection, and Edit Texts with the external editor",
+  "author": "asamuzaK",
+  "homepage": "https://github.com/asamuzaK/withExEditor",
+  "locales": {
+    "ja": {
+      "description": "外部エディタでソースや選択部分を表示、またはテキストを編集"
+    }
+  },
+  "permissions": {
+    "private-browsing": true,
+    "multiprocess": true
+  },
+  "engines": {
+    "firefox": ">=52.0a1 <=*"
+  },
+  "hasEmbeddedWebExtension": true,
+  "icon": "icon.png",
+  "main": "lib/main.js",
+  "license": "MPL 2.0",
+  "version": "2.0.0-rc1"
+}

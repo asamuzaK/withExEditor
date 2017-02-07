@@ -1,0 +1,9 @@
+#jpmignore
+*.md
+*.xpi
+*.zip
+.git/
+.gitignore
+.jpmignore
+notes/
+test/
