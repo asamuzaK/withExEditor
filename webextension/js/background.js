@@ -28,6 +28,7 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
+  const LABEL_HOST = "withexeditorhost";
   const LOCAL_FILE_VIEW = "viewLocalFile";
   const MENU_ENABLED = "menuEnabled";
   const MODE_EDIT = "modeEditText";
@@ -40,7 +41,6 @@
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPEN_OPTIONS = "openOptions";
   const PORT_CONTENT = "portContent";
-  const PORT_HOST = "withexeditorhost";
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
@@ -115,21 +115,8 @@
   };
 
   /* port */
-  // NOTE: for hybrid
-  /* hybrid */
-  const hybrid = runtime.connect({name: "portBackground"});
-
   /* native application host */
-  let host = runtime.connectNative(PORT_HOST);
-
-  /**
-   * connect to host
-   * @returns {void}
-   */
-  const connectHost = async () => {
-    host && host.disconnect();
-    host = varsL[IS_EXECUTABLE] && runtime.connectNative(PORT_HOST) || null;
-  };
+  const host = runtime.connectNative(LABEL_HOST);
 
   /**
    * port message to host
@@ -382,86 +369,6 @@
     ]) || null;
   };
 
-  /* handle variables */
-  /**
-   * port variable
-   * @param {Object} v - variable
-   * @returns {Object} - ?Promise.<void>
-   */
-  const portVar = async v => v && portMsg({[SET_VARS]: v}) || null;
-
-  /**
-   * set variable
-   * @param {string} item - item
-   * @param {Object} obj - value object
-   * @param {boolean} changed - changed
-   * @returns {Object} - Promise.<Array.<*>>
-   */
-  const setVar = async (item, obj, changed = false) => {
-    const func = [];
-    if (item && obj) {
-      const hasPorts = Object.keys(ports).length;
-      switch (item) {
-        case EDITOR_CONFIG:
-          varsL[item] = obj.value;
-          varsL[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
-          func.push(connectHost());
-          changed && func.push(toggleBadge());
-          break;
-        case EDITOR_LABEL:
-          varsL[item] = obj.value;
-          func.push(cacheMenuItemTitle());
-          changed && func.push(updateContextMenu());
-          break;
-        case ONLY_EDITABLE:
-          vars[item] = !!obj.checked;
-          hasPorts && func.push(portVar({[item]: !!obj.checked}));
-          changed && func.push(restoreContextMenu());
-          break;
-        case ENABLE_PB:
-          varsL[item] = !!obj.checked;
-          changed && func.push(syncUI());
-          break;
-        case ICON_COLOR:
-        case ICON_GRAY:
-        case ICON_WHITE:
-          if (obj.checked) {
-            varsL[ICON_PATH] = obj.value;
-            changed && func.push(replaceIcon());
-          }
-          break;
-        case KEY_ACCESS:
-          vars[item] = obj.value;
-          hasPorts && func.push(portVar({[item]: obj.value}));
-          break;
-        case KEY_EDITOR:
-        case KEY_OPTIONS:
-          vars[item] = !!obj.checked;
-          hasPorts && func.push(portVar({[item]: !!obj.checked}));
-          break;
-        default:
-      }
-    }
-    return Promise.all(func);
-  };
-
-  /**
-   * set variables
-   * @param {Object} data - storage data
-   * @returns {Object} - Promise.<Array.<*>>
-   */
-  const setVars = async (data = {}) => {
-    const func = [];
-    const items = Object.keys(data);
-    if (items.length) {
-      for (const item of items) {
-        const obj = data[item];
-        func.push(setVar(item, obj.newValue || obj, !!obj.newValue));
-      }
-    }
-    return Promise.all(func);
-  };
-
   /* storage */
   /**
    * fetch and store data to share
@@ -484,6 +391,28 @@
    */
   const openOptionsPage = async () =>
     vars[IS_ENABLED] && runtime.openOptionsPage() || null;
+
+  /**
+   * handle host message
+   * @param {Object} msg - message
+   * @returns
+   */
+  const handleHostMsg = async msg => {
+    const {message, status} = msg;
+    const func = [];
+    switch (status) {
+      case "ready":
+        func.push(storage.get(EDITOR_CONFIG_GET).then(value => {
+          console.log(EDITOR_CONFIG_GET);
+          console.log(value);
+          portHostMsg({[EDITOR_CONFIG_GET]: value});
+        }));
+        break;
+      default:
+        console.log(msg);
+    }
+    return Promise.all(func);
+  };
 
   /**
    * handle message
@@ -510,16 +439,17 @@
             case OPEN_OPTIONS:
               func.push(openOptionsPage());
               break;
+            case LABEL_HOST:
+              func.push(handleHostMsg(obj));
+              break;
             case LOCAL_FILE_VIEW:
             case TMP_FILE_CREATE:
             case TMP_FILE_GET:
-              host && func.push(portHostMsg({[item]: obj}));
+              func.push(portHostMsg({[item]: obj}));
               break;
             case SYNC_TEXT:
               func.push(portSyncText(obj));
               break;
-            case PROCESS_MAIN:
-              console.log(obj);
             default:
           }
         }
@@ -641,12 +571,92 @@
     return Promise.all(func).catch(logError);
   };
 
+  /* handle variables */
+  /**
+   * port variable
+   * @param {Object} v - variable
+   * @returns {Object} - ?Promise.<void>
+   */
+  const portVar = async v => v && portMsg({[SET_VARS]: v}) || null;
+
+  /**
+   * set variable
+   * @param {string} item - item
+   * @param {Object} obj - value object
+   * @param {boolean} changed - changed
+   * @returns {Object} - Promise.<Array.<*>>
+   */
+  const setVar = async (item, obj, changed = false) => {
+    const func = [];
+    if (item && obj) {
+      const hasPorts = Object.keys(ports).length;
+      switch (item) {
+        case EDITOR_CONFIG:
+          varsL[item] = obj.value;
+          varsL[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+          changed && func.push(toggleBadge());
+          break;
+        case EDITOR_LABEL:
+          varsL[item] = obj.value;
+          func.push(cacheMenuItemTitle());
+          changed && func.push(updateContextMenu());
+          break;
+        case ONLY_EDITABLE:
+          vars[item] = !!obj.checked;
+          hasPorts && func.push(portVar({[item]: !!obj.checked}));
+          changed && func.push(restoreContextMenu());
+          break;
+        case ENABLE_PB:
+          varsL[item] = !!obj.checked;
+          changed && func.push(syncUI());
+          break;
+        case ICON_COLOR:
+        case ICON_GRAY:
+        case ICON_WHITE:
+          if (obj.checked) {
+            varsL[ICON_PATH] = obj.value;
+            changed && func.push(replaceIcon());
+          }
+          break;
+        case KEY_ACCESS:
+          vars[item] = obj.value;
+          hasPorts && func.push(portVar({[item]: obj.value}));
+          break;
+        case KEY_EDITOR:
+        case KEY_OPTIONS:
+          vars[item] = !!obj.checked;
+          hasPorts && func.push(portVar({[item]: !!obj.checked}));
+          break;
+        default:
+      }
+    }
+    return Promise.all(func);
+  };
+
+  /**
+   * set variables
+   * @param {Object} data - storage data
+   * @returns {Object} - Promise.<Array.<*>>
+   */
+  const setVars = async (data = {}) => {
+    const func = [];
+    const items = Object.keys(data);
+    if (items.length) {
+      for (const item of items) {
+        const obj = data[item];
+        func.push(setVar(item, obj.newValue || obj, !!obj.newValue));
+      }
+    }
+    return Promise.all(func);
+  };
+
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
   browser.storage.onChanged.addListener(data => setVars(data).catch(logError));
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
   );
+  host.onMessage.addListener(handleMsg);
   runtime.onConnect.addListener(port => handlePort(port).catch(logError));
   runtime.onMessage.addListener(handleMsg);
   tabs.onActivated.addListener(onTabActivated);
@@ -658,9 +668,6 @@
   );
   windows.onFocusChanged.addListener(onWindowFocusChanged);
   windows.onRemoved.addListener(onWindowRemoved);
-
-  // NOTE: for hybrid
-  hybrid.onMessage.addListener(handleMsg);
 
   /* startup */
   Promise.all([
