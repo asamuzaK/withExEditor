@@ -756,7 +756,7 @@
         };
       } else {
         data[LOCAL_FILE_VIEW] &&
-          (msg = {[LOCAL_FILE_VIEW]: data[LOCAL_FILE_VIEW]});
+          (msg = {[LOCAL_FILE_VIEW]: data[LOCAL_FILE_VIEW].uri});
       }
     }
     return msg || null;
