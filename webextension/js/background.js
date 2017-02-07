@@ -17,6 +17,7 @@
   const ENABLE_PB = "enablePB";
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "../data/fileExt.json";
+  const HOST = "withexeditorhost";
   const ICON = "./img/icon.svg";
   const ICON_COLOR = "buttonIcon";
   const ICON_GRAY = "buttonIconGray";
@@ -28,7 +29,6 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
-  const LABEL_HOST = "withexeditorhost";
   const LOCAL_FILE_VIEW = "viewLocalFile";
   const MENU_ENABLED = "menuEnabled";
   const MODE_EDIT = "modeEditText";
@@ -118,7 +118,7 @@
 
   /* port */
   /* native application host */
-  const host = runtime.connectNative(LABEL_HOST);
+  const host = runtime.connectNative(HOST);
 
   /**
    * port message to host
@@ -448,16 +448,16 @@
             case PORT_FILE_DATA:
               func.push(portMsg({[item]: obj}));
               break;
-            case OPEN_OPTIONS:
-              func.push(openOptionsPage());
-              break;
-            case LABEL_HOST:
+            case HOST:
               func.push(handleHostMsg(obj));
               break;
             case LOCAL_FILE_VIEW:
             case TMP_FILE_CREATE:
             case TMP_FILE_GET:
               func.push(portHostMsg({[item]: obj}));
+              break;
+            case OPEN_OPTIONS:
+              func.push(openOptionsPage());
               break;
             case SYNC_TEXT:
               func.push(portSyncText(obj));
