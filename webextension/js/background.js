@@ -130,14 +130,21 @@
   };
 
   /**
+   * extract editor config file path from storage data
+   * @param {Object} data - storage data
+   * @returns {?string} - file path
+   */
+  const extractEditorConfigStorage = data =>
+    data && data[EDITOR_CONFIG] && data[EDITOR_CONFIG].value || null;
+
+  /**
    * port editor config path
    * @returns {Object} - Promise.<void>
    */
   const portEditorConfigPath = () =>
-    storage.get(EDITOR_CONFIG).then((data = {}) => {
-      const {value} = data[EDITOR_CONFIG];
-      return value || null;
-    }).then(value => value && portHostMsg({[EDITOR_CONFIG_GET]: value}));
+    storage.get(EDITOR_CONFIG).then(extractEditorConfigStorage).then(filePath =>
+      filePath && portHostMsg({[EDITOR_CONFIG_GET]: filePath})
+    );
 
   /* content ports collection */
   const ports = {};
