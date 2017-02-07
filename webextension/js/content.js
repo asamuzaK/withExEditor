@@ -8,7 +8,6 @@
   const storage = browser.storage.local;
 
   /* constants */
-  const CHAR = "utf-8";
   const CONTENT_GET = "getContent";
   const CONTEXT_MENU = "contextMenu";
   const CONTEXT_MODE = "contextMode";
@@ -258,16 +257,10 @@
    * @returns {void}
    */
   const updateTmpFileData = async (obj = {}) => {
-    const {data, filePath} = obj;
+    const {data} = obj;
     if (data) {
       const {dataId, mode} = data;
-      if (mode === MODE_EDIT) {
-        const keys = dataIds[dataId];
-        if (keys && filePath) {
-          data.filePath = filePath;
-          dataIds[dataId] = data;
-        }
-      }
+      mode === MODE_EDIT && dataIds[dataId] && (dataIds[dataId] = data);
     }
   };
 
@@ -1022,14 +1015,12 @@
    */
   const syncText = async (obj = {}) => {
     const func = [];
-    const {data, dataId, tabId} = obj;
+    const {data, dataId, tabId, value} = obj;
     if (data && dataId && tabId === vars[ID_TAB]) {
       const {namespaceURI, timestamp} = data;
       const elm = document.activeElement;
-      let {value} = obj,
-          isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+      let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
           ns = !isHtml && nsURI.html || "", attr, nsPrefix;
-      value = await (new TextDecoder(CHAR)).decode(value) || "";
       if (elm.hasAttributeNS(ns, DATA_ATTR_CTRLS)) {
         const arr = (elm.getAttributeNS(ns, DATA_ATTR_CTRLS)).split(" ");
         for (let id of arr) {

@@ -41,6 +41,8 @@
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPEN_OPTIONS = "openOptions";
   const PORT_CONTENT = "portContent";
+  const PORT_FILE_DATA = "portFileData";
+  const PROCESS_CHILD = "childProcess";
   const SET_VARS = "setVars";
   const SYNC_TEXT = "syncText";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
@@ -126,6 +128,16 @@
   const portHostMsg = async msg => {
     msg && host && host.postMessage(msg);
   };
+
+  /**
+   * port editor config path
+   * @returns {Object} - Promise.<void>
+   */
+  const portEditorConfigPath = () =>
+    storage.get(EDITOR_CONFIG).then((data = {}) => {
+      const {value} = data[EDITOR_CONFIG];
+      return value || null;
+    }).then(value => value && portHostMsg({[EDITOR_CONFIG_GET]: value}));
 
   /* content ports collection */
   const ports = {};
@@ -395,21 +407,20 @@
   /**
    * handle host message
    * @param {Object} msg - message
-   * @returns
+   * @returns {Object} - Promise.<Array.<*>>
    */
   const handleHostMsg = async msg => {
     const {message, status} = msg;
     const func = [];
     switch (status) {
       case "ready":
-        func.push(storage.get(EDITOR_CONFIG_GET).then(value => {
-          console.log(EDITOR_CONFIG_GET);
-          console.log(value);
-          portHostMsg({[EDITOR_CONFIG_GET]: value});
-        }));
+        func.push(portEditorConfigPath());
+        break;
+      case `${PROCESS_CHILD}_stderr`:
+        func.push(() => message && console.warn(message));
         break;
       default:
-        console.log(msg);
+        func.push(() => message && console.log(message));
     }
     return Promise.all(func);
   };
@@ -434,6 +445,7 @@
               func.push(portHostMsg({[item]: obj}));
               break;
             case EDITOR_CONFIG_RES:
+            case PORT_FILE_DATA:
               func.push(portMsg({[item]: obj}));
               break;
             case OPEN_OPTIONS:
