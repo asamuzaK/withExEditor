@@ -106,7 +106,7 @@
    * @returns {boolean} - result
    */
   const checkWindowIncognito = async () => {
-    const windowIds = await windows.getAll({windowTypes: "normal"});
+    const windowIds = await windows.getAll({windowTypes: ["normal"]});
     let incog;
     if (windowIds && windowIds.length) {
       for (const windowId of windowIds) {
