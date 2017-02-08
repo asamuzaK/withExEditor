@@ -39,16 +39,16 @@
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPTIONS_OPEN = "openOptions";
-  const PORT_FILE_DATA = "portFileData";
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
-  const VARS_SET = "setVars";
   const SUBST = "index";
   const TEXT_SYNC = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILE_CREATE = "createTmpFile";
+  const TMP_FILE_DATA_PORT = "portTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
+  const VARS_SET = "setVars";
   const W3C = "http://www.w3.org/";
   const XMLNS = "xmlns";
 
@@ -968,13 +968,17 @@
 
   /**
    * determine port content process
-   * @param {Object} info - context menu info
+   * @param {Object} obj - context menu obj
    * @returns {Object} - Promise.<Array.<*>>
    */
-  const determinePortProc = async (info = {}) => {
-    const {menuItemId} = info;
+  const determinePortProcess = async (obj = {}) => {
+    const {info} = obj;
     const elm = vars[CONTEXT_NODE];
-    const mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
+    let mode;
+    if (info) {
+      const {menuItemId} = info;
+      mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
+    }
     return mode && portContent(elm, mode) ||
            getContextMode(elm).then(m => portContent(elm, m));
   };
@@ -1101,13 +1105,17 @@
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
-          case ONLY_EDITABLE:
+          case CONTENT_GET:
+            func.push(determinePortProcess(obj));
+            break;
+          case ID_TAB:
+          case ID_WIN:
+            vars[item] = obj;
+            break;
           case INCOGNITO:
           case IS_ENABLED:
+          case ONLY_EDITABLE:
             vars[item] = !!obj;
-            break;
-          case CONTENT_GET:
-            func.push(determinePortProc(obj.info));
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -1122,15 +1130,11 @@
             vars[item] = !!obj;
             openOptionsKey.enabled = !!obj;
             break;
-          case PORT_FILE_DATA:
-            func.push(updateTmpFileData(obj));
-            break;
           case TEXT_SYNC:
             func.push(syncText(obj));
             break;
-          case ID_TAB:
-          case ID_WIN:
-            vars[item] = obj;
+          case TMP_FILE_DATA_PORT:
+            func.push(updateTmpFileData(obj));
             break;
           case VARS_SET:
             func.push(handleMsg(obj));
