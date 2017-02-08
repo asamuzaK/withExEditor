@@ -42,12 +42,12 @@
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPTIONS_OPEN = "openOptions";
   const PORT_CONTENT = "portContent";
-  const PORT_FILE_DATA = "portFileData";
   const PROCESS_CHILD = "childProcess";
   const STORAGE_SET = "setStorage";
   const TEXT_SYNC = "syncText";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
   const TMP_FILE_CREATE = "createTmpFile";
+  const TMP_FILE_DATA_PORT = "portTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
   const TMP_FILE_RES = "resTmpFile";
   const WARN_COLOR = "#C13832";
@@ -521,11 +521,11 @@
             case OPTIONS_OPEN:
               func.push(openOptionsPage());
               break;
-            case PORT_FILE_DATA:
-              func.push(portMsg({[item]: obj}));
-              break;
             case STORAGE_SET:
               func.push(setStorage(obj));
+              break;
+            case TMP_FILE_DATA_PORT:
+              func.push(portMsg({[item]: obj}));
               break;
             case TMP_FILE_RES:
               func.push(portSyncText(obj));
