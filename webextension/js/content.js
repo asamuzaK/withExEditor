@@ -38,13 +38,13 @@
   const NODE_TEXT = Node.TEXT_NODE;
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPEN_OPTIONS = "openOptions";
+  const OPTIONS_OPEN = "openOptions";
   const PORT_FILE_DATA = "portFileData";
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
-  const SET_VARS = "setVars";
+  const VARS_SET = "setVars";
   const SUBST = "index";
-  const SYNC_TEXT = "syncText";
+  const TEXT_SYNC = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILE_CREATE = "createTmpFile";
@@ -1014,40 +1014,42 @@
    * @returns {Object} - Promise.<Array.<*>>
    */
   const syncText = async (obj = {}) => {
+    const {data, value} = obj;
     const func = [];
-    const {data, dataId, tabId, value} = obj;
-    if (data && dataId && tabId === vars[ID_TAB]) {
-      const {namespaceURI, timestamp} = data;
-      const elm = document.activeElement;
-      let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
-          ns = !isHtml && nsURI.html || "", attr, nsPrefix;
-      if (elm.hasAttributeNS(ns, DATA_ATTR_CTRLS)) {
-        const arr = (elm.getAttributeNS(ns, DATA_ATTR_CTRLS)).split(" ");
-        for (let id of arr) {
-          if (id === dataId &&
-              (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
-            isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
-            ns = !isHtml && nsURI.html || "";
-            nsPrefix = id.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
-            attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
-            if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
-                timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
-              id.setAttributeNS(ns, attr, timestamp);
-              func.push(replaceContent(id, value, namespaceURI));
+    if (data) {
+      const {dataId, namespaceURI, tabId, timestamp} = data;
+      if (dataId && tabId === vars[ID_TAB]) {
+        const elm = document.activeElement;
+        let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+            ns = !isHtml && nsURI.html || "", attr, nsPrefix;
+        if (elm.hasAttributeNS(ns, DATA_ATTR_CTRLS)) {
+          const arr = (elm.getAttributeNS(ns, DATA_ATTR_CTRLS)).split(" ");
+          for (let id of arr) {
+            if (id === dataId &&
+                (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
+              isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
+              ns = !isHtml && nsURI.html || "";
+              nsPrefix = id.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
+              attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
+              if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
+                  timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
+                id.setAttributeNS(ns, attr, timestamp);
+                func.push(replaceContent(id, value, namespaceURI));
+              }
+              break;
             }
-            break;
           }
+        } else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
+                   elm.getAttributeNS(ns, DATA_ATTR_ID) === dataId &&
+                   (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
+                    timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
+          nsPrefix = elm.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
+          attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
+          elm.setAttributeNS(ns, attr, timestamp);
+          elm.isContentEditable &&
+          func.push(replaceContent(elm, value, namespaceURI)) ||
+          /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value);
         }
-      } else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-                 elm.getAttributeNS(ns, DATA_ATTR_ID) === dataId &&
-                 (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
-                  timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
-        nsPrefix = elm.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
-        attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
-        elm.setAttributeNS(ns, attr, timestamp);
-        elm.isContentEditable &&
-        func.push(replaceContent(elm, value, namespaceURI)) ||
-        /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value);
       }
     }
     return Promise.all(func);
@@ -1099,9 +1101,6 @@
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
-          case SET_VARS:
-            func.push(handleMsg(obj));
-            break;
           case ONLY_EDITABLE:
           case INCOGNITO:
           case IS_ENABLED:
@@ -1126,12 +1125,15 @@
           case PORT_FILE_DATA:
             func.push(updateTmpFileData(obj));
             break;
-          case SYNC_TEXT:
+          case TEXT_SYNC:
             func.push(syncText(obj));
             break;
           case ID_TAB:
           case ID_WIN:
             vars[item] = obj;
+            break;
+          case VARS_SET:
+            func.push(handleMsg(obj));
             break;
           default:
         }
@@ -1190,7 +1192,7 @@
         }
       } else {
         const openOpt = await keyComboMatches(evt, openOptionsKey);
-        openOpt && func.push(portMsg({[OPEN_OPTIONS]: openOpt}));
+        openOpt && func.push(portMsg({[OPTIONS_OPEN]: openOpt}));
       }
     }
     return Promise.all(func).catch(logError);

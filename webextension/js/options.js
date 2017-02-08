@@ -18,6 +18,7 @@
   const LANG = "optionsLang";
   const NODE_ELEMENT = Node.ELEMENT_NODE;
   const PORT_NAME = "portOptions";
+  const STORAGE_SET = "setStorage";
 
   /**
    * log error
@@ -48,14 +49,6 @@
     msg && port.postMessage(msg);
   };
 
-  /* storage */
-  /**
-   * set storage
-   * @param {Object} pref - pref
-   * @returns {Object} - ?Promise.<void>
-   */
-  const setStorage = async pref => pref && storage.set(pref) || null;
-
   /**
    * create pref
    * @param {Object} elm - element
@@ -65,13 +58,15 @@
   const createPref = async (elm, executable = false) => {
     const id = elm && elm.id;
     return id && {
-      [id]: {
-        id,
-        app: {
-          executable: !!executable,
+      [STORAGE_SET]: {
+        [id]: {
+          id,
+          app: {
+            executable: !!executable,
+          },
+          checked: !!elm.checked,
+          value: elm.value || "",
         },
-        checked: !!elm.checked,
-        value: elm.value || "",
       },
     } || null;
   };
@@ -79,15 +74,13 @@
   /**
    * extract editor config
    * @param {string} obj - editor config object
-   * @returns {Object} - Promise.<Array.<void>>
+   * @returns {void}
    */
   const extractEditorConfig = async (obj = {}) => {
     const {editorName, executable} = obj;
-    const editor = document.getElementById(EDITOR_CONFIG);
     const name = document.getElementById(EDITOR_FILE_NAME);
     const label = document.getElementById(EDITOR_LABEL);
-    const func = [];
-    if (editor && name && label) {
+    if (name && label) {
       name.value = editorName || "";
       if (executable && name.value) {
         label.value = name.value;
@@ -96,19 +89,15 @@
         label.value = "";
         label.disabled = true;
       }
-      func.push(createPref(editor, executable).then(setStorage));
-      func.push(createPref(name).then(setStorage));
-      func.push(createPref(label).then(setStorage));
     }
-    return Promise.all(func);
   };
 
   /**
-   * set pref storage
+   * port pref
    * @param {!Object} evt - Event
    * @returns {Object} - Promise.<Array.<*>>
    */
-  const setPrefStorage = async evt => {
+  const portPref = async evt => {
     const {target} = evt;
     const {id, name, type, value} = target;
     const func = [];
@@ -116,7 +105,7 @@
       const nodes = document.querySelectorAll(`[name=${name}]`);
       if (nodes instanceof NodeList) {
         for (const node of nodes) {
-          func.push(createPref(node).then(setStorage));
+          func.push(createPref(node).then(portMsg));
         }
       }
     } else {
@@ -126,10 +115,10 @@
           break;
         case KEY_ACCESS:
           (value === "" || value.length === 1) &&
-            func.push(createPref(target).then(setStorage));
+            func.push(createPref(target).then(portMsg));
           break;
         default:
-          func.push(createPref(target).then(setStorage));
+          func.push(createPref(target).then(portMsg));
       }
     }
     return Promise.all(func).catch(logError);
@@ -144,7 +133,7 @@
     const nodes = document.querySelectorAll("input");
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
-        node.addEventListener("change", setPrefStorage, false);
+        node.addEventListener("change", portPref, false);
       }
     }
   };
