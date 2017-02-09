@@ -1,7 +1,7 @@
 v2.0.0
 New And Updated Features
 <ul>
-<li>Migrate to WebExtensions' Native Messaging API, you need to set up add-on again</li>
+<li>Mostly migrate to WebExtensions, you need to set up add-on again</li>
 <li>New Options page</li>
 <li>Added view SVG source menu</li>
 <li>Default color of the toolbar icon changed to `gray`</li>
