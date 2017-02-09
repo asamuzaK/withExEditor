@@ -16,7 +16,7 @@ Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラ
 詳細については、[Native messaging - Mozilla | MDN](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging)を参照してください。
 
 このため、withExEditorを使うには、エディタを起動するホストも用意する必要があります。
-withExEditor用のホストは、[asamuzaK/withExEditorHost](https://github.com/asamuzaK/withExEditorHost)からダウンロードできます。
+[asamuzaK/withExEditorHost](https://github.com/asamuzaK/withExEditorHost)からwithExEditor用のホストをダウンロードしてください。
 
 ***
 

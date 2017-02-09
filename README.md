@@ -2,11 +2,11 @@ EN | [JA](./README.ja.md)
 
 # WithExEditor
 
-Addon for Firefox.
+Add-on for Firefox.
 From the context menu (right click), you can "View source" "View selection" or "Edit text" with your favorite editor.
 Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
 
-## Addon distribution page
+## Add-on distribution page
 
 [WithExEditor :: Add-ons for Firefox] (https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
 
@@ -16,7 +16,7 @@ In Mozilla's new add-on ecosystem WebExtensions, the browser interacts with the 
 For more information, refer to [Native messaging - Mozilla | MDN] (https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging).
 
 Therefore, to use withExEditor, you also need to prepare a host which executes your editor.
-The host for withExEditor can be downloaded from [asamuzaK / withExEditorHost] (https://github.com/asamuzaK/withExEditorHost).
+Please download the host for withExEditor from [asamuzaK / withExEditorHost] (https://github.com/asamuzaK/withExEditorHost).
 
 ***
 
