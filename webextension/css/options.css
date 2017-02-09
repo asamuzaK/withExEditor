@@ -11,10 +11,10 @@ body {
 }
 main {
   margin: 1rem 0;
-  border-bottom: 1px solid rgb(128, 128, 128);
 }
 footer {
   margin: 1rem 0 2rem;
+  border-top: 1px solid rgb(128, 128, 128);
 }
 section {
   margin: 1.5rem 0;
