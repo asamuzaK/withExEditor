@@ -8,20 +8,16 @@
   const storage = browser.storage.local;
 
   /* constants */
-  const CHAR = "utf-8";
+  const CONTENT_GET = "getContent";
   const CONTEXT_MENU = "contextMenu";
   const CONTEXT_MODE = "contextMode";
   const CONTEXT_NODE = "contextNode";
-  const CREATE_TMP_FILE = "createTmpFile";
   const DATA_ATTR = "data-with_ex_editor";
   const DATA_ATTR_CTRLS = `${DATA_ATTR}_controls`;
   const DATA_ATTR_ID = `${DATA_ATTR}_id`;
   const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
   const FILE_EXT = "fileExt";
-  const GET_CONTENT = "getContent";
-  const GET_FILE_PATH = "getFilePath";
-  const GET_TMP_FILE = "getTmpFile";
   const HTML = "html";
   const ID_TAB = "tabId";
   const ID_WIN = "windowId";
@@ -31,6 +27,7 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
+  const LOCAL_FILE_VIEW = "viewLocalFile";
   const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
   const MODE_SELECTION = "modeViewSelection";
@@ -41,16 +38,17 @@
   const NODE_TEXT = Node.TEXT_NODE;
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPEN_OPTIONS = "openOptions";
-  const PORT_FILE_PATH = "portFilePath";
-  const PORT_HOST = "portHost";
+  const OPTIONS_OPEN = "openOptions";
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
-  const SET_VARS = "setVars";
   const SUBST = "index";
-  const SYNC_TEXT = "syncText";
+  const TEXT_SYNC = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
+  const TMP_FILE_CREATE = "createTmpFile";
+  const TMP_FILE_DATA_PORT = "portTmpFileData";
+  const TMP_FILE_GET = "getTmpFile";
+  const VARS_SET = "setVars";
   const W3C = "http://www.w3.org/";
   const XMLNS = "xmlns";
 
@@ -218,7 +216,7 @@
    */
   const portTmpFileData = async dataId => {
     const data = dataId && dataIds[dataId];
-    return data && portMsg({[GET_TMP_FILE]: data}) || null;
+    return data && portMsg({[TMP_FILE_GET]: data}) || null;
   };
 
   /**
@@ -247,7 +245,7 @@
    * @returns {void}
    */
   const storeTmpFileData = async (data = {}) => {
-    if (data[CREATE_TMP_FILE] && (data = data[CREATE_TMP_FILE])) {
+    if (data[TMP_FILE_CREATE] && (data = data[TMP_FILE_CREATE])) {
       const {dataId, mode} = data;
       mode === MODE_EDIT && (dataIds[dataId] = data);
     }
@@ -259,16 +257,10 @@
    * @returns {void}
    */
   const updateTmpFileData = async (obj = {}) => {
-    const {data, path} = obj;
+    const {data} = obj;
     if (data) {
       const {dataId, mode} = data;
-      if (mode === MODE_EDIT) {
-        const keys = dataIds[dataId];
-        if (keys && path) {
-          data.path = path;
-          dataIds[dataId] = data;
-        }
-      }
+      mode === MODE_EDIT && dataIds[dataId] && (dataIds[dataId] = data);
     }
   };
 
@@ -755,15 +747,16 @@
   const createContentDataMsg = async data => {
     let msg;
     if (data) {
-      if (data[CREATE_TMP_FILE]) {
+      if (data[TMP_FILE_CREATE]) {
         msg = {
-          [CREATE_TMP_FILE]: {
-            data: data[CREATE_TMP_FILE],
+          [TMP_FILE_CREATE]: {
+            data: data[TMP_FILE_CREATE],
             value: data.value,
           },
         };
       } else {
-        data[GET_FILE_PATH] && (msg = {[GET_FILE_PATH]: data[GET_FILE_PATH]});
+        data[LOCAL_FILE_VIEW] &&
+          (msg = {[LOCAL_FILE_VIEW]: data[LOCAL_FILE_VIEW].uri});
       }
     }
     return msg || null;
@@ -779,7 +772,7 @@
     let obj;
     if (window.location.protocol === "file:") {
       obj = {
-        [GET_FILE_PATH]: {uri},
+        [LOCAL_FILE_VIEW]: {uri},
       };
     } else {
       const headers = new Headers({
@@ -794,7 +787,7 @@
         const fileName = dataId + await getFileExtension(type);
         const value = await res.text();
         obj = {
-          [CREATE_TMP_FILE]: {
+          [TMP_FILE_CREATE]: {
             dataId, dir, fileName, host, incognito, mode, tabId, windowId,
           },
           value,
@@ -819,7 +812,7 @@
         if (dataId) {
           fileName = `${dataId}.txt`;
           tmpFileData = {
-            [CREATE_TMP_FILE]: {
+            [TMP_FILE_CREATE]: {
               dataId, dir, fileName, host, incognito, mode, namespaceURI,
               tabId, windowId,
             },
@@ -832,7 +825,7 @@
         if (value && (dataId = await getFileNameFromURI(uri, SUBST))) {
           fileName = `${dataId}.${mode === MODE_MATHML && "mml" || "svg"}`;
           tmpFileData = {
-            [CREATE_TMP_FILE]: {
+            [TMP_FILE_CREATE]: {
               dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
@@ -845,7 +838,7 @@
             /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
           fileName = `${dataId}.xml`;
           tmpFileData = {
-            [CREATE_TMP_FILE]: {
+            [TMP_FILE_CREATE]: {
               dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
@@ -854,7 +847,7 @@
           value = await convertValue(value);
           fileName = dataId + await getFileExtension(contentType);
           tmpFileData = {
-            [CREATE_TMP_FILE]: {
+            [TMP_FILE_CREATE]: {
               dataId, dir, fileName, host, incognito, mode, tabId, windowId,
             },
             value,
@@ -975,13 +968,17 @@
 
   /**
    * determine port content process
-   * @param {Object} info - context menu info
+   * @param {Object} obj - context menu obj
    * @returns {Object} - Promise.<Array.<*>>
    */
-  const determinePortProc = async (info = {}) => {
-    const {menuItemId} = info;
+  const determinePortProcess = async (obj = {}) => {
+    const {info} = obj;
     const elm = vars[CONTEXT_NODE];
-    const mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
+    let mode;
+    if (info) {
+      const {menuItemId} = info;
+      mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
+    }
     return mode && portContent(elm, mode) ||
            getContextMode(elm).then(m => portContent(elm, m));
   };
@@ -1021,42 +1018,42 @@
    * @returns {Object} - Promise.<Array.<*>>
    */
   const syncText = async (obj = {}) => {
+    const {data, value} = obj;
     const func = [];
-    const {data, dataId, tabId} = obj;
-    if (data && dataId && tabId === vars[ID_TAB]) {
-      const {namespaceURI, timestamp} = data;
-      const elm = document.activeElement;
-      let {value} = obj,
-          isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
-          ns = !isHtml && nsURI.html || "", attr, nsPrefix;
-      value = await (new TextDecoder(CHAR)).decode(value) || "";
-      if (elm.hasAttributeNS(ns, DATA_ATTR_CTRLS)) {
-        const arr = (elm.getAttributeNS(ns, DATA_ATTR_CTRLS)).split(" ");
-        for (let id of arr) {
-          if (id === dataId &&
-              (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
-            isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
-            ns = !isHtml && nsURI.html || "";
-            nsPrefix = id.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
-            attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
-            if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
-                timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
-              id.setAttributeNS(ns, attr, timestamp);
-              func.push(replaceContent(id, value, namespaceURI));
+    if (data) {
+      const {dataId, namespaceURI, tabId, timestamp} = data;
+      if (dataId && tabId === vars[ID_TAB]) {
+        const elm = document.activeElement;
+        let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
+            ns = !isHtml && nsURI.html || "", attr, nsPrefix;
+        if (elm.hasAttributeNS(ns, DATA_ATTR_CTRLS)) {
+          const arr = (elm.getAttributeNS(ns, DATA_ATTR_CTRLS)).split(" ");
+          for (let id of arr) {
+            if (id === dataId &&
+                (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
+              isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
+              ns = !isHtml && nsURI.html || "";
+              nsPrefix = id.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
+              attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
+              if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
+                  timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
+                id.setAttributeNS(ns, attr, timestamp);
+                func.push(replaceContent(id, value, namespaceURI));
+              }
+              break;
             }
-            break;
           }
+        } else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
+                   elm.getAttributeNS(ns, DATA_ATTR_ID) === dataId &&
+                   (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
+                    timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
+          nsPrefix = elm.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
+          attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
+          elm.setAttributeNS(ns, attr, timestamp);
+          elm.isContentEditable &&
+          func.push(replaceContent(elm, value, namespaceURI)) ||
+          /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value);
         }
-      } else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-                 elm.getAttributeNS(ns, DATA_ATTR_ID) === dataId &&
-                 (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
-                  timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
-        nsPrefix = elm.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
-        attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
-        elm.setAttributeNS(ns, attr, timestamp);
-        elm.isContentEditable &&
-        func.push(replaceContent(elm, value, namespaceURI)) ||
-        /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value);
       }
     }
     return Promise.all(func);
@@ -1108,16 +1105,17 @@
       for (const item of items) {
         const obj = msg[item];
         switch (item) {
-          case SET_VARS:
-            func.push(handleMsg(obj));
+          case CONTENT_GET:
+            func.push(determinePortProcess(obj));
             break;
-          case ONLY_EDITABLE:
+          case ID_TAB:
+          case ID_WIN:
+            vars[item] = obj;
+            break;
           case INCOGNITO:
           case IS_ENABLED:
+          case ONLY_EDITABLE:
             vars[item] = !!obj;
-            break;
-          case GET_CONTENT:
-            func.push(determinePortProc(obj.info));
             break;
           case KEY_ACCESS:
             vars[item] = obj;
@@ -1132,18 +1130,14 @@
             vars[item] = !!obj;
             openOptionsKey.enabled = !!obj;
             break;
-          case PORT_FILE_PATH:
-            func.push(updateTmpFileData(obj));
-            obj.path && func.push(portMsg({
-              [PORT_HOST]: {path: obj.path},
-            }));
-            break;
-          case SYNC_TEXT:
+          case TEXT_SYNC:
             func.push(syncText(obj));
             break;
-          case ID_TAB:
-          case ID_WIN:
-            vars[item] = obj;
+          case TMP_FILE_DATA_PORT:
+            func.push(updateTmpFileData(obj));
+            break;
+          case VARS_SET:
+            func.push(handleMsg(obj));
             break;
           default:
         }
@@ -1202,7 +1196,7 @@
         }
       } else {
         const openOpt = await keyComboMatches(evt, openOptionsKey);
-        openOpt && func.push(portMsg({[OPEN_OPTIONS]: openOpt}));
+        openOpt && func.push(portMsg({[OPTIONS_OPEN]: openOpt}));
       }
     }
     return Promise.all(func).catch(logError);

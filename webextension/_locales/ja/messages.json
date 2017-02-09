@@ -44,31 +44,31 @@
   "optionsAccessKeySettings": {
     "message": "アクセスキー設定"
   },
-  "optionsAppManifestPath": {
+  "optionsEditorConfigPath": {
     "message": ""
   },
-  "optionsAppManifestPath.placeholder": {
-    "message": "マニフェストのパスを入力"
+  "optionsEditorConfigPath.placeholder": {
+    "message": "エディタ設定ファイルのパスを入力"
   },
-  "optionsAppManifestPathDetail": {
-    "message": "アプリケーションマニフェストファイル（JSON）のパスを入力してください。"
+  "optionsEditorConfigPathDetail": {
+    "message": "エディタ設定ファイル（JSON）のパスを入力してください。"
   },
-  "optionsAppManifestPathLabel": {
-    "message": "マニフェストのパス"
+  "optionsEditorConfigPathLabel": {
+    "message": "エディタ設定ファイルのパス"
   },
-  "optionsEditorName": {
+  "optionsEditorLabel": {
     "message": ""
   },
-  "optionsEditorName.placeholder": {
+  "optionsEditorLabel.placeholder": {
     "message": "エディタの表示名を変更"
   },
-  "optionsEditorNameDetail": {
+  "optionsEditorLabelDetail": {
     "message": "エディタの表示名を入力してください。"
   },
-  "optionsEditorNameDetail2": {
+  "optionsEditorLabelDetail2": {
     "message": "アプリケーションマニフェストのパスが未入力の場合やホストが見つからなかった場合などには無効となります。"
   },
-  "optionsEditorNameLabel": {
+  "optionsEditorLabelLabel": {
     "message": "エディタの表示名"
   },
   "optionsEditorSettings": {
@@ -91,15 +91,6 @@
   },
   "optionsEnablePBLabel": {
     "message": "プライベートブラウジング中も有効化"
-  },
-  "optionsForceRemoveDetail": {
-    "message": "プライベートブラウジングの終了時やブラウザの終了時に一時ファイルを強制的に削除します。"
-  },
-  "optionsForceRemoveDetail2": {
-    "message": "チェックを入れておくことを推奨しますが、エディタによってはこのオプションを有効にすると不具合が起こる可能性があります。"
-  },
-  "optionsForceRemoveLabel": {
-    "message": "一時ファイルを強制的に削除"
   },
   "optionsIconColor": {
     "message": ""
