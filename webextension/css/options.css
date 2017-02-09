@@ -9,12 +9,33 @@ body {
   color: black;
   line-height: 1.5;
 }
+main {
+  margin: 1rem 0;
+  border-bottom: 1px solid rgb(128, 128, 128);
+}
+footer {
+  margin: 1rem 0 2rem;
+}
 section {
   margin: 1.5rem 0;
 }
+section + section {
+  border-top: 1px dotted rgb(128, 128, 128);
+}
+section section + section {
+  border-top: none;
+}
+main > section + p {
+  margin-top: 1rem;
+  border-top: 1px dotted rgb(128, 128, 128);
+  padding-top: 1rem;
+}
 h1 {
-  margin: 0;
+  margin: 1rem 0;
   font-size: 1.2rem;
+}
+header > h1 {
+  margin-top: 0;
 }
 header > h1::before {
   display: inline-block;
@@ -124,5 +145,7 @@ pre {
 }
 code {
   display: inline-block;
-  margin: 1rem;
+}
+pre > code {
+  margin: 0 1rem;
 }
