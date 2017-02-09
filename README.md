@@ -16,7 +16,7 @@ In Mozilla's new add-on ecosystem WebExtensions, the browser interacts with the 
 For more information, refer to [Native messaging - Mozilla | MDN] (https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging).
 
 Therefore, to use withExEditor, you also need to prepare a host which executes your editor.
-Please download the host for withExEditor from [asamuzaK / withExEditorHost] (https://github.com/asamuzaK/withExEditorHost).
+Please download the host for withExEditor from [asamuzaK/withExEditorHost] (https://github.com/asamuzaK/withExEditorHost).
 
 ***
 
