@@ -469,23 +469,27 @@
   /**
    * handle host message
    * @param {Object} msg - message
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - ?Promise.<void>
    */
   const handleHostMsg = async msg => {
-    const {message, status} = msg;
-    const func = [];
+    const {message, pid, status} = msg;
+    const log = `${HOST}(${pid}): ${message}`;
+    let func;
     switch (status) {
-      case "ready":
-        func.push(portEditorConfigPath());
-        break;
-      case `${HOST}_warn`:
+      case "error":
       case `${PROCESS_CHILD}_stderr`:
-        func.push(console.warn(message));
+        console.error(log);
+        break;
+      case "ready":
+        func = portEditorConfigPath();
+        break;
+      case "warn":
+        console.warn(log);
         break;
       default:
-        func.push(console.log(message));
+        console.log(log);
     }
-    return Promise.all(func);
+    return func || null;
   };
 
   /**
