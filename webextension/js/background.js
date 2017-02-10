@@ -478,6 +478,7 @@
       case "ready":
         func.push(portEditorConfigPath());
         break;
+      case `${HOST}_warn`:
       case `${PROCESS_CHILD}_stderr`:
         func.push(console.warn(message));
         break;
