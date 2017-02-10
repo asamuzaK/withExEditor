@@ -66,7 +66,7 @@
     "message": "Enter the label of the editor."
   },
   "optionsEditorLabelDetail2": {
-    "message": "Disabled if application manifest path field is not filled, or could not find the host etc."
+    "message": "Disabled if editor config path field is not filled, or could not find the host etc."
   },
   "optionsEditorLabelLabel": {
     "message": "Editor Label"
