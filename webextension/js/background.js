@@ -473,21 +473,21 @@
    */
   const handleHostMsg = async msg => {
     const {message, pid, status} = msg;
-    const log = `${HOST}(${pid}): ${message}`;
+    const log = `${HOST} (${pid}): ${message}`;
     let func;
     switch (status) {
       case "error":
       case `${PROCESS_CHILD}_stderr`:
-        console.error(log);
+        log && console.error(log);
         break;
       case "ready":
         func = portEditorConfigPath();
         break;
       case "warn":
-        console.warn(log);
+        log && console.warn(log);
         break;
       default:
-        console.log(log);
+        log && console.log(log);
     }
     return func || null;
   };
