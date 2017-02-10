@@ -162,7 +162,7 @@
       return data && {
         [key]: data,
       } || null;
-    }).then(setStorage);
+    }).then(setStorage) || null;
 
   /**
    * extract editor config data
