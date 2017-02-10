@@ -479,7 +479,7 @@
   /**
    * handle host message
    * @param {Object} msg - message
-   * @returns {Object} - ?Promise.<void>
+   * @returns {Object|Function} - Promise.<void> or Function
    */
   const handleHostMsg = async msg => {
     const {message, pid, status} = msg;
