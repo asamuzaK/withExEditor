@@ -85,6 +85,16 @@
   };
 
   /**
+   * log warn
+   * @param {Object} msg - message
+   * @returns {boolean} - false
+   */
+  const logWarn = msg => {
+    msg && console.warn(msg);
+    return false;
+  };
+
+  /**
    * is string
    * @param {*} o - object to check
    * @returns {boolean} - result
@@ -473,21 +483,22 @@
    */
   const handleHostMsg = async msg => {
     const {message, pid, status} = msg;
-    const log = `${HOST} (${pid}): ${message}`;
+    const log = pid && message && `${HOST} (${pid}): ${message}`;
     let func;
     switch (status) {
-      case "error":
       case `${PROCESS_CHILD}_stderr`:
-        log && console.error(log);
+      case "error":
+        log && (func = logError(log));
         break;
       case "ready":
         func = portEditorConfigPath();
         break;
       case "warn":
-        log && console.warn(log);
+        log && (func = logWarn(log));
         break;
       default:
-        log && console.log(log);
+        // NOTE: need this?
+        //log && console.log(log);
     }
     return func || null;
   };
