@@ -6,7 +6,7 @@ Add-on for Firefox.
 From the context menu (right click), you can "View source" "View selection" or "Edit text" with your favorite editor.
 Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
 
-## Add-on distribution page
+## Download
 
 [WithExEditor :: Add-ons for Firefox] (https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
 

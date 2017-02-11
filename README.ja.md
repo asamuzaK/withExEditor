@@ -6,7 +6,7 @@ Firefox用のアドオン。
 コンテキストメニュー（右クリック）から、お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。
 (X)HTML、JavaScript、CSS、MathML、SVG、XMLなどで使用可能です。
 
-## アドオンの配布ページ
+## ダウンロード
 
 [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
 
@@ -62,7 +62,7 @@ Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラ
 ### エディタの表示名
 
 * エディタの表示名を入力してください。
-* エディタが選択されてない場合は無効となります。
+* エディタ設定ファイルのパスが未入力の場合やファイルが見つからなかった場合などには無効となります。
 
 ### アクセスキー
 
