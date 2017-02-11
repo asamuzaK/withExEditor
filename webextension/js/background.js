@@ -250,7 +250,7 @@
   /**
    * remove port from ports collection
    * @param {!Object} port - removed port
-   * @return {void}
+   * @returns {void}
    */
   const removePort = async (port = {}) => {
     const {sender} = port;
