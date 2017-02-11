@@ -248,6 +248,25 @@
   };
 
   /**
+   * remove port from ports collection
+   * @param {!Object} port - removed port
+   * @return {void}
+   */
+  const removePort = async (port = {}) => {
+    const {sender} = port;
+    if (sender) {
+      const {tab, url} = sender;
+      if (tab) {
+        let {windowId, id: tabId} = tab;
+        tabId = stringifyPositiveInt(tabId, true);
+        windowId = stringifyPositiveInt(windowId, true);
+        tabId && windowId && url && ports[windowId] && ports[windowId][tabId] &&
+          delete ports[windowId][tabId][url];
+      }
+    }
+  };
+
+  /**
    * port message
    * @param {*} msg - message
    * @param {string} windowId - windowId
@@ -255,6 +274,7 @@
    * @returns {void}
    */
   const portMsg = async (msg, windowId, tabId) => {
+    const arr = [];
     if (msg) {
       if (windowId && tabId) {
         const frameUrls = ports[windowId] && ports[windowId][tabId] &&
@@ -262,7 +282,11 @@
         if (frameUrls && frameUrls.length) {
           for (const frameUrl of frameUrls) {
             const port = ports[windowId][tabId][frameUrl];
-            port && port.postMessage(msg);
+            try {
+              port && port.postMessage(msg);
+            } catch (e) {
+              arr.push(ports[windowId][tabId][frameUrl]);
+            }
           }
         }
       } else if (windowId) {
@@ -281,6 +305,9 @@
         }
       }
     }
+    arr.length && arr.forEach(i => {
+      delete i;
+    });
   };
 
   /**
@@ -569,6 +596,7 @@
       ports[windowId] = ports[windowId] || {};
       ports[windowId][tabId] = ports[windowId][tabId] || {};
       ports[windowId][tabId][url] = port;
+      port.onDisconnect.addListener(removePort);
       port.onMessage.addListener(handleMsg);
       port.postMessage({
         incognito, tabId, windowId,
