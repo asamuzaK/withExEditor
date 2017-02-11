@@ -274,7 +274,6 @@
    * @returns {void}
    */
   const portMsg = async (msg, windowId, tabId) => {
-    const arr = [];
     if (msg) {
       if (windowId && tabId) {
         const frameUrls = ports[windowId] && ports[windowId][tabId] &&
@@ -285,7 +284,7 @@
             try {
               port && port.postMessage(msg);
             } catch (e) {
-              arr.push(ports[windowId][tabId][frameUrl]);
+              delete ports[windowId][tabId][frameUrl];
             }
           }
         }
@@ -305,9 +304,6 @@
         }
       }
     }
-    arr.length && arr.forEach(i => {
-      delete i;
-    });
   };
 
   /**
