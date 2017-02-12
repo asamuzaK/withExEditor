@@ -95,6 +95,16 @@
   };
 
   /**
+   * log message
+   * @param {Object} msg - message
+   * @returns {boolean} - false
+   */
+  const logWarn = msg => {
+    msg && console.log(msg);
+    return true;
+  };
+
+  /**
    * is string
    * @param {*} o - object to check
    * @returns {boolean} - result
@@ -520,8 +530,7 @@
         log && (func = logWarn(log));
         break;
       default:
-        // NOTE: need this?
-        //log && console.log(log);
+        log && (func = logMsg(log));
     }
     return func || null;
   };
