@@ -97,11 +97,11 @@
   /**
    * log message
    * @param {Object} msg - message
-   * @returns {boolean} - false
+   * @returns {Object} - message
    */
-  const logWarn = msg => {
+  const logMsg = msg => {
     msg && console.log(msg);
-    return true;
+    return msg;
   };
 
   /**
