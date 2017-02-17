@@ -88,7 +88,7 @@
    * @param {string} v - value
    * @returns {string} - converted value
    */
-  const convertValue = async v => {
+  const stripHtmlTags = async v => {
     while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
       v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "")
             .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
@@ -844,7 +844,7 @@
             value,
           };
         } else if (dataId && value) {
-          value = await convertValue(value);
+          value = await stripHtmlTags(value);
           fileName = dataId + await getFileExtension(contentType);
           tmpFileData = {
             [TMP_FILE_CREATE]: {
