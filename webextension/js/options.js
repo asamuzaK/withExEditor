@@ -43,7 +43,7 @@
   /**
    * port message
    * @param {*} msg - message
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const portMsg = async msg => {
     msg && port.postMessage(msg);
@@ -53,7 +53,7 @@
    * create pref
    * @param {Object} elm - element
    * @param {boolean} executable - executable
-   * @returns {Object} - pref data
+   * @returns {Object} - Promise.<Object>, pref data
    */
   const createPref = async (elm, executable = false) => {
     const id = elm && elm.id;
@@ -74,7 +74,7 @@
   /**
    * extract editor config
    * @param {string} obj - editor config object
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const extractEditorConfig = async (obj = {}) => {
     const {editorName, executable} = obj;
@@ -95,7 +95,7 @@
   /**
    * port pref
    * @param {!Object} evt - Event
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array>
    */
   const portPref = async evt => {
     const {target} = evt;
@@ -127,7 +127,7 @@
   /* html */
   /**
    * add event listener to input elements
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const addInputChangeListener = async () => {
     const nodes = document.querySelectorAll("input");
@@ -141,7 +141,7 @@
   /**
    * localize attribute value
    * @param {Object} elm - element
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const localizeAttr = async elm => {
     if (elm && elm.nodeType === NODE_ELEMENT && elm.hasAttributes()) {
@@ -164,7 +164,7 @@
 
   /**
    * localize html
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const localizeHtml = async () => {
     const lang = i18n.getMessage(LANG);
@@ -184,7 +184,7 @@
   /**
    * set html input value
    * @param {Object} data - storage data
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const setHtmlInputValue = async (data = {}) => {
     const {id} = data;
@@ -207,7 +207,7 @@
 
   /**
    * set html input values from storage
-   * @returns {Object} - Promise.<Array.<void>>
+   * @returns {Object} - Promise.<Array>
    */
   const setValuesFromStorage = async () => {
     const func = [];
@@ -225,7 +225,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @returns {Object} - Promise.<Array<*>>
+   * @returns {Object} - Promise.<Array>
    */
   const handleMsg = async msg => {
     const func = [];

@@ -123,7 +123,7 @@
   /* windows */
   /**
    * check if any of windows is incognito
-   * @returns {boolean} - result
+   * @returns {Object} - Promise.<boolean>, result
    */
   const checkWindowIncognito = async () => {
     const windowIds = await windows.getAll({windowTypes: ["normal"]});
@@ -146,7 +146,7 @@
   /**
    * port message to host
    * @param {*} msg - message
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const portHostMsg = async msg => {
     msg && host && host.postMessage(msg);
@@ -156,7 +156,7 @@
   /**
    * set storage
    * @param {Object} obj - object to store
-   * @returns {Object} - ?Promise.<void>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const setStorage = async obj => obj && storage.set(obj) || null;
 
@@ -164,7 +164,7 @@
    * fetch shared data and store
    * @param {string} path - data path
    * @param {string} key - storage key
-   * @returns {Object} - ?Promise.<void>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const storeFetchedData = async (path, key) =>
     isString(path) && isString(key) && fetch(path).then(async res => {
@@ -177,7 +177,7 @@
   /**
    * extract editor config data
    * @param {Object} data - editor config data
-   * @returns {Object} - ?data to store
+   * @returns {Object} - Promise.<Object>, data to store
    */
   const extractEditorConfig = async (data = {}) => {
     const {editorConfig, editorName, executable} = data;
@@ -229,7 +229,7 @@
 
   /**
    * port editor config path
-   * @returns {Object} - Promise.<void>
+   * @returns {Object} - Promise.<AsyncFunction>
    */
   const portEditorConfigPath = () =>
     storage.get(EDITOR_CONFIG).then(extractEditorConfigStorage).then(filePath =>
@@ -242,7 +242,7 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
-   * @returns {Object} - ?Promise.<void>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const restorePorts = async (data = {}) => {
     const {tabId, windowId} = data;
@@ -260,7 +260,7 @@
   /**
    * remove port from ports collection
    * @param {!Object} port - removed port
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const removePort = async (port = {}) => {
     const {sender} = port;
@@ -281,7 +281,7 @@
    * @param {*} msg - message
    * @param {string} windowId - windowId
    * @param {string} tabId - tabId
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const portMsg = async (msg, windowId, tabId) => {
     if (msg) {
@@ -320,7 +320,7 @@
    * port context menu data
    * @param {!Object} info - contextMenus.OnClickData
    * @param {!Object} tab - tabs.Tab
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const portContextMenuData = async (info, tab) => {
     const {frameUrl} = info;
@@ -339,7 +339,7 @@
   /**
    * port sync text
    * @param {*} msg - message
-   * @returns {Object} - ?Promise.<void>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const portSyncText = async msg => {
     let func;
@@ -357,7 +357,7 @@
   /**
    * replace icon
    * @param {Object} path - icon path
-   * @returns {Object} - Promise.<void>
+   * @returns {Object} - Promise.<AsyncFunction>
    */
   const replaceIcon = async (path = varsL[ICON_PATH]) =>
     browserAction.setIcon({path});
@@ -365,7 +365,7 @@
   /**
    * toggle badge
    * @param {boolean} executable - executable
-   * @returns {Object} - Promise.<Array.<void>>
+   * @returns {Object} - Promise.<Array>
    */
   const toggleBadge = async (executable = varsL[IS_EXECUTABLE]) => {
     const color = !executable && WARN_COLOR || "transparent";
@@ -389,7 +389,7 @@
    * create context menu item
    * @param {string} id - menu item ID
    * @param {Array} contexts - contexts
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const createMenuItem = async (id, contexts) => {
     const label = varsL[EDITOR_LABEL] || LABEL;
@@ -404,7 +404,7 @@
 
   /**
    * create context menu items
-   * @returns {Object} - Promise.<Array.<void>>
+   * @returns {Object} - Promise.<Array>
    */
   const createMenuItems = async () => {
     const func = [];
@@ -431,7 +431,7 @@
 
   /**
    * restore context menu
-   * @returns {Object} - Promise.<Array.<void>>
+   * @returns {Object} - Promise.<AsyncFunction>
    */
   const restoreContextMenu = () =>
     contextMenus.removeAll().then(createMenuItems);
@@ -440,7 +440,7 @@
   /**
    * update context menu
    * @param {Object} type - context type data
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const updateContextMenu = async type => {
     if (type) {
@@ -474,7 +474,7 @@
 
   /**
    * cache localized context menu item title
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
@@ -487,7 +487,7 @@
   /* UI */
   /**
    * synchronize UI components
-   * @returns {Object} - ?Promise.<Array.<*>>
+   * @returns {Object} - Promise.<?Array>
    */
   const syncUI = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
@@ -504,7 +504,7 @@
   /* handlers */
   /**
    * open options page
-   * @returns {Object} - ?Promise.<void>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const openOptionsPage = async () =>
     vars[IS_ENABLED] && runtime.openOptionsPage() || null;
@@ -512,7 +512,7 @@
   /**
    * handle host message
    * @param {Object} msg - message
-   * @returns {Object|Function} - Promise.<void> or Function
+   * @returns {Object} - Promise.<?(Function|AsyncFunction)>
    */
   const handleHostMsg = async msg => {
     const {message, pid, status} = msg;
@@ -538,7 +538,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array>
    */
   const handleMsg = async msg => {
     const func = [];
@@ -589,7 +589,7 @@
   /**
    * handle connected port
    * @param {!Object} port - runtime.Port
-   * @returns {void}
+   * @returns {Object} - Promise.<void>
    */
   const handlePort = async port => {
     const {tab, url} = port.sender;
@@ -613,7 +613,7 @@
   /**
    * handle tab activated
    * @param {!Object} info - activated tab info
-   * @returns {Object} - Promise.<Array.<void>>
+   * @returns {Object} - Promise.<AsyncFunction>
    */
   const onTabActivated = async info => {
     let {tabId, windowId} = info, bool;
@@ -641,7 +641,7 @@
    * @param {!number} id - tabId
    * @param {!Object} info - changed tab info
    * @param {!Object} tab - tabs.Tab
-   * @returns {Object} - ?Promise.<Array.<void>>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const onTabUpdated = async (id, info, tab) => {
     const {active, url} = tab;
@@ -664,7 +664,7 @@
    * handle tab removed
    * @param {!number} id - tabId
    * @param {!Object} info - removed tab info
-   * @returns {Object} - ?Promise.<Array.<*>>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const onTabRemoved = async (id, info) => {
     const tabId = stringifyPositiveInt(id, true);
@@ -676,7 +676,7 @@
 
   /**
    * handle window focus changed
-   * @returns {Object} - Promise.<?Array.<*>>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const onWindowFocusChanged = () =>
     windows.getAll({windowTypes: ["normal"]}).then(arr =>
@@ -686,7 +686,7 @@
   /**
    * handle window removed
    * @param {!number} windowId - windowId
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array>
    */
   const onWindowRemoved = async windowId => {
     const func = [];
@@ -704,7 +704,7 @@
   /**
    * port variable
    * @param {Object} v - variable
-   * @returns {Object} - ?Promise.<void>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
   const portVar = async v => v && portMsg({[VARS_SET]: v}) || null;
 
@@ -713,7 +713,7 @@
    * @param {string} item - item
    * @param {Object} obj - value object
    * @param {boolean} changed - changed
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array>
    */
   const setVar = async (item, obj, changed = false) => {
     const func = [];
@@ -765,7 +765,7 @@
   /**
    * set variables
    * @param {Object} data - storage data
-   * @returns {Object} - Promise.<Array.<*>>
+   * @returns {Object} - Promise.<Array>
    */
   const setVars = async (data = {}) => {
     const func = [];
