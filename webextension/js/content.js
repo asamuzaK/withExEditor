@@ -200,7 +200,7 @@
   /**
    * port message
    * @param {*} msg - message
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const portMsg = async msg => {
     msg && port.postMessage(msg);
@@ -242,7 +242,7 @@
   /**
    * store temporary file data
    * @param {Object} data - temporary file data
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const storeTmpFileData = async (data = {}) => {
     if (data[TMP_FILE_CREATE] && (data = data[TMP_FILE_CREATE])) {
@@ -254,7 +254,7 @@
   /**
    * update temporary file data
    * @param {Object} obj - temporary file data object
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const updateTmpFileData = async (obj = {}) => {
     const {data} = obj;
@@ -718,7 +718,7 @@
   /**
    * set data attribute and add listener
    * @param {Object} elm - element
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const setDataAttrs = async elm => {
     if (elm) {
@@ -989,7 +989,7 @@
    * @param {Object} node - editable element
    * @param {string} value - value
    * @param {string} ns - namespace URI
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const replaceContent = async (node, value = "", ns = nsURI.html) => {
     if (node && node.nodeType === NODE_ELEMENT) {

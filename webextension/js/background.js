@@ -146,7 +146,7 @@
   /**
    * port message to host
    * @param {*} msg - message
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const portHostMsg = async msg => {
     msg && host && host.postMessage(msg);
@@ -260,7 +260,7 @@
   /**
    * remove port from ports collection
    * @param {!Object} port - removed port
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const removePort = async (port = {}) => {
     const {sender} = port;
@@ -281,7 +281,7 @@
    * @param {*} msg - message
    * @param {string} windowId - windowId
    * @param {string} tabId - tabId
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const portMsg = async (msg, windowId, tabId) => {
     if (msg) {
@@ -320,7 +320,7 @@
    * port context menu data
    * @param {!Object} info - contextMenus.OnClickData
    * @param {!Object} tab - tabs.Tab
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const portContextMenuData = async (info, tab) => {
     const {frameUrl} = info;
@@ -389,7 +389,7 @@
    * create context menu item
    * @param {string} id - menu item ID
    * @param {Array} contexts - contexts
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const createMenuItem = async (id, contexts) => {
     const label = varsL[EDITOR_LABEL] || LABEL;
@@ -440,7 +440,7 @@
   /**
    * update context menu
    * @param {Object} type - context type data
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const updateContextMenu = async type => {
     if (type) {
@@ -474,7 +474,7 @@
 
   /**
    * cache localized context menu item title
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
@@ -589,7 +589,7 @@
   /**
    * handle connected port
    * @param {!Object} port - runtime.Port
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const handlePort = async port => {
     const {tab, url} = port.sender;

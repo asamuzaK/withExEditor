@@ -43,7 +43,7 @@
   /**
    * port message
    * @param {*} msg - message
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const portMsg = async msg => {
     msg && port.postMessage(msg);
@@ -74,7 +74,7 @@
   /**
    * extract editor config
    * @param {string} obj - editor config object
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const extractEditorConfig = async (obj = {}) => {
     const {editorName, executable} = obj;
@@ -127,7 +127,7 @@
   /* html */
   /**
    * add event listener to input elements
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const addInputChangeListener = async () => {
     const nodes = document.querySelectorAll("input");
@@ -141,7 +141,7 @@
   /**
    * localize attribute value
    * @param {Object} elm - element
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const localizeAttr = async elm => {
     if (elm && elm.nodeType === NODE_ELEMENT && elm.hasAttributes()) {
@@ -164,7 +164,7 @@
 
   /**
    * localize html
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const localizeHtml = async () => {
     const lang = i18n.getMessage(LANG);
@@ -184,7 +184,7 @@
   /**
    * set html input value
    * @param {Object} data - storage data
-   * @returns {Object} - Promise.<void>
+   * @returns {void} - Promise.<void>
    */
   const setHtmlInputValue = async (data = {}) => {
     const {id} = data;
