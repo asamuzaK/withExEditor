@@ -231,7 +231,7 @@
    * port editor config path
    * @returns {Object} - Promise.<AsyncFunction>
    */
-  const portEditorConfigPath = () =>
+  const portEditorConfigPath = async () =>
     storage.get(EDITOR_CONFIG).then(extractEditorConfigStorage).then(filePath =>
       portHostMsg({[EDITOR_CONFIG_GET]: filePath || ""})
     );
@@ -433,7 +433,7 @@
    * restore context menu
    * @returns {Object} - Promise.<AsyncFunction>
    */
-  const restoreContextMenu = () =>
+  const restoreContextMenu = async () =>
     contextMenus.removeAll().then(createMenuItems);
 
   // FIXME: sometimes, update does not make it in time, Issue #20
@@ -678,7 +678,7 @@
    * handle window focus changed
    * @returns {Object} - Promise.<?AsyncFunction>
    */
-  const onWindowFocusChanged = () =>
+  const onWindowFocusChanged = async () =>
     windows.getAll({windowTypes: ["normal"]}).then(arr =>
       arr.length && syncUI() || null
     ).catch(logError);

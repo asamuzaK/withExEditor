@@ -929,7 +929,7 @@
    * @param {string} mode - context mode
    * @returns {Object} - Promise.<Array>
    */
-  const portContent = (elm, mode) =>
+  const portContent = async (elm, mode) =>
     createContentData(elm, mode).then(createTmpFileData).then(data =>
       Promise.all([
         createContentDataMsg(data).then(msg => msg && portMsg(msg) || null),
