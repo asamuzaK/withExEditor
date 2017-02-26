@@ -1,11 +1,5 @@
-コンテキストメニュー（右クリック）から、お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。
+お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。
 (X)HTML、JavaScript、CSS、MathML、SVG、XMLなどで使用可能です。
 
-Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラウザはメッセージを介してネイティブアプリケーションとやりとりする仕組みとなっています（つまり、外部エディタはもう直接起動できません）。
-このため、withExEditorを使うにあたり、ユーザーのみなさんは：
-<ul>
-<li>外部エディタを起動するためのホスト</li>
-<li>ホストのアプリケーションマニフェスト</li>
-</ul>
-を準備する必要があります。
-ホストやアプリケーションマニフェストの設定マニュアルはアドオンに同梱しています。
+withExEditorを使うには、エディタを起動するホストも用意する必要があります。
+<a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">asamuzaK/withExEditorHost (GitHub)</a>からwithExEditor用のホストをダウンロードしてください。
