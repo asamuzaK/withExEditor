@@ -796,7 +796,7 @@
     onTabRemoved(id, info).catch(logError)
   );
   windows.onFocusChanged.addListener(() =>
-    onWindowFocusChanged.catch(logError)
+    onWindowFocusChanged().catch(logError)
   );
   windows.onRemoved.addListener(windowId =>
     onWindowRemoved(windowId).catch(logError)
