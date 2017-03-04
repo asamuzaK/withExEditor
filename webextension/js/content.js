@@ -224,7 +224,7 @@
    * @param {!Object} evt - Event
    * @returns {Object} - Promise.<Array>
    */
-  const requestTmpFile = async evt => {
+  const requestTmpFile = evt => {
     const func = [];
     const {target, currentTarget} = evt;
     if (target === currentTarget) {
@@ -1151,7 +1151,7 @@
    * @param {!Object} evt - Event
    * @returns {Object} - Promise.<AsyncFunction>
    */
-  const handleContextMenu = async evt => {
+  const handleContextMenu = evt => {
     const {target} = evt;
     const {localName, namespaceURI, type} = target;
     const {anchorNode, focusNode, isCollapsed} = window.getSelection();
@@ -1184,7 +1184,7 @@
    * @param {!Object} evt - Event
    * @returns {Object} - Promise.<Array>
    */
-  const handleKeyPress = async evt => {
+  const handleKeyPress = evt => {
     const func = [];
     if (vars[IS_ENABLED]) {
       if (await keyComboMatches(evt, execEditorKey)) {
