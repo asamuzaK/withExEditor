@@ -121,7 +121,7 @@
           func.push(createPref(target).then(portMsg));
       }
     }
-    return Promise.all(func).catch(logError);
+    return Promise.all(func);
   };
 
   /* html */
@@ -133,7 +133,9 @@
     const nodes = document.querySelectorAll("input");
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
-        node.addEventListener("change", portPref, false);
+        node.addEventListener(
+          "change", evt => portPref(evt).catch(logError), false
+        );
       }
     }
   };
@@ -241,11 +243,11 @@
         }
       }
     }
-    return Promise.all(func).catch(logError);
+    return Promise.all(func);
   };
 
   /* listeners */
-  port.onMessage.addListener(handleMsg);
+  port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
 
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtml(),

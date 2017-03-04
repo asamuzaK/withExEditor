@@ -583,7 +583,7 @@
         }
       }
     }
-    return Promise.all(func).catch(logError);
+    return Promise.all(func);
   };
 
   /**
@@ -602,7 +602,7 @@
       ports[windowId][tabId] = ports[windowId][tabId] || {};
       ports[windowId][tabId][url] = port;
       port.onDisconnect.addListener(removePort);
-      port.onMessage.addListener(handleMsg);
+      port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
       port.postMessage({
         incognito, tabId, windowId,
         [VARS_SET]: vars,
@@ -633,7 +633,7 @@
       }
     }
     varsL[MENU_ENABLED] = bool || false;
-    return restoreContextMenu().catch(logError);
+    return restoreContextMenu();
   };
 
   /**
@@ -681,7 +681,7 @@
   const onWindowFocusChanged = async () =>
     windows.getAll({windowTypes: ["normal"]}).then(arr =>
       arr.length && syncUI() || null
-    ).catch(logError);
+    );
 
   /**
    * handle window removed
@@ -697,7 +697,7 @@
         !bool && portHostMsg({[TMP_FILES_PB_REMOVE]: !bool})
       ));
     }
-    return Promise.all(func).catch(logError);
+    return Promise.all(func);
   };
 
   /* handle variables */
@@ -785,18 +785,22 @@
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
   );
-  host.onMessage.addListener(handleMsg);
+  host.onMessage.addListener(msg => handleMsg(msg).catch(logError));
   runtime.onConnect.addListener(port => handlePort(port).catch(logError));
-  runtime.onMessage.addListener(handleMsg);
-  tabs.onActivated.addListener(onTabActivated);
+  runtime.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  tabs.onActivated.addListener(info => onTabActivated(info).catch(logError));
   tabs.onUpdated.addListener((id, info, tab) =>
     onTabUpdated(id, info, tab).catch(logError)
   );
   tabs.onRemoved.addListener((id, info) =>
     onTabRemoved(id, info).catch(logError)
   );
-  windows.onFocusChanged.addListener(onWindowFocusChanged);
-  windows.onRemoved.addListener(onWindowRemoved);
+  windows.onFocusChanged.addListener(() =>
+    onWindowFocusChanged.catch(logError)
+  );
+  windows.onRemoved.addListener(windowId =>
+    onWindowRemoved(windowId).catch(logError)
+  );
 
   /* startup */
   Promise.all([

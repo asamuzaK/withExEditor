@@ -236,7 +236,7 @@
         func.push(portTmpFileData(dataId))
       );
     }
-    return Promise.all(func).catch(logError);
+    return Promise.all(func);
   };
 
   /**
@@ -633,7 +633,9 @@
         dataId = `${LABEL}_${elm.id || window.performance.now()}`
                    .replace(/[-:.]/g, "_");
         elm.setAttributeNS(ns, attr, dataId);
-        isHtml && elm.addEventListener("focus", requestTmpFile, false);
+        isHtml && elm.addEventListener(
+          "focus", evt => requestTmpFile(evt).catch(logError), false
+        );
       }
     }
     return dataId || null;
@@ -732,7 +734,9 @@
           attr && ctrl.setAttributeNS("", DATA_ATTR_CTRLS, attr);
         } else {
           ctrl.setAttributeNS("", DATA_ATTR_CTRLS, dataId);
-          ctrl.addEventListener("focus", requestTmpFile, false);
+          ctrl.addEventListener(
+            "focus", evt => requestTmpFile(evt).catch(logError), false
+          );
         }
       }
     }
@@ -1176,7 +1180,7 @@
           menuItemId: MODE_SOURCE,
         },
       },
-    }).catch(logError);
+    });
   };
 
   /**
@@ -1199,7 +1203,7 @@
         openOpt && func.push(portMsg({[OPTIONS_OPEN]: openOpt}));
       }
     }
-    return Promise.all(func).catch(logError);
+    return Promise.all(func);
   };
 
   /* listeners */
@@ -1207,7 +1211,11 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
-    root.addEventListener("contextmenu", handleContextMenu, false);
-    root.addEventListener("keypress", handleKeyPress, false);
+    root.addEventListener(
+      "contextmenu", evt => handleContextMenu(evt).catch(logError), false
+    );
+    root.addEventListener(
+      "keypress", evt => handleKeyPress(evt).catch(logError), false
+    );
   }, false);
 }
