@@ -97,7 +97,7 @@
    * @param {!Object} evt - Event
    * @returns {Object} - Promise.<Array>
    */
-  const portPref = evt => {
+  const portPref = async evt => {
     const {target} = evt;
     const {id, name, type, value} = target;
     const func = [];
