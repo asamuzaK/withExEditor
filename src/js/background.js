@@ -601,7 +601,7 @@
       ports[windowId] = ports[windowId] || {};
       ports[windowId][tabId] = ports[windowId][tabId] || {};
       ports[windowId][tabId][url] = port;
-      port.onDisconnect.addListener(removePort);
+      port.onDisconnect.addListener(p => removePort(p).catch(logError));
       port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
       port.postMessage({
         incognito, tabId, windowId,
