@@ -174,20 +174,17 @@
       const suffix = arr[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
                        subtype;
-      const items = fileExt[type];
+      const items = fileExt[type] && fileExt[type][suffix] &&
+                    fileExt[type][subtype] && fileExt[type] ||
+                    await extendObjItems(fileExt, FILE_EXT).then(obj =>
+                      obj[type]
+                    );
       if (items) {
         const item = suffix && items[suffix];
         if (item) {
-          ext = item[subtype] ||
-                await extendObjItems(fileExt, FILE_EXT).then(obj =>
-                  obj[type][suffix][subtype]
-                ) ||
-                item[suffix];
+          ext = item[subtype] || item[suffix];
         } else {
-          ext = items[subtype] ||
-                await extendObjItems(fileExt, FILE_EXT).then(obj =>
-                  obj[type][subtype]
-                );
+          ext = items[subtype];
         }
       }
     }
@@ -982,9 +979,10 @@
     if (info) {
       const {menuItemId} = info;
       mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
+    } else {
+      mode = await getContextMode(elm);
     }
-    return mode && portContent(elm, mode) ||
-           getContextMode(elm).then(m => portContent(elm, m));
+    return mode && portContent(elm, mode) || null;
   };
 
   /* synchronize edited text */
