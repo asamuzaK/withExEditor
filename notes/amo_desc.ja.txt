@@ -1,5 +1,5 @@
 お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。
 (X)HTML、JavaScript、CSS、MathML、SVG、XMLなどで使用可能です。
 
-withExEditorを使うには、エディタを起動するホストも用意する必要があります。
+withExEditor（v2.0.0以降）を使うには、エディタを起動するホストも用意する必要があります。
 <a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">asamuzaK/withExEditorHost (GitHub)</a>からwithExEditor用のホストをダウンロードしてください。
