@@ -237,8 +237,6 @@
         if (item === EDITOR_CONFIG_RES) {
           const obj = msg[item];
           func.push(extractEditorConfig(obj));
-          // NOTE: for hybrid
-          func.push(portMsg({removeSdkPrefs: obj.executable}));
           break;
         }
       }
