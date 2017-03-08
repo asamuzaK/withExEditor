@@ -1033,6 +1033,7 @@
   const replaceEditControlValue = async (elm, value) => {
     let changed;
     if (/^input$/.test(elm.localName)) {
+      while (/[\f\n\t\r\v]$/.test(value)) {
         value = value.replace(/[\f\n\t\r\v]$/, "");
       }
       changed = elm.value !== value;
