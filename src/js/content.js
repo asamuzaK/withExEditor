@@ -984,7 +984,7 @@
    * @returns {void} - Promise.<void>
    */
   const dispatchInputEvt = async elm => {
-    if (elm) {
+    if (elm && elm.nodeType === NODE_ELEMENT) {
       const evt = window.InputEvent &&
                   new InputEvent("input", {bubbles: true, cancelable: false}) ||
                   new Event("input", {bubbles: true, cancelable: false});
@@ -1002,9 +1002,9 @@
    */
   const replaceContent = async (elm, node, value = "", ns = nsURI.html) => {
     let changed;
-    if (node && node.nodeType === NODE_ELEMENT) {
+    if (node && node.nodeType === NODE_ELEMENT && isString(value)) {
       const frag = document.createDocumentFragment();
-      const arr = value && value.split("\n") || [""];
+      const arr = value.length && value.split("\n") || [""];
       const l = arr.length;
       let i = 0;
       while (i < l) {
@@ -1032,15 +1032,17 @@
    */
   const replaceEditControlValue = async (elm, value) => {
     let changed;
-    if (/^input$/.test(elm.localName)) {
-      while (/[\f\n\t\r\v]$/.test(value)) {
-        value = value.replace(/[\f\n\t\r\v]$/, "");
+    if (elm && elm.nodeType === NODE_ELEMENT && isString(value)) {
+      if (/^input$/.test(elm.localName)) {
+        while (value.length && /[\f\n\t\r\v]$/.test(value)) {
+          value = value.replace(/[\f\n\t\r\v]$/, "");
+        }
+        changed = elm.value !== value;
+      } else {
+        /^textarea$/.test(elm.localName) && (changed = elm.value !== value);
       }
-      changed = elm.value !== value;
-    } else {
-      /^textarea$/.test(elm.localName) && (changed = elm.value !== value);
+      isString(elm.value) && (elm.value = value);
     }
-    elm.value = value;
     return changed && dispatchInputEvt(elm) || null;
   };
 
