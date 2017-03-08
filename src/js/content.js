@@ -985,9 +985,12 @@
    */
   const dispatchInputEvt = async elm => {
     if (elm && elm.nodeType === NODE_ELEMENT) {
-      const evt = window.InputEvent &&
-                  new InputEvent("input", {bubbles: true, cancelable: false}) ||
-                  new Event("input", {bubbles: true, cancelable: false});
+      const opt = {
+        bubbles: true,
+        cancelable: false,
+      };
+      const evt = window.InputEvent && new InputEvent("input", opt) ||
+                  new Event("input", opt);
       elm.dispatchEvent(evt);
     }
   };
