@@ -167,8 +167,8 @@
    * @returns {Object} - Promise.<?AsyncFunction>
    */
   const storeFetchedData = async (path, key) => {
-    const res = isString(path) && isString(key) && await fetch(path);
-    const data = res && res.json();
+    const data = isString(path) && isString(key) &&
+                   await fetch(path).then(res => res && res.json());
     return data && setStorage({[key]: data}) || null;
   };
 
