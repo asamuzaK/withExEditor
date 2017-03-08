@@ -174,17 +174,12 @@
       const suffix = arr[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
                        subtype;
-      const items = fileExt[type] && fileExt[type][suffix] &&
-                    fileExt[type][subtype] && fileExt[type] ||
-                    await extendObjItems(fileExt, FILE_EXT).then(obj =>
-                      obj[type]
-                    );
-      if (items) {
-        const item = suffix && items[suffix];
+      if (fileExt[type]) {
+        const item = suffix && fileExt[type][suffix];
         if (item) {
           ext = item[subtype] || item[suffix];
         } else {
-          ext = items[subtype];
+          ext = fileExt[type][subtype];
         }
       }
     }
@@ -313,10 +308,7 @@
         ns.localName = root.localName;
         ns.namespaceURI = root.hasAttribute(XMLNS) &&
                           root.getAttribute(XMLNS) ||
-                          nsURI[root.localName] ||
-                          await extendObjItems(nsURI, NS_URI).then(obj =>
-                            obj[root.localName]
-                          ) || "";
+                          nsURI[root.localName] || "";
       }
     }
     return ns;
@@ -388,10 +380,7 @@
             const attrName = prefix && `${prefix}:${localName}` || localName;
             ns = namespaceURI || prefix && nsURI[prefix] || "";
             (ns || !prefix) &&
-            func.push(elm.setAttributeNS(ns, attrName, value)) ||
-            func.push(extendObjItems(nsURI, NS_URI).then(obj =>
-              elm.setAttributeNS(obj[prefix] || "", attrName, value)
-            ));
+              func.push(elm.setAttributeNS(ns, attrName, value));
           }
         }
       }
@@ -409,10 +398,7 @@
     if (node) {
       const {attributes, localName, namespaceURI, prefix} = node;
       const ns = namespaceURI ||
-                 prefix && (
-                   nsURI[prefix] ||
-                   await extendObjItems(nsURI, NS_URI).then(obj => obj[prefix])
-                 ) ||
+                 prefix && nsURI[prefix] ||
                  await getNodeNS(node).namespaceURI || nsURI.html;
       const name = prefix && `${prefix}:${localName}` || localName;
       elm = document.createElementNS(ns, name);
@@ -1216,4 +1202,10 @@
       "keypress", evt => handleKeyPress(evt).catch(logError), false
     );
   }, false);
+
+  /* startup */
+  Promise.all([
+    extendObjItems(fileExt, FILE_EXT),
+    extendObjItems(nsURI, NS_URI),
+  ]).catch(logError);
 }
