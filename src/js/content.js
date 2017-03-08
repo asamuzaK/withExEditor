@@ -979,13 +979,29 @@
 
   /* synchronize edited text */
   /**
+   * dispatch input event
+   * @param {Object} elm - element
+   * @returns {void} - Promise.<void>
+   */
+  const dispatchInputEvt = async elm => {
+    if (elm) {
+      const evt = window.InputEvent &&
+                  new InputEvent("input", {bubbles: true, cancelable: false}) ||
+                  new Event("input", {bubbles: true, cancelable: false});
+      elm.dispatchEvent(evt);
+    }
+  };
+
+  /**
    * replace content editable element text
+   * @param {Object} elm - owner element
    * @param {Object} node - editable element
    * @param {string} value - value
    * @param {string} ns - namespace URI
-   * @returns {void} - Promise.<void>
+   * @returns {Object} - Promise.<?AsyncFunction>
    */
-  const replaceContent = async (node, value = "", ns = nsURI.html) => {
+  const replaceContent = async (elm, node, value = "", ns = nsURI.html) => {
+    let changed;
     if (node && node.nodeType === NODE_ELEMENT) {
       const frag = document.createDocumentFragment();
       const arr = value && value.split("\n") || [""];
@@ -997,6 +1013,7 @@
           frag.appendChild(document.createElementNS(ns, "br"));
         i++;
       }
+      changed = node.textContent !== value;
       if (node.hasChildNodes()) {
         while (node.firstChild) {
           node.removeChild(node.firstChild);
@@ -1004,6 +1021,26 @@
       }
       node.appendChild(frag);
     }
+    return changed && dispatchInputEvt(elm) || null;
+  };
+
+  /**
+   * replace text edit control element value
+   * @param {Object} elm - element
+   * @param {string} value - value
+   * @returns {Object} - Promise.<?AsyncFunction>
+   */
+  const replaceEditControlValue = async (elm, value) => {
+    let changed;
+    if (/^input$/.test(elm.localName)) {
+        value = value.replace(/[\f\n\t\r\v]$/, "");
+      }
+      changed = elm.value !== value;
+    } else {
+      /^textarea$/.test(elm.localName) && (changed = elm.value !== value);
+    }
+    elm.value = value;
+    return changed && dispatchInputEvt(elm) || null;
   };
 
   /**
@@ -1032,7 +1069,7 @@
               if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
                   timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
                 id.setAttributeNS(ns, attr, timestamp);
-                func.push(replaceContent(id, value, namespaceURI));
+                func.push(replaceContent(elm, id, value, namespaceURI));
               }
               break;
             }
@@ -1045,8 +1082,9 @@
           attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
           elm.setAttributeNS(ns, attr, timestamp);
           elm.isContentEditable &&
-          func.push(replaceContent(elm, value, namespaceURI)) ||
-          /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value);
+          func.push(replaceContent(elm, elm, value, namespaceURI)) ||
+          /^(?:input|textarea)$/.test(elm.localName) &&
+          func.push(replaceEditControlValue(elm, value));
         }
       }
     }
