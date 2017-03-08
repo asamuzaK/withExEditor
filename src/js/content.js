@@ -324,7 +324,7 @@
   const getXmlnsPrefix = async (elm, ns = nsURI.html, prefix = HTML) => {
     if (elm) {
       const {attributes} = elm;
-      const arr = [];
+      let arr = [];
       if (attributes && attributes.length) {
         const item = attributes.getNamedItemNS(nsURI.xmlns, prefix);
         if (!item || item.value !== ns) {
@@ -341,10 +341,10 @@
           }
         }
       }
-      arr.length === 1 && (prefix = await Promise.all(arr).then(a => {
-        const [p] = a;
-        return p !== prefix && p || null;
-      }));
+      if (arr.length === 1 && (arr = await Promise.all(arr))) {
+        const [p] = arr;
+        prefix = p !== prefix && p || null;
+      }
     }
     return prefix;
   };
@@ -438,7 +438,7 @@
           if (nodeType === NODE_ELEMENT) {
             child === parentNode.firstChild &&
               arr.push(document.createTextNode("\n"));
-            arr.push(createElm(child).then(obj => appendChild(obj, child)));
+            arr.push(appendChild(child, child));
             child === parentNode.lastChild &&
               arr.push(document.createTextNode("\n"));
           } else {
@@ -446,8 +446,11 @@
               arr.push(document.createTextNode(nodeValue));
           }
         }
+        if (arr.length) {
+          const frag = await Promise.all(arr).then(createFrag);
+          elm.appendChild(frag);
+        }
       }
-      elm.appendChild(await Promise.all(arr).then(createFrag));
     }
     return elm || document.createTextNode("");
   };
@@ -579,6 +582,7 @@
    */
   const getText = async nodes => {
     const arr = [];
+    let text;
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
         if (node.nodeType === NODE_ELEMENT) {
@@ -588,8 +592,9 @@
           node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
         }
       }
+      text = await Promise.all(arr).then(a => a.join(""));
     }
-    return Promise.all(arr).then(a => a.join(""));
+    return text || "";
   };
 
   /**
@@ -916,12 +921,13 @@
    * @param {string} mode - context mode
    * @returns {Object} - Promise.<Array>
    */
-  const portContent = async (elm, mode) =>
-    createContentData(elm, mode).then(createTmpFileData).then(data =>
-      Promise.all([
-        createContentDataMsg(data).then(msg => msg && portMsg(msg) || null),
-        storeTmpFileData(data),
-      ]));
+  const portContent = async (elm, mode) => {
+    const data = await createContentData(elm, mode).then(createTmpFileData);
+    return Promise.all([
+      createContentDataMsg(data).then(portMsg),
+      storeTmpFileData(data),
+    ]);
+  };
 
   /**
    * get context mode
