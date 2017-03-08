@@ -324,7 +324,7 @@
   const getXmlnsPrefix = async (elm, ns = nsURI.html, prefix = HTML) => {
     if (elm) {
       const {attributes} = elm;
-      let arr = [];
+      const arr = [];
       if (attributes && attributes.length) {
         const item = attributes.getNamedItemNS(nsURI.xmlns, prefix);
         if (!item || item.value !== ns) {
@@ -339,11 +339,11 @@
               break;
             }
           }
+          if (arr.length === 1) {
+            const [p] = await Promise.all(arr);
+            prefix = p !== prefix && p || null;
+          }
         }
-      }
-      if (arr.length === 1 && (arr = await Promise.all(arr))) {
-        const [p] = arr;
-        prefix = p !== prefix && p || null;
       }
     }
     return prefix;
