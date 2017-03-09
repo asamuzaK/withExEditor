@@ -127,8 +127,12 @@
    * @returns {Object} - Promise.<string>, file name
    */
   const getFileNameFromURI = async (uri, subst = LABEL) => {
-    const name = isString(uri) && !/^data:/.test(uri) &&
-                   /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-.~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-.~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*)?)?$/.exec(uri);
+    let name;
+    if (isString(uri)) {
+      const {pathname, protocol} = new URL(uri);
+      name = !/^(?:blob|data):/.test(protocol) &&
+               /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-.~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-.~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*)?)?$/.exec(pathname);
+    }
     return name && name[1] || subst;
   };
 
@@ -416,7 +420,7 @@
     const frag = document.createDocumentFragment();
     Array.isArray(nodes) && nodes.forEach(node => {
       (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
-        frag.appendChild(node);
+        frag.append(node);
     });
     return frag;
   };
@@ -448,7 +452,7 @@
         }
         if (arr.length) {
           const frag = await Promise.all(arr).then(createFrag);
-          elm.appendChild(frag);
+          elm.append(frag);
         }
       }
     }
@@ -493,7 +497,7 @@
               const {nodeType} = node;
               (nodeType === NODE_ELEMENT || nodeType === NODE_TEXT ||
                nodeType === NODE_COMMENT) &&
-                frag.appendChild(node);
+                frag.append(node);
             }
           }
         } else {
@@ -535,7 +539,7 @@
         case NODE_TEXT:
           obj = await createElm(ancestor.parentNode);
           if (obj.nodeType === NODE_ELEMENT) {
-            obj.appendChild(range.cloneContents());
+            obj.append(range.cloneContents());
             arr.push(obj);
           }
           break;
@@ -566,10 +570,9 @@
       frag = await Promise.all(arr).then(createSelFrag);
       if (l > 1 && frag && frag.hasChildNodes() &&
           (obj = await createElm(document.documentElement))) {
-        obj.appendChild(frag);
+        obj.append(frag);
         frag = document.createDocumentFragment();
-        frag.appendChild(obj);
-        frag.appendChild(document.createTextNode("\n"));
+        frag.append(obj, document.createTextNode("\n"));
       }
     }
     return frag && (new XMLSerializer()).serializeToString(frag) || null;
@@ -1011,9 +1014,9 @@
       const l = arr.length;
       let i = 0;
       while (i < l) {
-        frag.appendChild(document.createTextNode(arr[i]));
+        frag.append(document.createTextNode(arr[i]));
         i < l - 1 && ns === nsURI.html &&
-          frag.appendChild(document.createElementNS(ns, "br"));
+          frag.append(document.createElementNS(ns, "br"));
         i++;
       }
       if (node.hasChildNodes()) {
@@ -1021,7 +1024,7 @@
           node.removeChild(node.firstChild);
         }
       }
-      node.appendChild(frag);
+      node.append(frag);
       changed && dispatchInputEvt(elm);
     }
   };
