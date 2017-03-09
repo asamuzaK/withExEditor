@@ -549,7 +549,7 @@
             case EDITOR_CONFIG_RES:
               func.push(
                 extractEditorConfig(obj).then(setStorage),
-                portMsg({[item]: obj}),
+                portMsg({[item]: obj})
               );
               break;
             case HOST:
