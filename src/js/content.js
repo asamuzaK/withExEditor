@@ -981,9 +981,9 @@
   /**
    * dispatch input event
    * @param {Object} elm - element
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
-  const dispatchInputEvt = async elm => {
+  const dispatchInputEvt = elm => {
     if (elm && elm.nodeType === NODE_ELEMENT) {
       const opt = {
         bubbles: true,
@@ -1001,11 +1001,11 @@
    * @param {Object} node - editable element
    * @param {string} value - value
    * @param {string} ns - namespace URI
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {void} - Promise.<void>
    */
   const replaceContent = async (elm, node, value = "", ns = nsURI.html) => {
-    let changed;
     if (node && node.nodeType === NODE_ELEMENT && isString(value)) {
+      const changed = node.textContent !== value;
       const frag = document.createDocumentFragment();
       const arr = value.length && value.split("\n") || [""];
       const l = arr.length;
@@ -1016,26 +1016,25 @@
           frag.appendChild(document.createElementNS(ns, "br"));
         i++;
       }
-      changed = node.textContent !== value;
       if (node.hasChildNodes()) {
         while (node.firstChild) {
           node.removeChild(node.firstChild);
         }
       }
       node.appendChild(frag);
+      changed && dispatchInputEvt(elm);
     }
-    return changed && dispatchInputEvt(elm) || null;
   };
 
   /**
    * replace text edit control element value
    * @param {Object} elm - element
    * @param {string} value - value
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {void} - Promise.<void>
    */
   const replaceEditControlValue = async (elm, value) => {
-    let changed;
     if (elm && elm.nodeType === NODE_ELEMENT && isString(value)) {
+      let changed;
       if (/^input$/.test(elm.localName)) {
         while (value.length && /[\f\n\t\r\v]$/.test(value)) {
           value = value.replace(/[\f\n\t\r\v]$/, "");
@@ -1045,8 +1044,8 @@
         /^textarea$/.test(elm.localName) && (changed = elm.value !== value);
       }
       isString(elm.value) && (elm.value = value);
+      changed && dispatchInputEvt(elm);
     }
-    return changed && dispatchInputEvt(elm) || null;
   };
 
   /**
