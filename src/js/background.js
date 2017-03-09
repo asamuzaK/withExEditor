@@ -547,8 +547,10 @@
               func.push(portHostMsg({[item]: obj}));
               break;
             case EDITOR_CONFIG_RES:
-              func.push(extractEditorConfig(obj).then(setStorage));
-              func.push(portMsg({[item]: obj}));
+              func.push(
+                extractEditorConfig(obj).then(setStorage),
+                portMsg({[item]: obj}),
+              );
               break;
             case HOST:
               func.push(handleHostMsg(obj));
