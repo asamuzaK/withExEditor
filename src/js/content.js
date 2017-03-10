@@ -130,7 +130,7 @@
     let name;
     if (isString(uri)) {
       const {pathname, protocol} = new URL(uri);
-      !/^(?:blob|data):/.test(protocol) && (
+      pathname && protocol && !/^(?:blob|data):/.test(protocol) && (
         name = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/.exec(pathname)
       );
     }
