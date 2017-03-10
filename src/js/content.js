@@ -127,8 +127,13 @@
    * @returns {Object} - Promise.<string>, file name
    */
   const getFileNameFromURI = async (uri, subst = LABEL) => {
-    const name = isString(uri) && !/^data:/.test(uri) &&
-                   /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*(?:\?(?:[\w\-.~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*)?(?:#(?:[\w\-.~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*)?)?$/.exec(uri);
+    let name;
+    if (isString(uri)) {
+      const {pathname, protocol} = new URL(uri);
+      pathname && protocol && !/^(?:blob|data):/.test(protocol) && (
+        name = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/.exec(pathname)
+      );
+    }
     return name && name[1] || subst;
   };
 
@@ -174,20 +179,12 @@
       const suffix = arr[3] ||
                      type === "application" && /^(?:json|xml)$/.test(subtype) &&
                        subtype;
-      const items = fileExt[type];
-      if (items) {
-        const item = suffix && items[suffix];
+      if (fileExt[type]) {
+        const item = suffix && fileExt[type][suffix];
         if (item) {
-          ext = item[subtype] ||
-                await extendObjItems(fileExt, FILE_EXT).then(obj =>
-                  obj[type][suffix][subtype]
-                ) ||
-                item[suffix];
+          ext = item[subtype] || item[suffix];
         } else {
-          ext = items[subtype] ||
-                await extendObjItems(fileExt, FILE_EXT).then(obj =>
-                  obj[type][subtype]
-                );
+          ext = fileExt[type][subtype];
         }
       }
     }
@@ -316,10 +313,7 @@
         ns.localName = root.localName;
         ns.namespaceURI = root.hasAttribute(XMLNS) &&
                           root.getAttribute(XMLNS) ||
-                          nsURI[root.localName] ||
-                          await extendObjItems(nsURI, NS_URI).then(obj =>
-                            obj[root.localName]
-                          ) || "";
+                          nsURI[root.localName] || "";
       }
     }
     return ns;
@@ -350,12 +344,12 @@
               break;
             }
           }
+          if (arr.length === 1) {
+            const [p] = await Promise.all(arr);
+            prefix = p !== prefix && p || null;
+          }
         }
       }
-      arr.length === 1 && (prefix = await Promise.all(arr).then(a => {
-        const [p] = a;
-        return p !== prefix && p || null;
-      }));
     }
     return prefix;
   };
@@ -391,10 +385,7 @@
             const attrName = prefix && `${prefix}:${localName}` || localName;
             ns = namespaceURI || prefix && nsURI[prefix] || "";
             (ns || !prefix) &&
-            func.push(elm.setAttributeNS(ns, attrName, value)) ||
-            func.push(extendObjItems(nsURI, NS_URI).then(obj =>
-              elm.setAttributeNS(obj[prefix] || "", attrName, value)
-            ));
+              func.push(elm.setAttributeNS(ns, attrName, value));
           }
         }
       }
@@ -412,10 +403,7 @@
     if (node) {
       const {attributes, localName, namespaceURI, prefix} = node;
       const ns = namespaceURI ||
-                 prefix && (
-                   nsURI[prefix] ||
-                   await extendObjItems(nsURI, NS_URI).then(obj => obj[prefix])
-                 ) ||
+                 prefix && nsURI[prefix] ||
                  await getNodeNS(node).namespaceURI || nsURI.html;
       const name = prefix && `${prefix}:${localName}` || localName;
       elm = document.createElementNS(ns, name);
@@ -433,7 +421,7 @@
     const frag = document.createDocumentFragment();
     Array.isArray(nodes) && nodes.forEach(node => {
       (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
-        frag.appendChild(node);
+        frag.append(node);
     });
     return frag;
   };
@@ -455,7 +443,7 @@
           if (nodeType === NODE_ELEMENT) {
             child === parentNode.firstChild &&
               arr.push(document.createTextNode("\n"));
-            arr.push(createElm(child).then(obj => appendChild(obj, child)));
+            arr.push(appendChild(child, child));
             child === parentNode.lastChild &&
               arr.push(document.createTextNode("\n"));
           } else {
@@ -463,8 +451,11 @@
               arr.push(document.createTextNode(nodeValue));
           }
         }
+        if (arr.length) {
+          const frag = await Promise.all(arr).then(createFrag);
+          elm.append(frag);
+        }
       }
-      elm.appendChild(await Promise.all(arr).then(createFrag));
     }
     return elm || document.createTextNode("");
   };
@@ -507,7 +498,7 @@
               const {nodeType} = node;
               (nodeType === NODE_ELEMENT || nodeType === NODE_TEXT ||
                nodeType === NODE_COMMENT) &&
-                frag.appendChild(node);
+                frag.append(node);
             }
           }
         } else {
@@ -549,7 +540,7 @@
         case NODE_TEXT:
           obj = await createElm(ancestor.parentNode);
           if (obj.nodeType === NODE_ELEMENT) {
-            obj.appendChild(range.cloneContents());
+            obj.append(range.cloneContents());
             arr.push(obj);
           }
           break;
@@ -580,10 +571,9 @@
       frag = await Promise.all(arr).then(createSelFrag);
       if (l > 1 && frag && frag.hasChildNodes() &&
           (obj = await createElm(document.documentElement))) {
-        obj.appendChild(frag);
+        obj.append(frag);
         frag = document.createDocumentFragment();
-        frag.appendChild(obj);
-        frag.appendChild(document.createTextNode("\n"));
+        frag.append(obj, document.createTextNode("\n"));
       }
     }
     return frag && (new XMLSerializer()).serializeToString(frag) || null;
@@ -596,6 +586,7 @@
    */
   const getText = async nodes => {
     const arr = [];
+    let text;
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
         if (node.nodeType === NODE_ELEMENT) {
@@ -605,8 +596,9 @@
           node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
         }
       }
+      text = await Promise.all(arr).then(a => a.join(""));
     }
-    return Promise.all(arr).then(a => a.join(""));
+    return text || "";
   };
 
   /**
@@ -933,12 +925,13 @@
    * @param {string} mode - context mode
    * @returns {Object} - Promise.<Array>
    */
-  const portContent = async (elm, mode) =>
-    createContentData(elm, mode).then(createTmpFileData).then(data =>
-      Promise.all([
-        createContentDataMsg(data).then(msg => msg && portMsg(msg) || null),
-        storeTmpFileData(data),
-      ]));
+  const portContent = async (elm, mode) => {
+    const data = await createContentData(elm, mode).then(createTmpFileData);
+    return Promise.all([
+      createContentDataMsg(data).then(portMsg),
+      storeTmpFileData(data),
+    ]);
+  };
 
   /**
    * get context mode
@@ -982,29 +975,49 @@
     if (info) {
       const {menuItemId} = info;
       mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
+    } else {
+      mode = await getContextMode(elm);
     }
-    return mode && portContent(elm, mode) ||
-           getContextMode(elm).then(m => portContent(elm, m));
+    return mode && portContent(elm, mode) || null;
   };
 
   /* synchronize edited text */
   /**
+   * dispatch input event
+   * @param {Object} elm - element
+   * @returns {void}
+   */
+  const dispatchInputEvt = elm => {
+    if (elm && elm.nodeType === NODE_ELEMENT) {
+      const opt = {
+        bubbles: true,
+        cancelable: false,
+      };
+      const evt = window.InputEvent && new InputEvent("input", opt) ||
+                  new Event("input", opt);
+      elm.dispatchEvent(evt);
+    }
+  };
+
+  /**
    * replace content editable element text
+   * @param {Object} elm - owner element
    * @param {Object} node - editable element
    * @param {string} value - value
    * @param {string} ns - namespace URI
    * @returns {void} - Promise.<void>
    */
-  const replaceContent = async (node, value = "", ns = nsURI.html) => {
-    if (node && node.nodeType === NODE_ELEMENT) {
+  const replaceContent = async (elm, node, value = "", ns = nsURI.html) => {
+    if (node && node.nodeType === NODE_ELEMENT && isString(value)) {
+      const changed = node.textContent !== value;
       const frag = document.createDocumentFragment();
-      const arr = value && value.split("\n") || [""];
+      const arr = value.length && value.split("\n") || [""];
       const l = arr.length;
       let i = 0;
       while (i < l) {
-        frag.appendChild(document.createTextNode(arr[i]));
+        frag.append(document.createTextNode(arr[i]));
         i < l - 1 && ns === nsURI.html &&
-          frag.appendChild(document.createElementNS(ns, "br"));
+          frag.append(document.createElementNS(ns, "br"));
         i++;
       }
       if (node.hasChildNodes()) {
@@ -1012,7 +1025,30 @@
           node.removeChild(node.firstChild);
         }
       }
-      node.appendChild(frag);
+      node.append(frag);
+      changed && dispatchInputEvt(elm);
+    }
+  };
+
+  /**
+   * replace text edit control element value
+   * @param {Object} elm - element
+   * @param {string} value - value
+   * @returns {void} - Promise.<void>
+   */
+  const replaceEditControlValue = async (elm, value) => {
+    if (elm && elm.nodeType === NODE_ELEMENT && isString(value)) {
+      let changed;
+      if (/^input$/.test(elm.localName)) {
+        while (value.length && /[\f\n\t\r\v]$/.test(value)) {
+          value = value.replace(/[\f\n\t\r\v]$/, "");
+        }
+        changed = elm.value !== value;
+      } else {
+        /^textarea$/.test(elm.localName) && (changed = elm.value !== value);
+      }
+      isString(elm.value) && (elm.value = value);
+      changed && dispatchInputEvt(elm);
     }
   };
 
@@ -1042,7 +1078,7 @@
               if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
                   timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
                 id.setAttributeNS(ns, attr, timestamp);
-                func.push(replaceContent(id, value, namespaceURI));
+                func.push(replaceContent(elm, id, value, namespaceURI));
               }
               break;
             }
@@ -1055,8 +1091,9 @@
           attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
           elm.setAttributeNS(ns, attr, timestamp);
           elm.isContentEditable &&
-          func.push(replaceContent(elm, value, namespaceURI)) ||
-          /^(?:input|textarea)$/.test(elm.localName) && (elm.value = value);
+          func.push(replaceContent(elm, elm, value, namespaceURI)) ||
+          /^(?:input|textarea)$/.test(elm.localName) &&
+          func.push(replaceEditControlValue(elm, value));
         }
       }
     }
@@ -1218,4 +1255,10 @@
       "keypress", evt => handleKeyPress(evt).catch(logError), false
     );
   }, false);
+
+  /* startup */
+  Promise.all([
+    extendObjItems(fileExt, FILE_EXT),
+    extendObjItems(nsURI, NS_URI),
+  ]).catch(logError);
 }

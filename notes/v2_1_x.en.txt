@@ -1,0 +1,10 @@
+v2.1.0
+New And Updated Features
+<ul>
+<li>`input` event will be fired after syncronizing text</li>
+</ul>
+
+Code Refactoring
+<ul>
+<li>Migrated to `WebExtensions`</li>
+</ul>

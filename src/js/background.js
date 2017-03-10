@@ -166,13 +166,11 @@
    * @param {string} key - storage key
    * @returns {Object} - Promise.<?AsyncFunction>
    */
-  const storeFetchedData = async (path, key) =>
-    isString(path) && isString(key) && fetch(path).then(async res => {
-      const data = await res.json();
-      return data && {
-        [key]: data,
-      } || null;
-    }).then(setStorage) || null;
+  const storeFetchedData = async (path, key) => {
+    const data = isString(path) && isString(key) &&
+                   await fetch(path).then(res => res && res.json());
+    return data && setStorage({[key]: data}) || null;
+  };
 
   /**
    * extract editor config data
@@ -220,21 +218,15 @@
   };
 
   /**
-   * extract editor config file path from storage data
-   * @param {Object} data - storage data
-   * @returns {?string} - file path
-   */
-  const extractEditorConfigStorage = data =>
-    data && data[EDITOR_CONFIG] && data[EDITOR_CONFIG].value || null;
-
-  /**
    * port editor config path
    * @returns {Object} - Promise.<AsyncFunction>
    */
-  const portEditorConfigPath = async () =>
-    storage.get(EDITOR_CONFIG).then(extractEditorConfigStorage).then(filePath =>
-      portHostMsg({[EDITOR_CONFIG_GET]: filePath || ""})
-    );
+  const portEditorConfigPath = async () => {
+    const data = await storage.get(EDITOR_CONFIG);
+    const filePath = data && data[EDITOR_CONFIG] &&
+                     data[EDITOR_CONFIG].value || "";
+    return portHostMsg({[EDITOR_CONFIG_GET]: filePath});
+  };
 
   /* content ports collection */
   const ports = {};
@@ -555,8 +547,10 @@
               func.push(portHostMsg({[item]: obj}));
               break;
             case EDITOR_CONFIG_RES:
-              func.push(extractEditorConfig(obj).then(setStorage));
-              func.push(portMsg({[item]: obj}));
+              func.push(
+                extractEditorConfig(obj).then(setStorage),
+                portMsg({[item]: obj})
+              );
               break;
             case HOST:
               func.push(handleHostMsg(obj));
@@ -601,7 +595,7 @@
       ports[windowId] = ports[windowId] || {};
       ports[windowId][tabId] = ports[windowId][tabId] || {};
       ports[windowId][tabId][url] = port;
-      port.onDisconnect.addListener(removePort);
+      port.onDisconnect.addListener(p => removePort(p).catch(logError));
       port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
       port.postMessage({
         incognito, tabId, windowId,
@@ -678,10 +672,10 @@
    * handle window focus changed
    * @returns {Object} - Promise.<?AsyncFunction>
    */
-  const onWindowFocusChanged = async () =>
-    windows.getAll({windowTypes: ["normal"]}).then(arr =>
-      arr.length && syncUI() || null
-    );
+  const onWindowFocusChanged = async () => {
+    const win = windows.getAll({windowTypes: ["normal"]});
+    return win.length && syncUI() || null;
+  };
 
   /**
    * handle window removed
@@ -692,10 +686,10 @@
     const func = [];
     const win = await windows.getAll({windowTypes: ["normal"]});
     if (win.length) {
-      func.push(restorePorts({windowId: stringifyPositiveInt(windowId, true)}));
-      func.push(checkWindowIncognito().then(bool =>
-        !bool && portHostMsg({[TMP_FILES_PB_REMOVE]: !bool})
-      ));
+      const bool = await checkWindowIncognito();
+      !bool && func.push(portHostMsg({[TMP_FILES_PB_REMOVE]: !bool}));
+      windowId = stringifyPositiveInt(windowId, true);
+      windowId && func.push(restorePorts({windowId}));
     }
     return Promise.all(func);
   };
