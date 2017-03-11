@@ -18,6 +18,7 @@
   const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
   const FILE_EXT = "fileExt";
+  const FILE_LEN = 128;
   const HTML = "html";
   const ID_TAB = "tabId";
   const ID_WIN = "windowId";
@@ -130,11 +131,12 @@
     let name;
     if (isString(uri)) {
       const {pathname, protocol} = new URL(uri);
-      pathname && protocol && !/^(?:blob|data):/.test(protocol) && (
-        name = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/.exec(pathname)
-      );
+      if (pathname && protocol && !/^(?:blob|data):/.test(protocol)) {
+        name = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/.exec(pathname);
+        Array.isArray(name) && (name = decodeURIComponent(name[1]));
+      }
     }
-    return name && name[1] || subst;
+    return name && name.length < FILE_LEN && name || subst;
   };
 
   /* file extension */
