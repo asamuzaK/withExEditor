@@ -870,7 +870,7 @@
       incognito, tabId, windowId,
       mode: MODE_SOURCE,
       dir: incognito && TMP_FILES_PB || TMP_FILES,
-      host: window.location.host || LABEL,
+      host: window.location.hostname || LABEL,
       dataId: null,
       namespaceURI: null,
       value: null,
