@@ -13,7 +13,7 @@ Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
 ### Important Notice
 
 In Mozilla's new add-on ecosystem WebExtensions, the browser interacts with the native application via messages (that is, the external editor can not be executed directly anymore).
-For more information, refer to [Native messaging - MDN](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging "Native messaging - Mozilla | MDN").
+For more information, refer to [Native messaging (MDN)](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging "Native messaging - Mozilla | MDN").
 
 Therefore, to use withExEditor, you also need to prepare a host which executes your editor.
 Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHub)](https://github.com/asamuzaK/withExEditorHost "asamuzaK/withExEditorHost: Native messaging host for withExEditor").
