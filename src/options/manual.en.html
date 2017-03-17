@@ -13,12 +13,8 @@
       <section>
         <h1>Important Notice</h1>
         <p>
-          In Mozilla's new add-on ecosystem WebExtensions, the browser interacts with native application via messages (that is, external editor can not be executed directly anymore).
-          For details, refer to <a href="https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging">Native messaging - Mozilla | MDN</a>.
-        </p>
-        <p>
-          Therefore, to use withExEditor, you need to prepare the host which executes your editor.
-          Please download the host for withExEditor from <a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">asamuzaK/withExEditorHost (GitHub)</a>.
+          To use withExEditor, you need to prepare the host which executes your editor.
+          You can get the host for withExEditor from <a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">asamuzaK/withExEditorHost (GitHub)</a>.
         </p>
       </section>
       <section>
@@ -42,7 +38,7 @@
           It may be overwritten when updating withExEditorHost.
         </p>
         <p>
-          The config folder can be saved in an arbitrary place, but if you saved withExEditorHost from zip or tar.gz, just put it in the same place as the _config.
+          The config folder can be saved in an arbitrary place, but if you saved withExEditorHost from zip or tar.gz, just put it in the same place as the _config (<code>C:\Users\XXX\withExEditorHost\config\</code>).
           If you are cloning the repository, to prevent your personal configuration information from being uploaded to GitHub unintentionally, it is strongly recommended to save the folder <em>outside</em> the repository, not inside.
         </p>
         <section>
@@ -99,9 +95,20 @@ REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\withexeditorhos
             </code></pre>
           </figure>
           <p>
-            On Linux and Mac, you need to save the application manifest in the specified location.
-            For details, please refer to <a href="https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Native_messaging#App_manifest_location" title="Native messaging - Mozilla | MDN">Native messaging - Mozilla | MDN</a>.
+            On Linux and Mac, you need to save "withexeditorhost.json" in the specified location.
           </p>
+          <figure>
+            <figcaption>Linux:</figcaption>
+            <pre class="sample"><code>
+~/.mozilla/native-messaging-hosts/withexeditorhost.json
+            </code></pre>
+          </figure>
+          <figure>
+            <figcaption>Mac:</figcaption>
+            <pre class="sample"><code>
+~/Library/Application Support/Mozilla/NativeMessagingHosts/withexeditorhost.json
+            </code></pre>
+          </figure>
         </section>
         <section>
           <h1>Edit the editor configuration</h1>

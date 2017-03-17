@@ -13,12 +13,8 @@
       <section>
         <h1>重要なお知らせ</h1>
         <p>
-          Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラウザはメッセージを介してネイティブアプリケーションとやりとりする仕組みとなっています（つまり、外部エディタはもう直接起動できません）。
-          詳細については、<a href="https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging">Native messaging - Mozilla | MDN</a>を参照してください。
-        </p>
-        <p>
-          このため、withExEditorを使うには、エディタを起動するホストも用意する必要があります。
-          <a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">asamuzaK/withExEditorHost (GitHub)</a>からwithExEditor用のホストをダウンロードしてください。
+          withExEditorを使うには、エディタを起動するホストも用意する必要があります。
+          <a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">asamuzaK/withExEditorHost (GitHub)</a>からwithExEditor用のホストを入手できます。
         </p>
       </section>
       <section>
@@ -40,7 +36,7 @@
           withExEditorHostをアップデートしたときに上書きされてしまう可能性があります。
         </p>
         <p>
-          configフォルダは任意の場所に保存できますが、zipやtar.gzから展開して保存した場合は、そのまま_configと同じ場所に置けばOKです。
+          configフォルダは任意の場所に保存できますが、zipやtar.gzから展開して保存した場合は、そのまま_configと同じ場所（<code>C:\Users\XXX\withExEditorHost\config\</code>）に置けばOKです。
           一方、レポジトリをクローンしている場合は、あなたの個人的な設定情報が意図せずGitHubにアップロードされることを防ぐためにも、レポジトリの中ではなく「<em>外</em>」にフォルダを保存することを強くおすすめします。
         </p>
         <section>
@@ -97,9 +93,20 @@ REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\withexeditorhos
             </code></pre>
           </figure>
           <p>
-            LinuxとMacでは、アプリケーションマニフェストを指定の場所に保存する必要があります。
-            詳細は<a href="https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging#App_manifest_location" title="Native messaging - Mozilla | MDN">App manifest location</a>を参照してください。
+            LinuxとMacでは、"withexeditorhost.json"を指定の場所に保存する必要があります。
           </p>
+          <figure>
+            <figcaption>Linux:</figcaption>
+            <pre class="sample"><code>
+~/.mozilla/native-messaging-hosts/withexeditorhost.json
+            </code></pre>
+          </figure>
+          <figure>
+            <figcaption>Mac:</figcaption>
+            <pre class="sample"><code>
+~/Library/Application Support/Mozilla/NativeMessagingHosts/withexeditorhost.json
+            </code></pre>
+          </figure>
         </section>
         <section>
           <h1>エディタ設定ファイルの編集</h1>
