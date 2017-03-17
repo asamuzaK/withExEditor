@@ -135,15 +135,9 @@
     "message": "ja"
   },
   "optionsManualLabel": {
-    "message": "マニュアル"
+    "message": "ホストマニュアル"
   },
   "optionsManualLabel.href": {
-    "message": "./manual.ja.html"
-  },
-  "optionsNoticeLabel": {
-    "message": "重要なお知らせ"
-  },
-  "optionsNoticeLabel.href": {
     "message": "./manual.ja.html"
   },
   "optionsOptionsShortCutDetail": {

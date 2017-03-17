@@ -135,15 +135,9 @@
     "message": "en"
   },
   "optionsManualLabel": {
-    "message": "Manual"
+    "message": "Host Manual"
   },
   "optionsManualLabel.href": {
-    "message": "./manual.en.html"
-  },
-  "optionsNoticeLabel": {
-    "message": "Important Notice"
-  },
-  "optionsNoticeLabel.href": {
     "message": "./manual.en.html"
   },
   "optionsOptionsShortCutDetail": {
