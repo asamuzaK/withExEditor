@@ -724,7 +724,7 @@
         const arr = ctrl.hasAttributeNS("", DATA_ATTR_CTRLS) &&
                       (ctrl.getAttributeNS("", DATA_ATTR_CTRLS)).split(" ");
         if (arr) {
-          const attr = arr.push(dataId) && [...(new Set(arr))].join(" ");
+          const attr = arr.push(dataId) && [...new Set(arr)].join(" ");
           attr && ctrl.setAttributeNS("", DATA_ATTR_CTRLS, attr);
         } else {
           ctrl.setAttributeNS("", DATA_ATTR_CTRLS, dataId);
