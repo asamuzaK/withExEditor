@@ -123,7 +123,7 @@
   /* windows */
   /**
    * check if any of windows is incognito
-   * @returns {Object} - Promise.<boolean>, result
+   * @returns {boolean} - result
    */
   const checkWindowIncognito = async () => {
     const windowIds = await windows.getAll({windowTypes: ["normal"]});
@@ -146,7 +146,7 @@
   /**
    * port message to host
    * @param {*} msg - message
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const portHostMsg = async msg => {
     msg && host && host.postMessage(msg);
@@ -156,7 +156,7 @@
   /**
    * set storage
    * @param {Object} obj - object to store
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const setStorage = async obj => obj && storage.set(obj) || null;
 
@@ -164,7 +164,7 @@
    * fetch shared data and store
    * @param {string} path - data path
    * @param {string} key - storage key
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const storeFetchedData = async (path, key) => {
     const data = isString(path) && isString(key) &&
@@ -175,7 +175,7 @@
   /**
    * extract editor config data
    * @param {Object} data - editor config data
-   * @returns {Object} - Promise.<Object>, data to store
+   * @returns {Object} - data to store
    */
   const extractEditorConfig = async (data = {}) => {
     const {editorConfig, editorName, executable} = data;
@@ -234,7 +234,7 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const restorePorts = async (data = {}) => {
     const {tabId, windowId} = data;
@@ -252,7 +252,7 @@
   /**
    * remove port from ports collection
    * @param {!Object} port - removed port
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const removePort = async (port = {}) => {
     const {sender} = port;
@@ -273,7 +273,7 @@
    * @param {*} msg - message
    * @param {string} windowId - windowId
    * @param {string} tabId - tabId
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const portMsg = async (msg, windowId, tabId) => {
     if (msg) {
@@ -312,7 +312,7 @@
    * port context menu data
    * @param {!Object} info - contextMenus.OnClickData
    * @param {!Object} tab - tabs.Tab
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const portContextMenuData = async (info, tab) => {
     const {frameUrl} = info;
@@ -331,7 +331,7 @@
   /**
    * port sync text
    * @param {*} msg - message
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const portSyncText = async msg => {
     let func;
@@ -381,7 +381,7 @@
    * create context menu item
    * @param {string} id - menu item ID
    * @param {Array} contexts - contexts
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const createMenuItem = async (id, contexts) => {
     const label = varsL[EDITOR_LABEL] || LABEL;
@@ -432,7 +432,7 @@
   /**
    * update context menu
    * @param {Object} type - context type data
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const updateContextMenu = async type => {
     if (type) {
@@ -466,7 +466,7 @@
 
   /**
    * cache localized context menu item title
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
@@ -479,7 +479,7 @@
   /* UI */
   /**
    * synchronize UI components
-   * @returns {Object} - Promise.<?Array>
+   * @returns {Object} - ?Promise.<Array>
    */
   const syncUI = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
@@ -496,7 +496,7 @@
   /* handlers */
   /**
    * open options page
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const openOptionsPage = async () =>
     vars[IS_ENABLED] && runtime.openOptionsPage() || null;
@@ -504,7 +504,7 @@
   /**
    * handle host message
    * @param {Object} msg - message
-   * @returns {Object} - Promise.<?(Function|AsyncFunction)>
+   * @returns {Object} - ?Promise.<(Function|AsyncFunction)>
    */
   const handleHostMsg = async msg => {
     const {message, pid, status} = msg;
@@ -583,7 +583,7 @@
   /**
    * handle connected port
    * @param {!Object} port - runtime.Port
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const handlePort = async port => {
     const {tab, url} = port.sender;
@@ -635,7 +635,7 @@
    * @param {!number} id - tabId
    * @param {!Object} info - changed tab info
    * @param {!Object} tab - tabs.Tab
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const onTabUpdated = async (id, info, tab) => {
     const {active, url} = tab;
@@ -658,7 +658,7 @@
    * handle tab removed
    * @param {!number} id - tabId
    * @param {!Object} info - removed tab info
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const onTabRemoved = async (id, info) => {
     const tabId = stringifyPositiveInt(id, true);
@@ -670,7 +670,7 @@
 
   /**
    * handle window focus changed
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const onWindowFocusChanged = async () => {
     const win = windows.getAll({windowTypes: ["normal"]});
@@ -698,7 +698,7 @@
   /**
    * port variable
    * @param {Object} v - variable
-   * @returns {Object} - Promise.<?AsyncFunction>
+   * @returns {Object} - ?Promise.<AsyncFunction>
    */
   const portVar = async v => v && portMsg({[VARS_SET]: v}) || null;
 

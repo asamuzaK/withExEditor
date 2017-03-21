@@ -43,7 +43,7 @@
   /**
    * port message
    * @param {*} msg - message
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const portMsg = async msg => {
     msg && port.postMessage(msg);
@@ -53,7 +53,7 @@
    * create pref
    * @param {Object} elm - element
    * @param {boolean} executable - executable
-   * @returns {Object} - Promise.<Object>, pref data
+   * @returns {Object} - pref data
    */
   const createPref = async (elm, executable = false) => {
     const id = elm && elm.id;
@@ -74,7 +74,7 @@
   /**
    * extract editor config
    * @param {string} obj - editor config object
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const extractEditorConfig = async (obj = {}) => {
     const {editorName, executable} = obj;
@@ -127,7 +127,7 @@
   /* html */
   /**
    * add event listener to input elements
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const addInputChangeListener = async () => {
     const nodes = document.querySelectorAll("input");
@@ -143,7 +143,7 @@
   /**
    * localize attribute value
    * @param {Object} elm - element
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const localizeAttr = async elm => {
     if (elm && elm.nodeType === NODE_ELEMENT && elm.hasAttributes()) {
@@ -166,7 +166,7 @@
 
   /**
    * localize html
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const localizeHtml = async () => {
     const lang = i18n.getMessage(LANG);
@@ -186,7 +186,7 @@
   /**
    * set html input value
    * @param {Object} data - storage data
-   * @returns {void} - Promise.<void>
+   * @returns {void}
    */
   const setHtmlInputValue = async (data = {}) => {
     const {id} = data;
