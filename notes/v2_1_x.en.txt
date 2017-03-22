@@ -1,10 +1,15 @@
 v2.1.0
 New And Updated Features
 <ul>
-<li>`input` event will be fired after syncronizing text</li>
+<li>Migrated to WebExtensions. Not compatible with v1.x, so you need to set up add-on again</li>
+<li>New Options page</li>
+<li>Behavior of "Ctrl+Alt+key" shortcut key changed, it opens the Options page</li>
+<li>Added "View SVG Source" menu</li>
+<li>Default color of the toolbar icon changed to "gray"</li>
 </ul>
 
-Code Refactoring
 <ul>
-<li>Migrated to `WebExtensions`</li>
+<li>Native messaging host for withExEditor https://github.com/asamuzaK/withExEditorHost/releases
+</li>
+<li>Skipped 2.0.0</li>
 </ul>
