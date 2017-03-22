@@ -211,7 +211,7 @@
   /**
    * port temporary file data
    * @param {string} dataId - data ID
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - port message
    */
   const portTmpFileData = async dataId => {
     const data = dataId && dataIds[dataId];
@@ -221,7 +221,7 @@
   /**
    * port temporary file data to get temporary file
    * @param {!Object} evt - Event
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const requestTmpFile = async evt => {
     const func = [];
@@ -360,7 +360,7 @@
    * set namespaced attribute
    * @param {Object} elm - element to append attributes
    * @param {Object} node - element node to get attributes from
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const setAttributeNS = async (elm, node = {}) => {
     const {attributes} = node;
@@ -517,7 +517,7 @@
    * @param {Object} range - range
    * @param {number} index - index
    * @param {number} count - range count
-   * @returns {Object} - ?Promise.<Array>, range array
+   * @returns {?Promise.<Array>} - range array
    */
   const createRangeArr = async (range, index, count) => {
     const arr = [];
@@ -925,7 +925,7 @@
    * port content data
    * @param {Object} elm - element
    * @param {string} mode - context mode
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const portContent = async (elm, mode) => {
     const data = await createContentData(elm, mode).then(createTmpFileData);
@@ -968,7 +968,7 @@
   /**
    * determine port content process
    * @param {Object} obj - context menu obj
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - port content
    */
   const determinePortProcess = async (obj = {}) => {
     const {info} = obj;
@@ -1057,7 +1057,7 @@
   /**
    * get target element and synchronize text
    * @param {Object} obj - sync data object
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const syncText = async (obj = {}) => {
     const {data, value} = obj;
@@ -1139,7 +1139,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const handleMsg = async msg => {
     const func = [];
@@ -1192,7 +1192,7 @@
   /**
    * handle contextmenu event
    * @param {!Object} evt - Event
-   * @returns {Object} - Promise.<AsyncFunction>
+   * @returns {AsyncFunction} - port message
    */
   const handleContextMenu = async evt => {
     const {target} = evt;
@@ -1225,24 +1225,24 @@
   /**
    * handle keypress event
    * @param {!Object} evt - Event
-   * @returns {Object} - Promise.<Array>
+   * @returns {?AsyncFunction} - port content / port message
    */
   const handleKeyPress = async evt => {
-    const func = [];
+    let func;
     if (vars[IS_ENABLED]) {
       if (await keyComboMatches(evt, execEditorKey)) {
         if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
           const {target} = evt;
           const mode = await getContextMode(target);
           (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) &&
-            func.push(portContent(target, mode));
+            (func = portContent(target, mode));
         }
       } else {
         const openOpt = await keyComboMatches(evt, openOptionsKey);
-        openOpt && func.push(portMsg({[OPTIONS_OPEN]: openOpt}));
+        openOpt && (func = portMsg({[OPTIONS_OPEN]: openOpt}));
       }
     }
-    return Promise.all(func);
+    return func || null;
   };
 
   /* listeners */

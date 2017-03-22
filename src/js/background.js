@@ -156,7 +156,7 @@
   /**
    * set storage
    * @param {Object} obj - object to store
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - store object
    */
   const setStorage = async obj => obj && storage.set(obj) || null;
 
@@ -164,7 +164,7 @@
    * fetch shared data and store
    * @param {string} path - data path
    * @param {string} key - storage key
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - set storage
    */
   const storeFetchedData = async (path, key) => {
     const data = isString(path) && isString(key) &&
@@ -219,7 +219,7 @@
 
   /**
    * port editor config path
-   * @returns {Object} - Promise.<AsyncFunction>
+   * @returns {AsyncFunction} - port host message
    */
   const portEditorConfigPath = async () => {
     const data = await storage.get(EDITOR_CONFIG);
@@ -234,7 +234,7 @@
   /**
    * restore ports collection
    * @param {Object} data - disconnected port data
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - restore ports (recursive)
    */
   const restorePorts = async (data = {}) => {
     const {tabId, windowId} = data;
@@ -331,7 +331,7 @@
   /**
    * port sync text
    * @param {*} msg - message
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {AsyncFunction} - port message
    */
   const portSyncText = async msg => {
     let func;
@@ -349,7 +349,7 @@
   /**
    * replace icon
    * @param {Object} path - icon path
-   * @returns {Object} - Promise.<AsyncFunction>
+   * @returns {AsyncFunction} - set icon
    */
   const replaceIcon = async (path = varsL[ICON_PATH]) =>
     browserAction.setIcon({path});
@@ -357,7 +357,7 @@
   /**
    * toggle badge
    * @param {boolean} executable - executable
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const toggleBadge = async (executable = varsL[IS_EXECUTABLE]) => {
     const color = !executable && WARN_COLOR || "transparent";
@@ -396,7 +396,7 @@
 
   /**
    * create context menu items
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const createMenuItems = async () => {
     const func = [];
@@ -423,7 +423,7 @@
 
   /**
    * restore context menu
-   * @returns {Object} - Promise.<AsyncFunction>
+   * @returns {AsyncFunction} - create menu items
    */
   const restoreContextMenu = async () =>
     contextMenus.removeAll().then(createMenuItems);
@@ -479,7 +479,7 @@
   /* UI */
   /**
    * synchronize UI components
-   * @returns {Object} - ?Promise.<Array>
+   * @returns {?Promise.<Array>} - resolved values
    */
   const syncUI = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
@@ -496,7 +496,7 @@
   /* handlers */
   /**
    * open options page
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - open options page
    */
   const openOptionsPage = async () =>
     vars[IS_ENABLED] && runtime.openOptionsPage() || null;
@@ -504,7 +504,7 @@
   /**
    * handle host message
    * @param {Object} msg - message
-   * @returns {Object} - ?Promise.<(Function|AsyncFunction)>
+   * @returns {?(Function|AsyncFunction)} - logger / port editor config
    */
   const handleHostMsg = async msg => {
     const {message, pid, status} = msg;
@@ -530,7 +530,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const handleMsg = async msg => {
     const func = [];
@@ -607,7 +607,7 @@
   /**
    * handle tab activated
    * @param {!Object} info - activated tab info
-   * @returns {Object} - Promise.<AsyncFunction>
+   * @returns {AsyncFunction} - restore context menu
    */
   const onTabActivated = async info => {
     let {tabId, windowId} = info, bool;
@@ -635,7 +635,7 @@
    * @param {!number} id - tabId
    * @param {!Object} info - changed tab info
    * @param {!Object} tab - tabs.Tab
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - restore context menu
    */
   const onTabUpdated = async (id, info, tab) => {
     const {active, url} = tab;
@@ -658,7 +658,7 @@
    * handle tab removed
    * @param {!number} id - tabId
    * @param {!Object} info - removed tab info
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - restore ports
    */
   const onTabRemoved = async (id, info) => {
     const tabId = stringifyPositiveInt(id, true);
@@ -670,7 +670,7 @@
 
   /**
    * handle window focus changed
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - sync UI
    */
   const onWindowFocusChanged = async () => {
     const win = windows.getAll({windowTypes: ["normal"]});
@@ -680,7 +680,7 @@
   /**
    * handle window removed
    * @param {!number} windowId - windowId
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const onWindowRemoved = async windowId => {
     const func = [];
@@ -698,7 +698,7 @@
   /**
    * port variable
    * @param {Object} v - variable
-   * @returns {Object} - ?Promise.<AsyncFunction>
+   * @returns {?AsyncFunction} - port message
    */
   const portVar = async v => v && portMsg({[VARS_SET]: v}) || null;
 
@@ -707,7 +707,7 @@
    * @param {string} item - item
    * @param {Object} obj - value object
    * @param {boolean} changed - changed
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const setVar = async (item, obj, changed = false) => {
     const func = [];
@@ -759,7 +759,7 @@
   /**
    * set variables
    * @param {Object} data - storage data
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const setVars = async (data = {}) => {
     const func = [];

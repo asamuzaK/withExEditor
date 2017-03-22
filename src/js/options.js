@@ -95,7 +95,7 @@
   /**
    * port pref
    * @param {!Object} evt - Event
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const portPref = async evt => {
     const {target} = evt;
@@ -209,7 +209,7 @@
 
   /**
    * set html input values from storage
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const setValuesFromStorage = async () => {
     const func = [];
@@ -227,7 +227,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @returns {Object} - Promise.<Array>
+   * @returns {Promise.<Array>} - resolved values
    */
   const handleMsg = async msg => {
     const func = [];
