@@ -12,10 +12,7 @@ Firefox用のアドオン。
 
 ### 重要なお知らせ
 
-Mozillaの新しいアドオンのエコシステムWebExtensionsでは、ブラウザはメッセージを介してネイティブアプリケーションとやりとりする仕組みとなっています（つまり、外部エディタはもう直接起動できません）。
-詳細については、[Native messaging (MDN)](https://developer.mozilla.org/ja/Add-ons/WebExtensions/Native_messaging "Native messaging - Mozilla | MDN")を参照してください。
-
-このため、withExEditorを使うには、エディタを起動するホストも用意する必要があります。
+withExEditorを使うには、エディタを起動するホストも用意する必要があります。
 [asamuzaK/withExEditorHost (GitHub)](https://github.com/asamuzaK/withExEditorHost "asamuzaK/withExEditorHost: Native messaging host for withExEditor")からwithExEditor用のホストをダウンロードしてください。
 
 ***
