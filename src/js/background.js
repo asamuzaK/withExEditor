@@ -86,7 +86,7 @@
 
   /**
    * log warn
-   * @param {Object} msg - message
+   * @param {*} msg - message
    * @returns {boolean} - false
    */
   const logWarn = msg => {
@@ -96,7 +96,7 @@
 
   /**
    * log message
-   * @param {Object} msg - message
+   * @param {*} msg - message
    * @returns {Object} - message
    */
   const logMsg = msg => {
@@ -348,7 +348,7 @@
   /* icon */
   /**
    * replace icon
-   * @param {Object} path - icon path
+   * @param {string} path - icon path
    * @returns {AsyncFunction} - set icon
    */
   const replaceIcon = async (path = varsL[ICON_PATH]) =>
