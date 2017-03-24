@@ -59,7 +59,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 ### Editor Label
 
 * Enter the label of the editor.
-* Disabled if application manifest path field is not filled, or could not find the host etc.
+* Disabled if editor config path field is not filled, or could not find the host etc.
 
 ### Access Key
 
