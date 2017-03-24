@@ -221,7 +221,7 @@
   /**
    * port temporary file data to get temporary file
    * @param {!Object} evt - Event
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const requestTmpFile = async evt => {
     const func = [];
@@ -360,7 +360,7 @@
    * set namespaced attribute
    * @param {Object} elm - element to append attributes
    * @param {Object} node - element node to get attributes from
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const setAttributeNS = async (elm, node = {}) => {
     const {attributes} = node;
@@ -925,7 +925,7 @@
    * port content data
    * @param {Object} elm - element
    * @param {string} mode - context mode
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const portContent = async (elm, mode) => {
     const data = await createContentData(elm, mode).then(createTmpFileData);
@@ -1057,7 +1057,7 @@
   /**
    * get target element and synchronize text
    * @param {Object} obj - sync data object
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const syncText = async (obj = {}) => {
     const {data, value} = obj;
@@ -1139,7 +1139,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const handleMsg = async msg => {
     const func = [];

@@ -357,7 +357,7 @@
   /**
    * toggle badge
    * @param {boolean} executable - executable
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const toggleBadge = async (executable = varsL[IS_EXECUTABLE]) => {
     const color = !executable && WARN_COLOR || "transparent";
@@ -396,7 +396,7 @@
 
   /**
    * create context menu items
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const createMenuItems = async () => {
     const func = [];
@@ -479,7 +479,7 @@
   /* UI */
   /**
    * synchronize UI components
-   * @returns {?Promise.<Array>} - resolved values
+   * @returns {?Promise.<Array>} - results of each handler
    */
   const syncUI = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
@@ -530,7 +530,7 @@
   /**
    * handle message
    * @param {*} msg - message
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const handleMsg = async msg => {
     const func = [];
@@ -680,7 +680,7 @@
   /**
    * handle window removed
    * @param {!number} windowId - windowId
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const onWindowRemoved = async windowId => {
     const func = [];
@@ -707,7 +707,7 @@
    * @param {string} item - item
    * @param {Object} obj - value object
    * @param {boolean} changed - changed
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const setVar = async (item, obj, changed = false) => {
     const func = [];
@@ -759,7 +759,7 @@
   /**
    * set variables
    * @param {Object} data - storage data
-   * @returns {Promise.<Array>} - resolved values
+   * @returns {Promise.<Array>} - results of each handler
    */
   const setVars = async (data = {}) => {
     const func = [];
