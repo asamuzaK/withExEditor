@@ -1,3 +1,9 @@
+v2.1.1
+Updated Features
+<ul>
+<li>Host manual updated. You can use host setup script now.</li>
+</ul>
+
 v2.1.0
 New And Updated Features
 <ul>
