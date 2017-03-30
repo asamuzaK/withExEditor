@@ -38,130 +38,51 @@
       <section>
         <h1>Setting up the host</h1>
         <p>
-          There are sample configuration files in "_config" folder of withExEditorHost.
+          Open "cmd.exe" on Windows, "terminal" on Linux / Mac, and run setup script.
+          Depending on the Windows environment, you may need to run "cmd.exe" as admin.
+        </p>
+        <figure>
+          <figcaption>Windows:</figcaption>
+          <pre class="sample"><code>
+&gt; cd path\to\withExEditorHost
+&gt; node setup.js
+          </code></pre>
+        </figure>
+        <figure>
+          <figcaption>Linux / Mac:</figcaption>
+          <pre class="sample"><code>
+$ cd path/to/withexeditorhost
+$ node setup.js
+          </code></pre>
+        </figure>
+        <p>
+          By default, the setup script creates a "config" folder under the location of withExEditorHost.
+          If you want to save setting files in different location, use `--config-path` argument.
+        </p>
+        <figure>
+          <figcaption>Windows:</figcaption>
+          <pre class="sample"><code>
+&gt; node setup.js --config-path=&quot;C:\Users\XXX\path\to\another\location&quot;
+          </code></pre>
+        </figure>
+        <p>
+          You will be prompted for the following, please input as appropriate.
+        </p>
+        <ul>
+          <li>Enter editor path</li>
+          <li>Enter command line options</li>
+          <li>Put file path after command arguments?</li>
+        </ul>
+        <p>
+          You can leave them empty and set them later too.
         </p>
         <p>
-          Create a copy of the _config folder and rename it to <var>config</var>.
-          Please do not edit the contents of the _config folder directly.
-          It may be overwritten when updating withExEditorHost.
+          About more information for manual setups, refer to the README of withExEditorHost.
         </p>
         <p>
-          The config folder can be saved in an arbitrary place, but if you saved withExEditorHost from zip or tar.gz, just put it in the same place as the _config (<code>C:\Users\XXX\withExEditorHost\config\</code>).
-          If you are cloning the repository, to prevent your personal configuration information from being uploaded to GitHub unintentionally, it is strongly recommended to save the folder <em>outside</em> the repository, not inside.
+          If config files are created successfully, restart Firefox.
         </p>
-        <section>
-          <h1>Edit the shell script which executes the host</h1>
-          <p>
-            On Windows, open "withexeditorhost.cmd" and enter the path of the index.js file of the host.
-          </p>
-          <figure>
-            <pre class="sample"><code>
-@echo off
-:: Fill in the path of the index.js file of the host.
-node "C:\Users\XXX\withExEditorHost\index.js"
-            </code></pre>
-          </figure>
-          <p>
-          On Linux / Mac, open "withexeditorhost.sh" and enter the path of the index.js file of the host.
-          </p>
-          <figure>
-            <pre class="sample"><code>
-#!/usr/bin/env bash
-# Fill in the path of the index.js file of the host.
-# Replace "node" command to "nodejs" according to your environment.
-node /path/to/withexeditorhost/index.js
-            </code></pre>
-          </figure>
-        </section>
-        <section>
-          <h1>Edit the application manifest</h1>
-          <p>
-            Open "withexeditorhost.json" and enter the path of the shell script in the <var>path</var> field in it.
-            Note that on Windows, it is necessary to escape backslashes, which is a directory delimiter, by adding an extra backslash.
-          </p>
-          <p>
-            Leave other fields as is.
-          </p>
-          <figure>
-            <pre class="sample"><code>
-{
-  "name": "withexeditorhost",
-  "description": "Native messaging host for withExEditor",
-  "path": "C:\\Users\\XXX\\withExEditorHost\\config\\withexeditorhost.cmd",
-  "type": "stdio",
-  "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
-}
-            </code></pre>
-          </figure>
-          <p>
-            On Windows, you also need to set the registry.
-            You can save the registry key by executing the following command with cmd.exe.
-            Edit the <var>"C:\Users\XXX\withExEditorHosts\config\withexeditorhost.json"</var> part.
-          </p>
-          <figure>
-            <pre class="sample"><code>
-REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\withexeditorhost" /ve /d "C:\Users\XXX\withExEditorHosts\config\withexeditorhost.json" /f
-            </code></pre>
-          </figure>
-          <p>
-            On Linux and Mac, you need to save "withexeditorhost.json" in the specified location.
-          </p>
-          <figure>
-            <figcaption>Linux:</figcaption>
-            <pre class="sample"><code>
-~/.mozilla/native-messaging-hosts/withexeditorhost.json
-            </code></pre>
-          </figure>
-          <figure>
-            <figcaption>Mac:</figcaption>
-            <pre class="sample"><code>
-~/Library/Application Support/Mozilla/NativeMessagingHosts/withexeditorhost.json
-            </code></pre>
-          </figure>
-        </section>
-        <section>
-          <h1>Edit the editor configuration</h1>
-          <p>
-            Open "editorconfig.json" and fill in the information of the editor.
-          </p>
-          <figure>
-            <pre class="sample"><code>
-{
-  "editorPath": "C:\\Program Files\\Path\\To\\Your\\Editor.exe",
-  "cmdArgs": [],
-  "fileAfterCmdArgs": false
-}
-            </code></pre>
-          </figure>
-          <dl>
-            <dt>editorPath</dt>
-            <dd>
-              The path of the editor to use.
-              On Windows, backslashes must be escaped.
-            </dd>
-            <dt>cmdArgs</dt>
-            <dd>
-              Command line options.
-              Enter each argument in array, separated by comma.
-              For example, <code>"cmdArgs": ["-a", "-b", "-c"]</code>
-            </dd>
-            <dt>fileAfterCmdArgs</dt>
-            <dd>
-              Boolean (<var>true</var> / <var>false</var>).
-              When specifying the file, some editor requires to put the file path after command arguments.
-              Set <var>true</var> in such case.
-            </dd>
-          </dl>
-          <p>
-            Editor configuration files can also be switched for each Firefox profile.
-            For example, use "editorconfig.json" for the default profile, and prepare another configuration file such as "editorconfig-nightly.json" for nightly's profile.
-            When you choose a name other than "editorconfig.json", enter the path of the editor configuration file in the Options page of withExEditor.
-          </p>
-        </section>
       </section>
-      <p>
-        After the above work, restart Firefox.
-      </p>
     </main>
     <footer>
       <p>

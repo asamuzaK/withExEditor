@@ -38,128 +38,51 @@
       <section>
         <h1>ホストの設定</h1>
         <p>
-          withExEditorHostの"_config"というフォルダの中に必要な設定ファイルのサンプルがあります。
-          _configフォルダのコピーを作成して<var>config</var>にリネームしてください。
-          なお、_configフォルダの中身は直接編集しないようにしてください。
-          withExEditorHostをアップデートしたときに上書きされてしまう可能性があります。
+          Windowsでは"cmd.exe"、Linux / Macでは「端末」（ターミナル）を開き、セットアップスクリプトを実行します。
+          なお、Windowsの環境によっては、管理者権限で"cmd.exe"を実行する必要があるかもしれません。
+        </p>
+        <figure>
+          <figcaption>Windows:</figcaption>
+          <pre class="sample"><code>
+&gt; cd path\to\withExEditorHost
+&gt; node setup.js
+          </code></pre>
+        </figure>
+        <figure>
+          <figcaption>Linux / Mac:</figcaption>
+          <pre class="sample"><code>
+$ cd path/to/withexeditorhost
+$ node setup.js
+          </code></pre>
+        </figure>
+        <p>
+          セットアップスクリプトは、デフォルトでwithExEditorHostの保存先の直下に"config"フォルダを作成し各設定ファイルを保持します。
+          設定ファイルの保存先を変更したい場合は、`--config-path`引数で指定してください。
+        </p>
+        <figure>
+          <figcaption>Windows:</figcaption>
+          <pre class="sample"><code>
+&gt; node setup.js --config-path=&quot;C:\Users\XXX\path\to\another\location&quot;
+          </code></pre>
+        </figure>
+        <p>
+          スクリプトを実行すると以下の入力を求められますので適宜入力してください。
+        </p>
+        <ul>
+          <li>エディタのパス</li>
+          <li>コマンドラインオプション</li>
+          <li>一時ファイルをコマンドラインオプションの後に置くか</li>
+        </ul>
+        <p>
+          その場では何も入力せず、後で設定することもできます。
         </p>
         <p>
-          configフォルダは任意の場所に保存できますが、zipやtar.gzから展開して保存した場合は、そのまま_configと同じ場所（<code>C:\Users\XXX\withExEditorHost\config\</code>）に置けばOKです。
-          一方、レポジトリをクローンしている場合は、あなたの個人的な設定情報が意図せずGitHubにアップロードされることを防ぐためにも、レポジトリの中ではなく「<em>外</em>」にフォルダを保存することを強くおすすめします。
+          このほか、手動設定の詳細については、withExEditorHostのREADMEを参照してください。
         </p>
-        <section>
-          <h1>ホストを起動するシェルスクリプトの編集</h1>
-          <p>
-            Windowsの場合は"withexeditorhost.cmd"を開いて、ホストのindex.jsファイルのパスを記入します。
-          </p>
-          <figure>
-            <pre class="sample"><code>
-@echo off
-:: Fill in the path of the index.js file of the host.
-node "C:\Users\XXX\withExEditorHost\index.js"
-            </code></pre>
-          </figure>
-          <p>
-          Linux / Macの場合は"withexeditorhost.sh"を開いて、ホストのindex.jsファイルのパスを記入します。
-          </p>
-          <figure>
-            <pre class="sample"><code>
-#!/usr/bin/env bash
-# Fill in the path of the index.js file of the host.
-# Replace "node" command to "nodejs" according to your environment.
-node /path/to/withexeditorhost/index.js
-            </code></pre>
-          </figure>
-        </section>
-        <section>
-          <h1>アプリケーションマニフェストの編集</h1>
-          <p>
-            "withexeditorhost.json"を開いて、その中の<var>path</var>フィールドにシェルスクリプトのパスを記入します。
-            Windowsの場合は、ディレクトリの区切りであるバックスラッシュ文字にはさらにバックスラッシュを加えてエスケープさせる必要があることに注意してください。
-          </p>
-          <p>
-            ほかのフィールドはそのままでOKです。
-          </p>
-          <figure>
-            <pre class="sample"><code>
-{
-  "name": "withexeditorhost",
-  "description": "Native messaging host for withExEditor",
-  "path": "C:\\Users\\XXX\\withExEditorHost\\config\\withexeditorhost.cmd",
-  "type": "stdio",
-  "allowed_extensions": ["jid1-WiAigu4HIo0Tag@jetpack"]
-}
-            </code></pre>
-          </figure>
-          <p>
-            Windowsではレジストリも設定する必要があります。
-            cmd.exeで次のコマンドを実行するとレジストリキーを保存することができます。
-            <var>"C:\Users\XXX\withExEditorHosts\config\withexeditorhost.json"</var>の部分は書き換えてください。
-          </p>
-          <figure>
-            <pre class="sample"><code>
-REG ADD "HKEY_CURRENT_USER\SOFTWARE\Mozilla\NativeMessagingHosts\withexeditorhost" /ve /d "C:\Users\XXX\withExEditorHosts\config\withexeditorhost.json" /f
-            </code></pre>
-          </figure>
-          <p>
-            LinuxとMacでは、"withexeditorhost.json"を指定の場所に保存する必要があります。
-          </p>
-          <figure>
-            <figcaption>Linux:</figcaption>
-            <pre class="sample"><code>
-~/.mozilla/native-messaging-hosts/withexeditorhost.json
-            </code></pre>
-          </figure>
-          <figure>
-            <figcaption>Mac:</figcaption>
-            <pre class="sample"><code>
-~/Library/Application Support/Mozilla/NativeMessagingHosts/withexeditorhost.json
-            </code></pre>
-          </figure>
-        </section>
-        <section>
-          <h1>エディタ設定ファイルの編集</h1>
-          <p>
-            "editorconfig.json"を開いて、使用するエディタの情報を記入します。
-          </p>
-          <figure>
-            <pre class="sample"><code>
-{
-  "editorPath": "C:\\Program Files\\Path\\To\\Your\\Editor.exe",
-  "cmdArgs": [],
-  "fileAfterCmdArgs": false
-}
-            </code></pre>
-          </figure>
-          <dl>
-            <dt>editorPath</dt>
-            <dd>
-              使用するエディタのパス。
-              Windowsの場合は、バックスラッシュ文字はエスケープさせる必要があります。
-            </dd>
-            <dt>cmdArgs</dt>
-            <dd>
-              コマンドラインオプション。
-              配列（[]括弧）の中にカンマ区切りで各引数を記入してください。
-              例：<code>"cmdArgs": ["-a", "-b", "-c"]</code>
-            </dd>
-            <dt>fileAfterCmdArgs</dt>
-            <dd>
-              真偽値（<var>true</var> / <var>false</var>）。
-              いくつかのエディタでは、ファイルを指定する場合はコマンドの最後に置くように求めているものがあります。
-              そのような場合に<var>true</var>にしてください。
-            </dd>
-          </dl>
-          <p>
-            エディタ設定ファイルは、Firefoxのプロファイル毎に切り替えることもできます。
-            例えば、defaultのプロファイルでは"editorconfig.json"を使い、nightlyのプロファイルでは"editorconfig-nightly.json"といった別名のエディタ設定ファイルを用意するなど。
-            なお、"editorconfig.json"以外の名前にした場合は、withExEditor本体の設定ページでエディタ設定ファイルのパスを入力してください。
-          </p>
-        </section>
+        <p>
+          設定ファイルが正常に作成されたら、Firefoxを再起動してください。
+        </p>
       </section>
-      <p>
-        以上の作業を終えたら、Firefoxを再起動してください。
-      </p>
     </main>
     <footer>
       <p>
