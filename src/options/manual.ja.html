@@ -38,7 +38,7 @@
       <section>
         <h1>ホストの設定</h1>
         <p>
-          Windowsでは"cmd.exe"、Linux / Macでは「端末」（ターミナル）を開き、セットアップスクリプトを実行します。
+          Windowsでは"cmd.exe"、Linux / Macでは「端末」（ターミナル）を開き、withExEditorHostを保存したディレクトリに移動してセットアップスクリプトを実行します。
           なお、Windowsの環境によっては、管理者権限で"cmd.exe"を実行する必要があるかもしれません。
         </p>
         <figure>
@@ -56,28 +56,16 @@ $ node setup.js
           </code></pre>
         </figure>
         <p>
-          セットアップスクリプトは、デフォルトでwithExEditorHostの保存先の直下に"config"フォルダを作成し各設定ファイルを保持します。
-          設定ファイルの保存先を変更したい場合は、`--config-path`引数で指定してください。
-        </p>
-        <figure>
-          <figcaption>Windows:</figcaption>
-          <pre class="sample"><code>
-&gt; node setup.js --config-path=&quot;C:\Users\XXX\path\to\another\location&quot;
-          </code></pre>
-        </figure>
-        <p>
           スクリプトを実行すると以下の入力を求められますので適宜入力してください。
         </p>
         <ul>
           <li>エディタのパス</li>
-          <li>コマンドラインオプション</li>
+          <li>コマンドラインオプション<br />
+              引数に空白やバックスラッシュが含まれる場合は引用符で括ってください。</li>
           <li>一時ファイルをコマンドラインオプションの後に置くか</li>
         </ul>
         <p>
-          その場では何も入力せず、後で設定することもできます。
-        </p>
-        <p>
-          このほか、手動設定の詳細については、withExEditorHostのREADMEを参照してください。
+          そのほかセットアップの詳細についてはwithExEditorHostのREADMEを参照してください。
         </p>
         <p>
           設定ファイルが正常に作成されたら、Firefoxを再起動してください。

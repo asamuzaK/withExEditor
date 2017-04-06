@@ -38,7 +38,7 @@
       <section>
         <h1>Setting up the host</h1>
         <p>
-          Open "cmd.exe" on Windows, "terminal" on Linux / Mac, and run setup script.
+          Open "cmd.exe" on Windows, "terminal" on Linux / Mac, change directory to where you saved withExEditorHost and run setup script.
           Depending on the Windows environment, you may need to run "cmd.exe" as admin.
         </p>
         <figure>
@@ -56,28 +56,16 @@ $ node setup.js
           </code></pre>
         </figure>
         <p>
-          By default, the setup script creates a "config" folder under the location of withExEditorHost.
-          If you want to save setting files in different location, use `--config-path` argument.
-        </p>
-        <figure>
-          <figcaption>Windows:</figcaption>
-          <pre class="sample"><code>
-&gt; node setup.js --config-path=&quot;C:\Users\XXX\path\to\another\location&quot;
-          </code></pre>
-        </figure>
-        <p>
           You will be prompted for the following, please input as appropriate.
         </p>
         <ul>
           <li>Enter editor path</li>
-          <li>Enter command line options</li>
+          <li>Enter command line options<br />
+              NOTE: Quote the argument if it contains spaces or backslashes.</li>
           <li>Put file path after command arguments?</li>
         </ul>
         <p>
-          You can leave them empty and set them later too.
-        </p>
-        <p>
-          About more information for manual setups, refer to the README of withExEditorHost.
+          For other details of setup, refer to the README of withExEditorHost.
         </p>
         <p>
           If config files are created successfully, restart Firefox.
