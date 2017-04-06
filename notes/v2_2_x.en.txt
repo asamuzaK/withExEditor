@@ -1,0 +1,5 @@
+v2.2.0
+Updated Features
+<ul>
+<li>Added compatibility with newline behavior of editor changed in Firefox 55.</li>
+</ul>
