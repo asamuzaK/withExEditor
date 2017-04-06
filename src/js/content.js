@@ -17,6 +17,7 @@
   const DATA_ATTR_ID = `${DATA_ATTR}_id`;
   const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
+  const DEFAULT_SEP = "defaultParagraphSeparator";
   const FILE_EXT = "fileExt";
   const FILE_LEN = 128;
   const HTML = "html";
@@ -595,7 +596,10 @@
           node.localName === "br" && arr.push("\n") ||
           node.hasChildNodes() && arr.push(getText(node.childNodes));
         } else {
-          node.nodeType === NODE_TEXT && arr.push(node.nodeValue);
+          node.nodeType === NODE_TEXT && arr.push(
+            node.nodeValue.replace(/^[\n|\s]*/, "")
+              .replace(/([^\n])$/, (m, c) => `${c}\n`)
+          );
         }
       }
       text = await Promise.all(arr).then(a => a.join(""));
@@ -700,7 +704,8 @@
       elm = node;
     } else {
       while (node && node.parentNode) {
-        if (typeof node.isContentEditable === "boolean" &&
+        if (node.hasAttribute("contentEditable") &&
+            node.isContentEditable &&
             (!node.namespaceURI || node.namespaceURI === nsURI.html)) {
           elm = node;
           break;
@@ -1013,14 +1018,38 @@
     if (node && node.nodeType === NODE_ELEMENT && isString(value)) {
       const changed = node.textContent !== value;
       const frag = document.createDocumentFragment();
-      const arr = value.length && value.split("\n") || [""];
-      const l = arr.length;
-      let i = 0;
-      while (i < l) {
-        frag.append(document.createTextNode(arr[i]));
-        i < l - 1 && ns === nsURI.html &&
-          frag.append(document.createElementNS(ns, "br"));
-        i++;
+      if (elm === node) {
+        const arr = value.length && value.split("\n") || [""];
+        const l = arr.length;
+        if (l === 1) {
+          frag.append(document.createTextNode(arr[0]));
+        } else {
+          const sep = document.queryCommandSupported(DEFAULT_SEP) &&
+                        document.queryCommandValue(DEFAULT_SEP);
+          let i = 0;
+          while (i < l) {
+            const text = arr[i];
+            const br = document.createElementNS(ns, "br");
+            if (ns === nsURI.html) {
+              if (sep === "div" || sep === "p") {
+                const cont = document.createElementNS(ns, sep);
+                text ?
+                  cont.append(document.createTextNode(text)) :
+                  i < l - 1 && cont.append(br);
+                cont.hasChildNodes() && frag.append(cont);
+              } else {
+                frag.append(document.createTextNode(text));
+                i < l - 1 && frag.append(br);
+              }
+            } else {
+              frag.append(document.createTextNode(text));
+            }
+            i < l - 1 && frag.append(document.createTextNode("\n"));
+            i++;
+          }
+        }
+      } else {
+        frag.append(document.createTextNode(value));
       }
       if (node.hasChildNodes()) {
         while (node.firstChild) {
@@ -1200,14 +1229,17 @@
     const {anchorNode, focusNode, isCollapsed} = window.getSelection();
     const mode = namespaceURI === nsURI.math && MODE_MATHML ||
                  namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
+    const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
+                          await getEditableElm(target);
     let enabled;
     if (localName === "input") {
       enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
     } else {
-      enabled = isCollapsed || anchorNode.parentNode === focusNode.parentNode;
+      enabled = isCollapsed || !!editableElm ||
+                anchorNode.parentNode === focusNode.parentNode;
     }
     vars[CONTEXT_MODE] = mode;
-    vars[CONTEXT_NODE] = target;
+    vars[CONTEXT_NODE] = editableElm || target;
     return portMsg({
       [CONTEXT_MENU]: {
         [MODE_EDIT]: {
