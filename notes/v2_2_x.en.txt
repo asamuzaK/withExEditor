@@ -1,5 +1,6 @@
-v2.2.0
+v2.2.1
 Updated Features
 <ul>
 <li>Added compatibility with newline behavior of editor changed in Firefox 55.</li>
+<li>Organized options page and host setup manual.</li>
 </ul>
