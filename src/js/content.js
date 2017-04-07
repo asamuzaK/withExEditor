@@ -1006,6 +1006,47 @@
   };
 
   /**
+   * create paragraph separated content
+   * @param {string} value - value
+   * @param {string} ns - namespace
+   * @returns {Object} - document fragment
+   */
+  const createSeparatedContent = async (value = "", ns = nsURI.html) => {
+    const arr = isString(value) && value.length && value.split("\n") || [""];
+    const l = arr.length;
+    const frag = document.createDocumentFragment();
+    if (l === 1) {
+      frag.append(document.createTextNode(arr[0]));
+    } else {
+      const cmd = "defaultParagraphSeparator";
+      const sep = document.queryCommandSupported(cmd) &&
+                    document.queryCommandValue(cmd);
+      let i = 0;
+      while (i < l) {
+        const text = arr[i];
+        const br = document.createElementNS(ns, "br");
+        if (ns === nsURI.html) {
+          if (sep === "div" || sep === "p") {
+            const cont = document.createElementNS(ns, sep);
+            text ?
+              cont.append(document.createTextNode(text)) :
+              i < l - 1 && cont.append(br);
+            cont.hasChildNodes() && frag.append(cont);
+          } else {
+            frag.append(document.createTextNode(text));
+            i < l - 1 && frag.append(br);
+          }
+        } else {
+          frag.append(document.createTextNode(text));
+        }
+        i < l - 1 && frag.append(document.createTextNode("\n"));
+        i++;
+      }
+    }
+    return frag;
+  };
+
+  /**
    * replace content editable element text
    * @param {Object} elm - owner element
    * @param {Object} node - editable element
@@ -1018,48 +1059,18 @@
       const changed = node.textContent.replace(/^\s*/, "")
                         .replace(/\n +/g, "\n")
                         .replace(/([^\n])$/, (m, c) => `${c}\n`) !== value;
-      const frag = document.createDocumentFragment();
-      if (elm === node) {
-        const arr = value.length && value.split("\n") || [""];
-        const l = arr.length;
-        if (l === 1) {
-          frag.append(document.createTextNode(arr[0]));
-        } else {
-          const cmd = "defaultParagraphSeparator";
-          const sep = document.queryCommandSupported(cmd) &&
-                        document.queryCommandValue(cmd);
-          let i = 0;
-          while (i < l) {
-            const text = arr[i];
-            const br = document.createElementNS(ns, "br");
-            if (ns === nsURI.html) {
-              if (sep === "div" || sep === "p") {
-                const cont = document.createElementNS(ns, sep);
-                text ?
-                  cont.append(document.createTextNode(text)) :
-                  i < l - 1 && cont.append(br);
-                cont.hasChildNodes() && frag.append(cont);
-              } else {
-                frag.append(document.createTextNode(text));
-                i < l - 1 && frag.append(br);
-              }
-            } else {
-              frag.append(document.createTextNode(text));
-            }
-            i < l - 1 && frag.append(document.createTextNode("\n"));
-            i++;
+      if (changed) {
+        const frag = document.createDocumentFragment();
+        const sep = elm === node && await createSeparatedContent(value, ns);
+        frag.append(sep || document.createTextNode(value));
+        if (node.hasChildNodes()) {
+          while (node.firstChild) {
+            node.removeChild(node.firstChild);
           }
         }
-      } else {
-        frag.append(document.createTextNode(value));
+        node.append(frag);
+        dispatchInputEvt(elm);
       }
-      if (node.hasChildNodes()) {
-        while (node.firstChild) {
-          node.removeChild(node.firstChild);
-        }
-      }
-      node.append(frag);
-      changed && dispatchInputEvt(elm);
     }
   };
 
