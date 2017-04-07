@@ -17,7 +17,6 @@
   const DATA_ATTR_ID = `${DATA_ATTR}_id`;
   const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
-  const DEFAULT_SEP = "defaultParagraphSeparator";
   const FILE_EXT = "fileExt";
   const FILE_LEN = 128;
   const HTML = "html";
@@ -35,9 +34,6 @@
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
-  const NODE_COMMENT = Node.COMMENT_NODE;
-  const NODE_ELEMENT = Node.ELEMENT_NODE;
-  const NODE_TEXT = Node.TEXT_NODE;
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPTIONS_OPEN = "openOptions";
@@ -423,7 +419,8 @@
   const createFrag = async nodes => {
     const frag = document.createDocumentFragment();
     Array.isArray(nodes) && nodes.forEach(node => {
-      (node.nodeType === NODE_ELEMENT || node.nodeType === NODE_TEXT) &&
+      (node.nodeType === Node.ELEMENT_NODE ||
+       node.nodeType === Node.TEXT_NODE) &&
         frag.append(node);
     });
     return frag;
@@ -437,20 +434,21 @@
    */
   const appendChild = async (elm, node) => {
     elm = await createElm(elm);
-    if (elm && elm.nodeType === NODE_ELEMENT && node && node.hasChildNodes()) {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+        node && node.hasChildNodes()) {
       const arr = [];
       const nodes = node.childNodes;
       if (nodes instanceof NodeList) {
         for (const child of nodes) {
           const {nodeType, nodeValue, parentNode} = child;
-          if (nodeType === NODE_ELEMENT) {
+          if (nodeType === Node.ELEMENT_NODE) {
             child === parentNode.firstChild &&
               arr.push(document.createTextNode("\n"));
             arr.push(appendChild(child, child));
             child === parentNode.lastChild &&
               arr.push(document.createTextNode("\n"));
           } else {
-            nodeType === NODE_TEXT &&
+            nodeType === Node.TEXT_NODE &&
               arr.push(document.createTextNode(nodeValue));
           }
         }
@@ -499,8 +497,8 @@
           for (const node of nodes) {
             if (node) {
               const {nodeType} = node;
-              (nodeType === NODE_ELEMENT || nodeType === NODE_TEXT ||
-               nodeType === NODE_COMMENT) &&
+              (nodeType === Node.ELEMENT_NODE || nodeType === Node.TEXT_NODE ||
+               nodeType === Node.COMMENT_NODE) &&
                 frag.append(node);
             }
           }
@@ -527,7 +525,7 @@
       let obj;
       count > 1 && arr.push(document.createTextNode("\n"));
       switch (ancestor.nodeType) {
-        case NODE_ELEMENT:
+        case Node.ELEMENT_NODE:
           obj = await getNodeNS(ancestor);
           if (/^(?:svg|math)$/.test(obj.localName)) {
             if (obj.node === document.documentElement) {
@@ -540,9 +538,9 @@
           }
           arr.push(appendChild(ancestor, range.cloneContents()));
           break;
-        case NODE_TEXT:
+        case Node.TEXT_NODE:
           obj = await createElm(ancestor.parentNode);
-          if (obj.nodeType === NODE_ELEMENT) {
+          if (obj.nodeType === Node.ELEMENT_NODE) {
             obj.append(range.cloneContents());
             arr.push(obj);
           }
@@ -592,11 +590,11 @@
     let text;
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
-        if (node.nodeType === NODE_ELEMENT) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
           node.localName === "br" && arr.push("\n") ||
           node.hasChildNodes() && arr.push(getText(node.childNodes));
         } else {
-          node.nodeType === NODE_TEXT && arr.push(
+          node.nodeType === Node.TEXT_NODE && arr.push(
             node.nodeValue.replace(/^[\n|\s]*/, "")
               .replace(/([^\n])$/, (m, c) => `${c}\n`)
           );
@@ -668,7 +666,7 @@
         node.namespaceURI !== nsURI.html && node.hasChildNodes()) {
       const nodes = node.childNodes;
       for (const child of nodes) {
-        isText = child.nodeType === NODE_TEXT;
+        isText = child.nodeType === Node.TEXT_NODE;
         if (!isText) {
           break;
         }
@@ -952,8 +950,9 @@
     let mode = MODE_SOURCE;
     if (elm) {
       elm = !isCollapsed &&
-            (anchorNode.nodeType === NODE_TEXT && anchorNode.parentNode ||
-             focusNode.nodeType === NODE_TEXT && focusNode.parentNode) || elm;
+            (anchorNode.nodeType === Node.TEXT_NODE && anchorNode.parentNode ||
+             focusNode.nodeType === Node.TEXT_NODE && focusNode.parentNode) ||
+             elm;
       if ((elm.isContentEditable || await isEditControl(elm) ||
            await isContentTextNode(elm)) &&
           (isCollapsed || rangeCount === 1 &&
@@ -995,7 +994,7 @@
    * @returns {void}
    */
   const dispatchInputEvt = elm => {
-    if (elm && elm.nodeType === NODE_ELEMENT) {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE) {
       const opt = {
         bubbles: true,
         cancelable: false,
@@ -1015,7 +1014,7 @@
    * @returns {void}
    */
   const replaceContent = async (elm, node, value = "", ns = nsURI.html) => {
-    if (node && node.nodeType === NODE_ELEMENT && isString(value)) {
+    if (node && node.nodeType === Node.ELEMENT_NODE && isString(value)) {
       const changed = node.textContent !== value;
       const frag = document.createDocumentFragment();
       if (elm === node) {
@@ -1024,8 +1023,9 @@
         if (l === 1) {
           frag.append(document.createTextNode(arr[0]));
         } else {
-          const sep = document.queryCommandSupported(DEFAULT_SEP) &&
-                        document.queryCommandValue(DEFAULT_SEP);
+          const cmd = "defaultParagraphSeparator";
+          const sep = document.queryCommandSupported(cmd) &&
+                        document.queryCommandValue(cmd);
           let i = 0;
           while (i < l) {
             const text = arr[i];
@@ -1068,7 +1068,7 @@
    * @returns {void}
    */
   const replaceEditControlValue = async (elm, value) => {
-    if (elm && elm.nodeType === NODE_ELEMENT && isString(value)) {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE && isString(value)) {
       let changed;
       if (/^input$/.test(elm.localName)) {
         while (value.length && /[\f\n\t\r\v]$/.test(value)) {

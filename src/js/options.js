@@ -16,7 +16,6 @@
   const EDITOR_LABEL = "editorLabel";
   const KEY_ACCESS = "accessKey";
   const LANG = "optionsLang";
-  const NODE_ELEMENT = Node.ELEMENT_NODE;
   const PORT_NAME = "portOptions";
   const STORAGE_SET = "setStorage";
 
@@ -146,7 +145,7 @@
    * @returns {void}
    */
   const localizeAttr = async elm => {
-    if (elm && elm.nodeType === NODE_ELEMENT && elm.hasAttributes()) {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE && elm.hasAttributes()) {
       const attrs = {
         alt: "alt",
         ariaLabel: "aria-label",
