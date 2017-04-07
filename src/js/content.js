@@ -1008,10 +1008,10 @@
   /**
    * create paragraph separated content
    * @param {string} value - value
-   * @param {string} ns - namespace
+   * @param {string} ns - namespace URI
    * @returns {Object} - document fragment
    */
-  const createSeparatedContent = async (value = "", ns = nsURI.html) => {
+  const createSeparatedContent = async (value, ns = nsURI.html) => {
     const arr = isString(value) && value.length && value.split("\n") || [""];
     const l = arr.length;
     const frag = document.createDocumentFragment();
@@ -1054,7 +1054,7 @@
    * @param {string} ns - namespace URI
    * @returns {void}
    */
-  const replaceContent = async (elm, node, value = "", ns = nsURI.html) => {
+  const replaceContent = async (elm, node, value, ns = nsURI.html) => {
     if (node && node.nodeType === Node.ELEMENT_NODE && isString(value)) {
       const changed = node.textContent.replace(/^\s*/, "")
                         .replace(/\n +/g, "\n")
@@ -1081,7 +1081,8 @@
    * @returns {void}
    */
   const replaceEditControlValue = async (elm, value) => {
-    if (elm && elm.nodeType === Node.ELEMENT_NODE && isString(value)) {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE && isString(elm.value) &&
+        isString(value)) {
       let changed;
       if (/^input$/.test(elm.localName)) {
         while (value.length && /[\f\n\t\r\v]$/.test(value)) {
@@ -1091,8 +1092,10 @@
       } else {
         /^textarea$/.test(elm.localName) && (changed = elm.value !== value);
       }
-      isString(elm.value) && (elm.value = value);
-      changed && dispatchInputEvt(elm);
+      if (changed) {
+        elm.value = value;
+        dispatchInputEvt(elm);
+      }
     }
   };
 
