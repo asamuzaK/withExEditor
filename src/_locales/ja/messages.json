@@ -53,6 +53,9 @@
   "optionsEditorConfigPathDetail": {
     "message": "エディタ設定ファイル（JSON）のパスを入力してください。"
   },
+  "optionsEditorConfigPathDetail2": {
+    "message": "詳細についてはwithExEditorHostのREADMEを参照してください。"
+  },
   "optionsEditorConfigPathLabel": {
     "message": "エディタ設定ファイルのパス"
   },

@@ -53,6 +53,9 @@
   "optionsEditorConfigPathDetail": {
     "message": "Enter the path of editor configuration JSON file."
   },
+  "optionsEditorConfigPathDetail2": {
+    "message": "For details, refer to the README of withExEditorHost."
+  },
   "optionsEditorConfigPathLabel": {
     "message": "Editor Config Path"
   },
