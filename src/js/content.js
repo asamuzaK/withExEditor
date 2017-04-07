@@ -595,7 +595,7 @@
           node.hasChildNodes() && arr.push(getText(node.childNodes));
         } else {
           node.nodeType === Node.TEXT_NODE && arr.push(
-            node.nodeValue.replace(/^[\n|\s]*/, "")
+            node.nodeValue.replace(/^\s*/, "")
               .replace(/([^\n])$/, (m, c) => `${c}\n`)
           );
         }
@@ -1015,7 +1015,9 @@
    */
   const replaceContent = async (elm, node, value = "", ns = nsURI.html) => {
     if (node && node.nodeType === Node.ELEMENT_NODE && isString(value)) {
-      const changed = node.textContent !== value;
+      const changed = node.textContent.replace(/^\s*/, "")
+                        .replace(/\n +/g, "\n")
+                        .replace(/([^\n])$/, (m, c) => `${c}\n`) !== value;
       const frag = document.createDocumentFragment();
       if (elm === node) {
         const arr = value.length && value.split("\n") || [""];
