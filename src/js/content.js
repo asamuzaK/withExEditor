@@ -1024,14 +1024,14 @@
       let i = 0;
       while (i < l) {
         const text = arr[i];
-        const br = document.createElementNS(ns, "br");
         if (ns === nsURI.html) {
+          const br = document.createElementNS(ns, "br");
           if (sep === "div" || sep === "p") {
-            const cont = document.createElementNS(ns, sep);
+            const elm = document.createElementNS(ns, sep);
             text ?
-              cont.append(document.createTextNode(text)) :
+              elm.append(document.createTextNode(text)) :
               i < l - 1 && cont.append(br);
-            cont.hasChildNodes() && frag.append(cont);
+            elm.hasChildNodes() && frag.append(elm);
           } else {
             frag.append(document.createTextNode(text));
             i < l - 1 && frag.append(br);
