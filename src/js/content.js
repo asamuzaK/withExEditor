@@ -1030,7 +1030,7 @@
             const elm = document.createElementNS(ns, sep);
             text ?
               elm.append(document.createTextNode(text)) :
-              i < l - 1 && cont.append(br);
+              i < l - 1 && elm.append(br);
             elm.hasChildNodes() && frag.append(elm);
           } else {
             frag.append(document.createTextNode(text));
