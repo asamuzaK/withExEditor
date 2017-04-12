@@ -44,6 +44,21 @@
   "optionsAccessKeySettings": {
     "message": "Access Key Settings"
   },
+  "optionsEditorCmdArgs": {
+    "message": ""
+  },
+  "optionsEditorCmdArgs.placeholder": {
+    "message": "Input Command Line Options"
+  },
+  "optionsEditorCmdArgsDetail": {
+    "message": "Enter command line options."
+  },
+  "optionsEditorCmdArgsDetail2": {
+    "message": "Quote the argument if it contains spaces or backslashes."
+  },
+  "optionsEditorCmdArgsLabel": {
+    "message": "Command Line Options"
+  },
   "optionsEditorConfigPath": {
     "message": ""
   },
@@ -59,6 +74,12 @@
   "optionsEditorConfigPathLabel": {
     "message": "Editor Config Path"
   },
+  "optionsEditorFileAfterCmdArgsDetail": {
+    "message": "When specifying the file, some editor requires to put the file path after command arguments. Check in such case."
+  },
+  "optionsEditorFileAfterCmdArgsLabel": {
+    "message": "Put File Path After Command Line Options"
+  },
   "optionsEditorLabel": {
     "message": ""
   },
@@ -73,6 +94,18 @@
   },
   "optionsEditorLabelLabel": {
     "message": "Editor Label"
+  },
+  "optionsEditorPath": {
+    "message": ""
+  },
+  "optionsEditorPath.placeholder": {
+    "message": "Input Editor Path"
+  },
+  "optionsEditorPathDetail": {
+    "message": "Enter the path of the editor."
+  },
+  "optionsEditorPathLabel": {
+    "message": "Editor Path"
   },
   "optionsEditorSettings": {
     "message": "Editor Settings"
@@ -151,6 +184,9 @@
   },
   "optionsOtherSettings": {
     "message": "Other Settings"
+  },
+  "optionsSaveEditorSettings": {
+    "message": "Save"
   },
   "optionsTitle": {
     "message": "withExEditor Options"
