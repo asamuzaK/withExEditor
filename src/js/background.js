@@ -183,16 +183,21 @@
    * @returns {Object} - data to store
    */
   const extractEditorConfig = async (data = {}) => {
-    const {editorConfig, editorName, executable} = data;
+    const {
+      editorCmdArgs, editorConfig, editorConfigTimestamp,
+      editorFileAfterCmdArgs, editorName, editorPath, executable,
+    } = data;
     const store = await storage.get([
-      EDITOR_CONFIG, EDITOR_FILE_NAME, EDITOR_LABEL,
+      EDITOR_CMD_ARGS, EDITOR_CONFIG, EDITOR_CONFIG_TS, EDITOR_FILE_NAME,
+      EDITOR_FILE_POS, EDITOR_LABEL, EDITOR_PATH,
     ]);
     const editorConfigPath = store[EDITOR_CONFIG] && store[EDITOR_CONFIG].value;
     const editorFileName = store[EDITOR_FILE_NAME] &&
                              store[EDITOR_FILE_NAME].value;
     const editorLabel = store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
     const msg = {};
-    if (!editorConfigPath || editorConfigPath !== editorConfig) {
+    if (!store[EDITOR_CONFIG_TS] ||
+        editorConfigTimestamp > store[EDITOR_CONFIG_TS]) {
       msg[EDITOR_CONFIG] = {
         id: EDITOR_CONFIG,
         app: {
@@ -200,6 +205,38 @@
         },
         checked: false,
         value: editorConfig || "",
+      };
+      msg[EDITOR_CONFIG_TS] = {
+        id: EDITOR_CONFIG_TS,
+        app: {
+          executable: !!executable,
+        },
+        checked: false,
+        value: editorConfigTimestamp || 0,
+      };
+      msg[EDITOR_PATH] = {
+        id: EDITOR_PATH,
+        app: {
+          executable: !!executable,
+        },
+        checked: false,
+        value: editorPath || "",
+      };
+      msg[EDITOR_CMD_ARGS] = {
+        id: EDITOR_CMD_ARGS,
+        app: {
+          executable: false,
+        },
+        checked: false,
+        value: editorCmdArgs || "",
+      };
+      msg[EDITOR_FILE_POS] = {
+        id: EDITOR_FILE_POS,
+        app: {
+          executable: false,
+        },
+        checked: !!editorFileAfterCmdArgs,
+        value: "",
       };
       msg[EDITOR_FILE_NAME] = {
         id: EDITOR_FILE_NAME,
