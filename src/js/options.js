@@ -9,11 +9,16 @@
 
   /* constants */
   const DATA_ATTR_I18N = "data-i18n";
+  const EDITOR_CMD_ARGS = "editorCmdArgs";
   const EDITOR_CONFIG = "editorConfigPath";
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
+  const EDITOR_CONFIG_SET = "setEditorConfig";
+  const EDITOR_CONFIG_TS = "editorConfigTimestamp";
   const EDITOR_FILE_NAME = "editorFileName";
+  const EDITOR_FILE_POS = "editorFileAfterCmdArgs";
   const EDITOR_LABEL = "editorLabel";
+  const EDITOR_PATH = "editorPath";
   const KEY_ACCESS = "accessKey";
   const LANG = "optionsLang";
   const PORT_NAME = "portOptions";
