@@ -77,7 +77,7 @@
   "optionsEditorFileAfterCmdArgsDetail": {
     "message": "When specifying the file, some editor requires to put the file path after command arguments. Check in such case."
   },
-  "optionsEditorFileAfterCmdArgsLabel": {
+  "optionsEditorFileAfterCmdArgs": {
     "message": "Put File Path After Command Line Options"
   },
   "optionsEditorLabel": {

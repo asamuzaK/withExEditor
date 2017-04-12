@@ -77,7 +77,7 @@
   "optionsEditorFileAfterCmdArgsDetail": {
     "message": "いくつかのエディタでは、ファイルを指定する場合はコマンドの最後に置くように求めているものがあります。そのような場合に有効化してください。"
   },
-  "optionsEditorFileAfterCmdArgsLabel": {
+  "optionsEditorFileAfterCmdArgs": {
     "message": "ファイルのパスをコマンドラインオプションの後ろに置く"
   },
   "optionsEditorLabel": {
