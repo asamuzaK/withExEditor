@@ -90,7 +90,7 @@
     "message": "Enter the label of the editor."
   },
   "optionsEditorLabelDetail2": {
-    "message": "Disabled if editor config path field is not filled, or could not find the file etc."
+    "message": "Disabled if editor config path and/or editor path fields are not filled, editor is not executable, etc."
   },
   "optionsEditorLabelLabel": {
     "message": "Editor Label"
