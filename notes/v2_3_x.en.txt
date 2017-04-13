@@ -1,0 +1,7 @@
+v2.3.0
+Updated Features
+<ul>
+<li>Added editor settings fields in options page.
+<li>Organized host setup manual.</li>
+<li>Added compatibility with newline behavior of editor changed in Firefox 55.</li>
+</ul>
