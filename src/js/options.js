@@ -9,16 +9,13 @@
 
   /* constants */
   const DATA_ATTR_I18N = "data-i18n";
-  const EDITOR_CMD_ARGS = "editorCmdArgs";
   const EDITOR_CONFIG = "editorConfigPath";
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
   const EDITOR_CONFIG_SET = "setEditorConfig";
   const EDITOR_CONFIG_TS = "editorConfigTimestamp";
   const EDITOR_FILE_NAME = "editorFileName";
-  const EDITOR_FILE_POS = "editorFileAfterCmdArgs";
   const EDITOR_LABEL = "editorLabel";
-  const EDITOR_PATH = "editorPath";
   const KEY_ACCESS = "accessKey";
   const LANG = "optionsLang";
   const PORT_NAME = "portOptions";
@@ -51,6 +48,39 @@
    */
   const portMsg = async msg => {
     msg && port.postMessage(msg);
+  };
+
+  /**
+   * port editor settings
+   * @param {Object} evt - Event
+   * @returns {AsyncFunction} - port message
+   */
+  const portEditorSettings = async evt => {
+    const editorConfig = document.getElementById("editorConfigPath");
+    const editorPath = document.getElementById("editorPath");
+    const cmdArgs = document.getElementById("editorCmdArgs");
+    const fileAfterCmdArgs = document.getElementById("editorFileAfterCmdArgs");
+    const timestamp = Date.now();
+    const msg = {
+      [EDITOR_CONFIG_SET]: {
+        editorConfig: editorConfig && editorConfig.value || "",
+        editorPath: editorPath && editorPath.value || "",
+        cmdArgs: cmdArgs && cmdArgs.value || "",
+        fileAfterCmdArgs: fileAfterCmdArgs && fileAfterCmdArgs.checked,
+      },
+      [STORAGE_SET]: {
+        [EDITOR_CONFIG_TS]: {
+          id: EDITOR_CONFIG_TS,
+          app: {
+            executable: false,
+          },
+          checked: false,
+          value: timestamp,
+        },
+      },
+    };
+    evt.preventDefault();
+    return portMsg(msg);
   };
 
   /**
@@ -87,7 +117,7 @@
     if (name && label) {
       name.value = editorName || "";
       if (executable && name.value) {
-        label.value = name.value;
+        !label.value && (label.value = name.value);
         label.disabled = false;
       } else {
         label.value = "";
@@ -129,6 +159,19 @@
   };
 
   /* html */
+  /**
+   * add event listener to save editor settings button
+   * @returns {void}
+   */
+  const addSaveEditorSettingsListener = async () => {
+    const elm = document.getElementById("saveEditorSettings");
+    if (elm) {
+      elm.addEventListener(
+        "click", evt => portEditorSettings(evt).catch(logError), false
+      );
+    }
+  };
+
   /**
    * add event listener to input elements
    * @returns {void}
@@ -255,5 +298,6 @@
     localizeHtml(),
     setValuesFromStorage(),
     addInputChangeListener(),
+    addSaveEditorSettingsListener(),
   ]).catch(logError), false);
 }

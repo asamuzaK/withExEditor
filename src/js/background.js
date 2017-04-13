@@ -178,51 +178,6 @@
   };
 
   /**
-   * extract editor config data
-   * @param {Object} data - editor config data
-   * @returns {Object} - data to store
-   */
-  const extractEditorConfig = async (data = {}) => {
-    const {editorConfig, editorName, executable} = data;
-    const store = await storage.get([
-      EDITOR_CONFIG, EDITOR_FILE_NAME, EDITOR_LABEL,
-    ]);
-    const editorConfigPath = store[EDITOR_CONFIG] && store[EDITOR_CONFIG].value;
-    const editorFileName = store[EDITOR_FILE_NAME] &&
-                             store[EDITOR_FILE_NAME].value;
-    const editorLabel = store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
-    const msg = {};
-    if (!editorConfigPath || editorConfigPath !== editorConfig) {
-      msg[EDITOR_CONFIG] = {
-        id: EDITOR_CONFIG,
-        app: {
-          executable: !!executable,
-        },
-        checked: false,
-        value: editorConfig || "",
-      };
-      msg[EDITOR_FILE_NAME] = {
-        id: EDITOR_FILE_NAME,
-        app: {
-          executable: false,
-        },
-        checked: false,
-        value: executable && editorName || "",
-      };
-      msg[EDITOR_LABEL] = {
-        id: EDITOR_LABEL,
-        app: {
-          executable: false,
-        },
-        checked: false,
-        value: editorFileName === editorName && editorLabel ||
-               executable && editorName || "",
-      };
-    }
-    return Object.keys(msg).length && msg || null;
-  };
-
-  /**
    * port editor config path
    * @returns {AsyncFunction} - port host message
    */
@@ -498,6 +453,115 @@
     ]) || null;
   };
 
+  /* editor config */
+  /**
+   * extract editor config data
+   * @param {Object} data - editor config data
+   * @returns {Promise.<Array>} - results of each handler
+   */
+  const extractEditorConfig = async (data = {}) => {
+    const {
+      editorCmdArgs, editorConfig, editorConfigTimestamp,
+      editorFileAfterCmdArgs, editorName, editorPath, executable,
+    } = data;
+    const store = await storage.get([
+      EDITOR_CMD_ARGS, EDITOR_CONFIG, EDITOR_CONFIG_TS, EDITOR_FILE_NAME,
+      EDITOR_FILE_POS, EDITOR_LABEL, EDITOR_PATH,
+    ]);
+    const editorFileName = store[EDITOR_FILE_NAME] &&
+                             store[EDITOR_FILE_NAME].value;
+    const editorLabel = store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
+    const timestamp = store[EDITOR_CONFIG_TS] &&
+                      store[EDITOR_CONFIG_TS].value || 0;
+    const func = [];
+    if (!timestamp ||
+        editorConfigTimestamp > timestamp) {
+      const msg = {
+        [EDITOR_CONFIG]: {
+          id: EDITOR_CONFIG,
+          app: {
+            executable: !!executable,
+          },
+          checked: false,
+          value: editorConfig || "",
+        },
+        [EDITOR_CONFIG_TS]: {
+          id: EDITOR_CONFIG_TS,
+          app: {
+            executable: false,
+          },
+          checked: false,
+          value: editorConfigTimestamp || 0,
+        },
+        [EDITOR_PATH]: {
+          id: EDITOR_PATH,
+          app: {
+            executable: !!executable,
+          },
+          checked: false,
+          value: editorPath || "",
+        },
+        [EDITOR_CMD_ARGS]: {
+          id: EDITOR_CMD_ARGS,
+          app: {
+            executable: false,
+          },
+          checked: false,
+          value: editorCmdArgs || "",
+        },
+        [EDITOR_FILE_POS]: {
+          id: EDITOR_FILE_POS,
+          app: {
+            executable: false,
+          },
+          checked: !!editorFileAfterCmdArgs,
+          value: "",
+        },
+        [EDITOR_FILE_NAME]: {
+          id: EDITOR_FILE_NAME,
+          app: {
+            executable: false,
+          },
+          checked: false,
+          value: executable && editorName || "",
+        },
+        [EDITOR_LABEL]: {
+          id: EDITOR_LABEL,
+          app: {
+            executable: false,
+          },
+          checked: false,
+          value: editorFileName === editorName && editorLabel ||
+                 executable && editorName || "",
+        },
+      };
+      func.push(setStorage(msg), portMsg({[EDITOR_CONFIG_RES]: data}));
+    } else {
+      editorConfigTimestamp < store[EDITOR_CONFIG_TS].value &&
+        func.push(portHostMsg({
+          [EDITOR_CONFIG_SET]: {
+            editorConfig: store[EDITOR_CONFIG].value,
+            editorPath: store[EDITOR_PATH].value,
+            cmdArgs: store[EDITOR_CMD_ARGS].value,
+            fileAfterCmdArgs: store[EDITOR_FILE_POS].checked,
+          },
+        }));
+      func.push(portMsg({
+        [EDITOR_CONFIG_RES]: {
+          editorConfig: store[EDITOR_CONFIG].value || "",
+          editorConfigTimestamp: timestamp,
+          editorPath: store[EDITOR_PATH].value || "",
+          editorCmdArgs: store[EDITOR_CMD_ARGS].value || "",
+          editorFileAfterCmdArgs: !!store[EDITOR_FILE_POS].checked,
+          editorName: store[EDITOR_FILE_NAME].value || "",
+          editorLabel: store[EDITOR_LABEL].value || "",
+          executable: store[EDITOR_PATH].app.executable,
+        },
+      }));
+    }
+    return Promise.all(func);
+  };
+
   /* handlers */
   /**
    * open options page
@@ -549,13 +613,11 @@
               func.push(updateContextMenu(obj));
               break;
             case EDITOR_CONFIG_GET:
+            case EDITOR_CONFIG_SET:
               func.push(portHostMsg({[item]: obj}));
               break;
             case EDITOR_CONFIG_RES:
-              func.push(
-                extractEditorConfig(obj).then(setStorage),
-                portMsg({[item]: obj})
-              );
+              func.push(extractEditorConfig(obj));
               break;
             case HOST:
               func.push(handleHostMsg(obj));
