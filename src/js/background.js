@@ -471,9 +471,11 @@
     const editorFileName = store[EDITOR_FILE_NAME] &&
                              store[EDITOR_FILE_NAME].value;
     const editorLabel = store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
+    const timestamp = store[EDITOR_CONFIG_TS] &&
+                      store[EDITOR_CONFIG_TS].value || 0;
     const func = [];
-    if (!store[EDITOR_CONFIG_TS] ||
-        editorConfigTimestamp > store[EDITOR_CONFIG_TS]) {
+    if (!timestamp ||
+        editorConfigTimestamp > timestamp) {
       const msg = {
         [EDITOR_CONFIG]: {
           id: EDITOR_CONFIG,
@@ -486,7 +488,7 @@
         [EDITOR_CONFIG_TS]: {
           id: EDITOR_CONFIG_TS,
           app: {
-            executable: !!executable,
+            executable: false,
           },
           checked: false,
           value: editorConfigTimestamp || 0,
@@ -535,16 +537,27 @@
       };
       func.push(setStorage(msg), portMsg({[EDITOR_CONFIG_RES]: data}));
     } else {
-      editorConfigTimestamp < store[EDITOR_CONFIG_TS] &&
+      editorConfigTimestamp < store[EDITOR_CONFIG_TS].value &&
         func.push(portHostMsg({
           [EDITOR_CONFIG_SET]: {
-            editorConfig: store[EDITOR_CONFIG],
-            editorPath: store[EDITOR_PATH],
-            cmdArgs: store[EDITOR_CMD_ARGS],
-            fileAfterCmdArgs: store[EDITOR_FILE_POS],
+            editorConfig: store[EDITOR_CONFIG].value,
+            editorPath: store[EDITOR_PATH].value,
+            cmdArgs: store[EDITOR_CMD_ARGS].value,
+            fileAfterCmdArgs: store[EDITOR_FILE_POS].checked,
           },
         }));
-      func.push(portMsg({[EDITOR_CONFIG_RES]: store}));
+      func.push(portMsg({
+        [EDITOR_CONFIG_RES]: {
+          editorConfig: store[EDITOR_CONFIG].value || "",
+          editorConfigTimestamp: timestamp,
+          editorPath: store[EDITOR_PATH].value || "",
+          editorCmdArgs: store[EDITOR_CMD_ARGS].value || "",
+          editorFileAfterCmdArgs: !!store[EDITOR_FILE_POS].checked,
+          editorName: store[EDITOR_FILE_NAME].value || "",
+          editorLabel: store[EDITOR_LABEL].value || "",
+          executable: store[EDITOR_PATH].app.executable,
+        },
+      }));
     }
     return Promise.all(func);
   };
@@ -600,6 +613,7 @@
               func.push(updateContextMenu(obj));
               break;
             case EDITOR_CONFIG_GET:
+            case EDITOR_CONFIG_SET:
               func.push(portHostMsg({[item]: obj}));
               break;
             case EDITOR_CONFIG_RES:
