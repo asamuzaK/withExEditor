@@ -2,4 +2,9 @@
 Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
 
 To use withExEditor (v2.0.0 and later), you also need to prepare a host which executes your editor.
+
 Download the host for withExEditor from <a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">asamuzaK/withExEditorHost (GitHub)</a>.
+
+Requirements:
+* withExEditorHost v1.3.0 or later
+* Node.js v6.9.5 or later

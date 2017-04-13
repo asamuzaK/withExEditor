@@ -3,3 +3,7 @@
 
 withExEditor（v2.0.0以降）を使うには、エディタを起動するホストも用意する必要があります。
 <a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">asamuzaK/withExEditorHost (GitHub)</a>からwithExEditor用のホストをダウンロードしてください。
+
+動作要件：
+* withExEditorHost v1.3.0以降
+* Node.js v6.9.5以降
