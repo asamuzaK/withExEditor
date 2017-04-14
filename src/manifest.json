@@ -1,10 +1,4 @@
 {
-  "applications": {
-    "gecko": {
-      "id": "jid1-WiAigu4HIo0Tag@jetpack",
-      "strict_min_version": "52.0a1"
-    }
-  },
   "background": {
     "scripts": [
       "js/browser-polyfill.js",
