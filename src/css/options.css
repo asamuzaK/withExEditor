@@ -51,6 +51,7 @@ form {
   margin: 0 0 2rem 0;
 }
 fieldset {
+  margin-top: 1rem;
   border: 1px solid rgb(128, 128, 128);
   border-radius: 8px;
 }
