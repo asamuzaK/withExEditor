@@ -23,7 +23,7 @@
   "optionsAccessKey": {
     "message": ""
   },
-  "optionsAccessKey.placeholder": {
+  "optionsAccessKey_placeholder": {
     "message": "Input Access Key"
   },
   "optionsAccessKeyDetail": {
@@ -47,7 +47,7 @@
   "optionsEditorCmdArgs": {
     "message": ""
   },
-  "optionsEditorCmdArgs.placeholder": {
+  "optionsEditorCmdArgs_placeholder": {
     "message": "Input Command Line Options"
   },
   "optionsEditorCmdArgsDetail": {
@@ -62,7 +62,7 @@
   "optionsEditorConfigPath": {
     "message": ""
   },
-  "optionsEditorConfigPath.placeholder": {
+  "optionsEditorConfigPath_placeholder": {
     "message": "Input Editor Config Path"
   },
   "optionsEditorConfigPathDetail": {
@@ -83,7 +83,7 @@
   "optionsEditorLabel": {
     "message": ""
   },
-  "optionsEditorLabel.placeholder": {
+  "optionsEditorLabel_placeholder": {
     "message": "Rename Editor Label"
   },
   "optionsEditorLabelDetail": {
@@ -98,7 +98,7 @@
   "optionsEditorPath": {
     "message": ""
   },
-  "optionsEditorPath.placeholder": {
+  "optionsEditorPath_placeholder": {
     "message": "Input Editor Path"
   },
   "optionsEditorPathDetail": {
@@ -131,13 +131,13 @@
   "optionsIconColor": {
     "message": ""
   },
-  "optionsIconColor.alt": {
+  "optionsIconColor_alt": {
     "message": "Color"
   },
   "optionsIconColorLabel": {
     "message": ""
   },
-  "optionsIconColorLabel.ariaLabel": {
+  "optionsIconColorLabel_ariaLabel": {
     "message": "Color Icon"
   },
   "optionsIconDetail": {
@@ -146,25 +146,25 @@
   "optionsIconGray": {
     "message": ""
   },
-  "optionsIconGray.alt": {
+  "optionsIconGray_alt": {
     "message": "Gray"
   },
   "optionsIconGrayLabel": {
     "message": ""
   },
-  "optionsIconGrayLabel.ariaLabel": {
+  "optionsIconGrayLabel_ariaLabel": {
     "message": "Gray Icon"
   },
   "optionsIconWhite": {
     "message": ""
   },
-  "optionsIconWhite.alt": {
+  "optionsIconWhite_alt": {
     "message": "White"
   },
   "optionsIconWhiteLabel": {
     "message": ""
   },
-  "optionsIconWhiteLabel.ariaLabel": {
+  "optionsIconWhiteLabel_ariaLabel": {
     "message": "White Icon"
   },
   "optionsLang": {
@@ -173,7 +173,7 @@
   "optionsManualLabel": {
     "message": "Host Manual"
   },
-  "optionsManualLabel.href": {
+  "optionsManualLabel_href": {
     "message": "./manual.en.html"
   },
   "optionsOptionsShortCutDetail": {

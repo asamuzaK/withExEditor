@@ -1,14 +1,14 @@
 {
-  "optionsIconColor.alt": {
+  "optionsIconColor_alt": {
     "message": "Colour"
   },
-  "optionsIconColorLabel.ariaLabel": {
+  "optionsIconColorLabel_ariaLabel": {
     "message": "Colour Icon"
   },
-  "optionsIconGray.alt": {
+  "optionsIconGray_alt": {
     "message": "Grey"
   },
-  "optionsIconGrayLabel.ariaLabel": {
+  "optionsIconGrayLabel_ariaLabel": {
     "message": "Grey Icon"
   },
   "optionsLang": {

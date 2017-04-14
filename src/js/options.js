@@ -206,7 +206,7 @@
       for (const item of items) {
         const attr = attrs[item];
         elm.hasAttribute(attr) &&
-          elm.setAttribute(attr, i18n.getMessage(`${dataAttr}.${item}`));
+          elm.setAttribute(attr, i18n.getMessage(`${dataAttr}_${item}`));
       }
     }
   };

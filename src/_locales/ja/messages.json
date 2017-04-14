@@ -23,7 +23,7 @@
   "optionsAccessKey": {
     "message": ""
   },
-  "optionsAccessKey.placeholder": {
+  "optionsAccessKey_placeholder": {
     "message": "アクセスキーを入力"
   },
   "optionsAccessKeyDetail": {
@@ -47,7 +47,7 @@
   "optionsEditorCmdArgs": {
     "message": ""
   },
-  "optionsEditorCmdArgs.placeholder": {
+  "optionsEditorCmdArgs_placeholder": {
     "message": "コマンドラインオプションを入力"
   },
   "optionsEditorCmdArgsDetail": {
@@ -62,7 +62,7 @@
   "optionsEditorConfigPath": {
     "message": ""
   },
-  "optionsEditorConfigPath.placeholder": {
+  "optionsEditorConfigPath_placeholder": {
     "message": "エディタ設定ファイルのパスを入力"
   },
   "optionsEditorConfigPathDetail": {
@@ -83,7 +83,7 @@
   "optionsEditorLabel": {
     "message": ""
   },
-  "optionsEditorLabel.placeholder": {
+  "optionsEditorLabel_placeholder": {
     "message": "エディタの表示名を変更"
   },
   "optionsEditorLabelDetail": {
@@ -98,7 +98,7 @@
   "optionsEditorPath": {
     "message": ""
   },
-  "optionsEditorPath.placeholder": {
+  "optionsEditorPath_placeholder": {
     "message": "エディタのパスを入力"
   },
   "optionsEditorPathDetail": {
@@ -131,13 +131,13 @@
   "optionsIconColor": {
     "message": ""
   },
-  "optionsIconColor.alt": {
+  "optionsIconColor_alt": {
     "message": "カラー"
   },
   "optionsIconColorLabel": {
     "message": ""
   },
-  "optionsIconColorLabel.ariaLabel": {
+  "optionsIconColorLabel_ariaLabel": {
     "message": "カラーアイコン"
   },
   "optionsIconDetail": {
@@ -146,25 +146,25 @@
   "optionsIconGray": {
     "message": ""
   },
-  "optionsIconGray.alt": {
+  "optionsIconGray_alt": {
     "message": "グレー"
   },
   "optionsIconGrayLabel": {
     "message": ""
   },
-  "optionsIconGrayLabel.ariaLabel": {
+  "optionsIconGrayLabel_ariaLabel": {
     "message": "グレーアイコン"
   },
   "optionsIconWhite": {
     "message": ""
   },
-  "optionsIconWhite.alt": {
+  "optionsIconWhite_alt": {
     "message": "ホワイト"
   },
   "optionsIconWhiteLabel": {
     "message": ""
   },
-  "optionsIconWhiteLabel.ariaLabel": {
+  "optionsIconWhiteLabel_ariaLabel": {
     "message": "ホワイトアイコン"
   },
   "optionsLang": {
@@ -173,7 +173,7 @@
   "optionsManualLabel": {
     "message": "ホストマニュアル"
   },
-  "optionsManualLabel.href": {
+  "optionsManualLabel_href": {
     "message": "./manual.ja.html"
   },
   "optionsOptionsShortCutDetail": {
