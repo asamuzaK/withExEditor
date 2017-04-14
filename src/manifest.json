@@ -6,17 +6,22 @@
     }
   },
   "background": {
-    "scripts": ["js/background.js"]
+    "scripts": [
+      "js/browser-polyfill.js",
+      "js/background.js"
+    ]
   },
   "browser_action": {
     "browser_style": false,
-    "default_icon": "img/icon.svg#gray",
     "default_title": "__MSG_extensionName__"
   },
   "content_scripts": [
     {
       "all_frames": true,
-      "js": ["js/content.js"],
+      "js": [
+        "js/browser-polyfill.js",
+        "js/content.js"
+      ],
       "matches": ["<all_urls>"],
       "run_at": "document_start"
     }
@@ -25,8 +30,7 @@
   "description": "__MSG_extensionDescription__",
   "homepage_url": "https://github.com/asamuzaK/withExEditor",
   "icons": {
-    "32": "img/icon.svg#gray",
-    "64": "img/icon.svg"
+    "128": "img/icon.png"
   },
   "manifest_version": 2,
   "name": "__MSG_extensionName__",

@@ -81,8 +81,8 @@ details > div {
   left: 0.9rem;
   border: 1px solid rgb(192,192,192);
   border-radius: 4px;
-  background-color: -moz-Dialog;
-  color: -moz-DialogText;
+  background-color: #F6F6F6;
+  color: #333;
   z-index: 2;
 }
 fieldset:last-child > div:last-child > details > div {
@@ -104,7 +104,7 @@ label[for^=buttonIcon] {
 }
 label[for=buttonIcon],
 label[for=buttonIconGray] {
-  background-color: -moz-Dialog;
+  background-color: #F6F6F6;
 }
 label[for=buttonIconWhite] {
   background-color: #4D4E53;
