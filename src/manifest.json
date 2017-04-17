@@ -24,7 +24,8 @@
   "description": "__MSG_extensionDescription__",
   "homepage_url": "https://github.com/asamuzaK/withExEditor",
   "icons": {
-    "128": "img/icon.png"
+    "32": "img/icon-gray.png",
+    "64": "img/icon-color.png"
   },
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
