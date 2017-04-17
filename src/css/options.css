@@ -82,8 +82,8 @@ details > div {
   left: 0.9rem;
   border: 1px solid rgb(192,192,192);
   border-radius: 4px;
-  background-color: #F6F6F6;
-  color: #333;
+  background-color: rgb(240,240,240);
+  color: rgb(16,16,16);
   z-index: 2;
 }
 fieldset:last-child > div:last-child > details > div {
@@ -105,10 +105,10 @@ label[for^=buttonIcon] {
 }
 label[for=buttonIcon],
 label[for=buttonIconGray] {
-  background-color: #F6F6F6;
+  background-color: rgb(240,240,240);
 }
 label[for=buttonIconWhite] {
-  background-color: #4D4E53;
+  background-color: rgb(64,64,64);
 }
 .label {
   box-sizing: border-box;
