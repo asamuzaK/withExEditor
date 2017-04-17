@@ -13,6 +13,7 @@
   },
   "browser_action": {
     "browser_style": false,
+    "default_icon": "img/icon-gray.png",
     "default_title": "__MSG_extensionName__"
   },
   "content_scripts": [
