@@ -275,13 +275,14 @@
    * @returns {void}
    */
   const portContextMenuData = async (info, tab) => {
-    const {frameUrl} = info;
+    const {frameUrl, pageUrl} = info;
     let {windowId, id: tabId} = tab;
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
     if (windowId && tabId) {
       const port = ports[windowId] && ports[windowId][tabId] &&
-                     ports[windowId][tabId][frameUrl];
+                   ports[windowId][tabId][frameUrl] ||
+                   ports[windowId][tabId][pageUrl];
       port && port.postMessage({
         [CONTENT_GET]: {info, tab},
       });
@@ -320,7 +321,7 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const toggleBadge = async (executable = varsL[IS_EXECUTABLE]) => {
-    const color = !executable && WARN_COLOR || "transparent";
+    const color = !executable && WARN_COLOR || [0,0,0,0];
     const text = !executable && WARN_TEXT || "";
     return Promise.all([
       browserAction.setBadgeBackgroundColor({color}),
