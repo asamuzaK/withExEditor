@@ -19,6 +19,7 @@
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
   // NOTE: temporary ID for development
   const EXT_CHROME_ID = "jakgdeodohnbhngonaabiaklmhfahjbj";
+  const EXT_WEB_ID = "jid1-WiAigu4HIo0Tag@jetpack";
   const FILE_EXT = "fileExt";
   const FILE_LEN = 128;
   const HTML = "html";
@@ -109,7 +110,8 @@
     let code;
     if (isString(key) && key.length === 1) {
       code = key.toLowerCase().charCodeAt(0);
-      runtime.id === EXT_CHROME_ID && code > CODE_A && code <= CODE_Z &&
+      // NOTE: switch to runtime.id === EXT_CHROME_ID
+      runtime.id !== EXT_WEB_ID && code > CODE_A && code <= CODE_Z &&
         (code -= CODE_A);
     }
     return code || null;
@@ -1192,7 +1194,7 @@
 
   /**
    * update key combination
-   * @param {string} - key
+   * @param {string} key - key
    * @returns {void}
    */
   const updateKeyCombo = async key => {
@@ -1203,7 +1205,7 @@
       execEditorKey.which = getKeyboardWhich(key);
       openOptionsKey.key = key;
       openOptionsKey.which = getKeyboardWhich(key);
-    };
+    }
   };
 
   /**

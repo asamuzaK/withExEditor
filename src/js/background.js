@@ -321,7 +321,7 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const toggleBadge = async (executable = varsL[IS_EXECUTABLE]) => {
-    const color = !executable && WARN_COLOR || [0,0,0,0];
+    const color = !executable && WARN_COLOR || [0, 0, 0, 0];
     const text = !executable && WARN_TEXT || "";
     return Promise.all([
       browserAction.setBadgeBackgroundColor({color}),
