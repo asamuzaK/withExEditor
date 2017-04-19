@@ -1231,7 +1231,9 @@
           case KEY_ACCESS:
             vars[item] = obj;
             execEditorKey.key = obj;
+            execEditorKey.which = getKeyboardWhich(obj);
             openOptionsKey.key = obj;
+            openOptionsKey.which = getKeyboardWhich(obj);
             break;
           case KEY_EDITOR:
             vars[item] = !!obj;
