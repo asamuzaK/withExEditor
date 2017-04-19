@@ -17,6 +17,8 @@
   const DATA_ATTR_ID = `${DATA_ATTR}_id`;
   const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
+  // NOTE: temporary ID for development
+  const EXT_CHROME_ID = "jakgdeodohnbhngonaabiaklmhfahjbj";
   const FILE_EXT = "fileExt";
   const FILE_LEN = 128;
   const HTML = "html";
@@ -28,6 +30,8 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
+  const CODE_A = 96;
+  const CODE_Z = 123;
   const LOCAL_FILE_VIEW = "viewLocalFile";
   const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
@@ -93,6 +97,21 @@
     }
     return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
              .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  };
+
+  /**
+   * get KeyBoardEvent.which value
+   * @param {string} key - key
+   * @returns {?number} - KeyBoardEvent.which value
+   */
+  const getKeyWhich = key => {
+    let code;
+    if (isString(key) && key.length === 1) {
+      code = key.toLowerCase().charCodeAt(0);
+      runtime.id === EXT_CHROME_ID && code > CODE_A && code <= CODE_Z &&
+        (code -= CODE_A);
+    }
+    return code || null;
   };
 
   /* storage */
@@ -1155,6 +1174,7 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: true,
+    which: getKeyWhich(vars[KEY_ACCESS]),
     enabled: vars[KEY_EDITOR],
   };
 
@@ -1165,6 +1185,7 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: false,
+    which: getKeyWhich(vars[KEY_ACCESS]),
     enabled: vars[KEY_OPTIONS],
   };
 
@@ -1176,7 +1197,8 @@
    */
   const keyComboMatches = async (evt, key) =>
     evt && key && key.enabled && key.key && evt.key &&
-    evt.key.toLowerCase() === key.key.toLowerCase() &&
+    (evt.key.toLowerCase() === key.key.toLowerCase() ||
+     evt.which === key.which) &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
 
@@ -1290,6 +1312,7 @@
         openOpt && (func = portMsg({[OPTIONS_OPEN]: openOpt}));
       }
     }
+    func && evt.preventDefault();
     return func || null;
   };
 
