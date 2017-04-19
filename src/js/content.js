@@ -100,12 +100,12 @@
   };
 
   /**
-   * get KeyBoardEvent.which value
+   * get KeyboardEvent.which value
    * NOTE: Temporary fix for Blink. issue #35
    * @param {string} key - key
-   * @returns {?number} - KeyBoardEvent.which value
+   * @returns {?number} - KeyboardEvent.which value
    */
-  const getKeyWhich = key => {
+  const getKeyboardWhich = key => {
     let code;
     if (isString(key) && key.length === 1) {
       code = key.toLowerCase().charCodeAt(0);
@@ -1175,7 +1175,7 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: true,
-    which: getKeyWhich(vars[KEY_ACCESS]),
+    which: getKeyboardWhich(vars[KEY_ACCESS]),
     enabled: vars[KEY_EDITOR],
   };
 
@@ -1186,7 +1186,7 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: false,
-    which: getKeyWhich(vars[KEY_ACCESS]),
+    which: getKeyboardWhich(vars[KEY_ACCESS]),
     enabled: vars[KEY_OPTIONS],
   };
 
