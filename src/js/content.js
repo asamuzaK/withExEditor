@@ -1191,6 +1191,22 @@
   };
 
   /**
+   * update key combination
+   * @param {string} - key
+   * @returns {void}
+   */
+  const updateKeyCombo = async key => {
+    if (isString(key) && key.length === 1) {
+      key = key.toLowerCase();
+      vars[KEY_ACCESS] = key;
+      execEditorKey.key = key;
+      execEditorKey.which = getKeyboardWhich(key);
+      openOptionsKey.key = key;
+      openOptionsKey.which = getKeyboardWhich(key);
+    };
+  };
+
+  /**
    * key combination matches
    * @param {Object} evt - Event
    * @param {Object} key - KeyCombo
@@ -1229,11 +1245,7 @@
             vars[item] = !!obj;
             break;
           case KEY_ACCESS:
-            vars[item] = obj;
-            execEditorKey.key = obj;
-            execEditorKey.which = getKeyboardWhich(obj);
-            openOptionsKey.key = obj;
-            openOptionsKey.which = getKeyboardWhich(obj);
+            func.push(updateKeyCombo(obj));
             break;
           case KEY_EDITOR:
             vars[item] = !!obj;
