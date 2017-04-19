@@ -101,6 +101,7 @@
 
   /**
    * get KeyBoardEvent.which value
+   * NOTE: Temporary fix for Blink. issue #35
    * @param {string} key - key
    * @returns {?number} - KeyBoardEvent.which value
    */
