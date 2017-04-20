@@ -1329,7 +1329,6 @@
         openOpt && (func = portMsg({[OPTIONS_OPEN]: openOpt}));
       }
     }
-    func && evt.preventDefault();
     return func || null;
   };
 
