@@ -312,9 +312,9 @@
    * @param {string} path - icon path
    * @returns {AsyncFunction} - set icon
    */
-  const replaceIcon = async (path = varsL[ICON_PATH]) =>
-    browserAction.setIcon({path});
-
+  const replaceIcon = async (path = varsL[ICON_PATH]) => {
+    return browserAction.setIcon({path});
+  };
   /**
    * toggle badge
    * @param {boolean} executable - executable
@@ -675,7 +675,7 @@
   /**
    * handle tab activated
    * @param {!Object} info - activated tab info
-   * @returns {AsyncFunction} - restore context menu
+   * @returns {Promise.<Array>} - results of each handler
    */
   const onTabActivated = async info => {
     let {tabId, windowId} = info, bool;
@@ -695,7 +695,10 @@
       }
     }
     varsL[MENU_ENABLED] = bool || false;
-    return restoreContextMenu();
+    return Promise.all([
+      restoreContextMenu(),
+      syncUI(),
+    ]);
   };
 
   /**
@@ -703,11 +706,11 @@
    * @param {!number} id - tabId
    * @param {!Object} info - changed tab info
    * @param {!Object} tab - tabs.Tab
-   * @returns {?AsyncFunction} - restore context menu
+   * @returns {Promise.<Array>} - results of each handler
    */
   const onTabUpdated = async (id, info, tab) => {
     const {active, url} = tab;
-    let func;
+    const func = [];
     if (active) {
       const tabId = stringifyPositiveInt(id, true);
       let {windowId} = tab;
@@ -717,9 +720,9 @@
                             ports[windowId][tabId][url] &&
                             ports[windowId][tabId][url].name === PORT_CONTENT ||
                             false;
-      func = info.status === "complete" && restoreContextMenu();
+      info.status === "complete" && func.push(restoreContextMenu(), syncUI());
     }
-    return func || null;
+    return Promise.all(func);
   };
 
   /**
