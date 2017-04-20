@@ -312,9 +312,9 @@
    * @param {string} path - icon path
    * @returns {AsyncFunction} - set icon
    */
-  const replaceIcon = async (path = varsL[ICON_PATH]) => {
-    return browserAction.setIcon({path});
-  };
+  const replaceIcon = async (path = varsL[ICON_PATH]) =>
+    browserAction.setIcon({path});
+
   /**
    * toggle badge
    * @param {boolean} executable - executable
