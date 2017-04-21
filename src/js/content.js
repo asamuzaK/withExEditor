@@ -103,7 +103,7 @@
 
   /**
    * get KeyboardEvent.which value
-   * NOTE: Temporary fix for Blink. issue #35
+   * NOTE: Temporary workaround for Blink. issue #35
    * @param {string} key - key
    * @returns {?number} - KeyboardEvent.which value
    */
