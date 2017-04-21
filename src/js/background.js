@@ -360,10 +360,13 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const createMenuItems = async () => {
-    const func = [];
-    const enabled = vars[IS_ENABLED];
+    const win = await windows.getCurrent({windowTypes: ["normal"]});
+    const enabled = win && (
+      !win.incognito || varsL[ENABLE_PB]
+    ) || false;
     const bool = enabled && !vars[ONLY_EDITABLE];
     const items = Object.keys(menus);
+    const func = [];
     for (const item of items) {
       menus[item] = null;
       switch (item) {
@@ -846,7 +849,9 @@
 
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
-  browser.storage.onChanged.addListener(data => setVars(data).catch(logError));
+  browser.storage.onChanged.addListener(data =>
+    setVars(data).then(syncUI).catch(logError)
+  );
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
   );

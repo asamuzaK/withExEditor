@@ -1280,36 +1280,38 @@
    * @returns {?AsyncFunction} - port message
    */
   const handleBeforeContextMenu = async evt => {
-    const {button, target} = evt;
     let func;
-    if (button === MOUSE_BUTTON_RIGHT) {
-      const {localName, namespaceURI, type} = target;
-      const {anchorNode, focusNode, isCollapsed} = window.getSelection();
-      const mode = namespaceURI === nsURI.math && MODE_MATHML ||
-                   namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
-      const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
-                            await getEditableElm(target);
-      let enabled;
-      if (localName === "input") {
-        enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
-      } else {
-        enabled = isCollapsed || !!editableElm ||
-                  anchorNode.parentNode === focusNode.parentNode;
+    if (vars[IS_ENABLED]) {
+      const {button, target} = evt;
+      if (button === MOUSE_BUTTON_RIGHT) {
+        const {localName, namespaceURI, type} = target;
+        const {anchorNode, focusNode, isCollapsed} = window.getSelection();
+        const mode = namespaceURI === nsURI.math && MODE_MATHML ||
+                     namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
+        const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
+                              await getEditableElm(target);
+        let enabled;
+        if (localName === "input") {
+          enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
+        } else {
+          enabled = isCollapsed || !!editableElm ||
+                    anchorNode.parentNode === focusNode.parentNode;
+        }
+        vars[CONTEXT_MODE] = mode;
+        vars[CONTEXT_NODE] = editableElm || target;
+        func = portMsg({
+          [CONTEXT_MENU]: {
+            [MODE_EDIT]: {
+              enabled,
+              menuItemId: MODE_EDIT,
+            },
+            [MODE_SOURCE]: {
+              mode,
+              menuItemId: MODE_SOURCE,
+            },
+          },
+        });
       }
-      vars[CONTEXT_MODE] = mode;
-      vars[CONTEXT_NODE] = editableElm || target;
-      func = portMsg({
-        [CONTEXT_MENU]: {
-          [MODE_EDIT]: {
-            enabled,
-            menuItemId: MODE_EDIT,
-          },
-          [MODE_SOURCE]: {
-            mode,
-            menuItemId: MODE_SOURCE,
-          },
-        },
-      });
     }
     return func || null;
   };
