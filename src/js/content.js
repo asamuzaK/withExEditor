@@ -1277,7 +1277,7 @@
   /**
    * handle before contextmenu event
    * @param {!Object} evt - Event
-   * @returns {AsyncFunction} - port message
+   * @returns {?AsyncFunction} - port message
    */
   const handleBeforeContextMenu = async evt => {
     const {button, target} = evt;
