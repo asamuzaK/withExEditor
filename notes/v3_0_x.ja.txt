@@ -3,3 +3,9 @@ v3.0.0
 <ul>
 <li>Blink互換</li>
 </ul>
+
+ホスト要件
+<ul>
+<li>withExEditorHost v2.0.0-b.1以降</li>
+<li>Node.js v7.9.0以降</li>
+</ul>

@@ -3,3 +3,9 @@ New Features
 <ul>
 <li>Blink compatible.</li>
 </ul>
+
+Host Requirement
+<ul>
+<li>withExEditorHost v2.0.0-b.1 or later</li>
+<li>Node.js v7.9.0 or later</li>
+</ul>
