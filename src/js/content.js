@@ -17,9 +17,7 @@
   const DATA_ATTR_ID = `${DATA_ATTR}_id`;
   const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
-  // NOTE: temporary ID for development
-  const EXT_CHROME_ID = "jakgdeodohnbhngonaabiaklmhfahjbj";
-  const EXT_WEB_ID = "jid1-WiAigu4HIo0Tag@jetpack";
+  const EXT_CHROME_ID = "koghhpkkcndhhclklnnnhcpkkplfkgoi";
   const FILE_EXT = "fileExt";
   const FILE_LEN = 128;
   const HTML = "html";
@@ -111,8 +109,7 @@
     let code;
     if (isString(key) && key.length === 1) {
       code = key.toLowerCase().charCodeAt(0);
-      // NOTE: switch to runtime.id === EXT_CHROME_ID
-      runtime.id !== EXT_WEB_ID && code > CODE_A && code <= CODE_Z &&
+      runtime.id === EXT_CHROME_ID && code > CODE_A && code <= CODE_Z &&
         (code -= CODE_A);
     }
     return code || null;
