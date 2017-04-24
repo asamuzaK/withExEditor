@@ -1197,12 +1197,13 @@
    */
   const updateKeyCombo = async key => {
     if (isString(key) && key.length === 1) {
+      const whichKey = getKeyboardWhich(key);
       key = key.toLowerCase();
       vars[KEY_ACCESS] = key;
       execEditorKey.key = key;
-      execEditorKey.which = getKeyboardWhich(key);
+      execEditorKey.which = whichKey;
       openOptionsKey.key = key;
-      openOptionsKey.which = getKeyboardWhich(key);
+      openOptionsKey.which = whichKey;
     }
   };
 
