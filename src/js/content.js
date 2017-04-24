@@ -1196,9 +1196,8 @@
    * @returns {void}
    */
   const updateKeyCombo = async key => {
-    if (isString(key) && key.length === 1) {
+    if (isString(key) && key.length === 1 && (key = key.toLowerCase())) {
       const whichKey = await getKeyboardWhich(key);
-      key = key.toLowerCase();
       vars[KEY_ACCESS] = key;
       execEditorKey.key = key;
       execEditorKey.which = whichKey;
