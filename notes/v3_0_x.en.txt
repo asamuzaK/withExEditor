@@ -6,6 +6,6 @@ New Features
 
 Host Requirement
 <ul>
-<li>withExEditorHost v2.0.0-b.1 or later</li>
-<li>Node.js v7.9.0 or later</li>
+<li>withExEditorHost v2.0.0-b.2 or higher</li>
+<li>Node.js v7.9.0 or higher</li>
 </ul>
