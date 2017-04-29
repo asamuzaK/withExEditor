@@ -177,10 +177,7 @@
     "message": "./manual.en.html"
   },
   "optionsOptionsShortCutDetail": {
-    "message": "To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac)."
-  },
-  "optionsOptionsShortCutDetail2": {
-    "message": "NOTE: Does not work in Blink based browsers."
+    "message": "To open the options page, press 'Alt + Shift + key' ('Opt + Shift + key' on Mac)."
   },
   "optionsOptionsShortCutLabel": {
     "message": "Enable Shortcut Key To Open The Options Page"

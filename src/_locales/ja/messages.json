@@ -177,10 +177,7 @@
     "message": "./manual.ja.html"
   },
   "optionsOptionsShortCutDetail": {
-    "message": "設定ページを開くには「Ctrl + Alt + キー」（Macは「Cmd + Opt + キー」）を押してください。"
-  },
-  "optionsOptionsShortCutDetail2": {
-    "message": "備考： Blinkベースのブラウザでは動作しません。"
+    "message": "設定ページを開くには「Alt + Shift + キー」（Macは「Opt + Shift + キー」）を押してください。"
   },
   "optionsOptionsShortCutLabel": {
     "message": "設定ページを開くショートカットキーを有効化"

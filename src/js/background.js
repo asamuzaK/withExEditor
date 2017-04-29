@@ -62,7 +62,7 @@
   /* variables */
   const vars = {
     [IS_ENABLED]: false,
-    [KEY_ACCESS]: "e",
+    [KEY_ACCESS]: "u",
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,

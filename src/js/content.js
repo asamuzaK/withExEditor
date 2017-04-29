@@ -62,7 +62,7 @@
     [ID_WIN]: "",
     [INCOGNITO]: false,
     [IS_ENABLED]: false,
-    [KEY_ACCESS]: "e",
+    [KEY_ACCESS]: "u",
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
@@ -1183,9 +1183,9 @@
   const openOptionsKey = {
     key: vars[KEY_ACCESS],
     altKey: true,
-    ctrlKey: true,
+    ctrlKey: false,
     metaKey: false,
-    shiftKey: false,
+    shiftKey: true,
     which: getKeyboardWhich(vars[KEY_ACCESS]),
     enabled: vars[KEY_OPTIONS],
   };
