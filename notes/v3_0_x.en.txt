@@ -4,8 +4,8 @@ New Features
 <li>Blink compatible.</li>
 </ul>
 
-Host Requirement
+Updated
 <ul>
-<li>withExEditorHost v2.0.0-b.2 or higher</li>
-<li>Node.js v7.9.0 or higher</li>
+<li>Default access key value changed from "e" to "u".</li>
+<li>Keyboard shortcut to open options page changed to "Alt + Shift + key" ("Opt + Shift + key" on Mac).</li>
 </ul>

@@ -1,11 +1,11 @@
 v3.0.0
 新規
 <ul>
-<li>Blink互換</li>
+<li>Blink互換。</li>
 </ul>
 
-ホスト要件
+更新
 <ul>
-<li>withExEditorHost v2.0.0-b.2以降</li>
-<li>Node.js v7.9.0以降</li>
+<li>アクセスキーの初期値を"e"から"u"に変更。</li>
+<li>設定ページを開くキーボードショートカットを"Alt + Shift + key"（Macでは"Opt + Shift + key"）に変更。</li>
 </ul>
