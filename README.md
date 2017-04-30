@@ -71,7 +71,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 ### Enable Shortcut Key To Open The Options Page
 
-* To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac).
+* To open the options page, press 'Alt + Shift + key' ('Opt + Shift + key' on Mac).
 
 ### Enable Shortcut Key To Execute The Editor Directly
 
