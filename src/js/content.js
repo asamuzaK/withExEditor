@@ -1190,8 +1190,7 @@
    */
   const keyComboMatches = async (evt, key) =>
     evt && key && key.enabled && key.key && evt.key &&
-    (evt.key.toLowerCase() === key.key.toLowerCase() ||
-     evt.which === key.which) &&
+    evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
 
