@@ -75,7 +75,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 ### Enable Shortcut Key To Execute The Editor Directly
 
-* To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac).
+* To execute the editor without going through the context menu, press 'Ctrl + Shift + key'.
 
 ### Enable During Private Browsing
 
