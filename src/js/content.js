@@ -17,7 +17,6 @@
   const DATA_ATTR_ID = `${DATA_ATTR}_id`;
   const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
   const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
-  const EXT_CHROME_ID = "koghhpkkcndhhclklnnnhcpkkplfkgoi";
   const FILE_EXT = "fileExt";
   const FILE_LEN = 128;
   const HTML = "html";
@@ -29,8 +28,6 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
-  const CODE_A = 96;
-  const CODE_Z = 123;
   const LOCAL_FILE_VIEW = "viewLocalFile";
   const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
@@ -97,22 +94,6 @@
     }
     return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
              .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-  };
-
-  /**
-   * get KeyboardEvent.which value
-   * NOTE: Temporary workaround for Blink. issue #35
-   * @param {string} key - key
-   * @returns {?number} - KeyboardEvent.which value
-   */
-  const getKeyboardWhich = key => {
-    let code;
-    if (isString(key) && key.length === 1) {
-      code = key.toLowerCase().charCodeAt(0);
-      runtime.id === EXT_CHROME_ID && code > CODE_A && code <= CODE_Z &&
-        (code -= CODE_A);
-    }
-    return code || null;
   };
 
   /* storage */
@@ -1175,7 +1156,6 @@
     ctrlKey: true,
     metaKey: false,
     shiftKey: true,
-    which: getKeyboardWhich(vars[KEY_ACCESS]),
     enabled: vars[KEY_EDITOR],
   };
 
@@ -1186,7 +1166,6 @@
     ctrlKey: false,
     metaKey: false,
     shiftKey: true,
-    which: getKeyboardWhich(vars[KEY_ACCESS]),
     enabled: vars[KEY_OPTIONS],
   };
 
@@ -1197,12 +1176,9 @@
    */
   const updateKeyCombo = async key => {
     if (isString(key) && key.length === 1 && (key = key.toLowerCase())) {
-      const whichKey = await getKeyboardWhich(key);
       vars[KEY_ACCESS] = key;
       execEditorKey.key = key;
-      execEditorKey.which = whichKey;
       openOptionsKey.key = key;
-      openOptionsKey.which = whichKey;
     }
   };
 
@@ -1314,11 +1290,11 @@
   };
 
   /**
-   * handle keypress event
+   * handle keydown event
    * @param {!Object} evt - Event
    * @returns {?AsyncFunction} - port content / port message
    */
-  const handleKeyPress = async evt => {
+  const handleKeyDown = async evt => {
     let func;
     if (vars[IS_ENABLED]) {
       if (await keyComboMatches(evt, execEditorKey)) {
@@ -1345,7 +1321,7 @@
       "mousedown", evt => handleBeforeContextMenu(evt).catch(logError), true
     );
     root.addEventListener(
-      "keypress", evt => handleKeyPress(evt).catch(logError), false
+      "keydown", evt => handleKeyDown(evt).catch(logError), false
     );
   }, false);
 
