@@ -65,7 +65,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 ### Access Key
 
 * Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly.
-* Choose any key, but it must be a single character.
+* Access key can be any key from 'a' to 'z'.
 * In the context menu, press 'key' itself.
 * NOTE: accesskey in context menu is not yet implemented in WebExtensions.
 
