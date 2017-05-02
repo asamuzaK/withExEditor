@@ -111,7 +111,7 @@
     "message": "Editor Settings"
   },
   "optionsEditorShortCutDetail": {
-    "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac)."
+    "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key'."
   },
   "optionsEditorShortCutLabel": {
     "message": "Enable Shortcut Key To Execute The Editor Directly"

@@ -111,7 +111,7 @@
     "message": "エディタ設定"
   },
   "optionsEditorShortCutDetail": {
-    "message": "コンテキストメニューを経由せずにエディタを直接起動するには「Ctrl + Shift + キー」（Macは「Cmd + Shift + キー」）を押してください。"
+    "message": "コンテキストメニューを経由せずにエディタを直接起動するには「Ctrl + Shift + キー」を押してください。"
   },
   "optionsEditorShortCutLabel": {
     "message": "エディタを直接起動するショートカットキーを有効化"
