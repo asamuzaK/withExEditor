@@ -1316,12 +1316,14 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
-    root.addEventListener(
-      "mousedown", evt => handleBeforeContextMenu(evt).catch(logError), true
-    );
-    root.addEventListener(
-      "keydown", evt => handleKeyDown(evt).catch(logError), false
-    );
+    root.addEventListener("mousedown", evt =>
+      handleBeforeContextMenu(evt).catch(logError),
+    true);
+    root.addEventListener("keydown", evt =>
+      evt.getModifierState("Shift") &&
+      (evt.getModifierState("Alt") || evt.getModifierState("Control")) &&
+        handleKeyDown(evt).catch(logError),
+    false);
   }, false);
 
   /* startup */
