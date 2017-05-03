@@ -6,19 +6,69 @@
     "message": "withExEditor"
   },
   "modeEditText": {
-    "message": "Edit Text with $1"
+    "message": "Edit Text with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewMathML": {
-    "message": "View MathML Source with $1"
+    "message": "View MathML Source with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSelection": {
-    "message": "View Selection Source with $1"
+    "message": "View Selection Source with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSource": {
-    "message": "View Page Source with $1"
+    "message": "View Page Source with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSVG": {
-    "message": "View SVG Source with $1"
+    "message": "View SVG Source with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "optionsAccessKey": {
     "message": ""

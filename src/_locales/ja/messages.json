@@ -6,19 +6,69 @@
     "message": "withExEditor"
   },
   "modeEditText": {
-    "message": "テキストを $1 で編集"
+    "message": "テキストを $LABEL$ で編集 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewMathML": {
-    "message": "MathML のソースを $1 で表示"
+    "message": "MathML のソースを $LABEL$ で表示 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSelection": {
-    "message": "選択した部分のソースを $1 で表示"
+    "message": "選択した部分のソースを $LABEL$ で表示 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSource": {
-    "message": "ページのソースを $1 で表示"
+    "message": "ページのソースを $LABEL$ で表示 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSVG": {
-    "message": "SVG のソースを $1 で表示"
+    "message": "SVG のソースを $LABEL$ で表示 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "optionsAccessKey": {
     "message": ""

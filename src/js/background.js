@@ -21,6 +21,7 @@
   const EDITOR_LABEL = "editorLabel";
   const EDITOR_PATH = "editorPath";
   const ENABLE_PB = "enablePB";
+  const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "../data/fileExt.json";
   const HOST = "withexeditorhost";
@@ -31,6 +32,7 @@
   const ICON_WHITE = "buttonIconWhite";
   const IS_ENABLED = "isEnabled";
   const IS_EXECUTABLE = "isExecutable";
+  const IS_WEBEXT = "isWebExtension";
   const KEY_ACCESS = "accessKey";
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
@@ -62,6 +64,7 @@
   /* variables */
   const vars = {
     [IS_ENABLED]: false,
+    [IS_WEBEXT]: runtime.id === EXT_WEBEXT,
     [KEY_ACCESS]: "u",
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
@@ -346,10 +349,12 @@
    */
   const createMenuItem = async (id, contexts) => {
     const label = varsL[EDITOR_LABEL] || LABEL;
+    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
+                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
     isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
       menus[id] = contextMenus.create({
         id, contexts,
-        title: i18n.getMessage(id, label),
+        title: i18n.getMessage(id, [label, accKey]),
         enabled: !!varsL[MENU_ENABLED],
       })
     );
@@ -418,10 +423,13 @@
       }
     } else {
       const items = Object.keys(menus);
+      const label = varsL[EDITOR_LABEL] || LABEL;
+      const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
+                     `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
       if (items.length) {
         for (const item of items) {
           menus[item] && contextMenus.update(item, {
-            title: i18n.getMessage(item, varsL[EDITOR_LABEL] || LABEL),
+            title: i18n.getMessage(item, [label, accKey]),
           });
         }
       }
@@ -435,8 +443,10 @@
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
     const label = varsL[EDITOR_LABEL] || LABEL;
+    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
+                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
     for (const item of items) {
-      varsL[item] = i18n.getMessage(item, label);
+      varsL[item] = i18n.getMessage(item, [label, accKey]);
     }
   };
 
