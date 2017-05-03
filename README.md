@@ -55,12 +55,25 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 ### Editor Config Path
 
-* Enter the path of `editorconfig.json` which you created for withExEditorHost.
+* Enter the path of editor configuration JSON file.
+
+### Editor Path
+
+* Enter the path of the editor.
+
+### Command Line Options
+
+* Enter command line options.
+* Quote the argument if it contains spaces or backslashes.
+
+### Put File Path After Command Line Options
+
+* When specifying the file, some editor requires to put the file path after command arguments. Check in such case.
 
 ### Editor Label
 
 * Enter the label of the editor.
-* Disabled if editor config path field is not filled, or could not find the host etc.
+* Disabled if editor config path and/or editor path fields are not filled, editor is not executable, etc.
 
 ### Access Key
 
