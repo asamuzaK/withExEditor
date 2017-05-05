@@ -453,18 +453,17 @@
   /* UI */
   /**
    * synchronize UI components
-   * @returns {?Promise.<Array>} - results of each handler
+   * @returns {Promise.<Array>} - results of each handler
    */
   const syncUI = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
-    const enabled = vars[IS_ENABLED] = win && (
-      !win.incognito || varsL[ENABLE_PB]
-    ) || false;
-    return win && Promise.all([
+    const enabled = win && (!win.incognito || varsL[ENABLE_PB]) || false;
+    vars[IS_ENABLED] = !!enabled;
+    return Promise.all([
       portMsg({[IS_ENABLED]: !!enabled}),
       replaceIcon(!enabled && `${ICON}#off` || varsL[ICON_PATH]),
       toggleBadge(),
-    ]) || null;
+    ]);
   };
 
   /* editor config */
@@ -822,7 +821,7 @@
         case ICON_WHITE:
           if (obj.checked) {
             varsL[ICON_PATH] = obj.value;
-            changed && func.push(replaceIcon());
+            changed && func.push(replaceIcon(obj.value));
           }
           break;
         case KEY_ACCESS:
