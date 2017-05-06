@@ -2,7 +2,7 @@
 
 # withExEditor
 
-FirefoxとGeckoベースのブラウザ、Blinkベースのブラウザ用の拡張機能。
+Geckoベースのブラウザ、Blinkベースのブラウザ用の拡張機能。
 コンテキストメニュー（右クリック）から、お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。
 (X)HTML、JavaScript、CSS、MathML、SVG、XMLなどで使用可能です。
 
