@@ -2,13 +2,16 @@
 
 # withExEditor
 
-Geckoベースのブラウザ、Blinkベースのブラウザ用の拡張機能。
+GeckoベースのブラウザとBlinkベースのブラウザ用の拡張機能。
+
 コンテキストメニュー（右クリック）から、お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。
 (X)HTML、JavaScript、CSS、MathML、SVG、XMLなどで使用可能です。
 
 ## ダウンロード
 
+Gecko:
 * [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
+Blink:
 * [withExEditor - Chrome ウェブストア](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi "withExEditor - Chrome ウェブストア")
 
 ### 重要なお知らせ

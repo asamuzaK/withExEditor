@@ -2,13 +2,16 @@ EN | [JA](./README.ja.md)
 
 # WithExEditor
 
-Extensions for Gecko based browsers and Blink based browsers.
+Extension for Gecko based browsers and Blink based browsers.
+
 From the context menu (right click), you can "View source" "View selection" or "Edit text" with your favorite editor.
 Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
 
 ## Download
 
+Gecko:
 * [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
+Blink:
 * [withExEditor - Chrome Web Store](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi "withExEditor - Chrome Web Store")
 
 ### Important Notice
