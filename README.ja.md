@@ -11,6 +11,7 @@ GeckoベースのブラウザとBlinkベースのブラウザ用の拡張機能�
 
 Gecko:
 * [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
+
 Blink:
 * [withExEditor - Chrome ウェブストア](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi "withExEditor - Chrome ウェブストア")
 

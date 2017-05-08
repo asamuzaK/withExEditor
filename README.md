@@ -11,6 +11,7 @@ Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
 
 Gecko:
 * [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
+
 Blink:
 * [withExEditor - Chrome Web Store](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi "withExEditor - Chrome Web Store")
 
