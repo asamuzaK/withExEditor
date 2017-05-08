@@ -86,7 +86,7 @@
     "message": "コンテキストメニューでは設定した「キー」をそのまま押してください。"
   },
   "optionsAccessKeyDetail4": {
-    "message": "備考： コンテクストメニューでのアクセスキーは、まだWebExtensionsでは実装されていません。"
+    "message": "備考： コンテクストメニューでのアクセスキーは、まだGeckoブラウザあでは実装されていません。"
   },
   "optionsAccessKeyLabel": {
     "message": "アクセスキー"

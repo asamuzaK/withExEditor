@@ -86,7 +86,7 @@
     "message": "In the context menu, press 'key' itself."
   },
   "optionsAccessKeyDetail4": {
-    "message": "NOTE: accesskey in context menu is not yet implemented in WebExtensions."
+    "message": "NOTE: accesskey in context menu is not yet implemented in Gecko browsers."
   },
   "optionsAccessKeyLabel": {
     "message": "Access Key"
