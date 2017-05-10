@@ -34,6 +34,7 @@
   const MODE_SELECTION = "modeViewSelection";
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
+  const MOUSE_BUTTON_RIGHT = 2;
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPTIONS_OPEN = "openOptions";
@@ -58,7 +59,7 @@
     [ID_WIN]: "",
     [INCOGNITO]: false,
     [IS_ENABLED]: false,
-    [KEY_ACCESS]: "e",
+    [KEY_ACCESS]: "u",
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
@@ -1162,10 +1163,23 @@
   const openOptionsKey = {
     key: vars[KEY_ACCESS],
     altKey: true,
-    ctrlKey: true,
+    ctrlKey: false,
     metaKey: false,
-    shiftKey: false,
+    shiftKey: true,
     enabled: vars[KEY_OPTIONS],
+  };
+
+  /**
+   * update key combination
+   * @param {string} key - key
+   * @returns {void}
+   */
+  const updateKeyCombo = async key => {
+    if (isString(key) && /^[a-z]$/i.test(key) && (key = key.toLowerCase())) {
+      vars[KEY_ACCESS] = key;
+      execEditorKey.key = key;
+      openOptionsKey.key = key;
+    }
   };
 
   /**
@@ -1206,9 +1220,7 @@
             vars[item] = !!obj;
             break;
           case KEY_ACCESS:
-            vars[item] = obj;
-            execEditorKey.key = obj;
-            openOptionsKey.key = obj;
+            func.push(updateKeyCombo(obj));
             break;
           case KEY_EDITOR:
             vars[item] = !!obj;
@@ -1235,47 +1247,53 @@
   };
 
   /**
-   * handle contextmenu event
+   * handle before contextmenu event
    * @param {!Object} evt - Event
-   * @returns {AsyncFunction} - port message
+   * @returns {?AsyncFunction} - port message
    */
-  const handleContextMenu = async evt => {
-    const {target} = evt;
-    const {localName, namespaceURI, type} = target;
-    const {anchorNode, focusNode, isCollapsed} = window.getSelection();
-    const mode = namespaceURI === nsURI.math && MODE_MATHML ||
-                 namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
-    const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
-                          await getEditableElm(target);
-    let enabled;
-    if (localName === "input") {
-      enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
-    } else {
-      enabled = isCollapsed || !!editableElm ||
-                anchorNode.parentNode === focusNode.parentNode;
+  const handleBeforeContextMenu = async evt => {
+    let func;
+    if (vars[IS_ENABLED]) {
+      const {button, target} = evt;
+      if (button === MOUSE_BUTTON_RIGHT) {
+        const {localName, namespaceURI, type} = target;
+        const {anchorNode, focusNode, isCollapsed} = window.getSelection();
+        const mode = namespaceURI === nsURI.math && MODE_MATHML ||
+                     namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
+        const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
+                              await getEditableElm(target);
+        let enabled;
+        if (localName === "input") {
+          enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
+        } else {
+          enabled = isCollapsed || !!editableElm ||
+                    anchorNode.parentNode === focusNode.parentNode;
+        }
+        vars[CONTEXT_MODE] = mode;
+        vars[CONTEXT_NODE] = editableElm || target;
+        func = portMsg({
+          [CONTEXT_MENU]: {
+            [MODE_EDIT]: {
+              enabled,
+              menuItemId: MODE_EDIT,
+            },
+            [MODE_SOURCE]: {
+              mode,
+              menuItemId: MODE_SOURCE,
+            },
+          },
+        });
+      }
     }
-    vars[CONTEXT_MODE] = mode;
-    vars[CONTEXT_NODE] = editableElm || target;
-    return portMsg({
-      [CONTEXT_MENU]: {
-        [MODE_EDIT]: {
-          enabled,
-          menuItemId: MODE_EDIT,
-        },
-        [MODE_SOURCE]: {
-          mode,
-          menuItemId: MODE_SOURCE,
-        },
-      },
-    });
+    return func || null;
   };
 
   /**
-   * handle keypress event
+   * handle keydown event
    * @param {!Object} evt - Event
    * @returns {?AsyncFunction} - port content / port message
    */
-  const handleKeyPress = async evt => {
+  const handleKeyDown = async evt => {
     let func;
     if (vars[IS_ENABLED]) {
       if (await keyComboMatches(evt, execEditorKey)) {
@@ -1298,12 +1316,14 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
-    root.addEventListener(
-      "contextmenu", evt => handleContextMenu(evt).catch(logError), false
-    );
-    root.addEventListener(
-      "keypress", evt => handleKeyPress(evt).catch(logError), false
-    );
+    root.addEventListener("mousedown", evt =>
+      handleBeforeContextMenu(evt).catch(logError),
+    true);
+    root.addEventListener("keydown", evt =>
+      evt.getModifierState("Shift") &&
+      (evt.getModifierState("Alt") || evt.getModifierState("Control")) &&
+        handleKeyDown(evt).catch(logError),
+    false);
   }, false);
 
   /* startup */

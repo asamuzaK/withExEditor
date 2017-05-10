@@ -148,7 +148,7 @@
           func.push(portMsg({[EDITOR_CONFIG_GET]: value}));
           break;
         case KEY_ACCESS:
-          (value === "" || value.length === 1) &&
+          (value === "" || /^[a-z]$/i.test(value)) &&
             func.push(createPref(target).then(portMsg));
           break;
         default:

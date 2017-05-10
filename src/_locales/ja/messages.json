@@ -6,19 +6,69 @@
     "message": "withExEditor"
   },
   "modeEditText": {
-    "message": "テキストを $1 で編集"
+    "message": "テキストを $LABEL$ で編集 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewMathML": {
-    "message": "MathML のソースを $1 で表示"
+    "message": "MathML のソースを $LABEL$ で表示 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSelection": {
-    "message": "選択した部分のソースを $1 で表示"
+    "message": "選択した部分のソースを $LABEL$ で表示 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSource": {
-    "message": "ページのソースを $1 で表示"
+    "message": "ページのソースを $LABEL$ で表示 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSVG": {
-    "message": "SVG のソースを $1 で表示"
+    "message": "SVG のソースを $LABEL$ で表示 $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "optionsAccessKey": {
     "message": ""
@@ -30,13 +80,13 @@
     "message": "コンテキストメニュー、設定ページを開くショートカット、および直接エディタを実行するためのショートカットで共通して使用するアクセスキーを設定します。"
   },
   "optionsAccessKeyDetail2": {
-    "message": "アクセスキーは任意のキーに変更可能です。ただし、一文字である必要があります。"
+    "message": "アクセスキーには、「a」から「z」までの任意のキーを使用できます。"
   },
   "optionsAccessKeyDetail3": {
     "message": "コンテキストメニューでは設定した「キー」をそのまま押してください。"
   },
   "optionsAccessKeyDetail4": {
-    "message": "備考： コンテクストメニューでのアクセスキーは、まだWebExtensionsでは実装されていません。"
+    "message": "備考： コンテクストメニューでのアクセスキーは、まだGeckoブラウザあでは実装されていません。"
   },
   "optionsAccessKeyLabel": {
     "message": "アクセスキー"
@@ -111,7 +161,7 @@
     "message": "エディタ設定"
   },
   "optionsEditorShortCutDetail": {
-    "message": "コンテキストメニューを経由せずにエディタを直接起動するには「Ctrl + Shift + キー」（Macは「Cmd + Shift + キー」）を押してください。"
+    "message": "コンテキストメニューを経由せずにエディタを直接起動するには「Ctrl + Shift + キー」を押してください。"
   },
   "optionsEditorShortCutLabel": {
     "message": "エディタを直接起動するショートカットキーを有効化"
@@ -177,7 +227,7 @@
     "message": "./manual.ja.html"
   },
   "optionsOptionsShortCutDetail": {
-    "message": "設定ページを開くには「Ctrl + Alt + キー」（Macは「Cmd + Opt + キー」）を押してください。"
+    "message": "設定ページを開くには「Alt + Shift + キー」（Macは「Opt + Shift + キー」）を押してください。"
   },
   "optionsOptionsShortCutLabel": {
     "message": "設定ページを開くショートカットキーを有効化"

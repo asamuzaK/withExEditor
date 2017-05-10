@@ -2,13 +2,18 @@ EN | [JA](./README.ja.md)
 
 # WithExEditor
 
-Add-on for Firefox.
+Extension for Gecko based browsers and Blink based browsers.
+
 From the context menu (right click), you can "View source" "View selection" or "Edit text" with your favorite editor.
 Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
 
 ## Download
 
-[WithExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
+Gecko:
+* [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
+
+Blink:
+* [withExEditor - Chrome Web Store](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi "withExEditor - Chrome Web Store")
 
 ### Important Notice
 
@@ -54,27 +59,40 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 ### Editor Config Path
 
-* Enter the path of `editorconfig.json` which you created for withExEditorHost.
+* Enter the path of editor configuration JSON file.
+
+### Editor Path
+
+* Enter the path of the editor.
+
+### Command Line Options
+
+* Enter command line options.
+* Quote the argument if it contains spaces or backslashes.
+
+### Put File Path After Command Line Options
+
+* When specifying the file, some editor requires to put the file path after command arguments. Check in such case.
 
 ### Editor Label
 
 * Enter the label of the editor.
-* Disabled if editor config path field is not filled, or could not find the host etc.
+* Disabled if editor config path and/or editor path fields are not filled, editor is not executable, etc.
 
 ### Access Key
 
 * Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly.
-* Choose any key, but it must be a single character.
+* Access key can be any key from 'a' to 'z'.
 * In the context menu, press 'key' itself.
-* NOTE: accesskey in context menu is not yet implemented in WebExtensions.
+* NOTE: accesskey in context menu is not yet implemented in Gecko browsers.
 
 ### Enable Shortcut Key To Open The Options Page
 
-* To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac).
+* To open the options page, press 'Alt + Shift + key' ('Opt + Shift + key' on Mac).
 
 ### Enable Shortcut Key To Execute The Editor Directly
 
-* To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac).
+* To execute the editor without going through the context menu, press 'Ctrl + Shift + key'.
 
 ### Enable During Private Browsing
 

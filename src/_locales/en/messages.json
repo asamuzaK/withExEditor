@@ -6,19 +6,69 @@
     "message": "withExEditor"
   },
   "modeEditText": {
-    "message": "Edit Text with $1"
+    "message": "Edit Text with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewMathML": {
-    "message": "View MathML Source with $1"
+    "message": "View MathML Source with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSelection": {
-    "message": "View Selection Source with $1"
+    "message": "View Selection Source with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSource": {
-    "message": "View Page Source with $1"
+    "message": "View Page Source with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "modeViewSVG": {
-    "message": "View SVG Source with $1"
+    "message": "View SVG Source with $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
   },
   "optionsAccessKey": {
     "message": ""
@@ -30,13 +80,13 @@
     "message": "Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly."
   },
   "optionsAccessKeyDetail2": {
-    "message": "Choose any key, but it must be a single character."
+    "message": "Access key can be any key from 'a' to 'z'."
   },
   "optionsAccessKeyDetail3": {
     "message": "In the context menu, press 'key' itself."
   },
   "optionsAccessKeyDetail4": {
-    "message": "NOTE: accesskey in context menu is not yet implemented in WebExtensions."
+    "message": "NOTE: accesskey in context menu is not yet implemented in Gecko browsers."
   },
   "optionsAccessKeyLabel": {
     "message": "Access Key"
@@ -111,7 +161,7 @@
     "message": "Editor Settings"
   },
   "optionsEditorShortCutDetail": {
-    "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac)."
+    "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key'."
   },
   "optionsEditorShortCutLabel": {
     "message": "Enable Shortcut Key To Execute The Editor Directly"
@@ -177,7 +227,7 @@
     "message": "./manual.en.html"
   },
   "optionsOptionsShortCutDetail": {
-    "message": "To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac)."
+    "message": "To open the options page, press 'Alt + Shift + key' ('Opt + Shift + key' on Mac)."
   },
   "optionsOptionsShortCutLabel": {
     "message": "Enable Shortcut Key To Open The Options Page"

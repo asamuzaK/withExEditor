@@ -21,6 +21,7 @@
   const EDITOR_LABEL = "editorLabel";
   const EDITOR_PATH = "editorPath";
   const ENABLE_PB = "enablePB";
+  const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "../data/fileExt.json";
   const HOST = "withexeditorhost";
@@ -31,6 +32,7 @@
   const ICON_WHITE = "buttonIconWhite";
   const IS_ENABLED = "isEnabled";
   const IS_EXECUTABLE = "isExecutable";
+  const IS_WEBEXT = "isWebExtension";
   const KEY_ACCESS = "accessKey";
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
@@ -62,7 +64,8 @@
   /* variables */
   const vars = {
     [IS_ENABLED]: false,
-    [KEY_ACCESS]: "e",
+    [IS_WEBEXT]: runtime.id === EXT_WEBEXT,
+    [KEY_ACCESS]: "u",
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
@@ -275,13 +278,14 @@
    * @returns {void}
    */
   const portContextMenuData = async (info, tab) => {
-    const {frameUrl} = info;
+    const {frameUrl, pageUrl} = info;
     let {windowId, id: tabId} = tab;
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
     if (windowId && tabId) {
       const port = ports[windowId] && ports[windowId][tabId] &&
-                     ports[windowId][tabId][frameUrl];
+                   ports[windowId][tabId][frameUrl] ||
+                   ports[windowId][tabId][pageUrl];
       port && port.postMessage({
         [CONTENT_GET]: {info, tab},
       });
@@ -320,7 +324,7 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const toggleBadge = async (executable = varsL[IS_EXECUTABLE]) => {
-    const color = !executable && WARN_COLOR || "transparent";
+    const color = !executable && WARN_COLOR || [0, 0, 0, 0];
     const text = !executable && WARN_TEXT || "";
     return Promise.all([
       browserAction.setBadgeBackgroundColor({color}),
@@ -345,10 +349,12 @@
    */
   const createMenuItem = async (id, contexts) => {
     const label = varsL[EDITOR_LABEL] || LABEL;
+    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
+                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
     isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
       menus[id] = contextMenus.create({
         id, contexts,
-        title: i18n.getMessage(id, label),
+        title: i18n.getMessage(id, [label, accKey]),
         enabled: !!varsL[MENU_ENABLED],
       })
     );
@@ -359,10 +365,13 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const createMenuItems = async () => {
-    const func = [];
-    const enabled = vars[IS_ENABLED];
+    const win = await windows.getCurrent({windowTypes: ["normal"]});
+    const enabled = win && (
+      !win.incognito || varsL[ENABLE_PB]
+    ) || false;
     const bool = enabled && !vars[ONLY_EDITABLE];
     const items = Object.keys(menus);
+    const func = [];
     for (const item of items) {
       menus[item] = null;
       switch (item) {
@@ -414,10 +423,13 @@
       }
     } else {
       const items = Object.keys(menus);
+      const label = varsL[EDITOR_LABEL] || LABEL;
+      const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
+                     `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
       if (items.length) {
         for (const item of items) {
           menus[item] && contextMenus.update(item, {
-            title: i18n.getMessage(item, varsL[EDITOR_LABEL] || LABEL),
+            title: i18n.getMessage(item, [label, accKey]),
           });
         }
       }
@@ -431,26 +443,27 @@
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
     const label = varsL[EDITOR_LABEL] || LABEL;
+    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
+                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
     for (const item of items) {
-      varsL[item] = i18n.getMessage(item, label);
+      varsL[item] = i18n.getMessage(item, [label, accKey]);
     }
   };
 
   /* UI */
   /**
    * synchronize UI components
-   * @returns {?Promise.<Array>} - results of each handler
+   * @returns {Promise.<Array>} - results of each handler
    */
   const syncUI = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
-    const enabled = vars[IS_ENABLED] = win && (
-      !win.incognito || varsL[ENABLE_PB]
-    ) || false;
-    return win && Promise.all([
+    const enabled = win && (!win.incognito || varsL[ENABLE_PB]) || false;
+    vars[IS_ENABLED] = !!enabled;
+    return Promise.all([
       portMsg({[IS_ENABLED]: !!enabled}),
       replaceIcon(!enabled && `${ICON}#off` || varsL[ICON_PATH]),
       toggleBadge(),
-    ]) || null;
+    ]);
   };
 
   /* editor config */
@@ -674,7 +687,7 @@
   /**
    * handle tab activated
    * @param {!Object} info - activated tab info
-   * @returns {AsyncFunction} - restore context menu
+   * @returns {Promise.<Array>} - results of each handler
    */
   const onTabActivated = async info => {
     let {tabId, windowId} = info, bool;
@@ -694,7 +707,10 @@
       }
     }
     varsL[MENU_ENABLED] = bool || false;
-    return restoreContextMenu();
+    return Promise.all([
+      restoreContextMenu(),
+      syncUI(),
+    ]);
   };
 
   /**
@@ -702,11 +718,11 @@
    * @param {!number} id - tabId
    * @param {!Object} info - changed tab info
    * @param {!Object} tab - tabs.Tab
-   * @returns {?AsyncFunction} - restore context menu
+   * @returns {Promise.<Array>} - results of each handler
    */
   const onTabUpdated = async (id, info, tab) => {
     const {active, url} = tab;
-    let func;
+    const func = [];
     if (active) {
       const tabId = stringifyPositiveInt(id, true);
       let {windowId} = tab;
@@ -716,9 +732,9 @@
                             ports[windowId][tabId][url] &&
                             ports[windowId][tabId][url].name === PORT_CONTENT ||
                             false;
-      func = info.status === "complete" && restoreContextMenu();
+      info.status === "complete" && func.push(restoreContextMenu(), syncUI());
     }
-    return func || null;
+    return Promise.all(func);
   };
 
   /**
@@ -805,7 +821,7 @@
         case ICON_WHITE:
           if (obj.checked) {
             varsL[ICON_PATH] = obj.value;
-            changed && func.push(replaceIcon());
+            changed && func.push(replaceIcon(obj.value));
           }
           break;
         case KEY_ACCESS:
@@ -842,7 +858,9 @@
 
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
-  browser.storage.onChanged.addListener(data => setVars(data).catch(logError));
+  browser.storage.onChanged.addListener(data =>
+    setVars(data).then(syncUI).catch(logError)
+  );
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
   );

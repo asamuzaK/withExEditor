@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <title data-i18n="optionsTitle">withExEditor Options</title>
     <link rel="stylesheet" href="../css/options.css" />
+    <script src="../js/browser-polyfill.js"></script>
     <script src="../js/options.js"></script>
   </head>
   <body>
@@ -185,7 +186,7 @@
                 Access Key
               </label>
               <input type="text" id="accessKey" data-i18n="optionsAccessKey"
-                     placeholder="Input Access Key" value= "e" />
+                     placeholder="Input Access Key" value= "u" />
             </p>
             <details id="accessKeyDetail">
               <div>
@@ -193,13 +194,13 @@
                   Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly.
                 </p>
                 <p data-i18n="optionsAccessKeyDetail2">
-                  Choose any key, but it must be a single character.
+                  Access key can be any key from 'a' to 'z'.
                 </p>
-                <!--p data-i18n="optionsAccessKeyDetail3">
+                <p data-i18n="optionsAccessKeyDetail3">
                   In the context menu, press 'key' itself.
-                </p-->
+                </p>
                 <p data-i18n="optionsAccessKeyDetail4">
-                  NOTE: accesskey in context menu is not yet implemented in WebExtensions.
+                  NOTE: accesskey in context menu is not yet implemented in Gecko browsers.
                 </p>
               </div>
             </details>
@@ -218,7 +219,7 @@
             <details id="optionsShortCutDetail">
               <div>
                 <p data-i18n="optionsOptionsShortCutDetail">
-                  To open the options page, press 'Ctrl + Alt + key' ('Cmd + Opt + key' on Mac).
+                  To open the options page, press 'Alt + Shift + key' ('Opt + Shift + key' on Mac).
                 </p>
               </div>
             </details>
@@ -237,7 +238,7 @@
             <details id="editorShortCutDetail">
               <div>
                 <p data-i18n="optionsEditorShortCutDetail">
-                  To execute the editor without going through the context menu, press 'Ctrl + Shift + key' ('Cmd + Shift + key' on Mac).
+                  To execute the editor without going through the context menu, press 'Ctrl + Shift + key'.
                 </p>
               </div>
             </details>

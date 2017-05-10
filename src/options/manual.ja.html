@@ -22,24 +22,13 @@
         </p>
         <p>
           なお、ホストは<a href="https://nodejs.org/ja/" title="Node.js">Node.js</a>で実行しますので、Node.jsが入っていない場合はインストールしてください。
+          また、ホストのリリースノートで、必要なNode.jsのバージョンを確認してください。
         </p>
-        <p>
-          また、ホストはNode.jsのバージョンに依存することにも注意してください。
-        </p>
-        <ul>
-          <li>
-            withExEditorHost v1.xでは、Node.js v6.9.5以上を必要とします。
-          </li>
-          <li>
-            withExEditorHost v2.xでは、Node.js v7.6.0以上（現時点）を必要とします。
-          </li>
-        </ul>
       </section>
       <section>
         <h1>ホストの設定</h1>
         <p>
           Windowsでは"cmd.exe"、Linux / Macでは「端末」（ターミナル）を開き、withExEditorHostを保存したディレクトリに移動してセットアップスクリプトを実行します。
-          なお、環境によっては管理者権限で実行する必要があるかもしれません。
         </p>
         <figure>
           <pre class="sample"><code>
@@ -48,8 +37,11 @@
           </code></pre>
         </figure>
         <p>
-          スクリプトを実行すると以下の入力を求められますので適宜入力してください。
-          その場では何も入力せず、後でwithExEditorのオプションページから設定することもできます。
+          スクリプトを実行すると、どのブラウザ向けにホストを設定するのか尋ねられますので、リストに表示されたブラウザ名を入力してください。
+        </p>
+        <p>
+          続いて、以下の入力を求められますので適宜入力してください。
+          その場では何も入力せず、後でwithExEditorの設定ページから設定することもできます。
         </p>
         <ul>
           <li>エディタのパス</li>
@@ -61,11 +53,15 @@
           そのほかセットアップの詳細についてはwithExEditorHostのREADMEを参照してください。
         </p>
         <p>
-          設定ファイルが正常に作成されたら、Firefoxを再起動してください。
+          設定ファイルが正常に作成されたら、ブラウザを再起動してください。
         </p>
       </section>
     </main>
     <footer>
+      <p>
+        もしこの拡張機能が有用だとお思いになりましたら、ぜひ寄付をご検討ください。
+        <a href="https://addons.mozilla.org/firefox/addon/withexeditor/">AMO</a>でPayPal経由の寄付を受け付けています。
+      </p>
       <p>
         <a href="./options.html">設定ページ</a>に戻る
       </p>
