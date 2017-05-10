@@ -1,11 +1,7 @@
 v3.0.0
-New Features
+New and updated features
 <ul>
-<li>Blink compatible.</li>
-</ul>
-
-Updated
-<ul>
+<li>Added support for Blink based browsers.</li>
 <li>Default access key value changed from "e" to "u".</li>
 <li>Access key must be one of the alphabetic characters (a-z).</li>
 <li>Keyboard shortcut to open options page changed to "Alt + Shift + key" ("Opt + Shift + key" on Mac).</li>
