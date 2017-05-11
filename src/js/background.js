@@ -662,25 +662,27 @@
 
   /**
    * handle connected port
-   * @param {!Object} port - runtime.Port
+   * @param {Object} port - runtime.Port
    * @returns {void}
    */
-  const handlePort = async port => {
+  const handlePort = async (port = {}) => {
     const {tab, url} = port.sender;
-    const {incognito} = tab;
-    let {windowId, id: tabId} = tab;
-    windowId = stringifyPositiveInt(windowId, true);
-    tabId = stringifyPositiveInt(tabId, true);
-    if (windowId && tabId && url) {
-      ports[windowId] = ports[windowId] || {};
-      ports[windowId][tabId] = ports[windowId][tabId] || {};
-      ports[windowId][tabId][url] = port;
-      port.onDisconnect.addListener(p => removePort(p).catch(logError));
-      port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
-      port.postMessage({
-        incognito, tabId, windowId,
-        [VARS_SET]: vars,
-      });
+    if (tab) {
+      const {incognito} = tab;
+      let {windowId, id: tabId} = tab;
+      windowId = stringifyPositiveInt(windowId, true);
+      tabId = stringifyPositiveInt(tabId, true);
+      if (windowId && tabId && url) {
+        ports[windowId] = ports[windowId] || {};
+        ports[windowId][tabId] = ports[windowId][tabId] || {};
+        ports[windowId][tabId][url] = port;
+        port.onDisconnect.addListener(p => removePort(p).catch(logError));
+        port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+        port.postMessage({
+          incognito, tabId, windowId,
+          [VARS_SET]: vars,
+        });
+      }
     }
   };
 
