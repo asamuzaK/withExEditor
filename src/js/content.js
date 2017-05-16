@@ -1254,8 +1254,9 @@
   const handleBeforeContextMenu = async evt => {
     let func;
     if (vars[IS_ENABLED]) {
-      const {button, target} = evt;
-      if (button === MOUSE_BUTTON_RIGHT) {
+      const {button, key, shiftKey, target} = evt;
+      if (button === MOUSE_BUTTON_RIGHT ||
+          (key === "ContextMenu" || shiftKey && key === "F10")) {
         const {localName, namespaceURI, type} = target;
         const {anchorNode, focusNode, isCollapsed} = window.getSelection();
         const mode = namespaceURI === nsURI.math && MODE_MATHML ||
@@ -1319,11 +1320,18 @@
     root.addEventListener("mousedown", evt =>
       handleBeforeContextMenu(evt).catch(logError),
     true);
-    root.addEventListener("keydown", evt =>
-      evt.getModifierState("Shift") &&
-      (evt.getModifierState("Alt") || evt.getModifierState("Control")) &&
-        handleKeyDown(evt).catch(logError),
-    false);
+    root.addEventListener("keydown", evt => {
+      let func;
+      if (evt.getModifierState("Shift") &&
+          (evt.getModifierState("Alt") || evt.getModifierState("Control"))) {
+        func = handleKeyDown(evt).catch(logError);
+      } else {
+        (evt.getModifierState("Shift") && evt.key === "F10" ||
+         evt.key === "ContextMenu") &&
+          (func = handleBeforeContextMenu(evt).catch(logError));
+      }
+      return func || null;
+    }, false);
   }, false);
 
   /* startup */
