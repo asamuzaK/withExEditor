@@ -1296,18 +1296,25 @@
    */
   const handleKeyDown = async evt => {
     let func;
-    if (vars[IS_ENABLED]) {
-      if (await keyComboMatches(evt, execEditorKey)) {
-        if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
-          const {target} = evt;
-          const mode = await getContextMode(target);
-          (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) &&
-            (func = portContent(target, mode));
+    if (evt.getModifierState("Shift") &&
+        (evt.getModifierState("Alt") || evt.getModifierState("Control"))) {
+      if (vars[IS_ENABLED]) {
+        if (await keyComboMatches(evt, execEditorKey)) {
+          if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
+            const {target} = evt;
+            const mode = await getContextMode(target);
+            (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) &&
+              (func = portContent(target, mode));
+          }
+        } else {
+          const openOpt = await keyComboMatches(evt, openOptionsKey);
+          openOpt && (func = portMsg({[OPTIONS_OPEN]: openOpt}));
         }
-      } else {
-        const openOpt = await keyComboMatches(evt, openOptionsKey);
-        openOpt && (func = portMsg({[OPTIONS_OPEN]: openOpt}));
       }
+    } else {
+      (evt.getModifierState("Shift") && evt.key === "F10" ||
+       evt.key === "ContextMenu") &&
+        (func = handleBeforeContextMenu(evt).catch(logError));
     }
     return func || null;
   };
@@ -1320,18 +1327,9 @@
     root.addEventListener("mousedown", evt =>
       handleBeforeContextMenu(evt).catch(logError),
     true);
-    root.addEventListener("keydown", evt => {
-      let func;
-      if (evt.getModifierState("Shift") &&
-          (evt.getModifierState("Alt") || evt.getModifierState("Control"))) {
-        func = handleKeyDown(evt).catch(logError);
-      } else {
-        (evt.getModifierState("Shift") && evt.key === "F10" ||
-         evt.key === "ContextMenu") &&
-          (func = handleBeforeContextMenu(evt).catch(logError));
-      }
-      return func || null;
-    }, false);
+    root.addEventListener("keydown", evt =>
+      handleKeyDown(evt).catch(logError),
+    true);
   }, false);
 
   /* startup */
