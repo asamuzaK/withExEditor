@@ -129,18 +129,14 @@
     Number.isSafeInteger(i) && (zero && i >= 0 || i > 0) && `${i}` || null;
 
   /**
-   * remove query and/or fragment from URI
+   * remove query string from URI
    * @param {string} uri - URI
-   * @returns {?string} - replaced URI
+   * @returns {string} - replaced URI
    */
-  const removeQueryFragmentFromURI = async uri => {
-    let u;
-    if (isString(uri)) {
-      const q = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
-      const f = /#(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
-      u = uri.replace(q, "").replace(f, "");
-    }
-    return u || null;
+  const removeQueryFromURI = async uri => {
+    const query = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
+    isString(uri) && (uri = uri.replace(query, ""));
+    return uri;
   };
 
   /* windows */
@@ -237,7 +233,7 @@
     if (sender) {
       const {tab, url} = sender;
       if (tab) {
-        const portUrl = await removeQueryFragmentFromURI(url);
+        const portUrl = await removeQueryFromURI(url);
         let {windowId, id: tabId} = tab;
         tabId = stringifyPositiveInt(tabId, true);
         windowId = stringifyPositiveInt(windowId, true);
@@ -300,7 +296,7 @@
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
     if (windowId && tabId) {
-      const portUrl = await removeQueryFragmentFromURI(frameUrl || pageUrl);
+      const portUrl = await removeQueryFromURI(frameUrl || pageUrl);
       const port = ports[windowId] && ports[windowId][tabId] &&
                    ports[windowId][tabId][portUrl];
       port && port.postMessage({
@@ -689,7 +685,7 @@
       windowId = stringifyPositiveInt(windowId, true);
       tabId = stringifyPositiveInt(tabId, true);
       if (windowId && tabId && url) {
-        const portUrl = await removeQueryFragmentFromURI(url);
+        const portUrl = await removeQueryFromURI(url);
         ports[windowId] = ports[windowId] || {};
         ports[windowId][tabId] = ports[windowId][tabId] || {};
         ports[windowId][tabId][portUrl] = port;
@@ -744,7 +740,7 @@
     const func = [];
     if (active) {
       const {status} = info;
-      const portUrl = await removeQueryFragmentFromURI(url);
+      const portUrl = await removeQueryFromURI(url);
       const tId = stringifyPositiveInt(id, true);
       const wId = stringifyPositiveInt(windowId, true);
       varsL[MENU_ENABLED] = wId && tId && portUrl &&
