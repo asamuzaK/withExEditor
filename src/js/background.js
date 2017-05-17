@@ -128,6 +128,21 @@
   const stringifyPositiveInt = (i, zero = false) =>
     Number.isSafeInteger(i) && (zero && i >= 0 || i > 0) && `${i}` || null;
 
+  /**
+   * remove query and/or fragment from URI
+   * @param {string} uri - URI
+   * @returns {?string} - replaced URI
+   */
+  const removeQueryFragmentFromURI = async uri => {
+    let u;
+    if (isString(uri)) {
+      const q = /\?(?:[a-z0-9\-\._~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*/;
+      const f = /#(?:[a-z0-9\-\._~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*/;
+      u = uri.replace(q, "").replace(f, "");
+    }
+    return u || null;
+  };
+
   /* windows */
   /**
    * check if any of windows is incognito
@@ -222,11 +237,13 @@
     if (sender) {
       const {tab, url} = sender;
       if (tab) {
+        const portUrl = await removeQueryFragmentFromURI(url);
         let {windowId, id: tabId} = tab;
         tabId = stringifyPositiveInt(tabId, true);
         windowId = stringifyPositiveInt(windowId, true);
-        tabId && windowId && url && ports[windowId] && ports[windowId][tabId] &&
-          delete ports[windowId][tabId][url];
+        tabId && windowId && portUrl && ports[windowId] &&
+        ports[windowId][tabId] &&
+          delete ports[windowId][tabId][portUrl];
       }
     }
   };
@@ -245,11 +262,12 @@
                             Object.keys(ports[windowId][tabId]);
         if (frameUrls && frameUrls.length) {
           for (const frameUrl of frameUrls) {
-            const port = ports[windowId][tabId][frameUrl];
+            const portUrl = await removeQueryFragmentFromURI(frameUrl);
+            const port = ports[windowId][tabId][portUrl];
             try {
               port && port.postMessage(msg);
             } catch (e) {
-              delete ports[windowId][tabId][frameUrl];
+              delete ports[windowId][tabId][portUrl];
             }
           }
         }
@@ -283,9 +301,9 @@
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
     if (windowId && tabId) {
+      const portId = await removeQueryFragmentFromURI(framUrl || pageUrl);
       const port = ports[windowId] && ports[windowId][tabId] &&
-                   ports[windowId][tabId][frameUrl] ||
-                   ports[windowId][tabId][pageUrl];
+                   ports[windowId][tabId][portUrl];
       port && port.postMessage({
         [CONTENT_GET]: {info, tab},
       });
@@ -672,9 +690,10 @@
       windowId = stringifyPositiveInt(windowId, true);
       tabId = stringifyPositiveInt(tabId, true);
       if (windowId && tabId && url) {
+        const portUrl = await removeQueryFragmentFromURI(url);
         ports[windowId] = ports[windowId] || {};
         ports[windowId][tabId] = ports[windowId][tabId] || {};
-        ports[windowId][tabId][url] = port;
+        ports[windowId][tabId][portUrl] = port;
         port.onDisconnect.addListener(p => removePort(p).catch(logError));
         port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
         port.postMessage({
@@ -722,18 +741,19 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabUpdated = async (id, info, tab) => {
-    const {active, url} = tab;
+    const {active, url, windowId} = tab;
     const func = [];
     if (active) {
-      const tabId = stringifyPositiveInt(id, true);
-      let {windowId} = tab;
-      windowId = stringifyPositiveInt(windowId, true);
-      varsL[MENU_ENABLED] = windowId && tabId && url &&
-                            ports[windowId] && ports[windowId][tabId] &&
-                            ports[windowId][tabId][url] &&
-                            ports[windowId][tabId][url].name === PORT_CONTENT ||
+      const {status} = info;
+      const portUrl = await removeQueryFragmentFromURI(url);
+      const tId = stringifyPositiveInt(id, true);
+      const wId = stringifyPositiveInt(windowId, true);
+      varsL[MENU_ENABLED] = wId && tId && portUrl &&
+                            ports[wId] && ports[wId][tId] &&
+                            ports[wId][tId][portUrl] &&
+                            ports[wId][tId][portUrl].name === PORT_CONTENT ||
                             false;
-      info.status === "complete" && func.push(restoreContextMenu(), syncUI());
+      status === "complete" && func.push(restoreContextMenu(), syncUI());
     }
     return Promise.all(func);
   };
