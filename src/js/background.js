@@ -136,8 +136,8 @@
   const removeQueryFragmentFromURI = async uri => {
     let u;
     if (isString(uri)) {
-      const q = /\?(?:[a-z0-9\-\._~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*/;
-      const f = /#(?:[a-z0-9\-\._~!\$&'\(\)\*\+,;=:@\/\?]|%[0-9A-F]{2})*/;
+      const q = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
+      const f = /#(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
       u = uri.replace(q, "").replace(f, "");
     }
     return u || null;
@@ -258,11 +258,10 @@
   const portMsg = async (msg, windowId, tabId) => {
     if (msg) {
       if (windowId && tabId) {
-        const frameUrls = ports[windowId] && ports[windowId][tabId] &&
-                            Object.keys(ports[windowId][tabId]);
-        if (frameUrls && frameUrls.length) {
-          for (const frameUrl of frameUrls) {
-            const portUrl = await removeQueryFragmentFromURI(frameUrl);
+        const portUrls = ports[windowId] && ports[windowId][tabId] &&
+                           Object.keys(ports[windowId][tabId]);
+        if (portUrls && portUrls.length) {
+          for (const portUrl of portUrls) {
             const port = ports[windowId][tabId][portUrl];
             try {
               port && port.postMessage(msg);
@@ -301,7 +300,7 @@
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
     if (windowId && tabId) {
-      const portId = await removeQueryFragmentFromURI(framUrl || pageUrl);
+      const portUrl = await removeQueryFragmentFromURI(frameUrl || pageUrl);
       const port = ports[windowId] && ports[windowId][tabId] &&
                    ports[windowId][tabId][portUrl];
       port && port.postMessage({
