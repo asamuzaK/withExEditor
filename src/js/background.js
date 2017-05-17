@@ -397,7 +397,6 @@
   const restoreContextMenu = async () =>
     contextMenus.removeAll().then(createMenuItems);
 
-  // FIXME: sometimes, update does not make it in time, Issue #20
   /**
    * update context menu
    * @param {Object} type - context type data
