@@ -639,6 +639,9 @@
               break;
             case EDITOR_CONFIG_GET:
             case EDITOR_CONFIG_SET:
+            case LOCAL_FILE_VIEW:
+            case TMP_FILE_CREATE:
+            case TMP_FILE_GET:
               func.push(portHostMsg({[item]: obj}));
               break;
             case EDITOR_CONFIG_RES:
@@ -646,11 +649,6 @@
               break;
             case HOST:
               func.push(handleHostMsg(obj));
-              break;
-            case LOCAL_FILE_VIEW:
-            case TMP_FILE_CREATE:
-            case TMP_FILE_GET:
-              func.push(portHostMsg({[item]: obj}));
               break;
             case OPTIONS_OPEN:
               func.push(openOptionsPage());
