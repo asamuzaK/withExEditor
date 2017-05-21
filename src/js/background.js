@@ -4,8 +4,12 @@
 "use strict";
 {
   /* api */
-  const {browserAction, contextMenus, i18n, runtime, tabs, windows} = browser;
-  const storage = browser.storage.local;
+  const {
+    browserAction, contextMenus, i18n, runtime, tabs, windows,
+    storage: {
+      local: storage,
+    },
+  } = browser;
 
   /* constants */
   const CONTENT_GET = "getContent";
@@ -133,7 +137,7 @@
    * @param {string} uri - URI
    * @returns {string} - replaced URI
    */
-  const removeQueryFromURI = async uri => {
+  const removeQueryFromURI = uri => {
     const query = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
     isString(uri) && (uri = uri.replace(query, ""));
     return uri;
@@ -233,7 +237,7 @@
     if (sender) {
       const {tab, url} = sender;
       if (tab) {
-        const portUrl = await removeQueryFromURI(url);
+        const portUrl = removeQueryFromURI(url);
         let {windowId, id: tabId} = tab;
         tabId = stringifyPositiveInt(tabId, true);
         windowId = stringifyPositiveInt(windowId, true);
@@ -296,7 +300,7 @@
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
     if (windowId && tabId) {
-      const portUrl = await removeQueryFromURI(frameUrl || pageUrl);
+      const portUrl = removeQueryFromURI(frameUrl || pageUrl);
       const port = ports[windowId] && ports[windowId][tabId] &&
                    ports[windowId][tabId][portUrl];
       port && port.postMessage({
@@ -379,9 +383,7 @@
    */
   const createMenuItems = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
-    const enabled = win && (
-      !win.incognito || varsL[ENABLE_PB]
-    ) || false;
+    const enabled = win && (!win.incognito || varsL[ENABLE_PB]) || false;
     const bool = enabled && !vars[ONLY_EDITABLE];
     const items = Object.keys(menus);
     const func = [];
@@ -499,8 +501,7 @@
     const timestamp = store[EDITOR_CONFIG_TS] &&
                       store[EDITOR_CONFIG_TS].value || 0;
     const func = [];
-    if (!timestamp ||
-        editorConfigTimestamp > timestamp) {
+    if (!timestamp || editorConfigTimestamp > timestamp) {
       const msg = {
         [EDITOR_CONFIG]: {
           id: EDITOR_CONFIG,
@@ -683,7 +684,7 @@
       windowId = stringifyPositiveInt(windowId, true);
       tabId = stringifyPositiveInt(tabId, true);
       if (windowId && tabId && url) {
-        const portUrl = await removeQueryFromURI(url);
+        const portUrl = removeQueryFromURI(url);
         ports[windowId] = ports[windowId] || {};
         ports[windowId][tabId] = ports[windowId][tabId] || {};
         ports[windowId][tabId][portUrl] = port;
@@ -738,7 +739,7 @@
     const func = [];
     if (active) {
       const {status} = info;
-      const portUrl = await removeQueryFromURI(url);
+      const portUrl = removeQueryFromURI(url);
       const tId = stringifyPositiveInt(id, true);
       const wId = stringifyPositiveInt(windowId, true);
       varsL[MENU_ENABLED] = wId && tId && portUrl &&
@@ -809,43 +810,46 @@
   const setVar = async (item, obj, changed = false) => {
     const func = [];
     if (item && obj) {
+      const {
+        app, checked, value,
+      } = obj;
       const hasPorts = Object.keys(ports).length;
       switch (item) {
         case EDITOR_CONFIG:
-          varsL[item] = obj.value;
-          varsL[IS_EXECUTABLE] = obj.app && !!obj.app.executable;
+          varsL[item] = value;
+          varsL[IS_EXECUTABLE] = app && !!app.executable;
           changed && func.push(toggleBadge());
           break;
         case EDITOR_LABEL:
-          varsL[item] = obj.value;
+          varsL[item] = value;
           func.push(cacheMenuItemTitle());
           changed && func.push(updateContextMenu());
           break;
         case ONLY_EDITABLE:
-          vars[item] = !!obj.checked;
-          hasPorts && func.push(portVar({[item]: !!obj.checked}));
+          vars[item] = !!checked;
+          hasPorts && func.push(portVar({[item]: !!checked}));
           changed && func.push(restoreContextMenu());
           break;
         case ENABLE_PB:
-          varsL[item] = !!obj.checked;
+          varsL[item] = !!checked;
           changed && func.push(syncUI());
           break;
         case ICON_COLOR:
         case ICON_GRAY:
         case ICON_WHITE:
           if (obj.checked) {
-            varsL[ICON_PATH] = obj.value;
-            changed && func.push(replaceIcon(obj.value));
+            varsL[ICON_PATH] = value;
+            changed && func.push(replaceIcon(value));
           }
           break;
         case KEY_ACCESS:
-          vars[item] = obj.value;
-          hasPorts && func.push(portVar({[item]: obj.value}));
+          vars[item] = value;
+          hasPorts && func.push(portVar({[item]: value}));
           break;
         case KEY_EDITOR:
         case KEY_OPTIONS:
-          vars[item] = !!obj.checked;
-          hasPorts && func.push(portVar({[item]: !!obj.checked}));
+          vars[item] = !!checked;
+          hasPorts && func.push(portVar({[item]: !!checked}));
           break;
         default:
       }
@@ -864,7 +868,8 @@
     if (items.length) {
       for (const item of items) {
         const obj = data[item];
-        func.push(setVar(item, obj.newValue || obj, !!obj.newValue));
+        const {newValue} = obj;
+        func.push(setVar(item, newValue || obj, !!newValue));
       }
     }
     return Promise.all(func);

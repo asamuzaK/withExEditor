@@ -4,8 +4,12 @@
 "use strict";
 {
   /* api */
-  const {runtime} = browser;
-  const storage = browser.storage.local;
+  const {
+    runtime,
+    storage: {
+      local: storage,
+    },
+  } = browser;
 
   /* constants */
   const CONTENT_GET = "getContent";

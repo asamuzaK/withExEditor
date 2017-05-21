@@ -4,8 +4,12 @@
 "use strict";
 {
   /* api */
-  const {i18n, runtime} = browser;
-  const storage = browser.storage.local;
+  const {
+    i18n, runtime,
+    storage: {
+      local: storage,
+    },
+  } = browser;
 
   /* constants */
   const DATA_ATTR_I18N = "data-i18n";
