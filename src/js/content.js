@@ -1259,8 +1259,8 @@
     let func;
     if (vars[IS_ENABLED]) {
       const {button, key, shiftKey, target} = evt;
-      if (button === MOUSE_BUTTON_RIGHT ||
-          (key === "ContextMenu" || shiftKey && key === "F10")) {
+      if (button === MOUSE_BUTTON_RIGHT || key === "ContextMenu" ||
+          shiftKey && key === "F10") {
         const {localName, namespaceURI, type} = target;
         const {anchorNode, focusNode, isCollapsed} = window.getSelection();
         const mode = namespaceURI === nsURI.math && MODE_MATHML ||
