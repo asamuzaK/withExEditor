@@ -1,3 +1,14 @@
+v3.1.0
+更新点
+<ul>
+<li>黒アイコンを追加。</li>
+</ul>
+
+動作要件
+<ul>
+<li>withExEditorHost v1.4.1</li>
+</ul>
+
 v3.0.0
 新規・更新点
 <ul>
