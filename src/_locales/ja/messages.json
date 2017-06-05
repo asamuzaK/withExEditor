@@ -178,6 +178,18 @@
   "optionsEnablePBLabel": {
     "message": "プライベートブラウジング中も有効化"
   },
+  "optionsIconBlack": {
+    "message": ""
+  },
+  "optionsIconBlack_alt": {
+    "message": "ブラック"
+  },
+  "optionsIconBlackLabel": {
+    "message": ""
+  },
+  "optionsIconBlackLabel_ariaLabel": {
+    "message": "ブラックアイコン"
+  },
   "optionsIconColor": {
     "message": ""
   },

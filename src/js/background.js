@@ -5,7 +5,7 @@
 {
   /* api */
   const {
-    browserAction, contextMenus, i18n, runtime, tabs, windows,
+    browserAction, contextMenus, extension, i18n, runtime, tabs, windows,
     storage: {
       local: storage,
     },
@@ -29,10 +29,11 @@
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "../data/fileExt.json";
   const HOST = "withexeditorhost";
-  const ICON = "./img/icon.svg";
+  const ICON = "img/icon.svg";
   const ICON_COLOR = "buttonIcon";
+  const ICON_BLACK = "buttonIconBlack";
   const ICON_GRAY = "buttonIconGray";
-  const ICON_PATH = "iconPath";
+  const ICON_ID = "iconId";
   const ICON_WHITE = "buttonIconWhite";
   const IS_ENABLED = "isEnabled";
   const IS_EXECUTABLE = "isExecutable";
@@ -78,7 +79,7 @@
   const varsL = {
     [EDITOR_LABEL]: "",
     [ENABLE_PB]: false,
-    [ICON_PATH]: `${ICON}#gray`,
+    [ICON_ID]: "gray",
     [IS_EXECUTABLE]: false,
     [MENU_ENABLED]: false,
     [MODE_MATHML]: "",
@@ -328,12 +329,15 @@
 
   /* icon */
   /**
-   * replace icon
-   * @param {string} path - icon path
+   * set icon
+   * @param {string} id - icon fragment id
    * @returns {AsyncFunction} - set icon
    */
-  const replaceIcon = async (path = varsL[ICON_PATH]) =>
-    browserAction.setIcon({path});
+  const setIcon = async (id = varsL[ICON_ID]) => {
+    const icon = await extension.getURL(ICON);
+    const path = vars[IS_ENABLED] && `${icon}#${id}` || `${icon}#off`;
+    return browserAction.setIcon({path});
+  };
 
   /**
    * toggle badge
@@ -475,7 +479,7 @@
     vars[IS_ENABLED] = !!enabled;
     return Promise.all([
       portMsg({[IS_ENABLED]: !!enabled}),
-      replaceIcon(!enabled && `${ICON}#off` || varsL[ICON_PATH]),
+      setIcon(!enabled && "off" || varsL[ICON_ID]),
       toggleBadge(),
     ]);
   };
@@ -771,7 +775,7 @@
    * @returns {?AsyncFunction} - sync UI
    */
   const onWindowFocusChanged = async () => {
-    const win = windows.getAll({windowTypes: ["normal"]});
+    const win = await windows.getAll({windowTypes: ["normal"]});
     return win.length && syncUI() || null;
   };
 
@@ -834,12 +838,13 @@
           varsL[item] = !!checked;
           changed && func.push(syncUI());
           break;
+        case ICON_BLACK:
         case ICON_COLOR:
         case ICON_GRAY:
         case ICON_WHITE:
           if (obj.checked) {
-            varsL[ICON_PATH] = value;
-            changed && func.push(replaceIcon(value));
+            varsL[ICON_ID] = value;
+            changed && func.push(setIcon(value));
           }
           break;
         case KEY_ACCESS:

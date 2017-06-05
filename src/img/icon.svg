@@ -27,6 +27,10 @@
     <path d="m107.52 3.5156-60 60 16.969 16.969 60-60-16.969-16.969z"/>
     <path d="m0 0v24h12l12-12-12-12z" transform="translate(60,85) rotate(135)"/>
   </symbol>
+  <g id="black" fill="#000">
+    <use href="#frame"/>
+    <use href="#pen"/>
+  </g>
   <g id="gray" fill="#4C4C4C">
     <use href="#frame"/>
     <use href="#pen"/>
