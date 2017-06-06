@@ -27,7 +27,7 @@
   const ENABLE_PB = "enablePB";
   const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const FILE_EXT = "fileExt";
-  const FILE_EXT_PATH = "../data/fileExt.json";
+  const FILE_EXT_PATH = "data/fileExt.json";
   const HOST = "withexeditorhost";
   const ICON = "img/icon.svg";
   const ICON_COLOR = "buttonIcon";
@@ -50,7 +50,7 @@
   const MODE_SOURCE = "modeViewSource";
   const MODE_SVG = "modeViewSVG";
   const NS_URI = "nsUri";
-  const NS_URI_PATH = "../data/nsUri.json";
+  const NS_URI_PATH = "data/nsUri.json";
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPTIONS_OPEN = "openOptions";
   const PORT_CONTENT = "portContent";
@@ -191,9 +191,13 @@
    * @returns {?AsyncFunction} - set storage
    */
   const storeFetchedData = async (path, key) => {
-    const data = isString(path) && isString(key) &&
-                   await fetch(path).then(res => res && res.json());
-    return data && setStorage({[key]: data}) || null;
+    let func;
+    if (isString(path) && isString(key)) {
+      path = await extension.getURL(path);
+      data = await fetch(path).then(res => res && res.json());
+      func = setStorage({[key]: data});
+    }
+    return func || null;
   };
 
   /**
