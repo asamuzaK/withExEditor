@@ -30,8 +30,8 @@
   const FILE_EXT_PATH = "data/fileExt.json";
   const HOST = "withexeditorhost";
   const ICON = "img/icon.svg";
-  const ICON_COLOR = "buttonIcon";
   const ICON_BLACK = "buttonIconBlack";
+  const ICON_COLOR = "buttonIconColor";
   const ICON_GRAY = "buttonIconGray";
   const ICON_ID = "iconId";
   const ICON_WHITE = "buttonIconWhite";
@@ -79,7 +79,7 @@
   const varsL = {
     [EDITOR_LABEL]: "",
     [ENABLE_PB]: false,
-    [ICON_ID]: "gray",
+    [ICON_ID]: "#gray",
     [IS_EXECUTABLE]: false,
     [MENU_ENABLED]: false,
     [MODE_MATHML]: "",
@@ -192,9 +192,9 @@
    */
   const storeFetchedData = async (path, key) => {
     let func;
-    if (isString(path) && isString(key)) {
-      path = await extension.getURL(path);
-      data = await fetch(path).then(res => res && res.json());
+    path = isString(path) && await extension.getURL(path);
+    if (path && isString(key)) {
+      const data = await fetch(path).then(res => res && res.json());
       func = setStorage({[key]: data});
     }
     return func || null;
@@ -339,7 +339,7 @@
    */
   const setIcon = async (id = varsL[ICON_ID]) => {
     const icon = await extension.getURL(ICON);
-    const path = vars[IS_ENABLED] && `${icon}#${id}` || `${icon}#off`;
+    const path = vars[IS_ENABLED] && `${icon}${id}` || `${icon}#off`;
     return browserAction.setIcon({path});
   };
 
@@ -483,7 +483,7 @@
     vars[IS_ENABLED] = !!enabled;
     return Promise.all([
       portMsg({[IS_ENABLED]: !!enabled}),
-      setIcon(!enabled && "off" || varsL[ICON_ID]),
+      setIcon(!enabled && "#off" || varsL[ICON_ID]),
       toggleBadge(),
     ]);
   };
