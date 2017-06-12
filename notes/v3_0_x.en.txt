@@ -1,9 +1,9 @@
-v3.1.1
+v3.1.2
 Updated feature
 * Added black icon.
 
 Requirement
-* withExEditorHost v1.4.1
+* withExEditorHost v1.4.2
 
 v3.0.0
 New and updated features

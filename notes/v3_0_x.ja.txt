@@ -1,9 +1,9 @@
-v3.1.1
+v3.1.2
 更新点
 * 黒アイコンを追加。
 
 動作要件
-* withExEditorHost v1.4.1</li>
+* withExEditorHost v1.4.2
 
 v3.0.0
 新規・更新点
