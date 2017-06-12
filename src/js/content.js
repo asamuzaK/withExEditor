@@ -94,10 +94,10 @@
   const stripHtmlTags = v => {
     while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
       v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "")
-            .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
+        .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
     }
     return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
-             .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+      .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
   };
 
   /* storage */
@@ -632,7 +632,7 @@
         }
         attr = isHtml && DATA_ATTR_ID || `${nsPrefix || HTML}:${DATA_ATTR_ID}`;
         dataId = `${LABEL}_${elm.id || window.performance.now()}`
-                   .replace(/[-:.]/g, "_");
+          .replace(/[-:.]/g, "_");
         elm.setAttributeNS(ns, attr, dataId);
         isHtml && elm.addEventListener(
           "focus", evt => requestTmpFile(evt).catch(logError), false
@@ -1062,8 +1062,8 @@
   const replaceContent = async (elm, node, value, ns = nsURI.html) => {
     if (node && node.nodeType === Node.ELEMENT_NODE && isString(value)) {
       const changed = node.textContent.replace(/^\s*/, "")
-                        .replace(/\n +/g, "\n")
-                        .replace(/([^\n])$/, (m, c) => `${c}\n`) !== value;
+        .replace(/\n +/g, "\n")
+        .replace(/([^\n])$/, (m, c) => `${c}\n`) !== value;
       if (changed) {
         const frag = document.createDocumentFragment();
         const sep = elm === node && await createSeparatedContent(value, ns);
