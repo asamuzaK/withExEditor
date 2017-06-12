@@ -1328,12 +1328,16 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.documentElement;
-    root.addEventListener("mousedown", evt =>
-      handleBeforeContextMenu(evt).catch(logError),
-    true);
-    root.addEventListener("keydown", evt =>
-      handleKeyDown(evt).catch(logError),
-    true);
+    root.addEventListener(
+      "mousedown",
+      evt => handleBeforeContextMenu(evt).catch(logError),
+      true
+    );
+    root.addEventListener(
+      "keydown",
+      evt => handleKeyDown(evt).catch(logError),
+      true
+    );
   }, false);
 
   /* startup */
