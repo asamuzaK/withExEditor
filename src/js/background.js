@@ -30,6 +30,7 @@
   const FILE_EXT_PATH = "data/fileExt.json";
   const HOST = "withexeditorhost";
   const ICON = "img/icon.svg";
+  const ICON_AUTO = "buttonIconAuto";
   const ICON_BLACK = "buttonIconBlack";
   const ICON_COLOR = "buttonIconColor";
   const ICON_GRAY = "buttonIconGray";
@@ -842,6 +843,7 @@
           varsL[item] = !!checked;
           changed && func.push(syncUI());
           break;
+        case ICON_AUTO:
         case ICON_BLACK:
         case ICON_COLOR:
         case ICON_GRAY:
