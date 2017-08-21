@@ -1,3 +1,9 @@
+v3.2.0
+Updated feature
+* Added icon which automatically matches toolbar
+* * Gecko 57.0 and later.
+* * Need to set "svg.context-properties.content.enabled" to "true" from "about:config".
+
 v3.1.3
 Updated feature
 * Added black icon.
