@@ -27,8 +27,16 @@
     <path d="m107.52 3.5156-60 60 16.969 16.969 60-60-16.969-16.969z"/>
     <path d="m0 0v24h12l12-12-12-12z" transform="translate(60,85) rotate(135)"/>
   </symbol>
-  <g id="context" fill="context-fill #4C4C4C"
-     fill-opacity="context-fill-opacity 1">
+  <g id="context" fill="context-fill"
+     fill-opacity="context-fill-opacity">
+    <use href="#frame"/>
+    <use href="#pen"/>
+  </g>
+  <g id="photon_gray_90" fill="#0C0C0D">
+    <use href="#frame"/>
+    <use href="#pen"/>
+  </g>
+  <g id="photon_gray_10" fill="#F9F9FA">
     <use href="#frame"/>
     <use href="#pen"/>
   </g>

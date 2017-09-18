@@ -80,7 +80,7 @@
   const varsL = {
     [EDITOR_LABEL]: "",
     [ENABLE_PB]: false,
-    [ICON_ID]: "#gray",
+    [ICON_ID]: "#context",
     [IS_EXECUTABLE]: false,
     [MENU_ENABLED]: false,
     [MODE_MATHML]: "",
