@@ -730,7 +730,7 @@
       const ctrl = await getEditableElm(elm);
       if (dataId && ctrl) {
         const arr = ctrl.hasAttributeNS("", DATA_ATTR_CTRLS) &&
-                      (ctrl.getAttributeNS("", DATA_ATTR_CTRLS)).split(" ");
+                      ctrl.getAttributeNS("", DATA_ATTR_CTRLS).split(" ");
         if (arr) {
           const attr = arr.push(dataId) && [...new Set(arr)].join(" ");
           attr && ctrl.setAttributeNS("", DATA_ATTR_CTRLS, attr);
@@ -788,7 +788,7 @@
       const res = await fetch(uri, {headers, method: "GET", mode: "cors"});
       if (res) {
         const {dir, host, incognito, mode, tabId, windowId} = data;
-        const [type] = (res.headers.get("Content-Type")).split(";");
+        const [type] = res.headers.get("Content-Type").split(";");
         const dataId = await getFileNameFromURI(uri, SUBST);
         const fileName = dataId + await getFileExtension(type);
         const value = await res.text();
@@ -1119,7 +1119,7 @@
         let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
             ns = !isHtml && nsURI.html || "", attr, nsPrefix;
         if (elm.hasAttributeNS(ns, DATA_ATTR_CTRLS)) {
-          const arr = (elm.getAttributeNS(ns, DATA_ATTR_CTRLS)).split(" ");
+          const arr = elm.getAttributeNS(ns, DATA_ATTR_CTRLS).split(" ");
           for (let id of arr) {
             if (id === dataId &&
                 (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
