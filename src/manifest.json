@@ -7,7 +7,7 @@
   },
   "background": {
     "scripts": [
-      "js/browser-polyfill.js",
+      "js/browser-polyfill.min.js",
       "js/background.js"
     ]
   },
@@ -20,7 +20,7 @@
     {
       "all_frames": true,
       "js": [
-        "js/browser-polyfill.js",
+        "js/browser-polyfill.min.js",
         "js/content.js"
       ],
       "matches": ["<all_urls>"],
