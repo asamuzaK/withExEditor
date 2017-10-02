@@ -164,6 +164,19 @@
 
   /* html */
   /**
+   * add event listener to reload extension button
+   * @returns {void}
+   */
+  const addReloadExtensionListener = async () => {
+    const elm = document.getElementById("reloadExtension");
+    if (elm) {
+      elm.addEventListener(
+        "click", () => runtime.reload().catch(logError), false
+      );
+    }
+  };
+
+  /**
    * add event listener to save editor settings button
    * @returns {void}
    */
@@ -303,5 +316,6 @@
     setValuesFromStorage(),
     addInputChangeListener(),
     addSaveEditorSettingsListener(),
+    addReloadExtensionListener(),
   ]).catch(logError), false);
 }
