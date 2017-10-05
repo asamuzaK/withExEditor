@@ -101,3 +101,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 ### Enable Only When Editing Text
 
 * Enables only when the content is editable.
+
+### Reload withExEditor
+
+* Try when withExEditor stops working, for example when updating Node.js or updating withExEditorHost.
