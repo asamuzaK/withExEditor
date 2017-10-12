@@ -28,11 +28,19 @@
       <section>
         <h1>ホストの設定</h1>
         <p>
-          Windowsでは"cmd.exe"、Linux / Macでは「端末」（ターミナル）を開き、withExEditorHostを保存したディレクトリに移動してセットアップスクリプトを実行します。
+          Windowsでは"cmd.exe"、Linux / Macでは「端末」（ターミナル）を開き、withExEditorHostの保存先に移動したうえで、下記コマンドを実行してインストールを完了させます。
         </p>
         <figure>
           <pre class="sample"><code>
 &gt; cd path/to/withExEditorHost
+&gt; npm install
+          </code></pre>
+        </figure>
+        <p>
+          続いて、セットアップスクリプトを実行します。
+        </p>
+        <figure>
+          <pre class="sample"><code>
 &gt; node setup.js
           </code></pre>
         </figure>
@@ -41,7 +49,6 @@
         </p>
         <p>
           続いて、以下の入力を求められますので適宜入力してください。
-          その場では何も入力せず、後でwithExEditorの設定ページから設定することもできます。
         </p>
         <ul>
           <li>エディタのパス</li>

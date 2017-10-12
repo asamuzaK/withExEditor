@@ -18,7 +18,6 @@
   const EDITOR_CONFIG = "editorConfigPath";
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
-  const EDITOR_CONFIG_SET = "setEditorConfig";
   const EDITOR_CONFIG_TS = "editorConfigTimestamp";
   const EDITOR_FILE_NAME = "editorFileName";
   const EDITOR_FILE_POS = "editorFileAfterCmdArgs";
@@ -572,15 +571,6 @@
       };
       func.push(setStorage(msg), portMsg({[EDITOR_CONFIG_RES]: data}));
     } else {
-      editorConfigTimestamp < store[EDITOR_CONFIG_TS].value &&
-        func.push(portHostMsg({
-          [EDITOR_CONFIG_SET]: {
-            editorConfig: store[EDITOR_CONFIG].value,
-            editorPath: store[EDITOR_PATH].value,
-            cmdArgs: store[EDITOR_CMD_ARGS].value,
-            fileAfterCmdArgs: store[EDITOR_FILE_POS].checked,
-          },
-        }));
       func.push(portMsg({
         [EDITOR_CONFIG_RES]: {
           editorConfig: store[EDITOR_CONFIG].value || "",
@@ -648,7 +638,6 @@
               func.push(updateContextMenu(obj));
               break;
             case EDITOR_CONFIG_GET:
-            case EDITOR_CONFIG_SET:
             case LOCAL_FILE_VIEW:
             case TMP_FILE_CREATE:
             case TMP_FILE_GET:

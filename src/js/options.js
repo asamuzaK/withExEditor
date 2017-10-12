@@ -16,7 +16,6 @@
   const EDITOR_CONFIG = "editorConfigPath";
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
-  const EDITOR_CONFIG_SET = "setEditorConfig";
   const EDITOR_CONFIG_TS = "editorConfigTimestamp";
   const EDITOR_FILE_NAME = "editorFileName";
   const EDITOR_LABEL = "editorLabel";
@@ -60,18 +59,8 @@
    * @returns {AsyncFunction} - port message
    */
   const portEditorSettings = async evt => {
-    const editorConfig = document.getElementById("editorConfigPath");
-    const editorPath = document.getElementById("editorPath");
-    const cmdArgs = document.getElementById("editorCmdArgs");
-    const fileAfterCmdArgs = document.getElementById("editorFileAfterCmdArgs");
     const timestamp = Date.now();
     const msg = {
-      [EDITOR_CONFIG_SET]: {
-        editorConfig: editorConfig && editorConfig.value || "",
-        editorPath: editorPath && editorPath.value || "",
-        cmdArgs: cmdArgs && cmdArgs.value || "",
-        fileAfterCmdArgs: fileAfterCmdArgs && fileAfterCmdArgs.checked,
-      },
       [STORAGE_SET]: {
         [EDITOR_CONFIG_TS]: {
           id: EDITOR_CONFIG_TS,
@@ -172,19 +161,6 @@
     if (elm) {
       elm.addEventListener(
         "click", () => runtime.reload().catch(logError), false
-      );
-    }
-  };
-
-  /**
-   * add event listener to save editor settings button
-   * @returns {void}
-   */
-  const addSaveEditorSettingsListener = async () => {
-    const elm = document.getElementById("saveEditorSettings");
-    if (elm) {
-      elm.addEventListener(
-        "click", evt => portEditorSettings(evt).catch(logError), false
       );
     }
   };
@@ -315,7 +291,6 @@
     localizeHtml(),
     setValuesFromStorage(),
     addInputChangeListener(),
-    addSaveEditorSettingsListener(),
     addReloadExtensionListener(),
   ]).catch(logError), false);
 }
