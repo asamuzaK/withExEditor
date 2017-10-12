@@ -59,10 +59,6 @@
    * @returns {AsyncFunction} - port message
    */
   const portEditorSettings = async evt => {
-    const editorConfig = document.getElementById("editorConfigPath");
-    const editorPath = document.getElementById("editorPath");
-    const cmdArgs = document.getElementById("editorCmdArgs");
-    const fileAfterCmdArgs = document.getElementById("editorFileAfterCmdArgs");
     const timestamp = Date.now();
     const msg = {
       [STORAGE_SET]: {
@@ -295,7 +291,6 @@
     localizeHtml(),
     setValuesFromStorage(),
     addInputChangeListener(),
-    addSaveEditorSettingsListener(),
     addReloadExtensionListener(),
   ]).catch(logError), false);
 }
