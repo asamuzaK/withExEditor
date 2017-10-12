@@ -28,11 +28,19 @@
       <section>
         <h1>Setting up the host</h1>
         <p>
-          Open "cmd.exe" on Windows, "terminal" on Linux / Mac, change directory to where you saved withExEditorHost and run setup script.
+          Open "cmd.exe" on Windows, "terminal" on Linux / Mac, change directory to where you saved withExEditorHost, execute the following command to complete the installation.
         </p>
         <figure>
           <pre class="sample"><code>
 &gt; cd path/to/withExEditorHost
+&gt; npm install
+          </code></pre>
+        </figure>
+        <p>
+          Then run setup script.
+        </p>
+        <figure>
+          <pre class="sample"><code>
 &gt; node setup.js
           </code></pre>
         </figure>
@@ -41,7 +49,6 @@
         </p>
         <p>
           After that, You will be prompted for the following, please input as appropriate.
-          You can leave them empty and set them later from the options page of withExEditor.
         </p>
         <ul>
           <li>Enter editor path</li>
