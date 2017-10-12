@@ -102,67 +102,6 @@
           </div>
           <div>
             <p>
-              <label for="editorPath" class="label"
-                     data-i18n="optionsEditorPathLabel"
-                     aria-details="editorPathDetail">
-                Editor Path
-              </label>
-              <input type="text" id="editorPath" data-executable="false"
-                     data-i18n="optionsEditorPath"
-                     placeholder="Input Editor Path" />
-            </p>
-            <details id="editorPathDetail">
-              <div>
-                <p data-i18n="optionsEditorPathDetail">
-                  Enter the path of the editor.
-                </p>
-              </div>
-            </details>
-          </div>
-          <div>
-            <p>
-              <label for="editorCmdArgs" class="label"
-                     data-i18n="optionsEditorCmdArgsLabel"
-                     aria-details="editorCmdArgsDetail">
-                Command Line Options
-              </label>
-              <input type="text" id="editorCmdArgs"
-                     data-i18n="optionsEditorCmdArgs"
-                     placeholder="Input Command Line Options" />
-            </p>
-            <details id="editorPathDetail">
-              <div>
-                <p data-i18n="optionsEditorCmdArgsDetail">
-                  Enter command line options.
-                </p>
-                <p data-i18n="optionsEditorCmdArgsDetail2">
-                  Quote the argument if it contains spaces or backslashes.
-                </p>
-              </div>
-            </details>
-          </div>
-          <div>
-            <p>
-              <span>
-                <input type="checkbox" id="editorFileAfterCmdArgs" />
-                <label for="editorFileAfterCmdArgs" class="checkboxLabel"
-                       data-i18n="optionsEditorFileAfterCmdArgs"
-                       aria-details="editorFileAfterCmdArgsDetail">
-                  Put File Path After Command Line Options
-                </label>
-              </span>
-            </p>
-            <details id="editorFileAfterCmdArgsDetail">
-              <div>
-                <p data-i18n="optionsEditorFileAfterCmdArgsDetail">
-                  When specifying the file, some editor requires to put the file path after command arguments.
-                  Check in such case.
-                </p>
-              </div>
-            </details>
-          </div>
-          <div>
-            <p>
               <label for="editorLabel" class="label"
                      data-i18n="optionsEditorLabelLabel"
                      aria-details="editorLabelDetail">
@@ -179,18 +118,10 @@
                   Enter the label of the editor.
                 </p>
                 <p data-i18n="optionsEditorLabelDetail2">
-                  Disabled if editor config path and/or editor path fields are not filled, editor is not executable, etc.
+                  Disabled if editor config path is not filled or editor config file could not be found.
                 </p>
               </div>
             </details>
-          </div>
-          <div>
-            <p>
-              <button id="saveEditorSettings"
-                      data-i18n="optionsSaveEditorSettings">
-                Save
-              </button>
-            </p>
           </div>
         </fieldset>
         <fieldset>

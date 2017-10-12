@@ -94,21 +94,6 @@
   "optionsAccessKeySettings": {
     "message": "アクセスキー設定"
   },
-  "optionsEditorCmdArgs": {
-    "message": ""
-  },
-  "optionsEditorCmdArgs_placeholder": {
-    "message": "コマンドラインオプションを入力"
-  },
-  "optionsEditorCmdArgsDetail": {
-    "message": "コマンドラインオプションを入力します。"
-  },
-  "optionsEditorCmdArgsDetail2": {
-    "message": "引数に空白やバックスラッシュが含まれる場合は引用符で括ってください。"
-  },
-  "optionsEditorCmdArgsLabel": {
-    "message": "コマンドラインオプション"
-  },
   "optionsEditorConfigPath": {
     "message": ""
   },
@@ -124,12 +109,6 @@
   "optionsEditorConfigPathLabel": {
     "message": "エディタ設定ファイルのパス"
   },
-  "optionsEditorFileAfterCmdArgsDetail": {
-    "message": "いくつかのエディタでは、ファイルを指定する場合はコマンドの最後に置くように求めているものがあります。そのような場合に有効化してください。"
-  },
-  "optionsEditorFileAfterCmdArgs": {
-    "message": "ファイルのパスをコマンドラインオプションの後ろに置く"
-  },
   "optionsEditorLabel": {
     "message": ""
   },
@@ -140,22 +119,10 @@
     "message": "エディタの表示名を入力してください。"
   },
   "optionsEditorLabelDetail2": {
-    "message": "エディタ設定ファイルのパスやエディタのパスが未入力の場合、エディタが実行可能ではない場合などには無効となります。"
+    "message": "エディタ設定ファイルのパスが未入力の場合やエディタ設定ファイルが見つからなかった場合などには無効となります。"
   },
   "optionsEditorLabelLabel": {
     "message": "エディタの表示名"
-  },
-  "optionsEditorPath": {
-    "message": ""
-  },
-  "optionsEditorPath_placeholder": {
-    "message": "エディタのパスを入力"
-  },
-  "optionsEditorPathDetail": {
-    "message": "エディタのパスを入力してください。"
-  },
-  "optionsEditorPathLabel": {
-    "message": "エディタのパス"
   },
   "optionsEditorSettings": {
     "message": "エディタ設定"

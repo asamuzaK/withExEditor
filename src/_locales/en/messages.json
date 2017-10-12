@@ -94,21 +94,6 @@
   "optionsAccessKeySettings": {
     "message": "Access Key Settings"
   },
-  "optionsEditorCmdArgs": {
-    "message": ""
-  },
-  "optionsEditorCmdArgs_placeholder": {
-    "message": "Input Command Line Options"
-  },
-  "optionsEditorCmdArgsDetail": {
-    "message": "Enter command line options."
-  },
-  "optionsEditorCmdArgsDetail2": {
-    "message": "Quote the argument if it contains spaces or backslashes."
-  },
-  "optionsEditorCmdArgsLabel": {
-    "message": "Command Line Options"
-  },
   "optionsEditorConfigPath": {
     "message": ""
   },
@@ -124,12 +109,6 @@
   "optionsEditorConfigPathLabel": {
     "message": "Editor Config Path"
   },
-  "optionsEditorFileAfterCmdArgsDetail": {
-    "message": "When specifying the file, some editor requires to put the file path after command arguments. Check in such case."
-  },
-  "optionsEditorFileAfterCmdArgs": {
-    "message": "Put File Path After Command Line Options"
-  },
   "optionsEditorLabel": {
     "message": ""
   },
@@ -140,22 +119,10 @@
     "message": "Enter the label of the editor."
   },
   "optionsEditorLabelDetail2": {
-    "message": "Disabled if editor config path and/or editor path fields are not filled, editor is not executable, etc."
+    "message": "Disabled if editor config path is not filled or editor config file could not be found."
   },
   "optionsEditorLabelLabel": {
     "message": "Editor Label"
-  },
-  "optionsEditorPath": {
-    "message": ""
-  },
-  "optionsEditorPath_placeholder": {
-    "message": "Input Editor Path"
-  },
-  "optionsEditorPathDetail": {
-    "message": "Enter the path of the editor."
-  },
-  "optionsEditorPathLabel": {
-    "message": "Editor Path"
   },
   "optionsEditorSettings": {
     "message": "Editor Settings"
