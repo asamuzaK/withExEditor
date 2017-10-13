@@ -208,7 +208,7 @@
   };
 
   /* data IDs */
-  const dataIds = {};
+  const dataIds = new Map();
 
   /**
    * port temporary file data
@@ -216,7 +216,7 @@
    * @returns {?AsyncFunction} - port message
    */
   const portTmpFileData = async dataId => {
-    const data = dataId && dataIds[dataId];
+    const data = dataId && dataIds.get(dataId);
     return data && portMsg({[TMP_FILE_GET]: data}) || null;
   };
 
@@ -248,7 +248,7 @@
   const storeTmpFileData = async (data = {}) => {
     if (data[TMP_FILE_CREATE] && (data = data[TMP_FILE_CREATE])) {
       const {dataId, mode} = data;
-      mode === MODE_EDIT && (dataIds[dataId] = data);
+      mode === MODE_EDIT && dataId && dataIds.set(dataId, data);
     }
   };
 
@@ -261,7 +261,7 @@
     const {data} = obj;
     if (data) {
       const {dataId, mode} = data;
-      mode === MODE_EDIT && dataIds[dataId] && (dataIds[dataId] = data);
+      mode === MODE_EDIT && dataId && dataIds.set(dataId, data);
     }
   };
 
