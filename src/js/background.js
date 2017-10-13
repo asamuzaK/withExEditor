@@ -496,12 +496,10 @@
    */
   const extractEditorConfig = async (data = {}) => {
     const {
-      editorCmdArgs, editorConfig, editorConfigTimestamp,
-      editorFileAfterCmdArgs, editorName, editorPath, executable,
+      editorConfig, editorConfigTimestamp, editorName, executable,
     } = data;
     const store = await storage.get([
-      EDITOR_CMD_ARGS, EDITOR_CONFIG, EDITOR_CONFIG_TS, EDITOR_FILE_NAME,
-      EDITOR_FILE_POS, EDITOR_LABEL, EDITOR_PATH,
+      EDITOR_CONFIG, EDITOR_CONFIG_TS, EDITOR_FILE_NAME, EDITOR_LABEL,
     ]);
     const editorFileName = store[EDITOR_FILE_NAME] &&
                              store[EDITOR_FILE_NAME].value;
@@ -527,30 +525,6 @@
           checked: false,
           value: editorConfigTimestamp || 0,
         },
-        [EDITOR_PATH]: {
-          id: EDITOR_PATH,
-          app: {
-            executable: !!executable,
-          },
-          checked: false,
-          value: editorPath || "",
-        },
-        [EDITOR_CMD_ARGS]: {
-          id: EDITOR_CMD_ARGS,
-          app: {
-            executable: false,
-          },
-          checked: false,
-          value: editorCmdArgs || "",
-        },
-        [EDITOR_FILE_POS]: {
-          id: EDITOR_FILE_POS,
-          app: {
-            executable: false,
-          },
-          checked: !!editorFileAfterCmdArgs,
-          value: "",
-        },
         [EDITOR_FILE_NAME]: {
           id: EDITOR_FILE_NAME,
           app: {
@@ -575,9 +549,6 @@
         [EDITOR_CONFIG_RES]: {
           editorConfig: store[EDITOR_CONFIG].value || "",
           editorConfigTimestamp: timestamp,
-          editorPath: store[EDITOR_PATH].value || "",
-          editorCmdArgs: store[EDITOR_CMD_ARGS].value || "",
-          editorFileAfterCmdArgs: !!store[EDITOR_FILE_POS].checked,
           editorName: store[EDITOR_FILE_NAME].value || "",
           editorLabel: store[EDITOR_LABEL].value || "",
           executable: store[EDITOR_PATH].app.executable,
