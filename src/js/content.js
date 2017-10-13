@@ -790,11 +790,11 @@
         const {dir, host, incognito, mode, tabId, windowId} = data;
         const [type] = res.headers.get("Content-Type").split(";");
         const dataId = await getFileNameFromURI(uri, SUBST);
-        const fileName = dataId + await getFileExtension(type);
+        const extType = await getFileExtension(type);
         const value = await res.text();
         obj = {
           [TMP_FILE_CREATE]: {
-            dataId, dir, fileName, host, incognito, mode, tabId, windowId,
+            dataId, dir, extType, host, incognito, mode, tabId, windowId,
           },
           value,
         };
@@ -811,16 +811,16 @@
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
     const {dir, host, incognito, mode, tabId, windowId} = data;
-    let {dataId, namespaceURI, value} = data, fileName, tmpFileData;
+    let {dataId, namespaceURI, value} = data, extType, tmpFileData;
     namespaceURI = namespaceURI || "";
     switch (mode) {
       case MODE_EDIT:
         if (dataId) {
-          fileName = `${dataId}.txt`;
+          extType = ".txt";
           tmpFileData = {
             [TMP_FILE_CREATE]: {
-              dataId, dir, fileName, host, incognito, mode, namespaceURI,
-              tabId, windowId,
+              dataId, dir, extType, host, incognito, mode, namespaceURI, tabId,
+              windowId,
             },
             value,
           };
@@ -829,10 +829,10 @@
       case MODE_MATHML:
       case MODE_SVG:
         if (value && (dataId = await getFileNameFromURI(uri, SUBST))) {
-          fileName = `${dataId}.${mode === MODE_MATHML && "mml" || "svg"}`;
+          extType = mode === MODE_MATHML && ".mml" || ".svg";
           tmpFileData = {
             [TMP_FILE_CREATE]: {
-              dataId, dir, fileName, host, incognito, mode, tabId, windowId,
+              dataId, dir, extType, host, incognito, mode, tabId, windowId,
             },
             value,
           };
@@ -842,19 +842,19 @@
         dataId = await getFileNameFromURI(uri, SUBST);
         if (dataId && value &&
             /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
-          fileName = `${dataId}.xml`;
+          extType = ".xml";
           tmpFileData = {
             [TMP_FILE_CREATE]: {
-              dataId, dir, fileName, host, incognito, mode, tabId, windowId,
+              dataId, dir, extType, host, incognito, mode, tabId, windowId,
             },
             value,
           };
         } else if (dataId && value) {
           value = stripHtmlTags(value);
-          fileName = dataId + await getFileExtension(contentType);
+          extType = await getFileExtension(contentType);
           tmpFileData = {
             [TMP_FILE_CREATE]: {
-              dataId, dir, fileName, host, incognito, mode, tabId, windowId,
+              dataId, dir, extType, host, incognito, mode, tabId, windowId,
             },
             value,
           };
