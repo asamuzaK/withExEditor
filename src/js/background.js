@@ -570,8 +570,8 @@
    * @returns {?(Function|AsyncFunction)} - logger / port editor config
    */
   const handleHostMsg = async msg => {
-    const {message, pid, status} = msg;
-    const log = pid && message && `${HOST} (${pid}): ${message}`;
+    const {message, status} = msg;
+    const log = pid && message && `${HOST}: ${message}`;
     let func;
     switch (status) {
       case `${PROCESS_CHILD}_stderr`:
