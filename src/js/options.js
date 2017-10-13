@@ -54,11 +54,11 @@
   };
 
   /**
-   * port editor settings
+   * port editor config timestamp
    * @param {Object} evt - Event
    * @returns {AsyncFunction} - port message
    */
-  const portEditorSettings = async evt => {
+  const portEditorConfigTimestamp = async () => {
     const timestamp = Date.now();
     const msg = {
       [STORAGE_SET]: {
@@ -72,7 +72,6 @@
         },
       },
     };
-    evt.preventDefault();
     return portMsg(msg);
   };
 
@@ -138,7 +137,10 @@
     } else {
       switch (id) {
         case EDITOR_CONFIG:
-          func.push(portMsg({[EDITOR_CONFIG_GET]: value}));
+          func.push(
+            portMsg({[EDITOR_CONFIG_GET]: value}),
+            portEditorConfigTimestamp(),
+          );
           break;
         case KEY_ACCESS:
           (value === "" || /^[a-z]$/i.test(value)) &&

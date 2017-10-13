@@ -14,15 +14,12 @@
   /* constants */
   const CONTENT_GET = "getContent";
   const CONTEXT_MENU = "contextMenu";
-  const EDITOR_CMD_ARGS = "editorCmdArgs";
   const EDITOR_CONFIG = "editorConfigPath";
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
   const EDITOR_CONFIG_TS = "editorConfigTimestamp";
   const EDITOR_FILE_NAME = "editorFileName";
-  const EDITOR_FILE_POS = "editorFileAfterCmdArgs";
   const EDITOR_LABEL = "editorLabel";
-  const EDITOR_PATH = "editorPath";
   const ENABLE_PB = "enablePB";
   const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const FILE_EXT = "fileExt";
@@ -499,7 +496,8 @@
       editorConfig, editorConfigTimestamp, editorName, executable,
     } = data;
     const store = await storage.get([
-      EDITOR_CONFIG, EDITOR_CONFIG_TS, EDITOR_FILE_NAME, EDITOR_LABEL,
+      EDITOR_CONFIG, EDITOR_CONFIG_TS, EDITOR_FILE_NAME,
+      EDITOR_LABEL,
     ]);
     const editorFileName = store[EDITOR_FILE_NAME] &&
                              store[EDITOR_FILE_NAME].value;
@@ -551,7 +549,7 @@
           editorConfigTimestamp: timestamp,
           editorName: store[EDITOR_FILE_NAME].value || "",
           editorLabel: store[EDITOR_LABEL].value || "",
-          executable: store[EDITOR_PATH].app.executable,
+          executable: store[EDITOR_CONFIG].app.executable,
         },
       }));
     }
