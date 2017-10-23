@@ -571,7 +571,7 @@
    */
   const handleHostMsg = async msg => {
     const {message, status} = msg;
-    const log = pid && message && `${HOST}: ${message}`;
+    const log = message && `${HOST}: ${message}`;
     let func;
     switch (status) {
       case `${PROCESS_CHILD}_stderr`:
