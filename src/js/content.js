@@ -16,11 +16,6 @@
   const CONTEXT_MENU = "contextMenu";
   const CONTEXT_MODE = "contextMode";
   const CONTEXT_NODE = "contextNode";
-  const DATA_ATTR = "data-with_ex_editor";
-  const DATA_ATTR_CTRLS = `${DATA_ATTR}_controls`;
-  const DATA_ATTR_ID = `${DATA_ATTR}_id`;
-  const DATA_ATTR_PREFIX = `${DATA_ATTR}_prefix`;
-  const DATA_ATTR_TS = `${DATA_ATTR}_timestamp`;
   const FILE_EXT = "fileExt";
   const FILE_LEN = 128;
   const HTML = "html";
@@ -51,6 +46,8 @@
   const TMP_FILE_CREATE = "createTmpFile";
   const TMP_FILE_DATA_PORT = "portTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
+  const TYPE_FROM = 8;
+  const TYPE_TO = -1;
   const VARS_SET = "setVars";
   const W3C = "http://www.w3.org/";
   const XMLNS = "xmlns";
@@ -80,11 +77,29 @@
   };
 
   /**
+   * get type
+   * @param {*} o - object to check
+   * @returns {string} - type of object
+   */
+  const getType = o =>
+    Object.prototype.toString.call(o).slice(TYPE_FROM, TYPE_TO);
+
+  /**
    * is string
    * @param {*} o - object to check
    * @returns {boolean} - result
    */
   const isString = o => typeof o === "string" || o instanceof String;
+
+  /**
+   * is object, and not an empty object
+   * @param {*} o - object to check;
+   * @returns {boolean} - result
+   */
+  const isObjectNotEmpty = o => {
+    const items = /Object/i.test(getType(o)) && Object.keys(o);
+    return !!(items && items.length);
+  };
 
   /**
    * strip HTML tags and decode HTML escaped characters
@@ -195,77 +210,7 @@
     return `.${ext || subst}`;
   };
 
-  /* port */
-  const port = runtime.connect({name: PORT_NAME});
-
-  /**
-   * port message
-   * @param {*} msg - message
-   * @returns {void}
-   */
-  const portMsg = async msg => {
-    msg && port.postMessage(msg);
-  };
-
-  /* data IDs */
-  const dataIds = new Map();
-
-  /**
-   * port temporary file data
-   * @param {string} dataId - data ID
-   * @returns {?AsyncFunction} - port message
-   */
-  const portTmpFileData = async dataId => {
-    const data = dataId && dataIds.get(dataId);
-    return data && portMsg({[TMP_FILE_GET]: data}) || null;
-  };
-
-  /**
-   * port temporary file data to get temporary file
-   * @param {!Object} evt - Event
-   * @returns {Promise.<Array>} - results of each handler
-   */
-  const requestTmpFile = async evt => {
-    const func = [];
-    const {target, currentTarget} = evt;
-    if (target === currentTarget) {
-      const attrs = target.hasAttributeNS("", DATA_ATTR_ID) &&
-                    target.getAttributeNS("", DATA_ATTR_ID) ||
-                    target.hasAttributeNS("", DATA_ATTR_CTRLS) &&
-                    target.getAttributeNS("", DATA_ATTR_CTRLS);
-      attrs && attrs.split(" ").forEach(dataId =>
-        func.push(portTmpFileData(dataId))
-      );
-    }
-    return Promise.all(func);
-  };
-
-  /**
-   * store temporary file data
-   * @param {Object} data - temporary file data
-   * @returns {void}
-   */
-  const storeTmpFileData = async (data = {}) => {
-    if (data[TMP_FILE_CREATE] && (data = data[TMP_FILE_CREATE])) {
-      const {dataId, mode} = data;
-      mode === MODE_EDIT && dataId && dataIds.set(dataId, data);
-    }
-  };
-
-  /**
-   * update temporary file data
-   * @param {Object} obj - temporary file data object
-   * @returns {void}
-   */
-  const updateTmpFileData = async (obj = {}) => {
-    const {data} = obj;
-    if (data) {
-      const {dataId, mode} = data;
-      mode === MODE_EDIT && dataId && dataIds.set(dataId, data);
-    }
-  };
-
-  /* serialize content */
+  /* DOM handling */
   /* namespace URI */
   const nsURI = {
     html: `${W3C}1999/xhtml`,
@@ -611,35 +556,24 @@
   };
 
   /**
-   * get / create temporary ID and add listener
-   * @param {Object} elm - target element
+   * get ancestor element ID
+   * @param {Object} elm - element node
    * @returns {?string} - ID
    */
-  const getId = async elm => {
-    let dataId;
-    if (elm) {
-      const isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html;
-      const ns = !isHtml && nsURI.html || "";
-      if (elm.hasAttributeNS(ns, DATA_ATTR_ID)) {
-        dataId = elm.getAttributeNS(ns, DATA_ATTR_ID);
-      } else {
-        const nsPrefix = ns && await getXmlnsPrefix(elm, ns, HTML);
-        let attr;
-        if (ns) {
-          nsPrefix && elm.setAttributeNS(nsURI.xmlns, `xmlns:${nsPrefix}`, ns);
-          attr = `${nsPrefix || HTML}:${DATA_ATTR_PREFIX}`;
-          elm.setAttributeNS(ns, attr, nsPrefix || HTML);
+  const getAncestorId = async elm => {
+    let ancestorId;
+    if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+      let node = elm;
+      while (node && node.parentNode) {
+        const {id: nodeId} = node;
+        if (nodeId) {
+          ancestorId = nodeId;
+          break;
         }
-        attr = isHtml && DATA_ATTR_ID || `${nsPrefix || HTML}:${DATA_ATTR_ID}`;
-        dataId = `${LABEL}_${elm.id || window.performance.now()}`
-          .replace(/[-:.]/g, "_");
-        elm.setAttributeNS(ns, attr, dataId);
-        isHtml && elm.addEventListener(
-          "focus", evt => requestTmpFile(evt).catch(logError), false
-        );
+        node = node.parentNode;
       }
     }
-    return dataId || null;
+    return ancestorId || null;
   };
 
   /**
@@ -719,29 +653,190 @@
     return elm || null;
   };
 
+  /* data IDs */
+  const dataIds = new Map();
+
   /**
-   * set data attribute and add listener
-   * @param {Object} elm - element
-   * @returns {void}
+   * set dataId
+   * @param {string} dataId - data ID
+   * @param {Object} data - data
+   * @returns {Object} - dataIds object
    */
-  const setDataAttrs = async elm => {
+  const setDataId = async (dataId, data) => {
+    let obj;
+    if (isString(dataId) && isObjectNotEmpty(data)) {
+      if (dataIds.has(dataId)) {
+        const idData = dataIds.get(dataId);
+        const items = Object.keys(data);
+        for (const item of items) {
+          idData[item] = data[item];
+        }
+        obj = dataIds.set(dataId, idData);
+      } else {
+        obj = dataIds.set(dataId, data);
+      }
+    }
+    return obj || null;
+  };
+
+  /**
+   * get ID data
+   * @param {Object} elm - target element
+   * @returns {Object} - ID data
+   */
+  const getIdData = async elm => {
+    let data;
     if (elm) {
-      const dataId = await getId(elm);
-      const ctrl = await getEditableElm(elm);
-      if (dataId && ctrl) {
-        const arr = ctrl.hasAttributeNS("", DATA_ATTR_CTRLS) &&
-                      ctrl.getAttributeNS("", DATA_ATTR_CTRLS).split(" ");
-        if (arr) {
-          const attr = arr.push(dataId) && [...new Set(arr)].join(" ");
-          attr && ctrl.setAttributeNS("", DATA_ATTR_CTRLS, attr);
-        } else {
-          ctrl.setAttributeNS("", DATA_ATTR_CTRLS, dataId);
-          ctrl.addEventListener(
-            "focus", evt => requestTmpFile(evt).catch(logError), false
-          );
+      const {id, localName, prefix} = elm;
+      if (id) {
+        data = {dataId: id};
+      } else {
+        const ancestorId = await getAncestorId(elm);
+        if (ancestorId) {
+          let items;
+          if (prefix) {
+            items = Array.from(
+              document.querySelectorAll(`#${ancestorId} *|*`)
+            ).filter(item => {
+              const {localName: itemLocalName} = item;
+              return itemLocalName === `${prefix}:${localName}` && item;
+            });
+          } else {
+            items = document.querySelectorAll(`#${ancestorId} ${localName}`);
+          }
+          if (items && items.length) {
+            const l = items.length;
+            let i = 0, queryIndex;
+            while (i < l) {
+              const item = items[i];
+              if (item === elm) {
+                queryIndex = i;
+                break;
+              }
+              i++;
+            }
+            if (Number.isInteger(queryIndex)) {
+              const targetElm = prefix && `${prefix}:${localName}` || localName;
+              data = {
+                ancestorId, localName, prefix, queryIndex,
+                dataId: `${ancestorId}_${targetElm}_${queryIndex}`,
+              };
+            }
+          }
         }
       }
     }
+    return data || null;
+  };
+
+  /**
+   * get target element from data ID
+   * @param {string} dataId - data ID
+   * @returns {Object} - target element
+   */
+  const getTargetElementFromDataId = async dataId => {
+    let elm;
+    if (isString(dataId)) {
+      const data = dataIds.get(dataId);
+      if (data) {
+        const {ancestorId, localName, prefix, queryIndex} = data;
+        if (ancestorId && localName && Number.isInteger(queryIndex)) {
+          let items;
+          if (prefix) {
+            const nodeList = document.querySelectorAll(`#${ancestorId} *|*`);
+            items = Array.from(nodeList).filter(item => {
+              const {localName: itemLocalName} = item;
+              return itemLocalName === `${prefix}:${localName}` && item;
+            });
+          } else {
+            items = document.querySelectorAll(`#${ancestorId} ${localName}`);
+          }
+          elm = items && items[queryIndex];
+        } else {
+          elm = document.getElementById(dataId);
+        }
+      }
+    }
+    return elm || null;
+  };
+
+  /* port */
+  const port = runtime.connect({name: PORT_NAME});
+
+  /**
+   * port message
+   * @param {*} msg - message
+   * @returns {void}
+   */
+  const portMsg = async msg => {
+    msg && port.postMessage(msg);
+  };
+
+  /**
+   * port temporary file data
+   * @param {string} dataId - data ID
+   * @returns {?AsyncFunction} - port message
+   */
+  const portTmpFileData = async dataId => {
+    let func;
+    if (dataId) {
+      const data = dataIds.get(dataId);
+      data && (func = portMsg({[TMP_FILE_GET]: data}));
+    }
+    return func || null;
+  };
+
+  /**
+   * port temporary file data to get temporary file
+   * @param {!Object} evt - Event
+   * @returns {Promise.<Array>} - results of each handler
+   */
+  const requestTmpFile = async evt => {
+    const func = [];
+    const {target, currentTarget} = evt;
+    if (target === currentTarget) {
+      const {dataId} = await getIdData(target) || {};
+      if (dataId) {
+        const {controls} = dataIds.get(dataId) || {};
+        if (controls) {
+          controls.forEach(id => {
+            func.push(portTmpFileData(id));
+          });
+        } else {
+          func.push(portTmpFileData(dataId));
+        }
+      }
+    }
+    return Promise.all(func);
+  };
+
+  /**
+   * store temporary file data
+   * @param {Object} data - temporary file data
+   * @returns {?AsyncFunction} - set data ID
+   */
+  const storeTmpFileData = async (data = {}) => {
+    let func;
+    if (data[TMP_FILE_CREATE] && (data = data[TMP_FILE_CREATE])) {
+      const {dataId, mode} = data;
+      mode === MODE_EDIT && dataId && (func = setDataId(dataId, data));
+    }
+    return func || null;
+  };
+
+  /**
+   * update temporary file data
+   * @param {Object} obj - temporary file data object
+   * @returns {?AsyncFunction} - set data ID
+   */
+  const updateTmpFileData = async (obj = {}) => {
+    let func;
+    const {data} = obj;
+    if (data) {
+      const {dataId, mode} = data;
+      mode === MODE_EDIT && dataId && (func = setDataId(dataId, data));
+    }
+    return func || null;
   };
 
   /* temporary file data */
@@ -867,6 +962,44 @@
   };
 
   /**
+   * set data ID controller
+   * @param {Object} elm - element
+   * @param {string} dataId - data ID
+   * @returns {void}
+   */
+  const setDataIdController = async (elm, dataId) => {
+    if (elm && dataId) {
+      const ctrl = await getEditableElm(elm);
+      if (ctrl) {
+        const ctrlData = await getIdData(ctrl);
+        if (ctrlData) {
+          const {dataId: ctrlId} = ctrlData;
+          if (dataIds.has(ctrlId)) {
+            const data = dataIds.get(ctrlId);
+            if (Array.isArray(data.controls)) {
+              const controls = new Set(data.controls);
+              controls.add(dataId);
+              data.controls = [...controls.values()];
+            } else {
+              data.controls = [dataId];
+            }
+            await setDataId(ctrlId, data);
+          } else {
+            ctrl.addEventListener(
+              "focus", evt => requestTmpFile(evt).catch(logError), false
+            );
+            ctrlData.controls = [dataId];
+            await setDataId(ctrlId, ctrlData);
+          }
+          await setDataId(dataId, {
+            controlledBy: ctrlId,
+          });
+        }
+      }
+    }
+  };
+
+  /**
    * create content data
    * @param {Object} elm - element
    * @param {string} mode - context mode
@@ -888,26 +1021,36 @@
     if (elm && mode) {
       let obj;
       switch (mode) {
-        case MODE_EDIT:
-          obj = await getId(elm);
+        case MODE_EDIT: {
+          obj = await getIdData(elm);
           if (obj) {
+            const {dataId} = obj;
+            if (!dataIds.has(dataId)) {
+              const isHtml = !elm.namespaceURI ||
+                             elm.namespaceURI === nsURI.html;
+              isHtml && elm.addEventListener(
+                "focus", evt => requestTmpFile(evt).catch(logError), false
+              );
+              await setDataId(dataId, obj);
+            }
             if (isCollapsed && await isEditControl(elm)) {
               data.mode = mode;
-              data.dataId = obj;
+              data.dataId = dataId;
               data.value = elm.value || "";
             } else {
               !elm.isContentEditable && !isCollapsed && anchorNode &&
                 (elm = anchorNode.parentNode);
               data.mode = mode;
-              data.dataId = obj;
+              data.dataId = dataId;
               data.value = elm.hasChildNodes() &&
                            await getText(elm.childNodes) || "";
               data.namespaceURI = elm.namespaceURI ||
                                   await getNodeNS(elm).namespaceURI;
-              setDataAttrs(elm);
+              await setDataIdController(elm, dataId);
             }
           }
           break;
+        }
         case MODE_MATHML:
         case MODE_SVG:
           obj = await createDomXmlBased(elm);
@@ -1113,39 +1256,27 @@
     const {data, value} = obj;
     const func = [];
     if (data) {
-      const {dataId, namespaceURI, tabId, timestamp} = data;
+      const {
+        controlledBy, dataId, lastUpdate, namespaceURI, tabId, timestamp,
+      } = data;
       if (dataId && tabId === vars[ID_TAB]) {
-        const elm = document.activeElement;
-        let isHtml = !elm.namespaceURI || elm.namespaceURI === nsURI.html,
-            ns = !isHtml && nsURI.html || "", attr, nsPrefix;
-        if (elm.hasAttributeNS(ns, DATA_ATTR_CTRLS)) {
-          const arr = elm.getAttributeNS(ns, DATA_ATTR_CTRLS).split(" ");
-          for (let id of arr) {
-            if (id === dataId &&
-                (id = document.querySelector(`[*|${DATA_ATTR_ID}=${id}]`))) {
-              isHtml = !id.namespaceURI || id.namespaceURI === nsURI.html;
-              ns = !isHtml && nsURI.html || "";
-              nsPrefix = id.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
-              attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
-              if (!id.hasAttributeNS(ns, DATA_ATTR_TS) ||
-                  timestamp > id.getAttributeNS(ns, DATA_ATTR_TS) * 1) {
-                id.setAttributeNS(ns, attr, timestamp);
-                func.push(replaceContent(elm, id, value, namespaceURI));
-              }
-              break;
+        const elm = await getTargetElementFromDataId(dataId);
+        if (elm) {
+          if (!lastUpdate ||
+              Number.isInteger(timestamp) && Number.isInteger(lastUpdate) &&
+              timestamp > lastUpdate) {
+            const controller = await getTargetElementFromDataId(controlledBy);
+            if (controller) {
+              func.push(replaceContent(controller, elm, value, namespaceURI));
+            } else if (elm.isContentEditable) {
+              func.push(replaceContent(elm, elm, value, namespaceURI));
+            } else {
+              /^(?:input|textarea)$/.test(elm.localName) &&
+                func.push(replaceEditControlValue(elm, value));
             }
+            data.lastUpdate = timestamp;
+            func.push(setDataId(dataId, data));
           }
-        } else if (elm.hasAttributeNS(ns, DATA_ATTR_ID) &&
-                   elm.getAttributeNS(ns, DATA_ATTR_ID) === dataId &&
-                   (!elm.hasAttributeNS(ns, DATA_ATTR_TS) ||
-                    timestamp > elm.getAttributeNS(ns, DATA_ATTR_TS) * 1)) {
-          nsPrefix = elm.getAttributeNS(ns, DATA_ATTR_PREFIX) || HTML;
-          attr = isHtml && DATA_ATTR_TS || `${nsPrefix}:${DATA_ATTR_TS}`;
-          elm.setAttributeNS(ns, attr, timestamp);
-          elm.isContentEditable &&
-          func.push(replaceContent(elm, elm, value, namespaceURI)) ||
-          /^(?:input|textarea)$/.test(elm.localName) &&
-          func.push(replaceEditControlValue(elm, value));
         }
       }
     }
