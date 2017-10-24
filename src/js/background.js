@@ -5,11 +5,10 @@
 {
   /* api */
   const {
-    browserAction, contextMenus, extension, i18n, runtime, tabs, windows,
-    storage: {
-      local: storage,
-    },
+    browserAction, contextMenus, extension, i18n, runtime, storage, tabs,
+    windows,
   } = browser;
+  const {local: localStorage} = storage;
 
   /* constants */
   const CONTENT_GET = "getContent";
@@ -173,26 +172,26 @@
     msg && host && host.postMessage(msg);
   };
 
-  /* storage */
+  /* local storage */
   /**
-   * set storage
+   * set local storage
    * @param {Object} obj - object to store
    * @returns {?AsyncFunction} - store object
    */
-  const setStorage = async obj => obj && storage.set(obj) || null;
+  const setLocalStorage = async obj => obj && localStorage.set(obj) || null;
 
   /**
    * fetch shared data and store
    * @param {string} path - data path
-   * @param {string} key - storage key
-   * @returns {?AsyncFunction} - set storage
+   * @param {string} key - local storage key
+   * @returns {?AsyncFunction} - set local storage
    */
   const storeFetchedData = async (path, key) => {
     let func;
     path = isString(path) && await extension.getURL(path);
     if (path && isString(key)) {
       const data = await fetch(path).then(res => res && res.json());
-      func = setStorage({[key]: data});
+      func = setLocalStorage({[key]: data});
     }
     return func || null;
   };
@@ -202,7 +201,7 @@
    * @returns {AsyncFunction} - port host message
    */
   const portEditorConfigPath = async () => {
-    const data = await storage.get(EDITOR_CONFIG);
+    const data = await localStorage.get(EDITOR_CONFIG);
     const filePath = data && data[EDITOR_CONFIG] &&
                      data[EDITOR_CONFIG].value || "";
     return portHostMsg({[EDITOR_CONFIG_GET]: filePath});
@@ -495,7 +494,7 @@
     const {
       editorConfig, editorConfigTimestamp, editorName, executable,
     } = data;
-    const store = await storage.get([
+    const store = await localStorage.get([
       EDITOR_CONFIG, EDITOR_CONFIG_TS, EDITOR_FILE_NAME,
       EDITOR_LABEL,
     ]);
@@ -541,7 +540,7 @@
                  executable && editorName || "",
         },
       };
-      func.push(setStorage(msg), portMsg({[EDITOR_CONFIG_RES]: data}));
+      func.push(setLocalStorage(msg), portMsg({[EDITOR_CONFIG_RES]: data}));
     } else {
       func.push(portMsg({
         [EDITOR_CONFIG_RES]: {
@@ -622,7 +621,7 @@
               func.push(openOptionsPage());
               break;
             case STORAGE_SET:
-              func.push(setStorage(obj));
+              func.push(setLocalStorage(obj));
               break;
             case TMP_FILE_DATA_PORT:
               func.push(portMsg({[item]: obj}));
@@ -828,7 +827,7 @@
 
   /**
    * set variables
-   * @param {Object} data - storage data
+   * @param {Object} data - data
    * @returns {Promise.<Array>} - results of each handler
    */
   const setVars = async (data = {}) => {
@@ -846,7 +845,7 @@
 
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
-  browser.storage.onChanged.addListener(data =>
+  storage.onChanged.addListener(data =>
     setVars(data).then(syncUI).catch(logError)
   );
   contextMenus.onClicked.addListener((info, tab) =>
@@ -871,7 +870,7 @@
 
   /* startup */
   Promise.all([
-    storage.get().then(setVars).then(syncUI),
+    localStorage.get().then(setVars).then(syncUI),
     storeFetchedData(NS_URI_PATH, NS_URI),
     storeFetchedData(FILE_EXT_PATH, FILE_EXT),
   ]).catch(logError);

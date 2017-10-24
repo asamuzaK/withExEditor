@@ -7,7 +7,7 @@
   const {
     i18n, runtime,
     storage: {
-      local: storage,
+      local: localStorage,
     },
   } = browser;
 
@@ -227,7 +227,7 @@
 
   /**
    * set html input value
-   * @param {Object} data - storage data
+   * @param {Object} data - data
    * @returns {void}
    */
   const setHtmlInputValue = async (data = {}) => {
@@ -250,12 +250,12 @@
   };
 
   /**
-   * set html input values from storage
+   * set html input values from local storage
    * @returns {Promise.<Array>} - results of each handler
    */
-  const setValuesFromStorage = async () => {
+  const setValuesFromLocalStorage = async () => {
     const func = [];
-    const pref = await storage.get();
+    const pref = await localStorage.get();
     const items = pref && Object.keys(pref);
     if (items && items.length) {
       for (const item of items) {
@@ -291,7 +291,7 @@
 
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtml(),
-    setValuesFromStorage(),
+    setValuesFromLocalStorage(),
     addInputChangeListener(),
     addReloadExtensionListener(),
   ]).catch(logError), false);

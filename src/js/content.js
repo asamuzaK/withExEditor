@@ -7,7 +7,7 @@
   const {
     runtime,
     storage: {
-      local: storage,
+      local: localStorage,
     },
   } = browser;
 
@@ -113,28 +113,6 @@
     }
     return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
       .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-  };
-
-  /* storage */
-  /**
-   * extend object items from storage
-   * @param {Object} obj - object to extend items
-   * @param {string} key - storage key
-   * @returns {Object} - extended object
-   */
-  const extendObjItems = async (obj, key) => {
-    if (obj && key) {
-      let ext = await storage.get(key);
-      if (ext && Object.keys(ext).length && (ext = ext[key])) {
-        const items = Object.keys(ext);
-        if (items && items.length) {
-          for (const item of items) {
-            obj[item] = ext[item];
-          }
-        }
-      }
-    }
-    return obj;
   };
 
   /* file utils */
@@ -1328,6 +1306,28 @@
     evt.key.toLowerCase() === key.key.toLowerCase() &&
     evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
     evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
+
+  /* local storage */
+  /**
+   * extend object items from local storage
+   * @param {Object} obj - object to extend items
+   * @param {string} key - local storage key
+   * @returns {Object} - extended object
+   */
+  const extendObjItems = async (obj, key) => {
+    if (obj && key) {
+      let ext = await localStorage.get(key);
+      if (ext && Object.keys(ext).length && (ext = ext[key])) {
+        const items = Object.keys(ext);
+        if (items && items.length) {
+          for (const item of items) {
+            obj[item] = ext[item];
+          }
+        }
+      }
+    }
+    return obj;
+  };
 
   /* handlers */
   /**
