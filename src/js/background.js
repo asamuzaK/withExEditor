@@ -24,6 +24,10 @@
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "data/fileExt.json";
   const HOST = "withexeditorhost";
+  const HOST_CONNECTED = "hostConnected";
+  const HOST_VERSION = "hostVersion";
+  const HOST_VERSION_CHECK = "checkHostVersion";
+  const HOST_VERSION_MIN = "v2.0.0-b.24";
   const ICON = "img/icon.svg";
   const ICON_AUTO = "buttonIconAuto";
   const ICON_BLACK = "buttonIconBlack";
@@ -72,7 +76,7 @@
     [ONLY_EDITABLE]: false,
   };
 
-  const varsL = {
+  const varsLocal = {
     [EDITOR_LABEL]: "",
     [ENABLE_PB]: false,
     [ICON_ID]: "#context",
@@ -162,6 +166,12 @@
   /* port */
   /* native application host */
   const host = runtime.connectNative(HOST);
+
+  /* host status */
+  const hostStatus = {
+    [HOST_CONNECTED]: false,
+    [HOST_VERSION]: false,
+  };
 
   /**
    * port message to host
@@ -333,7 +343,7 @@
    * @param {string} id - icon fragment id
    * @returns {AsyncFunction} - set icon
    */
-  const setIcon = async (id = varsL[ICON_ID]) => {
+  const setIcon = async (id = varsLocal[ICON_ID]) => {
     const icon = await extension.getURL(ICON);
     const path = vars[IS_ENABLED] && `${icon}${id}` || `${icon}#off`;
     return browserAction.setIcon({path});
@@ -341,12 +351,18 @@
 
   /**
    * toggle badge
-   * @param {boolean} executable - executable
    * @returns {Promise.<Array>} - results of each handler
    */
-  const toggleBadge = async (executable = varsL[IS_EXECUTABLE]) => {
-    const color = !executable && WARN_COLOR || [0, 0, 0, 0];
-    const text = !executable && WARN_TEXT || "";
+  const toggleBadge = async () => {
+    let color, text;
+    if (hostStatus[HOST_CONNECTED] && hostStatus[HOST_VERSION] &&
+        varsLocal[IS_EXECUTABLE]) {
+      color = [0, 0, 0, 0];
+      text = "";
+    } else {
+      color = WARN_COLOR;
+      text = WARN_TEXT;
+    }
     return Promise.all([
       browserAction.setBadgeBackgroundColor({color}),
       browserAction.setBadgeText({text}),
@@ -369,14 +385,14 @@
    * @returns {void}
    */
   const createMenuItem = async (id, contexts) => {
-    const label = varsL[EDITOR_LABEL] || LABEL;
+    const label = varsLocal[EDITOR_LABEL] || LABEL;
     const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
                    `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
     isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
       menus[id] = contextMenus.create({
         id, contexts,
         title: i18n.getMessage(id, [label, accKey]),
-        enabled: !!varsL[MENU_ENABLED],
+        enabled: !!varsLocal[MENU_ENABLED],
       })
     );
   };
@@ -387,7 +403,7 @@
    */
   const createMenuItems = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
-    const enabled = win && (!win.incognito || varsL[ENABLE_PB]) || false;
+    const enabled = win && (!win.incognito || varsLocal[ENABLE_PB]) || false;
     const bool = enabled && !vars[ONLY_EDITABLE];
     const items = Object.keys(menus);
     const func = [];
@@ -430,7 +446,7 @@
           const {menuItemId} = obj;
           if (menus[menuItemId]) {
             if (item === MODE_SOURCE) {
-              const title = varsL[obj.mode] || varsL[menuItemId];
+              const title = varsLocal[obj.mode] || varsLocal[menuItemId];
               title && contextMenus.update(menuItemId, {title});
             } else if (item === MODE_EDIT) {
               const enabled = !!obj.enabled;
@@ -441,7 +457,7 @@
       }
     } else {
       const items = Object.keys(menus);
-      const label = varsL[EDITOR_LABEL] || LABEL;
+      const label = varsLocal[EDITOR_LABEL] || LABEL;
       const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
                      `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
       if (items.length) {
@@ -460,11 +476,11 @@
    */
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-    const label = varsL[EDITOR_LABEL] || LABEL;
+    const label = varsLocal[EDITOR_LABEL] || LABEL;
     const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
                    `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
     for (const item of items) {
-      varsL[item] = i18n.getMessage(item, [label, accKey]);
+      varsLocal[item] = i18n.getMessage(item, [label, accKey]);
     }
   };
 
@@ -475,11 +491,11 @@
    */
   const syncUI = async () => {
     const win = await windows.getCurrent({windowTypes: ["normal"]});
-    const enabled = win && (!win.incognito || varsL[ENABLE_PB]) || false;
+    const enabled = win && (!win.incognito || varsLocal[ENABLE_PB]) || false;
     vars[IS_ENABLED] = !!enabled;
     return Promise.all([
       portMsg({[IS_ENABLED]: !!enabled}),
-      setIcon(!enabled && "#off" || varsL[ICON_ID]),
+      setIcon(!enabled && "#off" || varsLocal[ICON_ID]),
       toggleBadge(),
     ]);
   };
@@ -566,27 +582,31 @@
   /**
    * handle host message
    * @param {Object} msg - message
-   * @returns {?(Function|AsyncFunction)} - logger / port editor config
+   * @returns {Promise.<Array>} - result of each handler
    */
   const handleHostMsg = async msg => {
     const {message, status} = msg;
     const log = message && `${HOST}: ${message}`;
-    let func;
+    const func = [];
     switch (status) {
       case `${PROCESS_CHILD}_stderr`:
       case "error":
-        log && (func = logError(log));
+        log && func.push(logError(log));
         break;
       case "ready":
-        func = portEditorConfigPath();
+        hostStatus[HOST_CONNECTED] = true;
+        func.push(
+          portEditorConfigPath(),
+          portHostMsg({[HOST_VERSION_CHECK]: HOST_VERSION_MIN}),
+        );
         break;
       case "warn":
-        log && (func = logWarn(log));
+        log && func.push(logWarn(log));
         break;
       default:
-        log && (func = logMsg(log));
+        log && func.push(logMsg(log));
     }
-    return func || null;
+    return Promise.all(func);
   };
 
   /**
@@ -617,6 +637,14 @@
             case HOST:
               func.push(handleHostMsg(obj));
               break;
+            case HOST_VERSION: {
+              const {result} = obj;
+              if (Number.isInteger(result)) {
+                hostStatus[HOST_VERSION] = result >= 0 && true || false;
+                func.push(toggleBadge());
+              }
+              break;
+            }
             case OPTIONS_OPEN:
               func.push(openOptionsPage());
               break;
@@ -665,6 +693,14 @@
   };
 
   /**
+   * handle disconnected host
+   * @returns {void}
+   */
+  const handleDisconnectedHost = async () => {
+    hostStatus[HOST_CONNECTED] = false;
+  };
+
+  /**
    * handle tab activated
    * @param {!Object} info - activated tab info
    * @returns {Promise.<Array>} - results of each handler
@@ -686,7 +722,7 @@
         }
       }
     }
-    varsL[MENU_ENABLED] = bool || false;
+    varsLocal[MENU_ENABLED] = bool || false;
     return Promise.all([
       restoreContextMenu(),
       syncUI(),
@@ -705,14 +741,14 @@
     const func = [];
     if (active) {
       const {status} = info;
-      const portUrl = removeQueryFromURI(url);
+      const pUrl = removeQueryFromURI(url);
       const tId = stringifyPositiveInt(id, true);
       const wId = stringifyPositiveInt(windowId, true);
-      varsL[MENU_ENABLED] = wId && tId && portUrl &&
-                            ports[wId] && ports[wId][tId] &&
-                            ports[wId][tId][portUrl] &&
-                            ports[wId][tId][portUrl].name === PORT_CONTENT ||
-                            false;
+      varsLocal[MENU_ENABLED] = wId && tId && pUrl &&
+                                ports[wId] && ports[wId][tId] &&
+                                ports[wId][tId][pUrl] &&
+                                ports[wId][tId][pUrl].name === PORT_CONTENT ||
+                                false;
       status === "complete" && func.push(restoreContextMenu(), syncUI());
     }
     return Promise.all(func);
@@ -782,12 +818,12 @@
       const hasPorts = Object.keys(ports).length;
       switch (item) {
         case EDITOR_CONFIG:
-          varsL[item] = value;
-          varsL[IS_EXECUTABLE] = app && !!app.executable;
+          varsLocal[item] = value;
+          varsLocal[IS_EXECUTABLE] = app && !!app.executable;
           changed && func.push(toggleBadge());
           break;
         case EDITOR_LABEL:
-          varsL[item] = value;
+          varsLocal[item] = value;
           func.push(cacheMenuItemTitle());
           changed && func.push(updateContextMenu());
           break;
@@ -797,7 +833,7 @@
           changed && func.push(restoreContextMenu());
           break;
         case ENABLE_PB:
-          varsL[item] = !!checked;
+          varsLocal[item] = !!checked;
           changed && func.push(syncUI());
           break;
         case ICON_AUTO:
@@ -806,7 +842,7 @@
         case ICON_GRAY:
         case ICON_WHITE:
           if (obj.checked) {
-            varsL[ICON_ID] = value;
+            varsLocal[ICON_ID] = value;
             changed && func.push(setIcon(value));
           }
           break;
@@ -850,6 +886,9 @@
   );
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
+  );
+  host.onDisconnect.addListener(port =>
+    handleDisconnectedHost(port).then(toggleBadge).catch(logError)
   );
   host.onMessage.addListener(msg => handleMsg(msg).catch(logError));
   runtime.onConnect.addListener(port => handlePort(port).catch(logError));
