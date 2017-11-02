@@ -5,6 +5,18 @@
   "extensionName": {
     "message": "withExEditor"
   },
+  "hostConnection_false": {
+    "message": "ホストが接続されていません"
+  },
+  "hostConnection_true": {
+    "message": "接続中"
+  },
+  "hostVersion_false": {
+    "message": "ホストのアップデートが必要です"
+  },
+  "hostVersion_true": {
+    "message": "OK"
+  },
   "modeEditText": {
     "message": "テキストを $LABEL$ で編集 $KEY$",
     "placeholders": {
@@ -144,6 +156,15 @@
   },
   "optionsEnablePBLabel": {
     "message": "プライベートブラウジング中も有効化"
+  },
+  "optionsHostConnectionLabel": {
+    "message": "ホストの接続状態"
+  },
+  "optionsHostStatus": {
+    "message": "ホスト"
+  },
+  "optionsHostVersionLabel": {
+    "message": "ホストのバージョン"
   },
   "optionsIconAuto": {
     "message": "自動"

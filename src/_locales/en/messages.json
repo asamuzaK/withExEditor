@@ -5,6 +5,18 @@
   "extensionName": {
     "message": "withExEditor"
   },
+  "hostConnection_false": {
+    "message": "Disconnected"
+  },
+  "hostConnection_true": {
+    "message": "Connected"
+  },
+  "hostVersion_false": {
+    "message": "Incompatible"
+  },
+  "hostVersion_true": {
+    "message": "Compatible"
+  },
   "modeEditText": {
     "message": "Edit Text with $LABEL$ $KEY$",
     "placeholders": {
@@ -144,6 +156,15 @@
   },
   "optionsEnablePBLabel": {
     "message": "Enable During Private Browsing"
+  },
+  "optionsHostConnectionLabel": {
+    "message": "Host Connection"
+  },
+  "optionsHostStatus": {
+    "message": "Host"
+  },
+  "optionsHostVersionLabel": {
+    "message": "Host Version"
   },
   "optionsIconAuto": {
     "message": "Auto"

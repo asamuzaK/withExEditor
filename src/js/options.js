@@ -13,16 +13,18 @@
 
   /* constants */
   const DATA_ATTR_I18N = "data-i18n";
-  const EDITOR_CONFIG = "editorConfigPath";
-  const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
-  const EDITOR_CONFIG_TS = "editorConfigTimestamp";
   const EDITOR_FILE_NAME = "editorFileName";
   const EDITOR_LABEL = "editorLabel";
+  const HOST_CONNECTION = "hostConnection";
+  const HOST_STATUS = "hostStatus";
+  const HOST_STATUS_GET = "getHostStatus";
+  const HOST_VERSION = "hostVersion";
   const KEY_ACCESS = "accessKey";
   const LANG = "optionsLang";
   const PORT_NAME = "portOptions";
   const STORAGE_SET = "setStorage";
+  const WARN = "warn";
 
   /**
    * log error
@@ -51,28 +53,6 @@
    */
   const portMsg = async msg => {
     msg && port.postMessage(msg);
-  };
-
-  /**
-   * port editor config timestamp
-   * @param {Object} evt - Event
-   * @returns {AsyncFunction} - port message
-   */
-  const portEditorConfigTimestamp = async () => {
-    const timestamp = Date.now();
-    const msg = {
-      [STORAGE_SET]: {
-        [EDITOR_CONFIG_TS]: {
-          id: EDITOR_CONFIG_TS,
-          app: {
-            executable: false,
-          },
-          checked: false,
-          value: timestamp,
-        },
-      },
-    };
-    return portMsg(msg);
   };
 
   /**
@@ -119,6 +99,34 @@
   };
 
   /**
+   * extract host status
+   * @param {Object} status - host status
+   * @returns {void}
+   */
+  const extractHostStatus = async status => {
+    const {hostConnection, hostVersion} = status;
+    const connect = document.getElementById(HOST_CONNECTION);
+    const version = document.getElementById(HOST_VERSION);
+    console.log(hostConnection);
+    if (connect) {
+      connect.textContent = i18n.getMessage(`hostConnection_${hostConnection}`);
+      if (hostConnection) {
+        connect.classList.remove(WARN);
+      } else {
+        connect.classList.add(WARN);
+      }
+    }
+    if (version) {
+      version.textContent = i18n.getMessage(`hostVersion_${hostVersion}`);
+      if (hostVersion) {
+        version.classList.remove(WARN);
+      } else {
+        version.classList.add(WARN);
+      }
+    }
+  };
+
+  /**
    * port pref
    * @param {!Object} evt - Event
    * @returns {Promise.<Array>} - results of each handler
@@ -136,12 +144,6 @@
       }
     } else {
       switch (id) {
-        case EDITOR_CONFIG:
-          func.push(
-            portMsg({[EDITOR_CONFIG_GET]: value}),
-            portEditorConfigTimestamp(),
-          );
-          break;
         case KEY_ACCESS:
           (value === "" || /^[a-z]$/i.test(value)) &&
             func.push(createPref(target).then(portMsg));
@@ -152,6 +154,12 @@
     }
     return Promise.all(func);
   };
+
+  /**
+   * get host status
+   * @returns {AsyncFunction} - port message
+   */
+  const getHostStatus = async () => portMsg({[HOST_STATUS_GET]: true});
 
   /* html */
   /**
@@ -276,10 +284,15 @@
     const items = msg && Object.keys(msg);
     if (items && items.length) {
       for (const item of items) {
-        if (item === EDITOR_CONFIG_RES) {
-          const obj = msg[item];
-          func.push(extractEditorConfig(obj));
-          break;
+        const obj = msg[item];
+        switch (item) {
+          case EDITOR_CONFIG_RES:
+            func.push(extractEditorConfig(obj));
+            break;
+          case HOST_STATUS:
+            func.push(extractHostStatus(obj));
+            break;
+          default:
         }
       }
     }
@@ -294,5 +307,6 @@
     setValuesFromLocalStorage(),
     addInputChangeListener(),
     addReloadExtensionListener(),
+    getHostStatus(),
   ]).catch(logError), false);
 }

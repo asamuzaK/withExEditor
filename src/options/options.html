@@ -74,28 +74,41 @@
           </div>
         </fieldset>
         <fieldset>
-          <legend data-i18n="optionsEditorSettings">
-            Editor Settings
+          <legend data-i18n="optionsHostStatus">
+            Host
           </legend>
           <div>
             <p>
-              <label for="editorConfigPath" class="label"
-                     data-i18n="optionsEditorConfigPathLabel"
-                     aria-details="editorConfigPathDetail">
-                Editor Config Path
-              </label>
-              <input type="text" id="editorConfigPath" data-executable="false"
-                     data-i18n="optionsEditorConfigPath"
-                     placeholder="Input Editor Config Path" />
-              <input type="hidden" id="editorFileName" />
+              <span class="label" data-i18n="optionsHostConnectionLabel"
+                    aria-details="hostConnectionDetail">
+                Host Connection
+              </span>
+              <span id="hostConnection" class="status warn">
+                Unknown
+              </span>
             </p>
-            <details id="editorConfigPathDetail">
+            <details id="hostConnectionDetail">
               <div>
-                <p data-i18n="optionsEditorConfigPathDetail">
-                  Enter the path of editor configuration JSON file.
+                <p data-i18n="optionsHostConnectionDetail">
+                  If "Unknown" or "Disconnected", restart withExEditor.
                 </p>
-                <p data-i18n="optionsEditorConfigPathDetail2">
-                  For details, refer to the README of withExEditorHost.
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <span class="label" data-i18n="optionsHostVersionLabel"
+                    aria-details="hostVersionDetail">
+                Host Version
+              </span>
+              <span id="hostVersion" class="status warn">
+                Unknown
+              </span>
+            </p>
+            <details id="hostVersionDetail">
+              <div>
+                <p data-i18n="optionsHostVersionDetail">
+                  If "Unknown" or "Incompatible", update the host.
                 </p>
               </div>
             </details>
@@ -118,7 +131,7 @@
                   Enter the label of the editor.
                 </p>
                 <p data-i18n="optionsEditorLabelDetail2">
-                  Disabled if editor config path is not filled or editor config file could not be found.
+                  Disabled if editor config file could not be found.
                 </p>
               </div>
             </details>

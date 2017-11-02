@@ -129,6 +129,12 @@ input[type=text] {
   min-width: 15rem;
   max-width: calc(100% - 1rem);
 }
+.status {
+  max-width: calc(100% - 1rem);
+}
+.warn {
+  color: #C13832;
+}
 input[type=submit], button {
   font-size: 0.9rem;
 }

@@ -24,7 +24,9 @@
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "data/fileExt.json";
   const HOST = "withexeditorhost";
-  const HOST_CONNECTED = "hostConnected";
+  const HOST_CONNECTION = "hostConnection";
+  const HOST_STATUS = "hostStatus";
+  const HOST_STATUS_GET = "getHostStatus";
   const HOST_VERSION = "hostVersion";
   const HOST_VERSION_CHECK = "checkHostVersion";
   const HOST_VERSION_MIN = "v2.0.0-b.24";
@@ -169,7 +171,7 @@
 
   /* host status */
   const hostStatus = {
-    [HOST_CONNECTED]: false,
+    [HOST_CONNECTION]: false,
     [HOST_VERSION]: false,
   };
 
@@ -355,7 +357,7 @@
    */
   const toggleBadge = async () => {
     let color, text;
-    if (hostStatus[HOST_CONNECTED] && hostStatus[HOST_VERSION] &&
+    if (hostStatus[HOST_CONNECTION] && hostStatus[HOST_VERSION] &&
         varsLocal[IS_EXECUTABLE]) {
       color = [0, 0, 0, 0];
       text = "";
@@ -594,7 +596,7 @@
         log && func.push(logError(log));
         break;
       case "ready":
-        hostStatus[HOST_CONNECTED] = true;
+        hostStatus[HOST_CONNECTION] = true;
         func.push(
           portEditorConfigPath(),
           portHostMsg({[HOST_VERSION_CHECK]: HOST_VERSION_MIN}),
@@ -636,6 +638,9 @@
               break;
             case HOST:
               func.push(handleHostMsg(obj));
+              break;
+            case HOST_STATUS_GET:
+              func.push(portMsg({[HOST_STATUS]: hostStatus}));
               break;
             case HOST_VERSION: {
               const {result} = obj;
@@ -694,10 +699,11 @@
 
   /**
    * handle disconnected host
-   * @returns {void}
+   * @returns {AsyncFunction} - toggle badge
    */
   const handleDisconnectedHost = async () => {
-    hostStatus[HOST_CONNECTED] = false;
+    hostStatus[HOST_CONNECTION] = false;
+    return toggleBadge();
   };
 
   /**
