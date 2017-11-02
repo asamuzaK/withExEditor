@@ -29,7 +29,7 @@
   const HOST_STATUS_GET = "getHostStatus";
   const HOST_VERSION = "hostVersion";
   const HOST_VERSION_CHECK = "checkHostVersion";
-  const HOST_VERSION_MIN = "v2.0.0-b.24";
+  const HOST_VERSION_MIN = "v2.0.0-rc.1";
   const ICON = "img/icon.svg";
   const ICON_AUTO = "buttonIconAuto";
   const ICON_BLACK = "buttonIconBlack";
