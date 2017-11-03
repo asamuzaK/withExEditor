@@ -15,7 +15,7 @@
     "message": "ホストのアップデートが必要です"
   },
   "hostVersion_true": {
-    "message": "OK"
+    "message": "適合"
   },
   "modeEditText": {
     "message": "テキストを $LABEL$ で編集 $KEY$",
