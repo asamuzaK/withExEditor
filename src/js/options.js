@@ -170,9 +170,11 @@
   const addReloadExtensionListener = async () => {
     const elm = document.getElementById("reloadExtension");
     if (elm) {
-      elm.addEventListener(
-        "click", () => runtime.reload().catch(logError), false
-      );
+      elm.addEventListener("click", evt => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        runtime.reload().catch(logError);
+      }, false);
     }
   };
 
@@ -184,9 +186,27 @@
     const nodes = document.querySelectorAll("input");
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
-        node.addEventListener(
-          "change", evt => portPref(evt).catch(logError), false
-        );
+        node.addEventListener("change", evt => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          portPref(evt).catch(logError);
+        }, false);
+      }
+    }
+  };
+
+  /**
+   * add event listener to form elements
+   * @returns {void}
+   */
+  const addFormSubmitListener = async () => {
+    const nodes = document.getElementById("form");
+    if (nodes instanceof NodeList) {
+      for (const node of nodes) {
+        node.addEventListener("submit", evt => {
+          evt.stopPropagation();
+          evt.preventDefault();
+        }, false);
       }
     }
   };
@@ -308,6 +328,7 @@
     setValuesFromLocalStorage(),
     addInputChangeListener(),
     addReloadExtensionListener(),
+    addFormSubmitListener(),
     getHostStatus(),
   ]).catch(logError), false);
 }
