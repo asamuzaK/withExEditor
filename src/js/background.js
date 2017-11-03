@@ -13,7 +13,6 @@
   /* constants */
   const CONTENT_GET = "getContent";
   const CONTEXT_MENU = "contextMenu";
-  const EDITOR_CONFIG = "editorConfigPath";
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
   const EDITOR_CONFIG_TS = "editorConfigTimestamp";
@@ -206,17 +205,6 @@
       func = setLocalStorage({[key]: data});
     }
     return func || null;
-  };
-
-  /**
-   * port editor config path
-   * @returns {AsyncFunction} - port host message
-   */
-  const portEditorConfigPath = async () => {
-    const data = await localStorage.get(EDITOR_CONFIG);
-    const filePath = data && data[EDITOR_CONFIG] &&
-                     data[EDITOR_CONFIG].value || "";
-    return portHostMsg({[EDITOR_CONFIG_GET]: filePath});
   };
 
   /* content ports collection */
@@ -509,11 +497,10 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const extractEditorConfig = async (data = {}) => {
-    const {
-      editorConfig, editorConfigTimestamp, editorName, executable,
-    } = data;
+    const {editorConfigTimestamp, editorName, executable} = data;
     const store = await localStorage.get([
-      EDITOR_CONFIG, EDITOR_CONFIG_TS, EDITOR_FILE_NAME,
+      EDITOR_CONFIG_TS,
+      EDITOR_FILE_NAME,
       EDITOR_LABEL,
     ]);
     const editorFileName = store[EDITOR_FILE_NAME] &&
@@ -523,19 +510,13 @@
                       store[EDITOR_CONFIG_TS].value || 0;
     const func = [];
     if (!timestamp || editorConfigTimestamp > timestamp) {
+      const editorNewLabel = editorFileName === editorName && editorLabel ||
+                             executable && editorName || "";
       const msg = {
-        [EDITOR_CONFIG]: {
-          id: EDITOR_CONFIG,
-          app: {
-            executable: !!executable,
-          },
-          checked: false,
-          value: editorConfig || "",
-        },
         [EDITOR_CONFIG_TS]: {
           id: EDITOR_CONFIG_TS,
           app: {
-            executable: false,
+            executable: !!executable,
           },
           checked: false,
           value: editorConfigTimestamp || 0,
@@ -543,7 +524,7 @@
         [EDITOR_FILE_NAME]: {
           id: EDITOR_FILE_NAME,
           app: {
-            executable: false,
+            executable: !!executable,
           },
           checked: false,
           value: executable && editorName || "",
@@ -554,19 +535,25 @@
             executable: false,
           },
           checked: false,
-          value: editorFileName === editorName && editorLabel ||
-                 executable && editorName || "",
+          value: editorNewLabel,
         },
       };
-      func.push(setLocalStorage(msg), portMsg({[EDITOR_CONFIG_RES]: data}));
+      func.push(
+        setLocalStorage(msg),
+        portMsg({
+          [EDITOR_CONFIG_RES]: {
+            editorConfigTimestamp, editorName, executable,
+            editorLabel: editorNewLabel,
+          },
+        })
+      );
     } else {
       func.push(portMsg({
         [EDITOR_CONFIG_RES]: {
-          editorConfig: store[EDITOR_CONFIG].value || "",
           editorConfigTimestamp: timestamp,
           editorName: store[EDITOR_FILE_NAME].value || "",
           editorLabel: store[EDITOR_LABEL].value || "",
-          executable: store[EDITOR_CONFIG].app.executable,
+          executable: store[EDITOR_FILE_NAME].app.executable,
         },
       }));
     }
@@ -598,8 +585,10 @@
       case "ready":
         hostStatus[HOST_CONNECTION] = true;
         func.push(
-          portEditorConfigPath(),
-          portHostMsg({[HOST_VERSION_CHECK]: HOST_VERSION_MIN}),
+          portHostMsg({
+            [EDITOR_CONFIG_GET]: true,
+            [HOST_VERSION_CHECK]: HOST_VERSION_MIN,
+          })
         );
         break;
       case "warn":
@@ -823,7 +812,7 @@
       } = obj;
       const hasPorts = Object.keys(ports).length;
       switch (item) {
-        case EDITOR_CONFIG:
+        case EDITOR_FILE_NAME:
           varsLocal[item] = value;
           varsLocal[IS_EXECUTABLE] = app && !!app.executable;
           changed && func.push(toggleBadge());

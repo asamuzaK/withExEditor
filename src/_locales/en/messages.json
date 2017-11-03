@@ -106,21 +106,6 @@
   "optionsAccessKeySettings": {
     "message": "Access Key Settings"
   },
-  "optionsEditorConfigPath": {
-    "message": ""
-  },
-  "optionsEditorConfigPath_placeholder": {
-    "message": "Input Editor Config Path"
-  },
-  "optionsEditorConfigPathDetail": {
-    "message": "Enter the path of editor configuration JSON file."
-  },
-  "optionsEditorConfigPathDetail2": {
-    "message": "For details, refer to the README of withExEditorHost."
-  },
-  "optionsEditorConfigPathLabel": {
-    "message": "Editor Config Path"
-  },
   "optionsEditorLabel": {
     "message": ""
   },
@@ -131,13 +116,10 @@
     "message": "Enter the label of the editor."
   },
   "optionsEditorLabelDetail2": {
-    "message": "Disabled if editor config path is not filled or editor config file could not be found."
+    "message": "If the input field is disabled, run the setup script on the host."
   },
   "optionsEditorLabelLabel": {
     "message": "Editor Label"
-  },
-  "optionsEditorSettings": {
-    "message": "Editor Settings"
   },
   "optionsEditorShortCutDetail": {
     "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key'."
@@ -157,11 +139,17 @@
   "optionsEnablePBLabel": {
     "message": "Enable During Private Browsing"
   },
+  "optionsHostConnectionDetail": {
+    "message": "If \"Unknown\" or \"Disconnected\", restart withExEditor."
+  },
   "optionsHostConnectionLabel": {
     "message": "Host Connection"
   },
   "optionsHostStatus": {
     "message": "Host"
+  },
+  "optionsHostVersionDetail": {
+    "message": "If \"Unknown\" or \"Incompatible\", update the host."
   },
   "optionsHostVersionLabel": {
     "message": "Host Version"

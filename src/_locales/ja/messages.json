@@ -106,21 +106,6 @@
   "optionsAccessKeySettings": {
     "message": "アクセスキー設定"
   },
-  "optionsEditorConfigPath": {
-    "message": ""
-  },
-  "optionsEditorConfigPath_placeholder": {
-    "message": "エディタ設定ファイルのパスを入力"
-  },
-  "optionsEditorConfigPathDetail": {
-    "message": "エディタ設定ファイル（JSON）のパスを入力してください。"
-  },
-  "optionsEditorConfigPathDetail2": {
-    "message": "詳細についてはwithExEditorHostのREADMEを参照してください。"
-  },
-  "optionsEditorConfigPathLabel": {
-    "message": "エディタ設定ファイルのパス"
-  },
   "optionsEditorLabel": {
     "message": ""
   },
@@ -131,13 +116,10 @@
     "message": "エディタの表示名を入力してください。"
   },
   "optionsEditorLabelDetail2": {
-    "message": "エディタ設定ファイルのパスが未入力の場合やエディタ設定ファイルが見つからなかった場合などには無効となります。"
+    "message": "入力欄が無効になっている場合は、ホストでセットアップスクリプトを実行してください。"
   },
   "optionsEditorLabelLabel": {
     "message": "エディタの表示名"
-  },
-  "optionsEditorSettings": {
-    "message": "エディタ設定"
   },
   "optionsEditorShortCutDetail": {
     "message": "コンテキストメニューを経由せずにエディタを直接起動するには「Ctrl + Shift + キー」を押してください。"
@@ -157,11 +139,17 @@
   "optionsEnablePBLabel": {
     "message": "プライベートブラウジング中も有効化"
   },
+  "optionsHostConnectionDetail": {
+    "message": "状態が「不明」や「ホストが接続されていません」となっている場合は、withExEditor を再起動してください。"
+  },
   "optionsHostConnectionLabel": {
     "message": "ホストの接続状態"
   },
   "optionsHostStatus": {
     "message": "ホスト"
+  },
+  "optionsHostVersionDetail": {
+    "message": "状態が「不明」や「ホストのアップデートが必要です」と場合は、ホストをアップデートしてください。"
   },
   "optionsHostVersionLabel": {
     "message": "ホストのバージョン"
@@ -254,7 +242,7 @@
     "message": "withExEditorを再読み込み"
   },
   "optionsReloadExtensionDetail": {
-    "message": "Node.jsをアップデートしたときやwithExEditorHostをアップデートしたときなどに、withExEditorが動かなくなった場合に試してください。"
+    "message": "Node.jsをアップデートしたときやホストをアップデートしたとき、または、withExEditorが動かなくなった場合に試してください。"
   },
   "optionsSaveEditorSettings": {
     "message": "保存"

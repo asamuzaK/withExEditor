@@ -83,13 +83,15 @@
    * @returns {void}
    */
   const extractEditorConfig = async (obj = {}) => {
-    const {editorName, executable} = obj;
+    const {editorLabel, editorName, executable} = obj;
     const name = document.getElementById(EDITOR_FILE_NAME);
     const label = document.getElementById(EDITOR_LABEL);
-    if (name && label) {
+    if (name) {
       name.value = editorName || "";
-      if (executable && name.value) {
-        !label.value && (label.value = name.value);
+    }
+    if (label) {
+      if (executable && (editorLabel || editorName)) {
+        label.value = editorLabel || editorName;
         label.disabled = false;
       } else {
         label.value = "";
@@ -107,7 +109,6 @@
     const {hostConnection, hostVersion} = status;
     const connect = document.getElementById(HOST_CONNECTION);
     const version = document.getElementById(HOST_VERSION);
-    console.log(hostConnection);
     if (connect) {
       connect.textContent = i18n.getMessage(`hostConnection_${hostConnection}`);
       if (hostConnection) {
