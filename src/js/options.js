@@ -171,9 +171,10 @@
     const elm = document.getElementById("reloadExtension");
     if (elm) {
       elm.addEventListener("click", evt => {
+        const {currentTarget, target} = evt;
         evt.preventDefault();
         evt.stopPropagation();
-        runtime.reload().catch(logError);
+        currentTarget === target && runtime.reload().catch(logError);
       }, false);
     }
   };
@@ -187,8 +188,6 @@
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
         node.addEventListener("change", evt => {
-          evt.preventDefault();
-          evt.stopPropagation();
           portPref(evt).catch(logError);
         }, false);
       }
