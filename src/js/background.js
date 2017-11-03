@@ -508,55 +508,43 @@
     const editorLabel = store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
     const timestamp = store[EDITOR_CONFIG_TS] &&
                       store[EDITOR_CONFIG_TS].value || 0;
-    const func = [];
-    if (!timestamp || editorConfigTimestamp > timestamp) {
-      const editorNewLabel = editorFileName === editorName && editorLabel ||
-                             executable && editorName || "";
-      const msg = {
-        [EDITOR_CONFIG_TS]: {
-          id: EDITOR_CONFIG_TS,
-          app: {
-            executable: !!executable,
-          },
-          checked: false,
-          value: editorConfigTimestamp || 0,
+    const editorNewLabel = editorFileName === editorName && editorLabel ||
+                           executable && editorName || "";
+    const msg = {
+      [EDITOR_CONFIG_TS]: {
+        id: EDITOR_CONFIG_TS,
+        app: {
+          executable: !!executable,
         },
-        [EDITOR_FILE_NAME]: {
-          id: EDITOR_FILE_NAME,
-          app: {
-            executable: !!executable,
-          },
-          checked: false,
-          value: executable && editorName || "",
+        checked: false,
+        value: editorConfigTimestamp || 0,
+      },
+      [EDITOR_FILE_NAME]: {
+        id: EDITOR_FILE_NAME,
+        app: {
+          executable: !!executable,
         },
-        [EDITOR_LABEL]: {
-          id: EDITOR_LABEL,
-          app: {
-            executable: false,
-          },
-          checked: false,
-          value: editorNewLabel,
+        checked: false,
+        value: executable && editorName || "",
+      },
+      [EDITOR_LABEL]: {
+        id: EDITOR_LABEL,
+        app: {
+          executable: false,
         },
-      };
-      func.push(
-        setLocalStorage(msg),
-        portMsg({
-          [EDITOR_CONFIG_RES]: {
-            editorConfigTimestamp, editorName, executable,
-            editorLabel: editorNewLabel,
-          },
-        })
-      );
-    } else {
-      func.push(portMsg({
+        checked: false,
+        value: editorNewLabel,
+      },
+    };
+    const func = [
+      setLocalStorage(msg),
+      portMsg({
         [EDITOR_CONFIG_RES]: {
-          editorConfigTimestamp: timestamp,
-          editorName: store[EDITOR_FILE_NAME].value || "",
-          editorLabel: store[EDITOR_LABEL].value || "",
-          executable: store[EDITOR_FILE_NAME].app.executable,
+          editorConfigTimestamp, editorName, executable,
+          editorLabel: editorNewLabel,
         },
-      }));
-    }
+      }),
+    ];
     return Promise.all(func);
   };
 
