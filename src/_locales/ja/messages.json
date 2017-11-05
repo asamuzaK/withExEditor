@@ -6,13 +6,13 @@
     "message": "withExEditor"
   },
   "hostConnection_false": {
-    "message": "ホストが接続されていません"
+    "message": "未接続"
   },
   "hostConnection_true": {
     "message": "接続中"
   },
   "hostVersion_false": {
-    "message": "ホストのアップデートが必要です"
+    "message": "非適合"
   },
   "hostVersion_true": {
     "message": "適合"
@@ -140,7 +140,7 @@
     "message": "プライベートブラウジング中も有効化"
   },
   "optionsHostConnectionDetail": {
-    "message": "状態が「不明」や「ホストが接続されていません」となっている場合は、withExEditor を再起動してください。"
+    "message": "状態が「不明」や「未接続」となっている場合は、withExEditor を再起動してください。"
   },
   "optionsHostConnectionLabel": {
     "message": "ホストの接続状態"
@@ -149,7 +149,7 @@
     "message": "ホスト"
   },
   "optionsHostVersionDetail": {
-    "message": "状態が「不明」や「ホストのアップデートが必要です」と場合は、ホストをアップデートしてください。"
+    "message": "状態が「不明」や「非適合」となっている場合は、ホストをアップデートしてください。"
   },
   "optionsHostVersionLabel": {
     "message": "ホストのバージョン"
