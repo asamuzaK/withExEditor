@@ -499,15 +499,12 @@
   const extractEditorConfig = async (data = {}) => {
     const {editorConfigTimestamp, editorName, executable} = data;
     const store = await localStorage.get([
-      EDITOR_CONFIG_TS,
       EDITOR_FILE_NAME,
       EDITOR_LABEL,
     ]);
     const editorFileName = store[EDITOR_FILE_NAME] &&
                              store[EDITOR_FILE_NAME].value;
     const editorLabel = store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
-    const timestamp = store[EDITOR_CONFIG_TS] &&
-                      store[EDITOR_CONFIG_TS].value || 0;
     const editorNewLabel = editorFileName === editorName && editorLabel ||
                            executable && editorName || "";
     const msg = {
