@@ -378,11 +378,11 @@
     const label = varsLocal[EDITOR_LABEL] || LABEL;
     const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
                    `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
     isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
       menus[id] = contextMenus.create({
-        id, contexts,
+        id, contexts, enabled,
         title: i18n.getMessage(id, [label, accKey]),
-        enabled: !!varsLocal[MENU_ENABLED],
       })
     );
   };
@@ -792,9 +792,7 @@
   const setVar = async (item, obj, changed = false) => {
     const func = [];
     if (item && obj) {
-      const {
-        app, checked, value,
-      } = obj;
+      const {app, checked, value} = obj;
       const hasPorts = Object.keys(ports).length;
       switch (item) {
         case EDITOR_FILE_NAME:
