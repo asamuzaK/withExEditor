@@ -18,6 +18,7 @@ Blink:
 ### Important Notice
 
 To use withExEditor, you also need to prepare a host which executes your editor.
+The browser interacts with the host via messages, and the editor is executed by the host.
 Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHub)](https://github.com/asamuzaK/withExEditorHost "asamuzaK/withExEditorHost: Native messaging host for withExEditor").
 
 ***

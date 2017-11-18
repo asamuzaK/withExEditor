@@ -18,6 +18,7 @@ Blink:
 ### 重要なお知らせ
 
 withExEditorを使うには、エディタを起動するホストも用意する必要があります。
+ブラウザはメッセージを介してホストと対話し、エディタはホストによって実行されます。
 [asamuzaK/withExEditorHost (GitHub)](https://github.com/asamuzaK/withExEditorHost "asamuzaK/withExEditorHost: Native messaging host for withExEditor")からwithExEditor用のホストをダウンロードしてください。
 
 ***
