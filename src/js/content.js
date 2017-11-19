@@ -670,36 +670,42 @@
         data = {dataId: id};
       } else {
         const ancestorId = await getAncestorId(elm);
-        if (ancestorId) {
-          let items;
-          if (prefix) {
-            items = Array.from(
-              document.querySelectorAll(`#${ancestorId} *|*`)
-            ).filter(item => {
-              const {localName: itemLocalName} = item;
-              return itemLocalName === `${prefix}:${localName}` && item;
-            });
-          } else {
-            items = document.querySelectorAll(`#${ancestorId} ${localName}`);
+        const {localName: rootLocalName} = document.documentElement;
+        let items;
+        if (prefix) {
+          items = Array.from(
+            document.querySelectorAll(
+              ancestorId && `#${ancestorId} *|*` ||
+              `${rootLocalName} *|*`
+            )
+          ).filter(item => {
+            const {localName: itemLocalName} = item;
+            return itemLocalName === `${prefix}:${localName}` && item;
+          });
+        } else {
+          items = document.querySelectorAll(
+            ancestorId && `#${ancestorId} ${localName}` || localName
+          );
+        }
+        if (items && items.length) {
+          const l = items.length;
+          let i = 0, queryIndex;
+          while (i < l) {
+            const item = items[i];
+            if (item === elm) {
+              queryIndex = i;
+              break;
+            }
+            i++;
           }
-          if (items && items.length) {
-            const l = items.length;
-            let i = 0, queryIndex;
-            while (i < l) {
-              const item = items[i];
-              if (item === elm) {
-                queryIndex = i;
-                break;
-              }
-              i++;
-            }
-            if (Number.isInteger(queryIndex)) {
-              const targetElm = prefix && `${prefix}:${localName}` || localName;
-              data = {
-                ancestorId, localName, prefix, queryIndex,
-                dataId: `${ancestorId}_${targetElm}_${queryIndex}`,
-              };
-            }
+          if (Number.isInteger(queryIndex)) {
+            const targetElm = prefix && `${prefix}:${localName}` || localName;
+            const dataId =
+              ancestorId && `${ancestorId}_${targetElm}_${queryIndex}` ||
+              `${rootLocalName}_${targetElm}_${queryIndex}`;
+            data = {
+              ancestorId, localName, prefix, queryIndex, dataId,
+            };
           }
         }
       }
@@ -718,16 +724,21 @@
       const data = dataIds.get(dataId);
       if (data) {
         const {ancestorId, localName, prefix, queryIndex} = data;
-        if (ancestorId && localName && Number.isInteger(queryIndex)) {
+        if (localName && Number.isInteger(queryIndex)) {
           let items;
           if (prefix) {
-            const nodeList = document.querySelectorAll(`#${ancestorId} *|*`);
+            const {localName: rootLocalName} = document.documentElement;
+            const nodeList = document.querySelectorAll(
+              ancestorId && `#${ancestorId} *|*` || `#${rootLocalName} *|*`
+            );
             items = Array.from(nodeList).filter(item => {
               const {localName: itemLocalName} = item;
               return itemLocalName === `${prefix}:${localName}` && item;
             });
           } else {
-            items = document.querySelectorAll(`#${ancestorId} ${localName}`);
+            items = document.querySelectorAll(
+              ancestorId && `#${ancestorId} ${localName}` || localName
+            );
           }
           elm = items && items[queryIndex];
         } else {
