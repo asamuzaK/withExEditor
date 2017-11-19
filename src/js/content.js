@@ -675,8 +675,7 @@
         if (prefix) {
           items = Array.from(
             document.querySelectorAll(
-              ancestorId && `#${ancestorId} *|*` ||
-              `${rootLocalName} *|*`
+              ancestorId && `#${ancestorId} *|*` || `${rootLocalName} *|*`
             )
           ).filter(item => {
             const {localName: itemLocalName} = item;
