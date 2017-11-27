@@ -163,6 +163,9 @@
   "optionsIconAutoLabel": {
     "message": "自動"
   },
+  "optionsIconAutoLabel_ariaLabel": {
+    "message": "自動"
+  },
   "optionsIconBlack": {
     "message": ""
   },
@@ -219,12 +222,6 @@
   },
   "optionsLang": {
     "message": "ja"
-  },
-  "optionsManualLabel": {
-    "message": "ホストマニュアル"
-  },
-  "optionsManualLabel_href": {
-    "message": "./manual.ja.html"
   },
   "optionsOptionsShortCutDetail": {
     "message": "設定ページを開くには「Alt + Shift + キー」（Macは「Opt + Shift + キー」）を押してください。"

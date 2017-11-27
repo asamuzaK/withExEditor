@@ -163,6 +163,9 @@
   "optionsIconAutoLabel": {
     "message": "Auto"
   },
+  "optionsIconAutoLabel_ariaLabel": {
+    "message": "Auto"
+  },
   "optionsIconBlack": {
     "message": ""
   },
@@ -219,12 +222,6 @@
   },
   "optionsLang": {
     "message": "en"
-  },
-  "optionsManualLabel": {
-    "message": "Host Manual"
-  },
-  "optionsManualLabel_href": {
-    "message": "./manual.en.html"
   },
   "optionsOptionsShortCutDetail": {
     "message": "To open the options page, press 'Alt + Shift + key' ('Opt + Shift + key' on Mac)."
