@@ -19,6 +19,7 @@
   const EDITOR_FILE_NAME = "editorFileName";
   const EDITOR_LABEL = "editorLabel";
   const ENABLE_PB = "enablePB";
+  const EXT_RELOAD = "reloadExtension";
   const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "data/fileExt.json";
@@ -545,6 +546,19 @@
     return Promise.all(func);
   };
 
+  /* extension */
+  /**
+   * reload extension
+   * @param {boolean} reload - reload
+   * @returns {void}
+   */
+  const reloadExt = async (reload = false) => {
+    if (reload) {
+      host && host.disconnect();
+      runtime.reload();
+    }
+  };
+
   /* handlers */
   /**
    * open options page
@@ -609,6 +623,9 @@
               break;
             case EDITOR_CONFIG_RES:
               func.push(extractEditorConfig(obj));
+              break;
+            case EXT_RELOAD:
+              func.push(reloadExt(!!obj));
               break;
             case HOST:
               func.push(handleHostMsg(obj));

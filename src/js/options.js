@@ -16,6 +16,7 @@
   const EDITOR_CONFIG_RES = "resEditorConfig";
   const EDITOR_FILE_NAME = "editorFileName";
   const EDITOR_LABEL = "editorLabel";
+  const EXT_RELOAD = "reloadExtension";
   const HOST_CONNECTION = "hostConnection";
   const HOST_STATUS = "hostStatus";
   const HOST_STATUS_GET = "getHostStatus";
@@ -54,6 +55,16 @@
   const portMsg = async msg => {
     msg && port.postMessage(msg);
   };
+
+  /**
+   * reload extension
+   * @param {boolean} reload - reload
+   * @returns {?AsyncFunction} - port message
+   */
+  const portReloadExt = async (reload = false) =>
+    reload && portMsg({
+      [EXT_RELOAD]: !!reload,
+    }) || null;
 
   /**
    * create pref
@@ -174,7 +185,7 @@
         const {currentTarget, target} = evt;
         evt.preventDefault();
         evt.stopPropagation();
-        currentTarget === target && runtime.reload().catch(logError);
+        portReloadExt(currentTarget === target).catch(logError);
       }, false);
     }
   };
