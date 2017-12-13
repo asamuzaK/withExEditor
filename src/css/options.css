@@ -86,8 +86,8 @@ details > div {
   color: rgb(16,16,16);
   z-index: 2;
 }
-fieldset:last-child > div:last-child > details > div {
-  bottom: 1.5rem;
+form:last-child > fieldset:last-child > div:last-child > details > div {
+  bottom: 1.75rem;
 }
 details > div > p {
   margin: 0.5rem;
