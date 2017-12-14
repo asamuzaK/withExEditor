@@ -25,6 +25,7 @@
   const LANG = "optionsLang";
   const PORT_NAME = "portOptions";
   const STORAGE_SET = "setStorage";
+  const SYNC_AUTO_URL = "syncAutoUrls";
   const WARN = "warn";
 
   /**
@@ -55,16 +56,6 @@
   const portMsg = async msg => {
     msg && port.postMessage(msg);
   };
-
-  /**
-   * reload extension
-   * @param {boolean} reload - reload
-   * @returns {?AsyncFunction} - port message
-   */
-  const portReloadExt = async (reload = false) =>
-    reload && portMsg({
-      [EXT_RELOAD]: !!reload,
-    }) || null;
 
   /**
    * create pref
@@ -139,6 +130,22 @@
   };
 
   /**
+   * get host status
+   * @returns {AsyncFunction} - port message
+   */
+  const getHostStatus = async () => portMsg({[HOST_STATUS_GET]: true});
+
+  /**
+   * port reload extension
+   * @param {boolean} reload - reload
+   * @returns {?AsyncFunction} - port message
+   */
+  const portReloadExt = async (reload = false) =>
+    reload && portMsg({
+      [EXT_RELOAD]: !!reload,
+    }) || null;
+
+  /**
    * port pref
    * @param {!Object} evt - Event
    * @returns {Promise.<Array>} - results of each handler
@@ -168,10 +175,40 @@
   };
 
   /**
-   * get host status
-   * @returns {AsyncFunction} - port message
+   * extract auto sync url input
+   * @param {Object} evt - Event
+   * @returns {?AsyncFunction} - port pref
    */
-  const getHostStatus = async () => portMsg({[HOST_STATUS_GET]: true});
+  const extractAutoSyncUrlInput = async evt => {
+    const {target} = evt;
+    const {value} = target;
+    const items = value.split("\n");
+    let func, bool = false;
+    for (let item of items) {
+      if (isString(item)) {
+        item = item.trim();
+        if (item.length) {
+          try {
+            const url = new URL(item);
+            bool = url && true || false;
+            if (!bool) {
+              break;
+            }
+          } catch (e) {
+            bool = false;
+            break;
+          }
+        }
+      } else {
+        bool = false;
+        break;
+      }
+    }
+    if (bool) {
+      func = createPref(target).then(portMsg);
+    }
+    return func || null;
+  };
 
   /* html */
   /**
@@ -179,15 +216,28 @@
    * @returns {void}
    */
   const addReloadExtensionListener = async () => {
-    const elm = document.getElementById("reloadExtension");
+    const elm = document.getElementById(EXT_RELOAD);
     if (elm) {
       elm.addEventListener("click", evt => {
         const {currentTarget, target} = evt;
         evt.preventDefault();
         evt.stopPropagation();
-        portReloadExt(currentTarget === target).catch(logError);
+        return portReloadExt(currentTarget === target).catch(logError);
       }, false);
     }
+  };
+
+  /**
+   * add event listener to auto sync url textarea
+   * @returns {void}
+   */
+  const addAutoSyncUrlInputListener = async () => {
+    const elm = document.getElementById(SYNC_AUTO_URL);
+    elm && elm.addEventListener(
+      "input",
+      evt => extractAutoSyncUrlInput(evt).catch(logError),
+      false
+    );
   };
 
   /**
@@ -198,9 +248,11 @@
     const nodes = document.querySelectorAll("input");
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
-        node.addEventListener("change", evt => {
-          portPref(evt).catch(logError);
-        }, false);
+        node.addEventListener(
+          "change",
+          evt => portPref(evt).catch(logError),
+          false
+        );
       }
     }
   };
@@ -257,7 +309,9 @@
       if (nodes instanceof NodeList) {
         for (const node of nodes) {
           const data = i18n.getMessage(node.getAttribute(DATA_ATTR_I18N));
-          data && (node.textContent = data);
+          if (data) {
+            node.textContent = data;
+          }
           node.hasAttributes() && localizeAttr(node);
         }
       }
@@ -280,10 +334,14 @@
           break;
         case "text":
           elm.value = isString(data.value) && data.value || "";
-          elm === document.getElementById(EDITOR_LABEL) && elm.value &&
-            (elm.disabled = false);
+          if (elm.id === EDITOR_LABEL && elm.value) {
+            elm.disabled = false;
+          }
           break;
         default:
+          if (elm.id === SYNC_AUTO_URL) {
+            elm.value = isString(data.value) && data.value || "";
+          }
       }
     }
   };
@@ -337,6 +395,7 @@
     localizeHtml(),
     setValuesFromLocalStorage(),
     addInputChangeListener(),
+    addAutoSyncUrlInputListener(),
     addReloadExtensionListener(),
     addFormSubmitListener(),
     getHostStatus(),

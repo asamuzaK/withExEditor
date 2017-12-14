@@ -40,6 +40,8 @@
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
   const SUBST = "index";
+  const SYNC_AUTO = "enableSyncAuto";
+  const SYNC_AUTO_URL = "syncAutoUrls";
   const TEXT_SYNC = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
@@ -64,6 +66,8 @@
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
+    [SYNC_AUTO]: false,
+    [SYNC_AUTO_URL]: false,
   };
 
   /**
@@ -857,9 +861,11 @@
    * @returns {Object} - temporary file data
    */
   const fetchSource = async data => {
-    const {characterSet, contentType, documentURI: uri} = document;
+    const {
+      characterSet, contentType, documentURI: uri, location: {protocol},
+    } = document;
     let obj;
-    if (window.location.protocol === "file:") {
+    if (protocol === "file:") {
       obj = {
         [LOCAL_FILE_VIEW]: {uri},
       };
@@ -994,18 +1000,51 @@
    * @returns {Object} - content data
    */
   const createContentData = async (elm, mode) => {
-    const {incognito, tabId, windowId} = vars;
+    const {incognito, syncAuto, syncAutoUrls, tabId, windowId} = vars;
+    const {
+      protocol: docProt, hostname: docHost, href: docHref,
+    } = document.location;
     const data = {
       incognito, tabId, windowId,
       mode: MODE_SOURCE,
       dir: incognito && TMP_FILES_PB || TMP_FILES,
-      host: window.location.hostname || LABEL,
+      host: docHost || LABEL,
       dataId: null,
       namespaceURI: null,
       value: null,
+      watch: false,
     };
     const sel = window.getSelection();
     const {anchorNode, isCollapsed} = sel;
+    if (!incognito && syncAuto && isString(syncAutoUrls)) {
+      const items = syncAutoUrls.split("\n");
+      let bool = false;
+      for (let item of items) {
+        if (isString(item)) {
+          item = item.trim();
+          if (item.length) {
+            try {
+              const {
+                protocol: itemProt, hostname: itemHost, href: itemHref,
+              } = new URL(item);
+              if (docProt === itemProt && docHost === itemHost &&
+                  docHref.startsWith(itemHref)) {
+                bool = true;
+              }
+              if (bool) {
+                break;
+              }
+            } catch (e) {
+              bool = false;
+            }
+          }
+        } else {
+          bool = false;
+          break;
+        }
+      }
+      data.watch = !!bool;
+    }
     if (elm && mode) {
       let obj;
       switch (mode) {

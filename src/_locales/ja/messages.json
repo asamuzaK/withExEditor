@@ -139,6 +139,15 @@
   "optionsEnablePBLabel": {
     "message": "プライベートブラウジング中も有効化"
   },
+  "optionsEnableSyncAutoDetail": {
+    "message": "編集したコンテンツを自動的に同期させる場合に有効化してください。"
+  },
+  "optionsEnableSyncAutoDetail2": {
+    "message": "プライベートブラウジング中は、このオプションは有効になりません。 また、長い時間ブラウザを稼働させたり、多くの URL を登録すると、PCのパフォーマンスに影響する可能性があります。"
+  },
+  "optionsEnableSyncAutoLabel": {
+    "message": "特定のサイトでは編集したコンテンツを自動的に同期する"
+  },
   "optionsHostConnectionDetail": {
     "message": "状態が「不明」や「未接続」となっている場合は、withExEditor を再起動してください。"
   },
@@ -239,10 +248,13 @@
     "message": "withExEditorを再読み込み"
   },
   "optionsReloadExtensionDetail": {
-    "message": "Node.jsをアップデートしたときやホストをアップデートしたとき、または、withExEditorが動かなくなった場合に試してください。"
+    "message": "Node.js をアップデートしたときやホストをアップデートしたとき、または、 withExEditor が動かなくなった場合に試してください。"
   },
   "optionsSaveEditorSettings": {
     "message": "保存"
+  },
+  "optionsSyncAutoUrlLabel": {
+    "message": "同期するサイト（1行ごとにURLを入力）"
   },
   "optionsTitle": {
     "message": "withExEditor 設定"
