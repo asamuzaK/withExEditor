@@ -1012,7 +1012,7 @@
       dataId: null,
       namespaceURI: null,
       value: null,
-      watch: false,
+      syncAuto: false,
     };
     const sel = window.getSelection();
     const {anchorNode, isCollapsed} = sel;
@@ -1043,7 +1043,7 @@
           break;
         }
       }
-      data.watch = !!bool;
+      data.syncAuto = !!bool;
     }
     if (elm && mode) {
       let obj;
