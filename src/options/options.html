@@ -138,7 +138,8 @@
           </legend>
           <div>
             <p>
-              <label for="accessKey" class="label" data-i18n="optionsAccessKeyLabel"
+              <label for="accessKey" class="label"
+                     data-i18n="optionsAccessKeyLabel"
                      aria-details="accessKeyDetail">
                 Access Key
               </label>
@@ -235,6 +236,35 @@
               <div>
                 <p data-i18n="optionsEnableOnlyEditableDetail">
                   Enables only when the content is editable.
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
+              <input type="checkbox" id="enableSyncAuto" />
+              <label for="enableSyncAuto" class="checkboxLabel"
+                     data-i18n="optionsEnableSyncAutoLabel"
+                     aria-details="enableSyncAutoDetail">
+                Automatically Synchronize Edited Content On Specific Sites
+              </label>
+              <span class="sub-item">
+                <label for="syncAutoUrl" class="label"
+                       data-i18n="optionsSyncAutoUrlLabel"
+                       aria-details="enableSyncAutoDetail">
+                  Sites (Enter URL Per Line)
+                </label>
+                <textarea id="syncAutoUrls"></textarea>
+              </span>
+            </p>
+            <details id="enableSyncAutoDetail">
+              <div>
+                <p data-i18n="optionsEnableSyncAutoDetail">
+                  Enable when you want to automatically synchronize edited content.
+                </p>
+                <p data-i18n="optionsEnableSyncAutoDetail2">
+                  Note that this option will not be enabled when private browsing.
+                  Also note that if you leave your browser running for a long time or register many URLs, it may affect the performance of the PC.
                 </p>
               </div>
             </details>

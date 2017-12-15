@@ -40,6 +40,8 @@
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
   const SUBST = "index";
+  const SYNC_AUTO = "enableSyncAuto";
+  const SYNC_AUTO_URL = "syncAutoUrls";
   const TEXT_SYNC = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
@@ -64,6 +66,8 @@
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
+    [SYNC_AUTO]: false,
+    [SYNC_AUTO_URL]: null,
   };
 
   /**
@@ -857,9 +861,11 @@
    * @returns {Object} - temporary file data
    */
   const fetchSource = async data => {
-    const {characterSet, contentType, documentURI: uri} = document;
+    const {
+      characterSet, contentType, documentURI: uri, location: {protocol},
+    } = document;
     let obj;
-    if (window.location.protocol === "file:") {
+    if (protocol === "file:") {
       obj = {
         [LOCAL_FILE_VIEW]: {uri},
       };
@@ -893,7 +899,7 @@
    */
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
-    const {dir, host, incognito, mode, tabId, windowId} = data;
+    const {dir, host, incognito, mode, syncAuto, tabId, windowId} = data;
     let {dataId, namespaceURI, value} = data, extType, tmpFileData;
     namespaceURI = namespaceURI || "";
     switch (mode) {
@@ -902,8 +908,8 @@
           extType = ".txt";
           tmpFileData = {
             [TMP_FILE_CREATE]: {
-              dataId, dir, extType, host, incognito, mode, namespaceURI, tabId,
-              windowId,
+              dataId, dir, extType, host, incognito, mode, namespaceURI,
+              syncAuto, tabId, windowId,
             },
             value,
           };
@@ -988,21 +994,56 @@
   };
 
   /**
+   * check whether given array of URLs matches document URL
+   * @param {Array} arr - array of URLs
+   * @returns {boolean} - result
+   */
+  const matchDocUrl = async (arr = []) => {
+    let bool = false;
+    if (arr.length) {
+      const {
+        protocol: docProtocol, hostname: docHost, href: docHref,
+      } = document.location;
+      for (let item of arr) {
+        if (isString(item)) {
+          item = item.trim();
+          if (item.length) {
+            try {
+              const {
+                protocol: itemProtocol, hostname: itemHost, href: itemHref,
+              } = new URL(item);
+              if (docProtocol === itemProtocol && docHost === itemHost &&
+                  docHref.startsWith(itemHref)) {
+                bool = true;
+                break;
+              }
+            } catch (e) {
+              bool = false;
+            }
+          }
+        }
+      }
+    }
+    return bool;
+  };
+
+  /**
    * create content data
    * @param {Object} elm - element
    * @param {string} mode - context mode
    * @returns {Object} - content data
    */
   const createContentData = async (elm, mode) => {
-    const {incognito, tabId, windowId} = vars;
+    const {incognito, enableSyncAuto, syncAutoUrls, tabId, windowId} = vars;
     const data = {
       incognito, tabId, windowId,
       mode: MODE_SOURCE,
       dir: incognito && TMP_FILES_PB || TMP_FILES,
-      host: window.location.hostname || LABEL,
+      host: document.location.hostname || LABEL,
       dataId: null,
       namespaceURI: null,
       value: null,
+      syncAuto: false,
     };
     const sel = window.getSelection();
     const {anchorNode, isCollapsed} = sel;
@@ -1035,6 +1076,9 @@
               data.namespaceURI = elm.namespaceURI ||
                                   await getNodeNS(elm).namespaceURI;
               await setDataIdController(elm, dataId);
+            }
+            if (!incognito && enableSyncAuto && isString(syncAutoUrls)) {
+              data.syncAuto = await matchDocUrl(syncAutoUrls.split("\n"));
             }
           }
           break;
@@ -1357,11 +1401,13 @@
             break;
           case ID_TAB:
           case ID_WIN:
+          case SYNC_AUTO_URL:
             vars[item] = obj;
             break;
           case INCOGNITO:
           case IS_ENABLED:
           case ONLY_EDITABLE:
+          case SYNC_AUTO:
             vars[item] = !!obj;
             break;
           case KEY_ACCESS:

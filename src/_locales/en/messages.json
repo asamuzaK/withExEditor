@@ -139,6 +139,15 @@
   "optionsEnablePBLabel": {
     "message": "Enable During Private Browsing"
   },
+  "optionsEnableSyncAutoDetail": {
+    "message": "Enable when you want to automatically synchronize edited content."
+  },
+  "optionsEnableSyncAutoDetail2": {
+    "message": "Note that this option will not be enabled when private browsing. Also note that if you leave your browser running for a long time or register many URLs, it may affect the performance of the PC."
+  },
+  "optionsEnableSyncAutoLabel": {
+    "message": "Automatically Synchronize Edited Content On Specific Sites"
+  },
   "optionsHostConnectionDetail": {
     "message": "If \"Unknown\" or \"Disconnected\", restart withExEditor."
   },
@@ -243,6 +252,9 @@
   },
   "optionsSaveEditorSettings": {
     "message": "Save"
+  },
+  "optionsSyncAutoUrlLabel": {
+    "message": "Sites (Enter URL Per Line)"
   },
   "optionsTitle": {
     "message": "withExEditor Options"

@@ -29,7 +29,7 @@
   const HOST_STATUS_GET = "getHostStatus";
   const HOST_VERSION = "hostVersion";
   const HOST_VERSION_CHECK = "checkHostVersion";
-  const HOST_VERSION_MIN = "v2.0.0";
+  const HOST_VERSION_MIN = "v2.2.0";
   const ICON = "img/icon.svg";
   const ICON_AUTO = "buttonIconAuto";
   const ICON_BLACK = "buttonIconBlack";
@@ -58,6 +58,8 @@
   const PORT_CONTENT = "portContent";
   const PROCESS_CHILD = "childProcess";
   const STORAGE_SET = "setStorage";
+  const SYNC_AUTO = "enableSyncAuto";
+  const SYNC_AUTO_URL = "syncAutoUrls";
   const TEXT_SYNC = "syncText";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
   const TMP_FILE_CREATE = "createTmpFile";
@@ -76,6 +78,8 @@
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
+    [SYNC_AUTO]: false,
+    [SYNC_AUTO_URL]: null,
   };
 
   const varsLocal = {
@@ -322,7 +326,19 @@
       const {data} = msg;
       if (data) {
         const {tabId, windowId} = data;
-        func = portMsg({[TEXT_SYNC]: msg}, windowId, tabId);
+        if (isString(tabId) && /^\d+$/.test(tabId) &&
+            isString(windowId) && /^\d+$/.test(windowId)) {
+          const tabList = await tabs.query({
+            active: true,
+            windowId: windowId * 1,
+          });
+          if (tabList) {
+            const [tab] = tabList;
+            if (tab.id === tabId * 1) {
+              func = portMsg({[TEXT_SYNC]: msg}, windowId, tabId);
+            }
+          }
+        }
       }
     }
     return func || null;
@@ -842,11 +858,13 @@
           }
           break;
         case KEY_ACCESS:
+        case SYNC_AUTO_URL:
           vars[item] = value;
           hasPorts && func.push(portVar({[item]: value}));
           break;
         case KEY_EDITOR:
         case KEY_OPTIONS:
+        case SYNC_AUTO:
           vars[item] = !!checked;
           hasPorts && func.push(portVar({[item]: !!checked}));
           break;
