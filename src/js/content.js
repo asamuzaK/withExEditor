@@ -67,7 +67,7 @@
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
-    [SYNC_AUTO_URL]: false,
+    [SYNC_AUTO_URL]: null,
   };
 
   /**
@@ -899,7 +899,7 @@
    */
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
-    const {dir, host, incognito, mode, tabId, windowId} = data;
+    const {dir, host, incognito, mode, syncAuto, tabId, windowId} = data;
     let {dataId, namespaceURI, value} = data, extType, tmpFileData;
     namespaceURI = namespaceURI || "";
     switch (mode) {
@@ -908,8 +908,8 @@
           extType = ".txt";
           tmpFileData = {
             [TMP_FILE_CREATE]: {
-              dataId, dir, extType, host, incognito, mode, namespaceURI, tabId,
-              windowId,
+              dataId, dir, extType, host, incognito, mode, namespaceURI,
+              syncAuto, tabId, windowId,
             },
             value,
           };
@@ -1034,7 +1034,7 @@
    * @returns {Object} - content data
    */
   const createContentData = async (elm, mode) => {
-    const {incognito, syncAuto, syncAutoUrls, tabId, windowId} = vars;
+    const {incognito, enableSyncAuto, syncAutoUrls, tabId, windowId} = vars;
     const data = {
       incognito, tabId, windowId,
       mode: MODE_SOURCE,
@@ -1077,7 +1077,7 @@
                                   await getNodeNS(elm).namespaceURI;
               await setDataIdController(elm, dataId);
             }
-            if (!incognito && syncAuto && isString(syncAutoUrls)) {
+            if (!incognito && enableSyncAuto && isString(syncAutoUrls)) {
               data.syncAuto = await matchDocUrl(syncAutoUrls.split("\n"));
             }
           }
@@ -1401,11 +1401,13 @@
             break;
           case ID_TAB:
           case ID_WIN:
+          case SYNC_AUTO_URL:
             vars[item] = obj;
             break;
           case INCOGNITO:
           case IS_ENABLED:
           case ONLY_EDITABLE:
+          case SYNC_AUTO:
             vars[item] = !!obj;
             break;
           case KEY_ACCESS:
