@@ -175,17 +175,18 @@
   };
 
   /**
-   * extract auto sync url input
-   * @param {Object} evt - Event
-   * @returns {?AsyncFunction} - port pref
+   * extract sync urls input
+   * @param {!Object} evt - Event
+   * @returns {?AsyncFunction} - port message
    */
-  const extractAutoSyncUrlInput = async evt => {
+  const extractSyncUrlsInput = async evt => {
     const {target} = evt;
     const {value} = target;
-    const items = value.split("\n");
-    let func, bool = false;
-    for (let item of items) {
-      if (isString(item)) {
+    const items = isString(value) && value.split("\n");
+    let func;
+    if (items && items.length) {
+      let bool = false;
+      for (let item of items) {
         item = item.trim();
         if (item.length) {
           try {
@@ -199,13 +200,10 @@
             break;
           }
         }
-      } else {
-        bool = false;
-        break;
       }
-    }
-    if (bool) {
-      func = createPref(target).then(portMsg);
+      if (bool) {
+        func = createPref(target).then(portMsg);
+      }
     }
     return func || null;
   };
@@ -228,14 +226,14 @@
   };
 
   /**
-   * add event listener to auto sync url textarea
+   * add event listener to sync urls textarea
    * @returns {void}
    */
-  const addAutoSyncUrlInputListener = async () => {
+  const addSyncUrlsInputListener = async () => {
     const elm = document.getElementById(SYNC_AUTO_URL);
     elm && elm.addEventListener(
       "input",
-      evt => extractAutoSyncUrlInput(evt).catch(logError),
+      evt => extractSyncUrlsInput(evt).catch(logError),
       false
     );
   };
@@ -395,7 +393,7 @@
     localizeHtml(),
     setValuesFromLocalStorage(),
     addInputChangeListener(),
-    addAutoSyncUrlInputListener(),
+    addSyncUrlsInputListener(),
     addReloadExtensionListener(),
     addFormSubmitListener(),
     getHostStatus(),

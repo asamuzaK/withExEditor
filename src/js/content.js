@@ -994,6 +994,40 @@
   };
 
   /**
+   * check whether given array of URLs matches document URL
+   * @param {Array} arr - array of URLs
+   * @returns {boolean} - result
+   */
+  const matchDocUrl = async (arr = []) => {
+    let bool = false;
+    if (arr.length) {
+      const {
+        protocol: docProtocol, hostname: docHost, href: docHref,
+      } = document.location;
+      for (let item of arr) {
+        if (isString(item)) {
+          item = item.trim();
+          if (item.length) {
+            try {
+              const {
+                protocol: itemProtocol, hostname: itemHost, href: itemHref,
+              } = new URL(item);
+              if (docProtocol === itemProtocol && docHost === itemHost &&
+                  docHref.startsWith(itemHref)) {
+                bool = true;
+                break;
+              }
+            } catch (e) {
+              bool = false;
+            }
+          }
+        }
+      }
+    }
+    return bool;
+  };
+
+  /**
    * create content data
    * @param {Object} elm - element
    * @param {string} mode - context mode
@@ -1001,14 +1035,11 @@
    */
   const createContentData = async (elm, mode) => {
     const {incognito, syncAuto, syncAutoUrls, tabId, windowId} = vars;
-    const {
-      protocol: docProt, hostname: docHost, href: docHref,
-    } = document.location;
     const data = {
       incognito, tabId, windowId,
       mode: MODE_SOURCE,
       dir: incognito && TMP_FILES_PB || TMP_FILES,
-      host: docHost || LABEL,
+      host: document.location.hostname || LABEL,
       dataId: null,
       namespaceURI: null,
       value: null,
@@ -1016,35 +1047,6 @@
     };
     const sel = window.getSelection();
     const {anchorNode, isCollapsed} = sel;
-    if (!incognito && syncAuto && isString(syncAutoUrls)) {
-      const items = syncAutoUrls.split("\n");
-      let bool = false;
-      for (let item of items) {
-        if (isString(item)) {
-          item = item.trim();
-          if (item.length) {
-            try {
-              const {
-                protocol: itemProt, hostname: itemHost, href: itemHref,
-              } = new URL(item);
-              if (docProt === itemProt && docHost === itemHost &&
-                  docHref.startsWith(itemHref)) {
-                bool = true;
-              }
-              if (bool) {
-                break;
-              }
-            } catch (e) {
-              bool = false;
-            }
-          }
-        } else {
-          bool = false;
-          break;
-        }
-      }
-      data.syncAuto = !!bool;
-    }
     if (elm && mode) {
       let obj;
       switch (mode) {
@@ -1074,6 +1076,9 @@
               data.namespaceURI = elm.namespaceURI ||
                                   await getNodeNS(elm).namespaceURI;
               await setDataIdController(elm, dataId);
+            }
+            if (!incognito && syncAuto && isString(syncAutoUrls)) {
+              data.syncAuto = await matchDocUrl(syncAutoUrls.split("\n"));
             }
           }
           break;
