@@ -1514,13 +1514,12 @@
   port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
 
   document.addEventListener("DOMContentLoaded", () => {
-    const root = document.documentElement;
-    root.addEventListener(
+    window.addEventListener(
       "mousedown",
       evt => handleBeforeContextMenu(evt).catch(logError),
       true
     );
-    root.addEventListener(
+    window.addEventListener(
       "keydown",
       evt => handleKeyDown(evt).catch(logError),
       true
