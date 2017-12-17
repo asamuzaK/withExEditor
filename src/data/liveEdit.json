@@ -1,0 +1,24 @@
+{
+  "ace_": {
+    "alias": "ace_editor"
+  },
+  "ace_editor": {
+    "content": "div.ace_content",
+    "prefix": [
+      "ace_"
+    ]
+  },
+  "cm-": {
+    "alias": "CodeMirror"
+  },
+  "CodeMirror": {
+    "content": "pre.CodeMirror-line",
+    "prefix": [
+      "cm-",
+      "CodeMirror-"
+    ]
+  },
+  "CodeMirror-": {
+    "alias": "CodeMirror"
+  }
+}

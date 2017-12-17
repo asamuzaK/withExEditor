@@ -27,6 +27,7 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
+  const LIVE_EDIT = "liveEdit";
   const LOCAL_FILE_VIEW = "viewLocalFile";
   const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
@@ -612,6 +613,58 @@
     return bool || false;
   };
 
+  /* live editor */
+  const liveEdit = {};
+
+  /**
+   * get live edit element from ancestor
+   * @param {Object} node - node
+   * @returns {Object} - live edit element
+   */
+  const getLiveEditElm = async (node = {}) => {
+    let elm;
+    const items = Object.keys(liveEdit);
+    if (items && items.length && node.nodeType === Node.ELEMENT_NODE) {
+      const root = document.documentElement;
+      while (node && node.parentNode && node.parentNode !== root && !elm) {
+        for (const item of items) {
+          const {classList, className} = node;
+          if (className.includes(item)) {
+            const {alias} = item;
+            const targetClass = alias || item;
+            if (classList.contains(targetClass)) {
+              elm = node;
+              break;
+            }
+          }
+        }
+        node = node.parentNode;
+      }
+    }
+    return elm || null;
+  };
+
+  /**
+   * get live edit content
+   * @param {Object} elm - Element
+   * @param {string} key - key
+   * @returns {?string} - content
+   */
+  const getLiveEditContent = async (elm, key) => {
+    const arr = [];
+    if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+        isString(key) && liveEdit[key]) {
+      const {content} = liveEdit[key];
+      const items = elm.querySelectorAll(content);
+      if (items && items.length) {
+        for (const item of items) {
+          arr.push(item.innerText);
+        }
+      }
+    }
+    return arr.length && arr.join("\n") || null;
+  };
+
   /**
    * get editable element from ancestor
    * @param {Object} node - node
@@ -1053,27 +1106,41 @@
         case MODE_EDIT: {
           obj = await getIdData(elm);
           if (obj) {
+            const {
+              childNodes, classList, isContentEditable, namespaceURI, value,
+            } = elm;
             const {dataId} = obj;
+            const liveEditKeys = Object.keys(liveEdit) || [];
+            let liveEditKey;
+            for (const i of liveEditKeys) {
+              liveEditKey = classList.contains(i) && i;
+              if (liveEditKey) {
+                break;
+              }
+            }
             if (!dataIds.has(dataId)) {
-              const isHtml = !elm.namespaceURI ||
-                             elm.namespaceURI === nsURI.html;
+              const isHtml = !namespaceURI || namespaceURI === nsURI.html;
               isHtml && elm.addEventListener(
                 "focus", evt => requestTmpFile(evt).catch(logError), false
               );
               await setDataId(dataId, obj);
             }
-            if (isCollapsed && await isEditControl(elm)) {
+            if (liveEditKey) {
               data.mode = mode;
               data.dataId = dataId;
-              data.value = elm.value || "";
+              data.value = await getLiveEditContent(elm, liveEditKey) || "";
+            } else if (isCollapsed && await isEditControl(elm)) {
+              data.mode = mode;
+              data.dataId = dataId;
+              data.value = value || "";
             } else {
-              !elm.isContentEditable && !isCollapsed && anchorNode &&
+              !isContentEditable && !isCollapsed && anchorNode &&
                 (elm = anchorNode.parentNode);
               data.mode = mode;
               data.dataId = dataId;
               data.value = elm.hasChildNodes() &&
-                           await getText(elm.childNodes) || "";
-              data.namespaceURI = elm.namespaceURI ||
+                           await getText(childNodes) || "";
+              data.namespaceURI = namespaceURI ||
                                   await getNodeNS(elm).namespaceURI;
               await setDataIdController(elm, dataId);
             }
@@ -1453,7 +1520,8 @@
         const mode = namespaceURI === nsURI.math && MODE_MATHML ||
                      namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
         const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
-                              await getEditableElm(target);
+                              await getEditableElm(target) ||
+                              await getLiveEditElm(target);
         let enabled;
         if (localName === "input") {
           enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
@@ -1493,9 +1561,10 @@
         if (await keyComboMatches(evt, execEditorKey)) {
           if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
             const {target} = evt;
+            const liveEditTarget = await getLiveEditElm(target);
             const mode = await getContextMode(target);
             (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) &&
-              (func = portContent(target, mode));
+              (func = portContent(liveEditTarget || target, mode));
           }
         } else {
           const openOpt = await keyComboMatches(evt, openOptionsKey);
@@ -1530,5 +1599,6 @@
   Promise.all([
     extendObjItems(fileExt, FILE_EXT),
     extendObjItems(nsURI, NS_URI),
+    extendObjItems(liveEdit, LIVE_EDIT),
   ]).catch(logError);
 }

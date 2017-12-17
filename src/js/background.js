@@ -44,6 +44,8 @@
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
+  const LIVE_EDIT = "liveEdit";
+  const LIVE_EDIT_PATH = "data/liveEdit.json";
   const LOCAL_FILE_VIEW = "viewLocalFile";
   const MENU_ENABLED = "menuEnabled";
   const MODE_EDIT = "modeEditText";
@@ -925,5 +927,6 @@
     localStorage.get().then(setVars).then(syncUI),
     storeFetchedData(NS_URI_PATH, NS_URI),
     storeFetchedData(FILE_EXT_PATH, FILE_EXT),
+    storeFetchedData(LIVE_EDIT_PATH, LIVE_EDIT),
   ]).catch(logError);
 }
