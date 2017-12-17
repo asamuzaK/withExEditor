@@ -149,7 +149,7 @@
     "message": "特定のサイトでは編集したコンテンツを自動的に同期する"
   },
   "optionsHostConnectionDetail": {
-    "message": "状態が「不明」や「未接続」となっている場合は、withExEditor を再起動してください。"
+    "message": "状態が「不明」や「未接続」となっている場合は、withExEditor を再読み込みしてください。"
   },
   "optionsHostConnectionLabel": {
     "message": "ホストの接続状態"

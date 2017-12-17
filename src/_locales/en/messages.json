@@ -149,7 +149,7 @@
     "message": "Automatically Synchronize Edited Content On Specific Sites"
   },
   "optionsHostConnectionDetail": {
-    "message": "If \"Unknown\" or \"Disconnected\", restart withExEditor."
+    "message": "If \"Unknown\" or \"Disconnected\", reload withExEditor."
   },
   "optionsHostConnectionLabel": {
     "message": "Host Connection"
