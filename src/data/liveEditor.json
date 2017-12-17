@@ -1,0 +1,23 @@
+{
+  "aceEditor": {
+    "content": {
+      "element": "",
+      "type": "innerText"
+    },
+    "prefix": [
+      "ace_"
+    ],
+    "targetClass": "ace_editor"
+  },
+  "codeMirror": {
+    "content": {
+      "element": "pre",
+      "type": "innerText"
+    },
+    "prefix": [
+      "cm-",
+      "CodeMirror-"
+    ],
+    "targetClass": "CodeMirror"
+  }
+}
