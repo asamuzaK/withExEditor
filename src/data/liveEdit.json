@@ -3,7 +3,8 @@
     "alias": "ace_editor"
   },
   "ace_editor": {
-    "content": "div.ace_content",
+    "getContent": "div.ace_content",
+    "setContent": "",
     "prefix": [
       "ace_"
     ]
@@ -12,7 +13,8 @@
     "alias": "CodeMirror"
   },
   "CodeMirror": {
-    "content": "pre.CodeMirror-line",
+    "getContent": "pre.CodeMirror-line",
+    "setContent": "",
     "prefix": [
       "cm-",
       "CodeMirror-"

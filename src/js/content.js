@@ -628,8 +628,9 @@
       const root = document.documentElement;
       while (node && node.parentNode && node.parentNode !== root && !elm) {
         for (const item of items) {
-          const {classList, className} = node;
-          if (className.includes(item)) {
+          const {classList, className, namespaceURI} = node;
+          const isHtml = !namespaceURI || namespaceURI === nsURI.html;
+          if (isHtml && className.includes(item)) {
             const {alias} = item;
             const targetClass = alias || item;
             if (classList.contains(targetClass)) {
@@ -654,8 +655,8 @@
     const arr = [];
     if (elm && elm.nodeType === Node.ELEMENT_NODE &&
         isString(key) && liveEdit[key]) {
-      const {content} = liveEdit[key];
-      const items = elm.querySelectorAll(content);
+      const {getContent} = liveEdit[key];
+      const items = elm.querySelectorAll(getContent);
       if (items && items.length) {
         for (const item of items) {
           arr.push(item.innerText);
@@ -851,6 +852,21 @@
           func.push(portTmpFileData(dataId));
         }
       }
+    } else {
+      const {classList: currentClassList} = currentTarget;
+      const {localName: targetLocalName} = target;
+      const liveEditKeys = Object.keys(liveEdit) || [];
+      let liveEditKey;
+      for (const i of liveEditKeys) {
+        liveEditKey = currentClassList.contains(i) && i;
+        if (liveEditKey) {
+          break;
+        }
+      }
+      if (liveEditKey && targetLocalName === "textarea") {
+        const {dataId} = await getIdData(currentTarget) || {};
+        func.push(portTmpFileData(dataId));
+      }
     }
     return Promise.all(func);
   };
@@ -1033,7 +1049,7 @@
             await setDataId(ctrlId, data);
           } else {
             ctrl.addEventListener(
-              "focus", evt => requestTmpFile(evt).catch(logError), false
+              "focus", evt => requestTmpFile(evt).catch(logError), true
             );
             ctrlData.controls = [dataId];
             await setDataId(ctrlId, ctrlData);
@@ -1121,7 +1137,7 @@
             if (!dataIds.has(dataId)) {
               const isHtml = !namespaceURI || namespaceURI === nsURI.html;
               isHtml && elm.addEventListener(
-                "focus", evt => requestTmpFile(evt).catch(logError), false
+                "focus", evt => requestTmpFile(evt).catch(logError), true
               );
               await setDataId(dataId, obj);
             }
