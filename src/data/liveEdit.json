@@ -1,0 +1,26 @@
+{
+  "ace_": {
+    "alias": "ace_editor"
+  },
+  "ace_editor": {
+    "getContent": ".ace_line",
+    "setContent": ".ace_editor > textarea",
+    "prefix": [
+      "ace_"
+    ]
+  },
+  "cm-": {
+    "alias": "CodeMirror"
+  },
+  "CodeMirror": {
+    "getContent": ".CodeMirror-line",
+    "setContent": ".CodeMirror > div > textarea",
+    "prefix": [
+      "cm-",
+      "CodeMirror-"
+    ]
+  },
+  "CodeMirror-": {
+    "alias": "CodeMirror"
+  }
+}

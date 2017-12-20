@@ -24,9 +24,12 @@
   const INCOGNITO = "incognito";
   const IS_ENABLED = "isEnabled";
   const KEY_ACCESS = "accessKey";
+  const KEY_CODE_A = 65;
+  const KEY_CODE_BS = 8;
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
+  const LIVE_EDIT = "liveEdit";
   const LOCAL_FILE_VIEW = "viewLocalFile";
   const MODE_EDIT = "modeEditText";
   const MODE_MATHML = "modeViewMathML";
@@ -612,6 +615,59 @@
     return bool || false;
   };
 
+  /* live editor */
+  const liveEdit = {};
+
+  /**
+   * get live edit element from ancestor
+   * @param {Object} node - node
+   * @returns {Object} - live edit element
+   */
+  const getLiveEditElm = async (node = {}) => {
+    let elm;
+    const items = Object.keys(liveEdit);
+    if (items && items.length && node.nodeType === Node.ELEMENT_NODE) {
+      const root = document.documentElement;
+      while (node && node.parentNode && node.parentNode !== root && !elm) {
+        for (const item of items) {
+          const {classList, className, namespaceURI} = node;
+          const isHtml = !namespaceURI || namespaceURI === nsURI.html;
+          if (isHtml && className.includes(item)) {
+            const {alias} = item;
+            const targetClass = alias || item;
+            if (classList.contains(targetClass)) {
+              elm = node;
+              break;
+            }
+          }
+        }
+        node = node.parentNode;
+      }
+    }
+    return elm || null;
+  };
+
+  /**
+   * get live edit content
+   * @param {Object} elm - Element
+   * @param {string} key - key
+   * @returns {?string} - content
+   */
+  const getLiveEditContent = async (elm, key) => {
+    const arr = [];
+    if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+        isString(key) && liveEdit[key]) {
+      const {getContent} = liveEdit[key];
+      const items = elm.querySelectorAll(getContent);
+      if (items && items.length) {
+        for (const item of items) {
+          arr.push(item.innerText);
+        }
+      }
+    }
+    return arr.length && arr.join("\n") || null;
+  };
+
   /**
    * get editable element from ancestor
    * @param {Object} node - node
@@ -798,6 +854,21 @@
           func.push(portTmpFileData(dataId));
         }
       }
+    } else {
+      const {classList: currentClassList} = currentTarget;
+      const {localName: targetLocalName} = target;
+      const liveEditKeys = Object.keys(liveEdit) || [];
+      let liveEditKey;
+      for (const i of liveEditKeys) {
+        liveEditKey = currentClassList.contains(i) && i;
+        if (liveEditKey) {
+          break;
+        }
+      }
+      if (liveEditKey && targetLocalName === "textarea") {
+        const {dataId} = await getIdData(currentTarget) || {};
+        func.push(portTmpFileData(dataId));
+      }
     }
     return Promise.all(func);
   };
@@ -899,7 +970,9 @@
    */
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
-    const {dir, host, incognito, mode, syncAuto, tabId, windowId} = data;
+    const {
+      dir, host, incognito, liveEditKey, mode, syncAuto, tabId, windowId,
+    } = data;
     let {dataId, namespaceURI, value} = data, extType, tmpFileData;
     namespaceURI = namespaceURI || "";
     switch (mode) {
@@ -908,8 +981,8 @@
           extType = ".txt";
           tmpFileData = {
             [TMP_FILE_CREATE]: {
-              dataId, dir, extType, host, incognito, mode, namespaceURI,
-              syncAuto, tabId, windowId,
+              dataId, dir, extType, host, incognito, liveEditKey, mode,
+              namespaceURI, syncAuto, tabId, windowId,
             },
             value,
           };
@@ -980,7 +1053,7 @@
             await setDataId(ctrlId, data);
           } else {
             ctrl.addEventListener(
-              "focus", evt => requestTmpFile(evt).catch(logError), false
+              "focus", evt => requestTmpFile(evt).catch(logError), true
             );
             ctrlData.controls = [dataId];
             await setDataId(ctrlId, ctrlData);
@@ -1043,6 +1116,7 @@
       dataId: null,
       namespaceURI: null,
       value: null,
+      liveEditKey: null,
       syncAuto: false,
     };
     const sel = window.getSelection();
@@ -1053,27 +1127,42 @@
         case MODE_EDIT: {
           obj = await getIdData(elm);
           if (obj) {
+            const {
+              childNodes, classList, isContentEditable, namespaceURI, value,
+            } = elm;
             const {dataId} = obj;
+            const liveEditKeys = Object.keys(liveEdit) || [];
+            let liveEditKey;
+            for (const i of liveEditKeys) {
+              liveEditKey = classList.contains(i) && i;
+              if (liveEditKey) {
+                break;
+              }
+            }
             if (!dataIds.has(dataId)) {
-              const isHtml = !elm.namespaceURI ||
-                             elm.namespaceURI === nsURI.html;
+              const isHtml = !namespaceURI || namespaceURI === nsURI.html;
               isHtml && elm.addEventListener(
-                "focus", evt => requestTmpFile(evt).catch(logError), false
+                "focus", evt => requestTmpFile(evt).catch(logError), true
               );
               await setDataId(dataId, obj);
             }
-            if (isCollapsed && await isEditControl(elm)) {
+            if (liveEditKey) {
               data.mode = mode;
               data.dataId = dataId;
-              data.value = elm.value || "";
+              data.value = await getLiveEditContent(elm, liveEditKey) || "";
+              data.liveEditKey = liveEditKey;
+            } else if (isCollapsed && await isEditControl(elm)) {
+              data.mode = mode;
+              data.dataId = dataId;
+              data.value = value || "";
             } else {
-              !elm.isContentEditable && !isCollapsed && anchorNode &&
+              !isContentEditable && !isCollapsed && anchorNode &&
                 (elm = anchorNode.parentNode);
               data.mode = mode;
               data.dataId = dataId;
               data.value = elm.hasChildNodes() &&
-                           await getText(elm.childNodes) || "";
-              data.namespaceURI = elm.namespaceURI ||
+                           await getText(childNodes) || "";
+              data.namespaceURI = namespaceURI ||
                                   await getNodeNS(elm).namespaceURI;
               await setDataIdController(elm, dataId);
             }
@@ -1186,6 +1275,40 @@
   };
 
   /**
+   * dispatch keyboard event
+   * @param {Object} elm - Element
+   * @param {string} type - event type
+   * @param {Object} keyOpt - key options
+   * @returns {void}
+   */
+  const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+        isString(type) && /^key(?:down|press|up)$/.test(type) &&
+        Object.keys(keyOpt)) {
+      const {
+        altKey, code, ctrlKey, key, keyCode, metaKey, shiftKey,
+      } = keyOpt;
+      if (isString(key) && isString(code) && Number.isInteger(keyCode)) {
+        const opt = {
+          key, code, keyCode,
+          altKey: !!altKey,
+          bubbles: true,
+          ctrlKey: !!ctrlKey,
+          cancelable: true,
+          locale: "",
+          location: 0,
+          metaKey: !!metaKey,
+          repeat: false,
+          shiftKey: !!shiftKey,
+        };
+        const evt = window.KeyboardEvent && new KeyboardEvent(type, opt) ||
+                    new Event(type, opt);
+        elm.dispatchEvent(evt);
+      }
+    }
+  };
+
+  /**
    * create paragraph separated content
    * @param {string} value - value
    * @param {string} ns - namespace URI
@@ -1280,6 +1403,42 @@
   };
 
   /**
+   * replace live edit content
+   * @param {Object} elm - element
+   * @param {string} key - key
+   * @param {string} value - value
+   * @returns {void}
+   */
+  const replaceLiveEditContent = async (elm, key, value) => {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+        isString(key) && liveEdit[key] && isString(value)) {
+      const {setContent} = liveEdit[key];
+      const liveElm = elm.querySelector(setContent);
+      if (liveElm === document.activeElement) {
+        const ctrlA = {
+          key: "a",
+          code: "KeyA",
+          keyCode: KEY_CODE_A,
+          ctrlKey: true,
+        };
+        const backSpace = {
+          key: "Backspace",
+          code: "Backspace",
+          keyCode: KEY_CODE_BS,
+        };
+        await dispatchKeyboardEvent(liveElm, "keydown", ctrlA);
+        await dispatchKeyboardEvent(liveElm, "keypress", ctrlA);
+        await dispatchKeyboardEvent(liveElm, "keyup", ctrlA);
+        await dispatchKeyboardEvent(liveElm, "keydown", backSpace);
+        await dispatchKeyboardEvent(liveElm, "keypress", backSpace);
+        await dispatchKeyboardEvent(liveElm, "keyup", backSpace);
+        liveElm.value = value.replace(/\u200B/g, "");
+        dispatchInputEvt(liveElm);
+      }
+    }
+  };
+
+  /**
    * get target element and synchronize text
    * @param {Object} obj - sync data object
    * @returns {Promise.<Array>} - results of each handler
@@ -1289,7 +1448,8 @@
     const func = [];
     if (data) {
       const {
-        controlledBy, dataId, lastUpdate, namespaceURI, tabId, timestamp,
+        controlledBy, dataId, lastUpdate, liveEditKey, namespaceURI, tabId,
+        timestamp,
       } = data;
       if (dataId && tabId === vars[ID_TAB]) {
         const elm = await getTargetElementFromDataId(dataId);
@@ -1298,7 +1458,9 @@
               Number.isInteger(timestamp) && Number.isInteger(lastUpdate) &&
               timestamp > lastUpdate) {
             const controller = await getTargetElementFromDataId(controlledBy);
-            if (controller) {
+            if (liveEditKey && liveEdit[liveEditKey]) {
+              func.push(replaceLiveEditContent(elm, liveEditKey, value));
+            } else if (controller) {
               func.push(replaceContent(controller, elm, value, namespaceURI));
             } else if (elm.isContentEditable) {
               func.push(replaceContent(elm, elm, value, namespaceURI));
@@ -1453,7 +1615,8 @@
         const mode = namespaceURI === nsURI.math && MODE_MATHML ||
                      namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
         const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
-                              await getEditableElm(target);
+                              await getEditableElm(target) ||
+                              await getLiveEditElm(target);
         let enabled;
         if (localName === "input") {
           enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
@@ -1493,9 +1656,10 @@
         if (await keyComboMatches(evt, execEditorKey)) {
           if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
             const {target} = evt;
+            const liveEditTarget = await getLiveEditElm(target);
             const mode = await getContextMode(target);
             (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) &&
-              (func = portContent(target, mode));
+              (func = portContent(liveEditTarget || target, mode));
           }
         } else {
           const openOpt = await keyComboMatches(evt, openOptionsKey);
@@ -1530,5 +1694,6 @@
   Promise.all([
     extendObjItems(fileExt, FILE_EXT),
     extendObjItems(nsURI, NS_URI),
+    extendObjItems(liveEdit, LIVE_EDIT),
   ]).catch(logError);
 }
