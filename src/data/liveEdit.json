@@ -3,8 +3,8 @@
     "alias": "ace_editor"
   },
   "ace_editor": {
-    "getContent": "div.ace_content",
-    "setContent": "",
+    "getContent": ".ace_line",
+    "setContent": ".ace_editor > textarea",
     "prefix": [
       "ace_"
     ]
@@ -13,8 +13,8 @@
     "alias": "CodeMirror"
   },
   "CodeMirror": {
-    "getContent": "pre.CodeMirror-line",
-    "setContent": "",
+    "getContent": ".CodeMirror-line",
+    "setContent": ".CodeMirror > div > textarea",
     "prefix": [
       "cm-",
       "CodeMirror-"

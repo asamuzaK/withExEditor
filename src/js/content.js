@@ -968,7 +968,9 @@
    */
   const createTmpFileData = async data => {
     const {contentType, documentURI: uri} = document;
-    const {dir, host, incognito, mode, syncAuto, tabId, windowId} = data;
+    const {
+      dir, host, incognito, liveEditKey, mode, syncAuto, tabId, windowId,
+    } = data;
     let {dataId, namespaceURI, value} = data, extType, tmpFileData;
     namespaceURI = namespaceURI || "";
     switch (mode) {
@@ -977,8 +979,8 @@
           extType = ".txt";
           tmpFileData = {
             [TMP_FILE_CREATE]: {
-              dataId, dir, extType, host, incognito, mode, namespaceURI,
-              syncAuto, tabId, windowId,
+              dataId, dir, extType, host, incognito, liveEditKey, mode,
+              namespaceURI, syncAuto, tabId, windowId,
             },
             value,
           };
@@ -1112,6 +1114,7 @@
       dataId: null,
       namespaceURI: null,
       value: null,
+      liveEditKey: null,
       syncAuto: false,
     };
     const sel = window.getSelection();
@@ -1145,6 +1148,7 @@
               data.mode = mode;
               data.dataId = dataId;
               data.value = await getLiveEditContent(elm, liveEditKey) || "";
+              data.liveEditKey = liveEditKey;
             } else if (isCollapsed && await isEditControl(elm)) {
               data.mode = mode;
               data.dataId = dataId;
@@ -1269,6 +1273,40 @@
   };
 
   /**
+   * dispatch keyboard event
+   * @param {Object} elm - Element
+   * @param {string} type - event type
+   * @param {Object} keyOpt - key options
+   * @returns {void}
+   */
+  const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+        isString(type) && /^key(?:down|press|up)$/.test(type) &&
+        Object.keys(keyOpt)) {
+      const {
+        altKey, code, ctrlKey, key, keyCode, metaKey, shiftKey,
+      } = keyOpt;
+      if (isString(key) && isString(code) && Number.isInteger(keyCode)) {
+        const opt = {
+          key, code, keyCode,
+          altKey: !!altKey,
+          bubbles: true,
+          ctrlKey: !!ctrlKey,
+          cancelable: true,
+          locale: "",
+          location: 0,
+          metaKey: !!metaKey,
+          repeat: false,
+          shiftKey: !!shiftKey,
+        };
+        const evt = window.KeyboardEvent && new KeyboardEvent(type, opt) ||
+                    new Event(type, opt);
+        elm.dispatchEvent(evt);
+      }
+    }
+  };
+
+  /**
    * create paragraph separated content
    * @param {string} value - value
    * @param {string} ns - namespace URI
@@ -1363,6 +1401,42 @@
   };
 
   /**
+   * replace live edit content
+   * @param {Object} elm - element
+   * @param {string} key - key
+   * @param {string} value - value
+   * @returns {void}
+   */
+  const replaceLiveEditContent = async (elm, key, value) => {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+        isString(key) && liveEdit[key] && isString(value)) {
+      const {getContent, setContent} = liveEdit[key];
+      const liveElm = elm.querySelector(setContent);
+      if (liveElm === document.activeElement) {
+        const ctrlA = {
+          key: "a",
+          code: "KeyA",
+          keyCode: 65,
+          ctrlKey: true,
+        };
+        const backSpace = {
+          key: "Backspace",
+          code: "Backspace",
+          keyCode: 8,
+        };
+        await dispatchKeyboardEvent(liveElm, "keydown", ctrlA);
+        await dispatchKeyboardEvent(liveElm, "keypress", ctrlA);
+        await dispatchKeyboardEvent(liveElm, "keyup", ctrlA);
+        await dispatchKeyboardEvent(liveElm, "keydown", backSpace);
+        await dispatchKeyboardEvent(liveElm, "keypress", backSpace);
+        await dispatchKeyboardEvent(liveElm, "keyup", backSpace);
+        liveElm.value = value.replace(/\u200B/g, "");
+        dispatchInputEvt(liveElm);
+      }
+    }
+  };
+
+  /**
    * get target element and synchronize text
    * @param {Object} obj - sync data object
    * @returns {Promise.<Array>} - results of each handler
@@ -1372,7 +1446,8 @@
     const func = [];
     if (data) {
       const {
-        controlledBy, dataId, lastUpdate, namespaceURI, tabId, timestamp,
+        controlledBy, dataId, lastUpdate, liveEditKey, namespaceURI, tabId,
+        timestamp,
       } = data;
       if (dataId && tabId === vars[ID_TAB]) {
         const elm = await getTargetElementFromDataId(dataId);
@@ -1381,7 +1456,9 @@
               Number.isInteger(timestamp) && Number.isInteger(lastUpdate) &&
               timestamp > lastUpdate) {
             const controller = await getTargetElementFromDataId(controlledBy);
-            if (controller) {
+            if (liveEditKey && liveEdit[liveEditKey]) {
+              func.push(replaceLiveEditContent(elm, liveEditKey, value));
+            } else if (controller) {
               func.push(replaceContent(controller, elm, value, namespaceURI));
             } else if (elm.isContentEditable) {
               func.push(replaceContent(elm, elm, value, namespaceURI));
