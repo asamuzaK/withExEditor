@@ -24,6 +24,8 @@
   const INCOGNITO = "incognito";
   const IS_ENABLED = "isEnabled";
   const KEY_ACCESS = "accessKey";
+  const KEY_CODE_A = 65;
+  const KEY_CODE_BS = 8;
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
@@ -1410,19 +1412,19 @@
   const replaceLiveEditContent = async (elm, key, value) => {
     if (elm && elm.nodeType === Node.ELEMENT_NODE &&
         isString(key) && liveEdit[key] && isString(value)) {
-      const {getContent, setContent} = liveEdit[key];
+      const {setContent} = liveEdit[key];
       const liveElm = elm.querySelector(setContent);
       if (liveElm === document.activeElement) {
         const ctrlA = {
           key: "a",
           code: "KeyA",
-          keyCode: 65,
+          keyCode: KEY_CODE_A,
           ctrlKey: true,
         };
         const backSpace = {
           key: "Backspace",
           code: "Backspace",
-          keyCode: 8,
+          keyCode: KEY_CODE_BS,
         };
         await dispatchKeyboardEvent(liveElm, "keydown", ctrlA);
         await dispatchKeyboardEvent(liveElm, "keypress", ctrlA);
