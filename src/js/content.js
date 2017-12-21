@@ -859,8 +859,8 @@
       const {localName: targetLocalName} = target;
       const liveEditKeys = Object.keys(liveEdit) || [];
       let liveEditKey;
-      for (const i of liveEditKeys) {
-        liveEditKey = currentClassList.contains(i) && i;
+      for (const key of liveEditKeys) {
+        liveEditKey = currentClassList.contains(key) && key;
         if (liveEditKey) {
           break;
         }
@@ -1133,8 +1133,8 @@
             const {dataId} = obj;
             const liveEditKeys = Object.keys(liveEdit) || [];
             let liveEditKey;
-            for (const i of liveEditKeys) {
-              liveEditKey = classList.contains(i) && i;
+            for (const key of liveEditKeys) {
+              liveEditKey = classList.contains(key) && key;
               if (liveEditKey) {
                 break;
               }
