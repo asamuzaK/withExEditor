@@ -1258,6 +1258,24 @@
 
   /* synchronize edited text */
   /**
+   * dispatch focus event
+   * @param {Object} elm - Element
+   * @param {string} type - event type
+   * @returns {void}
+   */
+  const dispatchFocusEvt = elm => {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+      const opt = {
+        bubbles: false,
+        cancelable: false,
+      };
+      const evt = window.FocusEvent && new FocusEvent("focus", opt) ||
+                  new Event("focus", opt);
+      elm.dispatchEvent(evt);
+    }
+  };
+
+  /**
    * dispatch input event
    * @param {Object} elm - element
    * @returns {void}
@@ -1281,7 +1299,7 @@
    * @param {Object} keyOpt - key options
    * @returns {void}
    */
-  const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
+  const dispatchKeyboardEvt = (elm, type, keyOpt = {}) => {
     if (elm && elm.nodeType === Node.ELEMENT_NODE &&
         isString(type) && /^key(?:down|press|up)$/.test(type) &&
         Object.keys(keyOpt)) {
@@ -1426,12 +1444,13 @@
           code: "Backspace",
           keyCode: KEY_CODE_BS,
         };
-        await dispatchKeyboardEvent(liveElm, "keydown", ctrlA);
-        await dispatchKeyboardEvent(liveElm, "keypress", ctrlA);
-        await dispatchKeyboardEvent(liveElm, "keyup", ctrlA);
-        await dispatchKeyboardEvent(liveElm, "keydown", backSpace);
-        await dispatchKeyboardEvent(liveElm, "keypress", backSpace);
-        await dispatchKeyboardEvent(liveElm, "keyup", backSpace);
+        await dispatchFocusEvt(liveElm);
+        await dispatchKeyboardEvt(liveElm, "keydown", ctrlA);
+        await dispatchKeyboardEvt(liveElm, "keypress", ctrlA);
+        await dispatchKeyboardEvt(liveElm, "keyup", ctrlA);
+        await dispatchKeyboardEvt(liveElm, "keydown", backSpace);
+        await dispatchKeyboardEvt(liveElm, "keypress", backSpace);
+        await dispatchKeyboardEvt(liveElm, "keyup", backSpace);
         liveElm.value = value.replace(/\u200B/g, "");
         dispatchInputEvt(liveElm);
       }
