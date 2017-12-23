@@ -661,7 +661,7 @@
       const items = elm.querySelectorAll(getContent);
       if (items && items.length) {
         for (const item of items) {
-          arr.push(item.innerText);
+          arr.push(item.textContent);
         }
       }
     }
