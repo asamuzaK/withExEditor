@@ -86,6 +86,11 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 * Enables only when the content is editable.
 
+### Enable During Private Browsing
+
+* Enable when you want to automatically synchronize edited content.
+* Note that this option will not be enabled when private browsing. Also note that if you leave your browser running for a long time or register many URLs, it may affect the performance of the PC.
+
 ### Reload withExEditor
 
 * Try when withExEditor stops working, for example when updating Node.js or updating withExEditorHost.
