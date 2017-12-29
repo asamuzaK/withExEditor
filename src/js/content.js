@@ -619,6 +619,25 @@
   const liveEdit = {};
 
   /**
+   * get live editor key from class list
+   * @param {Object} classList - DOMTokenList
+   * @returns {?string} - live edit key
+   */
+  const getLiveEditKeyFromClassList = async classList => {
+    let liveEditKey;
+    if (classList instanceof DOMTokenList && classList.length) {
+      const liveEditKeys = Object.keys(liveEdit) || [];
+      for (const key of liveEditKeys) {
+        liveEditKey = classList.contains(key) && key;
+        if (liveEditKey) {
+          break;
+        }
+      }
+    }
+    return liveEditKey || null;
+  };
+
+  /**
    * get live edit element from ancestor
    * @param {Object} node - node
    * @returns {Object} - live edit element
@@ -857,14 +876,7 @@
     } else {
       const {classList: currentClassList} = currentTarget;
       const {localName: targetLocalName} = target;
-      const liveEditKeys = Object.keys(liveEdit) || [];
-      let liveEditKey;
-      for (const key of liveEditKeys) {
-        liveEditKey = currentClassList.contains(key) && key;
-        if (liveEditKey) {
-          break;
-        }
-      }
+      const liveEditKey = await getLiveEditKeyFromClassList(currentClassList);
       if (liveEditKey && targetLocalName === "textarea") {
         const {dataId} = await getIdData(currentTarget) || {};
         func.push(portTmpFileData(dataId));
@@ -1131,14 +1143,7 @@
               childNodes, classList, isContentEditable, namespaceURI, value,
             } = elm;
             const {dataId} = obj;
-            const liveEditKeys = Object.keys(liveEdit) || [];
-            let liveEditKey;
-            for (const key of liveEditKeys) {
-              liveEditKey = classList.contains(key) && key;
-              if (liveEditKey) {
-                break;
-              }
-            }
+            const liveEditKey = await getLiveEditKeyFromClassList(classList);
             if (!dataIds.has(dataId)) {
               const isHtml = !namespaceURI || namespaceURI === nsURI.html;
               isHtml && elm.addEventListener(
