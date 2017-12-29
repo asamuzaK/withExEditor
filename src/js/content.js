@@ -619,7 +619,7 @@
   const liveEdit = {};
 
   /**
-   * get live editor key from class list
+   * get live edit key from class list
    * @param {Object} classList - DOMTokenList
    * @returns {?string} - live edit key
    */
@@ -649,15 +649,11 @@
       const root = document.documentElement;
       while (node && node.parentNode && node.parentNode !== root && !elm) {
         for (const item of items) {
-          const {classList, className, namespaceURI} = node;
+          const {classList, namespaceURI} = node;
           const isHtml = !namespaceURI || namespaceURI === nsURI.html;
-          if (isHtml && className.includes(item)) {
-            const {alias} = item;
-            const targetClass = alias || item;
-            if (classList.contains(targetClass)) {
-              elm = node;
-              break;
-            }
+          if (isHtml && classList.contains(item)) {
+            elm = node;
+            break;
           }
         }
         node = node.parentNode;

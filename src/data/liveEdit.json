@@ -1,26 +1,10 @@
 {
   "ace_editor": {
     "getContent": ".ace_line",
-    "setContent": ".ace_editor > textarea",
-    "prefix": [
-      "ace_"
-    ]
-  },
-  "ace_": {
-    "alias": "ace_editor"
+    "setContent": ".ace_editor > textarea"
   },
   "CodeMirror": {
     "getContent": ".CodeMirror-line",
-    "setContent": ".CodeMirror > div > textarea",
-    "prefix": [
-      "CodeMirror-",
-      "cm-"
-    ]
-  },
-  "CodeMirror-": {
-    "alias": "CodeMirror"
-  },
-  "cm-": {
-    "alias": "CodeMirror"
+    "setContent": ".CodeMirror > div > textarea"
   }
 }
