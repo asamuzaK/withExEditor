@@ -1081,7 +1081,7 @@
    */
   const matchDocUrl = async (arr = []) => {
     let bool = false;
-    if (arr.length) {
+    if (Array.isArray(arr) && arr.length) {
       const {
         protocol: docProtocol, hostname: docHost, href: docHref,
       } = document.location;
