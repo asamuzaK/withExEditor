@@ -1697,18 +1697,12 @@
   /* listeners */
   port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
 
-  document.addEventListener("DOMContentLoaded", () => {
-    window.addEventListener(
-      "mousedown",
-      evt => handleBeforeContextMenu(evt).catch(logError),
-      true
-    );
-    window.addEventListener(
-      "keydown",
-      evt => handleKeyDown(evt).catch(logError),
-      true
-    );
-  }, false);
+  window.addEventListener("mousedown",
+                          evt => handleBeforeContextMenu(evt).catch(logError),
+                          true);
+  window.addEventListener("keydown",
+                          evt => handleKeyDown(evt).catch(logError),
+                          true);
 
   /* startup */
   Promise.all([

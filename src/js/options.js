@@ -397,5 +397,5 @@
     addReloadExtensionListener(),
     addFormSubmitListener(),
     getHostStatus(),
-  ]).catch(logError), false);
+  ]).catch(logError));
 }
