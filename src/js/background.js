@@ -11,7 +11,9 @@
   const {local: localStorage} = storage;
 
   /* constants */
+  const BROWSER_POLYFILL_PATH = "js/browser-polyfill.min.js";
   const CONTENT_GET = "getContent";
+  const CONTENT_SCRIPT_PATH = "js/content.js";
   const CONTEXT_MENU = "contextMenu";
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
@@ -169,6 +171,29 @@
       }
     }
     return incog || false;
+  };
+
+  /* tabs */
+  /**
+   * execute content script to existing tabs
+   * @returns {Promise.<Arrya>} - results of each handler
+   */
+  const execScriptToTabs = async () => {
+    const tabList = await tabs.query({
+      windowType: "normal",
+    });
+    const func = [];
+    tabList.forEach(tab => {
+      const {id: tabId} = tab;
+      const scriptFiles = [BROWSER_POLYFILL_PATH, CONTENT_SCRIPT_PATH];
+      for (const file of scriptFiles) {
+        func.push(tabs.executeScript(tabId, {
+          allFrames: true,
+          file: extension.getURL(file),
+        }));
+      }
+    });
+    return Promise.all(func);
   };
 
   /* port */
@@ -480,6 +505,23 @@
   };
 
   /**
+   * create context menu in current tab
+   * @returns {?AsyncFunction} - restore context menu
+   */
+  const createCurrentTabContextMenu = async () => {
+    const current = await tabs.query({
+      active: true,
+      status: "complete",
+    });
+    let func;
+    if (Array.isArray(current) && current.length) {
+      varsLocal[MENU_ENABLED] = true;
+      func = restoreContextMenu();
+    }
+    return func || null;
+  };
+
+  /**
    * cache localized context menu item title
    * @returns {void}
    */
@@ -560,6 +602,7 @@
           editorLabel: editorNewLabel,
         },
       }),
+      restoreContextMenu(),
     ];
     return Promise.all(func);
   };
@@ -924,7 +967,8 @@
 
   /* startup */
   Promise.all([
-    localStorage.get().then(setVars).then(syncUI),
+    localStorage.get().then(setVars).then(execScriptToTabs).then(syncUI)
+      .then(createCurrentTabContextMenu),
     storeFetchedData(NS_URI_PATH, NS_URI),
     storeFetchedData(FILE_EXT_PATH, FILE_EXT),
     storeFetchedData(LIVE_EDIT_PATH, LIVE_EDIT),
