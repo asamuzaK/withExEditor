@@ -11,7 +11,6 @@
   const {local: localStorage} = storage;
 
   /* constants */
-  const BROWSER_POLYFILL_PATH = "js/browser-polyfill.min.js";
   const CONTENT_GET = "getContent";
   const CONTENT_SCRIPT_PATH = "js/content.js";
   const CONTEXT_MENU = "contextMenu";
@@ -176,23 +175,24 @@
   /* tabs */
   /**
    * execute content script to existing tabs
+   * NOTE: Exclude Blink due to the error "No source code or file specified.".
    * @returns {Promise.<Arrya>} - results of each handler
    */
   const execScriptToTabs = async () => {
-    const tabList = await tabs.query({
-      windowType: "normal",
-    });
     const func = [];
-    tabList.forEach(tab => {
-      const {id: tabId} = tab;
-      const scriptFiles = [BROWSER_POLYFILL_PATH, CONTENT_SCRIPT_PATH];
-      for (const file of scriptFiles) {
+    if (vars[IS_WEBEXT]) {
+      const tabList = await tabs.query({
+        windowType: "normal",
+      });
+      const contentScript = extension.getURL(CONTENT_SCRIPT_PATH);
+      for (const tab of tabList) {
+        const {id: tabId} = tab;
         func.push(tabs.executeScript(tabId, {
           allFrames: true,
-          file: extension.getURL(file),
+          file: contentScript,
         }));
       }
-    });
+    }
     return Promise.all(func);
   };
 
@@ -505,23 +505,6 @@
   };
 
   /**
-   * create context menu in current tab
-   * @returns {?AsyncFunction} - restore context menu
-   */
-  const createCurrentTabContextMenu = async () => {
-    const current = await tabs.query({
-      active: true,
-      status: "complete",
-    });
-    let func;
-    if (Array.isArray(current) && current.length) {
-      varsLocal[MENU_ENABLED] = true;
-      func = restoreContextMenu();
-    }
-    return func || null;
-  };
-
-  /**
    * cache localized context menu item title
    * @returns {void}
    */
@@ -728,9 +711,11 @@
    * @returns {void}
    */
   const handlePort = async (port = {}) => {
-    const {tab, url} = port.sender;
+    const {name: portName, sender} = port;
+    const {frameId, tab, url} = sender;
+    let func;
     if (tab) {
-      const {incognito} = tab;
+      const {active, incognito, status} = tab;
       let {windowId, id: tabId} = tab;
       windowId = stringifyPositiveInt(windowId, true);
       tabId = stringifyPositiveInt(tabId, true);
@@ -746,7 +731,13 @@
           [VARS_SET]: vars,
         });
       }
+      if (portName === PORT_CONTENT && frameId === 0 && active &&
+          status === "complete") {
+        varsLocal[MENU_ENABLED] = true;
+        func = restoreContextMenu();
+      }
     }
+    return func || null;
   };
 
   /**
@@ -967,8 +958,7 @@
 
   /* startup */
   Promise.all([
-    localStorage.get().then(setVars).then(execScriptToTabs).then(syncUI)
-      .then(createCurrentTabContextMenu),
+    localStorage.get().then(setVars).then(execScriptToTabs).then(syncUI),
     storeFetchedData(NS_URI_PATH, NS_URI),
     storeFetchedData(FILE_EXT_PATH, FILE_EXT),
     storeFetchedData(LIVE_EDIT_PATH, LIVE_EDIT),
