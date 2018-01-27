@@ -181,10 +181,10 @@
   const execScriptToTabs = async () => {
     const func = [];
     if (vars[IS_WEBEXT]) {
+      const contentScript = extension.getURL(CONTENT_SCRIPT_PATH);
       const tabList = await tabs.query({
         windowType: "normal",
       });
-      const contentScript = extension.getURL(CONTENT_SCRIPT_PATH);
       for (const tab of tabList) {
         const {id: tabId} = tab;
         func.push(tabs.executeScript(tabId, {
