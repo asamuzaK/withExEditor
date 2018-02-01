@@ -5,8 +5,7 @@
 {
   /* api */
   const {
-    browserAction, contextMenus, extension, i18n, runtime, storage, tabs,
-    windows,
+    browserAction, contextMenus, i18n, runtime, storage, tabs, windows,
   } = browser;
   const {local: localStorage} = storage;
 
@@ -181,7 +180,7 @@
   const execScriptToTabs = async () => {
     const func = [];
     if (vars[IS_WEBEXT]) {
-      const contentScript = extension.getURL(CONTENT_SCRIPT_PATH);
+      const contentScript = runtime.getURL(CONTENT_SCRIPT_PATH);
       const tabList = await tabs.query({
         windowType: "normal",
       });
@@ -231,7 +230,7 @@
    */
   const storeFetchedData = async (path, key) => {
     let func;
-    path = isString(path) && await extension.getURL(path);
+    path = isString(path) && await runtime.getURL(path);
     if (path && isString(key)) {
       const data = await fetch(path).then(res => res && res.json());
       func = setLocalStorage({[key]: data});
@@ -378,7 +377,7 @@
    * @returns {AsyncFunction} - set icon
    */
   const setIcon = async (id = varsLocal[ICON_ID]) => {
-    const icon = await extension.getURL(ICON);
+    const icon = await runtime.getURL(ICON);
     const path = vars[IS_ENABLED] && `${icon}${id}` || `${icon}#off`;
     return browserAction.setIcon({path});
   };
