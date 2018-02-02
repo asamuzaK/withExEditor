@@ -882,6 +882,13 @@
   };
 
   /**
+   * handle focus event
+   * @param {!Object} evt - event
+   * @returns {AsyncFunction} - request tmp file
+   */
+  const handleFocusEvt = evt => requestTmpFile(evt).catch(logError);
+
+  /**
    * store temporary file data
    * @param {Object} data - temporary file data
    * @returns {?AsyncFunction} - set data ID
@@ -1049,6 +1056,7 @@
         const ctrlData = await getIdData(ctrl);
         if (ctrlData) {
           const {dataId: ctrlId} = ctrlData;
+          ctrl.addEventListener("focus", handleFocusEvt, true);
           if (dataIds.has(ctrlId)) {
             const data = dataIds.get(ctrlId);
             if (Array.isArray(data.controls)) {
@@ -1060,9 +1068,6 @@
             }
             await setDataId(ctrlId, data);
           } else {
-            ctrl.addEventListener(
-              "focus", evt => requestTmpFile(evt).catch(logError), true
-            );
             ctrlData.controls = [dataId];
             await setDataId(ctrlId, ctrlData);
           }
@@ -1140,11 +1145,11 @@
             } = elm;
             const {dataId} = obj;
             const liveEditKey = await getLiveEditKeyFromClassList(classList);
+            const isHtml = !namespaceURI || namespaceURI === nsURI.html;
+            if (isHtml) {
+              elm.addEventListener("focus", handleFocusEvt, true);
+            }
             if (!dataIds.has(dataId)) {
-              const isHtml = !namespaceURI || namespaceURI === nsURI.html;
-              isHtml && elm.addEventListener(
-                "focus", evt => requestTmpFile(evt).catch(logError), true
-              );
               await setDataId(dataId, obj);
             }
             if (liveEditKey) {
