@@ -1,8 +1,0 @@
-v4.0.0
-* Changed / removed some options for security reasons.
-* Requires withExEditorHost v2.x
-
-v4.1.0
-* Add support for some live programming sites.
-* Add automatically sync contents option.
-* Host requirement bumped to v2.2.0

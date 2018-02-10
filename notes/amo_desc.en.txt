@@ -1,6 +1,0 @@
-"View source" "View selection" or "Edit text" with your favorite editor.
-Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
-
-Requirements:
-To use withExEditor, you also need to prepare a host which executes your editor.
-* withExEditorHost (GitHub) <a href="https://github.com/asamuzaK/withExEditorHost" title="asamuzaK/withExEditorHost: Native messaging host for withExEditor">https://github.com/asamuzaK/withExEditorHost</a>
