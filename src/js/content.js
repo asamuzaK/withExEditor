@@ -1681,47 +1681,41 @@
    * @returns {?AsyncFunction} - port content / port message
    */
   const handleKeyDown = async evt => {
-    const {key, target} = evt;
-    const {namespaceURI} = target;
     let func;
-    if (vars[ON_COMMAND] && vars[IS_ENABLED]) {
-      if (key !== "ContextMenu" ||
-          !(evt.getModifierState("Shift") && key === "F10")) {
-        const mode = await getContextMode(target);
-        const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
+    if (vars[IS_ENABLED]) {
+      const {key, target} = evt;
+      const isAltKeyActive = evt.getModifierState("Alt");
+      const isCtrlKeyActive = evt.getModifierState("Control");
+      const isShiftKeyActive = evt.getModifierState("Shift");
+      const isParsable = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
+      if (isShiftKeyActive && key === "F10" || key === "ContextMenu") {
+        func = handleBeforeContextMenu(evt).catch(logError);
+      } else if (vars[ON_COMMAND]) {
+        if (isParsable) {
+          const {namespaceURI} = target;
+          const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
                               await getEditableElm(target) ||
                               await getLiveEditElm(target);
-        vars[CONTEXT_MODE] = mode;
-        if (vars[ONLY_EDITABLE]) {
-          if (mode === MODE_EDIT) {
-            vars[CONTEXT_NODE] = editableElm;
-          } else {
-            vars[CONTEXT_NODE] = null;
-          }
-        } else {
-          vars[CONTEXT_NODE] = target;
+          vars[CONTEXT_MODE] = await getContextMode(target) || null;
+          vars[CONTEXT_NODE] = editableElm || !vars[ONLY_EDITABLE] && target ||
+                               null;
         }
-      }
-    } else if (evt.getModifierState("Shift") &&
-               (evt.getModifierState("Alt") ||
-                evt.getModifierState("Control"))) {
-      if (vars[IS_ENABLED]) {
+      } else if (isShiftKeyActive && (isAltKeyActive || isCtrlKeyActive)) {
         if (await keyComboMatches(evt, execEditorKey)) {
-          if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
+          if (isParsable) {
             const liveEditTarget = await getLiveEditElm(target);
             const mode = await getContextMode(target);
-            (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) &&
-              (func = portContent(liveEditTarget || target, mode));
+            if (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) {
+              func = portContent(liveEditTarget || target, mode);
+            }
           }
         } else {
           const openOpt = await keyComboMatches(evt, openOptionsKey);
-          openOpt && (func = portMsg({[OPTIONS_OPEN]: openOpt}));
+          if (openOpt) {
+            func = portMsg({[OPTIONS_OPEN]: openOpt});
+          }
         }
       }
-    } else {
-      (evt.getModifierState("Shift") && key === "F10" ||
-       key === "ContextMenu") &&
-        (func = handleBeforeContextMenu(evt).catch(logError));
     }
     return func || null;
   };
