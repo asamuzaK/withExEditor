@@ -82,7 +82,7 @@
     [KEY_ACCESS]: "u",
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
-    [ON_COMMAND]: runtime.id !== EXT_WEBEXT,
+    [ON_COMMAND]: false, //runtime.id !== EXT_WEBEXT,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
