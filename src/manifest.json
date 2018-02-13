@@ -16,14 +16,6 @@
     "default_icon": "img/icon-gray.png",
     "default_title": "__MSG_extensionName__"
   },
-  "commands": {
-    "execEditor": {
-      "description": "__MSG_commandExecEditor__"
-    },
-    "openOptions": {
-      "description": "__MSG_commandOpenOptions__"
-    }
-  },
   "content_scripts": [
     {
       "all_frames": true,
