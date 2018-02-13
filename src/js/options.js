@@ -286,11 +286,11 @@
         title: "title",
       };
       const dataAttr = elm.getAttribute(DATA_ATTR_I18N);
-      const items = Object.keys(attrs);
+      const items = Object.entries(attrs);
       for (const item of items) {
-        const attr = attrs[item];
-        elm.hasAttribute(attr) &&
-          elm.setAttribute(attr, i18n.getMessage(`${dataAttr}_${item}`));
+        const [key, value] = item;
+        elm.hasAttribute(value) &&
+          elm.setAttribute(value, i18n.getMessage(`${dataAttr}_${key}`));
       }
     }
   };
@@ -351,10 +351,10 @@
   const setValuesFromLocalStorage = async () => {
     const func = [];
     const pref = await localStorage.get();
-    const items = pref && Object.keys(pref);
+    const items = pref && Object.values(pref);
     if (items && items.length) {
       for (const item of items) {
-        func.push(setHtmlInputValue(pref[item]));
+        func.push(setHtmlInputValue(item));
       }
     }
     return Promise.all(func);
@@ -368,16 +368,16 @@
    */
   const handleMsg = async msg => {
     const func = [];
-    const items = msg && Object.keys(msg);
+    const items = msg && Object.entries(msg);
     if (items && items.length) {
       for (const item of items) {
-        const obj = msg[item];
-        switch (item) {
+        const [key, value] = item;
+        switch (key) {
           case EDITOR_CONFIG_RES:
-            func.push(extractEditorConfig(obj));
+            func.push(extractEditorConfig(value));
             break;
           case HOST_STATUS:
-            func.push(extractHostStatus(obj));
+            func.push(extractHostStatus(value));
             break;
           default:
         }

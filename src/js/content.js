@@ -1584,45 +1584,45 @@
    */
   const handleMsg = async msg => {
     const func = [];
-    const items = msg && Object.keys(msg);
+    const items = msg && Object.entries(msg);
     if (items && items.length) {
       for (const item of items) {
-        const obj = msg[item];
-        switch (item) {
+        const [key, value] = item;
+        switch (key) {
           case CONTENT_GET:
-            func.push(determinePortProcess(obj));
+            func.push(determinePortProcess(value));
             break;
           case ID_TAB:
           case ID_WIN:
           case SYNC_AUTO_URL:
-            vars[item] = obj;
+            vars[key] = value;
             break;
           case INCOGNITO:
           case IS_ENABLED:
           case ON_COMMAND:
           case ONLY_EDITABLE:
           case SYNC_AUTO:
-            vars[item] = !!obj;
+            vars[key] = !!value;
             break;
           case KEY_ACCESS:
-            func.push(updateKeyCombo(obj));
+            func.push(updateKeyCombo(value));
             break;
           case KEY_EDITOR:
-            vars[item] = !!obj;
-            execEditorKey.enabled = !!obj;
+            vars[key] = !!value;
+            execEditorKey.enabled = !!value;
             break;
           case KEY_OPTIONS:
-            vars[item] = !!obj;
-            openOptionsKey.enabled = !!obj;
+            vars[key] = !!value;
+            openOptionsKey.enabled = !!value;
             break;
           case TEXT_SYNC:
-            func.push(syncText(obj));
+            func.push(syncText(value));
             break;
           case TMP_FILE_DATA_PORT:
-            func.push(updateTmpFileData(obj));
+            func.push(updateTmpFileData(value));
             break;
           case VARS_SET:
-            func.push(handleMsg(obj));
+            func.push(handleMsg(value));
             break;
           default:
         }

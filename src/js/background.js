@@ -499,17 +499,16 @@
    */
   const updateContextMenu = async type => {
     if (type) {
-      const items = Object.keys(type);
+      const items = Object.entries(type);
       if (items.length) {
         for (const item of items) {
-          const obj = type[item];
-          const {menuItemId} = obj;
+          const [key, value] = item;
+          const {enabled, menuItemId, mode} = value;
           if (menus[menuItemId]) {
-            if (item === MODE_SOURCE) {
-              const title = varsLocal[obj.mode] || varsLocal[menuItemId];
+            if (key === MODE_SOURCE) {
+              const title = varsLocal[mode] || varsLocal[menuItemId];
               title && contextMenus.update(menuItemId, {title});
-            } else if (item === MODE_EDIT) {
-              const enabled = !!obj.enabled;
+            } else if (key === MODE_EDIT) {
               contextMenus.update(menuItemId, {enabled});
             }
           }
@@ -676,35 +675,35 @@
    */
   const handleMsg = async msg => {
     const func = [];
-    const items = msg && Object.keys(msg);
+    const items = msg && Object.entries(msg);
     if (items && items.length) {
       for (const item of items) {
-        const obj = msg[item];
-        if (obj) {
-          switch (item) {
+        const [key, value] = item;
+        if (value) {
+          switch (key) {
             case CONTEXT_MENU:
-              func.push(updateContextMenu(obj));
+              func.push(updateContextMenu(value));
               break;
             case EDITOR_CONFIG_GET:
             case LOCAL_FILE_VIEW:
             case TMP_FILE_CREATE:
             case TMP_FILE_GET:
-              func.push(portHostMsg({[item]: obj}));
+              func.push(portHostMsg({[key]: value}));
               break;
             case EDITOR_CONFIG_RES:
-              func.push(extractEditorConfig(obj));
+              func.push(extractEditorConfig(value));
               break;
             case EXT_RELOAD:
-              func.push(reloadExt(!!obj));
+              func.push(reloadExt(!!value));
               break;
             case HOST:
-              func.push(handleHostMsg(obj));
+              func.push(handleHostMsg(value));
               break;
             case HOST_STATUS_GET:
               func.push(portMsg({[HOST_STATUS]: hostStatus}));
               break;
             case HOST_VERSION: {
-              const {result} = obj;
+              const {result} = value;
               if (Number.isInteger(result)) {
                 hostStatus[HOST_VERSION] = result >= 0 && true || false;
                 func.push(toggleBadge());
@@ -715,13 +714,13 @@
               func.push(openOptionsPage());
               break;
             case STORAGE_SET:
-              func.push(setLocalStorage(obj));
+              func.push(setLocalStorage(value));
               break;
             case TMP_FILE_DATA_PORT:
-              func.push(portMsg({[item]: obj}));
+              func.push(portMsg({[key]: value}));
               break;
             case TMP_FILE_RES:
-              func.push(portSyncText(obj));
+              func.push(portSyncText(value));
               break;
             default:
           }
@@ -790,9 +789,12 @@
       if (items && items.length) {
         for (const item of items) {
           const obj = ports[windowId][tabId][item];
-          if (obj && obj.name) {
-            bool = obj.name === PORT_CONTENT;
-            break;
+          if (obj) {
+            const {name} = obj;
+            if (name) {
+              bool = name === PORT_CONTENT;
+              break;
+            }
           }
         }
       }
@@ -964,12 +966,12 @@
    */
   const setVars = async (data = {}) => {
     const func = [];
-    const items = Object.keys(data);
+    const items = Object.entries(data);
     if (items.length) {
       for (const item of items) {
-        const obj = data[item];
-        const {newValue} = obj;
-        func.push(setVar(item, newValue || obj, !!newValue));
+        const [key, value] = item;
+        const {newValue} = value;
+        func.push(setVar(key, newValue || value, !!newValue));
       }
     }
     return Promise.all(func);
