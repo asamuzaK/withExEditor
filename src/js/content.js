@@ -1690,29 +1690,27 @@
       const isParsable = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
       if (isShiftKeyActive && key === "F10" || key === "ContextMenu") {
         func = handleBeforeContextMenu(evt).catch(logError);
-      } else if (vars[ON_COMMAND]) {
-        if (isParsable) {
+      } else {
+        const mode = await getContextMode(target);
+        if (vars[ON_COMMAND] && isParsable) {
           const {namespaceURI} = target;
           const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
                               await getEditableElm(target) ||
                               await getLiveEditElm(target);
-          vars[CONTEXT_MODE] = await getContextMode(target) || null;
+          vars[CONTEXT_MODE] = mode || null;
           vars[CONTEXT_NODE] = editableElm || !vars[ONLY_EDITABLE] && target ||
                                null;
-        }
-      } else if (isShiftKeyActive && (isAltKeyActive || isCtrlKeyActive)) {
-        if (await keyComboMatches(evt, execEditorKey)) {
-          if (isParsable) {
+        } else if (isShiftKeyActive && (isAltKeyActive || isCtrlKeyActive)) {
+          if (isParsable && await keyComboMatches(evt, execEditorKey)) {
             const liveEditTarget = await getLiveEditElm(target);
-            const mode = await getContextMode(target);
             if (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) {
               func = portContent(liveEditTarget || target, mode);
             }
-          }
-        } else {
-          const openOpt = await keyComboMatches(evt, openOptionsKey);
-          if (openOpt) {
-            func = portMsg({[OPTIONS_OPEN]: openOpt});
+          } else {
+            const openOpt = await keyComboMatches(evt, openOptionsKey);
+            if (openOpt) {
+              func = portMsg({[OPTIONS_OPEN]: openOpt});
+            }
           }
         }
       }
