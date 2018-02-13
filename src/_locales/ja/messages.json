@@ -5,6 +5,12 @@
   "extensionName": {
     "message": "withExEditor"
   },
+  "commandExecEditor": {
+    "message": "エディタを直接起動"
+  },
+  "commandOpenOptions": {
+    "message": "設定ページを開く"
+  },
   "hostConnection_false": {
     "message": "未接続"
   },

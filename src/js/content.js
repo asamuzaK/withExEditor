@@ -38,6 +38,7 @@
   const MODE_SVG = "modeViewSVG";
   const MOUSE_BUTTON_RIGHT = 2;
   const NS_URI = "nsURI";
+  const ON_COMMAND = "onCommand";
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPTIONS_OPEN = "openOptions";
   const PORT_NAME = "portContent";
@@ -69,6 +70,7 @@
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
+    [ON_COMMAND]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
   };
@@ -1206,11 +1208,15 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const portContent = async (elm, mode) => {
-    const data = await createContentData(elm, mode).then(createTmpFileData);
-    return Promise.all([
-      createContentDataMsg(data).then(portMsg),
-      storeTmpFileData(data),
-    ]);
+    const func = [];
+    if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+      const data = await createContentData(elm, mode).then(createTmpFileData);
+      func.push(
+        createContentDataMsg(data).then(portMsg),
+        storeTmpFileData(data),
+      );
+    }
+    return Promise.all(func);
   };
 
   /**
@@ -1593,6 +1599,7 @@
             break;
           case INCOGNITO:
           case IS_ENABLED:
+          case ON_COMMAND:
           case ONLY_EDITABLE:
           case SYNC_AUTO:
             vars[item] = !!obj;
@@ -1674,13 +1681,33 @@
    * @returns {?AsyncFunction} - port content / port message
    */
   const handleKeyDown = async evt => {
+    const {key, target} = evt;
+    const {namespaceURI} = target;
     let func;
-    if (evt.getModifierState("Shift") &&
-        (evt.getModifierState("Alt") || evt.getModifierState("Control"))) {
+    if (vars[ON_COMMAND] && vars[IS_ENABLED]) {
+      if (key !== "ContextMenu" ||
+          !(evt.getModifierState("Shift") && key === "F10")) {
+        const mode = await getContextMode(target);
+        const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
+                              await getEditableElm(target) ||
+                              await getLiveEditElm(target);
+        vars[CONTEXT_MODE] = mode;
+        if (vars[ONLY_EDITABLE]) {
+          if (mode === MODE_EDIT) {
+            vars[CONTEXT_NODE] = editableElm;
+          } else {
+            vars[CONTEXT_NODE] = null;
+          }
+        } else {
+          vars[CONTEXT_NODE] = target;
+        }
+      }
+    } else if (evt.getModifierState("Shift") &&
+               (evt.getModifierState("Alt") ||
+                evt.getModifierState("Control"))) {
       if (vars[IS_ENABLED]) {
         if (await keyComboMatches(evt, execEditorKey)) {
           if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
-            const {target} = evt;
             const liveEditTarget = await getLiveEditElm(target);
             const mode = await getContextMode(target);
             (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) &&
@@ -1692,8 +1719,8 @@
         }
       }
     } else {
-      (evt.getModifierState("Shift") && evt.key === "F10" ||
-       evt.key === "ContextMenu") &&
+      (evt.getModifierState("Shift") && key === "F10" ||
+       key === "ContextMenu") &&
         (func = handleBeforeContextMenu(evt).catch(logError));
     }
     return func || null;

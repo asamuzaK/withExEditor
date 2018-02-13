@@ -5,6 +5,12 @@
   "extensionName": {
     "message": "withExEditor"
   },
+  "commandExecEditor": {
+    "message": "Execute the editor directly"
+  },
+  "commandOpenOptions": {
+    "message": "Open the options page"
+  },
   "hostConnection_false": {
     "message": "Disconnected"
   },
