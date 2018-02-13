@@ -943,15 +943,22 @@
           }
           break;
         case KEY_ACCESS:
-        case SYNC_AUTO_URL:
           vars[item] = value;
           hasPorts && func.push(portVar({[item]: value}));
+          changed && func.push(
+            updateContextMenu(),
+            cacheMenuItemTitle(),
+          );
           break;
         case KEY_EDITOR:
         case KEY_OPTIONS:
         case SYNC_AUTO:
           vars[item] = !!checked;
           hasPorts && func.push(portVar({[item]: !!checked}));
+          break;
+        case SYNC_AUTO_URL:
+          vars[item] = value;
+          hasPorts && func.push(portVar({[item]: value}));
           break;
         default:
       }
