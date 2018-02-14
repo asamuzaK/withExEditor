@@ -18,15 +18,9 @@
   },
   "commands": {
     "execEditor": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+U"
-      },
       "description": "__MSG_commandExecEditor__"
     },
     "openOptionsPage": {
-      "suggested_key": {
-        "default": "Alt+Shift+U"
-      },
       "description": "__MSG_commandOpenOptions__"
     }
   },
