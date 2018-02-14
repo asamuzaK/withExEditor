@@ -55,7 +55,7 @@
   const NS_URI = "nsUri";
   const NS_URI_PATH = "data/nsUri.json";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPTIONS_OPEN = "openOptions";
+  const OPTIONS_OPEN = "openOptionsPage";
   const PORT_CONTENT = "portContent";
   const PROCESS_CHILD = "childProcess";
   const STORAGE_SET = "setStorage";

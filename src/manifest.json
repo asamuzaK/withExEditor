@@ -20,7 +20,7 @@
     "execEditor": {
       "description": "__MSG_commandExecEditor__"
     },
-    "openOptions": {
+    "openOptionsPage": {
       "description": "__MSG_commandOpenOptions__"
     }
   },
