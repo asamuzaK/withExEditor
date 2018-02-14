@@ -39,7 +39,6 @@
   const MOUSE_BUTTON_RIGHT = 2;
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPTIONS_OPEN = "openOptions";
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
   const SUBST = "index";
@@ -1540,18 +1539,6 @@
     }
   };
 
-  /**
-   * key combination matches
-   * @param {Object} evt - Event
-   * @param {Object} key - KeyCombo
-   * @returns {boolean} - result
-   */
-  const keyComboMatches = async (evt, key) =>
-    evt && key && key.enabled && key.key && evt.key &&
-    evt.key.toLowerCase() === key.key.toLowerCase() &&
-    evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
-    evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
-
   /* local storage */
   /**
    * extend object items from local storage
@@ -1684,19 +1671,15 @@
       const isParsable = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
       if (shiftKey && key === "F10" || key === "ContextMenu") {
         func = handleBeforeContextMenu(evt).catch(logError);
-      } else if (shiftKey && (altKey || ctrlKey)) {
-        if (isParsable && await keyComboMatches(evt, execEditorKey)) {
-          const mode = await getContextMode(target);
-          const liveEditTarget = await getLiveEditElm(target);
-          if (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) {
-            func = portContent(liveEditTarget || target, mode);
-          }
-        } else {
-          const openOpt = await keyComboMatches(evt, openOptionsKey);
-          if (openOpt) {
-            func = portMsg({[OPTIONS_OPEN]: openOpt});
-          }
-        }
+      } else if (isParsable) {
+        const mode = await getContextMode(target);
+        const {namespaceURI} = target;
+        const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
+                            await getEditableElm(target) ||
+                            await getLiveEditElm(target);
+        vars[CONTEXT_MODE] = mode || null;
+        vars[CONTEXT_NODE] = editableElm || !vars[ONLY_EDITABLE] && target ||
+                             null;
       }
     }
     return func || null;
