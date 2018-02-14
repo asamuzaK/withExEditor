@@ -23,11 +23,8 @@
   const ID_WIN = "windowId";
   const INCOGNITO = "incognito";
   const IS_ENABLED = "isEnabled";
-  const KEY_ACCESS = "accessKey";
   const KEY_CODE_A = 65;
   const KEY_CODE_BS = 8;
-  const KEY_EDITOR = "editorShortCut";
-  const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
   const LIVE_EDIT = "liveEdit";
   const LOCAL_FILE_VIEW = "viewLocalFile";
@@ -64,9 +61,6 @@
     [ID_WIN]: "",
     [INCOGNITO]: false,
     [IS_ENABLED]: false,
-    [KEY_ACCESS]: "u",
-    [KEY_EDITOR]: true,
-    [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
@@ -1505,40 +1499,6 @@
     return Promise.all(func);
   };
 
-  /* keyboard shortcuts */
-  /* execute editor key combination */
-  const execEditorKey = {
-    key: vars[KEY_ACCESS],
-    altKey: false,
-    ctrlKey: true,
-    metaKey: false,
-    shiftKey: true,
-    enabled: vars[KEY_EDITOR],
-  };
-
-  /* open options key combination */
-  const openOptionsKey = {
-    key: vars[KEY_ACCESS],
-    altKey: true,
-    ctrlKey: false,
-    metaKey: false,
-    shiftKey: true,
-    enabled: vars[KEY_OPTIONS],
-  };
-
-  /**
-   * update key combination
-   * @param {string} key - key
-   * @returns {void}
-   */
-  const updateKeyCombo = async key => {
-    if (isString(key) && /^[a-z]$/i.test(key) && (key = key.toLowerCase())) {
-      vars[KEY_ACCESS] = key;
-      execEditorKey.key = key;
-      openOptionsKey.key = key;
-    }
-  };
-
   /* local storage */
   /**
    * extend object items from local storage
@@ -1587,17 +1547,6 @@
           case ONLY_EDITABLE:
           case SYNC_AUTO:
             vars[key] = !!value;
-            break;
-          case KEY_ACCESS:
-            func.push(updateKeyCombo(value));
-            break;
-          case KEY_EDITOR:
-            vars[key] = !!value;
-            execEditorKey.enabled = !!value;
-            break;
-          case KEY_OPTIONS:
-            vars[key] = !!value;
-            openOptionsKey.enabled = !!value;
             break;
           case TEXT_SYNC:
             func.push(syncText(value));

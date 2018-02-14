@@ -42,8 +42,6 @@
   const IS_EXECUTABLE = "isExecutable";
   const IS_WEBEXT = "isWebExtension";
   const KEY_ACCESS = "accessKey";
-  const KEY_EDITOR = "editorShortCut";
-  const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
   const LIVE_EDIT = "liveEdit";
   const LIVE_EDIT_PATH = "data/liveEdit.json";
@@ -77,9 +75,6 @@
   const vars = {
     [IS_ENABLED]: false,
     [IS_WEBEXT]: runtime.id === EXT_WEBEXT,
-    [KEY_ACCESS]: "u",
-    [KEY_EDITOR]: true,
-    [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
@@ -90,6 +85,7 @@
     [ENABLE_PB]: false,
     [ICON_ID]: "#context",
     [IS_EXECUTABLE]: false,
+    [KEY_ACCESS]: "U",
     [MENU_ENABLED]: false,
     [MODE_MATHML]: "",
     [MODE_SOURCE]: "",
@@ -420,8 +416,8 @@
    */
   const createMenuItem = async (id, contexts) => {
     const label = varsLocal[EDITOR_LABEL] || LABEL;
-    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+    const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                   `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
     isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
       menus[id] = contextMenus.create({
@@ -491,8 +487,8 @@
     } else {
       const items = Object.keys(menus);
       const label = varsLocal[EDITOR_LABEL] || LABEL;
-      const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                     `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+      const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                     `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
       if (items.length) {
         for (const item of items) {
           menus[item] && contextMenus.update(item, {
@@ -510,8 +506,8 @@
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
     const label = varsLocal[EDITOR_LABEL] || LABEL;
-    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+    const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                   `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     for (const item of items) {
       varsLocal[item] = i18n.getMessage(item, [label, accKey]);
     }
@@ -896,15 +892,12 @@
           }
           break;
         case KEY_ACCESS:
-          vars[item] = value;
-          hasPorts && func.push(portVar({[item]: value}));
+          varsLocal[item] = value;
           changed && func.push(
             updateContextMenu(),
             cacheMenuItemTitle(),
           );
           break;
-        case KEY_EDITOR:
-        case KEY_OPTIONS:
         case SYNC_AUTO:
           vars[item] = !!checked;
           hasPorts && func.push(portVar({[item]: !!checked}));
