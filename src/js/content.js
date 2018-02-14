@@ -38,9 +38,7 @@
   const MODE_SVG = "modeViewSVG";
   const MOUSE_BUTTON_RIGHT = 2;
   const NS_URI = "nsURI";
-  const ON_COMMAND = "onCommand";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPTIONS_OPEN = "openOptions";
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
   const SUBST = "index";
@@ -70,7 +68,6 @@
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
-    [ON_COMMAND]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
   };
@@ -1542,18 +1539,6 @@
     }
   };
 
-  /**
-   * key combination matches
-   * @param {Object} evt - Event
-   * @param {Object} key - KeyCombo
-   * @returns {boolean} - result
-   */
-  const keyComboMatches = async (evt, key) =>
-    evt && key && key.enabled && key.key && evt.key &&
-    evt.key.toLowerCase() === key.key.toLowerCase() &&
-    evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
-    evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
-
   /* local storage */
   /**
    * extend object items from local storage
@@ -1599,7 +1584,6 @@
             break;
           case INCOGNITO:
           case IS_ENABLED:
-          case ON_COMMAND:
           case ONLY_EDITABLE:
           case SYNC_AUTO:
             vars[key] = !!value;
@@ -1684,35 +1668,19 @@
     let func;
     if (vars[IS_ENABLED]) {
       const {key, target} = evt;
-      const isAltKeyActive = evt.getModifierState("Alt");
-      const isCtrlKeyActive = evt.getModifierState("Control");
       const isShiftKeyActive = evt.getModifierState("Shift");
       const isParsable = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
       if (isShiftKeyActive && key === "F10" || key === "ContextMenu") {
         func = handleBeforeContextMenu(evt).catch(logError);
-      } else {
+      } else if (isParsable) {
         const mode = await getContextMode(target);
-        if (vars[ON_COMMAND] && isParsable) {
-          const {namespaceURI} = target;
-          const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
-                              await getEditableElm(target) ||
-                              await getLiveEditElm(target);
-          vars[CONTEXT_MODE] = mode || null;
-          vars[CONTEXT_NODE] = editableElm || !vars[ONLY_EDITABLE] && target ||
-                               null;
-        } else if (isShiftKeyActive && (isAltKeyActive || isCtrlKeyActive)) {
-          if (isParsable && await keyComboMatches(evt, execEditorKey)) {
-            const liveEditTarget = await getLiveEditElm(target);
-            if (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) {
-              func = portContent(liveEditTarget || target, mode);
-            }
-          } else {
-            const openOpt = await keyComboMatches(evt, openOptionsKey);
-            if (openOpt) {
-              func = portMsg({[OPTIONS_OPEN]: openOpt});
-            }
-          }
-        }
+        const {namespaceURI} = target;
+        const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
+                            await getEditableElm(target) ||
+                            await getLiveEditElm(target);
+        vars[CONTEXT_MODE] = mode || null;
+        vars[CONTEXT_NODE] = editableElm || !vars[ONLY_EDITABLE] && target ||
+                             null;
       }
     }
     return func || null;
