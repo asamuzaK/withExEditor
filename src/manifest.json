@@ -2,7 +2,7 @@
   "applications": {
     "gecko": {
       "id": "jid1-WiAigu4HIo0Tag@jetpack",
-      "strict_min_version": "52.0a1"
+      "strict_min_version": "60.0a1"
     }
   },
   "background": {
@@ -58,5 +58,5 @@
     "tabs"
   ],
   "short_name": "__MSG_extensionName__",
-  "version": "4.2.4"
+  "version": "4.2.5"
 }
