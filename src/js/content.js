@@ -1616,12 +1616,10 @@
   const handleKeyDown = async evt => {
     let func;
     if (vars[IS_ENABLED]) {
-      const {key, target} = evt;
-      const isShiftKeyActive = evt.getModifierState("Shift");
-      const isParsable = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
-      if (isShiftKeyActive && key === "F10" || key === "ContextMenu") {
+      const {key, shiftKey, target} = evt;
+      if (key === "ContextMenu" || shiftKey && key === "F10") {
         func = handleBeforeContextMenu(evt).catch(logError);
-      } else if (isParsable) {
+      } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
         const mode = await getContextMode(target);
         const {namespaceURI} = target;
         const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
