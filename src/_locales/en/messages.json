@@ -146,7 +146,7 @@
     "message": "Automatically Synchronize Edited Content On Specific Sites"
   },
   "optionsExecEditorDetail": {
-    "message": "Keyboard shortcut to execute the editor without going through the context menu."
+    "message": "Keyboard shortcut to execute the editor without going through the context menu. In the input field, press the combination of keys such as 'Ctrl+Shift+U'."
   },
   "optionsExecEditorLabel": {
     "message": "Execute The Editor Directly"
@@ -242,7 +242,7 @@
     "message": "en"
   },
   "optionsOpenOptionsPageDetail": {
-    "message": "Keyboard shortcut to open the options page."
+    "message": "Keyboard shortcut to open the options page. In the input field, press the combination of keys such as 'Alt+Shift+U'."
   },
   "optionsOpenOptionsPageNote": {
     "message": "NOTE: Incompatible with Blink browsers. Please specify keyboard shortcut on browser's extension page."
