@@ -31,6 +31,22 @@
   const isString = o => typeof o === "string" || o instanceof String;
 
   /**
+   * dispatch change event
+   * @param {Object} elm - element
+   * @returns {void}
+   */
+  const dispatchChangeEvt = elm => {
+    if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+      const opt = {
+        bubbles: true,
+        cancelable: false,
+      };
+      const evt = new Event("change", opt);
+      elm.dispatchEvent(evt);
+    }
+  };
+
+  /**
    * dispatch input event
    * @param {Object} elm - element
    * @returns {void}
@@ -56,16 +72,22 @@
     if (typeof commands.update === "function") {
       const {target} = evt;
       const {id, value} = target;
-      const shortcut = value.trim().replace(/SpaceBar/ig, " ");
-      await commands.update({
-        shortcut,
-        name: id,
-      });
+      if (isString(id) && isString(value)) {
+        const shortcut = value.trim();
+        if (/^(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-z,.]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Home|End|Delete|Insert|SpaceBar)$/.test(shortcut)) {
+          await commands.update({
+            name: id,
+            shortcut: shortcut.replace(/SpaceBar$/, " ")
+              .replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`),
+          });
+          dispatchChangeEvt(target);
+        }
+      }
     }
   };
 
   /**
-   * detect key
+   * detect key combination
    * @param {Object} evt - Event
    * @returns {void}
    */
@@ -73,34 +95,37 @@
     const {altKey, ctrlKey, key, metaKey, shiftKey, target} = evt;
     const {disabled} = target;
     if (!disabled &&
-        /^(?:[0-9A-z,.\ ]|Arrow(?:Down|Left|Right|Up)|Delete|End|F(?:[1-9]|1[0-2])|Home|Insert|Page(?:Down|Up))$/.test(key)) {
+        /^(?:[\dA-z,. ]|Arrow(?:Down|Left|Right|Up)|F(?:[1-9]|1[0-2])|Page(?:Down|Up)|Home|End|Insert|Delete)$/.test(key)) {
       const {os} = await runtime.getPlatformInfo();
       const isMac = os === "mac";
-      if (altKey || ctrlKey || isMac && metaKey) {
-        const modifiers = {
+      if (altKey && !ctrlKey || !altKey && ctrlKey || isMac && metaKey) {
+        const modKeys = {
           altKey: {
-            default: "Alt",
+            value: "Alt",
           },
           ctrlKey: {
-            default: "Ctrl",
-            mac: "MacCtrl",
+            value: "Ctrl",
+            macValue: "MacCtrl",
           },
           metaKey: {
-            default: null,
-            mac: "Command",
+            macValue: "Command",
           },
           shiftKey: {
-            default: "Shift",
+            value: "Shift",
           },
         };
         const cmd = [];
-        altKey && cmd.push(modifiers.altKey.default);
-        ctrlKey &&
-          cmd.push(isMac && modifiers.ctrlKey.mac || modifiers.ctrlKey.default);
-        metaKey && isMac && cmd.push(modifiers.metaKey.mac);
-        shiftKey && cmd.push(modifiers.shiftKey.default);
-        cmd.push(/^[A-z]$/.test(key) && key.toUpperCase() ||
-                 /^ $/.test(key) && "SpaceBar" || key);
+        if (altKey) {
+          cmd.push(modKeys.altKey.value);
+        } else if (ctrlKey) {
+          cmd.push(isMac && modKeys.ctrlKey.macValue || modKeys.ctrlKey.value);
+        } else if (isMac && metaKey) {
+          cmd.push(modKeys.metaKey.macValue);
+        }
+        shiftKey && cmd.push(modKeys.shiftKey.value);
+        cmd.push(/^ $/.test(key) && "SpaceBar" ||
+                 /^[a-z]$/.test(key) && key.toUpperCase() ||
+                 key.replace(/^Arrow/, ""));
         target.value = cmd.join("+");
         dispatchInputEvt(target);
       }
@@ -116,7 +141,7 @@
     for (const item of cmdInputs) {
       const elm = document.getElementById(item);
       if (elm) {
-        elm.addEventListener("keydown", evt =>
+        elm.addEventListener("keyup", evt =>
           detectKeyCombo(evt).catch(logError)
         );
         elm.addEventListener("input", evt =>

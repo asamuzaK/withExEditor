@@ -169,7 +169,8 @@
               </label>
               <input type="text" id="execEditor"
                      data-i18n="optionsKeyComboInput"
-                     placeholder="Input key combination" value= "" />
+                     pattern="^(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-z,.]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Home|End|Delete|Insert|SpaceBar)$"
+                     placeholder="Press key combination" value= "" />
             </p>
             <details id="execEditorDetail">
               <div>
@@ -191,7 +192,9 @@
               </label>
               <input type="text" id="openOptionsPage"
                      data-i18n="optionsKeyComboInput"
-                     placeholder="Input key combination" value= "" />
+                     pattern="^(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-z,.]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Home|End|Delete|Insert|SpaceBar)$"
+                     placeholder="Press key combination"
+                     value= "" />
             </p>
             <details id="openOptionsPageDetail">
               <div>
