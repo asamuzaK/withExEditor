@@ -1620,7 +1620,7 @@
       const isParsable = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
       if (shiftKey && key === "F10" || key === "ContextMenu") {
         func = handleBeforeContextMenu(evt).catch(logError);
-      } else if (isParsable) {
+      } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
         const mode = await getContextMode(target);
         const {namespaceURI} = target;
         const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
