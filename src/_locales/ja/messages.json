@@ -12,7 +12,7 @@
     "message": "設定ページを開く"
   },
   "compatNoteAccessKey": {
-    "message": "備考： コンテクストメニューでのアクセスキーは、まだGeckoブラウザでは実装されていません。"
+    "message": "備考： コンテクストメニューでのアクセスキーは、まだGecko系ブラウザでは実装されていません。"
   },
   "compatNoteIconAuto": {
     "message": "備考： 「自動」はGecko系ブラウザしか適用されません。また「about:config」から「svg.context-properties.content.enabled」の値を「true」に変更する必要があります。"
