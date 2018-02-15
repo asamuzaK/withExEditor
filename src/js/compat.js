@@ -81,6 +81,9 @@
               .replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`),
           });
           dispatchChangeEvt(target);
+        } else if (shortcut === "") {
+          await commands.reset(id);
+          dispatchChangeEvt(target);
         }
       }
     }
