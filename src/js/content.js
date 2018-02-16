@@ -1622,7 +1622,6 @@
         func = handleBeforeContextMenu(evt).catch(logError);
       } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
         const mode = await getContextMode(target);
-        const {namespaceURI} = target;
         const editableElm = await getEditableElm(target);
         const liveEditElm = await getLiveEditElm(target);
         vars[CONTEXT_MODE] = mode;
