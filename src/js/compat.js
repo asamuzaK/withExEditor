@@ -4,20 +4,13 @@
 "use strict";
 {
   /* api */
-  const {
-    commands, runtime,
-    storage: {
-      local: localStorage,
-    },
-  } = browser;
+  const {commands, runtime} = browser;
 
   /* constant */
   const EDITOR_EXEC = "execEditor";
   const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const ICON_AUTO = "buttonIconAuto";
   const KEY_ACCESS = "accessKey";
-  const KEY_EDITOR = "editorShortCut";
-  const KEY_OPTIONS = "optionsShortCut";
   const OPTIONS_OPEN = "openOptionsPage";
 
   /**
@@ -196,50 +189,8 @@
     return Promise.all(func);
   };
 
-  /**
-   * migrate old storage
-   * @returns {Promise.<Array>} - results of each handler
-   */
-  const migrateStorage = async () => {
-    const {id} = runtime;
-    const store = await localStorage.get([
-      EDITOR_EXEC,
-      KEY_ACCESS,
-      KEY_EDITOR,
-      KEY_OPTIONS,
-      OPTIONS_OPEN,
-    ]);
-    const func = [];
-    if (id === EXT_WEBEXT) {
-      const accKey = store[KEY_ACCESS] && store[KEY_ACCESS].value || "U";
-      if (!store[EDITOR_EXEC]) {
-        const elm = document.getElementById(EDITOR_EXEC);
-        if (elm) {
-          const {os} = await runtime.getPlatformInfo();
-          const isMac = os === "mac";
-          const ctrl = isMac && "MacCtrl" || "Ctrl";
-          const enabled = !store[KEY_EDITOR] || store[KEY_EDITOR].checked;
-          elm.value = enabled && `${ctrl}+Shift+${accKey}` || "";
-          dispatchInputEvt(elm);
-        }
-      }
-      if (!store[OPTIONS_OPEN]) {
-        const elm = document.getElementById(OPTIONS_OPEN);
-        if (elm) {
-          const enabled = !store[KEY_OPTIONS] || store[KEY_OPTIONS].checked;
-          elm.value = enabled && `Alt+Shift+${accKey}` || "";
-          dispatchInputEvt(elm);
-        }
-      }
-    }
-    store[KEY_EDITOR] && func.push(localStorage.remove(KEY_EDITOR));
-    store[KEY_OPTIONS] && func.push(localStorage.remove(KEY_OPTIONS));
-    return Promise.all(func);
-  };
-
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     disableIncompatibleInputs(),
     addListenerToCmdInputs(),
-    migrateStorage(),
   ]).catch(logError));
 }
