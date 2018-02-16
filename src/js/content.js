@@ -1224,7 +1224,7 @@
       elm = !isCollapsed &&
             (anchorNode.nodeType === Node.TEXT_NODE && anchorNode.parentNode ||
              focusNode.nodeType === Node.TEXT_NODE && focusNode.parentNode) ||
-             elm;
+            elm;
       if ((elm.isContentEditable || await isEditControl(elm) ||
            await isContentTextNode(elm)) &&
           (isCollapsed || rangeCount === 1 &&
@@ -1623,12 +1623,11 @@
       } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
         const mode = await getContextMode(target);
         const {namespaceURI} = target;
-        const editableElm = (!namespaceURI || namespaceURI === nsURI.html) &&
-                            await getEditableElm(target) ||
-                            await getLiveEditElm(target);
-        vars[CONTEXT_MODE] = mode || null;
-        vars[CONTEXT_NODE] = editableElm || !vars[ONLY_EDITABLE] && target ||
-                             null;
+        const editableElm = await getEditableElm(target);
+        const liveEditElm = await getLiveEditElm(target);
+        vars[CONTEXT_MODE] = mode;
+        vars[CONTEXT_NODE] = liveEditElm || editableElm ||
+                             !vars[ONLY_EDITABLE] && target || null;
       }
     }
     return func || null;
