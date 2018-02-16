@@ -56,7 +56,6 @@
   const MODE_SVG = "modeViewSVG";
   const NS_URI = "nsUri";
   const NS_URI_PATH = "data/nsUri.json";
-  const ON_COMMAND = "onCommand";
   const ONLY_EDITABLE = "enableOnlyEditable";
   const OPTIONS_OPEN = "openOptions";
   const PORT_CONTENT = "portContent";
@@ -81,7 +80,6 @@
     [KEY_ACCESS]: "u",
     [KEY_EDITOR]: true,
     [KEY_OPTIONS]: true,
-    [ON_COMMAND]: false,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
