@@ -15,10 +15,16 @@
   },
   "commands": {
     "execEditor": {
-      "description": "__MSG_commandExecEditor__"
+      "description": "__MSG_commandExecEditor__",
+      "suggested_key": {
+        "default": "Ctrl+Shift+U"
+      }
     },
     "openOptionsPage": {
-      "description": "__MSG_commandOpenOptions__"
+      "description": "__MSG_commandOpenOptions__",
+      "suggested_key": {
+        "default": "Alt+Shift+U"
+      }
     }
   },
   "content_scripts": [
