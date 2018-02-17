@@ -45,9 +45,9 @@
   const updateCmd = async (id, value) => {
     if (typeof commands.update === "function" &&
         isString(id) && isString(value)) {
-      const shortcut = value.trim().replace(/SpaceBar$/, " ")
-        .replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`);
-      if (/^(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-Z,. ]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Home|End|Delete|Insert)$/.test(shortcut)) {
+      const shortcut =
+        value.trim().replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`);
+      if (/^(?:(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-Z]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Comma|Period|Home|End|Delete|Insert|Space)|F(?:[1-9]|1[0-2]))$/.test(shortcut)) {
         await commands.update({
           shortcut,
           name: id,

@@ -73,12 +73,12 @@
       const {target} = evt;
       const {id, value} = target;
       if (isString(id) && isString(value)) {
-        const shortcut = value.trim();
-        if (/^(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-z,.]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Home|End|Delete|Insert|SpaceBar)$/.test(shortcut)) {
+        const shortcut =
+          value.trim().replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`);
+        if (/^(?:(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-Z]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Comma|Period|Home|End|Delete|Insert|Space)|F(?:[1-9]|1[0-2]))$/.test(shortcut)) {
           await commands.update({
+            shortcut,
             name: id,
-            shortcut: shortcut.replace(/SpaceBar$/, " ")
-              .replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`),
           });
           dispatchChangeEvt(target);
         } else if (shortcut === "") {
@@ -126,9 +126,10 @@
           cmd.push(modKeys.metaKey.macValue);
         }
         shiftKey && cmd.push(modKeys.shiftKey.value);
-        cmd.push(/^ $/.test(key) && "SpaceBar" ||
-                 /^[a-z]$/.test(key) && key.toUpperCase() ||
-                 key.replace(/^Arrow/, ""));
+        // FIXME:
+        cmd.push(/^[a-z]$/.test(key) && key.toUpperCase() ||
+                 /^,$/.test(key) && "Comma" || /^\.$/.test(key) && "Period" ||
+                 /^ $/.test(key) && "Space" || key.replace(/^Arrow/, ""));
         target.value = cmd.join("+");
         dispatchInputEvt(target);
       }
