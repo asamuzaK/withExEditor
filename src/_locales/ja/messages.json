@@ -146,7 +146,7 @@
     "message": "特定のサイトでは編集したコンテンツを自動的に同期する"
   },
   "optionsExecEditorDetail": {
-    "message": "エディタを直接起動するショートカットキーを設定します。入力欄で'Ctrl+Shift+U'などのキーの組み合わせで押下してください。"
+    "message": "エディタを直接起動するショートカットキーを設定します。入力欄で「Ctrl+Shift+U」などのキーの組み合わせで押下してください。"
   },
   "optionsExecEditorLabel": {
     "message": "エディタを直接起動"
@@ -242,7 +242,7 @@
     "message": "ja"
   },
   "optionsOpenOptionsPageDetail": {
-    "message": "設定ページを開くショートカットキーを設定します。入力欄で'Alt+Shift+U'などのキーの組み合わせで押下してください。"
+    "message": "設定ページを開くショートカットキーを設定します。入力欄で「Alt+Shift+U」などのキーの組み合わせで押下してください。"
   },
   "optionsOpenOptionsPageLabel": {
     "message": "設定ページを開く"
