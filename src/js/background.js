@@ -5,7 +5,7 @@
 {
   /* api */
   const {
-    browserAction, contextMenus, i18n, runtime, storage, tabs,
+    browserAction, commands, contextMenus, i18n, runtime, storage, tabs,
     windows,
   } = browser;
   const {local: localStorage} = storage;
@@ -17,6 +17,7 @@
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
   const EDITOR_CONFIG_TS = "editorConfigTimestamp";
+  const EDITOR_EXEC = "execEditor";
   const EDITOR_FILE_NAME = "editorFileName";
   const EDITOR_LABEL = "editorLabel";
   const ENABLE_PB = "enablePB";
@@ -363,6 +364,29 @@
           }
         }
       }
+    }
+    return func || null;
+  };
+
+  /**
+   * port get content message to active tab
+   * @returns {?AsyncFunction} - port msg
+   */
+  const portGetContentMsg = async () => {
+    const [tab] = await tabs.query({
+      active: true,
+      windowId: windows.WINDOW_ID_CURRENT,
+      windowType: "normal",
+    });
+    let func;
+    if (tab) {
+      const {id: tabId, windowId} = tab;
+      const tId = stringifyPositiveInt(tabId, true);
+      const wId = stringifyPositiveInt(windowId, true);
+      const msg = {
+        [CONTENT_GET]: {tab},
+      };
+      func = portMsg(msg, wId, tId);
     }
     return func || null;
   };
@@ -841,6 +865,27 @@
     return Promise.all(func);
   };
 
+  /**
+   * handle command
+   * @param {string} cmd - command
+   * @returns {?AsyncFunction} - command handler function
+   */
+  const handleCmd = async cmd => {
+    let func;
+    if (isString(cmd)) {
+      switch (cmd) {
+        case EDITOR_EXEC:
+          func = portGetContentMsg();
+          break;
+        case OPTIONS_OPEN:
+          func = openOptionsPage();
+          break;
+        default:
+      }
+    }
+    return func || null;
+  };
+
   /* handle variables */
   /**
    * port variable
@@ -932,6 +977,7 @@
 
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
+  commands.onCommand.addListener(cmd => handleCmd(cmd).catch(logError));
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
   );
