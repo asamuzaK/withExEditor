@@ -5,7 +5,7 @@
 {
   /* api */
   const {
-    browserAction, contextMenus, i18n, runtime, storage, tabs,
+    browserAction, commands, contextMenus, i18n, runtime, storage, tabs,
     windows,
   } = browser;
   const {local: localStorage} = storage;
@@ -17,6 +17,7 @@
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
   const EDITOR_CONFIG_TS = "editorConfigTimestamp";
+  const EDITOR_EXEC = "execEditor";
   const EDITOR_FILE_NAME = "editorFileName";
   const EDITOR_LABEL = "editorLabel";
   const ENABLE_PB = "enablePB";
@@ -42,8 +43,6 @@
   const IS_EXECUTABLE = "isExecutable";
   const IS_WEBEXT = "isWebExtension";
   const KEY_ACCESS = "accessKey";
-  const KEY_EDITOR = "editorShortCut";
-  const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
   const LIVE_EDIT = "liveEdit";
   const LIVE_EDIT_PATH = "data/liveEdit.json";
@@ -57,7 +56,7 @@
   const NS_URI = "nsUri";
   const NS_URI_PATH = "data/nsUri.json";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPTIONS_OPEN = "openOptions";
+  const OPTIONS_OPEN = "openOptionsPage";
   const PORT_CONTENT = "portContent";
   const PROCESS_CHILD = "childProcess";
   const STORAGE_SET = "setStorage";
@@ -77,9 +76,6 @@
   const vars = {
     [IS_ENABLED]: false,
     [IS_WEBEXT]: runtime.id === EXT_WEBEXT,
-    [KEY_ACCESS]: "u",
-    [KEY_EDITOR]: true,
-    [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
@@ -90,6 +86,7 @@
     [ENABLE_PB]: false,
     [ICON_ID]: "#context",
     [IS_EXECUTABLE]: false,
+    [KEY_ACCESS]: "U",
     [MENU_ENABLED]: false,
     [MODE_MATHML]: "",
     [MODE_SOURCE]: "",
@@ -371,6 +368,29 @@
     return func || null;
   };
 
+  /**
+   * port get content message to active tab
+   * @returns {?AsyncFunction} - port msg
+   */
+  const portGetContentMsg = async () => {
+    const [tab] = await tabs.query({
+      active: true,
+      windowId: windows.WINDOW_ID_CURRENT,
+      windowType: "normal",
+    });
+    let func;
+    if (tab) {
+      const {id: tabId, windowId} = tab;
+      const tId = stringifyPositiveInt(tabId, true);
+      const wId = stringifyPositiveInt(windowId, true);
+      const msg = {
+        [CONTENT_GET]: {tab},
+      };
+      func = portMsg(msg, wId, tId);
+    }
+    return func || null;
+  };
+
   /* icon */
   /**
    * set icon
@@ -420,8 +440,8 @@
    */
   const createMenuItem = async (id, contexts) => {
     const label = varsLocal[EDITOR_LABEL] || LABEL;
-    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+    const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                   `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
     isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
       menus[id] = contextMenus.create({
@@ -491,8 +511,8 @@
     } else {
       const items = Object.keys(menus);
       const label = varsLocal[EDITOR_LABEL] || LABEL;
-      const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                     `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+      const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                     `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
       if (items.length) {
         for (const item of items) {
           menus[item] && contextMenus.update(item, {
@@ -510,8 +530,8 @@
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
     const label = varsLocal[EDITOR_LABEL] || LABEL;
-    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+    const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                   `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     for (const item of items) {
       varsLocal[item] = i18n.getMessage(item, [label, accKey]);
     }
@@ -845,6 +865,27 @@
     return Promise.all(func);
   };
 
+  /**
+   * handle command
+   * @param {string} cmd - command
+   * @returns {?AsyncFunction} - command handler function
+   */
+  const handleCmd = async cmd => {
+    let func;
+    if (isString(cmd)) {
+      switch (cmd) {
+        case EDITOR_EXEC:
+          func = portGetContentMsg();
+          break;
+        case OPTIONS_OPEN:
+          func = openOptionsPage();
+          break;
+        default:
+      }
+    }
+    return func || null;
+  };
+
   /* handle variables */
   /**
    * port variable
@@ -896,15 +937,12 @@
           }
           break;
         case KEY_ACCESS:
-          vars[item] = value;
-          hasPorts && func.push(portVar({[item]: value}));
+          varsLocal[item] = value;
           changed && func.push(
             updateContextMenu(),
             cacheMenuItemTitle(),
           );
           break;
-        case KEY_EDITOR:
-        case KEY_OPTIONS:
         case SYNC_AUTO:
           vars[item] = !!checked;
           hasPorts && func.push(portVar({[item]: !!checked}));
@@ -939,6 +977,7 @@
 
   /* listeners */
   browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
+  commands.onCommand.addListener(cmd => handleCmd(cmd).catch(logError));
   contextMenus.onClicked.addListener((info, tab) =>
     portContextMenuData(info, tab).catch(logError)
   );

@@ -11,6 +11,15 @@
   "commandOpenOptions": {
     "message": "Open the options page"
   },
+  "compatNoteAccessKey": {
+    "message": "NOTE: Accesskey in context menu is not implemented in Gecko browsers yet."
+  },
+  "compatNoteIconAuto": {
+    "message": "NOTE: \"Auto\" only applies to Gecko browsers, and you need to set \"svg.context-properties.content.enabled\" to \"true\" from \"about:config\"."
+  },
+  "compatNoteShortcutKey": {
+    "message": "NOTE: Incompatible with Blink browsers. Please specify keyboard shortcut on browser's extension page."
+  },
   "hostConnection_false": {
     "message": "Disconnected"
   },
@@ -95,22 +104,10 @@
     "message": "Input Access Key"
   },
   "optionsAccessKeyDetail": {
-    "message": "Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly."
-  },
-  "optionsAccessKeyDetail2": {
-    "message": "Access key can be any key from 'a' to 'z'."
-  },
-  "optionsAccessKeyDetail3": {
-    "message": "In the context menu, press 'key' itself."
-  },
-  "optionsAccessKeyDetail4": {
-    "message": "NOTE: accesskey in context menu is not yet implemented in Gecko browsers."
+    "message": "Access key used in the context menu. Access key can be any key from 'A' to 'Z'."
   },
   "optionsAccessKeyLabel": {
     "message": "Access Key"
-  },
-  "optionsAccessKeySettings": {
-    "message": "Access Key Settings"
   },
   "optionsEditorLabel": {
     "message": ""
@@ -126,12 +123,6 @@
   },
   "optionsEditorLabelLabel": {
     "message": "Editor Label"
-  },
-  "optionsEditorShortCutDetail": {
-    "message": "To execute the editor without going through the context menu, press 'Ctrl + Shift + key'."
-  },
-  "optionsEditorShortCutLabel": {
-    "message": "Enable Shortcut Key To Execute The Editor Directly"
   },
   "optionsEnableOnlyEditableDetail": {
     "message": "Enables only when the content is editable."
@@ -153,6 +144,12 @@
   },
   "optionsEnableSyncAutoLabel": {
     "message": "Automatically Synchronize Edited Content On Specific Sites"
+  },
+  "optionsExecEditorDetail": {
+    "message": "Keyboard shortcut to execute the editor without going through the context menu. In the input field, press the combination of keys such as 'Ctrl+Shift+U'."
+  },
+  "optionsExecEditorLabel": {
+    "message": "Execute The Editor Directly"
   },
   "optionsHostConnectionDetail": {
     "message": "If \"Unknown\" or \"Disconnected\", reload withExEditor."
@@ -208,9 +205,6 @@
   "optionsIconDetail": {
     "message": "Choose the icon."
   },
-  "optionsIconDetail2": {
-    "message": "\"Auto\" only applies to Gecko (57.0 and later), and you need to set \"svg.context-properties.content.enabled\" to \"true\" from \"about:config\"."
-  },
   "optionsIconGray": {
     "message": ""
   },
@@ -235,14 +229,23 @@
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "White Icon"
   },
+  "optionsKeyComboInput": {
+    "message": ""
+  },
+  "optionsKeyComboInput_placeholder": {
+    "message": "Press key combination"
+  },
+  "optionsKeyboardShortcuts": {
+    "message": "Keyboard Shortcuts"
+  },
   "optionsLang": {
     "message": "en"
   },
-  "optionsOptionsShortCutDetail": {
-    "message": "To open the options page, press 'Alt + Shift + key' ('Opt + Shift + key' on Mac)."
+  "optionsOpenOptionsPageDetail": {
+    "message": "Keyboard shortcut to open the options page. In the input field, press the combination of keys such as 'Alt+Shift+U'."
   },
-  "optionsOptionsShortCutLabel": {
-    "message": "Enable Shortcut Key To Open The Options Page"
+  "optionsOpenOptionsPageLabel": {
+    "message": "Open The Options Page"
   },
   "optionsOtherSettings": {
     "message": "Other Settings"

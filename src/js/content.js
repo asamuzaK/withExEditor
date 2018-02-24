@@ -23,11 +23,8 @@
   const ID_WIN = "windowId";
   const INCOGNITO = "incognito";
   const IS_ENABLED = "isEnabled";
-  const KEY_ACCESS = "accessKey";
   const KEY_CODE_A = 65;
   const KEY_CODE_BS = 8;
-  const KEY_EDITOR = "editorShortCut";
-  const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
   const LIVE_EDIT = "liveEdit";
   const LOCAL_FILE_VIEW = "viewLocalFile";
@@ -39,7 +36,6 @@
   const MOUSE_BUTTON_RIGHT = 2;
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPTIONS_OPEN = "openOptions";
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
   const SUBST = "index";
@@ -65,9 +61,6 @@
     [ID_WIN]: "",
     [INCOGNITO]: false,
     [IS_ENABLED]: false,
-    [KEY_ACCESS]: "u",
-    [KEY_EDITOR]: true,
-    [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
@@ -1231,7 +1224,7 @@
       elm = !isCollapsed &&
             (anchorNode.nodeType === Node.TEXT_NODE && anchorNode.parentNode ||
              focusNode.nodeType === Node.TEXT_NODE && focusNode.parentNode) ||
-             elm;
+            elm;
       if ((elm.isContentEditable || await isEditControl(elm) ||
            await isContentTextNode(elm)) &&
           (isCollapsed || rangeCount === 1 &&
@@ -1506,52 +1499,6 @@
     return Promise.all(func);
   };
 
-  /* keyboard shortcuts */
-  /* execute editor key combination */
-  const execEditorKey = {
-    key: vars[KEY_ACCESS],
-    altKey: false,
-    ctrlKey: true,
-    metaKey: false,
-    shiftKey: true,
-    enabled: vars[KEY_EDITOR],
-  };
-
-  /* open options key combination */
-  const openOptionsKey = {
-    key: vars[KEY_ACCESS],
-    altKey: true,
-    ctrlKey: false,
-    metaKey: false,
-    shiftKey: true,
-    enabled: vars[KEY_OPTIONS],
-  };
-
-  /**
-   * update key combination
-   * @param {string} key - key
-   * @returns {void}
-   */
-  const updateKeyCombo = async key => {
-    if (isString(key) && /^[a-z]$/i.test(key) && (key = key.toLowerCase())) {
-      vars[KEY_ACCESS] = key;
-      execEditorKey.key = key;
-      openOptionsKey.key = key;
-    }
-  };
-
-  /**
-   * key combination matches
-   * @param {Object} evt - Event
-   * @param {Object} key - KeyCombo
-   * @returns {boolean} - result
-   */
-  const keyComboMatches = async (evt, key) =>
-    evt && key && key.enabled && key.key && evt.key &&
-    evt.key.toLowerCase() === key.key.toLowerCase() &&
-    evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
-    evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
-
   /* local storage */
   /**
    * extend object items from local storage
@@ -1600,17 +1547,6 @@
           case ONLY_EDITABLE:
           case SYNC_AUTO:
             vars[key] = !!value;
-            break;
-          case KEY_ACCESS:
-            func.push(updateKeyCombo(value));
-            break;
-          case KEY_EDITOR:
-            vars[key] = !!value;
-            execEditorKey.enabled = !!value;
-            break;
-          case KEY_OPTIONS:
-            vars[key] = !!value;
-            openOptionsKey.enabled = !!value;
             break;
           case TEXT_SYNC:
             func.push(syncText(value));
@@ -1680,23 +1616,16 @@
   const handleKeyDown = async evt => {
     let func;
     if (vars[IS_ENABLED]) {
-      const {altKey, ctrlKey, key, shiftKey, target} = evt;
-      const isParsable = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
-      if (shiftKey && key === "F10" || key === "ContextMenu") {
+      const {key, shiftKey, target} = evt;
+      if (key === "ContextMenu" || shiftKey && key === "F10") {
         func = handleBeforeContextMenu(evt).catch(logError);
-      } else if (shiftKey && (altKey || ctrlKey)) {
-        if (isParsable && await keyComboMatches(evt, execEditorKey)) {
-          const mode = await getContextMode(target);
-          const liveEditTarget = await getLiveEditElm(target);
-          if (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) {
-            func = portContent(liveEditTarget || target, mode);
-          }
-        } else {
-          const openOpt = await keyComboMatches(evt, openOptionsKey);
-          if (openOpt) {
-            func = portMsg({[OPTIONS_OPEN]: openOpt});
-          }
-        }
+      } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
+        const mode = await getContextMode(target);
+        const editableElm = await getEditableElm(target);
+        const liveEditElm = await getLiveEditElm(target);
+        vars[CONTEXT_MODE] = mode;
+        vars[CONTEXT_NODE] = liveEditElm || editableElm ||
+                             !vars[ONLY_EDITABLE] && target || null;
       }
     }
     return func || null;
