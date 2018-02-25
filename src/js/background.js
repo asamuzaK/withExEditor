@@ -277,16 +277,17 @@
         let {windowId, id: tabId} = tab;
         tabId = stringifyPositiveInt(tabId, true);
         windowId = stringifyPositiveInt(windowId, true);
-        tabId && windowId && portUrl && ports[windowId] &&
-        ports[windowId][tabId] &&
+        if (tabId && windowId && portUrl && ports[windowId] &&
+            ports[windowId][tabId]) {
           delete ports[windowId][tabId][portUrl];
-        func = portHostMsg({
-          [TMP_FILE_DATA_REMOVE]: {
-            tabId, windowId,
-            dir: incognito && TMP_FILES_PB || TMP_FILES,
-            host: hostname,
-          },
-        });
+          func = portHostMsg({
+            [TMP_FILE_DATA_REMOVE]: {
+              tabId, windowId,
+              dir: incognito && TMP_FILES_PB || TMP_FILES,
+              host: hostname,
+            },
+          });
+        }
       }
     }
     return func || null;
