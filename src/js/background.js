@@ -63,9 +63,12 @@
   const SYNC_AUTO = "enableSyncAuto";
   const SYNC_AUTO_URL = "syncAutoUrls";
   const TEXT_SYNC = "syncText";
+  const TMP_FILES = "tmpFiles";
+  const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
   const TMP_FILE_CREATE = "createTmpFile";
   const TMP_FILE_DATA_PORT = "portTmpFileData";
+  const TMP_FILE_DATA_REMOVE = "removeTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
   const TMP_FILE_RES = "resTmpFile";
   const WARN_COLOR = "#C13832";
@@ -260,22 +263,33 @@
   /**
    * remove port from ports collection
    * @param {!Object} port - removed port
-   * @returns {void}
+   * @returns {?AsyncFunction} - portHostMsg
    */
   const removePort = async (port = {}) => {
     const {sender} = port;
+    let func;
     if (sender) {
       const {tab, url} = sender;
       if (tab) {
         const portUrl = removeQueryFromURI(url);
+        const {hostname} = new URL(portUrl);
+        const {incognito} = tab;
         let {windowId, id: tabId} = tab;
         tabId = stringifyPositiveInt(tabId, true);
         windowId = stringifyPositiveInt(windowId, true);
         tabId && windowId && portUrl && ports[windowId] &&
         ports[windowId][tabId] &&
           delete ports[windowId][tabId][portUrl];
+        func = portHostMsg({
+          [TMP_FILE_DATA_REMOVE]: {
+            tabId, windowId,
+            dir: incognito && TMP_FILES_PB || TMP_FILES,
+            host: hostname,
+          },
+        });
       }
     }
+    return func || null;
   };
 
   /**
