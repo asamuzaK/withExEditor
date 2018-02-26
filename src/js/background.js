@@ -844,14 +844,26 @@
    * handle tab removed
    * @param {!number} id - tabId
    * @param {!Object} info - removed tab info
-   * @returns {?AsyncFunction} - restore ports
+   * @returns {Promise.<Array>} - results of each handler
    */
   const onTabRemoved = async (id, info) => {
     const tabId = stringifyPositiveInt(id, true);
+    const func = [];
     let {windowId} = info;
+    const {incognito} = await windows.get(windowId);
     windowId = stringifyPositiveInt(windowId, true);
-    return windowId && tabId && ports[windowId] && ports[windowId][tabId] &&
-           restorePorts({windowId, tabId}) || null;
+    if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
+      func.push(
+        restorePorts({windowId, tabId}),
+        portHostMsg({
+          [TMP_FILE_DATA_REMOVE]: {
+            tabId, windowId,
+            dir: incognito && TMP_FILES_PB || TMP_FILES,
+          },
+        }),
+      );
+    }
+    return Promise.all(func);
   };
 
   /**
