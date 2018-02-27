@@ -11,7 +11,7 @@
   const {local: localStorage} = storage;
 
   /* constants */
-  const {WINDOW_ID_CURRENT, WINDOW_ID_NONE} = windows;
+  const {WINDOW_ID_CURRENT} = windows;
   const CONTENT_GET = "getContent";
   const CONTENT_SCRIPT_PATH = "js/content.js";
   const CONTEXT_MENU = "contextMenu";
@@ -276,9 +276,9 @@
         const portUrl = removeQueryFromURI(url);
         const {hostname} = new URL(portUrl);
         const {incognito} = tab;
-        let {windowId, id: tabId} = tab;
-        tabId = stringifyPositiveInt(tabId, true);
-        windowId = stringifyPositiveInt(windowId, true);
+        const {windowId: wId, id: tId} = tab;
+        const tabId = stringifyPositiveInt(tId, true);
+        const windowId = stringifyPositiveInt(wId, true);
         if (tabId && windowId && portUrl && ports[windowId] &&
             ports[windowId][tabId]) {
           delete ports[windowId][tabId][portUrl];
@@ -343,9 +343,9 @@
    */
   const portContextMenuData = async (info, tab) => {
     const {frameUrl, pageUrl} = info;
-    let {windowId, id: tabId} = tab;
-    windowId = stringifyPositiveInt(windowId, true);
-    tabId = stringifyPositiveInt(tabId, true);
+    const {windowId: wId, id: tId} = tab;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(tId, true);
     if (windowId && tabId) {
       const portUrl = removeQueryFromURI(frameUrl || pageUrl);
       const port = ports[windowId] && ports[windowId][tabId] &&
@@ -752,9 +752,9 @@
     let func;
     if (tab) {
       const {active, incognito, status} = tab;
-      let {windowId, id: tabId} = tab;
-      windowId = stringifyPositiveInt(windowId, true);
-      tabId = stringifyPositiveInt(tabId, true);
+      const {windowId: wId, id: tId} = tab;
+      const windowId = stringifyPositiveInt(wId, true);
+      const tabId = stringifyPositiveInt(tId, true);
       if (windowId && tabId && url) {
         const portUrl = removeQueryFromURI(url);
         ports[windowId] = ports[windowId] || {};
@@ -792,9 +792,10 @@
    */
   const onTabActivated = async info => {
     const func = [];
-    let {tabId, windowId} = info, bool;
-    windowId = stringifyPositiveInt(windowId, true);
-    tabId = stringifyPositiveInt(tabId, true);
+    const {tabId: tId, windowId: wId} = info;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(tId, true);
+    let bool;
     if (windowId && tabId) {
       const items = ports[windowId] && ports[windowId][tabId] &&
                       Object.keys(ports[windowId][tabId]);
@@ -858,9 +859,9 @@
   const onTabRemoved = async (id, info) => {
     const tabId = stringifyPositiveInt(id, true);
     const func = [];
-    let {windowId} = info;
-    const {incognito} = await windows.get(windowId);
-    windowId = stringifyPositiveInt(windowId, true);
+    const {windowId: wId} = info;
+    const {incognito} = await windows.get(wId);
+    const windowId = stringifyPositiveInt(wId, true);
     if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
       func.push(
         restorePorts({windowId, tabId}),
@@ -891,8 +892,8 @@
     win.length && func.push(syncUI());
     if (tab) {
       const windowId = stringifyPositiveInt(id, true);
-      let {id: tabId} = tab;
-      tabId = stringifyPositiveInt(tabId, true);
+      const {id: tId} = tab;
+      const tabId = stringifyPositiveInt(tId, true);
       if (windowId && tabId) {
         func.push(portMsg({
           [TMP_FILE_REQ]: true,
