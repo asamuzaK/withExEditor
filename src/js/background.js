@@ -11,6 +11,7 @@
   const {local: localStorage} = storage;
 
   /* constants */
+  const {WINDOW_ID_CURRENT, WINDOW_ID_NONE} = windows;
   const CONTENT_GET = "getContent";
   const CONTENT_SCRIPT_PATH = "js/content.js";
   const CONTEXT_MENU = "contextMenu";
@@ -391,7 +392,7 @@
   const portGetContentMsg = async () => {
     const [tab] = await tabs.query({
       active: true,
-      windowId: windows.WINDOW_ID_CURRENT,
+      windowId: WINDOW_ID_CURRENT,
       windowType: "normal",
     });
     let func;
@@ -811,7 +812,7 @@
         if (bool) {
           func.push(portMsg({
             [TMP_FILE_REQ]: bool,
-          }));
+          }, windowId, tabId));
         }
       }
     }
@@ -876,11 +877,29 @@
 
   /**
    * handle window focus changed
-   * @returns {?AsyncFunction} - sync UI
+   * @param {number} id - window ID
+   * @returns {Promise.<Array>} - results of each handler
    */
-  const onWindowFocusChanged = async () => {
+  const onWindowFocusChanged = async id => {
+    const func = [];
+    const [tab] = await tabs.query({
+      active: true,
+      windowId: id,
+      windowType: "normal",
+    });
     const win = await windows.getAll({windowTypes: ["normal"]});
-    return win.length && syncUI() || null;
+    win.length && func.push(syncUI());
+    if (tab) {
+      const windowId = stringifyPositiveInt(id, true);
+      let {id: tabId} = tab;
+      tabId = stringifyPositiveInt(tabId, true);
+      if (windowId && tabId) {
+        func.push(portMsg({
+          [TMP_FILE_REQ]: true,
+        }, windowId, tabId));
+      }
+    }
+    return Promise.all(func);
   };
 
   /**
@@ -1032,8 +1051,8 @@
   tabs.onRemoved.addListener((id, info) =>
     onTabRemoved(id, info).catch(logError)
   );
-  windows.onFocusChanged.addListener(() =>
-    onWindowFocusChanged().catch(logError)
+  windows.onFocusChanged.addListener(windowId =>
+    onWindowFocusChanged(windowId).catch(logError)
   );
   windows.onRemoved.addListener(windowId =>
     onWindowRemoved(windowId).catch(logError)
