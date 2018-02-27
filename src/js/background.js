@@ -397,13 +397,13 @@
     });
     let func;
     if (tab) {
-      const {id: tabId, windowId} = tab;
-      const tId = stringifyPositiveInt(tabId, true);
-      const wId = stringifyPositiveInt(windowId, true);
+      const {id: tId, windowId: wId} = tab;
+      const tabId = stringifyPositiveInt(tId, true);
+      const windowId = stringifyPositiveInt(wId, true);
       const msg = {
         [CONTENT_GET]: {tab},
       };
-      func = portMsg(msg, wId, tId);
+      func = portMsg(msg, windowId, tabId);
     }
     return func || null;
   };
@@ -833,18 +833,18 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabUpdated = async (id, info, tab) => {
-    const {active, url, windowId} = tab;
+    const {active, url, windowId: wId} = tab;
     const func = [];
     if (active) {
       const {status} = info;
-      const pUrl = removeQueryFromURI(url);
-      const tId = stringifyPositiveInt(id, true);
-      const wId = stringifyPositiveInt(windowId, true);
-      varsLocal[MENU_ENABLED] = wId && tId && pUrl &&
-                                ports[wId] && ports[wId][tId] &&
-                                ports[wId][tId][pUrl] &&
-                                ports[wId][tId][pUrl].name === PORT_CONTENT ||
-                                false;
+      const portUrl = removeQueryFromURI(url);
+      const tabId = stringifyPositiveInt(id, true);
+      const windowId = stringifyPositiveInt(wId, true);
+      varsLocal[MENU_ENABLED] =
+        windowId && tabId && portUrl &&
+        ports[windowId] && ports[windowId][tabId] &&
+        ports[windowId][tabId][portUrl] &&
+        ports[windowId][tabId][portUrl].name === PORT_CONTENT || false;
       status === "complete" && func.push(restoreContextMenu(), syncUI());
     }
     return Promise.all(func);
