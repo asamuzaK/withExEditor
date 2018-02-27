@@ -70,6 +70,7 @@
   const TMP_FILE_DATA_PORT = "portTmpFileData";
   const TMP_FILE_DATA_REMOVE = "removeTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
+  const TMP_FILE_REQ = "requestTmpFile";
   const TMP_FILE_RES = "resTmpFile";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
@@ -789,6 +790,7 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabActivated = async info => {
+    const func = [];
     let {tabId, windowId} = info, bool;
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
@@ -806,13 +808,19 @@
             }
           }
         }
+        if (bool) {
+          func.push(portMsg({
+            [TMP_FILE_REQ]: bool,
+          }));
+        }
       }
     }
     varsLocal[MENU_ENABLED] = bool || false;
-    return Promise.all([
+    func.push(
       restoreContextMenu(),
       syncUI(),
-    ]);
+    );
+    return Promise.all(func);
   };
 
   /**

@@ -47,6 +47,7 @@
   const TMP_FILE_CREATE = "createTmpFile";
   const TMP_FILE_DATA_PORT = "portTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
+  const TMP_FILE_REQ = "requestTmpFile";
   const TYPE_FROM = 8;
   const TYPE_TO = -1;
   const VARS_SET = "setVars";
@@ -816,6 +817,24 @@
     return elm || null;
   };
 
+  /**
+   * port each data ID
+   * @param {boolean} bool - port data ID
+   * @returns {Promise.<Array>} - results of each handler
+   */
+  const portEachDataId = async (bool = false) => {
+    const func = [];
+    if (bool) {
+      dataIds.forEach(async (value, key) => {
+        const elm = await getTargetElementFromDataId(key);
+        if (elm) {
+          func.push(portMsg({[TMP_FILE_GET]: value}));
+        }
+      });
+    }
+    return Promise.all(func);
+  };
+
   /* port */
   const port = runtime.connect({name: PORT_NAME});
 
@@ -1553,6 +1572,9 @@
             break;
           case TMP_FILE_DATA_PORT:
             func.push(updateTmpFileData(value));
+            break;
+          case TMP_FILE_REQ:
+            func.push(portEachDataId(value));
             break;
           case VARS_SET:
             func.push(handleMsg(value));
