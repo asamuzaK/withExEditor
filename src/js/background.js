@@ -11,6 +11,7 @@
   const {local: localStorage} = storage;
 
   /* constants */
+  const {WINDOW_ID_CURRENT, WINDOW_ID_NONE} = windows;
   const CONTENT_GET = "getContent";
   const CONTENT_SCRIPT_PATH = "js/content.js";
   const CONTEXT_MENU = "contextMenu";
@@ -63,10 +64,14 @@
   const SYNC_AUTO = "enableSyncAuto";
   const SYNC_AUTO_URL = "syncAutoUrls";
   const TEXT_SYNC = "syncText";
+  const TMP_FILES = "tmpFiles";
+  const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
   const TMP_FILE_CREATE = "createTmpFile";
   const TMP_FILE_DATA_PORT = "portTmpFileData";
+  const TMP_FILE_DATA_REMOVE = "removeTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
+  const TMP_FILE_REQ = "requestTmpFile";
   const TMP_FILE_RES = "resTmpFile";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
@@ -260,22 +265,34 @@
   /**
    * remove port from ports collection
    * @param {!Object} port - removed port
-   * @returns {void}
+   * @returns {?AsyncFunction} - portHostMsg
    */
   const removePort = async (port = {}) => {
     const {sender} = port;
+    let func;
     if (sender) {
       const {tab, url} = sender;
       if (tab) {
         const portUrl = removeQueryFromURI(url);
+        const {hostname} = new URL(portUrl);
+        const {incognito} = tab;
         let {windowId, id: tabId} = tab;
         tabId = stringifyPositiveInt(tabId, true);
         windowId = stringifyPositiveInt(windowId, true);
-        tabId && windowId && portUrl && ports[windowId] &&
-        ports[windowId][tabId] &&
+        if (tabId && windowId && portUrl && ports[windowId] &&
+            ports[windowId][tabId]) {
           delete ports[windowId][tabId][portUrl];
+          func = portHostMsg({
+            [TMP_FILE_DATA_REMOVE]: {
+              tabId, windowId,
+              dir: incognito && TMP_FILES_PB || TMP_FILES,
+              host: hostname,
+            },
+          });
+        }
       }
     }
+    return func || null;
   };
 
   /**
@@ -375,7 +392,7 @@
   const portGetContentMsg = async () => {
     const [tab] = await tabs.query({
       active: true,
-      windowId: windows.WINDOW_ID_CURRENT,
+      windowId: WINDOW_ID_CURRENT,
       windowType: "normal",
     });
     let func;
@@ -774,6 +791,7 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabActivated = async info => {
+    const func = [];
     let {tabId, windowId} = info, bool;
     windowId = stringifyPositiveInt(windowId, true);
     tabId = stringifyPositiveInt(tabId, true);
@@ -791,13 +809,19 @@
             }
           }
         }
+        if (bool) {
+          func.push(portMsg({
+            [TMP_FILE_REQ]: bool,
+          }, windowId, tabId));
+        }
       }
     }
     varsLocal[MENU_ENABLED] = bool || false;
-    return Promise.all([
+    func.push(
       restoreContextMenu(),
       syncUI(),
-    ]);
+    );
+    return Promise.all(func);
   };
 
   /**
@@ -829,23 +853,53 @@
    * handle tab removed
    * @param {!number} id - tabId
    * @param {!Object} info - removed tab info
-   * @returns {?AsyncFunction} - restore ports
+   * @returns {Promise.<Array>} - results of each handler
    */
   const onTabRemoved = async (id, info) => {
     const tabId = stringifyPositiveInt(id, true);
+    const func = [];
     let {windowId} = info;
+    const {incognito} = await windows.get(windowId);
     windowId = stringifyPositiveInt(windowId, true);
-    return windowId && tabId && ports[windowId] && ports[windowId][tabId] &&
-           restorePorts({windowId, tabId}) || null;
+    if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
+      func.push(
+        restorePorts({windowId, tabId}),
+        portHostMsg({
+          [TMP_FILE_DATA_REMOVE]: {
+            tabId, windowId,
+            dir: incognito && TMP_FILES_PB || TMP_FILES,
+          },
+        }),
+      );
+    }
+    return Promise.all(func);
   };
 
   /**
    * handle window focus changed
-   * @returns {?AsyncFunction} - sync UI
+   * @param {number} id - window ID
+   * @returns {Promise.<Array>} - results of each handler
    */
-  const onWindowFocusChanged = async () => {
+  const onWindowFocusChanged = async id => {
+    const func = [];
+    const [tab] = await tabs.query({
+      active: true,
+      windowId: id,
+      windowType: "normal",
+    });
     const win = await windows.getAll({windowTypes: ["normal"]});
-    return win.length && syncUI() || null;
+    win.length && func.push(syncUI());
+    if (tab) {
+      const windowId = stringifyPositiveInt(id, true);
+      let {id: tabId} = tab;
+      tabId = stringifyPositiveInt(tabId, true);
+      if (windowId && tabId) {
+        func.push(portMsg({
+          [TMP_FILE_REQ]: true,
+        }, windowId, tabId));
+      }
+    }
+    return Promise.all(func);
   };
 
   /**
@@ -997,8 +1051,8 @@
   tabs.onRemoved.addListener((id, info) =>
     onTabRemoved(id, info).catch(logError)
   );
-  windows.onFocusChanged.addListener(() =>
-    onWindowFocusChanged().catch(logError)
+  windows.onFocusChanged.addListener(windowId =>
+    onWindowFocusChanged(windowId).catch(logError)
   );
   windows.onRemoved.addListener(windowId =>
     onWindowRemoved(windowId).catch(logError)
