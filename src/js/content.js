@@ -817,24 +817,6 @@
     return elm || null;
   };
 
-  /**
-   * port each data ID
-   * @param {boolean} bool - port data ID
-   * @returns {Promise.<Array>} - results of each handler
-   */
-  const portEachDataId = async (bool = false) => {
-    const func = [];
-    if (bool) {
-      dataIds.forEach(async (value, key) => {
-        const elm = await getTargetElementFromDataId(key);
-        if (elm) {
-          func.push(portMsg({[TMP_FILE_GET]: value}));
-        }
-      });
-    }
-    return Promise.all(func);
-  };
-
   /* port */
   const port = runtime.connect({name: PORT_NAME});
 
@@ -889,6 +871,24 @@
         const {dataId} = await getIdData(currentTarget) || {};
         func.push(portTmpFileData(dataId));
       }
+    }
+    return Promise.all(func);
+  };
+
+  /**
+   * port each data ID
+   * @param {boolean} bool - port data ID
+   * @returns {Promise.<Array>} - results of each handler
+   */
+  const portEachDataId = async (bool = false) => {
+    const func = [];
+    if (bool) {
+      dataIds.forEach(async (value, key) => {
+        const elm = await getTargetElementFromDataId(key);
+        if (elm) {
+          func.push(portMsg({[TMP_FILE_GET]: value}));
+        }
+      });
     }
     return Promise.all(func);
   };
