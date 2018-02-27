@@ -48,7 +48,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 ### Edit Text with *exEditor*
 
 * Enabled on input elements, textarea element and editable elements.
-* Edited contents will be synchronized when you go back to the browser and move focus to the element which you've edited.
+* Edited contents will be synchronized when you go back to the browser.
 
 ***
 
