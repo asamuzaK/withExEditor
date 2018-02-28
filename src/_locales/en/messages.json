@@ -139,6 +139,9 @@
   "optionsEnableSyncAutoDetail": {
     "message": "Enable when you want to automatically synchronize edited content."
   },
+  "optionsEnableSyncAutoDetail1": {
+    "message": "If you want this option to be the default behavior for all sites, enter the keyword \"$all_urls$\" in the text field."
+  },
   "optionsEnableSyncAutoDetail2": {
     "message": "Note that this option will not be enabled when private browsing. Also note that if you leave your browser running for a long time or register many URLs, it may affect the performance of the PC."
   },
