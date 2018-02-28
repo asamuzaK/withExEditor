@@ -460,7 +460,7 @@
     const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                    `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
-    if(isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts)) {
+    if (isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts)) {
       menus[id] = await contextMenus.create({
         id, contexts, enabled,
         title: i18n.getMessage(id, [label, accKey]),
