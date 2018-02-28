@@ -1105,10 +1105,7 @@
       for (let item of arr) {
         if (isString(item)) {
           item = item.trim();
-          if (item === "$all_urls$") {
-            bool = true;
-            break;
-          } else if (item.length) {
+          if (item.length) {
             try {
               const {
                 protocol: itemProtocol, hostname: itemHost, href: itemHref,
