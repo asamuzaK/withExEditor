@@ -460,12 +460,12 @@
     const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                    `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
-    isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
-      menus[id] = contextMenus.create({
+    if(isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts)) {
+      menus[id] = await contextMenus.create({
         id, contexts, enabled,
         title: i18n.getMessage(id, [label, accKey]),
-      })
-    );
+      });
+    }
   };
 
   /**
@@ -506,9 +506,10 @@
   /**
    * update context menu
    * @param {Object} type - context type data
-   * @returns {void}
+   * @returns {Promise.<Array>} - results of each handler
    */
   const updateContextMenu = async type => {
+    const func = [];
     if (type) {
       const items = Object.entries(type);
       if (items.length) {
@@ -518,9 +519,9 @@
           if (menus[menuItemId]) {
             if (key === MODE_SOURCE) {
               const title = varsLocal[mode] || varsLocal[menuItemId];
-              title && contextMenus.update(menuItemId, {title});
+              title && func.push(contextMenus.update(menuItemId, {title}));
             } else if (key === MODE_EDIT) {
-              contextMenus.update(menuItemId, {enabled});
+              func.push(contextMenus.update(menuItemId, {enabled}));
             }
           }
         }
@@ -530,14 +531,32 @@
       const label = varsLocal[EDITOR_LABEL] || LABEL;
       const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                      `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
+      const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
       if (items.length) {
         for (const item of items) {
-          menus[item] && contextMenus.update(item, {
-            title: i18n.getMessage(item, [label, accKey]),
-          });
+          if (menus[item]) {
+            func.push(contextMenus.update(item, {
+              enabled,
+              title: i18n.getMessage(item, [label, accKey]),
+            }));
+          } else {
+            switch (item) {
+              case MODE_EDIT:
+                func.push(createMenuItem(item, ["editable"]));
+                break;
+              case MODE_SELECTION:
+                func.push(createMenuItem(item, ["selection"]));
+                break;
+              case MODE_SOURCE:
+                func.push(createMenuItem(item, ["frame", "page"]));
+                break;
+              default:
+            }
+          }
         }
       }
     }
+    return Promise.all(func);
   };
 
   /**
@@ -770,7 +789,7 @@
       if (portName === PORT_CONTENT && frameId === 0 && active &&
           status === "complete") {
         varsLocal[MENU_ENABLED] = true;
-        func = restoreContextMenu();
+        func = updateContextMenu();
       }
     }
     return func || null;
@@ -819,7 +838,7 @@
     }
     varsLocal[MENU_ENABLED] = bool || false;
     func.push(
-      restoreContextMenu(),
+      updateContextMenu(),
       syncUI(),
     );
     return Promise.all(func);
@@ -845,7 +864,7 @@
         ports[windowId] && ports[windowId][tabId] &&
         ports[windowId][tabId][portUrl] &&
         ports[windowId][tabId][portUrl].name === PORT_CONTENT || false;
-      status === "complete" && func.push(restoreContextMenu(), syncUI());
+      status === "complete" && func.push(updateContextMenu(), syncUI());
     }
     return Promise.all(func);
   };
@@ -889,7 +908,10 @@
       windowType: "normal",
     });
     const win = await windows.getAll({windowTypes: ["normal"]});
-    win.length && func.push(syncUI());
+    win.length && func.push(
+      updateContextMenu(),
+      syncUI(),
+    );
     if (tab) {
       const windowId = stringifyPositiveInt(id, true);
       const {id: tId} = tab;
@@ -975,7 +997,7 @@
         case ONLY_EDITABLE:
           vars[item] = !!checked;
           hasPorts && func.push(portVar({[item]: !!checked}));
-          changed && func.push(restoreContextMenu());
+          changed && func.push(updateContextMenu());
           break;
         case ENABLE_PB:
           varsLocal[item] = !!checked;

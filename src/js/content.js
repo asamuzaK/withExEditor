@@ -1601,6 +1601,7 @@
         const {anchorNode, focusNode, isCollapsed} = window.getSelection();
         const mode = namespaceURI === nsURI.math && MODE_MATHML ||
                      namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
+        const isChildNodeText = await isContentTextNode(target);
         const editableElm = await getEditableElm(target);
         const liveEditElm = await getLiveEditElm(target);
         let enabled;
@@ -1611,8 +1612,15 @@
                     anchorNode.parentNode === focusNode.parentNode;
         }
         vars[CONTEXT_MODE] = mode;
-        vars[CONTEXT_NODE] = liveEditElm || editableElm ||
-                             !vars[ONLY_EDITABLE] && target || null;
+        if (liveEditElm) {
+          vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
+                               liveEditElm || isChildNodeText && target || null;
+        } else if (editableElm) {
+          vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
+                               editableElm || isChildNodeText && target || null;
+        } else {
+          vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] && target || null;
+        }
         func = portMsg({
           [CONTEXT_MENU]: {
             [MODE_EDIT]: {
@@ -1642,12 +1650,21 @@
       if (key === "ContextMenu" || shiftKey && key === "F10") {
         func = handleBeforeContextMenu(evt).catch(logError);
       } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
+        const {namespaceURI} = target;
         const mode = await getContextMode(target);
+        const isChildNodeText = await isContentTextNode(target);
         const editableElm = await getEditableElm(target);
         const liveEditElm = await getLiveEditElm(target);
         vars[CONTEXT_MODE] = mode;
-        vars[CONTEXT_NODE] = liveEditElm || editableElm ||
-                             !vars[ONLY_EDITABLE] && target || null;
+        if (liveEditElm) {
+          vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
+                               liveEditElm || isChildNodeText && target || null;
+        } else if (editableElm) {
+          vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
+                               editableElm || isChildNodeText && target || null;
+        } else {
+          vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] && target || null;
+        }
       }
     }
     return func || null;
