@@ -852,19 +852,26 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabUpdated = async (id, info, tab) => {
-    const {active, url, windowId: wId} = tab;
+    const {active, incognito, url, windowId: wId} = tab;
+    const {discarded, status} = info;
+    const tabId = stringifyPositiveInt(id, true);
+    const windowId = stringifyPositiveInt(wId, true);
     const func = [];
     if (active) {
-      const {status} = info;
       const portUrl = removeQueryFromURI(url);
-      const tabId = stringifyPositiveInt(id, true);
-      const windowId = stringifyPositiveInt(wId, true);
       varsLocal[MENU_ENABLED] =
         windowId && tabId && portUrl &&
         ports[windowId] && ports[windowId][tabId] &&
         ports[windowId][tabId][portUrl] &&
         ports[windowId][tabId][portUrl].name === PORT_CONTENT || false;
       status === "complete" && func.push(updateContextMenu(), syncUI());
+    } else if (discarded) {
+      func.push(portHostMsg({
+        [TMP_FILE_DATA_REMOVE]: {
+          tabId, windowId,
+          dir: incognito && TMP_FILES_PB || TMP_FILES,
+        },
+      }));
     }
     return Promise.all(func);
   };
