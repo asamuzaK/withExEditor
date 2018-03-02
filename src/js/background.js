@@ -902,26 +902,34 @@
    */
   const onWindowFocusChanged = async id => {
     const func = [];
-    const [tab] = await tabs.query({
-      active: true,
+    const win = await windows.getAll({windowTypes: ["normal"]});
+    const tabList = await tabs.query({
       windowId: id,
       windowType: "normal",
     });
-    const win = await windows.getAll({windowTypes: ["normal"]});
+    for (const tab of tabList) {
+      const {active, discarded, id: tId, incognito} = tab;
+      const tabId = stringifyPositiveInt(tId, true);
+      const windowId = stringifyPositiveInt(id, true);
+      if (windowId && tabId) {
+        if (active) {
+          func.push(portMsg({
+            [TMP_FILE_REQ]: true,
+          }, windowId, tabId));
+        } else if (discarded) {
+          func.push(portHostMsg({
+            [TMP_FILE_DATA_REMOVE]: {
+              tabId, windowId,
+              dir: incognito && TMP_FILES_PB || TMP_FILES,
+            },
+          }));
+        }
+      }
+    }
     win.length && func.push(
       updateContextMenu(),
       syncUI(),
     );
-    if (tab) {
-      const windowId = stringifyPositiveInt(id, true);
-      const {id: tId} = tab;
-      const tabId = stringifyPositiveInt(tId, true);
-      if (windowId && tabId) {
-        func.push(portMsg({
-          [TMP_FILE_REQ]: true,
-        }, windowId, tabId));
-      }
-    }
     return Promise.all(func);
   };
 
