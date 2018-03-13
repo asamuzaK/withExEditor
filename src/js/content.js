@@ -126,10 +126,12 @@
   const getFileNameFromURI = async (uri, subst = LABEL) => {
     let name;
     if (isString(uri)) {
+      const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/;
       const {pathname, protocol} = new URL(uri);
-      if (pathname && protocol && !/^(?:blob|data):/.test(protocol)) {
-        name = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/.exec(pathname);
-        Array.isArray(name) && (name = decodeURIComponent(name[1]));
+      if (pathname && reg.test(pathname) &&
+          protocol && !/^(?:blob|data):/.test(protocol)) {
+        const [, pName] = reg.exec(pathname);
+        name = decodeURIComponent(pName);
       }
     }
     return name && name.length < FILE_LEN && name || subst;
@@ -283,6 +285,26 @@
   };
 
   /**
+   * get xmlns prefixed namespace
+   * @param {Object} elm - element
+   * @param {string} attr - attribute
+   * @returns {string} - namespace
+   */
+  const getXmlnsPrefixedNamespace = (elm, attr) => {
+    let ns;
+    if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+      let node = elm;
+      while (node && node.parentNode && !ns) {
+        if (node.hasAttributeNS("", `xmlns:${attr}`)) {
+          ns = node.getAttributeNS("", `xmlns:${attr}`);
+        }
+        node = node.parentNode;
+      }
+    }
+    return ns || null;
+  };
+
+  /**
    * set namespaced attribute
    * @param {Object} elm - element to append attributes
    * @param {Object} node - element node to get attributes from
@@ -301,12 +323,7 @@
             if (p === XMLNS) {
               func.push(elm.setAttributeNS(nsURI.xmlns, localName, value));
             } else {
-              let n = node;
-              while (n && n.parentNode && !ns) {
-                n.hasAttributeNS("", `xmlns:${p}`) &&
-                  (ns = n.getAttributeNS("", `xmlns:${p}`));
-                n = n.parentNode;
-              }
+              ns = getXmlnsPrefixedNamespace(node);
               ns && func.push(elm.setAttributeNS(ns, localName, value));
             }
           } else {
@@ -400,7 +417,9 @@
     if (node) {
       const root = document.documentElement;
       while (node && node !== root && !elm) {
-        /^(?:math|svg)$/.test(node.localName) && (elm = node);
+        if (/^(?:math|svg)$/.test(node.localName)) {
+          elm = node;
+        }
         node = node.parentNode;
       }
       if (elm) {
@@ -451,29 +470,31 @@
     const arr = [];
     if (range) {
       const ancestor = range.commonAncestorContainer;
-      let obj;
       count > 1 && arr.push(document.createTextNode("\n"));
       switch (ancestor.nodeType) {
-        case Node.ELEMENT_NODE:
-          obj = await getNodeNS(ancestor);
+        case Node.ELEMENT_NODE: {
+          const obj = await getNodeNS(ancestor);
           if (/^(?:svg|math)$/.test(obj.localName)) {
             if (obj.node === document.documentElement) {
               return null;
             }
-            if (obj.node.parentNode && (obj = obj.node.parentNode)) {
-              range.setStart(obj, 0);
-              range.setEnd(obj, obj.childNodes.length);
+            if (obj.node.parentNode) {
+              const parent = obj.node.parentNode;
+              range.setStart(parent, 0);
+              range.setEnd(parent, parent.childNodes.length);
             }
           }
           arr.push(appendChild(ancestor, range.cloneContents()));
           break;
-        case Node.TEXT_NODE:
-          obj = await createElm(ancestor.parentNode);
+        }
+        case Node.TEXT_NODE: {
+          const obj = await createElm(ancestor.parentNode);
           if (obj.nodeType === Node.ELEMENT_NODE) {
             obj.append(range.cloneContents());
             arr.push(obj);
           }
           break;
+        }
         default:
       }
       arr.push(document.createTextNode("\n"));
@@ -493,14 +514,14 @@
     if (sel && sel.rangeCount) {
       const arr = [];
       const l = sel.rangeCount;
-      let i = 0, obj;
+      let i = 0;
       while (i < l) {
         arr.push(createRangeArr(sel.getRangeAt(i), i, l));
         i++;
       }
       frag = await Promise.all(arr).then(createSelFrag);
-      if (l > 1 && frag && frag.hasChildNodes() &&
-          (obj = await createElm(document.documentElement))) {
+      if (l > 1 && frag && frag.hasChildNodes()) {
+        const obj = await createElm(document.documentElement);
         obj.append(frag);
         frag = document.createDocumentFragment();
         frag.append(obj, document.createTextNode("\n"));
@@ -838,7 +859,9 @@
     let func;
     if (dataId) {
       const data = dataIds.get(dataId);
-      data && (func = portMsg({[TMP_FILE_GET]: data}));
+      if (data) {
+        func = portMsg({[TMP_FILE_GET]: data});
+      }
     }
     return func || null;
   };
@@ -907,9 +930,12 @@
    */
   const storeTmpFileData = async (data = {}) => {
     let func;
-    if (data[TMP_FILE_CREATE] && (data = data[TMP_FILE_CREATE])) {
-      const {dataId, mode} = data;
-      mode === MODE_EDIT && dataId && (func = setDataId(dataId, data));
+    const tmpFileData = data[TMP_FILE_CREATE] && data[TMP_FILE_CREATE];
+    if (tmpFileData) {
+      const {dataId, mode} = tmpFileData;
+      if (mode === MODE_EDIT && dataId) {
+        func = setDataId(dataId, tmpFileData);
+      }
     }
     return func || null;
   };
@@ -924,7 +950,9 @@
     const {data} = obj;
     if (data) {
       const {dataId, mode} = data;
-      mode === MODE_EDIT && dataId && (func = setDataId(dataId, data));
+      if (mode === MODE_EDIT && dataId) {
+        func = setDataId(dataId, data);
+      }
     }
     return func || null;
   };
@@ -945,9 +973,11 @@
             value: data.value,
           },
         };
-      } else {
-        data[LOCAL_FILE_VIEW] &&
-          (msg = {[LOCAL_FILE_VIEW]: data[LOCAL_FILE_VIEW].uri});
+      } else if (data[LOCAL_FILE_VIEW]) {
+        const {uri} = data[LOCAL_FILE_VIEW];
+        msg = {
+          [LOCAL_FILE_VIEW]: uri,
+        };
       }
     }
     return msg || null;
@@ -1051,7 +1081,9 @@
         break;
       default:
     }
-    !tmpFileData && (tmpFileData = await fetchSource(data));
+    if (!tmpFileData) {
+      tmpFileData = await fetchSource(data);
+    }
     return tmpFileData || null;
   };
 
@@ -1147,10 +1179,9 @@
     const sel = window.getSelection();
     const {anchorNode, isCollapsed} = sel;
     if (elm && mode) {
-      let obj;
       switch (mode) {
         case MODE_EDIT: {
-          obj = await getIdData(elm);
+          const obj = await getIdData(elm);
           if (obj) {
             const {
               childNodes, classList, isContentEditable, namespaceURI, value,
@@ -1174,8 +1205,9 @@
               data.dataId = dataId;
               data.value = value || "";
             } else {
-              !isContentEditable && !isCollapsed && anchorNode &&
-                (elm = anchorNode.parentNode);
+              if (!isContentEditable && !isCollapsed && anchorNode) {
+                elm = anchorNode.parentNode;
+              }
               data.mode = mode;
               data.dataId = dataId;
               data.value = elm.hasChildNodes() &&
@@ -1191,20 +1223,22 @@
           break;
         }
         case MODE_MATHML:
-        case MODE_SVG:
-          obj = await createDomXmlBased(elm);
+        case MODE_SVG: {
+          const obj = await createDomXmlBased(elm);
           if (obj) {
             data.mode = mode;
             data.value = obj;
           }
           break;
-        case MODE_SELECTION:
-          obj = await createDomFromSelRange(sel);
+        }
+        case MODE_SELECTION: {
+          const obj = await createDomFromSelRange(sel);
           if (obj) {
             data.mode = mode;
             data.value = obj;
           }
           break;
+        }
         default:
       }
     }
@@ -1432,8 +1466,8 @@
           value = value.replace(/[\f\n\t\r\v]$/, "");
         }
         changed = elm.value !== value;
-      } else {
-        /^textarea$/.test(elm.localName) && (changed = elm.value !== value);
+      } else if (/^textarea$/.test(elm.localName)) {
+        changed = elm.value !== value;
       }
       if (changed) {
         elm.value = value;
@@ -1527,8 +1561,9 @@
    */
   const extendObjItems = async (obj, key) => {
     if (obj && key) {
-      let ext = await localStorage.get(key);
-      if (ext && Object.keys(ext).length && (ext = ext[key])) {
+      const value = await localStorage.get(key);
+      const ext = value && Object.keys(value).length && value[key];
+      if (ext) {
         const items = Object.keys(ext);
         if (items && items.length) {
           for (const item of items) {

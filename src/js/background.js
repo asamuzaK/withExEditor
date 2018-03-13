@@ -151,7 +151,9 @@
    */
   const removeQueryFromURI = uri => {
     const query = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
-    isString(uri) && (uri = uri.replace(query, ""));
+    if (isString(uri)) {
+      uri = uri.replace(query, "");
+    }
     return uri;
   };
 
@@ -254,8 +256,9 @@
     let func;
     if (windowId && tabId && ports[windowId]) {
       delete ports[windowId][tabId];
-      Object.keys(ports[windowId]).length === 0 &&
-        (func = restorePorts({windowId}));
+      if (Object.keys(ports[windowId]).length === 0) {
+        func = restorePorts({windowId});
+      }
     } else {
       windowId && delete ports[windowId];
     }
