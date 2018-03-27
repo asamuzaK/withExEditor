@@ -241,6 +241,12 @@
   "optionsLang": {
     "message": "ja"
   },
+  "optionsNotifyHostError": {
+    "message": "ホストのエラーを通知"
+  },
+  "optionsNotifyHostErrorDetail": {
+    "message": "ホストでエラーが起きたときに通知します。"
+  },
   "optionsOpenOptionsPageDetail": {
     "message": "設定ページを開くショートカットキーを設定します。入力欄で「Alt+Shift+U」などのキーの組み合わせで押下してください。"
   },
