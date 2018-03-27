@@ -5,7 +5,7 @@
 {
   /* api */
   const {
-    i18n, runtime,
+    i18n, permissions, runtime,
     storage: {
       local: localStorage,
     },
@@ -18,6 +18,7 @@
   const EDITOR_LABEL = "editorLabel";
   const EXT_RELOAD = "reloadExtension";
   const HOST_CONNECTION = "hostConnection";
+  const HOST_ERR_NOTIFY = "notifyHostError";
   const HOST_STATUS = "hostStatus";
   const HOST_STATUS_GET = "getHostStatus";
   const HOST_VERSION = "hostVersion";
@@ -152,7 +153,7 @@
    */
   const portPref = async evt => {
     const {target} = evt;
-    const {id, name, type, value} = target;
+    const {checked, id, name, type, value} = target;
     const func = [];
     if (type === "radio") {
       const nodes = document.querySelectorAll(`[name=${name}]`);
@@ -163,6 +164,18 @@
       }
     } else {
       switch (id) {
+        case HOST_ERR_NOTIFY:
+          if (checked) {
+            target.checked = await permissions.request({
+              permissions: ["notifications"],
+            });
+          } else {
+            await permissions.remove({
+              permissions: ["notifications"],
+            });
+          }
+          func.push(createPref(target).then(portMsg));
+          break;
         case KEY_ACCESS:
           (value === "" || /^[a-z]$/i.test(value)) &&
             func.push(createPref(target).then(portMsg));

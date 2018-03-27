@@ -5,8 +5,8 @@
 {
   /* api */
   const {
-    browserAction, commands, contextMenus, i18n, runtime, storage, tabs,
-    windows,
+    browserAction, commands, contextMenus, i18n, notifications, runtime,
+    storage, tabs, windows,
   } = browser;
   const {local: localStorage} = storage;
 
@@ -28,6 +28,7 @@
   const FILE_EXT_PATH = "data/fileExt.json";
   const HOST = "withexeditorhost";
   const HOST_CONNECTION = "hostConnection";
+  const HOST_ERR_NOTIFY = "notifyHostError";
   const HOST_STATUS = "hostStatus";
   const HOST_STATUS_GET = "getHostStatus";
   const HOST_VERSION = "hostVersion";
@@ -670,6 +671,37 @@
     vars[IS_ENABLED] && runtime.openOptionsPage() || null;
 
   /**
+   * handle notifications onclosed
+   * @param {string} id - notification ID
+   * @returns {?AsyncFunction} - notifications.clear()
+   */
+  const handleNotifyOnClosed = id => {
+    let func;
+    if (isString(id)) {
+      func = notifications.clear(id).catch(logError);
+    }
+    return func || null;
+  };
+
+  /**
+   * create notification
+   * @param {string} id - notification ID
+   * @param {Object} opt - options
+   * @returns {void}
+   */
+  const createNotification = async (id, opt) => {
+    let func;
+    if (isString(id) && notifications) {
+      if (notifications.onClosed &&
+          !notifications.onClosed.hasListener(handleNotifyOnClosed)) {
+        notifications.onClosed.addListener(handleNotifyOnClosed);
+      }
+      func = notifications.create(id, opt);
+    }
+    return func || null;
+  };
+
+  /**
    * handle host message
    * @param {Object} msg - message
    * @returns {Promise.<Array>} - result of each handler
@@ -677,11 +709,18 @@
   const handleHostMsg = async msg => {
     const {message, status} = msg;
     const log = message && `${HOST}: ${message}`;
+    const iconUrl = await runtime.getURL(ICON);
+    const notifyMsg = {
+      iconUrl, message,
+      title: `${HOST}: ${status}`,
+      type: "basic",
+    };
     const func = [];
     switch (status) {
       case `${PROCESS_CHILD}_stderr`:
       case "error":
         log && func.push(logError(log));
+        notifications && func.push(createNotification(status, notifyMsg));
         break;
       case "ready":
         hostStatus[HOST_CONNECTION] = true;
@@ -694,6 +733,7 @@
         break;
       case "warn":
         log && func.push(logWarn(log));
+        notifications && func.push(createNotification(status, notifyMsg));
         break;
       default:
         log && func.push(logMsg(log));
@@ -1012,14 +1052,15 @@
           func.push(cacheMenuItemTitle());
           changed && func.push(updateContextMenu());
           break;
-        case ONLY_EDITABLE:
-          vars[item] = !!checked;
-          hasPorts && func.push(portVar({[item]: !!checked}));
-          changed && func.push(updateContextMenu());
-          break;
         case ENABLE_PB:
           varsLocal[item] = !!checked;
           changed && func.push(syncUI());
+          break;
+        case HOST_ERR_NOTIFY:
+          if (checked && notifications && notifications.onClosed &&
+              !notifications.onClosed.hasListener(handleNotifyOnClosed)) {
+            notifications.onClosed.addListener(handleNotifyOnClosed);
+          }
           break;
         case ICON_AUTO:
         case ICON_BLACK:
@@ -1037,6 +1078,11 @@
             updateContextMenu(),
             cacheMenuItemTitle(),
           );
+          break;
+        case ONLY_EDITABLE:
+          vars[item] = !!checked;
+          hasPorts && func.push(portVar({[item]: !!checked}));
+          changed && func.push(updateContextMenu());
           break;
         case SYNC_AUTO:
           vars[item] = !!checked;

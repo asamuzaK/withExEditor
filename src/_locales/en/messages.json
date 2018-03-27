@@ -241,6 +241,12 @@
   "optionsLang": {
     "message": "en"
   },
+  "optionsNotifyHostError": {
+    "message": "Notify Host Error"
+  },
+  "optionsNotifyHostErrorDetail": {
+    "message": "Notify when an error occurs on the host."
+  },
   "optionsOpenOptionsPageDetail": {
     "message": "Keyboard shortcut to open the options page. In the input field, press the combination of keys such as 'Alt+Shift+U'."
   },
