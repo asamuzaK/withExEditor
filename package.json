@@ -1,0 +1,24 @@
+{
+  "name": "withexeditor",
+  "description": "View Source, View Selection, and Edit Text with the external editor.",
+  "author": "asamuzaK",
+  "homepage": "https://github.com/asamuzaK/withExEditor",
+  "bugs": {
+    "url": "https://github.com/asamuzaK/withExEditor/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asamuzaK/withExEditor.git"
+  },
+  "license": "MPL-2.0",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1"
+  },
+  "version": "4.2.6"
+}

@@ -1,5 +1,8 @@
 [EN](./README.md) | JA
 
+[![Build Status](https://travis-ci.org/asamuzaK/withExEditor.svg?branch=master)](https://travis-ci.org/asamuzaK/withExEditor)
+[![devDependency Status](https://david-dm.org/asamuzaK/withExEditor/dev-status.svg)](https://david-dm.org/asamuzaK/withExEditor?type=dev)
+
 # withExEditor
 
 GeckoベースのブラウザとBlinkベースのブラウザ用の拡張機能。
