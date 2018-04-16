@@ -68,13 +68,12 @@
   };
 
   /**
-   * log error
+   * throw error
    * @param {!Object} e - Error
-   * @returns {boolean} - false
+   * @throws
    */
-  const logError = e => {
-    console.error(e);
-    return false;
+  const throwErr = e => {
+    throw e;
   };
 
   /**
@@ -921,7 +920,7 @@
    * @param {!Object} evt - event
    * @returns {AsyncFunction} - request tmp file
    */
-  const handleFocusEvt = evt => requestTmpFile(evt).catch(logError);
+  const handleFocusEvt = evt => requestTmpFile(evt).catch(throwErr);
 
   /**
    * store temporary file data
@@ -1683,7 +1682,7 @@
     if (vars[IS_ENABLED]) {
       const {key, shiftKey, target} = evt;
       if (key === "ContextMenu" || shiftKey && key === "F10") {
-        func = handleBeforeContextMenu(evt).catch(logError);
+        func = handleBeforeContextMenu(evt).catch(throwErr);
       } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
         const {namespaceURI} = target;
         const mode = await getContextMode(target);
@@ -1706,13 +1705,13 @@
   };
 
   /* listeners */
-  port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
   window.addEventListener("mousedown",
-                          evt => handleBeforeContextMenu(evt).catch(logError),
+                          evt => handleBeforeContextMenu(evt).catch(throwErr),
                           true);
   window.addEventListener("keydown",
-                          evt => handleKeyDown(evt).catch(logError),
+                          evt => handleKeyDown(evt).catch(throwErr),
                           true);
 
   /* startup */
@@ -1720,5 +1719,5 @@
     extendObjItems(fileExt, FILE_EXT),
     extendObjItems(nsURI, NS_URI),
     extendObjItems(liveEdit, LIVE_EDIT),
-  ]).catch(logError);
+  ]).catch(throwErr);
 }
