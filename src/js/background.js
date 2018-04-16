@@ -100,6 +100,15 @@
   };
 
   /**
+   * throw error
+   * @param {!Object} e - Error
+   * @throws
+   */
+  const throwErr = e => {
+    throw e;
+  };
+
+  /**
    * log error
    * @param {!Object} e - Error
    * @returns {boolean} - false
@@ -245,7 +254,24 @@
   };
 
   /* content ports collection */
-  const ports = {};
+  const ports = new Map();
+
+  /**
+   * create ports map
+   * @param {string} windowId - window ID
+   * @param {string} tabId - tabId
+   * @returns {Object} - Map
+   */
+  const createPortsMap = (windowId, tabId) => {
+    if (!ports.has(windowId)) {
+      ports.set(windowId, new Map());
+    }
+    const portsWin = ports.get(windowId);
+    if (!portsWin.has(tabId)) {
+      portsWin.set(tabId, new Map());
+    }
+    return portsWin.get(tabId);
+  };
 
   /**
    * restore ports collection
@@ -255,13 +281,14 @@
   const restorePorts = async (data = {}) => {
     const {tabId, windowId} = data;
     let func;
-    if (windowId && tabId && ports[windowId]) {
-      delete ports[windowId][tabId];
-      if (Object.keys(ports[windowId]).length === 0) {
+    if (windowId && tabId && ports.has(windowId)) {
+      const portsWin = ports.get(windowId);
+      portsWin.delete(tabId);
+      if (portsWin.size === 0) {
         func = restorePorts({windowId});
       }
     } else {
-      windowId && delete ports[windowId];
+      windowId && ports.delete(windowId);
     }
     return func || null;
   };
@@ -281,18 +308,21 @@
         const {hostname} = new URL(portUrl);
         const {incognito} = tab;
         const {windowId: wId, id: tId} = tab;
-        const tabId = stringifyPositiveInt(tId, true);
         const windowId = stringifyPositiveInt(wId, true);
-        if (tabId && windowId && portUrl && ports[windowId] &&
-            ports[windowId][tabId]) {
-          delete ports[windowId][tabId][portUrl];
-          func = portHostMsg({
-            [TMP_FILE_DATA_REMOVE]: {
-              tabId, windowId,
-              dir: incognito && TMP_FILES_PB || TMP_FILES,
-              host: hostname,
-            },
-          });
+        const tabId = stringifyPositiveInt(tId, true);
+        if (tabId && windowId && portUrl && ports.has(windowId)) {
+          const portsWin = ports.get(windowId);
+          if (portsWin.has(tabId)) {
+            const portsTab = portsWin.get(tabId);
+            portsTab.delete(portUrl);
+            func = portHostMsg({
+              [TMP_FILE_DATA_REMOVE]: {
+                tabId, windowId,
+                dir: incognito && TMP_FILES_PB || TMP_FILES,
+                host: hostname,
+              },
+            });
+          }
         }
       }
     }
@@ -308,30 +338,29 @@
    */
   const portMsg = async (msg, windowId, tabId) => {
     if (msg) {
-      if (windowId && tabId) {
-        const portUrls = ports[windowId] && ports[windowId][tabId] &&
-                           Object.keys(ports[windowId][tabId]);
-        if (portUrls && portUrls.length) {
-          for (const portUrl of portUrls) {
-            const port = ports[windowId][tabId][portUrl];
-            try {
-              port && port.postMessage(msg);
-            } catch (e) {
-              delete ports[windowId][tabId][portUrl];
-            }
+      const portsWin = ports.get(windowId);
+      const portsTab = portsWin && portsWin.get(tabId);
+      if (portsTab) {
+        const portUrls = portsTab && portsTab.entries();
+        for (const portUrl of portUrls) {
+          const [key, port] = portUrl;
+          try {
+            port && port.postMessage(msg);
+          } catch (e) {
+            portsTab.delete(key);
           }
         }
-      } else if (windowId) {
-        const tabIds = ports[windowId] && Object.keys(ports[windowId]);
-        if (tabIds && tabIds.length) {
-          for (tabId of tabIds) {
+      } else if (portsWin) {
+        const tabIds = portsWin.keys();
+        for (tabId of tabIds) {
+          if (tabId) {
             portMsg(msg, windowId, tabId);
           }
         }
       } else {
-        const windowIds = Object.keys(ports);
-        if (windowIds.length) {
-          for (windowId of windowIds) {
+        const windowIds = ports.keys();
+        for (windowId of windowIds) {
+          if (windowIds) {
             portMsg(msg, windowId);
           }
         }
@@ -352,8 +381,9 @@
     const tabId = stringifyPositiveInt(tId, true);
     if (windowId && tabId) {
       const portUrl = removeQueryFromURI(frameUrl || pageUrl);
-      const port = ports[windowId] && ports[windowId][tabId] &&
-                   ports[windowId][tabId][portUrl];
+      const portsWin = ports.get(windowId);
+      const portsTab = portsWin && portsWin.get(tabId);
+      const port = portsTab && portsTab.get(portUrl);
       port && port.postMessage({
         [CONTENT_GET]: {info, tab},
       });
@@ -402,8 +432,8 @@
     let func;
     if (tab) {
       const {id: tId, windowId: wId} = tab;
-      const tabId = stringifyPositiveInt(tId, true);
       const windowId = stringifyPositiveInt(wId, true);
+      const tabId = stringifyPositiveInt(tId, true);
       const msg = {
         [CONTENT_GET]: {tab},
       };
@@ -678,7 +708,7 @@
   const handleNotifyOnClosed = id => {
     let func;
     if (isString(id)) {
-      func = notifications.clear(id).catch(logError);
+      func = notifications.clear(id).catch(throwErr);
     }
     return func || null;
   };
@@ -818,12 +848,11 @@
       const windowId = stringifyPositiveInt(wId, true);
       const tabId = stringifyPositiveInt(tId, true);
       if (windowId && tabId && url) {
+        const portsTab = createPortsMap(windowId, tabId);
         const portUrl = removeQueryFromURI(url);
-        ports[windowId] = ports[windowId] || {};
-        ports[windowId][tabId] = ports[windowId][tabId] || {};
-        ports[windowId][tabId][portUrl] = port;
-        port.onDisconnect.addListener(p => removePort(p).catch(logError));
-        port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+        port.onDisconnect.addListener(p => removePort(p).catch(throwErr));
+        port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+        portsTab.set(portUrl, port);
         port.postMessage({
           incognito, tabId, windowId,
           [VARS_SET]: vars,
@@ -859,24 +888,22 @@
     const tabId = stringifyPositiveInt(tId, true);
     let bool;
     if (windowId && tabId) {
-      const items = ports[windowId] && ports[windowId][tabId] &&
-                      Object.keys(ports[windowId][tabId]);
-      if (items && items.length) {
-        for (const item of items) {
-          const obj = ports[windowId][tabId][item];
-          if (obj) {
-            const {name} = obj;
-            if (name) {
-              bool = name === PORT_CONTENT;
-              break;
-            }
+      const portsWin = ports.get(windowId);
+      const portsTab = portsWin && portsWin.get(tabId);
+      const items = portsTab && portsTab.values();
+      for (const item of items) {
+        if (item) {
+          const {name} = item;
+          if (name) {
+            bool = name === PORT_CONTENT;
+            break;
           }
         }
-        if (bool) {
-          func.push(portMsg({
-            [TMP_FILE_REQ]: bool,
-          }, windowId, tabId));
-        }
+      }
+      if (bool) {
+        func.push(portMsg({
+          [TMP_FILE_REQ]: bool,
+        }, windowId, tabId));
       }
     }
     varsLocal[MENU_ENABLED] = bool || false;
@@ -897,16 +924,20 @@
   const onTabUpdated = async (id, info, tab) => {
     const {active, incognito, url, windowId: wId} = tab;
     const {discarded, status} = info;
-    const tabId = stringifyPositiveInt(id, true);
     const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(id, true);
     const func = [];
     if (active) {
       const portUrl = removeQueryFromURI(url);
-      varsLocal[MENU_ENABLED] =
-        windowId && tabId && portUrl &&
-        ports[windowId] && ports[windowId][tabId] &&
-        ports[windowId][tabId][portUrl] &&
-        ports[windowId][tabId][portUrl].name === PORT_CONTENT || false;
+      const portsWin = ports.get(windowId);
+      const portsTab = portsWin && portsWin.get(tabId);
+      const port = portsTab && portsTab.get(portUrl);
+      if (port) {
+        const {name} = port;
+        varsLocal[MENU_ENABLED] = name === PORT_CONTENT;
+      } else {
+        varsLocal[MENU_ENABLED] = false;
+      }
       status === "complete" && func.push(updateContextMenu(), syncUI());
     } else if (discarded) {
       func.push(portHostMsg({
@@ -926,12 +957,14 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabRemoved = async (id, info) => {
-    const tabId = stringifyPositiveInt(id, true);
     const func = [];
     const {windowId: wId} = info;
     const {incognito} = await windows.get(wId);
     const windowId = stringifyPositiveInt(wId, true);
-    if (windowId && tabId && ports[windowId] && ports[windowId][tabId]) {
+    const tabId = stringifyPositiveInt(id, true);
+    const portsWin = ports.get(windowId);
+    const portsTab = portsWin && portsWin.get(tabId);
+    if (portsTab) {
       func.push(
         restorePorts({windowId, tabId}),
         portHostMsg({
@@ -959,8 +992,8 @@
     });
     for (const tab of tabList) {
       const {active, discarded, id: tId, incognito} = tab;
-      const tabId = stringifyPositiveInt(tId, true);
       const windowId = stringifyPositiveInt(id, true);
+      const tabId = stringifyPositiveInt(tId, true);
       if (windowId && tabId) {
         if (active) {
           func.push(portMsg({
@@ -1040,7 +1073,7 @@
     const func = [];
     if (item && obj) {
       const {app, checked, value} = obj;
-      const hasPorts = Object.keys(ports).length;
+      const hasPorts = ports.size > 0;
       switch (item) {
         case EDITOR_FILE_NAME:
           varsLocal[item] = value;
@@ -1117,32 +1150,32 @@
   };
 
   /* listeners */
-  browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
-  commands.onCommand.addListener(cmd => handleCmd(cmd).catch(logError));
+  browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
+  commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
   contextMenus.onClicked.addListener((info, tab) =>
-    portContextMenuData(info, tab).catch(logError)
+    portContextMenuData(info, tab).catch(throwErr)
   );
   host.onDisconnect.addListener(port =>
-    handleDisconnectedHost(port).then(toggleBadge).catch(logError)
+    handleDisconnectedHost(port).then(toggleBadge).catch(throwErr)
   );
-  host.onMessage.addListener(msg => handleMsg(msg).catch(logError));
-  runtime.onConnect.addListener(port => handlePort(port).catch(logError));
-  runtime.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  host.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+  runtime.onConnect.addListener(port => handlePort(port).catch(throwErr));
+  runtime.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
   storage.onChanged.addListener(data =>
-    setVars(data).then(syncUI).catch(logError)
+    setVars(data).then(syncUI).catch(throwErr)
   );
-  tabs.onActivated.addListener(info => onTabActivated(info).catch(logError));
+  tabs.onActivated.addListener(info => onTabActivated(info).catch(throwErr));
   tabs.onUpdated.addListener((id, info, tab) =>
-    onTabUpdated(id, info, tab).catch(logError)
+    onTabUpdated(id, info, tab).catch(throwErr)
   );
   tabs.onRemoved.addListener((id, info) =>
-    onTabRemoved(id, info).catch(logError)
+    onTabRemoved(id, info).catch(throwErr)
   );
   windows.onFocusChanged.addListener(windowId =>
-    onWindowFocusChanged(windowId).catch(logError)
+    onWindowFocusChanged(windowId).catch(throwErr)
   );
   windows.onRemoved.addListener(windowId =>
-    onWindowRemoved(windowId).catch(logError)
+    onWindowRemoved(windowId).catch(throwErr)
   );
 
   /* startup */
@@ -1151,5 +1184,5 @@
     storeFetchedData(NS_URI_PATH, NS_URI),
     storeFetchedData(FILE_EXT_PATH, FILE_EXT),
     storeFetchedData(LIVE_EDIT_PATH, LIVE_EDIT),
-  ]).catch(logError);
+  ]).catch(throwErr);
 }
