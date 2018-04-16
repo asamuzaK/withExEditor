@@ -891,19 +891,21 @@
       const portsWin = ports.get(windowId);
       const portsTab = portsWin && portsWin.get(tabId);
       const items = portsTab && portsTab.values();
-      for (const item of items) {
-        if (item) {
-          const {name} = item;
-          if (name) {
-            bool = name === PORT_CONTENT;
-            break;
+      if (items) {
+        for (const item of items) {
+          if (item) {
+            const {name} = item;
+            if (name) {
+              bool = name === PORT_CONTENT;
+              break;
+            }
           }
         }
-      }
-      if (bool) {
-        func.push(portMsg({
-          [TMP_FILE_REQ]: bool,
-        }, windowId, tabId));
+        if (bool) {
+          func.push(portMsg({
+            [TMP_FILE_REQ]: bool,
+          }, windowId, tabId));
+        }
       }
     }
     varsLocal[MENU_ENABLED] = bool || false;
