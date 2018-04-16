@@ -20,13 +20,12 @@
   const OPTIONS_OPEN = "openOptionsPage";
 
   /**
-   * log error
+   * throw error
    * @param {!Object} e - Error
-   * @returns {boolean} - false
+   * @throws
    */
-  const logError = e => {
-    console.error(e);
-    return false;
+  const throwErr = e => {
+    throw e;
   };
 
   /**
@@ -118,6 +117,6 @@
   };
 
   document.addEventListener("DOMContentLoaded", () =>
-    migrateStorage().catch(logError)
+    migrateStorage().catch(throwErr)
   );
 }

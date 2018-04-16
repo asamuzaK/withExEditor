@@ -14,13 +14,12 @@
   const OPTIONS_OPEN = "openOptionsPage";
 
   /**
-   * log error
+   * throw error
    * @param {!Object} e - Error
-   * @returns {boolean} - false
+   * @throws
    */
-  const logError = e => {
-    console.error(e);
-    return false;
+  const throwErr = e => {
+    throw e;
   };
 
   /**
@@ -146,10 +145,10 @@
       const elm = document.getElementById(item);
       if (elm) {
         elm.addEventListener("keyup", evt =>
-          detectKeyCombo(evt).catch(logError)
+          detectKeyCombo(evt).catch(throwErr)
         );
         elm.addEventListener("input", evt =>
-          updateCmdKey(evt).catch(logError)
+          updateCmdKey(evt).catch(throwErr)
         );
       }
     }
@@ -193,5 +192,5 @@
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     disableIncompatibleInputs(),
     addListenerToCmdInputs(),
-  ]).catch(logError));
+  ]).catch(throwErr));
 }

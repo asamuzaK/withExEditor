@@ -30,13 +30,12 @@
   const WARN = "warn";
 
   /**
-   * log error
+   * throw error
    * @param {!Object} e - Error
-   * @returns {boolean} - false
+   * @throws
    */
-  const logError = e => {
-    console.error(e);
-    return false;
+  const throwErr = e => {
+    throw e;
   };
 
   /**
@@ -233,7 +232,7 @@
         const {currentTarget, target} = evt;
         evt.preventDefault();
         evt.stopPropagation();
-        return portReloadExt(currentTarget === target).catch(logError);
+        return portReloadExt(currentTarget === target).catch(throwErr);
       }, false);
     }
   };
@@ -246,7 +245,7 @@
     const elm = document.getElementById(SYNC_AUTO_URL);
     elm && elm.addEventListener(
       "input",
-      evt => extractSyncUrlsInput(evt).catch(logError),
+      evt => extractSyncUrlsInput(evt).catch(throwErr),
       false
     );
   };
@@ -261,7 +260,7 @@
       for (const node of nodes) {
         node.addEventListener(
           "change",
-          evt => portPref(evt).catch(logError),
+          evt => portPref(evt).catch(throwErr),
           false
         );
       }
@@ -400,7 +399,7 @@
   };
 
   /* listeners */
-  port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
   document.addEventListener("DOMContentLoaded", () => Promise.all([
     localizeHtml(),
@@ -410,5 +409,5 @@
     addReloadExtensionListener(),
     addFormSubmitListener(),
     getHostStatus(),
-  ]).catch(logError));
+  ]).catch(throwErr));
 }
