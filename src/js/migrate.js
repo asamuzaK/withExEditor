@@ -116,7 +116,6 @@
     return Promise.all(func);
   };
 
-  document.addEventListener("DOMContentLoaded", () =>
-    migrateStorage().catch(throwErr)
-  );
+  /* startup */
+  migrateStorage().catch(throwErr);
 }

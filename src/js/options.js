@@ -401,7 +401,8 @@
   /* listeners */
   port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
-  document.addEventListener("DOMContentLoaded", () => Promise.all([
+  /* startup */
+  Promise.all([
     localizeHtml(),
     setValuesFromLocalStorage(),
     addInputChangeListener(),
@@ -409,5 +410,5 @@
     addReloadExtensionListener(),
     addFormSubmitListener(),
     getHostStatus(),
-  ]).catch(throwErr));
+  ]).catch(throwErr);
 }

@@ -189,8 +189,9 @@
     return Promise.all(func);
   };
 
-  document.addEventListener("DOMContentLoaded", () => Promise.all([
+  /* startup */
+  Promise.all([
     disableIncompatibleInputs(),
     addListenerToCmdInputs(),
-  ]).catch(throwErr));
+  ]).catch(throwErr);
 }
