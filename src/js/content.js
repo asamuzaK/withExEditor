@@ -23,11 +23,8 @@
   const ID_WIN = "windowId";
   const INCOGNITO = "incognito";
   const IS_ENABLED = "isEnabled";
-  const KEY_ACCESS = "accessKey";
   const KEY_CODE_A = 65;
   const KEY_CODE_BS = 8;
-  const KEY_EDITOR = "editorShortCut";
-  const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
   const LIVE_EDIT = "liveEdit";
   const LOCAL_FILE_VIEW = "viewLocalFile";
@@ -39,7 +36,6 @@
   const MOUSE_BUTTON_RIGHT = 2;
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPTIONS_OPEN = "openOptions";
   const PORT_NAME = "portContent";
   const RANGE_SEP = "Next Range";
   const SUBST = "index";
@@ -51,6 +47,7 @@
   const TMP_FILE_CREATE = "createTmpFile";
   const TMP_FILE_DATA_PORT = "portTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
+  const TMP_FILE_REQ = "requestTmpFile";
   const TYPE_FROM = 8;
   const TYPE_TO = -1;
   const VARS_SET = "setVars";
@@ -65,22 +62,18 @@
     [ID_WIN]: "",
     [INCOGNITO]: false,
     [IS_ENABLED]: false,
-    [KEY_ACCESS]: "u",
-    [KEY_EDITOR]: true,
-    [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
   };
 
   /**
-   * log error
+   * throw error
    * @param {!Object} e - Error
-   * @returns {boolean} - false
+   * @throws
    */
-  const logError = e => {
-    console.error(e);
-    return false;
+  const throwErr = e => {
+    throw e;
   };
 
   /**
@@ -132,10 +125,12 @@
   const getFileNameFromURI = async (uri, subst = LABEL) => {
     let name;
     if (isString(uri)) {
+      const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/;
       const {pathname, protocol} = new URL(uri);
-      if (pathname && protocol && !/^(?:blob|data):/.test(protocol)) {
-        name = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/.exec(pathname);
-        Array.isArray(name) && (name = decodeURIComponent(name[1]));
+      if (pathname && reg.test(pathname) &&
+          protocol && !/^(?:blob|data):/.test(protocol)) {
+        const [, pName] = reg.exec(pathname);
+        name = decodeURIComponent(pName);
       }
     }
     return name && name.length < FILE_LEN && name || subst;
@@ -289,6 +284,26 @@
   };
 
   /**
+   * get xmlns prefixed namespace
+   * @param {Object} elm - element
+   * @param {string} attr - attribute
+   * @returns {string} - namespace
+   */
+  const getXmlnsPrefixedNamespace = (elm, attr) => {
+    let ns;
+    if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+      let node = elm;
+      while (node && node.parentNode && !ns) {
+        if (node.hasAttributeNS("", `xmlns:${attr}`)) {
+          ns = node.getAttributeNS("", `xmlns:${attr}`);
+        }
+        node = node.parentNode;
+      }
+    }
+    return ns || null;
+  };
+
+  /**
    * set namespaced attribute
    * @param {Object} elm - element to append attributes
    * @param {Object} node - element node to get attributes from
@@ -307,12 +322,7 @@
             if (p === XMLNS) {
               func.push(elm.setAttributeNS(nsURI.xmlns, localName, value));
             } else {
-              let n = node;
-              while (n && n.parentNode && !ns) {
-                n.hasAttributeNS("", `xmlns:${p}`) &&
-                  (ns = n.getAttributeNS("", `xmlns:${p}`));
-                n = n.parentNode;
-              }
+              ns = getXmlnsPrefixedNamespace(node);
               ns && func.push(elm.setAttributeNS(ns, localName, value));
             }
           } else {
@@ -406,7 +416,9 @@
     if (node) {
       const root = document.documentElement;
       while (node && node !== root && !elm) {
-        /^(?:math|svg)$/.test(node.localName) && (elm = node);
+        if (/^(?:math|svg)$/.test(node.localName)) {
+          elm = node;
+        }
         node = node.parentNode;
       }
       if (elm) {
@@ -457,29 +469,31 @@
     const arr = [];
     if (range) {
       const ancestor = range.commonAncestorContainer;
-      let obj;
       count > 1 && arr.push(document.createTextNode("\n"));
       switch (ancestor.nodeType) {
-        case Node.ELEMENT_NODE:
-          obj = await getNodeNS(ancestor);
+        case Node.ELEMENT_NODE: {
+          const obj = await getNodeNS(ancestor);
           if (/^(?:svg|math)$/.test(obj.localName)) {
             if (obj.node === document.documentElement) {
               return null;
             }
-            if (obj.node.parentNode && (obj = obj.node.parentNode)) {
-              range.setStart(obj, 0);
-              range.setEnd(obj, obj.childNodes.length);
+            if (obj.node.parentNode) {
+              const parent = obj.node.parentNode;
+              range.setStart(parent, 0);
+              range.setEnd(parent, parent.childNodes.length);
             }
           }
           arr.push(appendChild(ancestor, range.cloneContents()));
           break;
-        case Node.TEXT_NODE:
-          obj = await createElm(ancestor.parentNode);
+        }
+        case Node.TEXT_NODE: {
+          const obj = await createElm(ancestor.parentNode);
           if (obj.nodeType === Node.ELEMENT_NODE) {
             obj.append(range.cloneContents());
             arr.push(obj);
           }
           break;
+        }
         default:
       }
       arr.push(document.createTextNode("\n"));
@@ -499,14 +513,14 @@
     if (sel && sel.rangeCount) {
       const arr = [];
       const l = sel.rangeCount;
-      let i = 0, obj;
+      let i = 0;
       while (i < l) {
         arr.push(createRangeArr(sel.getRangeAt(i), i, l));
         i++;
       }
       frag = await Promise.all(arr).then(createSelFrag);
-      if (l > 1 && frag && frag.hasChildNodes() &&
-          (obj = await createElm(document.documentElement))) {
+      if (l > 1 && frag && frag.hasChildNodes()) {
+        const obj = await createElm(document.documentElement);
         obj.append(frag);
         frag = document.createDocumentFragment();
         frag.append(obj, document.createTextNode("\n"));
@@ -844,7 +858,9 @@
     let func;
     if (dataId) {
       const data = dataIds.get(dataId);
-      data && (func = portMsg({[TMP_FILE_GET]: data}));
+      if (data) {
+        func = portMsg({[TMP_FILE_GET]: data});
+      }
     }
     return func || null;
   };
@@ -882,11 +898,29 @@
   };
 
   /**
+   * port each data ID
+   * @param {boolean} bool - port data ID
+   * @returns {Promise.<Array>} - results of each handler
+   */
+  const portEachDataId = async (bool = false) => {
+    const func = [];
+    if (bool) {
+      dataIds.forEach(async (value, key) => {
+        const elm = await getTargetElementFromDataId(key);
+        if (elm) {
+          func.push(portMsg({[TMP_FILE_GET]: value}));
+        }
+      });
+    }
+    return Promise.all(func);
+  };
+
+  /**
    * handle focus event
    * @param {!Object} evt - event
    * @returns {AsyncFunction} - request tmp file
    */
-  const handleFocusEvt = evt => requestTmpFile(evt).catch(logError);
+  const handleFocusEvt = evt => requestTmpFile(evt).catch(throwErr);
 
   /**
    * store temporary file data
@@ -895,9 +929,12 @@
    */
   const storeTmpFileData = async (data = {}) => {
     let func;
-    if (data[TMP_FILE_CREATE] && (data = data[TMP_FILE_CREATE])) {
-      const {dataId, mode} = data;
-      mode === MODE_EDIT && dataId && (func = setDataId(dataId, data));
+    const tmpFileData = data[TMP_FILE_CREATE] && data[TMP_FILE_CREATE];
+    if (tmpFileData) {
+      const {dataId, mode} = tmpFileData;
+      if (mode === MODE_EDIT && dataId) {
+        func = setDataId(dataId, tmpFileData);
+      }
     }
     return func || null;
   };
@@ -912,7 +949,9 @@
     const {data} = obj;
     if (data) {
       const {dataId, mode} = data;
-      mode === MODE_EDIT && dataId && (func = setDataId(dataId, data));
+      if (mode === MODE_EDIT && dataId) {
+        func = setDataId(dataId, data);
+      }
     }
     return func || null;
   };
@@ -933,9 +972,11 @@
             value: data.value,
           },
         };
-      } else {
-        data[LOCAL_FILE_VIEW] &&
-          (msg = {[LOCAL_FILE_VIEW]: data[LOCAL_FILE_VIEW].uri});
+      } else if (data[LOCAL_FILE_VIEW]) {
+        const {uri} = data[LOCAL_FILE_VIEW];
+        msg = {
+          [LOCAL_FILE_VIEW]: uri,
+        };
       }
     }
     return msg || null;
@@ -1039,7 +1080,9 @@
         break;
       default:
     }
-    !tmpFileData && (tmpFileData = await fetchSource(data));
+    if (!tmpFileData) {
+      tmpFileData = await fetchSource(data);
+    }
     return tmpFileData || null;
   };
 
@@ -1135,10 +1178,9 @@
     const sel = window.getSelection();
     const {anchorNode, isCollapsed} = sel;
     if (elm && mode) {
-      let obj;
       switch (mode) {
         case MODE_EDIT: {
-          obj = await getIdData(elm);
+          const obj = await getIdData(elm);
           if (obj) {
             const {
               childNodes, classList, isContentEditable, namespaceURI, value,
@@ -1162,8 +1204,9 @@
               data.dataId = dataId;
               data.value = value || "";
             } else {
-              !isContentEditable && !isCollapsed && anchorNode &&
-                (elm = anchorNode.parentNode);
+              if (!isContentEditable && !isCollapsed && anchorNode) {
+                elm = anchorNode.parentNode;
+              }
               data.mode = mode;
               data.dataId = dataId;
               data.value = elm.hasChildNodes() &&
@@ -1179,20 +1222,22 @@
           break;
         }
         case MODE_MATHML:
-        case MODE_SVG:
-          obj = await createDomXmlBased(elm);
+        case MODE_SVG: {
+          const obj = await createDomXmlBased(elm);
           if (obj) {
             data.mode = mode;
             data.value = obj;
           }
           break;
-        case MODE_SELECTION:
-          obj = await createDomFromSelRange(sel);
+        }
+        case MODE_SELECTION: {
+          const obj = await createDomFromSelRange(sel);
           if (obj) {
             data.mode = mode;
             data.value = obj;
           }
           break;
+        }
         default:
       }
     }
@@ -1231,7 +1276,7 @@
       elm = !isCollapsed &&
             (anchorNode.nodeType === Node.TEXT_NODE && anchorNode.parentNode ||
              focusNode.nodeType === Node.TEXT_NODE && focusNode.parentNode) ||
-             elm;
+            elm;
       if ((elm.isContentEditable || await isEditControl(elm) ||
            await isContentTextNode(elm)) &&
           (isCollapsed || rangeCount === 1 &&
@@ -1420,8 +1465,8 @@
           value = value.replace(/[\f\n\t\r\v]$/, "");
         }
         changed = elm.value !== value;
-      } else {
-        /^textarea$/.test(elm.localName) && (changed = elm.value !== value);
+      } else if (/^textarea$/.test(elm.localName)) {
+        changed = elm.value !== value;
       }
       if (changed) {
         elm.value = value;
@@ -1506,52 +1551,6 @@
     return Promise.all(func);
   };
 
-  /* keyboard shortcuts */
-  /* execute editor key combination */
-  const execEditorKey = {
-    key: vars[KEY_ACCESS],
-    altKey: false,
-    ctrlKey: true,
-    metaKey: false,
-    shiftKey: true,
-    enabled: vars[KEY_EDITOR],
-  };
-
-  /* open options key combination */
-  const openOptionsKey = {
-    key: vars[KEY_ACCESS],
-    altKey: true,
-    ctrlKey: false,
-    metaKey: false,
-    shiftKey: true,
-    enabled: vars[KEY_OPTIONS],
-  };
-
-  /**
-   * update key combination
-   * @param {string} key - key
-   * @returns {void}
-   */
-  const updateKeyCombo = async key => {
-    if (isString(key) && /^[a-z]$/i.test(key) && (key = key.toLowerCase())) {
-      vars[KEY_ACCESS] = key;
-      execEditorKey.key = key;
-      openOptionsKey.key = key;
-    }
-  };
-
-  /**
-   * key combination matches
-   * @param {Object} evt - Event
-   * @param {Object} key - KeyCombo
-   * @returns {boolean} - result
-   */
-  const keyComboMatches = async (evt, key) =>
-    evt && key && key.enabled && key.key && evt.key &&
-    evt.key.toLowerCase() === key.key.toLowerCase() &&
-    evt.altKey === key.altKey && evt.ctrlKey === key.ctrlKey &&
-    evt.metaKey === key.metaKey && evt.shiftKey === key.shiftKey || false;
-
   /* local storage */
   /**
    * extend object items from local storage
@@ -1561,8 +1560,9 @@
    */
   const extendObjItems = async (obj, key) => {
     if (obj && key) {
-      let ext = await localStorage.get(key);
-      if (ext && Object.keys(ext).length && (ext = ext[key])) {
+      const value = await localStorage.get(key);
+      const ext = value && Object.keys(value).length && value[key];
+      if (ext) {
         const items = Object.keys(ext);
         if (items && items.length) {
           for (const item of items) {
@@ -1601,22 +1601,14 @@
           case SYNC_AUTO:
             vars[key] = !!value;
             break;
-          case KEY_ACCESS:
-            func.push(updateKeyCombo(value));
-            break;
-          case KEY_EDITOR:
-            vars[key] = !!value;
-            execEditorKey.enabled = !!value;
-            break;
-          case KEY_OPTIONS:
-            vars[key] = !!value;
-            openOptionsKey.enabled = !!value;
-            break;
           case TEXT_SYNC:
             func.push(syncText(value));
             break;
           case TMP_FILE_DATA_PORT:
             func.push(updateTmpFileData(value));
+            break;
+          case TMP_FILE_REQ:
+            func.push(portEachDataId(value));
             break;
           case VARS_SET:
             func.push(handleMsg(value));
@@ -1643,6 +1635,7 @@
         const {anchorNode, focusNode, isCollapsed} = window.getSelection();
         const mode = namespaceURI === nsURI.math && MODE_MATHML ||
                      namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
+        const isChildNodeText = await isContentTextNode(target);
         const editableElm = await getEditableElm(target);
         const liveEditElm = await getLiveEditElm(target);
         let enabled;
@@ -1653,8 +1646,15 @@
                     anchorNode.parentNode === focusNode.parentNode;
         }
         vars[CONTEXT_MODE] = mode;
-        vars[CONTEXT_NODE] = liveEditElm || editableElm ||
-                             !vars[ONLY_EDITABLE] && target || null;
+        if (liveEditElm) {
+          vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
+                               liveEditElm || isChildNodeText && target || null;
+        } else if (editableElm) {
+          vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
+                               editableElm || isChildNodeText && target || null;
+        } else {
+          vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] && target || null;
+        }
         func = portMsg({
           [CONTEXT_MENU]: {
             [MODE_EDIT]: {
@@ -1680,22 +1680,24 @@
   const handleKeyDown = async evt => {
     let func;
     if (vars[IS_ENABLED]) {
-      const {altKey, ctrlKey, key, shiftKey, target} = evt;
-      const isParsable = /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType);
-      if (shiftKey && key === "F10" || key === "ContextMenu") {
-        func = handleBeforeContextMenu(evt).catch(logError);
-      } else if (shiftKey && (altKey || ctrlKey)) {
-        if (isParsable && await keyComboMatches(evt, execEditorKey)) {
-          const mode = await getContextMode(target);
-          const liveEditTarget = await getLiveEditElm(target);
-          if (!vars[ONLY_EDITABLE] || mode === MODE_EDIT) {
-            func = portContent(liveEditTarget || target, mode);
-          }
+      const {key, shiftKey, target} = evt;
+      if (key === "ContextMenu" || shiftKey && key === "F10") {
+        func = handleBeforeContextMenu(evt).catch(throwErr);
+      } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
+        const {namespaceURI} = target;
+        const mode = await getContextMode(target);
+        const isChildNodeText = await isContentTextNode(target);
+        const editableElm = await getEditableElm(target);
+        const liveEditElm = await getLiveEditElm(target);
+        vars[CONTEXT_MODE] = mode;
+        if (liveEditElm) {
+          vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
+                               liveEditElm || isChildNodeText && target || null;
+        } else if (editableElm) {
+          vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
+                               editableElm || isChildNodeText && target || null;
         } else {
-          const openOpt = await keyComboMatches(evt, openOptionsKey);
-          if (openOpt) {
-            func = portMsg({[OPTIONS_OPEN]: openOpt});
-          }
+          vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] && target || null;
         }
       }
     }
@@ -1703,13 +1705,13 @@
   };
 
   /* listeners */
-  port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
   window.addEventListener("mousedown",
-                          evt => handleBeforeContextMenu(evt).catch(logError),
+                          evt => handleBeforeContextMenu(evt).catch(throwErr),
                           true);
   window.addEventListener("keydown",
-                          evt => handleKeyDown(evt).catch(logError),
+                          evt => handleKeyDown(evt).catch(throwErr),
                           true);
 
   /* startup */
@@ -1717,5 +1719,5 @@
     extendObjItems(fileExt, FILE_EXT),
     extendObjItems(nsURI, NS_URI),
     extendObjItems(liveEdit, LIVE_EDIT),
-  ]).catch(logError);
+  ]).catch(throwErr);
 }

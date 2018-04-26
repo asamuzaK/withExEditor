@@ -2,19 +2,30 @@
   "applications": {
     "gecko": {
       "id": "jid1-WiAigu4HIo0Tag@jetpack",
-      "strict_min_version": "52.0a1"
+      "strict_min_version": "60.0a1"
     }
   },
   "background": {
-    "scripts": [
-      "lib/browser-polyfill.min.js",
-      "js/background.js"
-    ]
+    "page": "html/background.html"
   },
   "browser_action": {
     "browser_style": false,
     "default_icon": "img/icon-gray.png",
     "default_title": "__MSG_extensionName__"
+  },
+  "commands": {
+    "execEditor": {
+      "description": "__MSG_commandExecEditor__",
+      "suggested_key": {
+        "default": "Ctrl+Shift+U"
+      }
+    },
+    "openOptionsPage": {
+      "description": "__MSG_commandOpenOptions__",
+      "suggested_key": {
+        "default": "Alt+Shift+U"
+      }
+    }
   },
   "content_scripts": [
     {
@@ -36,10 +47,13 @@
   },
   "manifest_version": 2,
   "name": "__MSG_extensionName__",
+  "optional_permissions": [
+    "notifications"
+  ],
   "options_ui": {
     "browser_style": false,
     "open_in_tab": true,
-    "page": "options/options.html"
+    "page": "html/options.html"
   },
   "permissions": [
     "<all_urls>",
@@ -50,5 +64,5 @@
     "tabs"
   ],
   "short_name": "__MSG_extensionName__",
-  "version": "4.2.6"
+  "version": "5.0.0b6"
 }

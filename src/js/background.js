@@ -5,18 +5,20 @@
 {
   /* api */
   const {
-    browserAction, contextMenus, i18n, runtime, storage, tabs,
-    windows,
+    browserAction, commands, contextMenus, i18n, notifications, runtime,
+    storage, tabs, windows,
   } = browser;
   const {local: localStorage} = storage;
 
   /* constants */
+  const {WINDOW_ID_CURRENT} = windows;
   const CONTENT_GET = "getContent";
   const CONTENT_SCRIPT_PATH = "js/content.js";
   const CONTEXT_MENU = "contextMenu";
   const EDITOR_CONFIG_GET = "getEditorConfig";
   const EDITOR_CONFIG_RES = "resEditorConfig";
   const EDITOR_CONFIG_TS = "editorConfigTimestamp";
+  const EDITOR_EXEC = "execEditor";
   const EDITOR_FILE_NAME = "editorFileName";
   const EDITOR_LABEL = "editorLabel";
   const ENABLE_PB = "enablePB";
@@ -26,11 +28,12 @@
   const FILE_EXT_PATH = "data/fileExt.json";
   const HOST = "withexeditorhost";
   const HOST_CONNECTION = "hostConnection";
+  const HOST_ERR_NOTIFY = "notifyHostError";
   const HOST_STATUS = "hostStatus";
   const HOST_STATUS_GET = "getHostStatus";
   const HOST_VERSION = "hostVersion";
   const HOST_VERSION_CHECK = "checkHostVersion";
-  const HOST_VERSION_MIN = "v2.2.0";
+  const HOST_VERSION_MIN = "v3.0.0";
   const ICON = "img/icon.svg";
   const ICON_AUTO = "buttonIconAuto";
   const ICON_BLACK = "buttonIconBlack";
@@ -42,8 +45,6 @@
   const IS_EXECUTABLE = "isExecutable";
   const IS_WEBEXT = "isWebExtension";
   const KEY_ACCESS = "accessKey";
-  const KEY_EDITOR = "editorShortCut";
-  const KEY_OPTIONS = "optionsShortCut";
   const LABEL = "withExEditor";
   const LIVE_EDIT = "liveEdit";
   const LIVE_EDIT_PATH = "data/liveEdit.json";
@@ -57,17 +58,21 @@
   const NS_URI = "nsUri";
   const NS_URI_PATH = "data/nsUri.json";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const OPTIONS_OPEN = "openOptions";
+  const OPTIONS_OPEN = "openOptionsPage";
   const PORT_CONTENT = "portContent";
   const PROCESS_CHILD = "childProcess";
   const STORAGE_SET = "setStorage";
   const SYNC_AUTO = "enableSyncAuto";
   const SYNC_AUTO_URL = "syncAutoUrls";
   const TEXT_SYNC = "syncText";
+  const TMP_FILES = "tmpFiles";
+  const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
   const TMP_FILE_CREATE = "createTmpFile";
   const TMP_FILE_DATA_PORT = "portTmpFileData";
+  const TMP_FILE_DATA_REMOVE = "removeTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
+  const TMP_FILE_REQ = "requestTmpFile";
   const TMP_FILE_RES = "resTmpFile";
   const WARN_COLOR = "#C13832";
   const WARN_TEXT = "!";
@@ -77,9 +82,6 @@
   const vars = {
     [IS_ENABLED]: false,
     [IS_WEBEXT]: runtime.id === EXT_WEBEXT,
-    [KEY_ACCESS]: "u",
-    [KEY_EDITOR]: true,
-    [KEY_OPTIONS]: true,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
@@ -90,10 +92,20 @@
     [ENABLE_PB]: false,
     [ICON_ID]: "#context",
     [IS_EXECUTABLE]: false,
+    [KEY_ACCESS]: "U",
     [MENU_ENABLED]: false,
     [MODE_MATHML]: "",
     [MODE_SOURCE]: "",
     [MODE_SVG]: "",
+  };
+
+  /**
+   * throw error
+   * @param {!Object} e - Error
+   * @throws
+   */
+  const throwErr = e => {
+    throw e;
   };
 
   /**
@@ -149,7 +161,9 @@
    */
   const removeQueryFromURI = uri => {
     const query = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
-    isString(uri) && (uri = uri.replace(query, ""));
+    if (isString(uri)) {
+      uri = uri.replace(query, "");
+    }
     return uri;
   };
 
@@ -240,7 +254,24 @@
   };
 
   /* content ports collection */
-  const ports = {};
+  const ports = new Map();
+
+  /**
+   * create ports map
+   * @param {string} windowId - window ID
+   * @param {string} tabId - tabId
+   * @returns {Object} - Map
+   */
+  const createPortsMap = (windowId, tabId) => {
+    if (!ports.has(windowId)) {
+      ports.set(windowId, new Map());
+    }
+    const portsWin = ports.get(windowId);
+    if (!portsWin.has(tabId)) {
+      portsWin.set(tabId, new Map());
+    }
+    return portsWin.get(tabId);
+  };
 
   /**
    * restore ports collection
@@ -250,12 +281,14 @@
   const restorePorts = async (data = {}) => {
     const {tabId, windowId} = data;
     let func;
-    if (windowId && tabId && ports[windowId]) {
-      delete ports[windowId][tabId];
-      Object.keys(ports[windowId]).length === 0 &&
-        (func = restorePorts({windowId}));
+    if (windowId && tabId && ports.has(windowId)) {
+      const portsWin = ports.get(windowId);
+      portsWin.delete(tabId);
+      if (portsWin.size === 0) {
+        func = restorePorts({windowId});
+      }
     } else {
-      windowId && delete ports[windowId];
+      windowId && ports.delete(windowId);
     }
     return func || null;
   };
@@ -263,22 +296,37 @@
   /**
    * remove port from ports collection
    * @param {!Object} port - removed port
-   * @returns {void}
+   * @returns {?AsyncFunction} - portHostMsg
    */
   const removePort = async (port = {}) => {
     const {sender} = port;
+    let func;
     if (sender) {
       const {tab, url} = sender;
       if (tab) {
         const portUrl = removeQueryFromURI(url);
-        let {windowId, id: tabId} = tab;
-        tabId = stringifyPositiveInt(tabId, true);
-        windowId = stringifyPositiveInt(windowId, true);
-        tabId && windowId && portUrl && ports[windowId] &&
-        ports[windowId][tabId] &&
-          delete ports[windowId][tabId][portUrl];
+        const {hostname} = new URL(portUrl);
+        const {incognito} = tab;
+        const {windowId: wId, id: tId} = tab;
+        const windowId = stringifyPositiveInt(wId, true);
+        const tabId = stringifyPositiveInt(tId, true);
+        if (tabId && windowId && portUrl && ports.has(windowId)) {
+          const portsWin = ports.get(windowId);
+          if (portsWin.has(tabId)) {
+            const portsTab = portsWin.get(tabId);
+            portsTab.delete(portUrl);
+            func = portHostMsg({
+              [TMP_FILE_DATA_REMOVE]: {
+                tabId, windowId,
+                dir: incognito && TMP_FILES_PB || TMP_FILES,
+                host: hostname,
+              },
+            });
+          }
+        }
       }
     }
+    return func || null;
   };
 
   /**
@@ -290,30 +338,29 @@
    */
   const portMsg = async (msg, windowId, tabId) => {
     if (msg) {
-      if (windowId && tabId) {
-        const portUrls = ports[windowId] && ports[windowId][tabId] &&
-                           Object.keys(ports[windowId][tabId]);
-        if (portUrls && portUrls.length) {
-          for (const portUrl of portUrls) {
-            const port = ports[windowId][tabId][portUrl];
-            try {
-              port && port.postMessage(msg);
-            } catch (e) {
-              delete ports[windowId][tabId][portUrl];
-            }
+      const portsWin = ports.get(windowId);
+      const portsTab = portsWin && portsWin.get(tabId);
+      if (portsTab) {
+        const portUrls = portsTab && portsTab.entries();
+        for (const portUrl of portUrls) {
+          const [key, port] = portUrl;
+          try {
+            port && port.postMessage(msg);
+          } catch (e) {
+            portsTab.delete(key);
           }
         }
-      } else if (windowId) {
-        const tabIds = ports[windowId] && Object.keys(ports[windowId]);
-        if (tabIds && tabIds.length) {
-          for (tabId of tabIds) {
+      } else if (portsWin) {
+        const tabIds = portsWin.keys();
+        for (tabId of tabIds) {
+          if (tabId) {
             portMsg(msg, windowId, tabId);
           }
         }
       } else {
-        const windowIds = Object.keys(ports);
-        if (windowIds.length) {
-          for (windowId of windowIds) {
+        const windowIds = ports.keys();
+        for (windowId of windowIds) {
+          if (windowIds) {
             portMsg(msg, windowId);
           }
         }
@@ -329,13 +376,14 @@
    */
   const portContextMenuData = async (info, tab) => {
     const {frameUrl, pageUrl} = info;
-    let {windowId, id: tabId} = tab;
-    windowId = stringifyPositiveInt(windowId, true);
-    tabId = stringifyPositiveInt(tabId, true);
+    const {windowId: wId, id: tId} = tab;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(tId, true);
     if (windowId && tabId) {
       const portUrl = removeQueryFromURI(frameUrl || pageUrl);
-      const port = ports[windowId] && ports[windowId][tabId] &&
-                   ports[windowId][tabId][portUrl];
+      const portsWin = ports.get(windowId);
+      const portsTab = portsWin && portsWin.get(tabId);
+      const port = portsTab && portsTab.get(portUrl);
       port && port.postMessage({
         [CONTENT_GET]: {info, tab},
       });
@@ -367,6 +415,29 @@
           }
         }
       }
+    }
+    return func || null;
+  };
+
+  /**
+   * port get content message to active tab
+   * @returns {?AsyncFunction} - port msg
+   */
+  const portGetContentMsg = async () => {
+    const [tab] = await tabs.query({
+      active: true,
+      windowId: WINDOW_ID_CURRENT,
+      windowType: "normal",
+    });
+    let func;
+    if (tab) {
+      const {id: tId, windowId: wId} = tab;
+      const windowId = stringifyPositiveInt(wId, true);
+      const tabId = stringifyPositiveInt(tId, true);
+      const msg = {
+        [CONTENT_GET]: {tab},
+      };
+      func = portMsg(msg, windowId, tabId);
     }
     return func || null;
   };
@@ -420,15 +491,15 @@
    */
   const createMenuItem = async (id, contexts) => {
     const label = varsLocal[EDITOR_LABEL] || LABEL;
-    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+    const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                   `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
-    isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts) && (
-      menus[id] = contextMenus.create({
+    if (isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts)) {
+      menus[id] = await contextMenus.create({
         id, contexts, enabled,
         title: i18n.getMessage(id, [label, accKey]),
-      })
-    );
+      });
+    }
   };
 
   /**
@@ -469,9 +540,10 @@
   /**
    * update context menu
    * @param {Object} type - context type data
-   * @returns {void}
+   * @returns {Promise.<Array>} - results of each handler
    */
   const updateContextMenu = async type => {
+    const func = [];
     if (type) {
       const items = Object.entries(type);
       if (items.length) {
@@ -481,9 +553,9 @@
           if (menus[menuItemId]) {
             if (key === MODE_SOURCE) {
               const title = varsLocal[mode] || varsLocal[menuItemId];
-              title && contextMenus.update(menuItemId, {title});
+              title && func.push(contextMenus.update(menuItemId, {title}));
             } else if (key === MODE_EDIT) {
-              contextMenus.update(menuItemId, {enabled});
+              func.push(contextMenus.update(menuItemId, {enabled}));
             }
           }
         }
@@ -491,16 +563,34 @@
     } else {
       const items = Object.keys(menus);
       const label = varsLocal[EDITOR_LABEL] || LABEL;
-      const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                     `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+      const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                     `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
+      const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
       if (items.length) {
         for (const item of items) {
-          menus[item] && contextMenus.update(item, {
-            title: i18n.getMessage(item, [label, accKey]),
-          });
+          if (menus[item]) {
+            func.push(contextMenus.update(item, {
+              enabled,
+              title: i18n.getMessage(item, [label, accKey]),
+            }));
+          } else {
+            switch (item) {
+              case MODE_EDIT:
+                func.push(createMenuItem(item, ["editable"]));
+                break;
+              case MODE_SELECTION:
+                func.push(createMenuItem(item, ["selection"]));
+                break;
+              case MODE_SOURCE:
+                func.push(createMenuItem(item, ["frame", "page"]));
+                break;
+              default:
+            }
+          }
         }
       }
     }
+    return Promise.all(func);
   };
 
   /**
@@ -510,8 +600,8 @@
   const cacheMenuItemTitle = async () => {
     const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
     const label = varsLocal[EDITOR_LABEL] || LABEL;
-    const accKey = !vars[IS_WEBEXT] && vars[KEY_ACCESS] &&
-                   `(&${vars[KEY_ACCESS].toUpperCase()})` || "";
+    const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
+                   `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     for (const item of items) {
       varsLocal[item] = i18n.getMessage(item, [label, accKey]);
     }
@@ -611,6 +701,37 @@
     vars[IS_ENABLED] && runtime.openOptionsPage() || null;
 
   /**
+   * handle notifications onclosed
+   * @param {string} id - notification ID
+   * @returns {?AsyncFunction} - notifications.clear()
+   */
+  const handleNotifyOnClosed = id => {
+    let func;
+    if (isString(id)) {
+      func = notifications.clear(id).catch(throwErr);
+    }
+    return func || null;
+  };
+
+  /**
+   * create notification
+   * @param {string} id - notification ID
+   * @param {Object} opt - options
+   * @returns {void}
+   */
+  const createNotification = async (id, opt) => {
+    let func;
+    if (isString(id) && notifications) {
+      if (notifications.onClosed &&
+          !notifications.onClosed.hasListener(handleNotifyOnClosed)) {
+        notifications.onClosed.addListener(handleNotifyOnClosed);
+      }
+      func = notifications.create(id, opt);
+    }
+    return func || null;
+  };
+
+  /**
    * handle host message
    * @param {Object} msg - message
    * @returns {Promise.<Array>} - result of each handler
@@ -618,11 +739,18 @@
   const handleHostMsg = async msg => {
     const {message, status} = msg;
     const log = message && `${HOST}: ${message}`;
+    const iconUrl = await runtime.getURL(ICON);
+    const notifyMsg = {
+      iconUrl, message,
+      title: `${HOST}: ${status}`,
+      type: "basic",
+    };
     const func = [];
     switch (status) {
       case `${PROCESS_CHILD}_stderr`:
       case "error":
         log && func.push(logError(log));
+        notifications && func.push(createNotification(status, notifyMsg));
         break;
       case "ready":
         hostStatus[HOST_CONNECTION] = true;
@@ -635,6 +763,7 @@
         break;
       case "warn":
         log && func.push(logWarn(log));
+        notifications && func.push(createNotification(status, notifyMsg));
         break;
       default:
         log && func.push(logMsg(log));
@@ -715,16 +844,15 @@
     let func;
     if (tab) {
       const {active, incognito, status} = tab;
-      let {windowId, id: tabId} = tab;
-      windowId = stringifyPositiveInt(windowId, true);
-      tabId = stringifyPositiveInt(tabId, true);
+      const {windowId: wId, id: tId} = tab;
+      const windowId = stringifyPositiveInt(wId, true);
+      const tabId = stringifyPositiveInt(tId, true);
       if (windowId && tabId && url) {
+        const portsTab = createPortsMap(windowId, tabId);
         const portUrl = removeQueryFromURI(url);
-        ports[windowId] = ports[windowId] || {};
-        ports[windowId][tabId] = ports[windowId][tabId] || {};
-        ports[windowId][tabId][portUrl] = port;
-        port.onDisconnect.addListener(p => removePort(p).catch(logError));
-        port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+        port.onDisconnect.addListener(p => removePort(p).catch(throwErr));
+        port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+        portsTab.set(portUrl, port);
         port.postMessage({
           incognito, tabId, windowId,
           [VARS_SET]: vars,
@@ -733,7 +861,7 @@
       if (portName === PORT_CONTENT && frameId === 0 && active &&
           status === "complete") {
         varsLocal[MENU_ENABLED] = true;
-        func = restoreContextMenu();
+        func = updateContextMenu();
       }
     }
     return func || null;
@@ -754,30 +882,38 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabActivated = async info => {
-    let {tabId, windowId} = info, bool;
-    windowId = stringifyPositiveInt(windowId, true);
-    tabId = stringifyPositiveInt(tabId, true);
+    const func = [];
+    const {tabId: tId, windowId: wId} = info;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(tId, true);
+    let bool;
     if (windowId && tabId) {
-      const items = ports[windowId] && ports[windowId][tabId] &&
-                      Object.keys(ports[windowId][tabId]);
-      if (items && items.length) {
+      const portsWin = ports.get(windowId);
+      const portsTab = portsWin && portsWin.get(tabId);
+      const items = portsTab && portsTab.values();
+      if (items) {
         for (const item of items) {
-          const obj = ports[windowId][tabId][item];
-          if (obj) {
-            const {name} = obj;
+          if (item) {
+            const {name} = item;
             if (name) {
               bool = name === PORT_CONTENT;
               break;
             }
           }
         }
+        if (bool) {
+          func.push(portMsg({
+            [TMP_FILE_REQ]: bool,
+          }, windowId, tabId));
+        }
       }
     }
     varsLocal[MENU_ENABLED] = bool || false;
-    return Promise.all([
-      restoreContextMenu(),
+    func.push(
+      updateContextMenu(),
       syncUI(),
-    ]);
+    );
+    return Promise.all(func);
   };
 
   /**
@@ -788,19 +924,30 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabUpdated = async (id, info, tab) => {
-    const {active, url, windowId} = tab;
+    const {active, incognito, url, windowId: wId} = tab;
+    const {discarded, status} = info;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(id, true);
     const func = [];
     if (active) {
-      const {status} = info;
-      const pUrl = removeQueryFromURI(url);
-      const tId = stringifyPositiveInt(id, true);
-      const wId = stringifyPositiveInt(windowId, true);
-      varsLocal[MENU_ENABLED] = wId && tId && pUrl &&
-                                ports[wId] && ports[wId][tId] &&
-                                ports[wId][tId][pUrl] &&
-                                ports[wId][tId][pUrl].name === PORT_CONTENT ||
-                                false;
-      status === "complete" && func.push(restoreContextMenu(), syncUI());
+      const portUrl = removeQueryFromURI(url);
+      const portsWin = ports.get(windowId);
+      const portsTab = portsWin && portsWin.get(tabId);
+      const port = portsTab && portsTab.get(portUrl);
+      if (port) {
+        const {name} = port;
+        varsLocal[MENU_ENABLED] = name === PORT_CONTENT;
+      } else {
+        varsLocal[MENU_ENABLED] = false;
+      }
+      status === "complete" && func.push(updateContextMenu(), syncUI());
+    } else if (discarded) {
+      func.push(portHostMsg({
+        [TMP_FILE_DATA_REMOVE]: {
+          tabId, windowId,
+          dir: incognito && TMP_FILES_PB || TMP_FILES,
+        },
+      }));
     }
     return Promise.all(func);
   };
@@ -809,23 +956,66 @@
    * handle tab removed
    * @param {!number} id - tabId
    * @param {!Object} info - removed tab info
-   * @returns {?AsyncFunction} - restore ports
+   * @returns {Promise.<Array>} - results of each handler
    */
   const onTabRemoved = async (id, info) => {
+    const func = [];
+    const {windowId: wId} = info;
+    const {incognito} = await windows.get(wId);
+    const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(id, true);
-    let {windowId} = info;
-    windowId = stringifyPositiveInt(windowId, true);
-    return windowId && tabId && ports[windowId] && ports[windowId][tabId] &&
-           restorePorts({windowId, tabId}) || null;
+    const portsWin = ports.get(windowId);
+    const portsTab = portsWin && portsWin.get(tabId);
+    if (portsTab) {
+      func.push(
+        restorePorts({windowId, tabId}),
+        portHostMsg({
+          [TMP_FILE_DATA_REMOVE]: {
+            tabId, windowId,
+            dir: incognito && TMP_FILES_PB || TMP_FILES,
+          },
+        }),
+      );
+    }
+    return Promise.all(func);
   };
 
   /**
    * handle window focus changed
-   * @returns {?AsyncFunction} - sync UI
+   * @param {number} id - window ID
+   * @returns {Promise.<Array>} - results of each handler
    */
-  const onWindowFocusChanged = async () => {
+  const onWindowFocusChanged = async id => {
+    const func = [];
     const win = await windows.getAll({windowTypes: ["normal"]});
-    return win.length && syncUI() || null;
+    const tabList = await tabs.query({
+      windowId: id,
+      windowType: "normal",
+    });
+    for (const tab of tabList) {
+      const {active, discarded, id: tId, incognito} = tab;
+      const windowId = stringifyPositiveInt(id, true);
+      const tabId = stringifyPositiveInt(tId, true);
+      if (windowId && tabId) {
+        if (active) {
+          func.push(portMsg({
+            [TMP_FILE_REQ]: true,
+          }, windowId, tabId));
+        } else if (discarded) {
+          func.push(portHostMsg({
+            [TMP_FILE_DATA_REMOVE]: {
+              tabId, windowId,
+              dir: incognito && TMP_FILES_PB || TMP_FILES,
+            },
+          }));
+        }
+      }
+    }
+    win.length && func.push(
+      updateContextMenu(),
+      syncUI(),
+    );
+    return Promise.all(func);
   };
 
   /**
@@ -843,6 +1033,27 @@
       windowId && func.push(restorePorts({windowId}));
     }
     return Promise.all(func);
+  };
+
+  /**
+   * handle command
+   * @param {string} cmd - command
+   * @returns {?AsyncFunction} - command handler function
+   */
+  const handleCmd = async cmd => {
+    let func;
+    if (isString(cmd)) {
+      switch (cmd) {
+        case EDITOR_EXEC:
+          func = portGetContentMsg();
+          break;
+        case OPTIONS_OPEN:
+          func = openOptionsPage();
+          break;
+        default:
+      }
+    }
+    return func || null;
   };
 
   /* handle variables */
@@ -864,7 +1075,7 @@
     const func = [];
     if (item && obj) {
       const {app, checked, value} = obj;
-      const hasPorts = Object.keys(ports).length;
+      const hasPorts = ports.size > 0;
       switch (item) {
         case EDITOR_FILE_NAME:
           varsLocal[item] = value;
@@ -876,14 +1087,15 @@
           func.push(cacheMenuItemTitle());
           changed && func.push(updateContextMenu());
           break;
-        case ONLY_EDITABLE:
-          vars[item] = !!checked;
-          hasPorts && func.push(portVar({[item]: !!checked}));
-          changed && func.push(restoreContextMenu());
-          break;
         case ENABLE_PB:
           varsLocal[item] = !!checked;
           changed && func.push(syncUI());
+          break;
+        case HOST_ERR_NOTIFY:
+          if (checked && notifications && notifications.onClosed &&
+              !notifications.onClosed.hasListener(handleNotifyOnClosed)) {
+            notifications.onClosed.addListener(handleNotifyOnClosed);
+          }
           break;
         case ICON_AUTO:
         case ICON_BLACK:
@@ -896,15 +1108,17 @@
           }
           break;
         case KEY_ACCESS:
-          vars[item] = value;
-          hasPorts && func.push(portVar({[item]: value}));
+          varsLocal[item] = value;
           changed && func.push(
             updateContextMenu(),
             cacheMenuItemTitle(),
           );
           break;
-        case KEY_EDITOR:
-        case KEY_OPTIONS:
+        case ONLY_EDITABLE:
+          vars[item] = !!checked;
+          hasPorts && func.push(portVar({[item]: !!checked}));
+          changed && func.push(updateContextMenu());
+          break;
         case SYNC_AUTO:
           vars[item] = !!checked;
           hasPorts && func.push(portVar({[item]: !!checked}));
@@ -938,31 +1152,32 @@
   };
 
   /* listeners */
-  browserAction.onClicked.addListener(() => openOptionsPage().catch(logError));
+  browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
+  commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
   contextMenus.onClicked.addListener((info, tab) =>
-    portContextMenuData(info, tab).catch(logError)
+    portContextMenuData(info, tab).catch(throwErr)
   );
   host.onDisconnect.addListener(port =>
-    handleDisconnectedHost(port).then(toggleBadge).catch(logError)
+    handleDisconnectedHost(port).then(toggleBadge).catch(throwErr)
   );
-  host.onMessage.addListener(msg => handleMsg(msg).catch(logError));
-  runtime.onConnect.addListener(port => handlePort(port).catch(logError));
-  runtime.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  host.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+  runtime.onConnect.addListener(port => handlePort(port).catch(throwErr));
+  runtime.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
   storage.onChanged.addListener(data =>
-    setVars(data).then(syncUI).catch(logError)
+    setVars(data).then(syncUI).catch(throwErr)
   );
-  tabs.onActivated.addListener(info => onTabActivated(info).catch(logError));
+  tabs.onActivated.addListener(info => onTabActivated(info).catch(throwErr));
   tabs.onUpdated.addListener((id, info, tab) =>
-    onTabUpdated(id, info, tab).catch(logError)
+    onTabUpdated(id, info, tab).catch(throwErr)
   );
   tabs.onRemoved.addListener((id, info) =>
-    onTabRemoved(id, info).catch(logError)
+    onTabRemoved(id, info).catch(throwErr)
   );
-  windows.onFocusChanged.addListener(() =>
-    onWindowFocusChanged().catch(logError)
+  windows.onFocusChanged.addListener(windowId =>
+    onWindowFocusChanged(windowId).catch(throwErr)
   );
   windows.onRemoved.addListener(windowId =>
-    onWindowRemoved(windowId).catch(logError)
+    onWindowRemoved(windowId).catch(throwErr)
   );
 
   /* startup */
@@ -971,5 +1186,5 @@
     storeFetchedData(NS_URI_PATH, NS_URI),
     storeFetchedData(FILE_EXT_PATH, FILE_EXT),
     storeFetchedData(LIVE_EDIT_PATH, LIVE_EDIT),
-  ]).catch(logError);
+  ]).catch(throwErr);
 }

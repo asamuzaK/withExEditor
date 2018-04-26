@@ -5,7 +5,7 @@
 {
   /* api */
   const {
-    i18n, runtime,
+    i18n, permissions, runtime,
     storage: {
       local: localStorage,
     },
@@ -18,6 +18,7 @@
   const EDITOR_LABEL = "editorLabel";
   const EXT_RELOAD = "reloadExtension";
   const HOST_CONNECTION = "hostConnection";
+  const HOST_ERR_NOTIFY = "notifyHostError";
   const HOST_STATUS = "hostStatus";
   const HOST_STATUS_GET = "getHostStatus";
   const HOST_VERSION = "hostVersion";
@@ -29,13 +30,12 @@
   const WARN = "warn";
 
   /**
-   * log error
+   * throw error
    * @param {!Object} e - Error
-   * @returns {boolean} - false
+   * @throws
    */
-  const logError = e => {
-    console.error(e);
-    return false;
+  const throwErr = e => {
+    throw e;
   };
 
   /**
@@ -152,7 +152,7 @@
    */
   const portPref = async evt => {
     const {target} = evt;
-    const {id, name, type, value} = target;
+    const {checked, id, name, type, value} = target;
     const func = [];
     if (type === "radio") {
       const nodes = document.querySelectorAll(`[name=${name}]`);
@@ -163,6 +163,18 @@
       }
     } else {
       switch (id) {
+        case HOST_ERR_NOTIFY:
+          if (checked) {
+            target.checked = await permissions.request({
+              permissions: ["notifications"],
+            });
+          } else {
+            await permissions.remove({
+              permissions: ["notifications"],
+            });
+          }
+          func.push(createPref(target).then(portMsg));
+          break;
         case KEY_ACCESS:
           (value === "" || /^[a-z]$/i.test(value)) &&
             func.push(createPref(target).then(portMsg));
@@ -220,7 +232,7 @@
         const {currentTarget, target} = evt;
         evt.preventDefault();
         evt.stopPropagation();
-        return portReloadExt(currentTarget === target).catch(logError);
+        return portReloadExt(currentTarget === target).catch(throwErr);
       }, false);
     }
   };
@@ -233,7 +245,7 @@
     const elm = document.getElementById(SYNC_AUTO_URL);
     elm && elm.addEventListener(
       "input",
-      evt => extractSyncUrlsInput(evt).catch(logError),
+      evt => extractSyncUrlsInput(evt).catch(throwErr),
       false
     );
   };
@@ -248,7 +260,7 @@
       for (const node of nodes) {
         node.addEventListener(
           "change",
-          evt => portPref(evt).catch(logError),
+          evt => portPref(evt).catch(throwErr),
           false
         );
       }
@@ -387,9 +399,10 @@
   };
 
   /* listeners */
-  port.onMessage.addListener(msg => handleMsg(msg).catch(logError));
+  port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
-  document.addEventListener("DOMContentLoaded", () => Promise.all([
+  /* startup */
+  Promise.all([
     localizeHtml(),
     setValuesFromLocalStorage(),
     addInputChangeListener(),
@@ -397,5 +410,5 @@
     addReloadExtensionListener(),
     addFormSubmitListener(),
     getHostStatus(),
-  ]).catch(logError));
+  ]).catch(throwErr);
 }

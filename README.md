@@ -1,6 +1,9 @@
 EN | [JA](./README.ja.md)
 
-# WithExEditor
+[![Build Status](https://travis-ci.org/asamuzaK/withExEditor.svg?branch=master)](https://travis-ci.org/asamuzaK/withExEditor)
+[![devDependency Status](https://david-dm.org/asamuzaK/withExEditor/dev-status.svg)](https://david-dm.org/asamuzaK/withExEditor?type=dev)
+
+# withExEditor
 
 Extension for Gecko based browsers and Blink based browsers.
 
@@ -48,7 +51,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 ### Edit Text with *exEditor*
 
 * Enabled on input elements, textarea element and editable elements.
-* Edited contents will be synchronized when you go back to the browser and move focus to the element which you've edited.
+* Edited contents will be synchronized when you go back to the browser.
 
 ***
 
@@ -65,18 +68,18 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 ### Access Key
 
-* Access key commonly used for the context menu, for the shortcut to open the options page, and for the shortcut to execute the editor directly.
-* Access key can be any key from 'a' to 'z'.
-* In the context menu, press 'key' itself.
-* NOTE: accesskey in context menu is not yet implemented in Gecko browsers.
+* Access key used in the context menu. Access key can be any key from `A` to `Z`.
+* NOTE: Accesskey in context menu is not implemented in Gecko browsers yet.
 
-### Enable Shortcut Key To Open The Options Page
+### Execute The Editor Directly
 
-* To open the options page, press 'Alt + Shift + key' ('Opt + Shift + key' on Mac).
+* Keyboard shortcut to execute the editor without going through the context menu. In the input field, press the combination of keys such as `Ctrl+Shift+U`.
+* NOTE: Incompatible with Blink browsers. Please specify keyboard shortcut on browser's extension page.
 
-### Enable Shortcut Key To Execute The Editor Directly
+### Open The Options Page
 
-* To execute the editor without going through the context menu, press 'Ctrl + Shift + key'.
+* Keyboard shortcut to open the options page. In the input field, press the combination of keys such as 'Alt+Shift+U'.
+* NOTE: Incompatible with Blink browsers. Please specify keyboard shortcut on browser's extension page.
 
 ### Enable During Private Browsing
 

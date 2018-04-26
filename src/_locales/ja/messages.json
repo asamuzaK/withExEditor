@@ -11,6 +11,15 @@
   "commandOpenOptions": {
     "message": "設定ページを開く"
   },
+  "compatNoteAccessKey": {
+    "message": "備考： コンテクストメニューでのアクセスキーは、まだGecko系ブラウザでは実装されていません。"
+  },
+  "compatNoteIconAuto": {
+    "message": "備考： 「自動」はGecko系ブラウザしか適用されません。また「about:config」から「svg.context-properties.content.enabled」の値を「true」に変更する必要があります。"
+  },
+  "compatNoteShortcutKey": {
+    "message": "備考： Blink系ブラウザとは互換性がありません。ブラウザの拡張機能ページでショートカットキーを設定してください。"
+  },
   "hostConnection_false": {
     "message": "未接続"
   },
@@ -95,22 +104,10 @@
     "message": "アクセスキーを入力"
   },
   "optionsAccessKeyDetail": {
-    "message": "コンテキストメニュー、設定ページを開くショートカット、および直接エディタを実行するためのショートカットで共通して使用するアクセスキーを設定します。"
-  },
-  "optionsAccessKeyDetail2": {
-    "message": "アクセスキーには、「a」から「z」までの任意のキーを使用できます。"
-  },
-  "optionsAccessKeyDetail3": {
-    "message": "コンテキストメニューでは設定した「キー」をそのまま押してください。"
-  },
-  "optionsAccessKeyDetail4": {
-    "message": "備考： コンテクストメニューでのアクセスキーは、まだGeckoブラウザでは実装されていません。"
+    "message": "コンテキストメニューのアクセスキーを設定します。アクセスキーには、「A」から「Z」までの任意のキーを使用できます。"
   },
   "optionsAccessKeyLabel": {
     "message": "アクセスキー"
-  },
-  "optionsAccessKeySettings": {
-    "message": "アクセスキー設定"
   },
   "optionsEditorLabel": {
     "message": ""
@@ -126,12 +123,6 @@
   },
   "optionsEditorLabelLabel": {
     "message": "エディタの表示名"
-  },
-  "optionsEditorShortCutDetail": {
-    "message": "コンテキストメニューを経由せずにエディタを直接起動するには「Ctrl + Shift + キー」を押してください。"
-  },
-  "optionsEditorShortCutLabel": {
-    "message": "エディタを直接起動するショートカットキーを有効化"
   },
   "optionsEnableOnlyEditableDetail": {
     "message": "コンテンツが編集可能な場合にのみ有効化します。"
@@ -153,6 +144,12 @@
   },
   "optionsEnableSyncAutoLabel": {
     "message": "特定のサイトでは編集したコンテンツを自動的に同期する"
+  },
+  "optionsExecEditorDetail": {
+    "message": "エディタを直接起動するショートカットキーを設定します。入力欄で「Ctrl+Shift+U」などのキーの組み合わせで押下してください。"
+  },
+  "optionsExecEditorLabel": {
+    "message": "エディタを直接起動"
   },
   "optionsHostConnectionDetail": {
     "message": "状態が「不明」や「未接続」となっている場合は、withExEditor を再読み込みしてください。"
@@ -208,9 +205,6 @@
   "optionsIconDetail": {
     "message": "アイコンを選択してください。"
   },
-  "optionsIconDetail2": {
-    "message": "「自動」はGecko（57.0以降）しか適用されません。また「about:config」から「svg.context-properties.content.enabled」の値を「true」に変更する必要があります。"
-  },
   "optionsIconGray": {
     "message": ""
   },
@@ -235,14 +229,29 @@
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "ホワイトアイコン"
   },
+  "optionsKeyComboInput": {
+    "message": ""
+  },
+  "optionsKeyComboInput_placeholder": {
+    "message": "キーの組み合わせを押下"
+  },
+  "optionsKeyboardShortcuts": {
+    "message": "キーボードショートカット"
+  },
   "optionsLang": {
     "message": "ja"
   },
-  "optionsOptionsShortCutDetail": {
-    "message": "設定ページを開くには「Alt + Shift + キー」（Macは「Opt + Shift + キー」）を押してください。"
+  "optionsNotifyHostError": {
+    "message": "ホストのエラーを通知"
   },
-  "optionsOptionsShortCutLabel": {
-    "message": "設定ページを開くショートカットキーを有効化"
+  "optionsNotifyHostErrorDetail": {
+    "message": "ホストでエラーが起きたときに通知します。"
+  },
+  "optionsOpenOptionsPageDetail": {
+    "message": "設定ページを開くショートカットキーを設定します。入力欄で「Alt+Shift+U」などのキーの組み合わせで押下してください。"
+  },
+  "optionsOpenOptionsPageLabel": {
+    "message": "設定ページを開く"
   },
   "optionsOtherSettings": {
     "message": "その他"
