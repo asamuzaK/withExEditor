@@ -808,7 +808,7 @@
             case HOST_VERSION: {
               const {result} = value;
               if (Number.isInteger(result)) {
-                hostStatus[HOST_VERSION] = result >= 0 && true || false;
+                hostStatus[HOST_VERSION] = result >= 0;
                 func.push(toggleBadge());
               }
               break;
