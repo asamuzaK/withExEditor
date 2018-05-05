@@ -929,7 +929,7 @@
    */
   const storeTmpFileData = async (data = {}) => {
     let func;
-    const tmpFileData = data[TMP_FILE_CREATE] && data[TMP_FILE_CREATE];
+    const tmpFileData = data[TMP_FILE_CREATE];
     if (tmpFileData) {
       const {dataId, mode} = tmpFileData;
       if (mode === MODE_EDIT && dataId) {
