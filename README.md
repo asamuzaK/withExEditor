@@ -66,6 +66,10 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 * Enter the label of the editor.
 * If the input field is disabled, run the setup script on the host.
 
+### Notify Host Error
+
+* If enabled, notifies when an error occurs on the host.
+
 ### Access Key
 
 * Access key used in the context menu. Access key can be any key from `A` to `Z`.
