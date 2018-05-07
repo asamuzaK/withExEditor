@@ -924,8 +924,8 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const onTabUpdated = async (id, info, tab) => {
-    const {active, incognito, url, windowId: wId} = tab;
-    const {discarded, status} = info;
+    const {active, url, windowId: wId} = tab;
+    const {status} = info;
     const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(id, true);
     const func = [];
@@ -941,13 +941,6 @@
         varsLocal[MENU_ENABLED] = false;
       }
       status === "complete" && func.push(updateContextMenu(), syncUI());
-    } else if (discarded) {
-      func.push(portHostMsg({
-        [TMP_FILE_DATA_REMOVE]: {
-          tabId, windowId,
-          dir: incognito && TMP_FILES_PB || TMP_FILES,
-        },
-      }));
     }
     return Promise.all(func);
   };
@@ -993,7 +986,7 @@
       windowType: "normal",
     });
     for (const tab of tabList) {
-      const {active, discarded, id: tId, incognito} = tab;
+      const {active, id: tId} = tab;
       const windowId = stringifyPositiveInt(id, true);
       const tabId = stringifyPositiveInt(tId, true);
       if (windowId && tabId) {
@@ -1001,13 +994,6 @@
           func.push(portMsg({
             [TMP_FILE_REQ]: true,
           }, windowId, tabId));
-        } else if (discarded) {
-          func.push(portHostMsg({
-            [TMP_FILE_DATA_REMOVE]: {
-              tabId, windowId,
-              dir: incognito && TMP_FILES_PB || TMP_FILES,
-            },
-          }));
         }
       }
     }
