@@ -1404,9 +1404,11 @@
           const br = document.createElementNS(ns, "br");
           if (sep === "div" || sep === "p") {
             const elm = document.createElementNS(ns, sep);
-            text ?
-              elm.append(document.createTextNode(text)) :
+            if (text) {
+              elm.append(document.createTextNode(text));
+            } else {
               i < l - 1 && elm.append(br);
+            }
             elm.hasChildNodes() && frag.append(elm);
           } else {
             frag.append(document.createTextNode(text));
