@@ -173,11 +173,11 @@
    * @returns {boolean} - result
    */
   const checkWindowIncognito = async () => {
-    const windowIds = await windows.getAll({windowTypes: ["normal"]});
+    const winArr = await windows.getAll({windowTypes: ["normal"]});
     let incog;
-    if (windowIds && windowIds.length) {
-      for (const windowId of windowIds) {
-        incog = windowId.incognito;
+    if (winArr && winArr.length) {
+      for (const win of winArr) {
+        incog = win.incognito;
         if (incog) {
           break;
         }
@@ -507,7 +507,7 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const createMenuItems = async () => {
-    const win = await windows.getCurrent({windowTypes: ["normal"]});
+    const win = await windows.getCurrent();
     const enabled = win && (!win.incognito || varsLocal[ENABLE_PB]) || false;
     const bool = enabled && !vars[ONLY_EDITABLE];
     const items = Object.keys(menus);
@@ -613,7 +613,7 @@
    * @returns {Promise.<Array>} - results of each handler
    */
   const syncUI = async () => {
-    const win = await windows.getCurrent({windowTypes: ["normal"]});
+    const win = await windows.getCurrent();
     const enabled = win && (!win.incognito || varsLocal[ENABLE_PB]) || false;
     vars[IS_ENABLED] = !!enabled;
     return Promise.all([
@@ -980,7 +980,7 @@
    */
   const onWindowFocusChanged = async id => {
     const func = [];
-    const win = await windows.getAll({windowTypes: ["normal"]});
+    const winArr = await windows.getAll({windowTypes: ["normal"]});
     const tabList = await tabs.query({
       windowId: id,
       windowType: "normal",
@@ -997,10 +997,16 @@
         }
       }
     }
-    win.length && func.push(
-      updateContextMenu(),
-      syncUI(),
-    );
+    if (winArr) {
+      for (const win of winArr) {
+        const {focused, type} = win;
+        if (focused && type === "normal") {
+          func.push(restoreContextMenu());
+          break;
+        }
+      }
+    }
+    func.push(syncUI());
     return Promise.all(func);
   };
 
@@ -1011,8 +1017,8 @@
    */
   const onWindowRemoved = async windowId => {
     const func = [];
-    const win = await windows.getAll({windowTypes: ["normal"]});
-    if (win.length) {
+    const winArr = await windows.getAll({windowTypes: ["normal"]});
+    if (winArr && winArr.length) {
       const bool = await checkWindowIncognito();
       !bool && func.push(portHostMsg({[TMP_FILES_PB_REMOVE]: !bool}));
       windowId = stringifyPositiveInt(windowId, true);
