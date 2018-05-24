@@ -747,6 +747,14 @@
   };
 
   /**
+   * remove dataId
+   * @param {string} dataId - data ID
+   * @returns {boolean} - result
+   */
+  const removeDataId = async dataId =>
+    isString(dataId) && dataIds.has(dataId) && dataIds.remove(dataId);
+
+  /**
    * get ID data
    * @param {Object} elm - target element
    * @returns {Object} - ID data
@@ -1546,6 +1554,8 @@
             }
             data.lastUpdate = timestamp;
             func.push(setDataId(dataId, data));
+          } else if (Number.isInteger(timestamp) && timestamp < 0) {
+            func.push(removeDataId(dataId));
           }
         }
       }
