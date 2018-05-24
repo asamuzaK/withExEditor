@@ -18,6 +18,7 @@
   const CONTEXT_NODE = "contextNode";
   const FILE_EXT = "fileExt";
   const FILE_LEN = 128;
+  const FILE_NOT_FOUND_TIMESTAMP = -1;
   const HTML = "html";
   const ID_TAB = "tabId";
   const ID_WIN = "windowId";
@@ -1538,9 +1539,11 @@
       if (dataId && tabId === vars[ID_TAB]) {
         const elm = await getTargetElementFromDataId(dataId);
         if (elm) {
-          if (!lastUpdate ||
-              Number.isInteger(timestamp) && Number.isInteger(lastUpdate) &&
-              timestamp > lastUpdate) {
+          if (timestamp === FILE_NOT_FOUND_TIMESTAMP) {
+            func.push(removeDataId(dataId));
+          } else if (!lastUpdate ||
+                     Number.isInteger(timestamp) &&
+                     Number.isInteger(lastUpdate) && timestamp > lastUpdate) {
             const controller = await getTargetElementFromDataId(controlledBy);
             if (liveEditKey && liveEdit[liveEditKey]) {
               func.push(replaceLiveEditContent(elm, liveEditKey, value));
@@ -1554,8 +1557,6 @@
             }
             data.lastUpdate = timestamp;
             func.push(setDataId(dataId, data));
-          } else if (Number.isInteger(timestamp) && timestamp < 0) {
-            func.push(removeDataId(dataId));
           }
         }
       }
