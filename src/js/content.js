@@ -1010,7 +1010,13 @@
         Charset: characterSet,
         "Content-Type": contentType,
       });
-      const res = await fetch(uri, {headers, method: "GET", mode: "cors"});
+      const opt = {
+        headers,
+        credentials: "include",
+        method: "GET",
+        mode: "cors",
+      };
+      const res = await fetch(uri, opt);
       if (res) {
         const {dir, host, incognito, mode, tabId, windowId} = data;
         const [type] = res.headers.get("Content-Type").split(";");
