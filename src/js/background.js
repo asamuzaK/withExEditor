@@ -566,6 +566,7 @@
       const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                      `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
       const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
+      const bool = enabled && !vars[ONLY_EDITABLE];
       if (items.length) {
         for (const item of items) {
           if (menus[item]) {
@@ -573,16 +574,16 @@
               enabled,
               title: i18n.getMessage(item, [label, accKey]),
             }));
-          } else {
+          } else if (enabled) {
             switch (item) {
               case MODE_EDIT:
                 func.push(createMenuItem(item, ["editable"]));
                 break;
               case MODE_SELECTION:
-                func.push(createMenuItem(item, ["selection"]));
+                bool && func.push(createMenuItem(item, ["selection"]));
                 break;
               case MODE_SOURCE:
-                func.push(createMenuItem(item, ["frame", "page"]));
+                bool && func.push(createMenuItem(item, ["frame", "page"]));
                 break;
               default:
             }
