@@ -1109,7 +1109,7 @@
         case ONLY_EDITABLE:
           vars[item] = !!checked;
           hasPorts && func.push(portVar({[item]: !!checked}));
-          changed && func.push(updateContextMenu());
+          changed && func.push(restoreContextMenu());
           break;
         case SYNC_AUTO:
           vars[item] = !!checked;
