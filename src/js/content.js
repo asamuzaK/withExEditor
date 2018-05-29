@@ -1315,11 +1315,12 @@
    */
   const determinePortProcess = async (obj = {}) => {
     const {info} = obj;
-    const elm = vars[CONTEXT_NODE];
+    const elm = vars[CONTEXT_NODE] || document.documentElement;
     let mode;
     if (info) {
       const {menuItemId} = info;
-      mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE];
+      mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE] ||
+             MODE_SOURCE;
     } else {
       mode = await getContextMode(elm);
     }
