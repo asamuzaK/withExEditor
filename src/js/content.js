@@ -1017,6 +1017,8 @@
         mode: "cors",
       };
       const res = await fetch(uri, opt);
+      console.log("fetchSource:");
+      console.log(res);
       if (res) {
         const {dir, host, incognito, mode, tabId, windowId} = data;
         const [type] = res.headers.get("Content-Type").split(";");
@@ -1315,15 +1317,23 @@
    */
   const determinePortProcess = async (obj = {}) => {
     const {info} = obj;
-    const elm = vars[CONTEXT_NODE] || document.documentElement;
+    const isTop = window.top.location.href === document.URL;
+    const elm = vars[CONTEXT_NODE] || isTop && document.documentElement;
     let mode;
     if (info) {
       const {menuItemId} = info;
       mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE] ||
-             MODE_SOURCE;
+             isTop && MODE_SOURCE;
     } else {
       mode = await getContextMode(elm);
     }
+    console.log("determinePortProcess:");
+    console.log(`url: ${document.URL}`);
+    console.log(`window.top.location.href: ${window.top.location.href}`);
+    console.log(`isTop: ${isTop}`);
+    console.log(`context_node: ${vars[CONTEXT_NODE]}`);
+    console.log(`context_mode: ${vars[CONTEXT_MODE]}`);
+    console.log(`mode: ${mode}`);
     return mode && portContent(elm, mode) || null;
   };
 
@@ -1603,6 +1613,9 @@
   const handleMsg = async msg => {
     const func = [];
     const items = msg && Object.entries(msg);
+    console.log("handleMsg:");
+    console.log(`url: ${document.URL}`);
+    console.log(msg);
     if (items && items.length) {
       for (const item of items) {
         const [key, value] = item;
@@ -1689,6 +1702,10 @@
         });
       }
     }
+    console.log("handleBeforeContextMenu:");
+    console.log(`url: ${document.URL}`);
+    console.log(`context_node: ${vars[CONTEXT_NODE]}`);
+    console.log(`context_mode: ${vars[CONTEXT_MODE]}`);
     return func || null;
   };
 
@@ -1702,7 +1719,7 @@
     if (vars[IS_ENABLED]) {
       const {key, shiftKey, target} = evt;
       if (key === "ContextMenu" || shiftKey && key === "F10") {
-        func = handleBeforeContextMenu(evt).catch(throwErr);
+        func = handleBeforeContextMenu(evt);
       } else if (/^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
         const {namespaceURI} = target;
         const mode = await getContextMode(target);
@@ -1721,6 +1738,11 @@
         }
       }
     }
+    console.log("handleKeyDown:");
+    console.log(`url: ${document.URL}`);
+    console.log(`document.contentType: ${document.contentType}`);
+    console.log(`context_node: ${vars[CONTEXT_NODE]}`);
+    console.log(`context_mode: ${vars[CONTEXT_MODE]}`);
     return func || null;
   };
 
