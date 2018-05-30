@@ -1012,6 +1012,7 @@
       });
       const opt = {
         headers,
+        cache: "force-cache",
         credentials: "include",
         method: "GET",
         mode: "cors",
