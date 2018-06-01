@@ -42,7 +42,6 @@
   const SUBST = "index";
   const SYNC_AUTO = "enableSyncAuto";
   const SYNC_AUTO_URL = "syncAutoUrls";
-  const TEXT_SYNC = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILE_CREATE = "createTmpFile";
@@ -50,6 +49,7 @@
   const TMP_FILE_DATA_REMOVE = "removeTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
   const TMP_FILE_REQ = "requestTmpFile";
+  const TMP_FILE_RES = "resTmpFile";
   const TYPE_FROM = 8;
   const TYPE_TO = -1;
   const VARS_SET = "setVars";
@@ -1642,7 +1642,7 @@
           case SYNC_AUTO:
             vars[key] = !!value;
             break;
-          case TEXT_SYNC:
+          case TMP_FILE_RES:
             func.push(syncText(value));
             break;
           case TMP_FILE_DATA_PORT:
