@@ -47,6 +47,7 @@
   const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILE_CREATE = "createTmpFile";
   const TMP_FILE_DATA_PORT = "portTmpFileData";
+  const TMP_FILE_DATA_REMOVE = "removeTmpFileData";
   const TMP_FILE_GET = "getTmpFile";
   const TMP_FILE_REQ = "requestTmpFile";
   const TYPE_FROM = 8;
@@ -965,6 +966,24 @@
     return func || null;
   };
 
+  /**
+   * remove temporary file data
+   * @param {Ojbect} obj - temporary file data object
+   * @returns {?AsyncFunction} - remove data ID
+   */
+  const removeTmpFileData = async (obj = {}) => {
+    let func;
+    const {data} = obj;
+    if (data) {
+      const {dataId, tabId, timestamp} = data;
+      if (dataId && tabId === vars[ID_TAB] &&
+          timestamp === FILE_NOT_FOUND_TIMESTAMP) {
+        func.push(removeDataId(dataId));
+      }
+    }
+    return func || null;
+  };
+
   /* temporary file data */
   /**
    * create content data message
@@ -1628,6 +1647,9 @@
             break;
           case TMP_FILE_DATA_PORT:
             func.push(updateTmpFileData(value));
+            break;
+          case TMP_FILE_DATA_REMOVE:
+            func.push(removeTmpFileData(value));
             break;
           case TMP_FILE_REQ:
             func.push(portEachDataId(value));

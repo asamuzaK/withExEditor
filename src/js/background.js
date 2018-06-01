@@ -64,7 +64,6 @@
   const STORAGE_SET = "setStorage";
   const SYNC_AUTO = "enableSyncAuto";
   const SYNC_AUTO_URL = "syncAutoUrls";
-  const TEXT_SYNC = "syncText";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
@@ -391,13 +390,14 @@
   };
 
   /**
-   * port sync text
+   * port tmp file data message
+   * @param {string} key - message key
    * @param {*} msg - message
    * @returns {AsyncFunction} - port message
    */
-  const portSyncText = async msg => {
+  const portTmpFileDataMsg = async (key, msg) => {
     let func;
-    if (msg) {
+    if (isString(key) && msg) {
       const {data} = msg;
       if (data) {
         const {tabId, windowId} = data;
@@ -410,7 +410,7 @@
           if (tabList) {
             const [tab] = tabList;
             if (tab.id === tabId * 1) {
-              func = portMsg({[TEXT_SYNC]: msg}, windowId, tabId);
+              func = portMsg({[key]: msg}, windowId, tabId);
             }
           }
         }
@@ -823,8 +823,9 @@
             case TMP_FILE_DATA_PORT:
               func.push(portMsg({[key]: value}));
               break;
+            case TMP_FILE_DATA_REMOVE:
             case TMP_FILE_RES:
-              func.push(portSyncText(value));
+              func.push(portTmpFileDataMsg(key, value));
               break;
             default:
           }
