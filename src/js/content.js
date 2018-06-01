@@ -978,7 +978,7 @@
       const {dataId, tabId, timestamp} = data;
       if (dataId && tabId === vars[ID_TAB] &&
           timestamp === FILE_NOT_FOUND_TIMESTAMP) {
-        func.push(removeDataId(dataId));
+        func = removeDataId(dataId);
       }
     }
     return func || null;
