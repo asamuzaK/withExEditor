@@ -1096,7 +1096,7 @@
         case ICON_COLOR:
         case ICON_GRAY:
         case ICON_WHITE:
-          if (obj.checked) {
+          if (checked) {
             varsLocal[ICON_ID] = value;
             changed && func.push(setIcon(value));
           }
