@@ -754,7 +754,7 @@
    * @returns {boolean} - result
    */
   const removeDataId = async dataId =>
-    isString(dataId) && dataIds.has(dataId) && dataIds.remove(dataId);
+    isString(dataId) && dataIds.has(dataId) && dataIds.delete(dataId);
 
   /**
    * get ID data
