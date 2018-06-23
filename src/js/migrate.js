@@ -39,7 +39,7 @@
    * update command
    * @param {string} id - command ID
    * @param {string} value - key value
-   * @retunrs {void}
+   * @returns {void}
    */
   const updateCmd = async (id, value) => {
     if (typeof commands.update === "function" &&

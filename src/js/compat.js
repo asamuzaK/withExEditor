@@ -65,7 +65,7 @@
   /**
    * update command
    * @param {Object} evt - Event
-   * @retunrs {void}
+   * @returns {void}
    */
   const updateCmdKey = async evt => {
     if (typeof commands.update === "function") {
