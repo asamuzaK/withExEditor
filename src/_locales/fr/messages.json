@@ -1,0 +1,280 @@
+{
+  "extensionDescription": {
+    "message": "Depuis le menu contextuel (clic droit), vous pouvez \"afficher la source\" \"Sélectionner la source\" ou \"Éditer le texte\" avec votre éditeur favoris"
+  },
+  "extensionName": {
+    "message": "withExEditor"
+  },
+  "commandExecEditor": {
+    "message": "Éxécuter l'éditeur directement"
+  },
+  "commandOpenOptions": {
+    "message": "Ouvrir la page des options"
+  },
+  "compatNoteAccessKey": {
+    "message": "NOTE: Accesskey dans le menu contextuel n'est pas encore implémenté dans le navigateur Gecko."
+  },
+  "compatNoteIconAuto": {
+    "message": "NOTE: \"Auto\" applique uniquement aux navigateurs Gecko, et vous devez définir \"svg.context-properties.content.enabled\" à \"true\" depuis \"about:config\"."
+  },
+  "compatNoteShortcutKey": {
+    "message": "NOTE: Incompatible avec les navigateurs Blink. Merci de spécifier le raccourcis clavier sur la page d'extension du navigateur."
+  },
+  "hostConnection_false": {
+    "message": "Déconnecté"
+  },
+  "hostConnection_true": {
+    "message": "Connecté"
+  },
+  "hostVersion_false": {
+    "message": "Incompatible"
+  },
+  "hostVersion_true": {
+    "message": "Compatible"
+  },
+  "modeEditText": {
+    "message": "Editer Text avec $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
+  },
+  "modeViewMathML": {
+    "message": "Voir la source MathML avec $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
+  },
+  "modeViewSelection": {
+    "message": "Voir Source Sélectionnée avec $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
+  },
+  "modeViewSource": {
+    "message": "Voir Source de la Page avec $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
+  },
+  "modeViewSVG": {
+    "message": "Voir Source SVG avec $LABEL$ $KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(U)"
+      }
+    }
+  },
+  "optionsAccessKey": {
+    "message": ""
+  },
+  "optionsAccessKey_placeholder": {
+    "message": "Entrer une touche pour l'accès"
+  },
+  "optionsAccessKeyDetail": {
+    "message": "Clé d'accès utilisée dans le menu contextuel. La clé d'accès peut être n'importe qu'elle touche de 'A' à 'Z'."
+  },
+  "optionsAccessKeyLabel": {
+    "message": "Clé d'accès"
+  },
+  "optionsEditorLabel": {
+    "message": ""
+  },
+  "optionsEditorLabel_placeholder": {
+    "message": "Renommer Label Editeur"
+  },
+  "optionsEditorLabelDetail": {
+    "message": "Entrer le label de l'editeur."
+  },
+  "optionsEditorLabelDetail2": {
+    "message": "Si le champ de saisie est désactivé, exécutez le script de configuration sur l'hôte.."
+  },
+  "optionsEditorLabelLabel": {
+    "message": "Editer Label"
+  },
+  "optionsEnableOnlyEditableDetail": {
+    "message": "Active uniquement lorsque le contenu est modifiable."
+  },
+  "optionsEnableOnlyEditableLabel": {
+    "message": "Activer uniquement lors de l'édition de texte"
+  },
+  "optionsEnablePBDetail": {
+    "message": "Active si coché, désactive si non."
+  },
+  "optionsEnablePBLabel": {
+    "message": "Activer pendant la navigation privée"
+  },
+  "optionsEnableSyncAutoDetail": {
+    "message": "Activer lorsce que vous voulez automatiquement synchroniser les éléments édités."
+  },
+  "optionsEnableSyncAutoDetail2": {
+    "message": "Notez que cette option ne sera pas activée lors de la navigation privée. Notez également que si vous laissez tourner votre navigateur pendant une longue période ou si vous enregistrez de nombreuses URL, cela peut affecter les performances du PC."
+  },
+  "optionsEnableSyncAutoLabel": {
+    "message": "Synchroniser automatiquement le contenu édité sur des sites spécifiques."
+  },
+  "optionsExecEditorDetail": {
+    "message": "Raccourci clavier pour exécuter l'éditeur sans passer par le menu contextuel. Dans le champ de saisie, appuyez sur la combinaison de touches telles que'Ctrl+Maj+Maj+U'."
+  },
+  "optionsExecEditorLabel": {
+    "message": "Exécuter l'Éditeur directement"
+  },
+  "optionsHostConnectionDetail": {
+    "message": "Si \"Inconnu\" or \"Déconnecté\", relancez withExEditor."
+  },
+  "optionsHostConnectionLabel": {
+    "message": "Connection hôte"
+  },
+  "optionsHostStatus": {
+    "message": "Hôte"
+  },
+  "optionsHostVersionDetail": {
+    "message": "Si \"Inconnu\" or \"Incompatible\", mettre à jour l'hôte."
+  },
+  "optionsHostVersionLabel": {
+    "message": "Version de l'hôte"
+  },
+  "optionsIconAuto": {
+    "message": "Auto"
+  },
+  "optionsIconAuto_alt": {
+    "message": ""
+  },
+  "optionsIconAutoLabel": {
+    "message": "Auto"
+  },
+  "optionsIconAutoLabel_ariaLabel": {
+    "message": "Auto"
+  },
+  "optionsIconBlack": {
+    "message": ""
+  },
+  "optionsIconBlack_alt": {
+    "message": "Retour"
+  },
+  "optionsIconBlackLabel": {
+    "message": ""
+  },
+  "optionsIconBlackLabel_ariaLabel": {
+    "message": "Icone noire"
+  },
+  "optionsIconColor": {
+    "message": ""
+  },
+  "optionsIconColor_alt": {
+    "message": "Couleure"
+  },
+  "optionsIconColorLabel": {
+    "message": ""
+  },
+  "optionsIconColorLabel_ariaLabel": {
+    "message": "Couleur Icone"
+  },
+  "optionsIconDetail": {
+    "message": "Choisir une icone."
+  },
+  "optionsIconGray": {
+    "message": ""
+  },
+  "optionsIconGray_alt": {
+    "message": "Gris"
+  },
+  "optionsIconGrayLabel": {
+    "message": ""
+  },
+  "optionsIconGrayLabel_ariaLabel": {
+    "message": "Icone"
+  },
+  "optionsIconWhite": {
+    "message": ""
+  },
+  "optionsIconWhite_alt": {
+    "message": "Blanche"
+  },
+  "optionsIconWhiteLabel": {
+    "message": ""
+  },
+  "optionsIconWhiteLabel_ariaLabel": {
+    "message": "Icone blanche"
+  },
+  "optionsKeyComboInput": {
+    "message": ""
+  },
+  "optionsKeyComboInput_placeholder": {
+    "message": "Pressez la combinaison de touches"
+  },
+  "optionsKeyboardShortcuts": {
+    "message": "Raccourcis claviers"
+  },
+  "optionsLang": {
+    "message": "fr"
+  },
+  "optionsNotifyHostError": {
+    "message": "Notifier les érreures d'hôte"
+  },
+  "optionsNotifyHostErrorDetail": {
+    "message": "Notifier lorsce qu'une erreure survient dans l'hôte."
+  },
+  "optionsOpenOptionsPageDetail": {
+    "message": "Raccourci clavier pour ouvrir la page des options. Dans le champ de saisie, appuyez sur la combinaison de touches telles que 'Alt+Shift+U'."
+  },
+  "optionsOpenOptionsPageLabel": {
+    "message": "Ouvrir la page des options"
+  },
+  "optionsOtherSettings": {
+    "message": "Autres réglages"
+  },
+  "optionsReload": {
+    "message": "Recharger"
+  },
+  "optionsReloadExtension": {
+    "message": "Recharger withExEditor"
+  },
+  "optionsReloadExtensionDetail": {
+    "message": "Essayez quand avecExEditor cesse de fonctionner, par exemple lors de la mise à jour de Node.js ou de la mise à jour avecExEditorHost."
+  },
+  "optionsSaveEditorSettings": {
+    "message": "Sauvegarder"
+  },
+  "optionsSyncAutoUrlLabel": {
+    "message": "Sites (Entrer une URL par ligne)"
+  },
+  "optionsTitle": {
+    "message": "Options withExEditor"
+  },
+  "optionsToolbarIconLabel": {
+    "message": "Icônes du boutton de la barre d'outils"
+  }
+}
