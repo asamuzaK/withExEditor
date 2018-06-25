@@ -1,4 +1,7 @@
 {
+  "extensionLocale": {
+    "message": "en-CA"
+  },
   "extensionDescription": {
     "message": "From the context menu (right click), you can \"View source\" \"View selection\" or \"Edit text\" with your favourite editor."
   },
@@ -13,8 +16,5 @@
   },
   "optionsIconGrayLabel_ariaLabel": {
     "message": "Grey Icon"
-  },
-  "optionsLang": {
-    "message": "en-CA"
   }
 }

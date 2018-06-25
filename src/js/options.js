@@ -23,7 +23,7 @@
   const HOST_STATUS_GET = "getHostStatus";
   const HOST_VERSION = "hostVersion";
   const KEY_ACCESS = "accessKey";
-  const LANG = "optionsLang";
+  const LANG = "extensionLocale";
   const PORT_NAME = "portOptions";
   const STORAGE_SET = "setStorage";
   const SYNC_AUTO_URL = "syncAutoUrls";

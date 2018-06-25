@@ -1,4 +1,7 @@
 {
+  "extensionLocale": {
+    "message": "en"
+  },
   "extensionDescription": {
     "message": "From the context menu (right click), you can \"View source\" \"View selection\" or \"Edit text\" with your favorite editor."
   },
@@ -237,9 +240,6 @@
   },
   "optionsKeyboardShortcuts": {
     "message": "Keyboard Shortcuts"
-  },
-  "optionsLang": {
-    "message": "en"
   },
   "optionsNotifyHostError": {
     "message": "Notify Host Error"

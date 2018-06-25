@@ -1,4 +1,7 @@
 {
+  "extensionLocale": {
+    "message": "fr"
+  },
   "extensionDescription": {
     "message": "Depuis le menu contextuel (clic droit), vous pouvez \"afficher la source\" \"Sélectionner la source\" ou \"Éditer le texte\" avec votre éditeur favoris"
   },
@@ -237,9 +240,6 @@
   },
   "optionsKeyboardShortcuts": {
     "message": "Raccourcis claviers"
-  },
-  "optionsLang": {
-    "message": "fr"
   },
   "optionsNotifyHostError": {
     "message": "Notifier les érreures d'hôte"
