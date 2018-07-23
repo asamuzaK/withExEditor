@@ -48,6 +48,9 @@
   <g id="black" fill="#000">
     <use href="#outline"/>
   </g>
+  <g id="current" fill="currentColor">
+    <use href="#outline"/>
+  </g>
   <g id="dark" fill="#0C0C0D" fill-opacity="0.8">
     <use href="#outline"/>
   </g>
