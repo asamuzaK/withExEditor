@@ -61,7 +61,7 @@
     <use href="#outline"/>
   </g>
   <g id="white" fill="#FFF">
-    <use href="#outine"/>
+    <use href="#outline"/>
   </g>
   <g id="off" fill="ButtonShadow">
     <use href="#outline"/>
