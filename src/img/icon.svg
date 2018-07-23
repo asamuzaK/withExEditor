@@ -27,34 +27,41 @@
     <path d="m107.52 3.5156-60 60 16.969 16.969 60-60-16.969-16.969z"/>
     <path d="m0 0v24h12l12-12-12-12z" transform="translate(60,85) rotate(135)"/>
   </symbol>
-  <g id="context" fill="context-fill"
-     fill-opacity="context-fill-opacity">
-    <use href="#frame"/>
-    <use href="#pen"/>
-  </g>
-  <g id="photon_gray_90" fill="#0C0C0D" fill-opacity="0.8">
-    <use href="#frame"/>
-    <use href="#pen"/>
-  </g>
-  <g id="photon_gray_10" fill="#F9F9FA" fill-opacity="0.8">
-    <use href="#frame"/>
-    <use href="#pen"/>
+  <symbol id="outline">
+    <path transform="translate(60,85) rotate(135)"
+          d="M 0,0 V 24 H 12 L 24,12 12,0 Z
+             m -91.219886,24.016458 84.8528137,0 0,-23.99779038 H -91.219886 Z
+             m 62.228508,61.543463
+             c 6.170214,6.170213 16.457203,6.170213 22.627417,0
+             L 55.861436,23.334524
+             c 6.169931,-6.169931 6.169931,-16.4574863 0,-22.62741722
+             L 10.606602,-44.547727
+             c -6.1699312,-6.169931 -16.4574864,-6.169931 -22.627417,0
+             L -74.246212,17.67767
+             c -6.170214,6.170213 -6.170214,16.457203 0,22.627417 z
+             M -17.67767,74.246212 -62.932504,28.991378
+             -0.70710678,-33.234019 44.547727,12.020815 Z"/>
+  </symbol>
+  <g id="context" fill="context-fill" fill-opacity="context-fill-opacity">
+    <use href="#outline"/>
   </g>
   <g id="black" fill="#000">
-    <use href="#frame"/>
-    <use href="#pen"/>
+    <use href="#outline"/>
+  </g>
+  <g id="dark" fill="#0C0C0D" fill-opacity="0.8">
+    <use href="#outline"/>
   </g>
   <g id="gray" fill="#4C4C4C">
-    <use href="#frame"/>
-    <use href="#pen"/>
+    <use href="#outline"/>
+  </g>
+  <g id="light" fill="#F9F9FA" fill-opacity="0.8">
+    <use href="#outline"/>
   </g>
   <g id="white" fill="#FFF">
-    <use href="#frame"/>
-    <use href="#pen"/>
+    <use href="#outine"/>
   </g>
   <g id="off" fill="ButtonShadow">
-    <use href="#frame"/>
-    <use href="#pen"/>
+    <use href="#outline"/>
   </g>
   <g id="color">
     <use href="#frame" fill="#002147"/>
