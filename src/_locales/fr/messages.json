@@ -209,13 +209,13 @@
     "message": ""
   },
   "optionsIconDark_alt": {
-    "message": "Dark"
+    "message": "Noir"
   },
   "optionsIconDarkLabel": {
     "message": ""
   },
   "optionsIconDarkLabel_ariaLabel": {
-    "message": "Dark Icon"
+    "message": "Icône noirçie"
   },
   "optionsIconDetail": {
     "message": "Choisir une icone."
@@ -224,13 +224,13 @@
     "message": ""
   },
   "optionsIconLight_alt": {
-    "message": "Light"
+    "message": "Claire"
   },
   "optionsIconLightLabel": {
     "message": ""
   },
   "optionsIconLightLabel_ariaLabel": {
-    "message": "Light Icon"
+    "message": "Icône claire"
   },
   "optionsIconWhite": {
     "message": ""
