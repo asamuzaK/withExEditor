@@ -10,11 +10,5 @@
   },
   "optionsIconColorLabel_ariaLabel": {
     "message": "Colour Icon"
-  },
-  "optionsIconGray_alt": {
-    "message": "Grey"
-  },
-  "optionsIconGrayLabel_ariaLabel": {
-    "message": "Grey Icon"
   }
 }
