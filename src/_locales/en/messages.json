@@ -205,20 +205,32 @@
   "optionsIconColorLabel_ariaLabel": {
     "message": "Color Icon"
   },
+  "optionsIconDark": {
+    "message": ""
+  },
+  "optionsIconDark_alt": {
+    "message": "Dark"
+  },
+  "optionsIconDarkLabel": {
+    "message": ""
+  },
+  "optionsIconDarkLabel_ariaLabel": {
+    "message": "Dark Icon"
+  },
   "optionsIconDetail": {
     "message": "Choose the icon."
   },
-  "optionsIconGray": {
+  "optionsIconLight": {
     "message": ""
   },
-  "optionsIconGray_alt": {
-    "message": "Gray"
+  "optionsIconLight_alt": {
+    "message": "Light"
   },
-  "optionsIconGrayLabel": {
+  "optionsIconLightLabel": {
     "message": ""
   },
-  "optionsIconGrayLabel_ariaLabel": {
-    "message": "Gray Icon"
+  "optionsIconLightLabel_ariaLabel": {
+    "message": "Light Icon"
   },
   "optionsIconWhite": {
     "message": ""

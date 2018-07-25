@@ -95,6 +95,7 @@ label[for^=buttonIcon] {
   display: inline-block;
   position: relative;
   margin-right: 1.2rem;
+  background-color: rgb(240,240,240);
   border: 1px solid rgba(192,192,192,0.5);
   border-radius: 4px;
   width: 2.4rem;
@@ -102,10 +103,7 @@ label[for^=buttonIcon] {
   text-align: center;
   vertical-align: middle;
 }
-label[for=buttonIcon],
-label[for=buttonIconGray] {
-  background-color: rgb(240,240,240);
-}
+label[for=buttonIconLight],
 label[for=buttonIconWhite] {
   background-color: rgb(64,64,64);
 }
@@ -129,7 +127,7 @@ label[for=buttonIconAuto] {
   min-width: 13.5rem;
 }
 label + input[type=radio] {
-  margin-left: 1rem;
+  margin-left: 0.5rem;
 }
 input[type=text] {
   min-width: 15rem;

@@ -38,7 +38,8 @@
   const ICON_AUTO = "buttonIconAuto";
   const ICON_BLACK = "buttonIconBlack";
   const ICON_COLOR = "buttonIconColor";
-  const ICON_GRAY = "buttonIconGray";
+  const ICON_DARK = "buttonIconDark";
+  const ICON_LIGHT = "buttonIconLight";
   const ICON_ID = "iconId";
   const ICON_WHITE = "buttonIconWhite";
   const IS_ENABLED = "isEnabled";
@@ -89,7 +90,7 @@
   const varsLocal = {
     [EDITOR_LABEL]: "",
     [ENABLE_PB]: false,
-    [ICON_ID]: "#context",
+    [ICON_ID]: "",
     [IS_EXECUTABLE]: false,
     [KEY_ACCESS]: "U",
     [MENU_ENABLED]: false,
@@ -1094,7 +1095,8 @@
         case ICON_AUTO:
         case ICON_BLACK:
         case ICON_COLOR:
-        case ICON_GRAY:
+        case ICON_DARK:
+        case ICON_LIGHT:
         case ICON_WHITE:
           if (checked) {
             varsLocal[ICON_ID] = value;
