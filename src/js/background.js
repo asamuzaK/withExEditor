@@ -74,7 +74,7 @@
   const TMP_FILE_GET = "getTmpFile";
   const TMP_FILE_REQ = "requestTmpFile";
   const TMP_FILE_RES = "resTmpFile";
-  const WARN_COLOR = "#C13832";
+  const WARN_COLOR = "#D70022";
   const WARN_TEXT = "!";
   const VARS_SET = "setVars";
 

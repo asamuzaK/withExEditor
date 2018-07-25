@@ -142,7 +142,7 @@ textarea {
   max-width: calc(100% - 1rem);
 }
 .warn {
-  color: #C13832;
+  color: #D70022;
 }
 input[type=submit], button {
   font-size: 0.9rem;
