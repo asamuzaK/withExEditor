@@ -8,7 +8,6 @@
 
   /* constant */
   const EDITOR_EXEC = "execEditor";
-  const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const ICON_AUTO = "buttonIconAuto";
   const KEY_ACCESS = "accessKey";
   const MOD_KEYS_MAX = 2;
@@ -21,6 +20,7 @@
     `(${VERSION_PART}(?:\\.${VERSION_PART}){1,3})([A-z]+(?:-?[A-z\\d]+)?)?`;
   const VERSION_TOOLKIT_REGEXP = new RegExp(`^(?:${VERSION_TOOLKIT})$`);
   const WEBEXT_COMPAT_CMD_MIN = 63;
+  const WEBEXT_ID = "jid1-WiAigu4HIo0Tag@jetpack";
 
   /**
    * throw error
@@ -278,7 +278,7 @@
     const disableBlink = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
     const disableGecko = [KEY_ACCESS];
     const func = [];
-    if (id === EXT_WEBEXT) {
+    if (id === WEBEXT_ID) {
       for (const item of disableGecko) {
         func.push(disableInput(item));
       }

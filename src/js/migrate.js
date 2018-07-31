@@ -13,11 +13,11 @@
 
   /* constant */
   const EDITOR_EXEC = "execEditor";
-  const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const KEY_ACCESS = "accessKey";
   const KEY_EDITOR = "editorShortCut";
   const KEY_OPTIONS = "optionsShortCut";
   const OPTIONS_OPEN = "openOptionsPage";
+  const WEBEXT_ID = "jid1-WiAigu4HIo0Tag@jetpack";
 
   /**
    * throw error
@@ -71,7 +71,7 @@
       OPTIONS_OPEN,
     ]);
     const func = [];
-    if (id === EXT_WEBEXT) {
+    if (id === WEBEXT_ID) {
       const accKey = store[KEY_ACCESS] && store[KEY_ACCESS].value || "U";
       if (!store[EDITOR_EXEC]) {
         const {os} = await runtime.getPlatformInfo();
