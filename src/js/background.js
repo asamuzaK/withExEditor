@@ -5,8 +5,8 @@
 {
   /* api */
   const {
-    browserAction, commands, contextMenus, i18n, notifications, runtime,
-    storage, tabs, windows,
+    browserAction, commands, contextMenus, i18n, management, notifications,
+    runtime, storage, tabs, windows,
   } = browser;
   const {local: localStorage} = storage;
 
@@ -23,7 +23,6 @@
   const EDITOR_LABEL = "editorLabel";
   const ENABLE_PB = "enablePB";
   const EXT_RELOAD = "reloadExtension";
-  const EXT_WEBEXT = "jid1-WiAigu4HIo0Tag@jetpack";
   const FILE_EXT = "fileExt";
   const FILE_EXT_PATH = "data/fileExt.json";
   const HOST = "withexeditorhost";
@@ -39,7 +38,9 @@
   const ICON_BLACK = "buttonIconBlack";
   const ICON_COLOR = "buttonIconColor";
   const ICON_DARK = "buttonIconDark";
+  const ICON_DARK_ID = "#dark";
   const ICON_LIGHT = "buttonIconLight";
+  const ICON_LIGHT_ID = "#light";
   const ICON_ID = "iconId";
   const ICON_WHITE = "buttonIconWhite";
   const IS_ENABLED = "isEnabled";
@@ -65,6 +66,8 @@
   const STORAGE_SET = "setStorage";
   const SYNC_AUTO = "enableSyncAuto";
   const SYNC_AUTO_URL = "syncAutoUrls";
+  const THEME_DARK = "firefox-compact-dark@mozilla.org@personas.mozilla.org";
+  const THEME_LIGHT = "firefox-compact-light@mozilla.org@personas.mozilla.org";
   const TMP_FILES = "tmpFiles";
   const TMP_FILES_PB = "tmpFilesPb";
   const TMP_FILES_PB_REMOVE = "removePrivateTmpFiles";
@@ -76,12 +79,13 @@
   const TMP_FILE_RES = "resTmpFile";
   const WARN_COLOR = "#D70022";
   const WARN_TEXT = "!";
+  const WEBEXT_ID = "jid1-WiAigu4HIo0Tag@jetpack";
   const VARS_SET = "setVars";
 
   /* variables */
   const vars = {
     [IS_ENABLED]: false,
-    [IS_WEBEXT]: runtime.id === EXT_WEBEXT,
+    [IS_WEBEXT]: runtime.id === WEBEXT_ID,
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
@@ -473,6 +477,47 @@
       browserAction.setBadgeBackgroundColor({color}),
       browserAction.setBadgeText({text}),
     ]);
+  };
+
+  /**
+   * get enabled theme
+   * @returns {Array} - array of management.ExtensionInfo
+   */
+  const getEnabledTheme = async () => {
+    const themes = await management.getAll().then(arr => arr.filter(info =>
+      info.type && info.type === "theme" && info.enabled && info
+    ));
+    return themes;
+  };
+
+  /**
+   * set default icon
+   * @returns {void}
+   */
+  const setDefaultIcon = async () => {
+    const items = await getEnabledTheme();
+    if (Array.isArray(items) && items.length) {
+      for (const item of items) {
+        const {id: themeId} = item;
+        switch (themeId) {
+          case THEME_DARK: {
+            varsLocal[ICON_ID] = ICON_LIGHT_ID;
+            break;
+          }
+          case THEME_LIGHT: {
+            varsLocal[ICON_ID] = ICON_DARK_ID;
+            break;
+          }
+          default: {
+            if (vars[IS_WEBEXT]) {
+              varsLocal[ICON_ID] = ICON_DARK_ID;
+            } else {
+              varsLocal[ICON_ID] = "";
+            }
+          }
+        }
+      }
+    }
   };
 
   /* context menu */
@@ -1178,7 +1223,8 @@
 
   /* startup */
   Promise.all([
-    localStorage.get().then(setVars).then(execScriptToTabs).then(syncUI),
+    setDefaultIcon().then(() => localStorage.get()).then(setVars)
+      .then(execScriptToTabs).then(syncUI),
     storeFetchedData(NS_URI_PATH, NS_URI),
     storeFetchedData(FILE_EXT_PATH, FILE_EXT),
     storeFetchedData(LIVE_EDIT_PATH, LIVE_EDIT),

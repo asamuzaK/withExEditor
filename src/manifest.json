@@ -10,11 +10,19 @@
   },
   "browser_action": {
     "browser_style": false,
-    "default_icon": {
-      "16": "img/icon-black-16.png",
-      "32": "img/icon-black-32.png"
-    },
-    "default_title": "__MSG_extensionName__"
+    "default_title": "__MSG_extensionName__",
+    "theme_icons": [
+      {
+        "dark": "img/icon.svg#dark",
+        "light": "img/icon.svg#light",
+        "size": 16
+      },
+      {
+        "dark": "img/icon.svg#dark",
+        "light": "img/icon.svg#light",
+        "size": 32
+      }
+    ]
   },
   "commands": {
     "execEditor": {
@@ -64,9 +72,10 @@
     "activeTab",
     "contextMenus",
     "nativeMessaging",
+    "management",
     "storage",
     "tabs"
   ],
   "short_name": "__MSG_extensionName__",
-  "version": "5.3.0a3"
+  "version": "5.3.0"
 }

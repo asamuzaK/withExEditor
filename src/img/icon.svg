@@ -42,25 +42,22 @@
              M -17.67767,74.246212 -62.932504,28.991378
              -0.70710678,-33.234019 44.547727,12.020815 Z"/>
   </symbol>
-  <g id="context" fill="context-fill" fill-opacity="context-fill-opacity">
-    <use href="#outline"/>
-  </g>
   <g id="black" fill="#000">
     <use href="#outline"/>
   </g>
-  <g id="current" fill="currentColor">
+  <g id="white" fill="#FFF">
     <use href="#outline"/>
   </g>
   <g id="dark" fill="#0C0C0D" fill-opacity="0.8">
     <use href="#outline"/>
   </g>
-  <g id="gray" fill="#4C4C4C">
-    <use href="#outline"/>
-  </g>
   <g id="light" fill="#F9F9FA" fill-opacity="0.8">
     <use href="#outline"/>
   </g>
-  <g id="white" fill="#FFF">
+  <g id="context" fill="context-fill" fill-opacity="context-fill-opacity">
+    <use href="#outline"/>
+  </g>
+  <g id="current" fill="currentColor">
     <use href="#outline"/>
   </g>
   <g id="off" fill="ButtonShadow">
