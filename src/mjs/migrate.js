@@ -5,7 +5,6 @@
 import {
   EDITOR_EXEC, KEY_ACCESS, KEY_EDITOR, KEY_OPTIONS, OPTIONS_OPEN, WEBEXT_ID,
 } from "./constant.js";
-import {throwErr} from "./common.js";
 import {getStorage, removeStorage, setStorage, updateCmd} from "./browser.js";
 
 /* api */
