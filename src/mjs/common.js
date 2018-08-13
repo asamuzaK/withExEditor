@@ -2,11 +2,14 @@
  * common.js
  */
 
-import {VERSION_TOOLKIT_REGEXP} from "./constant.js";
-
 /* constants */
 const TYPE_FROM = 8;
 const TYPE_TO = -1;
+const VERSION_PART =
+  "(?:0|[1-9]\\d{0,3}|[1-5]\\d{4}|6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5]))))";
+const VERSION_TOOLKIT =
+  `(${VERSION_PART}(?:\\.${VERSION_PART}){1,3})([A-z]+(?:-?[A-z\\d]+)?)?`;
+const VERSION_TOOLKIT_REGEXP = new RegExp(`^(?:${VERSION_TOOLKIT})$`);
 
 /**
  * throw error

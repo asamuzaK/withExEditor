@@ -73,11 +73,6 @@ export const TMP_FILE_GET = "getTmpFile";
 export const TMP_FILE_REQ = "requestTmpFile";
 export const TMP_FILE_RES = "resTmpFile";
 export const VARS_SET = "setVars";
-export const VERSION_PART =
-    "(?:0|[1-9]\\d{0,3}|[1-5]\\d{4}|6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5]))))";
-export const VERSION_TOOLKIT =
-    `(${VERSION_PART}(?:\\.${VERSION_PART}){1,3})([A-z]+(?:-?[A-z\\d]+)?)?`;
-export const VERSION_TOOLKIT_REGEXP = new RegExp(`^(?:${VERSION_TOOLKIT})$`);
 export const WARN = "warn";
 export const WARN_COLOR = "#D70022";
 export const WARN_TEXT = "!";
