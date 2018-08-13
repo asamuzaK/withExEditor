@@ -5,18 +5,17 @@
 import {
   CONTENT_GET, CONTENT_SCRIPT_PATH, CONTEXT_MENU, EDITOR_CONFIG_GET,
   EDITOR_CONFIG_RES, EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME,
-  EDITOR_LABEL, ENABLE_PB, EXT_RELOAD, FILE_EXT, FILE_EXT_PATH,
+  EDITOR_LABEL, ENABLE_PB, EXT_NAME, EXT_RELOAD, FILE_EXT, FILE_EXT_PATH,
   HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
   HOST_VERSION, HOST_VERSION_CHECK, ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR,
   ICON_DARK, ICON_DARK_ID, ICON_LIGHT, ICON_LIGHT_ID, ICON_ID, ICON_WHITE,
-  IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, KEY_ACCESS, LABEL, LIVE_EDIT,
-  LIVE_EDIT_PATH, LOCAL_FILE_VIEW, MENU_ENABLED, MODE_EDIT, MODE_MATHML,
-  MODE_SELECTION, MODE_SOURCE, MODE_SVG, NS_URI, NS_URI_PATH,
-  ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONTENT, PROCESS_CHILD, STORAGE_SET,
-  SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT,
-  TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE, TMP_FILE_CREATE,
-  TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ,
-  TMP_FILE_RES, WARN_COLOR, WARN_TEXT, WEBEXT_ID, VARS_SET,
+  IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, KEY_ACCESS, LIVE_EDIT, LIVE_EDIT_PATH,
+  LOCAL_FILE_VIEW, MENU_ENABLED, MODE_EDIT, MODE_MATHML, MODE_SELECTION,
+  MODE_SOURCE, MODE_SVG, NS_URI, NS_URI_PATH, ONLY_EDITABLE, OPTIONS_OPEN,
+  PORT_CONTENT, PROCESS_CHILD, STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
+  THEME_DARK, THEME_LIGHT, TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE,
+  TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
+  TMP_FILE_REQ, TMP_FILE_RES, WARN_COLOR, WARN_TEXT, WEBEXT_ID, VARS_SET,
 } from "./constant.js";
 import {
   isString, logError, logMsg, logWarn, removeQueryFromURI, stringifyPositiveInt,
@@ -387,7 +386,7 @@ const menus = {
  * @returns {void}
  */
 const createMenuItem = async (id, contexts) => {
-  const label = varsLocal[EDITOR_LABEL] || LABEL;
+  const label = varsLocal[EDITOR_LABEL] || i18n.get(EXT_NAME);
   const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                  `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
   const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
@@ -459,7 +458,7 @@ const updateContextMenu = async type => {
     }
   } else {
     const items = Object.keys(menus);
-    const label = varsLocal[EDITOR_LABEL] || LABEL;
+    const label = varsLocal[EDITOR_LABEL] || i18n.get(EXT_NAME);
     const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                    `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
@@ -497,7 +496,7 @@ const updateContextMenu = async type => {
  */
 const cacheMenuItemTitle = async () => {
   const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-  const label = varsLocal[EDITOR_LABEL] || LABEL;
+  const label = varsLocal[EDITOR_LABEL] || i18n.get(EXT_NAME);
   const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                  `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
   for (const item of items) {
