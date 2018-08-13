@@ -2,7 +2,11 @@
  * common.js
  */
 
-import {TYPE_FROM, TYPE_TO, VERSION_TOOLKIT_REGEXP} from "./constant.js";
+import {VERSION_TOOLKIT_REGEXP} from "./constant.js";
+
+/* constants */
+const TYPE_FROM = 8;
+const TYPE_TO = -1;
 
 /**
  * throw error

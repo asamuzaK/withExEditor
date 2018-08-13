@@ -5,7 +5,6 @@
 export const CONTENT_GET = "getContent";
 export const CONTENT_SCRIPT_PATH = "js/content.js";
 export const CONTEXT_MENU = "contextMenu";
-export const DATA_I18N = "data-i18n";
 export const EDITOR_CONFIG_GET = "getEditorConfig";
 export const EDITOR_CONFIG_RES = "resEditorConfig";
 export const EDITOR_CONFIG_TS = "editorConfigTimestamp";
@@ -73,8 +72,6 @@ export const TMP_FILE_DATA_REMOVE = "removeTmpFileData";
 export const TMP_FILE_GET = "getTmpFile";
 export const TMP_FILE_REQ = "requestTmpFile";
 export const TMP_FILE_RES = "resTmpFile";
-export const TYPE_FROM = 8;
-export const TYPE_TO = -1;
 export const VARS_SET = "setVars";
 export const VERSION_PART =
     "(?:0|[1-9]\\d{0,3}|[1-5]\\d{4}|6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5]))))";
