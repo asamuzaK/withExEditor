@@ -483,7 +483,7 @@ const updateContextMenu = async type => {
  */
 const cacheMenuItemTitle = async () => {
   const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-  const label = varsLocal[EDITOR_LABEL] || i18n.get(EXT_NAME);
+  const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
   const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                  `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
   for (const item of items) {
