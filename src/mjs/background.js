@@ -22,8 +22,9 @@ import {
   throwErr,
 } from "./common.js";
 import {
-  checkWindowIncognito, createNotification, execScriptToExistingTabs,
-  getAllStorage, getEnabledTheme, getStorage, handleNotifyOnClosed, setStorage,
+  checkIncognitoWindowExists, clearNotification, createNotification,
+  execScriptToExistingTabs, getActiveTab, getActiveTabId, getAllStorage,
+  getAllNormalWindows, getEnabledTheme, getStorage, setStorage,
 } from "./browser.js";
 import {migrateStorage} from "./migrate.js";
 
@@ -34,7 +35,6 @@ const {
 } = browser;
 
 /* constants */
-const {WINDOW_ID_CURRENT} = windows;
 const HOST_VERSION_MIN = "v3.3.1";
 
 /* variables */
@@ -244,15 +244,9 @@ const portTmpFileDataMsg = async (key, msg) => {
       const {tabId, windowId} = data;
       if (isString(tabId) && /^\d+$/.test(tabId) &&
           isString(windowId) && /^\d+$/.test(windowId)) {
-        const tabList = await tabs.query({
-          active: true,
-          windowId: windowId * 1,
-        });
-        if (tabList) {
-          const [tab] = tabList;
-          if (tab.id === tabId * 1) {
-            func = portMsg({[key]: msg}, windowId, tabId);
-          }
+        const activeTabId = await getActiveTabId(windowId * 1);
+        if (activeTabId === tabId * 1) {
+          func = portMsg({[key]: msg}, windowId, tabId);
         }
       }
     }
@@ -265,12 +259,8 @@ const portTmpFileDataMsg = async (key, msg) => {
  * @returns {?AsyncFunction} - port msg
  */
 const portGetContentMsg = async () => {
-  const [tab] = await tabs.query({
-    active: true,
-    windowId: WINDOW_ID_CURRENT,
-    windowType: "normal",
-  });
   let func;
+  const tab = await getActiveTab();
   if (tab) {
     const {id: tId, windowId: wId} = tab;
     const windowId = stringifyPositiveInt(wId, true);
@@ -290,7 +280,7 @@ const portGetContentMsg = async () => {
 const restoreContentScript = async () => {
   let func;
   if (vars[IS_WEBEXT]) {
-    func = execScriptToExistingTabs(CONTENT_SCRIPT_PATH);
+    func = execScriptToExistingTabs(CONTENT_SCRIPT_PATH, true);
   }
   return func || null;
 };
@@ -834,22 +824,14 @@ const onTabRemoved = async (id, info) => {
  */
 const onWindowFocusChanged = async id => {
   const func = [];
-  const winArr = await windows.getAll({windowTypes: ["normal"]});
-  const tabList = await tabs.query({
-    windowId: id,
-    windowType: "normal",
-  });
-  for (const tab of tabList) {
-    const {active, id: tId} = tab;
-    const windowId = stringifyPositiveInt(id, true);
-    const tabId = stringifyPositiveInt(tId, true);
-    if (windowId && tabId) {
-      if (active) {
-        func.push(portMsg({
-          [TMP_FILE_REQ]: true,
-        }, windowId, tabId));
-      }
-    }
+  const winArr = await getAllNormalWindows();
+  const tId = await getActiveTabId(id);
+  const windowId = stringifyPositiveInt(id, true);
+  const tabId = stringifyPositiveInt(tId, true);
+  if (windowId && tabId) {
+    func.push(portMsg({
+      [TMP_FILE_REQ]: true,
+    }, windowId, tabId));
   }
   if (winArr) {
     for (const win of winArr) {
@@ -871,9 +853,9 @@ const onWindowFocusChanged = async id => {
  */
 const onWindowRemoved = async windowId => {
   const func = [];
-  const winArr = await windows.getAll({windowTypes: ["normal"]});
+  const winArr = await getAllNormalWindows();
   if (winArr && winArr.length) {
-    const bool = await checkWindowIncognito();
+    const bool = await checkIncognitoWindowExists();
     !bool && func.push(portHostMsg({[TMP_FILES_PB_REMOVE]: !bool}));
     windowId = stringifyPositiveInt(windowId, true);
     windowId && func.push(restorePorts({windowId}));
@@ -939,8 +921,8 @@ const setVar = async (item, obj, changed = false) => {
         break;
       case HOST_ERR_NOTIFY:
         if (checked && notifications && notifications.onClosed &&
-            !notifications.onClosed.hasListener(handleNotifyOnClosed)) {
-          notifications.onClosed.addListener(handleNotifyOnClosed);
+            !notifications.onClosed.hasListener(clearNotification)) {
+          notifications.onClosed.addListener(clearNotification);
         }
         break;
       case ICON_AUTO:

@@ -2,26 +2,25 @@
  * browser.js
  */
 
-import {WEBEXT_ID} from "./constant.js";
 import {isObjectNotEmpty, isString, throwErr} from "./common.js";
 
 /* api */
 const {
-  commands, management, notifications, permissions, runtime, storage,
-  tabs, windows,
+  commands, management, notifications, permissions, runtime, storage, tabs,
+  windows,
 } = browser;
 
 /* constants */
 const {TAB_ID_NONE} = tabs;
 
-/* command */
+/* commands */
 /**
  * update command
  * @param {string} id - command ID
  * @param {string} value - key value
  * @returns {void}
  */
-export const updateCmd = async (id, value = "") => {
+export const updateCommand = async (id, value = "") => {
   if (typeof commands.update === "function" &&
       isString(id) && isString(value)) {
     const shortcut =
@@ -51,11 +50,11 @@ export const getEnabledTheme = async () => {
 
 /* notifications */
 /**
- * handle notifications onclosed
+ * clear notification
  * @param {string} id - notification ID
  * @returns {?AsyncFunction} - notifications.clear()
  */
-export const handleNotifyOnClosed = id => {
+export const clearNotification = id => {
   let func;
   if (isString(id)) {
     func = notifications.clear(id).catch(throwErr);
@@ -73,8 +72,8 @@ export const createNotification = async (id, opt) => {
   let func;
   if (isString(id) && notifications) {
     if (notifications.onClosed &&
-        !notifications.onClosed.hasListener(handleNotifyOnClosed)) {
-      notifications.onClosed.addListener(handleNotifyOnClosed);
+        !notifications.onClosed.hasListener(clearNotification)) {
+      notifications.onClosed.addListener(clearNotification);
     }
     func = notifications.create(id, opt);
   }
@@ -83,18 +82,18 @@ export const createNotification = async (id, opt) => {
 
 /* permissions */
 /**
- * request permission
+ * remove permission
  * @param {string|Array} perm - permission
- * @returns {?AsyncFunction} - permission.request
+ * @returns {?AsyncFunction} - permissions.remove
  */
-export const requestPerm = async perm => {
+export const removePermission = async perm => {
   let func;
   if (isString(perm)) {
-    func = permissions.request({
+    func = permissions.remove({
       permissions: [perm],
     });
   } else if (Array.isArray(perm)) {
-    func = permissions.request({
+    func = permissions.remove({
       permissions: perm,
     });
   }
@@ -102,18 +101,18 @@ export const requestPerm = async perm => {
 };
 
 /**
- * remove permission
+ * request permission
  * @param {string|Array} perm - permission
- * @returns {?AsyncFunction} - permission.remove
+ * @returns {?AsyncFunction} - permissions.request
  */
-export const removePerm = async perm => {
+export const requestPermission = async perm => {
   let func;
   if (isString(perm)) {
-    func = permissions.remove({
+    func = permissions.request({
       permissions: [perm],
     });
   } else if (Array.isArray(perm)) {
-    func = permissions.remove({
+    func = permissions.request({
       permissions: perm,
     });
   }
@@ -144,6 +143,19 @@ export const sendMessage = async (id, msg, opt) => {
 
 /* storage */
 /**
+ * get all storage
+ * @returns {AsyncFunction} - storage.local.get
+ */
+export const getAllStorage = async () => storage.local.get();
+
+/**
+ * get storage
+ * @param {*} key - key
+ * @returns {AsyncFunction} - storage.local.get
+ */
+export const getStorage = async key => storage.local.get(key);
+
+/**
  * remove storage
  * @param {*} key - key
  * @returns {AsyncFunction} - storage.local.remove
@@ -158,28 +170,44 @@ export const removeStorage = async key => storage.local.remove(key);
 export const setStorage = async obj =>
   obj && storage && storage.local.set(obj) || null;
 
-/**
- * get storage
- * @param {*} key - key
- * @returns {AsyncFunction} - storage.local.get
- */
-export const getStorage = async key => storage.local.get(key);
-
-/**
- * get all storage
- * @returns {AsyncFunction} - storage.local.get
- */
-export const getAllStorage = async () => storage.local.get();
-
 /* tabs */
 /**
+ * execute content script to existing tabs
+ * @param {string} src - content script path
+ * @param {boolean} frame - execute to all frames
+ * @returns {Promise.<Array>} - results of each handler
+ */
+export const execScriptToExistingTabs = async (src, frame = false) => {
+  const func = [];
+  if (isString(src)) {
+    const contentScript = runtime.getURL(src);
+    const tabList = await tabs.query({
+      windowType: "normal",
+    });
+    for (const tab of tabList) {
+      const {id: tabId} = tab;
+      func.push(tabs.executeScript(tabId, {
+        allFrames: !!frame,
+        file: contentScript,
+      }));
+    }
+  }
+  return Promise.all(func);
+};
+
+/**
  * get active tab
+ * @param {number} windowId - window ID
  * @returns {Object} - tabs.Tab
  */
-export const getActiveTab = async () => {
+export const getActiveTab = async windowId => {
+  if (!Number.isInteger(windowId)) {
+    windowId = windows.WINDOW_ID_CURRENT;
+  }
   const arr = await tabs.query({
+    windowId,
     active: true,
-    currentWindow: true,
+    windowType: "normal",
   });
   let tab;
   if (arr.length) {
@@ -190,11 +218,15 @@ export const getActiveTab = async () => {
 
 /**
  * get active tab ID
+ * @param {number} windowId - window ID
  * @returns {number} - tab ID
  */
-export const getActiveTabId = async () => {
+export const getActiveTabId = async windowId => {
+  if (!Number.isInteger(windowId)) {
+    windowId = windows.WINDOW_ID_CURRENT;
+  }
   let tabId;
-  const tab = await getActiveTab();
+  const tab = await getActiveTab(windowId);
   if (tab) {
     tabId = tab.id;
   }
@@ -214,38 +246,22 @@ export const isTab = async tabId => {
   return !!tab;
 };
 
-/**
- * execute content script to existing tabs
- * NOTE: Exclude Blink due to the error "No source code or file specified.".
- * @param {string} src - content script path
- * @returns {Promise.<Array>} - results of each handler
- */
-export const execScriptToExistingTabs = async src => {
-  const func = [];
-  if (runtime.id === WEBEXT_ID && isString(src)) {
-    const contentScript = runtime.getURL(src);
-    const tabList = await tabs.query({
-      windowType: "normal",
-    });
-    for (const tab of tabList) {
-      const {id: tabId} = tab;
-      func.push(tabs.executeScript(tabId, {
-        allFrames: true,
-        file: contentScript,
-      }));
-    }
-  }
-  return Promise.all(func);
-};
-
 /* windows */
 /**
- * check if any of windows is incognito
+ * get all windows
+ * @returns {Promise.<Array>} - array of windows.Window
+ */
+export const getAllNormalWindows = async () => windows.getAll({
+  windowTypes: ["normal"],
+});
+
+/**
+ * check whether incognito window exists
  * @returns {boolean} - result
  */
-export const checkWindowIncognito = async () => {
-  const winArr = await windows.getAll({windowTypes: ["normal"]});
+export const checkIncognitoWindowExists = async () => {
   let incog;
+  const winArr = await getAllNormalWindows();
   if (winArr && winArr.length) {
     for (const win of winArr) {
       incog = win.incognito;
@@ -254,5 +270,5 @@ export const checkWindowIncognito = async () => {
       }
     }
   }
-  return incog || false;
+  return !!incog;
 };

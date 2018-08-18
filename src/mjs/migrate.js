@@ -5,7 +5,9 @@
 import {
   EDITOR_EXEC, KEY_ACCESS, KEY_EDITOR, KEY_OPTIONS, OPTIONS_OPEN, WEBEXT_ID,
 } from "./constant.js";
-import {getStorage, removeStorage, setStorage, updateCmd} from "./browser.js";
+import {
+  getStorage, removeStorage, setStorage, updateCommand,
+} from "./browser.js";
 
 /* api */
 const {runtime} = browser;
@@ -43,7 +45,7 @@ export const migrateStorage = async () => {
             checked: false,
           },
         }),
-        updateCmd(EDITOR_EXEC, value),
+        updateCommand(EDITOR_EXEC, value),
       );
     }
     if (!store[OPTIONS_OPEN]) {
@@ -60,7 +62,7 @@ export const migrateStorage = async () => {
             checked: false,
           },
         }),
-        updateCmd(OPTIONS_OPEN, value),
+        updateCommand(OPTIONS_OPEN, value),
       );
     }
   }

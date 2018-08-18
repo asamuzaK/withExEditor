@@ -8,7 +8,7 @@ import {
   KEY_ACCESS, STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "./constant.js";
 import {isString, throwErr} from "./common.js";
-import {getStorage, removePerm, requestPerm} from "./browser.js";
+import {getStorage, removePermission, requestPermission} from "./browser.js";
 import {localizeHtml} from "./localize.js";
 import {disableIncompatibleInputs, addListenerToCmdInputs} from "./compat.js";
 
@@ -138,9 +138,9 @@ const portPref = async evt => {
     switch (id) {
       case HOST_ERR_NOTIFY:
         if (checked) {
-          target.checked = await requestPerm(["notifications"]);
+          target.checked = await requestPermission(["notifications"]);
         } else {
-          await removePerm(["notifications"]);
+          await removePermission(["notifications"]);
         }
         func.push(createPref(target).then(portMsg));
         break;

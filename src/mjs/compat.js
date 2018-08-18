@@ -8,7 +8,7 @@ import {
 import {
   dispatchChangeEvt, dispatchInputEvt, isString, parseVersion, throwErr,
 } from "./common.js";
-import {updateCmd} from "./browser.js";
+import {updateCommand} from "./browser.js";
 
 /* api */
 const {commands, runtime} = browser;
@@ -22,7 +22,7 @@ const WEBEXT_COMPAT_CMD_MIN = 63;
  * @param {Object} evt - Event
  * @returns {void}
  */
-export const updateCmdKey = async evt => {
+export const updateCommandKey = async evt => {
   if (typeof commands.update === "function") {
     const {target} = evt;
     const {id, value} = target;
@@ -30,10 +30,10 @@ export const updateCmdKey = async evt => {
       const shortcut =
         value.trim().replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`);
       if (/^(?:(?:(?:(?:Alt|Command|(?:Mac)?Ctrl)(?:\+Shift)?|Alt\+(?:Command|(?:Mac)?Ctrl)|Command\+(?:Alt|MacCtrl)|Ctrl\+(?:Alt|MacCtrl)|MacCtrl\+(?:Alt|Command|Ctrl))\+(?:[\dA-Z]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Comma|Period|Home|End|Delete|Insert|Space))|F(?:[1-9]|1[0-2]))?$/.test(shortcut)) {
-        await updateCmd(id, shortcut);
+        await updateCommand(id, shortcut);
         dispatchChangeEvt(target);
       } else if (shortcut === "") {
-        await updateCmd(id);
+        await updateCommand(id);
         dispatchChangeEvt(target);
       }
     }
@@ -125,7 +125,7 @@ export const addListenerToCmdInputs = async () => {
         detectKeyCombo(evt).catch(throwErr)
       );
       elm.addEventListener("input", evt =>
-        updateCmdKey(evt).catch(throwErr)
+        updateCommandKey(evt).catch(throwErr)
       );
     }
   }
