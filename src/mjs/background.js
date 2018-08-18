@@ -8,22 +8,22 @@ import {
   EDITOR_LABEL, ENABLE_PB, EXT_NAME, EXT_RELOAD, FILE_EXT, FILE_EXT_PATH,
   HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
   HOST_VERSION, HOST_VERSION_CHECK, ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR,
-  ICON_DARK, ICON_DARK_ID, ICON_LIGHT, ICON_LIGHT_ID, ICON_ID, ICON_WHITE,
+  ICON_DARK, ICON_DARK_ID, ICON_ID, ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
   IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, KEY_ACCESS, LIVE_EDIT, LIVE_EDIT_PATH,
   LOCAL_FILE_VIEW, MENU_ENABLED, MODE_EDIT, MODE_MATHML, MODE_SELECTION,
   MODE_SOURCE, MODE_SVG, NS_URI, NS_URI_PATH, ONLY_EDITABLE, OPTIONS_OPEN,
   PORT_CONTENT, PROCESS_CHILD, STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
   THEME_DARK, THEME_LIGHT, TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE,
   TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
-  TMP_FILE_REQ, TMP_FILE_RES, WARN_COLOR, WARN_TEXT, WEBEXT_ID, VARS_SET,
+  TMP_FILE_REQ, TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID,
 } from "./constant.js";
 import {
   isString, logError, logMsg, logWarn, removeQueryFromURI, stringifyPositiveInt,
   throwErr,
 } from "./common.js";
 import {
-  checkWindowIncognito, createNotification, getAllStorage, getEnabledTheme,
-  getStorage, handleNotifyOnClosed, setStorage,
+  checkWindowIncognito, createNotification, execScriptToExistingTabs,
+  getAllStorage, getEnabledTheme, getStorage, handleNotifyOnClosed, setStorage,
 } from "./browser.js";
 import {migrateStorage} from "./migrate.js";
 
@@ -58,31 +58,6 @@ const varsLocal = {
   [MODE_SVG]: "",
 };
 
-/* tabs */
-/**
- * execute content script to existing tabs
- * NOTE: Exclude Blink due to the error "No source code or file specified.".
- * @returns {Promise.<Array>} - results of each handler
- */
-const execScriptToTabs = async () => {
-  const func = [];
-  if (vars[IS_WEBEXT]) {
-    const contentScript = runtime.getURL(CONTENT_SCRIPT_PATH);
-    const tabList = await tabs.query({
-      windowType: "normal",
-    });
-    for (const tab of tabList) {
-      const {id: tabId} = tab;
-      func.push(tabs.executeScript(tabId, {
-        allFrames: true,
-        file: contentScript,
-      }));
-    }
-  }
-  return Promise.all(func);
-};
-
-/* port */
 /* native application host */
 const host = runtime.connectNative(HOST);
 
@@ -308,6 +283,18 @@ const portGetContentMsg = async () => {
   return func || null;
 };
 
+/**
+ * restore content script
+ * @returns {?AsyncFunction} - execScriptToExistingTabs()
+ */
+const restoreContentScript = async () => {
+  let func;
+  if (vars[IS_WEBEXT]) {
+    func = execScriptToExistingTabs(CONTENT_SCRIPT_PATH);
+  }
+  return func || null;
+};
+
 /* icon */
 /**
  * set icon
@@ -386,7 +373,7 @@ const menus = {
  * @returns {void}
  */
 const createMenuItem = async (id, contexts) => {
-  const label = varsLocal[EDITOR_LABEL] || i18n.get(EXT_NAME);
+  const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
   const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                  `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
   const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
@@ -458,7 +445,7 @@ const updateContextMenu = async type => {
     }
   } else {
     const items = Object.keys(menus);
-    const label = varsLocal[EDITOR_LABEL] || i18n.get(EXT_NAME);
+    const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
     const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
                    `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
@@ -1042,7 +1029,7 @@ windows.onRemoved.addListener(windowId =>
 
 /* startup */
 Promise.all([
-  setDefaultIcon().then(getAllStorage).then(setVars).then(execScriptToTabs)
+  setDefaultIcon().then(getAllStorage).then(setVars).then(restoreContentScript)
     .then(syncUI),
   storeFetchedData(NS_URI_PATH, NS_URI),
   storeFetchedData(FILE_EXT_PATH, FILE_EXT),

@@ -2,6 +2,7 @@
  * browser.js
  */
 
+import {WEBEXT_ID} from "./constant.js";
 import {isObjectNotEmpty, isString, throwErr} from "./common.js";
 
 /* api */
@@ -211,6 +212,30 @@ export const isTab = async tabId => {
     tab = await tabs.get(tabId).catch(throwErr);
   }
   return !!tab;
+};
+
+/**
+ * execute content script to existing tabs
+ * NOTE: Exclude Blink due to the error "No source code or file specified.".
+ * @param {string} src - content script path
+ * @returns {Promise.<Array>} - results of each handler
+ */
+export const execScriptToExistingTabs = async src => {
+  const func = [];
+  if (runtime.id === WEBEXT_ID && isString(src)) {
+    const contentScript = runtime.getURL(src);
+    const tabList = await tabs.query({
+      windowType: "normal",
+    });
+    for (const tab of tabList) {
+      const {id: tabId} = tab;
+      func.push(tabs.executeScript(tabId, {
+        allFrames: true,
+        file: contentScript,
+      }));
+    }
+  }
+  return Promise.all(func);
 };
 
 /* windows */
