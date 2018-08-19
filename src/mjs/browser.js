@@ -120,6 +120,15 @@ export const requestPermission = async perm => {
 };
 
 /* runtime */
+/**
+ * get manifest icons
+ * @returns {Object|string} - icons
+ */
+export const getManifestIcons = () => {
+  const {icons} = runtime.getManifest();
+  return icons;
+};
+
 /** send message
  * @param {number|string} id - tabId or extension ID
  * @param {*} msg - message
@@ -231,6 +240,22 @@ export const getActiveTabId = async windowId => {
     tabId = tab.id;
   }
   return tabId;
+};
+
+/**
+ * get all tabs in window
+ * @param {number} windowId - window ID
+ * @returns {Array} - tab list
+ */
+export const getAllTabsInWindow = async windowId => {
+  if (!Number.isInteger(windowId)) {
+    windowId = windows.WINDOW_ID_CURRENT;
+  }
+  const tabList = await tabs.query({
+    windowId,
+    windowType: "normal",
+  });
+  return tabList;
 };
 
 /**
