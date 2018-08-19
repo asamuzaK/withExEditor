@@ -121,6 +121,20 @@ export const requestPermission = async perm => {
 
 /* runtime */
 /**
+ * fetch data
+ * @param {string} path - data path
+ * @returns {Object} - JSON data
+ */
+export const fetchData = async path => {
+  let data;
+  if (isString(path)) {
+    path = await runtime.getURL(path);
+    data = await fetch(path).then(res => res && res.json());
+  }
+  return data || null;
+};
+
+/**
  * get manifest icons
  * @returns {Object|string} - icons
  */
@@ -180,6 +194,14 @@ export const setStorage = async obj =>
   obj && storage && storage.local.set(obj) || null;
 
 /* tabs */
+/**
+ * create tab
+ * @param {Object} opt - options
+ * @returns {AsyncFunction} - tabs.create
+ */
+export const createTab = async (opt = {}) =>
+  tabs.create(isObjectNotEmpty(opt) && opt || null);
+
 /**
  * execute content script to existing tabs
  * @param {string} src - content script path

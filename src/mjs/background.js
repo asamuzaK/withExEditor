@@ -23,8 +23,8 @@ import {
 } from "./common.js";
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
-  execScriptToExistingTabs, getActiveTab, getActiveTabId, getAllStorage,
-  getAllNormalWindows, getEnabledTheme, getStorage, setStorage,
+  execScriptToExistingTabs, fetchData, getActiveTab, getActiveTabId,
+  getAllStorage, getAllNormalWindows, getEnabledTheme, getStorage, setStorage,
 } from "./browser.js";
 import {migrateStorage} from "./migrate.js";
 
@@ -85,9 +85,8 @@ const portHostMsg = async msg => {
  */
 const storeFetchedData = async (path, key) => {
   let func;
-  path = isString(path) && await runtime.getURL(path);
-  if (path && isString(key)) {
-    const data = await fetch(path).then(res => res && res.json());
+  if (isString(key)) {
+    const data = await fetchData(path);
     func = setStorage({[key]: data});
   }
   return func || null;
