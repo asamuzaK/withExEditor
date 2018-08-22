@@ -7,7 +7,7 @@ import {
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
   KEY_ACCESS, STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "./constant.js";
-import {isString, throwErr} from "./common.js";
+import {isObjectNotEmpty, isString, throwErr} from "./common.js";
 import {getStorage, removePermission, requestPermission} from "./browser.js";
 import {localizeHtml} from "./localize.js";
 import {disableIncompatibleInputs, addListenerToCmdInputs} from "./compat.js";
@@ -252,39 +252,40 @@ const addFormSubmitListener = async () => {
  * @returns {void}
  */
 const setHtmlInputValue = async (data = {}) => {
-  const {id} = data;
-  const elm = id && document.getElementById(id);
+  const {checked, id: dataId, value} = data;
+  const elm = dataId && document.getElementById(dataId);
   if (elm) {
-    switch (elm.type) {
+    const {id, type} = elm;
+    switch (type) {
       case "checkbox":
       case "radio":
-        elm.checked = !!data.checked;
+        elm.checked = !!checked;
         break;
       case "text":
-        elm.value = isString(data.value) && data.value || "";
-        if (elm.id === EDITOR_LABEL && elm.value) {
+        elm.value = isString(value) && value || "";
+        if (id === EDITOR_LABEL && elm.value) {
           elm.disabled = false;
         }
         break;
       default:
-        if (elm.id === SYNC_AUTO_URL) {
-          elm.value = isString(data.value) && data.value || "";
+        if (id === SYNC_AUTO_URL) {
+          elm.value = isString(value) && value || "";
         }
     }
   }
 };
 
 /**
- * set html input values from local storage
+ * set html input values from storage
  * @returns {Promise.<Array>} - results of each handler
  */
-const setValuesFromLocalStorage = async () => {
+const setValuesFromStorage = async () => {
   const func = [];
   const pref = await getStorage();
-  const items = pref && Object.values(pref);
-  if (items && items.length) {
+  if (isObjectNotEmpty(pref)) {
+    const items = Object.values(pref);
     for (const item of items) {
-      func.push(setHtmlInputValue(item));
+      isObjectNotEmpty(item) && func.push(setHtmlInputValue(item));
     }
   }
   return Promise.all(func);
@@ -322,7 +323,7 @@ port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 /* startup */
 Promise.all([
   localizeHtml(),
-  setValuesFromLocalStorage(),
+  setValuesFromStorage(),
   addInputChangeListener(),
   addSyncUrlsInputListener(),
   addReloadExtensionListener(),
