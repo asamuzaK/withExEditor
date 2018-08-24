@@ -14,9 +14,6 @@
   "commandOpenOptions": {
     "message": "設定ページを開く"
   },
-  "compatNoteAccessKey": {
-    "message": "備考： コンテクストメニューでのアクセスキーは、まだGecko系ブラウザでは実装されていません。"
-  },
   "compatNoteIconAuto": {
     "message": "備考： 「自動」はGecko系ブラウザしか適用されません。また「about:config」から「svg.context-properties.content.enabled」の値を「true」に変更する必要があります。"
   },
@@ -36,7 +33,16 @@
     "message": "適合"
   },
   "modeEditText": {
-    "message": "テキストを $LABEL$ で編集 $KEY$",
+    "message": "テキストを $LABEL$ で編集",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeEditText_key": {
+    "message": "テキストを $LABEL$ で編集$KEY$",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -44,12 +50,21 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&E)"
       }
     }
   },
   "modeViewMathML": {
-    "message": "MathML のソースを $LABEL$ で表示 $KEY$",
+    "message": "MathML のソースを $LABEL$ で表示",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewMathML_key": {
+    "message": "MathML のソースを $LABEL$ で表示$KEY$",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -57,12 +72,12 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&V)"
       }
     }
   },
   "modeViewSelection": {
-    "message": "選択した部分のソースを $LABEL$ で表示 $KEY$",
+    "message": "選択した部分のソースを $LABEL$ で表示",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -70,12 +85,25 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&V)"
+      }
+    }
+  },
+  "modeViewSelection_key": {
+    "message": "選択した部分のソースを $LABEL$ で表示$KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(&V)"
       }
     }
   },
   "modeViewSource": {
-    "message": "ページのソースを $LABEL$ で表示 $KEY$",
+    "message": "ページのソースを $LABEL$ で表示",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -83,12 +111,25 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&V)"
+      }
+    }
+  },
+  "modeViewSource_key": {
+    "message": "ページのソースを $LABEL$ で表示$KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(&V)"
       }
     }
   },
   "modeViewSVG": {
-    "message": "SVG のソースを $LABEL$ で表示 $KEY$",
+    "message": "SVG のソースを $LABEL$ で表示",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -96,21 +137,22 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&V)"
       }
     }
   },
-  "optionsAccessKey": {
-    "message": ""
-  },
-  "optionsAccessKey_placeholder": {
-    "message": "アクセスキーを入力"
-  },
-  "optionsAccessKeyDetail": {
-    "message": "コンテキストメニューのアクセスキーを設定します。アクセスキーには、「A」から「Z」までの任意のキーを使用できます。"
-  },
-  "optionsAccessKeyLabel": {
-    "message": "アクセスキー"
+  "modeViewSVG_key": {
+    "message": "SVG のソースを $LABEL$ で表示$KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(&V)"
+      }
+    }
   },
   "optionsEditorLabel": {
     "message": ""

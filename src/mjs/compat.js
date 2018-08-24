@@ -2,9 +2,7 @@
  * compat.js
  */
 
-import {
-  EDITOR_EXEC, ICON_AUTO, KEY_ACCESS, OPTIONS_OPEN, WEBEXT_ID,
-} from "./constant.js";
+import {EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
 import {
   dispatchChangeEvt, dispatchInputEvt, isString, parseVersion, throwErr,
 } from "./common.js";
@@ -15,6 +13,7 @@ const {commands, runtime} = browser;
 
 /* constants */
 const MOD_KEYS_MAX = 2;
+const WEBEXT_ACCKEY_MIN = 63;
 const WEBEXT_COMPAT_CMD_MIN = 63;
 
 /**
@@ -151,17 +150,30 @@ export const disableInput = async id => {
  */
 export const disableIncompatibleInputs = async () => {
   const {id} = runtime;
-  const disableBlink = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
-  const disableGecko = [KEY_ACCESS];
   const func = [];
-  if (id === WEBEXT_ID) {
-    for (const item of disableGecko) {
-      func.push(disableInput(item));
-    }
-  } else {
+  if (id !== WEBEXT_ID) {
+    const disableBlink = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
     for (const item of disableBlink) {
       func.push(disableInput(item));
     }
   }
   return Promise.all(func);
+};
+
+/**
+ * is accesskey supported
+ * @returns {boolean} - result
+ */
+export const isAccessKeySupported = async () => {
+  let bool;
+  if (typeof runtime.getBrowserInfo === "function") {
+    const {version} = await runtime.getBrowserInfo();
+    const {major: majorVersion} = await parseVersion(version);
+    if (majorVersion >= WEBEXT_ACCKEY_MIN) {
+      bool = true;
+    }
+  } else {
+    bool = true;
+  }
+  return !!bool;
 };
