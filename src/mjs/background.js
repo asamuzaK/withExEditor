@@ -9,7 +9,7 @@ import {
   HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
   HOST_VERSION, HOST_VERSION_CHECK, ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR,
   ICON_DARK, ICON_DARK_ID, ICON_ID, ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
-  IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, KEY_ACCESS, LIVE_EDIT, LIVE_EDIT_PATH,
+  IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, LIVE_EDIT, LIVE_EDIT_PATH,
   LOCAL_FILE_VIEW, MENU_ENABLED, MODE_EDIT, MODE_MATHML, MODE_SELECTION,
   MODE_SOURCE, MODE_SVG, NS_URI, NS_URI_PATH, ONLY_EDITABLE, OPTIONS_OPEN,
   PORT_CONTENT, PROCESS_CHILD, STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
@@ -26,6 +26,7 @@ import {
   execScriptToExistingTabs, fetchData, getActiveTab, getActiveTabId,
   getAllStorage, getAllNormalWindows, getEnabledTheme, getStorage, setStorage,
 } from "./browser.js";
+import {isAccessKeySupported} from "./compat.js";
 import {migrateStorage} from "./migrate.js";
 
 /* api */
@@ -51,7 +52,6 @@ const varsLocal = {
   [ENABLE_PB]: false,
   [ICON_ID]: "",
   [IS_EXECUTABLE]: false,
-  [KEY_ACCESS]: "U",
   [MENU_ENABLED]: false,
   [MODE_MATHML]: "",
   [MODE_SOURCE]: "",
@@ -354,7 +354,38 @@ const menus = {
   [MODE_EDIT]: null,
 };
 
-// TODO: implement accesskey, Issue #18
+/**
+ * get access key
+ * @param {string} id - menu item ID
+ * @returns {string} - accesskey
+ */
+const getAccesskey = id => {
+  let key;
+  if (isString(id)) {
+    switch (id) {
+      case MODE_EDIT:
+        if (vars[IS_WEBEXT]) {
+          key = "(&E)";
+        } else {
+          key = " (&E)";
+        }
+        break;
+      case MODE_MATHML:
+      case MODE_SELECTION:
+      case MODE_SOURCE:
+      case MODE_SVG:
+        if (vars[IS_WEBEXT]) {
+          key = "(&V)";
+        } else {
+          key = " (&V)";
+        }
+        break;
+      default:
+    }
+  }
+  return key || "";
+};
+
 /**
  * create context menu item
  * @param {string} id - menu item ID
@@ -362,14 +393,15 @@ const menus = {
  * @returns {void}
  */
 const createMenuItem = async (id, contexts) => {
-  const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-  const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
-                 `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
-  const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
   if (isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts)) {
+    const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
+    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
+    const accKeySupported = await isAccessKeySupported();
+    const title = accKeySupported && `${id}_key` || id;
+    const accKey = accKeySupported && getAccesskey(id) || "";
     menus[id] = await contextMenus.create({
       id, contexts, enabled,
-      title: i18n.getMessage(id, [label, accKey]),
+      title: i18n.getMessage(title, [label, accKey]),
     });
   }
 };
@@ -435,16 +467,17 @@ const updateContextMenu = async type => {
   } else {
     const items = Object.keys(menus);
     const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-    const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
-                   `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
     const bool = enabled && !vars[ONLY_EDITABLE];
+    const accKeySupported = await isAccessKeySupported();
     if (items.length) {
       for (const item of items) {
         if (menus[item]) {
+          const title = accKeySupported && `${item}_key` || item;
+          const accKey = accKeySupported && getAccesskey(item) || "";
           func.push(contextMenus.update(item, {
             enabled,
-            title: i18n.getMessage(item, [label, accKey]),
+            title: i18n.getMessage(title, [label, accKey]),
           }));
         } else if (enabled) {
           switch (item) {
@@ -473,10 +506,11 @@ const updateContextMenu = async type => {
 const cacheMenuItemTitle = async () => {
   const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
   const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-  const accKey = !vars[IS_WEBEXT] && varsLocal[KEY_ACCESS] &&
-                 `(&${varsLocal[KEY_ACCESS].toUpperCase()})` || "";
+  const accKeySupported = await isAccessKeySupported();
   for (const item of items) {
-    varsLocal[item] = i18n.getMessage(item, [label, accKey]);
+    const title = accKeySupported && `${item}_key` || item;
+    const accKey = accKeySupported && getAccesskey(item) || "";
+    varsLocal[item] = i18n.getMessage(title, [label, accKey]);
   }
 };
 
@@ -934,13 +968,6 @@ const setVar = async (item, obj, changed = false) => {
           varsLocal[ICON_ID] = value;
           changed && func.push(setIcon(value));
         }
-        break;
-      case KEY_ACCESS:
-        varsLocal[item] = value;
-        changed && func.push(
-          updateContextMenu(),
-          cacheMenuItemTitle(),
-        );
         break;
       case ONLY_EDITABLE:
         vars[item] = !!checked;

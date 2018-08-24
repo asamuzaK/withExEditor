@@ -1,330 +1,322 @@
 {
-    "extensionLocale": {
-        "message": "zh_CN",
-        "hash": "e2d59e95a3a41434b5a59d9ac0897d74"
-    },
-    "extensionDescription": {
-        "message": "从上下文菜单（右键菜单）选择使用您喜欢的编辑器来“查看源代码”、“查看选中部分源代码”或“编辑文本”。",
-        "hash": "b0a2b764a0d518244b372153d57edc5b"
-    },
-    "extensionName": {
-        "message": "withExEditor",
-        "hash": "c6a4edfa04150101d335682272ff9768"
-    },
-    "commandExecEditor": {
-        "message": "直接执行编辑器",
-        "hash": "5271a8e3d13d5b4a18ab0a62e81cb6ec"
-    },
-    "commandOpenOptions": {
-        "message": "打开选项页面",
-        "hash": "fd932d633cde80b3e7ed4b13bd86378a"
-    },
-    "compatNoteAccessKey": {
-        "message": "注意：Gecko 内核的浏览器尚未支持设定右键菜单中的访问键。",
-        "hash": "d7a51df22f9e3b3fe4485bec57d44b6f"
-    },
-    "compatNoteIconAuto": {
-        "message": "注意：“自动”仅适用于 Gecko 内核的浏览器，并且你需要在 \"about:config\" 中将 \"svg.context-properties.content.enabled\" 设定为 \"true\" 。",
-        "hash": "f5debbb6841e25945a00079c59195893"
-    },
-    "compatNoteShortcutKey": {
-        "message": "注意：不兼容 Blink 浏览器。请在浏览器的扩展页面中指定键盘快捷键。",
-        "hash": "c0a058406eb1cfdfb42f7e590711c9e3"
-    },
-    "hostConnection_false": {
-        "message": "已断开",
-        "hash": "27872c8089abdb327b012400d3cc9bf0"
-    },
-    "hostConnection_true": {
-        "message": "已连接",
-        "hash": "577010100feb9ad9c171ccd91db57a06"
-    },
-    "hostVersion_false": {
-        "message": "不兼容",
-        "hash": "28453c055bb3d322bb9a6ff2ba430ea2"
-    },
-    "hostVersion_true": {
-        "message": "兼容",
-        "hash": "7976aeb05daa7e3ab6ff5ebc8d74b0f9"
-    },
-    "modeEditText": {
-        "message": "使用 $LABEL$ $KEY$ 编辑文本",
-        "placeholders": {
-            "label": { "content": "$1", "example": "Mery" },
-            "key": { "content": "$2", "example": "(U)" }
-        },
-        "hash": "b62b509856155ceff6330159ffcd5317"
-    },
-    "modeViewMathML": {
-        "message": "使用 $LABEL$ $KEY$ 查看 MathML 源代码",
-        "placeholders": {
-            "label": { "content": "$1", "example": "Mery" },
-            "key": { "content": "$2", "example": "(U)" }
-        },
-        "hash": "80f48f7179afbebf43907169e78210f2"
-    },
-    "modeViewSelection": {
-        "message": "使用 $LABEL$ $KEY$ 查看选中部分源代码",
-        "placeholders": {
-            "label": { "content": "$1", "example": "Mery" },
-            "key": { "content": "$2", "example": "(U)" }
-        },
-        "hash": "6c727c75252bc819329564fed6b9badc"
-    },
-    "modeViewSource": {
-        "message": "使用 $LABEL$ $KEY$ 查看页面源代码",
-        "placeholders": {
-            "label": { "content": "$1", "example": "Mery" },
-            "key": { "content": "$2", "example": "(U)" }
-        },
-        "hash": "871fe799bba5f32b226da0795963261e"
-    },
-    "modeViewSVG": {
-        "message": "使用 $LABEL$ $KEY$ SVG 源代码",
-        "placeholders": {
-            "label": { "content": "$1", "example": "Mery" },
-            "key": { "content": "$2", "example": "(U)" }
-        },
-        "hash": "5b2ec0350a2e32da1630cb21b41117cf"
-    },
-    "optionsAccessKey": {
-        "message": ""
-    },
-    "optionsAccessKey_placeholder": {
-        "message": "输入访问键",
-        "hash": "d1e571f99e179b42dd5d4972fdb3f2d6"
-    },
-    "optionsAccessKeyDetail": {
-        "message": "访问键用于右键菜单，菜单打开时按下该键等同选择该菜单项。",
-        "hash": "da77205475b8cf0db97dc5df3640599c"
-    },
-    "optionsAccessKeyLabel": {
-        "message": "访问键",
-        "hash": "e0f45825052a431b998e157368d7c93b"
-    },
-    "optionsEditorLabel": {
-        "message": ""
-    },
-    "optionsEditorLabel_placeholder": {
-        "message": "重命名编辑器名称",
-        "hash": "2f237379676c271ad4d6e9efccd9633d"
-    },
-    "optionsEditorLabelDetail": {
-        "message": "输入编辑器的名称。",
-        "hash": "27a3dd3d013c94c1d8febc51d1875ba4"
-    },
-    "optionsEditorLabelDetail2": {
-        "message": "如果该文本框为禁用状态，请在主机上运行安装脚本。",
-        "hash": "35280dc6d7048d48e458f2caf3aa1a07"
-    },
-    "optionsEditorLabelLabel": {
-        "message": "编辑器名称",
-        "hash": "236066c590f782e1a35a1d1d9db0dd3c"
-    },
-    "optionsEnableOnlyEditableDetail": {
-        "message": "只在内容可编辑时启用。",
-        "hash": "62195f506cc8fa2a6a54616487428d05"
-    },
-    "optionsEnableOnlyEditableLabel": {
-        "message": "只在编辑文本时启用",
-        "hash": "cd1606c70ebfb6502f7c71a74fbd792a"
-    },
-    "optionsEnablePBDetail": {
-        "message": "选中则启用，未选中则禁用。",
-        "hash": "715fdf1e8fd1fe9cb6499167f6838ca6"
-    },
-    "optionsEnablePBLabel": {
-        "message": "在隐私浏览时启用。",
-        "hash": "4a5e09547ab0d31088cca84cf7fc15ce"
-    },
-    "optionsEnableSyncAutoDetail": {
-        "message": "如果您想自动同步已编辑的内容，启用此项。",
-        "hash": "47871c32e98714139c68029cedfecf5d"
-    },
-    "optionsEnableSyncAutoDetail2": {
-        "message": "请注意，隐私浏览模式下此选项无效，并且如果您的浏览器长时间运行或者注册较多网址，可能会使电脑卡顿。",
-        "hash": "b0d29129f55a40a1ce1c1ba5ac33cbe6"
-    },
-    "optionsEnableSyncAutoLabel": {
-        "message": "在特定站点上自动同步已编辑的内容",
-        "hash": "29025e86bdb91f03d8e212edb2876638"
-    },
-    "optionsExecEditorDetail": {
-        "message": "执行编辑器的键盘快捷键，用它就无需使用右键菜单。焦点在输入框时按下此快捷键即可调用。示例：Ctrl+Shift+U。",
-        "hash": "ecdc0a030b7f1e64d2f9bc09dbaf003a"
-    },
-    "optionsExecEditorLabel": {
-        "message": "直接执行编辑器",
-        "hash": "ce3ae5d8dbff7b4e701675146ace38b7"
-    },
-    "optionsHostConnectionDetail": {
-        "message": "如果为“未知”或“已断开”，重新加载 withExEditor。",
-        "hash": "c6ed2c0564ba0f29d84d47a549a3c1f5"
-    },
-    "optionsHostConnectionLabel": {
-        "message": "主机连接",
-        "hash": "577db7f5a98f4588e5fb666af1dcd5a0"
-    },
-    "optionsHostStatus": {
-        "message": "主机",
-        "hash": "f7eef1219fc8f8121c018636b0fc91c7"
-    },
-    "optionsHostVersionDetail": {
-        "message": "如果为“未知”或“不兼容”，请更新主机。",
-        "hash": "cd0ea91392b956c9f9c5820d416a9a33"
-    },
-    "optionsHostVersionLabel": {
-        "message": "主机版本",
-        "hash": "15d495787bde4931c11bd0dde95cfbb3"
-    },
-    "optionsIconAuto": {
-        "message": "自动",
-        "hash": "a91ee63a9deaf1088b86d1b620bb0549"
-    },
-    "optionsIconAuto_alt": {
-        "message": ""
-    },
-    "optionsIconAutoLabel": {
-        "message": "自动",
-        "hash": "a91ee63a9deaf1088b86d1b620bb0549"
-    },
-    "optionsIconAutoLabel_ariaLabel": {
-        "message": "自动",
-        "hash": "a91ee63a9deaf1088b86d1b620bb0549"
-    },
-    "optionsIconBlack": {
-        "message": ""
-    },
-    "optionsIconBlack_alt": {
-        "message": "黑",
-        "hash": "b6645aa61be84c0942817efacfefdf07"
-    },
-    "optionsIconBlackLabel": {
-        "message": ""
-    },
-    "optionsIconBlackLabel_ariaLabel": {
-        "message": "黑图标",
-        "hash": "8c93f0b8779a98d62ae4dd3c9e5fbfec"
-    },
-    "optionsIconColor": {
-        "message": ""
-    },
-    "optionsIconColor_alt": {
-        "message": "彩色",
-        "hash": "bf38f602f3073cfb0765264037315b38"
-    },
-    "optionsIconColorLabel": {
-        "message": ""
-    },
-    "optionsIconColorLabel_ariaLabel": {
-        "message": "彩色图标",
-        "hash": "b05a2b3c75a9be47815e373c3d786c5b"
-    },
-    "optionsIconDark": {
-        "message": ""
-    },
-    "optionsIconDark_alt": {
-        "message": "暗",
-        "hash": "f52e24bb113e8c96fde952627b413812"
-    },
-    "optionsIconDarkLabel": {
-        "message": ""
-    },
-    "optionsIconDarkLabel_ariaLabel": {
-        "message": "暗图标",
-        "hash": "d7e279dd969211db9751fa9e956f890e"
-    },
-    "optionsIconDetail": {
-        "message": "选择在工具栏上显示的图标。",
-        "hash": "37e7386c836ae87f2deabded444c58c7"
-    },
-    "optionsIconLight": {
-        "message": ""
-    },
-    "optionsIconLight_alt": {
-        "message": "亮",
-        "hash": "b0d6d2effb46a4a98ac85c4c61d2f64f"
-    },
-    "optionsIconLightLabel": {
-        "message": ""
-    },
-    "optionsIconLightLabel_ariaLabel": {
-        "message": "亮图标",
-        "hash": "ad4d9305fe02ca4f619de9a2ddc057e9"
-    },
-    "optionsIconWhite": {
-        "message": ""
-    },
-    "optionsIconWhite_alt": {
-        "message": "白",
-        "hash": "333377f0d431ac6506374ecec7db4a5f"
-    },
-    "optionsIconWhiteLabel": {
-        "message": ""
-    },
-    "optionsIconWhiteLabel_ariaLabel": {
-        "message": "白图标",
-        "hash": "ee5909ee51ae93a45cc66f0424bd1f5b"
-    },
-    "optionsKeyComboInput": {
-        "message": ""
-    },
-    "optionsKeyComboInput_placeholder": {
-        "message": "按下要设定的快捷键",
-        "hash": "d60f95c5428af2875963137ad452af4f"
-    },
-    "optionsKeyboardShortcuts": {
-        "message": "键盘快捷键",
-        "hash": "5f31ec40657513b48261008549fed0bd"
-    },
-    "optionsNotifyHostError": {
-        "message": "通知主机错误",
-        "hash": "676b53f82b43743cb9cea40dea5c1316"
-    },
-    "optionsNotifyHostErrorDetail": {
-        "message": "主机上发生错误时通知我。",
-        "hash": "fe1264984e60c36c27e12660def7363f"
-    },
-    "optionsOpenOptionsPageDetail": {
-        "message": "打开选项页面的键盘快捷键。在输入框中按下你要设置的键盘快捷键，例如 Alt+Shift+U。",
-        "hash": "fae62c8bb56fe4d3291c29317f1a6434"
-    },
-    "optionsOpenOptionsPageLabel": {
-        "message": "打开选项页面",
-        "hash": "66038e65dfcee00adcf5be2081ce1016"
-    },
-    "optionsOtherSettings": {
-        "message": "其他设置",
-        "hash": "0da3b206ce82c07a308c4754fb8a5afe"
-    },
-    "optionsReload": {
-        "message": "重新加载",
-        "hash": "6490950a1fa172dcd76eff7b256dd199"
-    },
-    "optionsReloadExtension": {
-        "message": "重新加载 withExEditor",
-        "hash": "e1a2a13f4896a74679c02a68fcf2033e"
-    },
-    "optionsReloadExtensionDetail": {
-        "message": "withExEditor 失效时尝试，例如在更新 Node.js 或 withExEditorHost 之后。",
-        "hash": "d26cbce871c61cfdfce2dbe8d84ba0c4"
-    },
-    "optionsSaveEditorSettings": {
-        "message": "保存",
-        "hash": "aa14043bd4e6f79db542868539be9220"
-    },
-    "optionsSyncAutoUrlLabel": {
-        "message": "站点（每行输入一条网址）",
-        "hash": "ea6443980aa0829ff81271f1b341cd3a"
-    },
-    "optionsTitle": {
-        "message": "withExEditor 选项",
-        "hash": "e0af667283d838872bf572a59fe4b1fb"
-    },
-    "optionsToolbarIconLabel": {
-        "message": "工具栏按钮的图标",
-        "hash": "52dc64f988cca90a9007bfbd523f0969"
-    },
-
-    "__WET_LOCALE__": { "message": "zh-CN" }
+  "extensionLocale": {
+    "message": "zh_CN"
+  },
+  "extensionDescription": {
+    "message": "从上下文菜单（右键菜单）选择使用您喜欢的编辑器来“查看源代码”、“查看选中部分源代码”或“编辑文本”。"
+  },
+  "extensionName": {
+    "message": "withExEditor"
+  },
+  "commandExecEditor": {
+    "message": "直接执行编辑器"
+  },
+  "commandOpenOptions": {
+    "message": "打开选项页面"
+  },
+  "compatNoteIconAuto": {
+    "message": "注意：“自动”仅适用于 Gecko 内核的浏览器，并且你需要在 \"about:config\" 中将 \"svg.context-properties.content.enabled\" 设定为 \"true\" 。"
+  },
+  "compatNoteShortcutKey": {
+    "message": "注意：不兼容 Blink 浏览器。请在浏览器的扩展页面中指定键盘快捷键。"
+  },
+  "hostConnection_false": {
+    "message": "已断开"
+  },
+  "hostConnection_true": {
+    "message": "已连接"
+  },
+  "hostVersion_false": {
+    "message": "不兼容"
+  },
+  "hostVersion_true": {
+    "message": "兼容"
+  },
+  "modeEditText": {
+    "message": "使用 $LABEL$ 编辑文本",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeEditText_key": {
+    "message": "使用 $LABEL$ 编辑文本$KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(&E)"
+      }
+    }
+  },
+  "modeViewMathML": {
+    "message": "使用 $LABEL$ 查看 MathML 源代码",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewMathML_key": {
+    "message": "使用 $LABEL$ 查看 MathML 源代码$KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(&V)"
+      }
+    }
+  },
+  "modeViewSelection": {
+    "message": "使用 $LABEL$ 查看选中部分源代码",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewSelection_key": {
+    "message": "使用 $LABEL$ 查看选中部分源代码$KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(&V)"
+      }
+    }
+  },
+  "modeViewSource": {
+    "message": "使用 $LABEL$ 查看页面源代码",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewSource_key": {
+    "message": "使用 $LABEL$ 查看页面源代码$KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(&V)"
+      }
+    }
+  },
+  "modeViewSVG": {
+    "message": "使用 $LABEL$ SVG 源代码",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewSVG_key": {
+    "message": "使用 $LABEL$ SVG 源代码$KEY$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      },
+      "key": {
+        "content": "$2",
+        "example": "(&V)"
+      }
+    }
+  },
+  "optionsEditorLabel": {
+    "message": ""
+  },
+  "optionsEditorLabel_placeholder": {
+    "message": "重命名编辑器名称"
+  },
+  "optionsEditorLabelDetail": {
+    "message": "输入编辑器的名称。"
+  },
+  "optionsEditorLabelDetail2": {
+    "message": "如果该文本框为禁用状态，请在主机上运行安装脚本。"
+  },
+  "optionsEditorLabelLabel": {
+    "message": "编辑器名称"
+  },
+  "optionsEnableOnlyEditableDetail": {
+    "message": "只在内容可编辑时启用。"
+  },
+  "optionsEnableOnlyEditableLabel": {
+    "message": "只在编辑文本时启用"
+  },
+  "optionsEnablePBDetail": {
+    "message": "选中则启用，未选中则禁用。"
+  },
+  "optionsEnablePBLabel": {
+    "message": "在隐私浏览时启用。"
+  },
+  "optionsEnableSyncAutoDetail": {
+    "message": "如果您想自动同步已编辑的内容，启用此项。"
+  },
+  "optionsEnableSyncAutoDetail2": {
+    "message": "请注意，隐私浏览模式下此选项无效，并且如果您的浏览器长时间运行或者注册较多网址，可能会使电脑卡顿。"
+  },
+  "optionsEnableSyncAutoLabel": {
+    "message": "在特定站点上自动同步已编辑的内容"
+  },
+  "optionsExecEditorDetail": {
+    "message": "执行编辑器的键盘快捷键，用它就无需使用右键菜单。焦点在输入框时按下此快捷键即可调用。示例：Ctrl+Shift+U。"
+  },
+  "optionsExecEditorLabel": {
+    "message": "直接执行编辑器"
+  },
+  "optionsHostConnectionDetail": {
+    "message": "如果为“未知”或“已断开”，重新加载 withExEditor。"
+  },
+  "optionsHostConnectionLabel": {
+    "message": "主机连接"
+  },
+  "optionsHostStatus": {
+    "message": "主机"
+  },
+  "optionsHostVersionDetail": {
+    "message": "如果为“未知”或“不兼容”，请更新主机。"
+  },
+  "optionsHostVersionLabel": {
+    "message": "主机版本"
+  },
+  "optionsIconAuto": {
+    "message": "自动"
+  },
+  "optionsIconAuto_alt": {
+    "message": ""
+  },
+  "optionsIconAutoLabel": {
+    "message": "自动"
+  },
+  "optionsIconAutoLabel_ariaLabel": {
+    "message": "自动"
+  },
+  "optionsIconBlack": {
+    "message": ""
+  },
+  "optionsIconBlack_alt": {
+    "message": "黑"
+  },
+  "optionsIconBlackLabel": {
+    "message": ""
+  },
+  "optionsIconBlackLabel_ariaLabel": {
+    "message": "黑图标"
+  },
+  "optionsIconColor": {
+    "message": ""
+  },
+  "optionsIconColor_alt": {
+    "message": "彩色"
+  },
+  "optionsIconColorLabel": {
+    "message": ""
+  },
+  "optionsIconColorLabel_ariaLabel": {
+    "message": "彩色图标"
+  },
+  "optionsIconDark": {
+    "message": ""
+  },
+  "optionsIconDark_alt": {
+    "message": "暗"
+  },
+  "optionsIconDarkLabel": {
+    "message": ""
+  },
+  "optionsIconDarkLabel_ariaLabel": {
+    "message": "暗图标"
+  },
+  "optionsIconDetail": {
+    "message": "选择在工具栏上显示的图标。"
+  },
+  "optionsIconLight": {
+    "message": ""
+  },
+  "optionsIconLight_alt": {
+    "message": "亮"
+  },
+  "optionsIconLightLabel": {
+    "message": ""
+  },
+  "optionsIconLightLabel_ariaLabel": {
+    "message": "亮图标"
+  },
+  "optionsIconWhite": {
+    "message": ""
+  },
+  "optionsIconWhite_alt": {
+    "message": "白"
+  },
+  "optionsIconWhiteLabel": {
+    "message": ""
+  },
+  "optionsIconWhiteLabel_ariaLabel": {
+    "message": "白图标"
+  },
+  "optionsKeyComboInput": {
+    "message": ""
+  },
+  "optionsKeyComboInput_placeholder": {
+    "message": "按下要设定的快捷键"
+  },
+  "optionsKeyboardShortcuts": {
+    "message": "键盘快捷键"
+  },
+  "optionsNotifyHostError": {
+    "message": "通知主机错误"
+  },
+  "optionsNotifyHostErrorDetail": {
+    "message": "主机上发生错误时通知我。"
+  },
+  "optionsOpenOptionsPageDetail": {
+    "message": "打开选项页面的键盘快捷键。在输入框中按下你要设置的键盘快捷键，例如 Alt+Shift+U。"
+  },
+  "optionsOpenOptionsPageLabel": {
+    "message": "打开选项页面"
+  },
+  "optionsOtherSettings": {
+    "message": "其他设置"
+  },
+  "optionsReload": {
+    "message": "重新加载"
+  },
+  "optionsReloadExtension": {
+    "message": "重新加载 withExEditor"
+  },
+  "optionsReloadExtensionDetail": {
+    "message": "withExEditor 失效时尝试，例如在更新 Node.js 或 withExEditorHost 之后。"
+  },
+  "optionsSaveEditorSettings": {
+    "message": "保存"
+  },
+  "optionsSyncAutoUrlLabel": {
+    "message": "站点（每行输入一条网址）"
+  },
+  "optionsTitle": {
+    "message": "withExEditor 选项"
+  },
+  "optionsToolbarIconLabel": {
+    "message": "工具栏按钮的图标"
+  }
 }
