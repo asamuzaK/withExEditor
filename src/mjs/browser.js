@@ -18,7 +18,7 @@ const {TAB_ID_NONE} = tabs;
  * update command
  * @param {string} id - command ID
  * @param {string} value - key value
- * @returns {void}
+ * @returns {?AsyncFunction} - commands.update | commands.reset
  */
 export const updateCommand = async (id, value = "") => {
   if (!isString(id)) {
@@ -27,18 +27,20 @@ export const updateCommand = async (id, value = "") => {
   if (!isString(value)) {
     throw new TypeError(`Expected String but got ${getType(value)}.`);
   }
+  let func;
   if (commands && typeof commands.update === "function") {
     const shortcut =
       value.trim().replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`);
     if (/^(?:(?:(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-Z]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Comma|Period|Home|End|Delete|Insert|Space))|F(?:[1-9]|1[0-2]))$/.test(shortcut)) {
-      await commands.update({
+      func = commands.update({
         shortcut,
         name: id,
       });
     } else if (shortcut === "") {
-      await commands.reset(id);
+      func = commands.reset(id);
     }
   }
+  return func || null;
 };
 
 /* management */
@@ -335,7 +337,7 @@ export const getAllTabsInWindow = async windowId => {
       windowType: "normal",
     });
   }
-  return tabList;
+  return tabList || null;
 };
 
 /**
