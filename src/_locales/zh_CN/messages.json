@@ -1,6 +1,6 @@
 {
   "extensionLocale": {
-    "message": "zh_CN"
+    "message": "zh-CN"
   },
   "extensionDescription": {
     "message": "从上下文菜单（右键菜单）选择使用您喜欢的编辑器来“查看源代码”、“查看选中部分源代码”或“编辑文本”。"
