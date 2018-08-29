@@ -14,9 +14,6 @@
   "commandOpenOptions": {
     "message": "Open the options page"
   },
-  "compatNoteAccessKey": {
-    "message": "NOTE: Accesskey in context menu is not implemented in Gecko browsers yet."
-  },
   "compatNoteIconAuto": {
     "message": "NOTE: \"Auto\" only applies to Gecko browsers, and you need to set \"svg.context-properties.content.enabled\" to \"true\" from \"about:config\"."
   },
@@ -36,7 +33,16 @@
     "message": "Compatible"
   },
   "modeEditText": {
-    "message": "Edit Text with $LABEL$ $KEY$",
+    "message": "Edit Text with $LABEL$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeEditText_key": {
+    "message": "&Edit Text with $LABEL$",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -44,12 +50,21 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&E)"
       }
     }
   },
   "modeViewMathML": {
-    "message": "View MathML Source with $LABEL$ $KEY$",
+    "message": "View MathML Source with $LABEL$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewMathML_key": {
+    "message": "&View MathML Source with $LABEL$",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -57,12 +72,21 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&V)"
       }
     }
   },
   "modeViewSelection": {
-    "message": "View Selection Source with $LABEL$ $KEY$",
+    "message": "View Selection Source with $LABEL$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewSelection_key": {
+    "message": "&View Selection Source with $LABEL$",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -70,12 +94,21 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&V)"
       }
     }
   },
   "modeViewSource": {
-    "message": "View Page Source with $LABEL$ $KEY$",
+    "message": "View Page Source with $LABEL$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewSource_key": {
+    "message": "&View Page Source with $LABEL$",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -83,12 +116,21 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&V)"
       }
     }
   },
   "modeViewSVG": {
-    "message": "View SVG Source with $LABEL$ $KEY$",
+    "message": "View SVG Source with $LABEL$",
+    "placeholders": {
+      "label": {
+        "content": "$1",
+        "example": "Mery"
+      }
+    }
+  },
+  "modeViewSVG_key": {
+    "message": "&View SVG Source with $LABEL$",
     "placeholders": {
       "label": {
         "content": "$1",
@@ -96,21 +138,9 @@
       },
       "key": {
         "content": "$2",
-        "example": "(U)"
+        "example": "(&V)"
       }
     }
-  },
-  "optionsAccessKey": {
-    "message": ""
-  },
-  "optionsAccessKey_placeholder": {
-    "message": "Input Access Key"
-  },
-  "optionsAccessKeyDetail": {
-    "message": "Access key used in the context menu. Access key can be any key from 'A' to 'Z'."
-  },
-  "optionsAccessKeyLabel": {
-    "message": "Access Key"
   },
   "optionsEditorLabel": {
     "message": ""

@@ -2,9 +2,7 @@
  * compat.js
  */
 
-import {
-  EDITOR_EXEC, ICON_AUTO, KEY_ACCESS, OPTIONS_OPEN, WEBEXT_ID,
-} from "./constant.js";
+import {EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
 import {
   dispatchChangeEvt, dispatchInputEvt, isString, parseVersion, throwErr,
 } from "./common.js";
@@ -14,6 +12,7 @@ import {updateCommand} from "./browser.js";
 const {commands, runtime} = browser;
 
 /* constants */
+const IS_WEBEXT = runtime.id === WEBEXT_ID;
 const MOD_KEYS_MAX = 2;
 const WEBEXT_COMPAT_CMD_MIN = 63;
 
@@ -23,7 +22,7 @@ const WEBEXT_COMPAT_CMD_MIN = 63;
  * @returns {void}
  */
 export const updateCommandKey = async evt => {
-  if (typeof commands.update === "function") {
+  if (commands && typeof commands.update === "function") {
     const {target} = evt;
     const {id, value} = target;
     if (isString(id) && isString(value)) {
@@ -48,7 +47,7 @@ export const updateCommandKey = async evt => {
 export const detectKeyCombo = async evt => {
   const {altKey, ctrlKey, key, metaKey, shiftKey, target} = evt;
   const {disabled} = target;
-  if (!disabled && typeof runtime.getBrowserInfo === "function") {
+  if (!disabled && IS_WEBEXT) {
     const {version} = await runtime.getBrowserInfo();
     const {major: majorVersion} = await parseVersion(version);
     const {os} = await runtime.getPlatformInfo();
@@ -150,16 +149,10 @@ export const disableInput = async id => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const disableIncompatibleInputs = async () => {
-  const {id} = runtime;
-  const disableBlink = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
-  const disableGecko = [KEY_ACCESS];
   const func = [];
-  if (id === WEBEXT_ID) {
-    for (const item of disableGecko) {
-      func.push(disableInput(item));
-    }
-  } else {
-    for (const item of disableBlink) {
+  if (!IS_WEBEXT) {
+    const items = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
+    for (const item of items) {
       func.push(disableInput(item));
     }
   }
