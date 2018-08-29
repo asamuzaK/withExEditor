@@ -151,9 +151,9 @@ export const disableInput = async id => {
 export const disableIncompatibleInputs = async () => {
   const {id} = runtime;
   const func = [];
-  if (id !== WEBEXT_ID) {
-    const disableBlink = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
-    for (const item of disableBlink) {
+  if (!IS_WEBEXT) {
+    const items = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
+    for (const item of items) {
       func.push(disableInput(item));
     }
   }
