@@ -149,7 +149,6 @@ export const disableInput = async id => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const disableIncompatibleInputs = async () => {
-  const {id} = runtime;
   const func = [];
   if (!IS_WEBEXT) {
     const items = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
