@@ -20,6 +20,19 @@ const WEBEXT_ACCKEY_MIN = 63;
 
 /* commands */
 /**
+ * is command customizable
+ * @returns {boolean} - result
+ */
+export const isCommandCustomizable = () => {
+  let bool;
+  if (commands) {
+    bool = typeof commands.update === "function" &&
+           typeof commands.reset === "function";
+  }
+  return !!bool;
+};
+
+/**
  * update command
  * @param {string} id - command ID
  * @param {string} value - key value
@@ -33,7 +46,7 @@ export const updateCommand = async (id, value = "") => {
     throw new TypeError(`Expected String but got ${getType(value)}.`);
   }
   let func;
-  if (commands && typeof commands.update === "function") {
+  if (isCommandCustomizable()) {
     const shortcut =
       value.trim().replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`);
     if (/^(?:(?:(?:Alt|Command|(?:Mac)?Ctrl)\+(?:Shift\+)?(?:[\dA-Z]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Comma|Period|Home|End|Delete|Insert|Space))|F(?:[1-9]|1[0-2]))$/.test(shortcut)) {

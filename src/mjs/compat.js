@@ -6,10 +6,10 @@ import {EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
 import {
   dispatchChangeEvt, dispatchInputEvt, isString, parseVersion, throwErr,
 } from "./common.js";
-import {updateCommand} from "./browser.js";
+import {isCommandCustomizable, updateCommand} from "./browser.js";
 
 /* api */
-const {commands, runtime} = browser;
+const {runtime} = browser;
 
 /* constants */
 const IS_WEBEXT = runtime.id === WEBEXT_ID;
@@ -22,7 +22,7 @@ const WEBEXT_COMPAT_CMD_MIN = 63;
  * @returns {void}
  */
 export const updateCommandKey = async evt => {
-  if (commands && typeof commands.update === "function") {
+  if (isCommandCustomizable()) {
     const {target} = evt;
     const {id, value} = target;
     if (isString(id) && isString(value)) {
