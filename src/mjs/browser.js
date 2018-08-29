@@ -2,7 +2,9 @@
  * browser.js
  */
 
-import {getType, isObjectNotEmpty, isString, throwErr} from "./common.js";
+import {
+  getType, isObjectNotEmpty, isString, parseVersion, throwErr,
+} from "./common.js";
 
 /* api */
 const {
@@ -12,6 +14,9 @@ const {
 
 /* constants */
 const {TAB_ID_NONE} = tabs;
+const IS_CHROMEEXT = typeof runtime.getPackageDirectoryEntry === "function";
+const IS_WEBEXT = typeof runtime.getBrowserInfo === "function";
+const WEBEXT_ACCKEY_MIN = 63;
 
 /* commands */
 /**
@@ -338,6 +343,24 @@ export const getAllTabsInWindow = async windowId => {
     });
   }
   return tabList || null;
+};
+
+/**
+ * is accesskey supported in context menu
+ * @returns {boolean} - result
+ */
+export const isAccessKeySupported = async () => {
+  let bool;
+  if (IS_CHROMEEXT) {
+    bool = true;
+  } else if (IS_WEBEXT) {
+    const {version} = await runtime.getBrowserInfo();
+    const {major: majorVersion} = await parseVersion(version);
+    if (majorVersion >= WEBEXT_ACCKEY_MIN) {
+      bool = true;
+    }
+  }
+  return !!bool;
 };
 
 /**

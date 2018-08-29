@@ -12,10 +12,8 @@ import {updateCommand} from "./browser.js";
 const {commands, runtime} = browser;
 
 /* constants */
-const IS_CHROME_EXT = typeof runtime.getPackageDirectoryEntry === "function";
-const IS_WEB_EXT = typeof runtime.getBrowserInfo === "function";
+const IS_WEBEXT = runtime.id === WEBEXT_ID;
 const MOD_KEYS_MAX = 2;
-const WEBEXT_ACCKEY_MIN = 63;
 const WEBEXT_COMPAT_CMD_MIN = 63;
 
 /**
@@ -49,7 +47,7 @@ export const updateCommandKey = async evt => {
 export const detectKeyCombo = async evt => {
   const {altKey, ctrlKey, key, metaKey, shiftKey, target} = evt;
   const {disabled} = target;
-  if (!disabled && IS_WEB_EXT) {
+  if (!disabled && IS_WEBEXT) {
     const {version} = await runtime.getBrowserInfo();
     const {major: majorVersion} = await parseVersion(version);
     const {os} = await runtime.getPlatformInfo();
@@ -160,22 +158,4 @@ export const disableIncompatibleInputs = async () => {
     }
   }
   return Promise.all(func);
-};
-
-/**
- * is accesskey supported
- * @returns {boolean} - result
- */
-export const isAccessKeySupported = async () => {
-  let bool;
-  if (IS_CHROME_EXT) {
-    bool = true;
-  } else if (IS_WEB_EXT) {
-    const {version} = await runtime.getBrowserInfo();
-    const {major: majorVersion} = await parseVersion(version);
-    if (majorVersion >= WEBEXT_ACCKEY_MIN) {
-      bool = true;
-    }
-  }
-  return !!bool;
 };
