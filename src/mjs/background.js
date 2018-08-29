@@ -24,9 +24,9 @@ import {
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   execScriptToExistingTabs, fetchData, getActiveTab, getActiveTabId,
-  getAllStorage, getAllNormalWindows, getEnabledTheme, getStorage, setStorage,
+  getAllStorage, getAllNormalWindows, getEnabledTheme, getStorage,
+  isAccessKeySupported, setStorage,
 } from "./browser.js";
-import {isAccessKeySupported} from "./compat.js";
 import {migrateStorage} from "./migrate.js";
 
 /* api */
