@@ -31,9 +31,6 @@ export const updateCommandKey = async evt => {
       if (/^(?:(?:(?:(?:Alt|Command|(?:Mac)?Ctrl)(?:\+Shift)?|Alt\+(?:Command|(?:Mac)?Ctrl)|Command\+(?:Alt|MacCtrl)|Ctrl\+(?:Alt|MacCtrl)|MacCtrl\+(?:Alt|Command|Ctrl))\+(?:[\dA-Z]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Comma|Period|Home|End|Delete|Insert|Space))|F(?:[1-9]|1[0-2]))?$/.test(shortcut)) {
         await updateCommand(id, shortcut);
         dispatchChangeEvt(target);
-      } else if (shortcut === "") {
-        await updateCommand(id);
-        dispatchChangeEvt(target);
       }
     }
   }
