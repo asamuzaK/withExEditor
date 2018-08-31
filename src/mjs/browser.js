@@ -51,7 +51,7 @@ export const updateCommand = async (id, value = "") => {
       value.trim().replace(/\+([a-z])$/, (m, c) => `+${c.toUpperCase()}`);
     if (shortcut === "") {
       func = commands.reset(id);
-    } else if (/^(?:(?:(?:Alt|Command|(?:Mac)?Ctrl)(?:\+Shift)?|Alt\+(?:Command|(?:Mac)?Ctrl)|Command\+(?:Alt|MacCtrl)|Ctrl\+(?:Alt|MacCtrl)|MacCtrl\+(?:Alt|Command|Ctrl))\+(?:[\dA-Z]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Comma|Period|Home|End|Delete|Insert|Space))|F(?:[1-9]|1[0-2])$/.test(shortcut)) {
+    } else if (/^(?:(?:(?:Alt|Command|(?:Mac)?Ctrl)(?:\+Shift)?|Alt\+(?:Command|(?:Mac)?Ctrl)|Command\+(?:Alt|MacCtrl)|Ctrl\+(?:Alt|MacCtrl)|MacCtrl\+(?:Alt|Command|Ctrl))\+(?:[\dA-Z]|F(?:[1-9]|1[0-2])|(?:Page)?(?:Down|Up)|Left|Right|Comma|Period|Home|End|Delete|Insert|Space))|F(?:[1-9]|1[0-2])|Media(?:(?:Next|Prev)Track|PlayPause|Stop)$/.test(shortcut)) {
       func = commands.update({
         shortcut,
         name: id,
