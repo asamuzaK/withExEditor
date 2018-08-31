@@ -291,7 +291,7 @@ const restoreContentScript = async () => {
  * @returns {AsyncFunction} - set icon
  */
 const setIcon = async (id = varsLocal[ICON_ID]) => {
-  const icon = await runtime.getURL(ICON);
+  const icon = runtime.getURL(ICON);
   const path = vars[IS_ENABLED] && `${icon}${id}` || `${icon}#off`;
   return browserAction.setIcon({path});
 };
@@ -615,7 +615,7 @@ const openOptionsPage = async () =>
 const handleHostMsg = async msg => {
   const {message, status} = msg;
   const log = message && `${HOST}: ${message}`;
-  const iconUrl = await runtime.getURL(ICON);
+  const iconUrl = runtime.getURL(ICON);
   const notifyMsg = {
     iconUrl, message,
     title: `${HOST}: ${status}`,
