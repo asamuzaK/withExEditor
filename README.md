@@ -70,11 +70,6 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 * If enabled, notifies when an error occurs on the host.
 
-### Access Key
-
-* Access key used in the context menu. Access key can be any key from `A` to `Z`.
-* NOTE: Accesskey in context menu is not implemented in Gecko browsers yet.
-
 ### Execute The Editor Directly
 
 * Keyboard shortcut to execute the editor without going through the context menu. In the input field, press the combination of keys such as `Ctrl+Shift+U`.
