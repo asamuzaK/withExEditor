@@ -399,10 +399,17 @@ const createMenuItem = async (id, contexts) => {
     const accKeySupported = await isAccessKeySupported();
     const title = accKeySupported && `${id}_key` || id;
     const accKey = accKeySupported && getAccesskey(id) || "";
-    menus[id] = await contextMenus.create({
-      id, contexts, enabled,
-      title: i18n.getMessage(title, [label, accKey]),
-    });
+    if (menus[id]) {
+      menus[id] = await contextMenus.update(id, {
+        contexts, enabled,
+        title: i18n.getMessage(title, [label, accKey]),
+      });
+    } else {
+      menus[id] = await contextMenus.create({
+        id, contexts, enabled,
+        title: i18n.getMessage(title, [label, accKey]),
+      });
+    }
   }
 };
 
