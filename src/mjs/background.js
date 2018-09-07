@@ -25,7 +25,7 @@ import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   execScriptToExistingTabs, fetchData, getActiveTab, getActiveTabId,
   getAllStorage, getAllNormalWindows, getEnabledTheme, getStorage,
-  isAccessKeySupported, setStorage,
+  isAccessKeySupported, isVisibleInMenuSupported, setStorage,
 } from "./browser.js";
 import {migrateStorage} from "./migrate.js";
 
@@ -355,6 +355,17 @@ const menus = {
 };
 
 /**
+ * init menu items collection
+ * @returns {void}
+ */
+const initMenuItems = async () => {
+  const items = Object.keys(menus);
+  for (const item of items) {
+    menus[item] = null;
+  }
+};
+
+/**
  * get access key
  * @param {string} id - menu item ID
  * @returns {string} - accesskey
@@ -395,20 +406,33 @@ const getAccesskey = id => {
 const createMenuItem = async (id, contexts) => {
   if (isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts)) {
     const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
     const accKeySupported = await isAccessKeySupported();
-    const title = accKeySupported && `${id}_key` || id;
     const accKey = accKeySupported && getAccesskey(id) || "";
+    const title = accKeySupported && `${id}_key` || id;
+    const opt = {
+      contexts,
+      enabled: !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE],
+      title: i18n.getMessage(title, [label, accKey]),
+    };
+    const visibleSupported = await isVisibleInMenuSupported();
+    if (visibleSupported) {
+      switch (id) {
+        case MODE_EDIT:
+          opt.visible = true;
+          break;
+        case MODE_SELECTION:
+        case MODE_SOURCE:
+          opt.visible = !vars[ONLY_EDITABLE];
+          break;
+        default:
+          opt.visible = false;
+      }
+    }
     if (menus[id]) {
-      menus[id] = await contextMenus.update(id, {
-        contexts, enabled,
-        title: i18n.getMessage(title, [label, accKey]),
-      });
+      await contextMenus.update(id, opt);
     } else {
-      menus[id] = await contextMenus.create({
-        id, contexts, enabled,
-        title: i18n.getMessage(title, [label, accKey]),
-      });
+      opt.id = id;
+      menus[id] = await contextMenus.create(opt);
     }
   }
 };
@@ -424,7 +448,6 @@ const createMenuItems = async () => {
   const items = Object.keys(menus);
   const func = [];
   for (const item of items) {
-    menus[item] = null;
     switch (item) {
       case MODE_EDIT:
         enabled && func.push(createMenuItem(item, ["editable"]));
@@ -446,7 +469,7 @@ const createMenuItems = async () => {
  * @returns {AsyncFunction} - create menu items
  */
 const restoreContextMenu = async () =>
-  contextMenus.removeAll().then(createMenuItems);
+  contextMenus.removeAll().then(initMenuItems).then(createMenuItems);
 
 /**
  * update context menu
@@ -473,20 +496,35 @@ const updateContextMenu = async type => {
     }
   } else {
     const items = Object.keys(menus);
-    const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
-    const bool = enabled && !vars[ONLY_EDITABLE];
-    const accKeySupported = await isAccessKeySupported();
-    if (items.length) {
+    if (items && items.length) {
+      const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
+      const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
+      const accKeySupported = await isAccessKeySupported();
+      const visibleSupported = await isVisibleInMenuSupported();
       for (const item of items) {
         if (menus[item]) {
           const title = accKeySupported && `${item}_key` || item;
           const accKey = accKeySupported && getAccesskey(item) || "";
-          func.push(contextMenus.update(item, {
+          const opt = {
             enabled,
             title: i18n.getMessage(title, [label, accKey]),
-          }));
+          };
+          if (visibleSupported) {
+            switch (item) {
+              case MODE_EDIT:
+                opt.visible = true;
+                break;
+              case MODE_SELECTION:
+              case MODE_SOURCE:
+                opt.visible = !vars[ONLY_EDITABLE];
+                break;
+              default:
+                opt.visible = false;
+            }
+          }
+          func.push(contextMenus.update(item, opt));
         } else if (enabled) {
+          const bool = !vars[ONLY_EDITABLE];
           switch (item) {
             case MODE_EDIT:
               func.push(createMenuItem(item, ["editable"]));
@@ -868,6 +906,7 @@ const onWindowFocusChanged = async id => {
   const tId = await getActiveTabId(id);
   const windowId = stringifyPositiveInt(id, true);
   const tabId = stringifyPositiveInt(tId, true);
+  const visibleSupported = await isVisibleInMenuSupported();
   if (windowId && tabId) {
     func.push(portMsg({
       [TMP_FILE_REQ]: true,
@@ -877,7 +916,11 @@ const onWindowFocusChanged = async id => {
     for (const win of winArr) {
       const {focused, type} = win;
       if (focused && type === "normal") {
-        func.push(restoreContextMenu());
+        if (visibleSupported) {
+          func.push(updateContextMenu());
+        } else {
+          func.push(restoreContextMenu());
+        }
         break;
       }
     }
