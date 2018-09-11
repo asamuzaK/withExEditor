@@ -685,18 +685,20 @@
    * @returns {?string} - content
    */
   const getLiveEditContent = async (elm, key) => {
-    const arr = [];
+    let content;
     if (elm && elm.nodeType === Node.ELEMENT_NODE &&
         isString(key) && liveEdit[key]) {
       const {getContent} = liveEdit[key];
       const items = elm.querySelectorAll(getContent);
       if (items && items.length) {
+        const arr = [];
         for (const item of items) {
           arr.push(item.textContent);
         }
+        content = arr.join("\n");
       }
     }
-    return arr.length && arr.join("\n") || null;
+    return content || null;
   };
 
   /**
