@@ -5,7 +5,7 @@
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
-  KEY_ACCESS, STORAGE_SET, SYNC_AUTO_URL, WARN,
+  STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "./constant.js";
 import {isObjectNotEmpty, isString, throwErr} from "./common.js";
 import {getStorage, removePermission, requestPermission} from "./browser.js";
@@ -125,7 +125,7 @@ const portReloadExt = async (reload = false) =>
  */
 const portPref = async evt => {
   const {target} = evt;
-  const {checked, id, name, type, value} = target;
+  const {checked, id, name, type} = target;
   const func = [];
   if (type === "radio") {
     const nodes = document.querySelectorAll(`[name=${name}]`);
@@ -143,10 +143,6 @@ const portPref = async evt => {
           await removePermission(["notifications"]);
         }
         func.push(createPref(target).then(portMsg));
-        break;
-      case KEY_ACCESS:
-        (value === "" || /^[a-z]$/i.test(value)) &&
-          func.push(createPref(target).then(portMsg));
         break;
       default:
         func.push(createPref(target).then(portMsg));

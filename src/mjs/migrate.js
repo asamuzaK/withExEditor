@@ -2,15 +2,18 @@
  * migrate.js
  */
 
-import {
-  EDITOR_EXEC, KEY_ACCESS, KEY_EDITOR, KEY_OPTIONS, OPTIONS_OPEN, WEBEXT_ID,
-} from "./constant.js";
+import {EDITOR_EXEC, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
 import {
   getStorage, removeStorage, setStorage, updateCommand,
 } from "./browser.js";
 
 /* api */
 const {runtime} = browser;
+
+/* constants */
+const KEY_ACCESS = "accessKey";
+const KEY_EDITOR = "editorShortCut";
+const KEY_OPTIONS = "optionsShortCut";
 
 /**
  * migrate old storage
@@ -66,6 +69,7 @@ export const migrateStorage = async () => {
       );
     }
   }
+  store[KEY_ACCESS] && func.push(removeStorage(KEY_ACCESS));
   store[KEY_EDITOR] && func.push(removeStorage(KEY_EDITOR));
   store[KEY_OPTIONS] && func.push(removeStorage(KEY_OPTIONS));
   return Promise.all(func);
