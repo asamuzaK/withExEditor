@@ -72,14 +72,20 @@ export const detectKeyCombo = async evt => {
       dispatchInputEvt(target);
     // Function keys
     } else if (/^F(?:[1-9]|1[0-2])$/.test(key)) {
-      ctrlKey &&
+      if (ctrlKey) {
         cmd.push(isMac && modKeys.ctrlKey.macValue || modKeys.ctrlKey.value);
-      altKey && cmd.push(modKeys.altKey.value);
-      isMac && metaKey &&
+      }
+      if (altKey) {
+        cmd.push(modKeys.altKey.value);
+      }
+      if (isMac && metaKey) {
         cmd.push(modKeys.metaKey.macValue);
+      }
       if (cmd.length < MOD_KEYS_MAX ||
           majorVersion >= WEBEXT_COMPAT_CMD_MIN) {
-        shiftKey && cmd.push(modKeys.shiftKey.value);
+        if (shiftKey) {
+          cmd.push(modKeys.shiftKey.value);
+        }
         if (cmd.length <= MOD_KEYS_MAX) {
           cmd.push(key);
           target.value = cmd.join("+");
@@ -88,13 +94,20 @@ export const detectKeyCombo = async evt => {
       }
     // Other keys
     } else if (/^(?:[\dA-z,. ]|Arrow(?:Down|Left|Right|Up)|F(?:[1-9]|1[0-2])|Page(?:Down|Up)|Home|End|Insert|Delete)$/.test(key)) {
-      ctrlKey &&
+      if (ctrlKey) {
         cmd.push(isMac && modKeys.ctrlKey.macValue || modKeys.ctrlKey.value);
-      altKey && cmd.push(modKeys.altKey.value);
-      isMac && metaKey && cmd.push(modKeys.metaKey.macValue);
+      }
+      if (altKey) {
+        cmd.push(modKeys.altKey.value);
+      }
+      if (isMac && metaKey) {
+        cmd.push(modKeys.metaKey.macValue);
+      }
       if (cmd.length === 1 ||
           majorVersion >= WEBEXT_COMPAT_CMD_MIN && cmd.length) {
-        shiftKey && cmd.push(modKeys.shiftKey.value);
+        if (shiftKey) {
+          cmd.push(modKeys.shiftKey.value);
+        }
         if (cmd.length <= MOD_KEYS_MAX) {
           cmd.push(/^[a-z]$/.test(key) && key.toUpperCase() ||
                    /^,$/.test(key) && "Comma" ||

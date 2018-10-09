@@ -69,8 +69,14 @@ export const migrateStorage = async () => {
       );
     }
   }
-  store[KEY_ACCESS] && func.push(removeStorage(KEY_ACCESS));
-  store[KEY_EDITOR] && func.push(removeStorage(KEY_EDITOR));
-  store[KEY_OPTIONS] && func.push(removeStorage(KEY_OPTIONS));
+  if (store[KEY_ACCESS]) {
+    func.push(removeStorage(KEY_ACCESS));
+  }
+  if (store[KEY_EDITOR]) {
+    func.push(removeStorage(KEY_EDITOR));
+  }
+  if (store[KEY_OPTIONS]) {
+    func.push(removeStorage(KEY_OPTIONS));
+  }
   return Promise.all(func);
 };

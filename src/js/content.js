@@ -325,13 +325,16 @@
               func.push(elm.setAttributeNS(nsURI.xmlns, localName, value));
             } else {
               ns = getXmlnsPrefixedNamespace(node);
-              ns && func.push(elm.setAttributeNS(ns, localName, value));
+              if (ns) {
+                func.push(elm.setAttributeNS(ns, localName, value));
+              }
             }
           } else {
             const attrName = prefix && `${prefix}:${localName}` || localName;
             ns = namespaceURI || prefix && nsURI[prefix] || "";
-            (ns || !prefix) &&
+            if (ns || !prefix) {
               func.push(elm.setAttributeNS(ns, attrName, value));
+            }
           }
         }
       }
@@ -353,7 +356,9 @@
                  await getNodeNS(node).namespaceURI || nsURI.html;
       const name = prefix && `${prefix}:${localName}` || localName;
       elm = document.createElementNS(ns, name);
-      attributes && await setAttributeNS(elm, node);
+      if (attributes) {
+        await setAttributeNS(elm, node);
+      }
     }
     return elm || null;
   };
@@ -365,11 +370,14 @@
    */
   const createFrag = async nodes => {
     const frag = document.createDocumentFragment();
-    Array.isArray(nodes) && nodes.forEach(node => {
-      (node.nodeType === Node.ELEMENT_NODE ||
-       node.nodeType === Node.TEXT_NODE) &&
-        frag.append(node);
-    });
+    if (Array.isArray(nodes)) {
+      nodes.forEach(node => {
+        if (node.nodeType === Node.ELEMENT_NODE ||
+            node.nodeType === Node.TEXT_NODE) {
+          frag.append(node);
+        }
+      });
+    }
     return frag;
   };
 
@@ -389,14 +397,15 @@
         for (const child of nodes) {
           const {nodeType, nodeValue, parentNode} = child;
           if (nodeType === Node.ELEMENT_NODE) {
-            child === parentNode.firstChild &&
+            if (child === parentNode.firstChild) {
               arr.push(document.createTextNode("\n"));
+            }
             arr.push(appendChild(child, child));
-            child === parentNode.lastChild &&
+            if (child === parentNode.lastChild) {
               arr.push(document.createTextNode("\n"));
-          } else {
-            nodeType === Node.TEXT_NODE &&
-              arr.push(document.createTextNode(nodeValue));
+            }
+          } else if (nodeType === Node.TEXT_NODE) {
+            arr.push(document.createTextNode(nodeValue));
           }
         }
         if (arr.length) {
@@ -446,9 +455,11 @@
           for (const node of nodes) {
             if (node) {
               const {nodeType} = node;
-              (nodeType === Node.ELEMENT_NODE || nodeType === Node.TEXT_NODE ||
-               nodeType === Node.COMMENT_NODE) &&
+              if (nodeType === Node.ELEMENT_NODE ||
+                  nodeType === Node.TEXT_NODE ||
+                  nodeType === Node.COMMENT_NODE) {
                 frag.append(node);
+              }
             }
           }
         } else {
@@ -471,7 +482,9 @@
     const arr = [];
     if (range) {
       const ancestor = range.commonAncestorContainer;
-      count > 1 && arr.push(document.createTextNode("\n"));
+      if (count > 1) {
+        arr.push(document.createTextNode("\n"));
+      }
       switch (ancestor.nodeType) {
         case Node.ELEMENT_NODE: {
           const obj = await getNodeNS(ancestor);
@@ -499,8 +512,9 @@
         default:
       }
       arr.push(document.createTextNode("\n"));
-      count > 1 && index < count - 1 &&
+      if (count > 1 && index < count - 1) {
         arr.push(document.createComment(RANGE_SEP));
+      }
     }
     return Promise.all(arr);
   };
@@ -542,10 +556,13 @@
     if (nodes instanceof NodeList) {
       for (const node of nodes) {
         if (node.nodeType === Node.ELEMENT_NODE) {
-          node.localName === "br" && arr.push("\n") ||
-          node.hasChildNodes() && arr.push(getText(node.childNodes));
-        } else {
-          node.nodeType === Node.TEXT_NODE && arr.push(
+          if (node.localName === "br") {
+            arr.push("\n");
+          } else if (node.hasChildNodes()) {
+            arr.push(getText(node.childNodes));
+          }
+        } else if (node.nodeType === Node.TEXT_NODE) {
+          arr.push(
             node.nodeValue.replace(/^\s*/, "")
               .replace(/([^\n])$/, (m, c) => `${c}\n`)
           );
@@ -858,7 +875,9 @@
    * @returns {void}
    */
   const portMsg = async msg => {
-    msg && port.postMessage(msg);
+    if (msg) {
+      port.postMessage(msg);
+    }
   };
 
   /**
@@ -1321,8 +1340,11 @@
                           elm !== document.documentElement)) {
         mode = MODE_EDIT;
       } else if (isCollapsed) {
-        elm.namespaceURI === nsURI.math && (mode = MODE_MATHML) ||
-        elm.namespaceURI === nsURI.svg && (mode = MODE_SVG);
+        if (elm.namespaceURI === nsURI.math) {
+          mode = MODE_MATHML;
+        } else if (elm.namespaceURI === nsURI.svg) {
+          mode = MODE_SVG;
+        }
       } else {
         mode = MODE_SELECTION;
       }
@@ -1445,18 +1467,24 @@
             const elm = document.createElementNS(ns, sep);
             if (text) {
               elm.append(document.createTextNode(text));
-            } else {
-              i < l - 1 && elm.append(br);
+            } else if (i < l - 1) {
+              elm.append(br);
             }
-            elm.hasChildNodes() && frag.append(elm);
+            if (elm.hasChildNodes()) {
+              frag.append(elm);
+            }
           } else {
             frag.append(document.createTextNode(text));
-            i < l - 1 && frag.append(br);
+            if (i < l - 1) {
+              frag.append(br);
+            }
           }
         } else {
           frag.append(document.createTextNode(text));
         }
-        i < l - 1 && frag.append(document.createTextNode("\n"));
+        if (i < l - 1) {
+          frag.append(document.createTextNode("\n"));
+        }
         i++;
       }
     }
@@ -1581,9 +1609,8 @@
               func.push(replaceContent(controller, elm, value, namespaceURI));
             } else if (elm.isContentEditable) {
               func.push(replaceContent(elm, elm, value, namespaceURI));
-            } else {
-              /^(?:input|textarea)$/.test(elm.localName) &&
-                func.push(replaceEditControlValue(elm, value));
+            } else if (/^(?:input|textarea)$/.test(elm.localName)) {
+              func.push(replaceEditControlValue(elm, value));
             }
             data.lastUpdate = timestamp;
             func.push(setDataId(dataId, data));

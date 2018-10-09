@@ -73,7 +73,9 @@ const hostStatus = {
  * @returns {void}
  */
 const portHostMsg = async msg => {
-  msg && host && host.postMessage(msg);
+  if (msg && host) {
+    host.postMessage(msg);
+  }
 };
 
 /* local storage */
@@ -126,8 +128,8 @@ const restorePorts = async (data = {}) => {
     if (portsWin.size === 0) {
       func = restorePorts({windowId});
     }
-  } else {
-    windowId && ports.delete(windowId);
+  } else if (windowId) {
+    ports.delete(windowId);
   }
   return func || null;
 };
@@ -184,7 +186,9 @@ const portMsg = async (msg, windowId, tabId) => {
       for (const portUrl of portUrls) {
         const [key, port] = portUrl;
         try {
-          port && port.postMessage(msg);
+          if (port) {
+            port.postMessage(msg);
+          }
         } catch (e) {
           portsTab.delete(key);
         }
@@ -223,9 +227,11 @@ const portContextMenuData = async (info, tab) => {
     const portsWin = ports.get(windowId);
     const portsTab = portsWin && portsWin.get(tabId);
     const port = portsTab && portsTab.get(portUrl);
-    port && port.postMessage({
-      [CONTENT_GET]: {info, tab},
-    });
+    if (port) {
+      port.postMessage({
+        [CONTENT_GET]: {info, tab},
+      });
+    }
   }
 };
 
@@ -450,13 +456,19 @@ const createMenuItems = async () => {
   for (const item of items) {
     switch (item) {
       case MODE_EDIT:
-        enabled && func.push(createMenuItem(item, ["editable"]));
+        if (enabled) {
+          func.push(createMenuItem(item, ["editable"]));
+        }
         break;
       case MODE_SELECTION:
-        bool && func.push(createMenuItem(item, ["selection"]));
+        if (bool) {
+          func.push(createMenuItem(item, ["selection"]));
+        }
         break;
       case MODE_SOURCE:
-        bool && func.push(createMenuItem(item, ["frame", "page"]));
+        if (bool) {
+          func.push(createMenuItem(item, ["frame", "page"]));
+        }
         break;
       default:
     }
@@ -487,7 +499,9 @@ const updateContextMenu = async type => {
         if (menus[menuItemId]) {
           if (key === MODE_SOURCE) {
             const title = varsLocal[mode] || varsLocal[menuItemId];
-            title && func.push(contextMenus.update(menuItemId, {title}));
+            if (title) {
+              func.push(contextMenus.update(menuItemId, {title}));
+            }
           } else if (key === MODE_EDIT) {
             func.push(contextMenus.update(menuItemId, {enabled}));
           }
@@ -530,10 +544,14 @@ const updateContextMenu = async type => {
               func.push(createMenuItem(item, ["editable"]));
               break;
             case MODE_SELECTION:
-              bool && func.push(createMenuItem(item, ["selection"]));
+              if (bool) {
+                func.push(createMenuItem(item, ["selection"]));
+              }
               break;
             case MODE_SOURCE:
-              bool && func.push(createMenuItem(item, ["frame", "page"]));
+              if (bool) {
+                func.push(createMenuItem(item, ["frame", "page"]));
+              }
               break;
             default:
           }
@@ -639,7 +657,9 @@ const extractEditorConfig = async (data = {}) => {
  */
 const reloadExt = async (reload = false) => {
   if (reload) {
-    host && host.disconnect();
+    if (host) {
+      host.disconnect();
+    }
     runtime.reload();
   }
 };
@@ -670,8 +690,12 @@ const handleHostMsg = async msg => {
   switch (status) {
     case `${PROCESS_CHILD}_stderr`:
     case "error":
-      log && func.push(logError(log));
-      notifications && func.push(createNotification(status, notifyMsg));
+      if (log) {
+        func.push(logError(log));
+      }
+      if (notifications) {
+        func.push(createNotification(status, notifyMsg));
+      }
       break;
     case "ready":
       hostStatus[HOST_CONNECTION] = true;
@@ -683,11 +707,17 @@ const handleHostMsg = async msg => {
       );
       break;
     case "warn":
-      log && func.push(logWarn(log));
-      notifications && func.push(createNotification(status, notifyMsg));
+      if (log) {
+        func.push(logWarn(log));
+      }
+      if (notifications) {
+        func.push(createNotification(status, notifyMsg));
+      }
       break;
     default:
-      log && func.push(logMsg(log));
+      if (log) {
+        func.push(logMsg(log));
+      }
   }
   return Promise.all(func);
 };
@@ -862,7 +892,9 @@ const onTabUpdated = async (id, info, tab) => {
     } else {
       varsLocal[MENU_ENABLED] = false;
     }
-    status === "complete" && func.push(updateContextMenu(), syncUI());
+    if (status === "complete") {
+      func.push(updateContextMenu(), syncUI());
+    }
   }
   return Promise.all(func);
 };
@@ -939,9 +971,13 @@ const onWindowRemoved = async windowId => {
   const winArr = await getAllNormalWindows();
   if (winArr && winArr.length) {
     const bool = await checkIncognitoWindowExists();
-    !bool && func.push(portHostMsg({[TMP_FILES_PB_REMOVE]: !bool}));
+    if (!bool) {
+      func.push(portHostMsg({[TMP_FILES_PB_REMOVE]: !bool}));
+    }
     windowId = stringifyPositiveInt(windowId, true);
-    windowId && func.push(restorePorts({windowId}));
+    if (windowId) {
+      func.push(restorePorts({windowId}));
+    }
   }
   return Promise.all(func);
 };
@@ -991,16 +1027,22 @@ const setVar = async (item, obj, changed = false) => {
       case EDITOR_FILE_NAME:
         varsLocal[item] = value;
         varsLocal[IS_EXECUTABLE] = app && !!app.executable;
-        changed && func.push(toggleBadge());
+        if (changed) {
+          func.push(toggleBadge());
+        }
         break;
       case EDITOR_LABEL:
         varsLocal[item] = value;
         func.push(cacheMenuItemTitle());
-        changed && func.push(updateContextMenu());
+        if (changed) {
+          func.push(updateContextMenu());
+        }
         break;
       case ENABLE_PB:
         varsLocal[item] = !!checked;
-        changed && func.push(syncUI());
+        if (changed) {
+          func.push(syncUI());
+        }
         break;
       case HOST_ERR_NOTIFY:
         if (checked && notifications && notifications.onClosed &&
@@ -1016,21 +1058,31 @@ const setVar = async (item, obj, changed = false) => {
       case ICON_WHITE:
         if (checked) {
           varsLocal[ICON_ID] = value;
-          changed && func.push(setIcon(value));
+          if (changed) {
+            func.push(setIcon(value));
+          }
         }
         break;
       case ONLY_EDITABLE:
         vars[item] = !!checked;
-        hasPorts && func.push(portVar({[item]: !!checked}));
-        changed && func.push(restoreContextMenu());
+        if (hasPorts) {
+          func.push(portVar({[item]: !!checked}));
+        }
+        if (changed) {
+          func.push(restoreContextMenu());
+        }
         break;
       case SYNC_AUTO:
         vars[item] = !!checked;
-        hasPorts && func.push(portVar({[item]: !!checked}));
+        if (hasPorts) {
+          func.push(portVar({[item]: !!checked}));
+        }
         break;
       case SYNC_AUTO_URL:
         vars[item] = value;
-        hasPorts && func.push(portVar({[item]: value}));
+        if (hasPorts) {
+          func.push(portVar({[item]: value}));
+        }
         break;
       default:
     }

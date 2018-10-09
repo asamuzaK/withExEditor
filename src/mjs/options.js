@@ -27,7 +27,9 @@ const port = runtime.connect({name: PORT_NAME});
  * @returns {void}
  */
 const portMsg = async msg => {
-  msg && port.postMessage(msg);
+  if (msg) {
+    port.postMessage(msg);
+  }
 };
 
 /**
@@ -113,10 +115,15 @@ const getHostStatus = async () => portMsg({[HOST_STATUS_GET]: true});
  * @param {boolean} reload - reload
  * @returns {?AsyncFunction} - port message
  */
-const portReloadExt = async (reload = false) =>
-  reload && portMsg({
-    [EXT_RELOAD]: !!reload,
-  }) || null;
+const portReloadExt = async (reload = false) => {
+  let func;
+  if (reload) {
+    func = portMsg({
+      [EXT_RELOAD]: !!reload,
+    });
+  }
+  return func || null;
+};
 
 /**
  * port pref
@@ -281,7 +288,9 @@ const setValuesFromStorage = async () => {
   if (isObjectNotEmpty(pref)) {
     const items = Object.values(pref);
     for (const item of items) {
-      isObjectNotEmpty(item) && func.push(setHtmlInputValue(item));
+      if (isObjectNotEmpty(item)) {
+        func.push(setHtmlInputValue(item));
+      }
     }
   }
   return Promise.all(func);
