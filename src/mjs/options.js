@@ -2,11 +2,6 @@
  * options.js
  */
 
-import {
-  EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
-  HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
-  STORAGE_SET, SYNC_AUTO_URL, WARN,
-} from "./constant.js";
 import {isObjectNotEmpty, isString, throwErr} from "./common.js";
 import {getStorage, removePermission, requestPermission} from "./browser.js";
 import {localizeHtml} from "./localize.js";
@@ -15,7 +10,12 @@ import {disableIncompatibleInputs, addListenerToCmdInputs} from "./compat.js";
 /* api */
 const {i18n, runtime} = browser;
 
-/* constant */
+/* constants */
+import {
+  EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
+  HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
+  STORAGE_SET, SYNC_AUTO_URL, WARN,
+} from "./constant.js";
 const PORT_NAME = "portOptions";
 
 /* port */

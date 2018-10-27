@@ -2,7 +2,6 @@
  * compat.js
  */
 
-import {EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
 import {
   dispatchChangeEvt, dispatchInputEvt, isString, parseVersion, throwErr,
 } from "./common.js";
@@ -12,6 +11,7 @@ import {isCommandCustomizable, updateCommand} from "./browser.js";
 const {runtime} = browser;
 
 /* constants */
+import {EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
 const IS_WEBEXT = runtime.id === WEBEXT_ID;
 const MOD_KEYS_MAX = 2;
 const WEBEXT_COMPAT_CMD_MIN = 63;

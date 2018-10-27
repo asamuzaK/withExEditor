@@ -2,7 +2,6 @@
  * migrate.js
  */
 
-import {EDITOR_EXEC, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
 import {
   getStorage, removeStorage, setStorage, updateCommand,
 } from "./browser.js";
@@ -11,6 +10,7 @@ import {
 const {runtime} = browser;
 
 /* constants */
+import {EDITOR_EXEC, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
 const KEY_ACCESS = "accessKey";
 const KEY_EDITOR = "editorShortCut";
 const KEY_OPTIONS = "optionsShortCut";
