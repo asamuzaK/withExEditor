@@ -190,6 +190,7 @@ const portMsg = async (msg, windowId, tabId) => {
             port.postMessage(msg);
           }
         } catch (e) {
+          logErr(e);
           portsTab.delete(key);
         }
       }

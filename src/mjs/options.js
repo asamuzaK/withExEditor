@@ -2,7 +2,7 @@
  * options.js
  */
 
-import {isObjectNotEmpty, isString, throwErr} from "./common.js";
+import {isObjectNotEmpty, isString, logErr, throwErr} from "./common.js";
 import {getStorage, removePermission, requestPermission} from "./browser.js";
 import {localizeHtml} from "./localize.js";
 import {disableIncompatibleInputs, addListenerToCmdInputs} from "./compat.js";
@@ -180,6 +180,7 @@ const extractSyncUrls = async evt => {
             break;
           }
         } catch (e) {
+          logErr(e);
           bool = false;
           break;
         }
