@@ -26,7 +26,7 @@ describe("common", () => {
     const func = mjs.throwErr;
 
     it("should throw", () => {
-      const e = new Error("error")
+      const e = new Error("error");
       assert.throws(() => func(e), "error");
     });
   });
@@ -169,14 +169,14 @@ describe("common", () => {
       const items = [[], ["foo"], {}, {foo: "bar"}, undefined, null, 1, true];
       for (const item of items) {
         assert.isFalse(func(item));
-      };
+      }
     });
 
     it("should get true", () => {
       const items = ["", "foo"];
       for (const item of items) {
         assert.isTrue(func(item));
-      };
+      }
     });
   });
 
