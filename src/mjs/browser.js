@@ -779,6 +779,7 @@ export const getCurrentWindow = async opt => {
  */
 export const checkIncognitoWindowExists = async () => {
   const arr = await getAllNormalWindows();
+  console.log(arr);
   let bool;
   if (arr && arr.length) {
     for (const win of arr) {
