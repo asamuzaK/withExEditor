@@ -8,11 +8,10 @@ import {
 import {isCommandCustomizable, updateCommand} from "./browser.js";
 
 /* api */
-const {runtime} = browser;
+const {commands, runtime} = browser;
 
 /* constants */
-import {EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN, WEBEXT_ID} from "./constant.js";
-const IS_WEBEXT = runtime.id === WEBEXT_ID;
+import {EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN} from "./constant.js";
 const MOD_KEYS_MAX = 2;
 const WEBEXT_COMPAT_CMD_MIN = 63;
 
@@ -38,13 +37,13 @@ export const updateCommandKey = async evt => {
 
 /**
  * detect key combination
- * @param {Object} evt - Event
+ * @param {!Object} evt - Event
  * @returns {void}
  */
 export const detectKeyCombo = async evt => {
   const {altKey, ctrlKey, key, metaKey, shiftKey, target} = evt;
   const {disabled} = target;
-  if (!disabled && IS_WEBEXT) {
+  if (!disabled && typeof runtime.getBrowserInfo === "function") {
     const {version} = await runtime.getBrowserInfo();
     const {major: majorVersion} = await parseVersion(version);
     const {os} = await runtime.getPlatformInfo();
@@ -93,7 +92,7 @@ export const detectKeyCombo = async evt => {
         }
       }
     // Other keys
-    } else if (/^(?:[\dA-z,. ]|Arrow(?:Down|Left|Right|Up)|F(?:[1-9]|1[0-2])|Page(?:Down|Up)|Home|End|Insert|Delete)$/.test(key)) {
+    } else if (/^(?:[\dA-z,. ]|Arrow(?:Down|Left|Right|Up)|Page(?:Down|Up)|Home|End|Insert|Delete)$/.test(key)) {
       if (ctrlKey) {
         cmd.push(isMac && modKeys.ctrlKey.macValue || modKeys.ctrlKey.value);
       }
@@ -122,6 +121,20 @@ export const detectKeyCombo = async evt => {
 };
 
 /**
+ * handle keyup event
+ * @param {!Object} evt - Event
+ * @returns {AsyncFunction} - detectKeyCombo()
+ */
+export const handleKeyupEvt = evt => detectKeyCombo(evt).catch(throwErr);
+
+/**
+ * handle input event
+ * @param {!Object} evt - Event
+ * @returns {AsyncFunction} - updateCommandKey
+ */
+export const handleInputEvt = evt => updateCommandKey(evt).catch(throwErr);
+
+/**
  * add listener to command inputs
  * @returns {void}
  */
@@ -130,12 +143,8 @@ export const addListenerToCmdInputs = async () => {
   for (const item of cmdInputs) {
     const elm = document.getElementById(item);
     if (elm) {
-      elm.addEventListener("keyup", evt =>
-        detectKeyCombo(evt).catch(throwErr)
-      );
-      elm.addEventListener("input", evt =>
-        updateCommandKey(evt).catch(throwErr)
-      );
+      elm.addEventListener("keyup", handleKeyupEvt);
+      elm.addEventListener("input", handleInputEvt);
     }
   }
 };
@@ -160,7 +169,10 @@ export const disableInput = async id => {
  */
 export const disableIncompatibleInputs = async () => {
   const func = [];
-  if (!IS_WEBEXT) {
+  if (typeof runtime.getBrowserInfo !== "function" ||
+      !commands ||
+      typeof commands.update !== "function" ||
+      typeof commands.reset !== "function") {
     const items = [EDITOR_EXEC, ICON_AUTO, OPTIONS_OPEN];
     for (const item of items) {
       func.push(disableInput(item));
