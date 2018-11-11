@@ -66,7 +66,7 @@ describe("compat", () => {
       };
       window.addEventListener("change", fake, true);
       window.func = func;
-      const res = await window.func(evt);
+      await window.func(evt);
       assert.isTrue(fake.notCalled, "change listener not called");
     });
 
@@ -75,10 +75,9 @@ describe("compat", () => {
       const fake2 = sinon.fake.resolves(undefined);
       browser.commands.update = fake;
       browser.commands.reset = fake2;
-      const evt = {
+      await func({
         target: {},
-      };
-      const res = await func(evt);
+      });
       assert.isTrue(fake.notCalled, "update not called");
       assert.isTrue(fake2.notCalled, "reset not called");
       delete browser.commands.update;
@@ -101,7 +100,7 @@ describe("compat", () => {
       };
       window.addEventListener("change", fake3, true);
       window.func = func;
-      const res = await window.func(evt);
+      await window.func(evt);
       assert.isTrue(fake.notCalled, "update called");
       assert.isTrue(fake2.notCalled, "reset not called");
       assert.isTrue(fake3.notCalled, "change listener called");
@@ -130,7 +129,7 @@ describe("compat", () => {
         };
         window.addEventListener("change", fake3, true);
         window.func = func;
-        const res = await window.func(evt);
+        await window.func(evt);
         assert.isTrue(fake.notCalled, `update not called ${value}`);
         assert.isTrue(fake2.notCalled, "reset not called");
         assert.isTrue(fake3.notCalled, `change listener not called ${value}`);
@@ -198,7 +197,7 @@ describe("compat", () => {
         };
         window.addEventListener("change", fake3, true);
         window.func = func;
-        const res = await window.func(evt);
+        await window.func(evt);
         assert.isTrue(fake.calledOnce, `update called ${value}`);
         assert.isTrue(fake2.notCalled, "reset not called");
         assert.isTrue(fake3.calledOnce, `change listener called ${value}`);
@@ -1163,6 +1162,8 @@ describe("compat", () => {
       const dom = createJsdom();
       window = dom && dom.window;
       document = window && window.document;
+      global.window = window;
+      global.document = document;
       for (const key of globalKeys) {
         global[key] = window[key];
       }
@@ -1173,6 +1174,8 @@ describe("compat", () => {
       for (const key of globalKeys) {
         delete global[key];
       }
+      delete global.window;
+      delete global.document;
     });
 
     it("should call function", async () => {
@@ -1236,7 +1239,7 @@ describe("compat", () => {
       };
       window.addEventListener("change", fake3, true);
       window.func = func;
-      const res = await window.func(evt);
+      await window.func(evt);
       assert.isTrue(fake.calledOnce, "update called");
       assert.isTrue(fake2.notCalled, "reset not called");
       assert.isTrue(fake3.calledOnce, "change listener called");
