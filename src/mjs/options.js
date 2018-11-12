@@ -19,18 +19,24 @@ import {
 const PORT_NAME = "portOptions";
 
 /* port */
-const port = runtime.connect({name: PORT_NAME});
+export const port = runtime.connect({name: PORT_NAME});
 
 /**
  * port message
  * @param {*} msg - message
  * @returns {void}
  */
-const portMsg = async msg => {
+export const portMsg = async msg => {
   if (msg) {
     port.postMessage(msg);
   }
 };
+
+/**
+ * get host status
+ * @returns {AsyncFunction} - port message
+ */
+export const getHostStatus = async () => portMsg({[HOST_STATUS_GET]: true});
 
 /**
  * create pref
@@ -38,7 +44,7 @@ const portMsg = async msg => {
  * @param {boolean} executable - executable
  * @returns {Object} - pref data
  */
-const createPref = async (elm, executable = false) => {
+export const createPref = async (elm, executable = false) => {
   const id = elm && elm.id;
   return id && {
     [STORAGE_SET]: {
@@ -59,7 +65,7 @@ const createPref = async (elm, executable = false) => {
  * @param {string} obj - editor config object
  * @returns {void}
  */
-const extractEditorConfig = async (obj = {}) => {
+export const extractEditorConfig = async (obj = {}) => {
   const {editorLabel, editorName, executable} = obj;
   const name = document.getElementById(EDITOR_FILE_NAME);
   const label = document.getElementById(EDITOR_LABEL);
@@ -82,7 +88,7 @@ const extractEditorConfig = async (obj = {}) => {
  * @param {Object} status - host status
  * @returns {void}
  */
-const extractHostStatus = async status => {
+export const extractHostStatus = async status => {
   const {hostConnection, hostVersion} = status;
   const connect = document.getElementById(HOST_CONNECTION);
   const version = document.getElementById(HOST_VERSION);
@@ -105,65 +111,11 @@ const extractHostStatus = async status => {
 };
 
 /**
- * get host status
- * @returns {AsyncFunction} - port message
- */
-const getHostStatus = async () => portMsg({[HOST_STATUS_GET]: true});
-
-/**
- * port reload extension
- * @param {boolean} reload - reload
- * @returns {?AsyncFunction} - port message
- */
-const portReloadExt = async (reload = false) => {
-  let func;
-  if (reload) {
-    func = portMsg({
-      [EXT_RELOAD]: !!reload,
-    });
-  }
-  return func || null;
-};
-
-/**
- * port pref
- * @param {!Object} evt - Event
- * @returns {Promise.<Array>} - results of each handler
- */
-const portPref = async evt => {
-  const {target} = evt;
-  const {checked, id, name, type} = target;
-  const func = [];
-  if (type === "radio") {
-    const nodes = document.querySelectorAll(`[name=${name}]`);
-    if (nodes instanceof NodeList) {
-      for (const node of nodes) {
-        func.push(createPref(node).then(portMsg));
-      }
-    }
-  } else {
-    switch (id) {
-      case HOST_ERR_NOTIFY:
-        if (checked) {
-          target.checked = await requestPermission(["notifications"]);
-        } else {
-          await removePermission(["notifications"]);
-        }
-        func.push(createPref(target).then(portMsg));
-        break;
-      default:
-        func.push(createPref(target).then(portMsg));
-    }
-  }
-  return Promise.all(func);
-};
-
-/**
  * extract sync urls input
  * @param {!Object} evt - Event
  * @returns {?AsyncFunction} - port message
  */
-const extractSyncUrls = async evt => {
+export const extractSyncUrls = async evt => {
   const {target} = evt;
   const {value} = target;
   const items = isString(value) && value.split("\n");
@@ -174,11 +126,7 @@ const extractSyncUrls = async evt => {
       item = item.trim();
       if (item.length) {
         try {
-          const url = new URL(item);
-          bool = url && true || false;
-          if (!bool) {
-            break;
-          }
+          bool = !!new URL(item);
         } catch (e) {
           logErr(e);
           bool = false;
@@ -193,20 +141,92 @@ const extractSyncUrls = async evt => {
   return func || null;
 };
 
+/**
+ * port pref
+ * @param {!Object} evt - Event
+ * @returns {Promise.<Array>} - results of each handler
+ */
+export const portPref = async evt => {
+  const {target} = evt;
+  const {checked, id, name, type} = target;
+  const func = [];
+  if (id && isString(id)) {
+    if (type === "radio") {
+      const nodes = document.querySelectorAll(`[name=${name}]`);
+      for (const node of nodes) {
+        func.push(createPref(node).then(portMsg));
+      }
+    } else {
+      switch (id) {
+        case HOST_ERR_NOTIFY:
+          if (checked) {
+            target.checked = await requestPermission(["notifications"]);
+          } else {
+            await removePermission(["notifications"]);
+          }
+          func.push(createPref(target).then(portMsg));
+          break;
+        default:
+          func.push(createPref(target).then(portMsg));
+      }
+    }
+  }
+  return Promise.all(func);
+};
+
+/* event handlers */
+/**
+ * handle reloadExtension click
+ * @param {!Object} evt - Event
+ * @returns {?AsyncFunction} - portMsg()
+ */
+export const handleReloadExtensionClick = evt => {
+  const {currentTarget, target} = evt;
+  let func;
+  const reload = currentTarget === target;
+  if (reload) {
+    func = portMsg({
+      [EXT_RELOAD]: reload,
+    }).catch(throwErr);
+  }
+  evt.stopPropagation();
+  evt.preventDefault();
+  return func || null;
+};
+
+/**
+ * handle sync urls input
+ * @param {!Object} evt - Event
+ * @returns {AsyncFunction} - extractSyncUrls()
+ */
+const handleSyncUrlsInputInput = evt => extractSyncUrls(evt).catch(throwErr);
+
+/**
+ * handle input change
+ * @param {!Object} evt - Event
+ * @returns {AsyncFunction} - portPref()
+ */
+const handleInputChange = evt => portPref(evt).catch(throwErr);
+
+/**
+ * prevent event
+ * @param {!Object} evt - Event
+ * @returns {void}
+ */
+export const preventEvent = evt => {
+  evt.stopPropagation();
+  evt.preventDefault();
+};
+
 /* html */
 /**
  * add event listener to reload extension button
  * @returns {void}
  */
-const addReloadExtensionListener = async () => {
+export const addReloadExtensionListener = async () => {
   const elm = document.getElementById(EXT_RELOAD);
   if (elm) {
-    elm.addEventListener("click", evt => {
-      const {currentTarget, target} = evt;
-      evt.preventDefault();
-      evt.stopPropagation();
-      return portReloadExt(currentTarget === target).catch(throwErr);
-    });
+    elm.addEventListener("click", handleReloadExtensionClick);
   }
 };
 
@@ -214,10 +234,10 @@ const addReloadExtensionListener = async () => {
  * add event listener to sync urls textarea
  * @returns {void}
  */
-const addSyncUrlsInputListener = async () => {
+export const addSyncUrlsInputListener = async () => {
   const elm = document.getElementById(SYNC_AUTO_URL);
   if (elm) {
-    elm.addEventListener("input", evt => extractSyncUrls(evt).catch(throwErr));
+    elm.addEventListener("input", handleSyncUrlsInputInput);
   }
 };
 
@@ -225,12 +245,10 @@ const addSyncUrlsInputListener = async () => {
  * add event listener to input elements
  * @returns {void}
  */
-const addInputChangeListener = async () => {
+export const addInputChangeListener = async () => {
   const nodes = document.querySelectorAll("input");
-  if (nodes instanceof NodeList) {
-    for (const node of nodes) {
-      node.addEventListener("change", evt => portPref(evt).catch(throwErr));
-    }
+  for (const node of nodes) {
+    node.addEventListener("change", handleInputChange);
   }
 };
 
@@ -238,15 +256,10 @@ const addInputChangeListener = async () => {
  * add event listener to form elements
  * @returns {void}
  */
-const addFormSubmitListener = async () => {
-  const nodes = document.getElementById("form");
-  if (nodes instanceof NodeList) {
-    for (const node of nodes) {
-      node.addEventListener("submit", evt => {
-        evt.stopPropagation();
-        evt.preventDefault();
-      });
-    }
+export const addFormSubmitListener = async () => {
+  const nodes = document.querySelectorAll("form");
+  for (const node of nodes) {
+    node.addEventListener("submit", preventEvent);
   }
 };
 
@@ -255,7 +268,7 @@ const addFormSubmitListener = async () => {
  * @param {Object} data - data
  * @returns {void}
  */
-const setHtmlInputValue = async (data = {}) => {
+export const setHtmlInputValue = async (data = {}) => {
   const {checked, id: dataId, value} = data;
   const elm = dataId && document.getElementById(dataId);
   if (elm) {
@@ -283,7 +296,7 @@ const setHtmlInputValue = async (data = {}) => {
  * set html input values from storage
  * @returns {Promise.<Array>} - results of each handler
  */
-const setValuesFromStorage = async () => {
+export const setValuesFromStorage = async () => {
   const func = [];
   const pref = await getStorage();
   if (isObjectNotEmpty(pref)) {
@@ -303,7 +316,7 @@ const setValuesFromStorage = async () => {
  * @param {*} msg - message
  * @returns {Promise.<Array>} - results of each handler
  */
-const handleMsg = async msg => {
+export const handleMsg = async msg => {
   const func = [];
   const items = msg && Object.entries(msg);
   if (items && items.length) {
@@ -323,7 +336,7 @@ const handleMsg = async msg => {
   return Promise.all(func);
 };
 
-/* listeners */
+/* listener */
 port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
 /* startup */

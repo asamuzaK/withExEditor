@@ -23,11 +23,21 @@ describe("compat", () => {
     };
     return new JSDOM(domstr, opt);
   };
+  let window, document;
   beforeEach(() => {
+    const dom = createJsdom();
+    window = dom && dom.window;
+    document = window && window.document;
     global.browser = browser;
+    global.window = window;
+    global.document = document;
   });
   afterEach(() => {
+    window = null;
+    document = null;
     delete global.browser;
+    delete global.window;
+    delete global.document;
   });
 
   it("should get browser object", () => {
@@ -37,18 +47,12 @@ describe("compat", () => {
   describe("update command key", () => {
     const func = mjs.updateCommandKey;
     const globalKeys = ["Event", "Node"];
-    let window, document;
     beforeEach(() => {
-      const dom = createJsdom();
-      window = dom && dom.window;
-      document = window && window.document;
       for (const key of globalKeys) {
         global[key] = window[key];
       }
     });
     afterEach(() => {
-      window = null;
-      document = null;
       for (const key of globalKeys) {
         delete global[key];
       }
@@ -210,18 +214,12 @@ describe("compat", () => {
   describe("detect key combination", () => {
     const func = mjs.detectKeyCombo;
     const globalKeys = ["InputEvent", "Node"];
-    let window, document;
     beforeEach(() => {
-      const dom = createJsdom();
-      window = dom && dom.window;
-      document = window && window.document;
       for (const key of globalKeys) {
         global[key] = window[key];
       }
     });
     afterEach(() => {
-      window = null;
-      document = null;
       for (const key of globalKeys) {
         delete global[key];
       }
@@ -1157,25 +1155,15 @@ describe("compat", () => {
   describe("handle keyup event", () => {
     const func = mjs.handleKeyupEvt;
     const globalKeys = ["InputEvent", "Node"];
-    let window, document;
     beforeEach(() => {
-      const dom = createJsdom();
-      window = dom && dom.window;
-      document = window && window.document;
-      global.window = window;
-      global.document = document;
       for (const key of globalKeys) {
         global[key] = window[key];
       }
     });
     afterEach(() => {
-      window = null;
-      document = null;
       for (const key of globalKeys) {
         delete global[key];
       }
-      delete global.window;
-      delete global.document;
     });
 
     it("should call function", async () => {
@@ -1206,18 +1194,12 @@ describe("compat", () => {
   describe("handle input event", () => {
     const func = mjs.handleInputEvt;
     const globalKeys = ["Event", "Node"];
-    let window, document;
     beforeEach(() => {
-      const dom = createJsdom();
-      window = dom && dom.window;
-      document = window && window.document;
       for (const key of globalKeys) {
         global[key] = window[key];
       }
     });
     afterEach(() => {
-      window = null;
-      document = null;
       for (const key of globalKeys) {
         delete global[key];
       }
@@ -1250,18 +1232,6 @@ describe("compat", () => {
 
   describe("add listener to command inputs", () => {
     const func = mjs.addListenerToCmdInputs;
-    let window, document;
-    beforeEach(() => {
-      const dom = createJsdom();
-      window = dom && dom.window;
-      document = window && window.document;
-      global.document = document;
-    });
-    afterEach(() => {
-      window = null;
-      document = null;
-      delete global.document;
-    });
 
     it("should not call function", async () => {
       const elm = document.createElement("input");
@@ -1295,18 +1265,6 @@ describe("compat", () => {
 
   describe("disable input", () => {
     const func = mjs.disableInput;
-    let window, document;
-    beforeEach(() => {
-      const dom = createJsdom();
-      window = dom && dom.window;
-      document = window && window.document;
-      global.document = document;
-    });
-    afterEach(() => {
-      window = null;
-      document = null;
-      delete global.document;
-    });
 
     it("should not set attr if no argument given", async () => {
       const elm = document.createElement("input");
@@ -1344,18 +1302,6 @@ describe("compat", () => {
 
   describe("disable incompatible inputs", () => {
     const func = mjs.disableIncompatibleInputs;
-    let window, document;
-    beforeEach(() => {
-      const dom = createJsdom();
-      window = dom && dom.window;
-      document = window && window.document;
-      global.document = document;
-    });
-    afterEach(() => {
-      window = null;
-      document = null;
-      delete global.document;
-    });
 
     it("should get empty array", async () => {
       const fake = sinon.fake.resolves(undefined);
