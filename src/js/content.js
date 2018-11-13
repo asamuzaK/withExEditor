@@ -251,41 +251,6 @@
   };
 
   /**
-   * get namespace prefix
-   * @param {Object} elm - element
-   * @param {string} ns - namespace URI
-   * @param {string} prefix - namespace prefix
-   * @returns {string} - namespace prefix
-   */
-  const getXmlnsPrefix = async (elm, ns = nsURI.html, prefix = HTML) => {
-    if (elm) {
-      const {attributes} = elm;
-      const arr = [];
-      if (attributes && attributes.length) {
-        const item = attributes.getNamedItemNS(nsURI.xmlns, prefix);
-        if (!item || item.value !== ns) {
-          for (const attr of attributes) {
-            const {name, value} = attr;
-            if (value === ns) {
-              arr.push(name.replace(/^xmlns:/, ""));
-              break;
-            } else if (name.includes(`${prefix}:`, 0) && !item &&
-                       elm.parentNode) {
-              arr.push(getXmlnsPrefix(elm.parentNode, ns, prefix));
-              break;
-            }
-          }
-          if (arr.length === 1) {
-            const [p] = await Promise.all(arr);
-            prefix = p !== prefix && p || null;
-          }
-        }
-      }
-    }
-    return prefix;
-  };
-
-  /**
    * get xmlns prefixed namespace
    * @param {Object} elm - element
    * @param {string} attr - attribute
@@ -659,9 +624,10 @@
   const getLiveEditKeyFromClassList = async classList => {
     let liveEditKey;
     if (classList instanceof DOMTokenList && classList.length) {
-      const liveEditKeys = Object.keys(liveEdit) || [];
-      for (const key of liveEditKeys) {
-        liveEditKey = classList.contains(key) && key;
+      const liveEditKeys = Object.entries(liveEdit) || [];
+      for (const [key, value] of liveEditKeys) {
+        const {className} = value;
+        liveEditKey = classList.contains(className) && key;
         if (liveEditKey) {
           break;
         }
@@ -677,14 +643,15 @@
    */
   const getLiveEditElm = async (node = {}) => {
     let elm;
-    const items = Object.keys(liveEdit);
+    const items = Object.entries(liveEdit);
     if (items && items.length && node.nodeType === Node.ELEMENT_NODE) {
       const root = document.documentElement;
       while (node && node.parentNode && node.parentNode !== root && !elm) {
-        for (const item of items) {
+        for (const [, value] of items) {
+          const {className} = value;
           const {classList, namespaceURI} = node;
           const isHtml = !namespaceURI || namespaceURI === nsURI.html;
-          if (isHtml && classList.contains(item)) {
+          if (isHtml && classList.contains(className)) {
             elm = node;
             break;
           }

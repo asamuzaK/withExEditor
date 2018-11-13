@@ -8,11 +8,14 @@ import {
 } from "./common.js";
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
-  execScriptToExistingTabs, fetchData, getActiveTab, getActiveTabId,
-  getAllStorage, getAllNormalWindows, getEnabledTheme, getStorage,
+  execScriptToExistingTabs, getActiveTab, getActiveTabId, getAllStorage,
+  getAllNormalWindows, getEnabledTheme, getStorage,
   isAccessKeySupported, isVisibleInMenuSupported, setStorage,
 } from "./browser.js";
 import {migrateStorage} from "./migrate.js";
+import fileExtData from "./file-ext.js";
+import liveEditData from "./live-edit.js";
+import nsUriData from "./ns-uri.js";
 
 /* api */
 const {
@@ -24,17 +27,18 @@ const {
 import {
   CONTENT_GET, CONTENT_SCRIPT_PATH, CONTEXT_MENU, EDITOR_CONFIG_GET,
   EDITOR_CONFIG_RES, EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME,
-  EDITOR_LABEL, ENABLE_PB, EXT_NAME, EXT_RELOAD, FILE_EXT, FILE_EXT_PATH,
+  EDITOR_LABEL, ENABLE_PB, EXT_NAME, EXT_RELOAD, FILE_EXT,
   HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
-  HOST_VERSION, HOST_VERSION_CHECK, ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR,
-  ICON_DARK, ICON_DARK_ID, ICON_ID, ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
-  IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, LIVE_EDIT, LIVE_EDIT_PATH,
-  LOCAL_FILE_VIEW, MENU_ENABLED, MODE_EDIT, MODE_MATHML, MODE_SELECTION,
-  MODE_SOURCE, MODE_SVG, NS_URI, NS_URI_PATH, ONLY_EDITABLE, OPTIONS_OPEN,
-  PORT_CONTENT, PROCESS_CHILD, STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
-  THEME_DARK, THEME_LIGHT, TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE,
-  TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
-  TMP_FILE_REQ, TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID,
+  HOST_VERSION, HOST_VERSION_CHECK,
+  ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
+  ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
+  IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, LIVE_EDIT, LOCAL_FILE_VIEW,
+  MENU_ENABLED, MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
+  NS_URI, ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONTENT, PROCESS_CHILD, STORAGE_SET,
+  SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT, TMP_FILES, TMP_FILES_PB,
+  TMP_FILES_PB_REMOVE, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
+  TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES,
+  VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID,
 } from "./constant.js";
 const HOST_VERSION_MIN = "v3.3.1";
 
@@ -81,14 +85,13 @@ const portHostMsg = async msg => {
 /* local storage */
 /**
  * fetch shared data and store
- * @param {string} path - data path
  * @param {string} key - local storage key
+ * @param {Object} data - data
  * @returns {?AsyncFunction} - set local storage
  */
-const storeFetchedData = async (path, key) => {
+const storeSharedData = async (key, data) => {
   let func;
   if (isString(key)) {
-    const data = await fetchData(path);
     func = setStorage({[key]: data});
   }
   return func || null;
@@ -1142,8 +1145,8 @@ windows.onRemoved.addListener(windowId =>
 Promise.all([
   setDefaultIcon().then(getAllStorage).then(setVars).then(restoreContentScript)
     .then(syncUI),
-  storeFetchedData(NS_URI_PATH, NS_URI),
-  storeFetchedData(FILE_EXT_PATH, FILE_EXT),
-  storeFetchedData(LIVE_EDIT_PATH, LIVE_EDIT),
+  storeSharedData(NS_URI, nsUriData),
+  storeSharedData(FILE_EXT, fileExtData),
+  storeSharedData(LIVE_EDIT, liveEditData),
   migrateStorage(),
 ]).catch(throwErr);
