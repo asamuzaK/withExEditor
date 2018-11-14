@@ -7,8 +7,6 @@ import {JSDOM} from "jsdom";
 import {assert} from "chai";
 import {afterEach, beforeEach, describe, it} from "mocha";
 import sinon from "sinon";
-import fs from "fs";
-import path from "path";
 import {browser} from "./mocha/setup.js";
 import * as mjs from "../src/mjs/browser.js";
 
@@ -48,6 +46,20 @@ describe("browser", () => {
   describe("is accesskey supported in context menu", () => {
     const func = mjs.isAccessKeySupported;
 
+    it("should get false", async () => {
+      browser.runtime.getBrowserInfo.returns({});
+      const res = await func();
+      assert.isFalse(res, "result");
+      browser.runtime.getBrowserInfo.flush();
+    });
+
+    it("should get false", async () => {
+      browser.runtime.getBrowserInfo.returns({foo: "bar"});
+      const res = await func();
+      assert.isFalse(res, "result");
+      browser.runtime.getBrowserInfo.flush();
+    });
+
     it("should get true", async () => {
       browser.runtime.getBrowserInfo.returns({version: "63.0a1"});
       const res = await func();
@@ -65,6 +77,20 @@ describe("browser", () => {
 
   describe("is visible supported in context menu", () => {
     const func = mjs.isVisibleInMenuSupported;
+
+    it("should get false", async () => {
+      browser.runtime.getBrowserInfo.returns({});
+      const res = await func();
+      assert.isFalse(res, "result");
+      browser.runtime.getBrowserInfo.flush();
+    });
+
+    it("should get false", async () => {
+      browser.runtime.getBrowserInfo.returns({foo: "bar"});
+      const res = await func();
+      assert.isFalse(res, "result");
+      browser.runtime.getBrowserInfo.flush();
+    });
 
     it("should get true", async () => {
       browser.runtime.getBrowserInfo.returns({version: "63.0a1"});
@@ -300,6 +326,11 @@ describe("browser", () => {
   describe("get enabled theme", () => {
     const func = mjs.getEnabledTheme;
 
+    it("should get null", async () => {
+      const res = await func();
+      assert.isNull(res, "result");
+    });
+
     it("should get array", async () => {
       browser.management.getAll.resolves([
         {
@@ -346,6 +377,14 @@ describe("browser", () => {
       });
     });
 
+    it("should reject if given id is not found", async () => {
+      browser.management.get.withArgs("foo").rejects(new Error("error"));
+      await func("foo").catch(e => {
+        assert.strictEqual(e.message, "error");
+      });
+      browser.management.get.flush();
+    });
+
     it("should get object", async () => {
       browser.management.get.withArgs("foo").resolves({});
       const res = await func("foo");
@@ -355,6 +394,11 @@ describe("browser", () => {
 
   describe("get external extensions", () => {
     const func = mjs.getExternalExtensions;
+
+    it("should get null", async () => {
+      const res = await func();
+      assert.isNull(res, "result");
+    });
 
     it("should get array", async () => {
       browser.management.getAll.resolves([
