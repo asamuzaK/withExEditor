@@ -46,6 +46,7 @@ class Port {
   }
 }
 
+browser.runtime.Port = Port;
 browser.runtime.connect.withArgs({name: "portOptions"})
   .returns(new Port({name: "portOptions"}));
 
