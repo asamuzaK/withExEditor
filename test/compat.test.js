@@ -1,5 +1,5 @@
 /**
- * options.test.js
+ * compat.test.js
  */
 /* eslint-disable  max-nested-callbacks, no-await-in-loop, no-magic-numbers */
 
@@ -69,8 +69,7 @@ describe("compat", () => {
         target: elm,
       };
       window.addEventListener("change", fake, true);
-      window.func = func;
-      await window.func(evt);
+      await func(evt);
       assert.isTrue(fake.notCalled, "change listener not called");
     });
 
@@ -103,8 +102,7 @@ describe("compat", () => {
         target: elm,
       };
       window.addEventListener("change", fake3, true);
-      window.func = func;
-      await window.func(evt);
+      await func(evt);
       assert.isTrue(fake.notCalled, "update called");
       assert.isTrue(fake2.notCalled, "reset not called");
       assert.isTrue(fake3.notCalled, "change listener called");
@@ -132,8 +130,7 @@ describe("compat", () => {
           target: elm,
         };
         window.addEventListener("change", fake3, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.isTrue(fake.notCalled, `update not called ${value}`);
         assert.isTrue(fake2.notCalled, "reset not called");
         assert.isTrue(fake3.notCalled, `change listener not called ${value}`);
@@ -200,8 +197,7 @@ describe("compat", () => {
           target: elm,
         };
         window.addEventListener("change", fake3, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.isTrue(fake.calledOnce, `update called ${value}`);
         assert.isTrue(fake2.notCalled, "reset not called");
         assert.isTrue(fake3.calledOnce, `change listener called ${value}`);
@@ -284,8 +280,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, key, `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
         browser.runtime.getBrowserInfo.flush();
@@ -378,8 +373,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, `Alt+${value || key}`, `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
         browser.runtime.getBrowserInfo.flush();
@@ -473,8 +467,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, `Alt+Shift+${value || key}`,
                            `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
@@ -568,8 +561,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, `Ctrl+${value || key}`, `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
         browser.runtime.getBrowserInfo.flush();
@@ -663,8 +655,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, `Ctrl+Shift+${value || key}`,
                            `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
@@ -758,8 +749,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, `MacCtrl+${value || key}`, `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
         browser.runtime.getBrowserInfo.flush();
@@ -853,8 +843,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, `MacCtrl+Shift+${value || key}`,
                            `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
@@ -948,8 +937,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, `Command+${value || key}`, `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
         browser.runtime.getBrowserInfo.flush();
@@ -1043,8 +1031,7 @@ describe("compat", () => {
         };
         evt.key = key;
         window.addEventListener("input", fake, true);
-        window.func = func;
-        await window.func(evt);
+        await func(evt);
         assert.strictEqual(elm.value, `Command+Shift+${value || key}`,
                            `key ${key}`);
         assert.strictEqual(fake.callCount, 1, "called");
@@ -1069,8 +1056,7 @@ describe("compat", () => {
         target: elm,
       };
       window.addEventListener("input", fake, true);
-      window.func = func;
-      await window.func(evt);
+      await func(evt);
       assert.strictEqual(elm.value, "", "value");
       assert.isTrue(fake.notCalled, "not called");
       browser.runtime.getBrowserInfo.flush();
@@ -1095,8 +1081,7 @@ describe("compat", () => {
         target: elm,
       };
       window.addEventListener("input", fake, true);
-      window.func = func;
-      await window.func(evt);
+      await func(evt);
       assert.strictEqual(elm.value, "", "value");
       assert.isTrue(fake.notCalled, "not called");
       browser.runtime.getBrowserInfo.flush();
@@ -1118,8 +1103,7 @@ describe("compat", () => {
         target: elm,
       };
       window.addEventListener("input", fake, true);
-      window.func = func;
-      await window.func(evt);
+      await func(evt);
       assert.strictEqual(elm.value, "", "value");
       assert.isTrue(fake.notCalled, "not called");
       browser.runtime.getBrowserInfo.flush();
@@ -1143,8 +1127,7 @@ describe("compat", () => {
         target: elm,
       };
       window.addEventListener("input", fake, true);
-      window.func = func;
-      await window.func(evt);
+      await func(evt);
       assert.strictEqual(elm.value, "", "value");
       assert.isTrue(fake.notCalled, "not called");
       browser.runtime.getBrowserInfo.flush();
@@ -1220,8 +1203,7 @@ describe("compat", () => {
         target: elm,
       };
       window.addEventListener("change", fake3, true);
-      window.func = func;
-      await window.func(evt);
+      await func(evt);
       assert.isTrue(fake.calledOnce, "update called");
       assert.isTrue(fake2.notCalled, "reset not called");
       assert.isTrue(fake3.calledOnce, "change listener called");
@@ -1238,8 +1220,7 @@ describe("compat", () => {
       const body = document.querySelector("body");
       const spy = sinon.spy(elm, "addEventListener");
       body.appendChild(elm);
-      window.func = func;
-      await window.func();
+      await func();
       assert.isTrue(spy.notCalled, "result");
       elm.addEventListener.restore();
     });
@@ -1254,8 +1235,7 @@ describe("compat", () => {
       elm2.id = OPTIONS_OPEN;
       body.appendChild(elm);
       body.appendChild(elm2);
-      window.func = func;
-      await window.func();
+      await func();
       assert.isTrue(spy.calledTwice, "result");
       assert.isTrue(spy2.calledTwice, "result");
       elm.addEventListener.restore();
@@ -1272,8 +1252,7 @@ describe("compat", () => {
       elm.disabled = false;
       elm.id = "foo";
       body.appendChild(elm);
-      window.func = func;
-      await window.func();
+      await func();
       assert.isFalse(elm.disabled, "result");
     });
 
@@ -1283,8 +1262,7 @@ describe("compat", () => {
       elm.disabled = false;
       elm.id = "foo";
       body.appendChild(elm);
-      window.func = func;
-      await window.func(1);
+      await func(1);
       assert.isFalse(elm.disabled, "result");
     });
 
@@ -1294,8 +1272,7 @@ describe("compat", () => {
       elm.disabled = false;
       elm.id = "foo";
       body.appendChild(elm);
-      window.func = func;
-      await window.func("foo");
+      await func("foo");
       assert.isTrue(elm.disabled, "result");
     });
   });

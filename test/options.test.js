@@ -220,8 +220,7 @@ describe("options", () => {
       const arg = {hostConnection: false};
       elm.id = HOST_CONNECTION;
       body.appendChild(elm);
-      window.func = func;
-      await window.func(arg);
+      await func(arg);
       assert.strictEqual(elm.textContent, "foo", "text");
       assert.isTrue(elm.classList.contains(WARN), "class");
       browser.i18n.getMessage.flush();
@@ -235,8 +234,7 @@ describe("options", () => {
       elm.id = HOST_CONNECTION;
       elm.classList.add(WARN);
       body.appendChild(elm);
-      window.func = func;
-      await window.func(arg);
+      await func(arg);
       assert.strictEqual(elm.textContent, "foo", "text");
       assert.isFalse(elm.classList.contains(WARN), "class");
       browser.i18n.getMessage.flush();
@@ -249,8 +247,7 @@ describe("options", () => {
       const arg = {hostVersion: false};
       elm.id = HOST_VERSION;
       body.appendChild(elm);
-      window.func = func;
-      await window.func(arg);
+      await func(arg);
       assert.strictEqual(elm.textContent, "foo", "text");
       assert.isTrue(elm.classList.contains(WARN), "class");
       browser.i18n.getMessage.flush();
@@ -264,8 +261,7 @@ describe("options", () => {
       elm.id = HOST_VERSION;
       elm.classList.add(WARN);
       body.appendChild(elm);
-      window.func = func;
-      await window.func(arg);
+      await func(arg);
       assert.strictEqual(elm.textContent, "foo", "text");
       assert.isFalse(elm.classList.contains(WARN), "class");
       browser.i18n.getMessage.flush();
@@ -335,8 +331,7 @@ describe("options", () => {
       const evt = {
         target: {},
       };
-      window.func = func;
-      const res = await window.func(evt);
+      const res = await func(evt);
       assert.deepEqual(res, [], "result");
     });
 
@@ -346,8 +341,7 @@ describe("options", () => {
           id: "foo",
         },
       };
-      window.func = func;
-      const res = await window.func(evt);
+      const res = await func(evt);
       assert.strictEqual(res.length, 1, "length");
       assert.deepEqual(res, [undefined], "result");
     });
@@ -374,8 +368,7 @@ describe("options", () => {
           checked: true,
         },
       };
-      window.func = func;
-      const res = await window.func(evt);
+      const res = await func(evt);
       assert.strictEqual(res.length, 2, "length");
       assert.deepEqual(res, [undefined, undefined], "result");
     });
@@ -388,8 +381,7 @@ describe("options", () => {
           checked: true,
         },
       };
-      window.func = func;
-      const res = await window.func(evt);
+      const res = await func(evt);
       assert.strictEqual(browser.permissions.request.callCount, i + 1,
                          "called");
       assert.strictEqual(res.length, 1, "length");
@@ -404,8 +396,7 @@ describe("options", () => {
           checked: false,
         },
       };
-      window.func = func;
-      const res = await window.func(evt);
+      const res = await func(evt);
       assert.strictEqual(browser.permissions.remove.callCount, i + 1, "called");
       assert.strictEqual(res.length, 1, "length");
       assert.deepEqual(res, [undefined], "result");
@@ -419,14 +410,13 @@ describe("options", () => {
       const elm = document.createElement("button");
       const body = document.querySelector("body");
       body.appendChild(elm);
-      window.func = func;
       const evt = {
         currentTarget: elm,
         target: elm,
         stopPropagation: () => sinon.fake(),
         preventDefault: () => sinon.fake(),
       };
-      const res = await window.func(evt);
+      const res = await func(evt);
       assert.isUndefined(res, "result");
     });
 
@@ -434,14 +424,13 @@ describe("options", () => {
       const elm = document.createElement("button");
       const body = document.querySelector("body");
       body.appendChild(elm);
-      window.func = func;
       const evt = {
         currentTarget: body,
         target: elm,
         stopPropagation: () => sinon.fake(),
         preventDefault: () => sinon.fake(),
       };
-      const res = await window.func(evt);
+      const res = await func(evt);
       assert.isNull(res, "result");
     });
   });
@@ -471,8 +460,7 @@ describe("options", () => {
       const spy = sinon.spy(elm, "addEventListener");
       elm.id = EXT_RELOAD;
       body.appendChild(elm);
-      window.func = func;
-      await window.func();
+      await func();
       assert.isTrue(spy.calledOnce, "called");
       elm.addEventListener.restore();
     });
@@ -487,8 +475,7 @@ describe("options", () => {
       const spy = sinon.spy(elm, "addEventListener");
       elm.id = SYNC_AUTO_URL;
       body.appendChild(elm);
-      window.func = func;
-      await window.func();
+      await func();
       assert.isTrue(spy.calledOnce, "called");
       elm.addEventListener.restore();
     });
@@ -502,8 +489,7 @@ describe("options", () => {
       const body = document.querySelector("body");
       const spy = sinon.spy(elm, "addEventListener");
       body.appendChild(elm);
-      window.func = func;
-      await window.func();
+      await func();
       assert.isTrue(spy.calledOnce, "called");
       elm.addEventListener.restore();
     });
@@ -517,8 +503,7 @@ describe("options", () => {
       const body = document.querySelector("body");
       const spy = sinon.spy(elm, "addEventListener");
       body.appendChild(elm);
-      window.func = func;
-      await window.func();
+      await func();
       assert.isTrue(spy.notCalled, "not called");
       elm.addEventListener.restore();
     });
@@ -528,8 +513,7 @@ describe("options", () => {
       const body = document.querySelector("body");
       const spy = sinon.spy(elm, "addEventListener");
       body.appendChild(elm);
-      window.func = func;
-      await window.func();
+      await func();
       assert.isTrue(spy.calledOnce, "called");
       elm.addEventListener.restore();
     });
@@ -541,22 +525,20 @@ describe("options", () => {
     it("should not set value if argument not given", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = "foo";
       elm.type = "checkbox";
       body.appendChild(elm);
-      await window.func();
+      await func();
       assert.strictEqual(elm.checked, false, "checked");
     });
 
     it("should not set value if element not found", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = "foo";
       elm.type = "checkbox";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: "bar",
         checked: true,
       });
@@ -566,13 +548,12 @@ describe("options", () => {
     it("should not set value if type does not match", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = "foo";
       elm.type = "bar";
       elm.checked = false;
       elm.value = "baz";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: "foo",
         checked: true,
         value: "qux",
@@ -584,11 +565,10 @@ describe("options", () => {
     it("should set checkbox value", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = "foo";
       elm.type = "checkbox";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: "foo",
         checked: true,
       });
@@ -598,11 +578,10 @@ describe("options", () => {
     it("should set checkbox value", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = "foo";
       elm.type = "checkbox";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: "foo",
       });
       assert.strictEqual(elm.checked, false, "checked");
@@ -611,11 +590,10 @@ describe("options", () => {
     it("should set radio value", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = "foo";
       elm.type = "radio";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: "foo",
         checked: true,
       });
@@ -625,11 +603,10 @@ describe("options", () => {
     it("should set text value", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = "foo";
       elm.type = "text";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: "foo",
         value: "bar",
       });
@@ -639,11 +616,10 @@ describe("options", () => {
     it("should set text value", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = "foo";
       elm.type = "text";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: "foo",
       });
       assert.strictEqual(elm.value, "", "value");
@@ -652,12 +628,11 @@ describe("options", () => {
     it("should set text value", async () => {
       const elm = document.createElement("input");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = EDITOR_LABEL;
       elm.type = "text";
       elm.disabled = true;
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: EDITOR_LABEL,
         value: "foo",
       });
@@ -668,11 +643,10 @@ describe("options", () => {
     it("should set text value", async () => {
       const elm = document.createElement("textarea");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = SYNC_AUTO_URL;
       elm.value = "";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: SYNC_AUTO_URL,
         value: "https://example.com",
       });
@@ -682,11 +656,10 @@ describe("options", () => {
     it("should set text value", async () => {
       const elm = document.createElement("textarea");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = SYNC_AUTO_URL;
       elm.value = "foo";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: SYNC_AUTO_URL,
       });
       assert.strictEqual(elm.value, "", "value");
@@ -695,11 +668,10 @@ describe("options", () => {
     it("should set text value", async () => {
       const elm = document.createElement("textarea");
       const body = document.querySelector("body");
-      window.func = func;
       elm.id = SYNC_AUTO_URL;
       elm.value = "foo";
       body.appendChild(elm);
-      await window.func({
+      await func({
         id: SYNC_AUTO_URL,
         value: null,
       });
@@ -713,8 +685,7 @@ describe("options", () => {
     it("should get empty array", async () => {
       const i = browser.storage.local.get.callCount;
       browser.storage.local.get.resolves({});
-      window.func = func;
-      const res = await window.func();
+      const res = await func();
       assert.strictEqual(browser.storage.local.get.callCount, i + 1, "called");
       assert.strictEqual(res.length, 0, "array length");
       assert.deepEqual(res, [], "result");
@@ -726,8 +697,7 @@ describe("options", () => {
         foo: {},
         bar: {},
       });
-      window.func = func;
-      const res = await window.func();
+      const res = await func();
       assert.strictEqual(browser.storage.local.get.callCount, i + 1, "called");
       assert.strictEqual(res.length, 0, "array length");
       assert.deepEqual(res, [], "result");
@@ -743,8 +713,7 @@ describe("options", () => {
           qux: {},
         },
       });
-      window.func = func;
-      const res = await window.func();
+      const res = await func();
       assert.strictEqual(browser.storage.local.get.callCount, i + 1, "called");
       assert.strictEqual(res.length, 2, "array length");
       assert.deepEqual(res, [undefined, undefined], "result");
