@@ -13,8 +13,12 @@ import {
 } from "./compat.js";
 import {
   addFormSubmitListener, addInputChangeListener, addReloadExtensionListener,
-  addSyncUrlsInputListener, getHostStatus, setValuesFromStorage,
+  addSyncUrlsInputListener, getHostStatus, handleMsg, port,
+  setValuesFromStorage,
 } from "./options-main.js";
+
+/* listener */
+port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
 /* startup */
 Promise.all([

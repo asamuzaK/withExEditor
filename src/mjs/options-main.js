@@ -338,6 +338,3 @@ export const handleMsg = async msg => {
   }
   return Promise.all(func);
 };
-
-/* listener */
-port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
