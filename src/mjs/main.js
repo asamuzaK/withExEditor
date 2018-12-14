@@ -351,22 +351,21 @@ export const setDefaultIcon = async () => {
   }
 };
 
-/* context menu */
-/* context menu items collection */
-export const menus = {
+/* context menu items */
+export const menuItems = {
   [MODE_SOURCE]: null,
   [MODE_SELECTION]: null,
   [MODE_EDIT]: null,
 };
 
 /**
- * init menu items collection
+ * init context menu items
  * @returns {void}
  */
 export const initMenuItems = async () => {
-  const items = Object.keys(menus);
+  const items = Object.keys(menuItems);
   for (const item of items) {
-    menus[item] = null;
+    menuItems[item] = null;
   }
 };
 
@@ -409,7 +408,7 @@ export const getAccesskey = id => {
  * @returns {void}
  */
 export const createMenuItem = async (id, contexts) => {
-  if (isString(id) && menus.hasOwnProperty(id) && Array.isArray(contexts)) {
+  if (isString(id) && menuItems.hasOwnProperty(id) && Array.isArray(contexts)) {
     const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
     const accKeySupported = await isAccessKeySupported();
     const accKey = accKeySupported && getAccesskey(id) || "";
@@ -433,11 +432,11 @@ export const createMenuItem = async (id, contexts) => {
           opt.visible = false;
       }
     }
-    if (menus[id]) {
+    if (menuItems[id]) {
       await contextMenus.update(id, opt);
     } else {
       opt.id = id;
-      menus[id] = await contextMenus.create(opt);
+      menuItems[id] = await contextMenus.create(opt);
     }
   }
 };
@@ -450,7 +449,7 @@ export const createMenuItems = async () => {
   const win = await windows.getCurrent();
   const enabled = win && (!win.incognito || varsLocal[ENABLE_PB]) || false;
   const bool = enabled && !vars[ONLY_EDITABLE];
-  const items = Object.keys(menus);
+  const items = Object.keys(menuItems);
   const func = [];
   for (const item of items) {
     switch (item) {
@@ -495,7 +494,7 @@ export const updateContextMenu = async type => {
       for (const item of items) {
         const [key, value] = item;
         const {enabled, menuItemId, mode} = value;
-        if (menus[menuItemId]) {
+        if (menuItems[menuItemId]) {
           if (key === MODE_SOURCE) {
             const title = varsLocal[mode] || varsLocal[menuItemId];
             if (title) {
@@ -508,14 +507,14 @@ export const updateContextMenu = async type => {
       }
     }
   } else {
-    const items = Object.keys(menus);
+    const items = Object.keys(menuItems);
     if (items && items.length) {
       const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
       const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
       const accKeySupported = await isAccessKeySupported();
       const visibleSupported = await isVisibleInMenuSupported();
       for (const item of items) {
-        if (menus[item]) {
+        if (menuItems[item]) {
           const title = accKeySupported && `${item}_key` || item;
           const accKey = accKeySupported && getAccesskey(item) || "";
           const opt = {
