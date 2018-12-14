@@ -1,5 +1,5 @@
 /**
- * options.test.js
+ * options-main.test.js
  */
 /* eslint-disable  max-nested-callbacks, no-await-in-loop, no-magic-numbers */
 
@@ -8,14 +8,14 @@ import {assert} from "chai";
 import {afterEach, beforeEach, describe, it} from "mocha";
 import sinon from "sinon";
 import {browser} from "./mocha/setup.js";
-import * as mjs from "../src/mjs/options.js";
+import * as mjs from "../src/mjs/options-main.js";
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION,
   STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "../src/mjs/constant.js";
 
-describe("options", () => {
+describe("options-main", () => {
   /**
    * create jsdom
    * @returns {Object} - jsdom instance
@@ -62,6 +62,16 @@ describe("options", () => {
       const i = mjs.port.postMessage.callCount;
       await func({});
       assert.isNumber(i, "call count");
+      assert.strictEqual(mjs.port.postMessage.callCount, i + 1, "called");
+    });
+  });
+
+  describe("get host status", () => {
+    const func = mjs.getHostStatus;
+
+    it("should call function", async () => {
+      const i = mjs.port.postMessage.callCount;
+      await func();
       assert.strictEqual(mjs.port.postMessage.callCount, i + 1, "called");
     });
   });
@@ -432,6 +442,35 @@ describe("options", () => {
       };
       const res = await func(evt);
       assert.isNull(res, "result");
+    });
+  });
+
+  describe("handle sync urls input", () => {
+    const func = mjs.handleSyncUrlsInputInput;
+
+    it("should call function", async () => {
+      const evt = {
+        target: {
+          id: "foo",
+          value: "https://example.com",
+        },
+      };
+      const res = await func(evt);
+      assert.isUndefined(res, "result");
+    });
+  });
+
+  describe("handle input change", () => {
+    const func = mjs.handleInputChange;
+
+    it("should get array", async () => {
+      const evt = {
+        target: {
+          id: "foo",
+        },
+      };
+      const res = await func(evt);
+      assert.deepEqual(res, [undefined], "result");
     });
   });
 
