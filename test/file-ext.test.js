@@ -9,8 +9,8 @@ import fileExt from "../src/mjs/file-ext.js";
 describe("file-ext", () => {
   it("should get key", () => {
     const itemKeys = ["application", "image", "text"];
-    const items = Object.entries(fileExt);
-    for (const [key, value] of items) {
+    const items = Object.keys(fileExt);
+    for (const key of items) {
       assert.isTrue(itemKeys.includes(key));
     }
   });
