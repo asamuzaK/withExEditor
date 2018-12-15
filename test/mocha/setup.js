@@ -48,6 +48,12 @@ class Port {
 
 browser.runtime.Port = Port;
 browser.runtime.connect.returns(new Port());
+browser.runtime.connectNative.callsFake(name => new Port({name}));
+browser.contextMenus.create = sinon.stub();
+browser.contextMenus.remove = sinon.stub();
+browser.contextMenus.removeAll = sinon.stub();
+browser.contextMenus.update = sinon.stub();
+browser.i18n.getMessage.callsFake((...args) => args.toString());
 
 global.browser = browser;
 global.window = window;
