@@ -6,7 +6,7 @@ import {
   throwErr,
 } from "./common.js";
 import {
-  getAllStorage,
+  getAllStorage, setStorage,
 } from "./browser.js";
 import {
   migrateStorage,
@@ -14,8 +14,8 @@ import {
 import {
   handleCmd, handleDisconnectedHost, handleMsg, handlePort, host,
   onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
-  onWindowRemoved, openOptionsPage, portContextMenuData, restoreContentScript,
-  setDefaultIcon, setVars, storeSharedData, syncUI, toggleBadge,
+  onWindowRemoved, openOptionsPage, postContextMenuData, restoreContentScript,
+  setDefaultIcon, setVars, syncUI, toggleBadge,
 } from "./main.js";
 import fileExtData from "./file-ext.js";
 import liveEditData from "./live-edit.js";
@@ -36,7 +36,7 @@ import {
 browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
 commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
 contextMenus.onClicked.addListener((info, tab) =>
-  portContextMenuData(info, tab).catch(throwErr)
+  postContextMenuData(info, tab).catch(throwErr)
 );
 host.onDisconnect.addListener(port =>
   handleDisconnectedHost(port).then(toggleBadge).catch(throwErr)
@@ -65,8 +65,8 @@ windows.onRemoved.addListener(windowId =>
 Promise.all([
   setDefaultIcon().then(getAllStorage).then(setVars).then(restoreContentScript)
     .then(syncUI),
-  storeSharedData(NS_URI, nsUriData),
-  storeSharedData(FILE_EXT, fileExtData),
-  storeSharedData(LIVE_EDIT, liveEditData),
+  setStorage({[NS_URI]: nsUriData}),
+  setStorage({[FILE_EXT]: fileExtData}),
+  setStorage({[LIVE_EDIT]: liveEditData}),
   migrateStorage(),
 ]).catch(throwErr);
