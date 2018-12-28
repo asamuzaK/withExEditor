@@ -30,6 +30,7 @@ class Port {
    */
   constructor(opt = {}) {
     this.name = opt.name;
+    this.sender = opt.sender;
     this.error = {
       message: sinon.stub(),
     };
