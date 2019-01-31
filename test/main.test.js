@@ -13,11 +13,11 @@ import {browser} from "./mocha/setup.js";
 import * as mjs from "../src/mjs/main.js";
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
-  EDITOR_FILE_NAME, EDITOR_LABEL, ENABLE_PB, EXT_NAME, EXT_RELOAD,
+  EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
   HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS_GET, HOST_VERSION,
   ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
   ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
-  IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
+  IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONTENT, PROCESS_CHILD, STORAGE_SET,
   SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT, TMP_FILE_CREATE,
@@ -504,38 +504,12 @@ describe("main", () => {
 
   describe("set icon", () => {
     const func = mjs.setIcon;
-    beforeEach(() => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = false;
-    });
-    afterEach(() => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = false;
-    });
 
     it("should call function", async () => {
       const i = browser.runtime.getURL.callCount;
       const j = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       browser.browserAction.setIcon.callsFake(arg => arg);
-      const res = await func();
-      assert.strictEqual(browser.runtime.getURL.callCount, i + 1, "called");
-      assert.strictEqual(browser.browserAction.setIcon.callCount, j + 1,
-                         "called");
-      assert.deepEqual(res, {
-        path: "img/icon.svg#off",
-      }, "result");
-      browser.runtime.getURL.flush();
-      browser.browserAction.setIcon.flush();
-    });
-
-    it("should call function", async () => {
-      const {vars} = mjs;
-      const i = browser.runtime.getURL.callCount;
-      const j = browser.browserAction.setIcon.callCount;
-      browser.runtime.getURL.callsFake(arg => arg);
-      browser.browserAction.setIcon.callsFake(arg => arg);
-      vars[IS_ENABLED] = true;
       const res = await func();
       assert.strictEqual(browser.runtime.getURL.callCount, i + 1, "called");
       assert.strictEqual(browser.browserAction.setIcon.callCount, j + 1,
@@ -548,12 +522,10 @@ describe("main", () => {
     });
 
     it("should call function", async () => {
-      const {vars} = mjs;
       const i = browser.runtime.getURL.callCount;
       const j = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       browser.browserAction.setIcon.callsFake(arg => arg);
-      vars[IS_ENABLED] = true;
       const res = await func("#foo");
       assert.strictEqual(browser.runtime.getURL.callCount, i + 1, "called");
       assert.strictEqual(browser.browserAction.setIcon.callCount, j + 1,
@@ -1139,19 +1111,17 @@ describe("main", () => {
   describe("create context menu items", () => {
     const func = mjs.createMenuItems;
     beforeEach(() => {
-      const {menuItems, vars, varsLocal} = mjs;
+      const {menuItems, vars} = mjs;
       const items = Object.keys(menuItems);
       vars[ONLY_EDITABLE] = false;
-      varsLocal[ENABLE_PB] = false;
       for (const item of items) {
         menuItems[item] = null;
       }
     });
     afterEach(() => {
-      const {menuItems, vars, varsLocal} = mjs;
+      const {menuItems, vars} = mjs;
       const items = Object.keys(menuItems);
       vars[ONLY_EDITABLE] = false;
-      varsLocal[ENABLE_PB] = false;
       for (const item of items) {
         menuItems[item] = null;
       }
@@ -1159,9 +1129,6 @@ describe("main", () => {
 
     it("should call function", async () => {
       const i = browser.contextMenus.create.callCount;
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -1169,45 +1136,20 @@ describe("main", () => {
       assert.strictEqual(browser.contextMenus.create.callCount, i + 3,
                          "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
-      const {vars, varsLocal} = mjs;
+      const {vars} = mjs;
       const i = browser.contextMenus.create.callCount;
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "60.0",
       });
       vars[ONLY_EDITABLE] = true;
-      varsLocal[ENABLE_PB] = false;
       const res = await func();
       assert.strictEqual(browser.contextMenus.create.callCount, i + 1,
                          "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.windows.getCurrent.flush();
-      browser.runtime.getBrowserInfo.flush();
-    });
-
-    it("should not call function", async () => {
-      const {vars, varsLocal} = mjs;
-      const i = browser.contextMenus.create.callCount;
-      browser.windows.getCurrent.resolves({
-        incognito: true,
-      });
-      browser.runtime.getBrowserInfo.resolves({
-        version: "60.0",
-      });
-      vars[ONLY_EDITABLE] = true;
-      varsLocal[ENABLE_PB] = false;
-      const res = await func();
-      assert.strictEqual(browser.contextMenus.create.callCount, i,
-                         "not called");
-      assert.deepEqual(res, [], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
   });
@@ -1215,19 +1157,17 @@ describe("main", () => {
   describe("restore context menu", () => {
     const func = mjs.restoreContextMenu;
     beforeEach(() => {
-      const {menuItems, vars, varsLocal} = mjs;
+      const {menuItems, vars} = mjs;
       const items = Object.keys(menuItems);
       vars[ONLY_EDITABLE] = false;
-      varsLocal[ENABLE_PB] = false;
       for (const item of items) {
         menuItems[item] = null;
       }
     });
     afterEach(() => {
-      const {menuItems, vars, varsLocal} = mjs;
+      const {menuItems, vars} = mjs;
       const items = Object.keys(menuItems);
       vars[ONLY_EDITABLE] = false;
-      varsLocal[ENABLE_PB] = false;
       for (const item of items) {
         menuItems[item] = null;
       }
@@ -1237,9 +1177,6 @@ describe("main", () => {
       const i = browser.contextMenus.removeAll.callCount;
       const j = browser.contextMenus.create.callCount;
       browser.contextMenus.removeAll.resolves(undefined);
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -1249,7 +1186,6 @@ describe("main", () => {
       assert.strictEqual(browser.contextMenus.create.callCount, j + 3,
                          "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
   });
@@ -1525,43 +1461,13 @@ describe("main", () => {
 
   describe("synchronize UI components", () => {
     const func = mjs.syncUI;
-    beforeEach(() => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = false;
-    });
-    afterEach(() => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = false;
-    });
 
     it("should call function", async () => {
-      const {vars} = mjs;
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       const res = await func();
-      assert.isTrue(vars[IS_ENABLED], "value");
       assert.deepEqual(res, [
-        [],
         undefined,
         [undefined, undefined],
       ], "result");
-      browser.windows.getCurrent.flush();
-    });
-
-    it("should call function", async () => {
-      const {vars} = mjs;
-      browser.windows.getCurrent.resolves({
-        incognito: true,
-      });
-      const res = await func();
-      assert.isFalse(vars[IS_ENABLED], "value");
-      assert.deepEqual(res, [
-        [],
-        undefined,
-        [undefined, undefined],
-      ], "result");
-      browser.windows.getCurrent.flush();
     });
   });
 
@@ -1585,14 +1491,10 @@ describe("main", () => {
           value: "baz",
         },
       });
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       const res = await func(data);
       assert.deepEqual(res, [undefined, [], [undefined, undefined, undefined]],
                        "result");
       browser.storage.local.get.flush();
-      browser.windows.getCurrent.flush();
     });
 
     it("should call function", async () => {
@@ -1605,14 +1507,10 @@ describe("main", () => {
         EDITOR_FILE_NAME,
         EDITOR_LABEL,
       ]).resolves({});
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       const res = await func(data);
       assert.deepEqual(res, [undefined, [], [undefined, undefined, undefined]],
                        "result");
       browser.storage.local.get.flush();
-      browser.windows.getCurrent.flush();
     });
   });
 
@@ -1640,28 +1538,8 @@ describe("main", () => {
 
   describe("open options page", () => {
     const func = mjs.openOptionsPage;
-    beforeEach(() => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = false;
-    });
-    afterEach(() => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = false;
-    });
 
-    it("should not call function", async () => {
-      const i = browser.runtime.openOptionsPage.callCount;
-      browser.runtime.openOptionsPage.resolves(undefined);
-      const res = await func();
-      assert.strictEqual(browser.runtime.openOptionsPage.callCount, i,
-                         "not called");
-      assert.isNull(res, "result");
-      browser.runtime.openOptionsPage.flush();
-    });
-
-    it("should not call function", async () => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = true;
+    it("should call function", async () => {
       const i = browser.runtime.openOptionsPage.callCount;
       browser.runtime.openOptionsPage.resolves(undefined);
       const res = await func();
@@ -1830,20 +1708,18 @@ describe("main", () => {
   describe("handle message", () => {
     const func = mjs.handleMsg;
     beforeEach(() => {
-      const {menuItems, ports, vars} = mjs;
+      const {menuItems, ports} = mjs;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
-      vars[IS_ENABLED] = true;
     });
     afterEach(() => {
-      const {menuItems, ports, vars} = mjs;
+      const {menuItems, ports} = mjs;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
-      vars[IS_ENABLED] = false;
     });
 
     it("should get empty array", async () => {
@@ -1967,7 +1843,7 @@ describe("main", () => {
       const res = await func(msg);
       assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
                          "called");
-      assert.deepEqual(res, [null], "result");
+      assert.deepEqual(res, [undefined], "result");
     });
 
     it("should call function", async () => {
@@ -2054,9 +1930,6 @@ describe("main", () => {
         [EDITOR_CONFIG_RES]: {},
       };
       browser.storage.local.get.resolves({});
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       const res = await func(msg);
       assert.strictEqual(port.postMessage.callCount, i + 1, "called");
       assert.strictEqual(browser.storage.local.set.callCount, j + 1, "called");
@@ -2070,7 +1943,6 @@ describe("main", () => {
         ],
       ], "result");
       browser.storage.local.get.flush();
-      browser.windows.getCurrent.flush();
     });
 
     it("should call function", async () => {
@@ -2361,22 +2233,20 @@ describe("main", () => {
   describe("handle tab activated", () => {
     const func = mjs.onTabActivated;
     beforeEach(() => {
-      const {menuItems, ports, vars, varsLocal} = mjs;
+      const {menuItems, ports, varsLocal} = mjs;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
-      vars[IS_ENABLED] = false;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = true;
     });
     afterEach(() => {
-      const {menuItems, ports, vars, varsLocal} = mjs;
+      const {menuItems, ports, varsLocal} = mjs;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
-      vars[IS_ENABLED] = false;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
     });
@@ -2396,9 +2266,6 @@ describe("main", () => {
         tabId: -1,
         windowId: -1,
       };
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -2415,7 +2282,6 @@ describe("main", () => {
       assert.deepEqual(res, [
         [],
         [
-          [],
           undefined,
           [
             undefined,
@@ -2423,7 +2289,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
 
@@ -2444,9 +2309,6 @@ describe("main", () => {
         tabId: 2,
         windowId: 1,
       };
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -2459,7 +2321,7 @@ describe("main", () => {
                          "called");
       assert.strictEqual(browser.contextMenus.create.callCount, k + 3,
                          "called");
-      assert.strictEqual(port.postMessage.callCount, l + 2, "called");
+      assert.strictEqual(port.postMessage.callCount, l + 1, "called");
       assert.isTrue(varsLocal[MENU_ENABLED], "value");
       assert.deepEqual(res, [
         [],
@@ -2469,7 +2331,6 @@ describe("main", () => {
           undefined,
         ],
         [
-          [[[]]],
           undefined,
           [
             undefined,
@@ -2477,7 +2338,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
 
@@ -2498,9 +2358,6 @@ describe("main", () => {
         tabId: 3,
         windowId: 1,
       };
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -2513,12 +2370,11 @@ describe("main", () => {
                          "called");
       assert.strictEqual(browser.contextMenus.create.callCount, k,
                          "not called");
-      assert.strictEqual(port.postMessage.callCount, l + 1, "called");
+      assert.strictEqual(port.postMessage.callCount, l, "not called");
       assert.isFalse(varsLocal[MENU_ENABLED], "value");
       assert.deepEqual(res, [
         [],
         [
-          [[[]]],
           undefined,
           [
             undefined,
@@ -2526,7 +2382,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
 
@@ -2547,9 +2402,6 @@ describe("main", () => {
         tabId: 2,
         windowId: 1,
       };
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -2562,12 +2414,11 @@ describe("main", () => {
                          "called");
       assert.strictEqual(browser.contextMenus.create.callCount, k,
                          "not called");
-      assert.strictEqual(port.postMessage.callCount, l + 1, "called");
+      assert.strictEqual(port.postMessage.callCount, l, "not called");
       assert.isFalse(varsLocal[MENU_ENABLED], "value");
       assert.deepEqual(res, [
         [],
         [
-          [[[]]],
           undefined,
           [
             undefined,
@@ -2575,7 +2426,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
   });
@@ -2583,22 +2433,20 @@ describe("main", () => {
   describe("handle tab updated", () => {
     const func = mjs.onTabUpdated;
     beforeEach(() => {
-      const {menuItems, ports, vars, varsLocal} = mjs;
+      const {menuItems, ports, varsLocal} = mjs;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
-      vars[IS_ENABLED] = false;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = true;
     });
     afterEach(() => {
-      const {menuItems, ports, vars, varsLocal} = mjs;
+      const {menuItems, ports, varsLocal} = mjs;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
-      vars[IS_ENABLED] = false;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
     });
@@ -2638,9 +2486,6 @@ describe("main", () => {
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.contextMenus.create.callCount;
       const l = browser.contextMenus.update.callCount;
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -2658,12 +2503,10 @@ describe("main", () => {
       assert.deepEqual(res, [
         [],
         [
-          [],
           undefined,
           [undefined, undefined],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
 
@@ -2679,9 +2522,6 @@ describe("main", () => {
                                   new browser.runtime.Port({
                                     name: PORT_CONTENT,
                                   }));
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -2710,7 +2550,6 @@ describe("main", () => {
           undefined,
         ],
         [
-          [[[]]],
           undefined,
           [
             undefined,
@@ -2718,7 +2557,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
     });
   });
@@ -2726,14 +2564,12 @@ describe("main", () => {
   describe("handle tab removed", () => {
     const func = mjs.onTabRemoved;
     beforeEach(() => {
-      const {ports, vars} = mjs;
+      const {ports} = mjs;
       ports.clear();
-      vars[IS_ENABLED] = false;
     });
     afterEach(() => {
-      const {ports, vars} = mjs;
+      const {ports} = mjs;
       ports.clear();
-      vars[IS_ENABLED] = false;
     });
 
     it("should throw", async () => {
@@ -2824,22 +2660,20 @@ describe("main", () => {
   describe("handle window focus changed", () => {
     const func = mjs.onWindowFocusChanged;
     beforeEach(() => {
-      const {menuItems, ports, vars, varsLocal} = mjs;
+      const {menuItems, ports, varsLocal} = mjs;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
-      vars[IS_ENABLED] = false;
       varsLocal[MENU_ENABLED] = true;
       varsLocal[IS_EXECUTABLE] = true;
     });
     afterEach(() => {
-      const {menuItems, ports, vars, varsLocal} = mjs;
+      const {menuItems, ports, varsLocal} = mjs;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
-      vars[IS_ENABLED] = false;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
     });
@@ -2857,9 +2691,6 @@ describe("main", () => {
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.contextMenus.create.callCount;
       const l = browser.contextMenus.update.callCount;
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       const res = await func(browser.windows.WINDOW_ID_NONE);
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
@@ -2872,7 +2703,6 @@ describe("main", () => {
                          "not called");
       assert.deepEqual(res, [
         [
-          [],
           undefined,
           [
             undefined,
@@ -2880,7 +2710,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
     });
 
     it("should call function", async () => {
@@ -2899,9 +2728,6 @@ describe("main", () => {
       const m = port.postMessage.callCount;
       browser.windows.get.withArgs(1).resolves({
         type: "normal",
-      });
-      browser.windows.getCurrent.resolves({
-        incognito: false,
       });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
@@ -2923,7 +2749,7 @@ describe("main", () => {
                          "called");
       assert.strictEqual(browser.contextMenus.update.callCount, l,
                          "not called");
-      assert.strictEqual(port.postMessage.callCount, m + 2, "called");
+      assert.strictEqual(port.postMessage.callCount, m + 1, "called");
       assert.deepEqual(res, [
         [],
         [
@@ -2932,7 +2758,6 @@ describe("main", () => {
           undefined,
         ],
         [
-          [[[]]],
           undefined,
           [
             undefined,
@@ -2941,7 +2766,6 @@ describe("main", () => {
         ],
       ], "result");
       browser.windows.get.flush();
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
       browser.tabs.query.flush();
     });
@@ -2962,9 +2786,6 @@ describe("main", () => {
       const m = port.postMessage.callCount;
       browser.windows.get.withArgs(1).resolves({
         type: "normal",
-      });
-      browser.windows.getCurrent.resolves({
-        incognito: false,
       });
       browser.runtime.getBrowserInfo.resolves({
         version: "60.0",
@@ -2986,7 +2807,7 @@ describe("main", () => {
                          "called");
       assert.strictEqual(browser.contextMenus.update.callCount, l,
                          "not called");
-      assert.strictEqual(port.postMessage.callCount, m + 2, "called");
+      assert.strictEqual(port.postMessage.callCount, m + 1, "called");
       assert.deepEqual(res, [
         [],
         [
@@ -2995,7 +2816,6 @@ describe("main", () => {
           undefined,
         ],
         [
-          [[[]]],
           undefined,
           [
             undefined,
@@ -3004,7 +2824,6 @@ describe("main", () => {
         ],
       ], "result");
       browser.windows.get.flush();
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
       browser.tabs.query.flush();
     });
@@ -3026,9 +2845,6 @@ describe("main", () => {
       browser.windows.get.withArgs(1).resolves({
         type: "foo",
       });
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       browser.runtime.getBrowserInfo.resolves({
         version: "64.0a1",
       });
@@ -3049,10 +2865,9 @@ describe("main", () => {
                          "not called");
       assert.strictEqual(browser.contextMenus.update.callCount, l,
                          "not called");
-      assert.strictEqual(port.postMessage.callCount, m + 1, "called");
+      assert.strictEqual(port.postMessage.callCount, m, "not called");
       assert.deepEqual(res, [
         [
-          [[[]]],
           undefined,
           [
             undefined,
@@ -3061,7 +2876,6 @@ describe("main", () => {
         ],
       ], "result");
       browser.windows.get.flush();
-      browser.windows.getCurrent.flush();
       browser.runtime.getBrowserInfo.flush();
       browser.tabs.query.flush();
     });
@@ -3137,14 +2951,6 @@ describe("main", () => {
 
   describe("handle command", () => {
     const func = mjs.handleCmd;
-    beforeEach(() => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = true;
-    });
-    afterEach(() => {
-      const {vars} = mjs;
-      vars[IS_ENABLED] = false;
-    });
 
     it("should throw", async () => {
       await func().catch(e => {
@@ -3241,7 +3047,6 @@ describe("main", () => {
       vars[SYNC_AUTO] = false;
       vars[SYNC_AUTO_URL] = null;
       varsLocal[EDITOR_LABEL] = "";
-      varsLocal[ENABLE_PB] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[ICON_ID] = "";
       varsLocal[MENU_ENABLED] = true;
@@ -3256,7 +3061,6 @@ describe("main", () => {
       vars[SYNC_AUTO] = false;
       vars[SYNC_AUTO_URL] = null;
       varsLocal[EDITOR_LABEL] = "";
-      varsLocal[ENABLE_PB] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[ICON_ID] = "";
       varsLocal[MENU_ENABLED] = false;
@@ -3373,9 +3177,6 @@ describe("main", () => {
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const j = browser.contextMenus.removeAll.callCount;
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
       const res = await func(ONLY_EDITABLE, {
         checked: true,
       }, true);
@@ -3387,7 +3188,6 @@ describe("main", () => {
         [[[]]],
         [undefined],
       ], "result");
-      browser.windows.getCurrent.flush();
     });
 
     it("should set value", async () => {
@@ -3528,57 +3328,6 @@ describe("main", () => {
       assert.strictEqual(browser.notifications.onClosed.addListener.callCount,
                          i, "not called");
       assert.deepEqual(res, [], "result");
-    });
-
-    it("should set value", async () => {
-      const {varsLocal} = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
-      const res = await func(ENABLE_PB, {
-        checked: true,
-      }, true);
-      assert.isTrue(varsLocal[ENABLE_PB], "value");
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount,
-        i + 1, "called",
-      );
-      assert.strictEqual(browser.browserAction.setBadgeText.callCount, j + 1,
-                         "called");
-      assert.deepEqual(res, [
-        [
-          [],
-          undefined,
-          [
-            undefined,
-            undefined,
-          ],
-        ],
-      ], "result");
-      browser.windows.getCurrent.flush();
-    });
-
-    it("should set value", async () => {
-      const {varsLocal} = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      browser.windows.getCurrent.resolves({
-        incognito: false,
-      });
-      const res = await func(ENABLE_PB, {
-        checked: true,
-      });
-      assert.isTrue(varsLocal[ENABLE_PB], "value");
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount,
-        i, "not called",
-      );
-      assert.strictEqual(browser.browserAction.setBadgeText.callCount, j,
-                         "not called");
-      assert.deepEqual(res, [], "result");
-      browser.windows.getCurrent.flush();
     });
 
     it("should set value", async () => {
