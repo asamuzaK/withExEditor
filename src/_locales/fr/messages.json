@@ -167,12 +167,6 @@
   "optionsEnableOnlyEditableLabel": {
     "message": "Activer uniquement lors de l'édition de texte"
   },
-  "optionsEnablePBDetail": {
-    "message": "Active si coché, désactive si non."
-  },
-  "optionsEnablePBLabel": {
-    "message": "Activer pendant la navigation privée"
-  },
   "optionsEnableSyncAutoDetail": {
     "message": "Activer lorsce que vous voulez automatiquement synchroniser les éléments édités."
   },

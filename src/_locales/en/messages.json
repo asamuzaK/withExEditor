@@ -163,12 +163,6 @@
   "optionsEnableOnlyEditableLabel": {
     "message": "Enable Only When Editing Text"
   },
-  "optionsEnablePBDetail": {
-    "message": "Enables if checked, disables if not."
-  },
-  "optionsEnablePBLabel": {
-    "message": "Enable During Private Browsing"
-  },
   "optionsEnableSyncAutoDetail": {
     "message": "Enable when you want to automatically synchronize edited content."
   },

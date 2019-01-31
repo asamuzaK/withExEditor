@@ -175,12 +175,6 @@
   "optionsEnableOnlyEditableLabel": {
     "message": "テキスト編集のみ有効化"
   },
-  "optionsEnablePBDetail": {
-    "message": "チェックを入れると有効、チェックを外すと無効です。"
-  },
-  "optionsEnablePBLabel": {
-    "message": "プライベートブラウジング中も有効化"
-  },
   "optionsEnableSyncAutoDetail": {
     "message": "編集したコンテンツを自動的に同期させる場合に有効化してください。"
   },

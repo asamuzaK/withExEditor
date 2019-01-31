@@ -163,12 +163,6 @@
   "optionsEnableOnlyEditableLabel": {
     "message": "只在编辑文本时启用"
   },
-  "optionsEnablePBDetail": {
-    "message": "选中则启用，未选中则禁用。"
-  },
-  "optionsEnablePBLabel": {
-    "message": "在隐私浏览时启用。"
-  },
   "optionsEnableSyncAutoDetail": {
     "message": "如果您想自动同步已编辑的内容，启用此项。"
   },
