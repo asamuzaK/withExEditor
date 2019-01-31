@@ -10,7 +10,7 @@ import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   execScriptToExistingTabs,
   getActiveTab, getActiveTabId, getEnabledTheme, getStorage, getWindow,
-  isAccessKeySupported, isVisibleInMenuSupported, setStorage,
+  setStorage,
 } from "./browser.js";
 
 /* api */
@@ -406,22 +406,18 @@ export const createMenuItem = async (id, contexts) => {
     throw new TypeError(`Expected Array but got ${getType(contexts)}.`);
   }
   if (menuItems.hasOwnProperty(id)) {
-    const accKeySupported = await isAccessKeySupported();
-    const visibleSupported = await isVisibleInMenuSupported();
     const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-    const accKey = accKeySupported && getAccesskey(id) || "";
-    const title = accKeySupported && `${id}_key` || id;
+    const accKey = getAccesskey(id);
+    const title = `${id}_key`;
     const opt = {
       contexts,
       enabled: !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE],
       title: i18n.getMessage(title, [label, accKey]),
     };
-    if (visibleSupported) {
-      if (id === MODE_EDIT) {
-        opt.visible = true;
-      } else {
-        opt.visible = !vars[ONLY_EDITABLE];
-      }
+    if (id === MODE_EDIT) {
+      opt.visible = true;
+    } else {
+      opt.visible = !vars[ONLY_EDITABLE];
     }
     if (menuItems[id]) {
       await contextMenus.update(id, opt);
@@ -495,22 +491,18 @@ export const updateContextMenu = async type => {
     const items = Object.keys(menuItems);
     const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
-    const accKeySupported = await isAccessKeySupported();
-    const visibleSupported = await isVisibleInMenuSupported();
     for (const item of items) {
       if (menuItems[item]) {
-        const title = accKeySupported && `${item}_key` || item;
-        const accKey = accKeySupported && getAccesskey(item) || "";
+        const title = `${item}_key`;
+        const accKey = getAccesskey(item);
         const opt = {
           enabled,
           title: i18n.getMessage(title, [label, accKey]),
         };
-        if (visibleSupported) {
-          if (item === MODE_EDIT) {
-            opt.visible = true;
-          } else {
-            opt.visible = !vars[ONLY_EDITABLE];
-          }
+        if (item === MODE_EDIT) {
+          opt.visible = true;
+        } else {
+          opt.visible = !vars[ONLY_EDITABLE];
         }
         func.push(contextMenus.update(item, opt));
       } else if (enabled) {
@@ -544,10 +536,9 @@ export const updateContextMenu = async type => {
 export const cacheMenuItemTitle = async () => {
   const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
   const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-  const accKeySupported = await isAccessKeySupported();
   for (const item of items) {
-    const title = accKeySupported && `${item}_key` || item;
-    const accKey = accKeySupported && getAccesskey(item) || "";
+    const title = `${item}_key`;
+    const accKey = getAccesskey(item);
     varsLocal[item] = i18n.getMessage(title, [label, accKey]);
   }
 };
@@ -923,17 +914,12 @@ export const onWindowFocusChanged = async id => {
       const tId = await getActiveTabId(id);
       const windowId = stringifyPositiveInt(id, true);
       const tabId = stringifyPositiveInt(tId, true);
-      const visibleSupported = await isVisibleInMenuSupported();
       if (windowId && tabId) {
         func.push(portPostMsg({
           [TMP_FILE_REQ]: true,
         }, windowId, tabId));
       }
-      if (visibleSupported) {
-        func.push(updateContextMenu());
-      } else {
-        func.push(restoreContextMenu());
-      }
+      func.push(updateContextMenu());
     }
   }
   func.push(syncUI());
