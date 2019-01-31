@@ -964,9 +964,6 @@ describe("main", () => {
       const {menuItems} = mjs;
       const i = browser.contextMenus.update.callCount;
       const j = browser.contextMenus.create.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.contextMenus.create.callsFake(opt => {
         const {id} = opt;
@@ -980,7 +977,6 @@ describe("main", () => {
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.runtime.getBrowserInfo.flush();
       browser.i18n.getMessage.flush();
     });
 
@@ -988,9 +984,6 @@ describe("main", () => {
       const {menuItems} = mjs;
       const i = browser.contextMenus.update.callCount;
       const j = browser.contextMenus.create.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.contextMenus.create.callsFake(opt => {
         const {id} = opt;
@@ -1004,7 +997,6 @@ describe("main", () => {
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.runtime.getBrowserInfo.flush();
       browser.i18n.getMessage.flush();
     });
 
@@ -1012,9 +1004,6 @@ describe("main", () => {
       const {menuItems, varsLocal} = mjs;
       const i = browser.contextMenus.update.callCount;
       const j = browser.contextMenus.create.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "62.0",
-      });
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.contextMenus.create.callsFake(opt => {
         const {id} = opt;
@@ -1030,7 +1019,6 @@ describe("main", () => {
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.runtime.getBrowserInfo.flush();
       browser.i18n.getMessage.flush();
     });
 
@@ -1038,9 +1026,6 @@ describe("main", () => {
       const {menuItems} = mjs;
       const i = browser.contextMenus.update.callCount;
       const j = browser.contextMenus.create.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.contextMenus.create.callsFake(opt => {
         const {id} = opt;
@@ -1055,7 +1040,6 @@ describe("main", () => {
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.runtime.getBrowserInfo.flush();
       browser.i18n.getMessage.flush();
     });
 
@@ -1063,9 +1047,6 @@ describe("main", () => {
       const {menuItems} = mjs;
       const i = browser.contextMenus.update.callCount;
       const j = browser.contextMenus.create.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.contextMenus.create.callsFake(opt => {
         const {id} = opt;
@@ -1079,7 +1060,6 @@ describe("main", () => {
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.strictEqual(menuItems[MODE_SELECTION], MODE_SELECTION, "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.runtime.getBrowserInfo.flush();
       browser.i18n.getMessage.flush();
     });
 
@@ -1087,9 +1067,6 @@ describe("main", () => {
       const {menuItems} = mjs;
       const i = browser.contextMenus.update.callCount;
       const j = browser.contextMenus.create.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.contextMenus.create.callsFake(opt => {
         const {id} = opt;
@@ -1103,7 +1080,6 @@ describe("main", () => {
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.strictEqual(menuItems[MODE_EDIT], MODE_EDIT, "menu");
-      browser.runtime.getBrowserInfo.flush();
       browser.i18n.getMessage.flush();
     });
   });
@@ -1129,28 +1105,20 @@ describe("main", () => {
 
     it("should call function", async () => {
       const i = browser.contextMenus.create.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func();
       assert.strictEqual(browser.contextMenus.create.callCount, i + 3,
                          "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
       const {vars} = mjs;
       const i = browser.contextMenus.create.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "60.0",
-      });
       vars[ONLY_EDITABLE] = true;
       const res = await func();
       assert.strictEqual(browser.contextMenus.create.callCount, i + 1,
                          "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
   });
 
@@ -1177,16 +1145,12 @@ describe("main", () => {
       const i = browser.contextMenus.removeAll.callCount;
       const j = browser.contextMenus.create.callCount;
       browser.contextMenus.removeAll.resolves(undefined);
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func();
       assert.strictEqual(browser.contextMenus.removeAll.callCount, i + 1,
                          "called");
       assert.strictEqual(browser.contextMenus.create.callCount, j + 3,
                          "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
   });
 
@@ -1224,29 +1188,21 @@ describe("main", () => {
     it("should call function", async () => {
       const i = browser.contextMenus.update.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func();
       assert.strictEqual(browser.contextMenus.update.callCount, i + 3,
                          "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
       browser.i18n.getMessage.flush();
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
       const i = browser.contextMenus.update.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.runtime.getBrowserInfo.resolves({
-        version: "60.0",
-      });
       const res = await func();
       assert.strictEqual(browser.contextMenus.update.callCount, i + 3,
                          "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
       browser.i18n.getMessage.flush();
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
@@ -1254,9 +1210,6 @@ describe("main", () => {
       const items = Object.keys(menuItems);
       const i = browser.contextMenus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       varsLocal[MENU_ENABLED] = true;
       varsLocal[IS_EXECUTABLE] = true;
       vars[ONLY_EDITABLE] = false;
@@ -1268,7 +1221,6 @@ describe("main", () => {
                          "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
       browser.i18n.getMessage.flush();
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should not call function", async () => {
@@ -1276,9 +1228,6 @@ describe("main", () => {
       const items = Object.keys(menuItems);
       const i = browser.contextMenus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       varsLocal[MENU_ENABLED] = false;
       vars[ONLY_EDITABLE] = false;
       for (const item of items) {
@@ -1289,7 +1238,6 @@ describe("main", () => {
                          "not called");
       assert.deepEqual(res, [], "result");
       browser.i18n.getMessage.flush();
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
@@ -1297,9 +1245,6 @@ describe("main", () => {
       const items = Object.keys(menuItems);
       const i = browser.contextMenus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       varsLocal[MENU_ENABLED] = true;
       varsLocal[IS_EXECUTABLE] = true;
       vars[ONLY_EDITABLE] = true;
@@ -1311,7 +1256,6 @@ describe("main", () => {
                          "called");
       assert.deepEqual(res, [undefined], "result");
       browser.i18n.getMessage.flush();
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
@@ -1431,9 +1375,6 @@ describe("main", () => {
       const {varsLocal} = mjs;
       varsLocal[EDITOR_LABEL] = "foo";
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       await func();
       assert.strictEqual(varsLocal[MODE_SOURCE], `${MODE_SOURCE}_key,foo, (&V)`,
                          "source");
@@ -1446,15 +1387,15 @@ describe("main", () => {
     it("should set value", async () => {
       const {varsLocal} = mjs;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.runtime.getBrowserInfo.resolves({
-        version: "60.0",
-      });
       await func();
-      assert.strictEqual(varsLocal[MODE_SOURCE], `${MODE_SOURCE},${EXT_NAME},`,
+      assert.strictEqual(varsLocal[MODE_SOURCE],
+                         `${MODE_SOURCE}_key,${EXT_NAME}, (&V)`,
                          "source");
-      assert.strictEqual(varsLocal[MODE_MATHML], `${MODE_MATHML},${EXT_NAME},`,
+      assert.strictEqual(varsLocal[MODE_MATHML],
+                         `${MODE_MATHML}_key,${EXT_NAME}, (&V)`,
                          "math");
-      assert.strictEqual(varsLocal[MODE_SVG], `${MODE_SVG},${EXT_NAME},`,
+      assert.strictEqual(varsLocal[MODE_SVG],
+                         `${MODE_SVG}_key,${EXT_NAME}, (&V)`,
                          "svg");
     });
   });
@@ -2102,27 +2043,20 @@ describe("main", () => {
         },
       });
       const i = port.postMessage.callCount;
-      const j = browser.runtime.getBrowserInfo.callCount;
       const k = browser.contextMenus.create.callCount;
       const l = browser.contextMenus.update.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(port);
       assert.strictEqual(
         ports.get("1").get("2").get("https://example.com").name,
         PORT_CONTENT, "port"
       );
       assert.strictEqual(port.postMessage.callCount, i + 1, "called port msg");
-      assert.strictEqual(browser.runtime.getBrowserInfo.callCount, j + 8,
-                         "called browser info");
       assert.strictEqual(browser.contextMenus.create.callCount, k + 3,
                          "called menus create");
       assert.strictEqual(browser.contextMenus.update.callCount, l,
                          "not called menus update");
       assert.isTrue(varsLocal[MENU_ENABLED], "menu enabled");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
@@ -2142,12 +2076,8 @@ describe("main", () => {
         },
       });
       const i = port.postMessage.callCount;
-      const j = browser.runtime.getBrowserInfo.callCount;
       const k = browser.contextMenus.create.callCount;
       const l = browser.contextMenus.update.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(port);
       assert.strictEqual(
         ports.get("1").get("2").get("https://example.com").name,
@@ -2155,14 +2085,11 @@ describe("main", () => {
       );
       assert.strictEqual(port.postMessage.callCount, i + 1, "called port msg");
       assert.isFalse(varsLocal[MENU_ENABLED], "menu enabled");
-      assert.strictEqual(browser.runtime.getBrowserInfo.callCount, j,
-                         "not called browser info");
       assert.strictEqual(browser.contextMenus.create.callCount, k,
                          "not called menus create");
       assert.strictEqual(browser.contextMenus.update.callCount, l,
                          "not called menus update");
       assert.isNull(res, "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should not call function", async () => {
@@ -2182,24 +2109,17 @@ describe("main", () => {
         },
       });
       const i = port.postMessage.callCount;
-      const j = browser.runtime.getBrowserInfo.callCount;
       const k = browser.contextMenus.create.callCount;
       const l = browser.contextMenus.update.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(port);
       assert.isFalse(ports.has("1"), "port");
       assert.strictEqual(port.postMessage.callCount, i, "not called port msg");
       assert.isFalse(varsLocal[MENU_ENABLED], "menu enabled");
-      assert.strictEqual(browser.runtime.getBrowserInfo.callCount, j,
-                         "not called browser info");
       assert.strictEqual(browser.contextMenus.create.callCount, k,
                          "not called menus create");
       assert.strictEqual(browser.contextMenus.update.callCount, l,
                          "not called menus update");
       assert.isNull(res, "result");
-      browser.runtime.getBrowserInfo.flush();
     });
   });
 
@@ -2266,9 +2186,6 @@ describe("main", () => {
         tabId: -1,
         windowId: -1,
       };
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(info);
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount,
@@ -2289,7 +2206,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
@@ -2309,9 +2225,6 @@ describe("main", () => {
         tabId: 2,
         windowId: 1,
       };
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(info);
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount,
@@ -2338,7 +2251,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
@@ -2358,9 +2270,6 @@ describe("main", () => {
         tabId: 3,
         windowId: 1,
       };
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(info);
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount,
@@ -2382,7 +2291,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
@@ -2402,9 +2310,6 @@ describe("main", () => {
         tabId: 2,
         windowId: 1,
       };
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(info);
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount,
@@ -2426,7 +2331,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
   });
 
@@ -2486,9 +2390,6 @@ describe("main", () => {
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.contextMenus.create.callCount;
       const l = browser.contextMenus.update.callCount;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(2, {status: "complete"}, {active: true});
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount,
@@ -2507,7 +2408,6 @@ describe("main", () => {
           [undefined, undefined],
         ],
       ], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should call function", async () => {
@@ -2522,9 +2422,6 @@ describe("main", () => {
                                   new browser.runtime.Port({
                                     name: PORT_CONTENT,
                                   }));
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(2, {
         status: "complete",
       }, {
@@ -2557,7 +2454,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
   });
 
@@ -2729,9 +2625,6 @@ describe("main", () => {
       browser.windows.get.withArgs(1).resolves({
         type: "normal",
       });
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       browser.tabs.query.withArgs({
         windowId: 1,
         active: true,
@@ -2766,7 +2659,6 @@ describe("main", () => {
         ],
       ], "result");
       browser.windows.get.flush();
-      browser.runtime.getBrowserInfo.flush();
       browser.tabs.query.flush();
     });
 
@@ -2787,9 +2679,6 @@ describe("main", () => {
       browser.windows.get.withArgs(1).resolves({
         type: "normal",
       });
-      browser.runtime.getBrowserInfo.resolves({
-        version: "60.0",
-      });
       browser.tabs.query.withArgs({
         windowId: 1,
         active: true,
@@ -2824,7 +2713,6 @@ describe("main", () => {
         ],
       ], "result");
       browser.windows.get.flush();
-      browser.runtime.getBrowserInfo.flush();
       browser.tabs.query.flush();
     });
 
@@ -2844,9 +2732,6 @@ describe("main", () => {
       const m = port.postMessage.callCount;
       browser.windows.get.withArgs(1).resolves({
         type: "foo",
-      });
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
       });
       browser.tabs.query.withArgs({
         windowId: 1,
@@ -2876,7 +2761,6 @@ describe("main", () => {
         ],
       ], "result");
       browser.windows.get.flush();
-      browser.runtime.getBrowserInfo.flush();
       browser.tabs.query.flush();
     });
   });
@@ -3334,9 +3218,6 @@ describe("main", () => {
       const {varsLocal} = mjs;
       const i = browser.contextMenus.create.callCount;
       varsLocal[IS_EXECUTABLE] = true;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(EDITOR_LABEL, {
         value: "foo",
       }, true);
@@ -3347,16 +3228,12 @@ describe("main", () => {
         undefined,
         [undefined, undefined, undefined],
       ], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should set value", async () => {
       const {varsLocal} = mjs;
       const i = browser.contextMenus.create.callCount;
       varsLocal[IS_EXECUTABLE] = true;
-      browser.runtime.getBrowserInfo.resolves({
-        version: "64.0a1",
-      });
       const res = await func(EDITOR_LABEL, {
         value: "foo",
       });
@@ -3364,7 +3241,6 @@ describe("main", () => {
       assert.strictEqual(browser.contextMenus.create.callCount, i,
                          "not called");
       assert.deepEqual(res, [undefined], "result");
-      browser.runtime.getBrowserInfo.flush();
     });
 
     it("should set value", async () => {
