@@ -8,8 +8,8 @@ import {
 } from "./common.js";
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
-  execScriptToExistingTabs, getActiveTab, getActiveTabId, getCurrentWindow,
-  getEnabledTheme, getStorage, getWindow,
+  execScriptToExistingTabs,
+  getActiveTab, getActiveTabId, getEnabledTheme, getStorage, getWindow,
   isAccessKeySupported, isVisibleInMenuSupported, setStorage,
 } from "./browser.js";
 
@@ -22,12 +22,12 @@ const {
 import {
   CONTENT_GET, CONTENT_SCRIPT_PATH, CONTEXT_MENU, EDITOR_CONFIG_GET,
   EDITOR_CONFIG_RES, EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME,
-  EDITOR_LABEL, ENABLE_PB, EXT_NAME, EXT_RELOAD,
+  EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
   HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
   HOST_VERSION, HOST_VERSION_CHECK,
   ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
   ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
-  IS_ENABLED, IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW,
+  IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW,
   MENU_ENABLED, MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONTENT, PROCESS_CHILD, STORAGE_SET,
   SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT, TMP_FILES, TMP_FILES_PB,
@@ -39,7 +39,6 @@ const HOST_VERSION_MIN = "v3.3.1";
 
 /* variables */
 export const vars = {
-  [IS_ENABLED]: false,
   [IS_WEBEXT]: runtime.id === WEBEXT_ID,
   [ONLY_EDITABLE]: false,
   [SYNC_AUTO]: false,
@@ -48,7 +47,6 @@ export const vars = {
 
 export const varsLocal = {
   [EDITOR_LABEL]: "",
-  [ENABLE_PB]: false,
   [ICON_ID]: "",
   [IS_EXECUTABLE]: false,
   [MENU_ENABLED]: false,
@@ -286,7 +284,7 @@ export const restoreContentScript = async () => {
  */
 export const setIcon = async (id = varsLocal[ICON_ID]) => {
   const icon = runtime.getURL(ICON);
-  const path = vars[IS_ENABLED] && `${icon}${id}` || `${icon}#off`;
+  const path = `${icon}${id}`;
   return browserAction.setIcon({path});
 };
 
@@ -439,17 +437,13 @@ export const createMenuItem = async (id, contexts) => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const createMenuItems = async () => {
-  const {incognito} = await getCurrentWindow();
-  const enabled = !incognito || varsLocal[ENABLE_PB];
-  const bool = enabled && !vars[ONLY_EDITABLE];
+  const bool = !vars[ONLY_EDITABLE];
   const items = Object.keys(menuItems);
   const func = [];
   for (const item of items) {
     switch (item) {
       case MODE_EDIT:
-        if (enabled) {
-          func.push(createMenuItem(item, ["editable"]));
-        }
+        func.push(createMenuItem(item, ["editable"]));
         break;
       case MODE_SELECTION:
         if (bool) {
@@ -563,16 +557,10 @@ export const cacheMenuItemTitle = async () => {
  * synchronize UI components
  * @returns {Promise.<Array>} - results of each handler
  */
-export const syncUI = async () => {
-  const {incognito} = await getCurrentWindow();
-  const enabled = !incognito || varsLocal[ENABLE_PB];
-  vars[IS_ENABLED] = !!enabled;
-  return Promise.all([
-    portPostMsg({[IS_ENABLED]: !!enabled}),
-    setIcon(!enabled && "#off" || varsLocal[ICON_ID]),
-    toggleBadge(),
-  ]);
-};
+export const syncUI = async () => Promise.all([
+  setIcon(varsLocal[ICON_ID]),
+  toggleBadge(),
+]);
 
 /* editor config */
 /**
@@ -648,13 +636,7 @@ export const reloadExt = async (reload = false) => {
  * open options page
  * @returns {?AsyncFunction} - open options page
  */
-export const openOptionsPage = async () => {
-  let func;
-  if (vars[IS_ENABLED]) {
-    func = runtime.openOptionsPage();
-  }
-  return func || null;
-};
+export const openOptionsPage = async () => runtime.openOptionsPage();
 
 /**
  * handle host message
@@ -1042,12 +1024,6 @@ export const setVar = async (item, obj, changed = false) => {
         func.push(cacheMenuItemTitle());
         if (changed) {
           func.push(updateContextMenu());
-        }
-        break;
-      case ENABLE_PB:
-        varsLocal[item] = !!checked;
-        if (changed) {
-          func.push(syncUI());
         }
         break;
       case HOST_ERR_NOTIFY:
