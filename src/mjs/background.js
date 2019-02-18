@@ -62,11 +62,11 @@ windows.onRemoved.addListener(windowId =>
 );
 
 /* startup */
-Promise.all([
+document.addEventListener("DOMContentLoaded", () => Promise.all([
   setDefaultIcon().then(getAllStorage).then(setVars).then(restoreContentScript)
     .then(syncUI),
   setStorage({[NS_URI]: nsUriData}),
   setStorage({[FILE_EXT]: fileExtData}),
   setStorage({[LIVE_EDIT]: liveEditData}),
   migrateStorage(),
-]).catch(throwErr);
+]).catch(throwErr));
