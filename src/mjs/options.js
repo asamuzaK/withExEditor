@@ -21,7 +21,7 @@ import {
 port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
 /* startup */
-Promise.all([
+document.addEventListener("DOMContentLoaded", () => Promise.all([
   localizeHtml(),
   setValuesFromStorage(),
   addInputChangeListener(),
@@ -31,4 +31,4 @@ Promise.all([
   getHostStatus(),
   disableIncompatibleInputs(),
   addListenerToCmdInputs(),
-]).catch(throwErr);
+]).catch(throwErr));
