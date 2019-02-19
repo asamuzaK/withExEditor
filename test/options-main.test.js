@@ -48,8 +48,8 @@ describe("options-main", () => {
     assert.isObject(browser, "browser");
   });
 
-  describe("port message", () => {
-    const func = mjs.portMsg;
+  describe("post message", () => {
+    const func = mjs.postMsg;
 
     it("should call function", async () => {
       const i = mjs.port.postMessage.callCount;
@@ -334,8 +334,8 @@ describe("options-main", () => {
     });
   });
 
-  describe("port pref", () => {
-    const func = mjs.portPref;
+  describe("store pref", () => {
+    const func = mjs.storePref;
 
     it("should get empty array", async () => {
       const evt = {

@@ -24,11 +24,11 @@ const PORT_NAME = "portOptions";
 export const port = runtime.connect({name: PORT_NAME});
 
 /**
- * port message
+ * post message
  * @param {*} msg - message
  * @returns {void}
  */
-export const portMsg = async msg => {
+export const postMsg = async msg => {
   if (msg) {
     port.postMessage(msg);
   }
@@ -38,7 +38,7 @@ export const portMsg = async msg => {
  * get host status
  * @returns {AsyncFunction} - port message
  */
-export const getHostStatus = async () => portMsg({[HOST_STATUS_GET]: true});
+export const getHostStatus = async () => postMsg({[HOST_STATUS_GET]: true});
 
 /**
  * create pref
@@ -115,7 +115,7 @@ export const extractHostStatus = async status => {
 /**
  * extract sync urls input
  * @param {!Object} evt - Event
- * @returns {?AsyncFunction} - port message
+ * @returns {?AsyncFunction} - post message
  */
 export const extractSyncUrls = async evt => {
   const {target} = evt;
@@ -137,18 +137,18 @@ export const extractSyncUrls = async evt => {
       }
     }
     if (bool) {
-      func = createPref(target).then(portMsg);
+      func = createPref(target).then(postMsg);
     }
   }
   return func || null;
 };
 
 /**
- * port pref
+ * store pref
  * @param {!Object} evt - Event
  * @returns {Promise.<Array>} - results of each handler
  */
-export const portPref = async evt => {
+export const storePref = async evt => {
   const {target} = evt;
   const {checked, id, name, type} = target;
   const func = [];
@@ -156,7 +156,7 @@ export const portPref = async evt => {
     if (type === "radio") {
       const nodes = document.querySelectorAll(`[name=${name}]`);
       for (const node of nodes) {
-        func.push(createPref(node).then(portMsg));
+        func.push(createPref(node).then(postMsg));
       }
     } else {
       switch (id) {
@@ -166,10 +166,10 @@ export const portPref = async evt => {
           } else {
             await removePermission(["notifications"]);
           }
-          func.push(createPref(target).then(portMsg));
+          func.push(createPref(target).then(postMsg));
           break;
         default:
-          func.push(createPref(target).then(portMsg));
+          func.push(createPref(target).then(postMsg));
       }
     }
   }
@@ -180,14 +180,14 @@ export const portPref = async evt => {
 /**
  * handle reloadExtension click
  * @param {!Object} evt - Event
- * @returns {?AsyncFunction} - portMsg()
+ * @returns {?AsyncFunction} - postMsg()
  */
 export const handleReloadExtensionClick = evt => {
   const {currentTarget, target} = evt;
   let func;
   const reload = currentTarget === target;
   if (reload) {
-    func = portMsg({
+    func = postMsg({
       [EXT_RELOAD]: reload,
     }).catch(throwErr);
   }
@@ -207,9 +207,9 @@ export const handleSyncUrlsInputInput = evt =>
 /**
  * handle input change
  * @param {!Object} evt - Event
- * @returns {AsyncFunction} - portPref()
+ * @returns {AsyncFunction} - storePref()
  */
-export const handleInputChange = evt => portPref(evt).catch(throwErr);
+export const handleInputChange = evt => storePref(evt).catch(throwErr);
 
 /**
  * prevent event

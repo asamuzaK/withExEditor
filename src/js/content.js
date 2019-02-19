@@ -835,34 +835,34 @@
   const port = runtime.connect({name: PORT_NAME});
 
   /**
-   * port message
+   * post message
    * @param {*} msg - message
    * @returns {void}
    */
-  const portMsg = async msg => {
+  const postMsg = async msg => {
     if (msg) {
       port.postMessage(msg);
     }
   };
 
   /**
-   * port temporary file data
+   * post temporary file data
    * @param {string} dataId - data ID
-   * @returns {?AsyncFunction} - port message
+   * @returns {?AsyncFunction} - post message
    */
-  const portTmpFileData = async dataId => {
+  const postTmpFileData = async dataId => {
     let func;
     if (dataId) {
       const data = dataIds.get(dataId);
       if (data) {
-        func = portMsg({[TMP_FILE_GET]: data});
+        func = postMsg({[TMP_FILE_GET]: data});
       }
     }
     return func || null;
   };
 
   /**
-   * port temporary file data to get temporary file
+   * post temporary file data to get temporary file
    * @param {!Object} evt - Event
    * @returns {Promise.<Array>} - results of each handler
    */
@@ -875,10 +875,10 @@
         const {controls} = dataIds.get(dataId) || {};
         if (controls) {
           controls.forEach(id => {
-            func.push(portTmpFileData(id));
+            func.push(postTmpFileData(id));
           });
         } else {
-          func.push(portTmpFileData(dataId));
+          func.push(postTmpFileData(dataId));
         }
       }
     } else {
@@ -887,24 +887,24 @@
       const liveEditKey = await getLiveEditKeyFromClassList(currentClassList);
       if (liveEditKey && targetLocalName === "textarea") {
         const {dataId} = await getIdData(currentTarget) || {};
-        func.push(portTmpFileData(dataId));
+        func.push(postTmpFileData(dataId));
       }
     }
     return Promise.all(func);
   };
 
   /**
-   * port each data ID
-   * @param {boolean} bool - port data ID
+   * post each data ID
+   * @param {boolean} bool - post data ID
    * @returns {Promise.<Array>} - results of each handler
    */
-  const portEachDataId = async (bool = false) => {
+  const postEachDataId = async (bool = false) => {
     const func = [];
     if (bool) {
       dataIds.forEach(async (value, key) => {
         const elm = await getTargetElementFromDataId(key);
         if (elm) {
-          func.push(portMsg({[TMP_FILE_GET]: value}));
+          func.push(postMsg({[TMP_FILE_GET]: value}));
         }
       });
     }
@@ -1266,17 +1266,17 @@
   };
 
   /**
-   * port content data
+   * post content data
    * @param {Object} elm - element
    * @param {string} mode - context mode
    * @returns {Promise.<Array>} - results of each handler
    */
-  const portContent = async (elm, mode) => {
+  const postContent = async (elm, mode) => {
     const func = [];
     if (elm && elm.nodeType === Node.ELEMENT_NODE) {
       const data = await createContentData(elm, mode).then(createTmpFileData);
       func.push(
-        createContentDataMsg(data).then(portMsg),
+        createContentDataMsg(data).then(postMsg),
         storeTmpFileData(data),
       );
     }
@@ -1318,11 +1318,11 @@
   };
 
   /**
-   * determine port content process
+   * determine content process
    * @param {Object} obj - context menu obj
-   * @returns {?AsyncFunction} - port content
+   * @returns {?AsyncFunction} - post content
    */
-  const determinePortProcess = async (obj = {}) => {
+  const determineContentProcess = async (obj = {}) => {
     const {info} = obj;
     const isTop = window.top.location.href === document.URL;
     const elm = vars[CONTEXT_NODE] || isTop && document.documentElement;
@@ -1334,7 +1334,7 @@
     } else {
       mode = await getContextMode(elm);
     }
-    return mode && portContent(elm, mode) || null;
+    return mode && postContent(elm, mode) || null;
   };
 
   /* synchronize edited text */
@@ -1623,7 +1623,7 @@
         const [key, value] = item;
         switch (key) {
           case CONTENT_GET:
-            func.push(determinePortProcess(value));
+            func.push(determineContentProcess(value));
             break;
           case ID_TAB:
           case ID_WIN:
@@ -1645,7 +1645,7 @@
             func.push(removeTmpFileData(value));
             break;
           case TMP_FILE_REQ:
-            func.push(portEachDataId(value));
+            func.push(postEachDataId(value));
             break;
           case VARS_SET:
             func.push(handleMsg(value));
@@ -1660,7 +1660,7 @@
   /**
    * handle before contextmenu event
    * @param {!Object} evt - Event
-   * @returns {?AsyncFunction} - port message
+   * @returns {?AsyncFunction} - post message
    */
   const handleBeforeContextMenu = async evt => {
     const {button, key, shiftKey, target} = evt;
@@ -1691,7 +1691,7 @@
       } else {
         vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] && target || null;
       }
-      func = portMsg({
+      func = postMsg({
         [CONTEXT_MENU]: {
           [MODE_EDIT]: {
             enabled,
@@ -1710,7 +1710,7 @@
   /**
    * handle keydown event
    * @param {!Object} evt - Event
-   * @returns {?AsyncFunction} - port content / port message
+   * @returns {?AsyncFunction} - post content / post message
    */
   const handleKeyDown = async evt => {
     const {key, shiftKey, target} = evt;
