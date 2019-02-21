@@ -17,9 +17,6 @@
   "compatNoteIconAuto": {
     "message": "注意：“自动”仅适用于 Gecko 内核的浏览器，并且你需要在 \"about:config\" 中将 \"svg.context-properties.content.enabled\" 设定为 \"true\" 。"
   },
-  "compatNoteShortcutKey": {
-    "message": "注意：不兼容 Blink 浏览器。请在浏览器的扩展页面中指定键盘快捷键。"
-  },
   "hostConnection_false": {
     "message": "已断开"
   },
@@ -172,12 +169,6 @@
   "optionsEnableSyncAutoLabel": {
     "message": "在特定站点上自动同步已编辑的内容"
   },
-  "optionsExecEditorDetail": {
-    "message": "执行编辑器的键盘快捷键，用它就无需使用右键菜单。焦点在输入框时按下此快捷键即可调用。示例：Ctrl+Shift+U。"
-  },
-  "optionsExecEditorLabel": {
-    "message": "直接执行编辑器"
-  },
   "optionsHostConnectionDetail": {
     "message": "如果为“未知”或“已断开”，重新加载 withExEditor。"
   },
@@ -268,26 +259,11 @@
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "白图标"
   },
-  "optionsKeyComboInput": {
-    "message": ""
-  },
-  "optionsKeyComboInput_placeholder": {
-    "message": "按下要设定的快捷键"
-  },
-  "optionsKeyboardShortcuts": {
-    "message": "键盘快捷键"
-  },
   "optionsNotifyHostError": {
     "message": "通知主机错误"
   },
   "optionsNotifyHostErrorDetail": {
     "message": "主机上发生错误时通知我。"
-  },
-  "optionsOpenOptionsPageDetail": {
-    "message": "打开选项页面的键盘快捷键。在输入框中按下你要设置的键盘快捷键，例如 Alt+Shift+U。"
-  },
-  "optionsOpenOptionsPageLabel": {
-    "message": "打开选项页面"
   },
   "optionsOtherSettings": {
     "message": "其他设置"

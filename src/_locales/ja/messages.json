@@ -17,9 +17,6 @@
   "compatNoteIconAuto": {
     "message": "備考： 「自動」はGecko系ブラウザしか適用されません。また「about:config」から「svg.context-properties.content.enabled」の値を「true」に変更する必要があります。"
   },
-  "compatNoteShortcutKey": {
-    "message": "備考： Blink系ブラウザとは互換性がありません。ブラウザの拡張機能ページでショートカットキーを設定してください。"
-  },
   "hostConnection_false": {
     "message": "未接続"
   },
@@ -184,12 +181,6 @@
   "optionsEnableSyncAutoLabel": {
     "message": "特定のサイトでは編集したコンテンツを自動的に同期する"
   },
-  "optionsExecEditorDetail": {
-    "message": "エディタを直接起動するショートカットキーを設定します。入力欄で「Ctrl+Shift+U」などのキーの組み合わせで押下してください。"
-  },
-  "optionsExecEditorLabel": {
-    "message": "エディタを直接起動"
-  },
   "optionsHostConnectionDetail": {
     "message": "状態が「不明」や「未接続」となっている場合は、withExEditor を再読み込みしてください。"
   },
@@ -280,26 +271,11 @@
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "ホワイトアイコン"
   },
-  "optionsKeyComboInput": {
-    "message": ""
-  },
-  "optionsKeyComboInput_placeholder": {
-    "message": "キーの組み合わせを押下"
-  },
-  "optionsKeyboardShortcuts": {
-    "message": "キーボードショートカット"
-  },
   "optionsNotifyHostError": {
     "message": "ホストのエラーを通知"
   },
   "optionsNotifyHostErrorDetail": {
     "message": "ホストでエラーが起きたときに通知します。"
-  },
-  "optionsOpenOptionsPageDetail": {
-    "message": "設定ページを開くショートカットキーを設定します。入力欄で「Alt+Shift+U」などのキーの組み合わせで押下してください。"
-  },
-  "optionsOpenOptionsPageLabel": {
-    "message": "設定ページを開く"
   },
   "optionsOtherSettings": {
     "message": "その他"

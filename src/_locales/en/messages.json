@@ -17,9 +17,6 @@
   "compatNoteIconAuto": {
     "message": "NOTE: \"Auto\" only applies to Gecko browsers, and you need to set \"svg.context-properties.content.enabled\" to \"true\" from \"about:config\"."
   },
-  "compatNoteShortcutKey": {
-    "message": "NOTE: Incompatible with Blink browsers. Please specify keyboard shortcut on browser's extension page."
-  },
   "hostConnection_false": {
     "message": "Disconnected"
   },
@@ -172,12 +169,6 @@
   "optionsEnableSyncAutoLabel": {
     "message": "Automatically Synchronize Edited Content On Specific Sites"
   },
-  "optionsExecEditorDetail": {
-    "message": "Keyboard shortcut to execute the editor without going through the context menu. In the input field, press the combination of keys such as 'Ctrl+Shift+U'."
-  },
-  "optionsExecEditorLabel": {
-    "message": "Execute The Editor Directly"
-  },
   "optionsHostConnectionDetail": {
     "message": "If \"Unknown\" or \"Disconnected\", reload withExEditor."
   },
@@ -268,26 +259,11 @@
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "White Icon"
   },
-  "optionsKeyComboInput": {
-    "message": ""
-  },
-  "optionsKeyComboInput_placeholder": {
-    "message": "Press key combination"
-  },
-  "optionsKeyboardShortcuts": {
-    "message": "Keyboard Shortcuts"
-  },
   "optionsNotifyHostError": {
     "message": "Notify Host Error"
   },
   "optionsNotifyHostErrorDetail": {
     "message": "Notify when an error occurs on the host."
-  },
-  "optionsOpenOptionsPageDetail": {
-    "message": "Keyboard shortcut to open the options page. In the input field, press the combination of keys such as 'Alt+Shift+U'."
-  },
-  "optionsOpenOptionsPageLabel": {
-    "message": "Open The Options Page"
   },
   "optionsOtherSettings": {
     "message": "Other Settings"
