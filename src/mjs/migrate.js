@@ -3,11 +3,12 @@
  */
 
 import {
-  getStorage, removeStorage, updateCommand,
+  getAllStorage, removeStorage, updateCommand,
 } from "./browser.js";
 
 /* constants */
 import {EDITOR_EXEC, OPTIONS_OPEN} from "./constant.js";
+const ENABLE_PB = "enablePB";
 const KEY_ACCESS = "accessKey";
 const KEY_EDITOR = "editorShortCut";
 const KEY_OPTIONS = "optionsShortCut";
@@ -17,13 +18,7 @@ const KEY_OPTIONS = "optionsShortCut";
  * @returns {Promise.<Array>} - results of each handler
  */
 export const migrateStorage = async () => {
-  const store = await getStorage([
-    EDITOR_EXEC,
-    KEY_ACCESS,
-    KEY_EDITOR,
-    KEY_OPTIONS,
-    OPTIONS_OPEN,
-  ]);
+  const store = await getAllStorage();
   const func = [];
   if (store[EDITOR_EXEC]) {
     const {value} = store[EDITOR_EXEC];
@@ -34,6 +29,9 @@ export const migrateStorage = async () => {
     const {value} = store[OPTIONS_OPEN];
     await updateCommand(OPTIONS_OPEN, value);
     func.push(removeStorage(OPTIONS_OPEN));
+  }
+  if (store[ENABLE_PB]) {
+    func.push(removeStorage(ENABLE_PB));
   }
   if (store[KEY_ACCESS]) {
     func.push(removeStorage(KEY_ACCESS));
