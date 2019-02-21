@@ -877,22 +877,25 @@ export const onTabRemoved = async (id, info) => {
     throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
   const {windowId: wId} = info;
-  const {incognito} = await windows.get(wId);
-  const windowId = stringifyPositiveInt(wId, true);
-  const tabId = stringifyPositiveInt(id, true);
-  const portsWin = ports.get(windowId);
-  const portsTab = portsWin && portsWin.get(tabId);
   const func = [];
-  if (portsTab) {
-    func.push(
-      restorePorts({windowId, tabId}),
-      hostPostMsg({
-        [TMP_FILE_DATA_REMOVE]: {
-          tabId, windowId,
-          dir: incognito && TMP_FILES_PB || TMP_FILES,
-        },
-      }),
-    );
+  const win = await getWindow(wId).catch(logErr);
+  if (win) {
+    const {incognito} = win;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(id, true);
+    const portsWin = ports.get(windowId);
+    const portsTab = portsWin && portsWin.get(tabId);
+    if (portsTab) {
+      func.push(
+        restorePorts({windowId, tabId}),
+        hostPostMsg({
+          [TMP_FILE_DATA_REMOVE]: {
+            tabId, windowId,
+            dir: incognito && TMP_FILES_PB || TMP_FILES,
+          },
+        }),
+      );
+    }
   }
   return Promise.all(func);
 };
@@ -908,18 +911,20 @@ export const onWindowFocusChanged = async id => {
   }
   const func = [];
   if (id !== windows.WINDOW_ID_NONE) {
-    const win = await getWindow(id);
-    const {type} = win;
-    if (type === "normal") {
-      const tId = await getActiveTabId(id);
-      const windowId = stringifyPositiveInt(id, true);
-      const tabId = stringifyPositiveInt(tId, true);
-      if (windowId && tabId) {
-        func.push(portPostMsg({
-          [TMP_FILE_REQ]: true,
-        }, windowId, tabId));
+    const win = await getWindow(id).catch(logErr);
+    if (win) {
+      const {type} = win;
+      if (type === "normal") {
+        const tId = await getActiveTabId(id);
+        const windowId = stringifyPositiveInt(id, true);
+        const tabId = stringifyPositiveInt(tId, true);
+        if (windowId && tabId) {
+          func.push(portPostMsg({
+            [TMP_FILE_REQ]: true,
+          }, windowId, tabId));
+        }
+        func.push(updateContextMenu());
       }
-      func.push(updateContextMenu());
     }
   }
   func.push(syncUI());
