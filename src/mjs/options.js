@@ -9,7 +9,7 @@ import {
   localizeHtml,
 } from "./localize.js";
 import {
-  disableIncompatibleInputs, addListenerToCmdInputs,
+  disableIncompatibleInputs,
 } from "./compat.js";
 import {
   addFormSubmitListener, addInputChangeListener, addReloadExtensionListener,
@@ -30,5 +30,4 @@ document.addEventListener("DOMContentLoaded", () => Promise.all([
   addFormSubmitListener(),
   getHostStatus(),
   disableIncompatibleInputs(),
-  addListenerToCmdInputs(),
 ]).catch(throwErr));
