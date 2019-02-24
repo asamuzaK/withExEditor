@@ -270,7 +270,7 @@ export const postGetContent = async () => {
  */
 export const restoreContentScript = async () => {
   let func;
-  if (vars[IS_WEBEXT]) {
+  if (vars[IS_WEBEXT] && ports.size < 1) {
     func = execScriptToExistingTabs(CONTENT_SCRIPT_PATH, true);
   }
   return func || null;
