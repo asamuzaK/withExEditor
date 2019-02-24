@@ -8,9 +8,8 @@ import {
 } from "./common.js";
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
-  execScriptToTabs,
-  getActiveTab, getActiveTabId, getEnabledTheme, getStorage, getWindow,
-  setStorage,
+  execScriptToTabs, getActiveTab, getActiveTabId, getCurrentWindow,
+  getEnabledTheme, getStorage, getWindow, setStorage,
 } from "./browser.js";
 
 /* api */
@@ -912,30 +911,22 @@ export const onTabRemoved = async (id, info) => {
 
 /**
  * handle window focus changed
- * @param {!number} id - window ID
  * @returns {Promise.<Array>} - results of each handler
  */
-export const onWindowFocusChanged = async id => {
-  if (!Number.isInteger(id)) {
-    throw new TypeError(`Expected Number but got ${getType(id)}.`);
-  }
+export const onWindowFocusChanged = async () => {
+  const win = await getCurrentWindow();
+  const {focused, id, type} = win;
   const func = [];
-  if (id !== windows.WINDOW_ID_NONE) {
-    const win = await getWindow(id).catch(logErr);
-    if (win) {
-      const {type} = win;
-      if (type === "normal") {
-        const tId = await getActiveTabId(id);
-        const windowId = stringifyPositiveInt(id, true);
-        const tabId = stringifyPositiveInt(tId, true);
-        if (windowId && tabId) {
-          func.push(portPostMsg({
-            [TMP_FILE_REQ]: true,
-          }, windowId, tabId));
-        }
-        func.push(updateContextMenu());
-      }
+  if (focused && id !== windows.WINDOW_ID_NONE && type === "normal") {
+    const tId = await getActiveTabId(id);
+    const windowId = stringifyPositiveInt(id, true);
+    const tabId = stringifyPositiveInt(tId, true);
+    if (windowId && tabId) {
+      func.push(portPostMsg({
+        [TMP_FILE_REQ]: true,
+      }, windowId, tabId));
     }
+    func.push(updateContextMenu());
   }
   func.push(syncUI());
   return Promise.all(func);

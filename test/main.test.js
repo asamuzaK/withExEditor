@@ -2607,66 +2607,17 @@ describe("main", () => {
       varsLocal[IS_EXECUTABLE] = false;
     });
 
-    it("should throw", async () => {
-      await func().catch(e => {
-        assert.instanceOf(e, TypeError, "error");
-        assert.strictEqual(e.message, "Expected Number but got Undefined.",
-                           "message");
+    it("should call function", async () => {
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const k = browser.contextMenus.create.callCount;
+      const l = browser.contextMenus.update.callCount;
+      browser.windows.getCurrent.resolves({
+        focused: false,
+        id: 1,
+        type: "normal",
       });
-    });
-
-    it("should call function", async () => {
-      const {ports} = mjs;
-      ports.set("1", new Map());
-      ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
-      const port = ports.get("1").get("2").get("https://example.com");
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.contextMenus.create.callCount;
-      const l = browser.contextMenus.update.callCount;
-      const m = port.postMessage.callCount;
-      browser.windows.get.withArgs(1).rejects(new Error("error"));
-      browser.tabs.query.withArgs({
-        windowId: 1,
-        active: true,
-        windowType: "normal",
-      }).resolves([{
-        id: 2,
-      }]);
-      const res = await func(1);
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
-      );
-      assert.strictEqual(browser.browserAction.setBadgeText.callCount, j + 1,
-                         "called");
-      assert.strictEqual(browser.contextMenus.create.callCount, k,
-                         "not called");
-      assert.strictEqual(browser.contextMenus.update.callCount, l,
-                         "not called");
-      assert.strictEqual(port.postMessage.callCount, m, "not called");
-      assert.deepEqual(res, [
-        [
-          undefined,
-          [
-            undefined,
-            undefined,
-          ],
-        ],
-      ], "result");
-      browser.windows.get.flush();
-      browser.tabs.query.flush();
-    });
-
-    it("should call function", async () => {
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.contextMenus.create.callCount;
-      const l = browser.contextMenus.update.callCount;
-      const res = await func(browser.windows.WINDOW_ID_NONE);
+      const res = await func();
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
       );
@@ -2685,6 +2636,70 @@ describe("main", () => {
           ],
         ],
       ], "result");
+      browser.windows.getCurrent.flush();
+    });
+
+    it("should call function", async () => {
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const k = browser.contextMenus.create.callCount;
+      const l = browser.contextMenus.update.callCount;
+      browser.windows.getCurrent.resolves({
+        focused: true,
+        id: browser.windows.WINDOW_ID_NONE,
+        type: "normal",
+      });
+      const res = await func();
+      assert.strictEqual(
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+      );
+      assert.strictEqual(browser.browserAction.setBadgeText.callCount, j + 1,
+                         "called");
+      assert.strictEqual(browser.contextMenus.create.callCount, k,
+                         "not called");
+      assert.strictEqual(browser.contextMenus.update.callCount, l,
+                         "not called");
+      assert.deepEqual(res, [
+        [
+          undefined,
+          [
+            undefined,
+            undefined,
+          ],
+        ],
+      ], "result");
+      browser.windows.getCurrent.flush();
+    });
+
+    it("should call function", async () => {
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const k = browser.contextMenus.create.callCount;
+      const l = browser.contextMenus.update.callCount;
+      browser.windows.getCurrent.resolves({
+        focused: true,
+        id: 1,
+        type: "popup",
+      });
+      const res = await func();
+      assert.strictEqual(
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+      );
+      assert.strictEqual(browser.browserAction.setBadgeText.callCount, j + 1,
+                         "called");
+      assert.strictEqual(browser.contextMenus.create.callCount, k,
+                         "not called");
+      assert.strictEqual(browser.contextMenus.update.callCount, l,
+                         "not called");
+      assert.deepEqual(res, [
+        [
+          undefined,
+          [
+            undefined,
+            undefined,
+          ],
+        ],
+      ], "result");
     });
 
     it("should call function", async () => {
@@ -2701,7 +2716,9 @@ describe("main", () => {
       const k = browser.contextMenus.create.callCount;
       const l = browser.contextMenus.update.callCount;
       const m = port.postMessage.callCount;
-      browser.windows.get.withArgs(1).resolves({
+      browser.windows.getCurrent.resolves({
+        focused: true,
+        id: 1,
         type: "normal",
       });
       browser.tabs.query.withArgs({
@@ -2737,7 +2754,7 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.get.flush();
+      browser.windows.getCurrent.flush();
       browser.tabs.query.flush();
     });
 
@@ -2755,7 +2772,9 @@ describe("main", () => {
       const k = browser.contextMenus.create.callCount;
       const l = browser.contextMenus.update.callCount;
       const m = port.postMessage.callCount;
-      browser.windows.get.withArgs(1).resolves({
+      browser.windows.getCurrent.resolves({
+        focused: true,
+        id: 1,
         type: "normal",
       });
       browser.tabs.query.withArgs({
@@ -2791,55 +2810,7 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.get.flush();
-      browser.tabs.query.flush();
-    });
-
-    it("should call function", async () => {
-      const {ports} = mjs;
-      ports.set("1", new Map());
-      ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
-      const port = ports.get("1").get("2").get("https://example.com");
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.contextMenus.create.callCount;
-      const l = browser.contextMenus.update.callCount;
-      const m = port.postMessage.callCount;
-      browser.windows.get.withArgs(1).resolves({
-        type: "foo",
-      });
-      browser.tabs.query.withArgs({
-        windowId: 1,
-        active: true,
-        windowType: "normal",
-      }).resolves([{
-        id: 2,
-      }]);
-      const res = await func(1);
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
-      );
-      assert.strictEqual(browser.browserAction.setBadgeText.callCount, j + 1,
-                         "called");
-      assert.strictEqual(browser.contextMenus.create.callCount, k,
-                         "not called");
-      assert.strictEqual(browser.contextMenus.update.callCount, l,
-                         "not called");
-      assert.strictEqual(port.postMessage.callCount, m, "not called");
-      assert.deepEqual(res, [
-        [
-          undefined,
-          [
-            undefined,
-            undefined,
-          ],
-        ],
-      ], "result");
-      browser.windows.get.flush();
+      browser.windows.getCurrent.flush();
       browser.tabs.query.flush();
     });
   });
