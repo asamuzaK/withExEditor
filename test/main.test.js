@@ -486,21 +486,22 @@ describe("main", () => {
     });
 
     it("should not call function", async () => {
-      const i = browser.tabs.query.callCount;
-      const res = await func();
-      assert.strictEqual(browser.tabs.query.callCount, i, "not called");
-      assert.isNull(res, "result");
-    });
-
-    it("should not call function", async () => {
-      const {ports, vars} = mjs;
+      const {ports} = mjs;
       const i = browser.tabs.query.callCount;
       browser.tabs.query.resolves([]);
       ports.set("foo", "bar");
-      vars[IS_WEBEXT] = true;
       const res = await func();
       assert.strictEqual(browser.tabs.query.callCount, i, "not called");
       assert.isNull(res, "result");
+      browser.tabs.query.flush();
+    });
+
+    it("should call function", async () => {
+      const i = browser.tabs.query.callCount;
+      browser.tabs.query.resolves([]);
+      const res = await func();
+      assert.strictEqual(browser.tabs.query.callCount, i + 2, "called");
+      assert.deepEqual(res, [], "result");
       browser.tabs.query.flush();
     });
 

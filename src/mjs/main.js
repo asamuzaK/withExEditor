@@ -8,7 +8,7 @@ import {
 } from "./common.js";
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
-  execScriptToExistingTabs,
+  execScriptToTabs,
   getActiveTab, getActiveTabId, getEnabledTheme, getStorage, getWindow,
   setStorage,
 } from "./browser.js";
@@ -20,19 +20,20 @@ const {
 
 /* constants */
 import {
-  CONTENT_GET, CONTENT_SCRIPT_PATH, CONTEXT_MENU, EDITOR_CONFIG_GET,
+  CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET,
   EDITOR_CONFIG_RES, EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME,
   EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
   HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
   HOST_VERSION, HOST_VERSION_CHECK,
   ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
   ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
-  IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW,
-  MENU_ENABLED, MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
-  ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONTENT, PROCESS_CHILD, STORAGE_SET,
-  SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT, TMP_FILES, TMP_FILES_PB,
-  TMP_FILES_PB_REMOVE, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
-  TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES,
+  IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
+  MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
+  ONLY_EDITABLE, OPTIONS_OPEN, PATH_BROWSER_POLYFILL, PATH_CONTENT_SCRIPT,
+  PORT_CONTENT, PROCESS_CHILD, STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
+  THEME_DARK, THEME_LIGHT, TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE,
+  TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
+  TMP_FILE_REQ, TMP_FILE_RES,
   VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID,
 } from "./constant.js";
 const HOST_VERSION_MIN = "v3.3.1";
@@ -266,12 +267,21 @@ export const postGetContent = async () => {
 
 /**
  * restore content script
- * @returns {?AsyncFunction} - execScriptToExistingTabs()
+ * @returns {?AsyncFunction} - execScriptToTabs()
  */
 export const restoreContentScript = async () => {
   let func;
-  if (vars[IS_WEBEXT] && ports.size < 1) {
-    func = execScriptToExistingTabs(CONTENT_SCRIPT_PATH, true);
+  if (ports.size < 1) {
+    if (!vars[IS_WEBEXT]) {
+      await execScriptToTabs({
+        allFrames: true,
+        file: PATH_BROWSER_POLYFILL,
+      });
+    }
+    func = execScriptToTabs({
+      allFrames: true,
+      file: PATH_CONTENT_SCRIPT,
+    });
   }
   return func || null;
 };

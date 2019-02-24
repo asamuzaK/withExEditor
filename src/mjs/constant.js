@@ -3,7 +3,6 @@
  */
 
 export const CONTENT_GET = "getContent";
-export const CONTENT_SCRIPT_PATH = "js/content.js";
 export const CONTEXT_MENU = "contextMenu";
 export const EDITOR_CONFIG_GET = "getEditorConfig";
 export const EDITOR_CONFIG_RES = "resEditorConfig";
@@ -46,6 +45,8 @@ export const MODE_SVG = "modeViewSVG";
 export const NS_URI = "nsUri";
 export const ONLY_EDITABLE = "enableOnlyEditable";
 export const OPTIONS_OPEN = "openOptionsPage";
+export const PATH_BROWSER_POLYFILL = "/lib/browser-polyfill.min.js";
+export const PATH_CONTENT_SCRIPT = "/js/content.js";
 export const PORT_CONTENT = "portContent";
 export const PROCESS_CHILD = "childProcess";
 export const STORAGE_SET = "setStorage";
