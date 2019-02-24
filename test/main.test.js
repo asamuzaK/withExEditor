@@ -475,11 +475,13 @@ describe("main", () => {
   describe("restore content script", () => {
     const func = mjs.restoreContentScript;
     beforeEach(() => {
-      const {vars} = mjs;
+      const {ports, vars} = mjs;
+      ports.clear();
       vars[IS_WEBEXT] = false;
     });
     afterEach(() => {
-      const {vars} = mjs;
+      const {ports, vars} = mjs;
+      ports.clear();
       vars[IS_WEBEXT] = false;
     });
 
@@ -491,6 +493,18 @@ describe("main", () => {
     });
 
     it("should not call function", async () => {
+      const {ports, vars} = mjs;
+      const i = browser.tabs.query.callCount;
+      browser.tabs.query.resolves([]);
+      ports.set("foo", "bar");
+      vars[IS_WEBEXT] = true;
+      const res = await func();
+      assert.strictEqual(browser.tabs.query.callCount, i, "not called");
+      assert.isNull(res, "result");
+      browser.tabs.query.flush();
+    });
+
+    it("should call function", async () => {
       const {vars} = mjs;
       const i = browser.tabs.query.callCount;
       browser.tabs.query.resolves([]);
