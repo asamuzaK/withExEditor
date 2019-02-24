@@ -70,20 +70,6 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 * If enabled, notifies when an error occurs on the host.
 
-### Execute The Editor Directly
-
-* Keyboard shortcut to execute the editor without going through the context menu. In the input field, press the combination of keys such as `Ctrl+Shift+U`.
-* NOTE: Incompatible with Blink browsers. Please specify keyboard shortcut on browser's extension page.
-
-### Open The Options Page
-
-* Keyboard shortcut to open the options page. In the input field, press the combination of keys such as 'Alt+Shift+U'.
-* NOTE: Incompatible with Blink browsers. Please specify keyboard shortcut on browser's extension page.
-
-### Enable During Private Browsing
-
-* Enables if checked, disables if not.
-
 ### Enable Only When Editing Text
 
 * Enables only when the content is editable.
