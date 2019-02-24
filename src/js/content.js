@@ -840,7 +840,7 @@
    * @returns {void}
    */
   const postMsg = async msg => {
-    if (msg) {
+    if (port && msg) {
       port.postMessage(msg);
     }
   };
