@@ -23,6 +23,15 @@
   "hostConnection_true": {
     "message": "Connected"
   },
+  "hostLatestVersion": {
+    "message": "New version $LATEST$ is available.",
+    "placeholders": {
+      "latest": {
+        "content": "$1",
+        "example": "v1.2.3"
+      }
+    }
+  },
   "hostVersion_false": {
     "message": "Incompatible"
   },

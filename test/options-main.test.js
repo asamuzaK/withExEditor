@@ -12,7 +12,7 @@ import * as mjs from "../src/mjs/options-main.js";
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION,
-  STORAGE_SET, SYNC_AUTO_URL, WARN,
+  HOST_VERSION_LATEST, STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "../src/mjs/constant.js";
 
 describe("options-main", () => {
@@ -223,6 +223,30 @@ describe("options-main", () => {
   describe("extract host status", () => {
     const func = mjs.extractHostStatus;
 
+    it("should not add string", async () => {
+      const i = browser.i18n.getMessage.callCount;
+      const elm = document.createElement("p");
+      const body = document.querySelector("body");
+      const arg = {hostLatestVersion: null};
+      elm.id = HOST_VERSION_LATEST;
+      body.appendChild(elm);
+      await func(arg);
+      assert.strictEqual(browser.i18n.getMessage.callCount, i, "not called");
+      assert.strictEqual(elm.textContent, "", "text");
+    });
+
+    it("should add string", async () => {
+      browser.i18n.getMessage.callsFake((...args) => args.toString());
+      const elm = document.createElement("p");
+      const body = document.querySelector("body");
+      const arg = {hostLatestVersion: "1.2.3"};
+      elm.id = HOST_VERSION_LATEST;
+      body.appendChild(elm);
+      await func(arg);
+      assert.strictEqual(elm.textContent, "hostLatestVersion,v1.2.3", "text");
+      browser.i18n.getMessage.flush();
+    });
+
     it("should add warning", async () => {
       browser.i18n.getMessage.withArgs("hostConnection_false").returns("foo");
       const elm = document.createElement("p");
@@ -254,7 +278,7 @@ describe("options-main", () => {
       browser.i18n.getMessage.withArgs("hostVersion_false").returns("foo");
       const elm = document.createElement("p");
       const body = document.querySelector("body");
-      const arg = {hostVersion: false};
+      const arg = {hostCompatibility: false};
       elm.id = HOST_VERSION;
       body.appendChild(elm);
       await func(arg);
@@ -267,7 +291,7 @@ describe("options-main", () => {
       browser.i18n.getMessage.withArgs("hostVersion_true").returns("foo");
       const elm = document.createElement("p");
       const body = document.querySelector("body");
-      const arg = {hostVersion: true};
+      const arg = {hostCompatibility: true};
       elm.id = HOST_VERSION;
       elm.classList.add(WARN);
       body.appendChild(elm);

@@ -14,7 +14,8 @@ import * as mjs from "../src/mjs/main.js";
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
   EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
-  HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS_GET, HOST_VERSION,
+  HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
+  HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST,
   ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
   ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
   IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
@@ -595,7 +596,7 @@ describe("main", () => {
       browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.browserAction.setBadgeText.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_VERSION] = true;
+      hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func();
       assert.strictEqual(
@@ -623,7 +624,7 @@ describe("main", () => {
       browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.browserAction.setBadgeText.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION] = true;
+      hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func();
       assert.strictEqual(
@@ -651,7 +652,7 @@ describe("main", () => {
       browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.browserAction.setBadgeText.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_VERSION] = false;
+      hostStatus[HOST_COMPAT] = false;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func();
       assert.strictEqual(
@@ -679,7 +680,7 @@ describe("main", () => {
       browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.browserAction.setBadgeText.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_VERSION] = true;
+      hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = false;
       const res = await func();
       assert.strictEqual(
@@ -1664,14 +1665,18 @@ describe("main", () => {
   describe("handle message", () => {
     const func = mjs.handleMsg;
     beforeEach(() => {
-      const {menuItems, ports} = mjs;
+      const {hostStatus, menuItems, ports} = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      hostStatus[HOST_VERSION_LATEST] = false;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
       ports.clear();
     });
     afterEach(() => {
-      const {menuItems, ports} = mjs;
+      const {hostStatus, menuItems, ports} = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      hostStatus[HOST_VERSION_LATEST] = false;
       menuItems[MODE_SOURCE] = null;
       menuItems[MODE_SELECTION] = null;
       menuItems[MODE_EDIT] = null;
@@ -1803,11 +1808,14 @@ describe("main", () => {
     });
 
     it("should call function", async () => {
+      const {hostStatus} = mjs;
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const msg = {
         [HOST_VERSION]: {
+          isLatest: true,
           result: 1,
+          latest: "1.2.3",
         },
       };
       const res = await func(msg);
@@ -1817,6 +1825,31 @@ describe("main", () => {
       );
       assert.strictEqual(browser.browserAction.setBadgeText.callCount, j + 1,
                          "called");
+      assert.isTrue(hostStatus[HOST_COMPAT], "compat");
+      assert.isNull(hostStatus[HOST_VERSION_LATEST], "latest");
+      assert.deepEqual(res, [[undefined, undefined]], "result");
+    });
+
+    it("should call function", async () => {
+      const {hostStatus} = mjs;
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const msg = {
+        [HOST_VERSION]: {
+          isLatest: false,
+          result: 1,
+          latest: "1.2.3",
+        },
+      };
+      const res = await func(msg);
+      assert.strictEqual(
+        browser.browserAction.setBadgeBackgroundColor.callCount,
+        i + 1, "called"
+      );
+      assert.strictEqual(browser.browserAction.setBadgeText.callCount, j + 1,
+                         "called");
+      assert.isTrue(hostStatus[HOST_COMPAT], "compat");
+      assert.strictEqual(hostStatus[HOST_VERSION_LATEST], "1.2.3", "latest");
       assert.deepEqual(res, [[undefined, undefined]], "result");
     });
 
