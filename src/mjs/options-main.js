@@ -16,7 +16,7 @@ const {i18n, runtime} = browser;
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
-  STORAGE_SET, SYNC_AUTO_URL, WARN,
+  HOST_VERSION_LATEST, STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "./constant.js";
 const PORT_NAME = "portOptions";
 
@@ -91,9 +91,14 @@ export const extractEditorConfig = async (obj = {}) => {
  * @returns {void}
  */
 export const extractHostStatus = async status => {
-  const {hostConnection, hostVersion} = status;
+  const {hostCompatibility, hostConnection, hostLatestVersion} = status;
+  const latest = document.getElementById(HOST_VERSION_LATEST);
   const connect = document.getElementById(HOST_CONNECTION);
   const version = document.getElementById(HOST_VERSION);
+  if (latest && hostLatestVersion) {
+    latest.textContent =
+      i18n.getMessage("hostLatestVersion", `v${hostLatestVersion}`);
+  }
   if (connect) {
     connect.textContent = i18n.getMessage(`hostConnection_${hostConnection}`);
     if (hostConnection) {
@@ -103,8 +108,8 @@ export const extractHostStatus = async status => {
     }
   }
   if (version) {
-    version.textContent = i18n.getMessage(`hostVersion_${hostVersion}`);
-    if (hostVersion) {
+    version.textContent = i18n.getMessage(`hostVersion_${hostCompatibility}`);
+    if (hostCompatibility) {
       version.classList.remove(WARN);
     } else {
       version.classList.add(WARN);

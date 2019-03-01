@@ -22,8 +22,8 @@ import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET,
   EDITOR_CONFIG_RES, EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME,
   EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
-  HOST, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
-  HOST_VERSION, HOST_VERSION_CHECK,
+  HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS,
+  HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK, HOST_VERSION_LATEST,
   ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
   ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
   IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
@@ -60,8 +60,9 @@ export const host = runtime.connectNative(HOST);
 
 /* host status */
 export const hostStatus = {
+  [HOST_COMPAT]: false,
   [HOST_CONNECTION]: false,
-  [HOST_VERSION]: false,
+  [HOST_VERSION_LATEST]: null,
 };
 
 /**
@@ -303,7 +304,7 @@ export const setIcon = async (id = varsLocal[ICON_ID]) => {
  */
 export const toggleBadge = async () => {
   let color, text;
-  if (hostStatus[HOST_CONNECTION] && hostStatus[HOST_VERSION] &&
+  if (hostStatus[HOST_CONNECTION] && hostStatus[HOST_COMPAT] &&
       varsLocal[IS_EXECUTABLE]) {
     color = [0, 0, 0, 0];
     text = "";
@@ -720,9 +721,10 @@ export const handleMsg = async msg => {
           break;
         case HOST_VERSION: {
           if (isObjectNotEmpty(value)) {
-            const {result} = value;
+            const {isLatest, latest, result} = value;
+            hostStatus[HOST_VERSION_LATEST] = !isLatest && latest || null;
             if (Number.isInteger(result)) {
-              hostStatus[HOST_VERSION] = result >= 0;
+              hostStatus[HOST_COMPAT] = result >= 0;
               func.push(toggleBadge());
             }
           }

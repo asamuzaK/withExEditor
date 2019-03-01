@@ -23,6 +23,15 @@
   "hostConnection_true": {
     "message": "接続中"
   },
+  "hostLatestVersion": {
+    "message": "新しいバージョン $LATEST$ が利用可能です。",
+    "placeholders": {
+      "latest": {
+        "content": "$1",
+        "example": "v1.2.3"
+      }
+    }
+  },
   "hostVersion_false": {
     "message": "非適合"
   },
