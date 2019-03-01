@@ -35,7 +35,7 @@ import {
   TMP_FILE_REQ, TMP_FILE_RES,
   VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID,
 } from "./constant.js";
-const HOST_VERSION_MIN = "v3.3.1";
+const HOST_VERSION_MIN = "v5.0.0-b.2.1";
 
 /* variables */
 export const vars = {
