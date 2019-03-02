@@ -840,7 +840,7 @@
    * @returns {void}
    */
   const postMsg = async msg => {
-    if (port && msg) {
+    if (port && msg && vars[ID_TAB] && vars[ID_WIN]) {
       port.postMessage(msg);
     }
   };
