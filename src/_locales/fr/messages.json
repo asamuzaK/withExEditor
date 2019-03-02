@@ -24,7 +24,7 @@
     "message": "Connecté"
   },
   "hostLatestVersion": {
-    "message": "New version $LATEST$ is available.",
+    "message": "La nouvelle version $LATEST$ est disponible.",
     "placeholders": {
       "latest": {
         "content": "$1",
