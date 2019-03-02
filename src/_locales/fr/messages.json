@@ -110,10 +110,6 @@
       "label": {
         "content": "$1",
         "example": "Mery"
-      },
-      "key": {
-        "content": "$2",
-        "example": "(&V)"
       }
     }
   },
