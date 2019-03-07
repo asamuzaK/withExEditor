@@ -98,6 +98,8 @@ export const extractHostStatus = async status => {
   if (latest && hostLatestVersion) {
     latest.textContent =
       i18n.getMessage("hostLatestVersion", `v${hostLatestVersion}`);
+  } else {
+    latest.textContent = "";
   }
   if (connect) {
     connect.textContent = i18n.getMessage(`hostConnection_${hostConnection}`);
