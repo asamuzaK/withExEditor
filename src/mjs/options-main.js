@@ -95,11 +95,13 @@ export const extractHostStatus = async status => {
   const latest = document.getElementById(HOST_VERSION_LATEST);
   const connect = document.getElementById(HOST_CONNECTION);
   const version = document.getElementById(HOST_VERSION);
-  if (latest && hostLatestVersion) {
-    latest.textContent =
-      i18n.getMessage("hostLatestVersion", `v${hostLatestVersion}`);
-  } else {
-    latest.textContent = "";
+  if (latest) {
+    if (hostLatestVersion) {
+      latest.textContent =
+        i18n.getMessage("hostLatestVersion", `v${hostLatestVersion}`);
+    } else {
+      latest.textContent = "";
+    }
   }
   if (connect) {
     connect.textContent = i18n.getMessage(`hostConnection_${hostConnection}`);
