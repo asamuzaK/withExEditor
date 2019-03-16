@@ -3,7 +3,6 @@
  */
 
 /* constants */
-const FILE_LEN = 128;
 const TYPE_FROM = 8;
 const TYPE_TO = -1;
 const VERSION_PART =
@@ -114,44 +113,6 @@ export const parseStringifiedInt = (i, zero = false) => {
     throw new Error(`${i} is not a stringified integer.`);
   }
   return parseInt(i);
-};
-
-/**
- * strip HTML tags and decode HTML escaped characters
- * @param {string} v - value
- * @returns {string} - converted value
- */
-export const stripHtmlTags = v => {
-  if (!isString(v)) {
-    throw new TypeError(`Expected String but got ${getType(v)}.`);
-  }
-  while (/^\n*<(?:[^>]+:)?[^>]+?>|<\/(?:[^>]+:)?[^>]+>\n*$/.test(v)) {
-    v = v.replace(/^\n*<(?:[^>]+:)?[^>]+?>/, "")
-      .replace(/<\/(?:[^>]+:)?[^>]+>\n*$/, "\n");
-  }
-  return v.replace(/<\/(?:[^>]+:)?[^>]+>\n*<!--.*-->\n*<(?:[^>]+:)?[^>]+>/g, "\n\n")
-    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-};
-
-/**
- * get file name from URI path
- * @param {string} uri - URI
- * @param {string} subst - substitute file name
- * @returns {string} - file name
- */
-export const getFileNameFromURI = (uri, subst = "index") => {
-  if (!isString(uri)) {
-    throw new TypeError(`Expected String but got ${getType(uri)}.`);
-  }
-  let name;
-  const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/;
-  const {pathname, protocol} = new URL(uri);
-  if (pathname && reg.test(pathname) &&
-      protocol && !/^(?:blob|data):/.test(protocol)) {
-    const [, pName] = reg.exec(pathname);
-    name = decodeURIComponent(pName);
-  }
-  return name && name.length < FILE_LEN && name || subst;
 };
 
 /**

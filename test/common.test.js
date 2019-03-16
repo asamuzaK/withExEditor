@@ -299,61 +299,6 @@ describe("common", () => {
     });
   });
 
-  describe("strip HTML tags and decode HTML escaped characters", () => {
-    const func = mjs.stripHtmlTags;
-
-    it("should throw", () => {
-      assert.throws(() => func(), "Expected String but got Undefined.");
-    });
-
-    it("should get result", () => {
-      const str = "<span>foo\nbar</span>";
-      const res = func(str);
-      assert.deepEqual(res, "foo\nbar\n");
-    });
-
-    it("should get result", () => {
-      const str = "<span>foo&amp;bar</span>";
-      const res = func(str);
-      assert.deepEqual(res, "foo&bar\n");
-    });
-
-    it("should get result", () => {
-      const str = "<span>foo</span>\n<!-- comment -->\n<span>bar</span>";
-      const res = func(str);
-      assert.deepEqual(res, "foo\n\nbar\n");
-    });
-  });
-
-  describe("get file name from URI path", () => {
-    const func = mjs.getFileNameFromURI;
-
-    it("should throw", () => {
-      assert.throws(() => func(), "Expected String but got Undefined.");
-    });
-
-    it("should get fallback string", () => {
-      const res = func("https://example.com");
-      assert.strictEqual(res, "index");
-    });
-
-    it("should get fallback string", () => {
-      const res = func("https://example.com/foo/");
-      assert.strictEqual(res, "index");
-    });
-
-    it("should get string", () => {
-      const res = func("https://example.com/foo/bar");
-      assert.strictEqual(res, "bar");
-    });
-
-    it("should get fallback string", () => {
-      const arr = new Array(128);
-      const res = func(`https://example.com/foo/${arr.fill("a").join("")}`);
-      assert.strictEqual(res, "index");
-    });
-  });
-
   describe("escape all matching chars", () => {
     const func = mjs.escapeMatchingChars;
 
