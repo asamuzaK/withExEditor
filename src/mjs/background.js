@@ -14,8 +14,8 @@ import {
 import {
   handleCmd, handleDisconnectedHost, handleMsg, handlePort, host,
   onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
-  onWindowRemoved, openOptionsPage, postContextMenuData, restoreContentScript,
-  setDefaultIcon, setVars, syncUI, toggleBadge,
+  onWindowRemoved, openOptionsPage, postContextMenuData, setDefaultIcon,
+  setVars, syncUI, toggleBadge,
 } from "./main.js";
 import fileExtData from "./file-ext.js";
 import liveEditData from "./live-edit.js";
@@ -43,7 +43,9 @@ host.onDisconnect.addListener(port =>
 );
 host.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 runtime.onConnect.addListener(port => handlePort(port).catch(throwErr));
-runtime.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+runtime.onMessage.addListener((msg, sender) =>
+  handleMsg(msg, sender).catch(throwErr)
+);
 storage.onChanged.addListener(data =>
   setVars(data).then(syncUI).catch(throwErr)
 );
@@ -68,4 +70,4 @@ document.addEventListener("DOMContentLoaded", () => Promise.all([
   setStorage({[FILE_EXT]: fileExtData}),
   setStorage({[LIVE_EDIT]: liveEditData}),
   migrateStorage(),
-]).then(restoreContentScript).catch(throwErr));
+]).catch(throwErr));
