@@ -20,10 +20,10 @@ import {
   ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
   IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
-  ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONTENT, PROCESS_CHILD, STORAGE_SET,
-  SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT, TMP_FILE_CREATE,
-  TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_RES,
-  WARN_COLOR, WARN_TEXT,
+  ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
+  STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT,
+  TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
+  TMP_FILE_RES, WARN_COLOR, WARN_TEXT,
 } from "../src/mjs/constant.js";
 
 describe("main", () => {
@@ -283,7 +283,11 @@ describe("main", () => {
       const port = ports.get("1").get("2").get("https://example.com");
       const stub = sinon.stub(console, "error");
       port.postMessage.throws();
-      const res = await func("foo", "1", "2");
+      const res = await func("foo", {
+        windowId: "1",
+        tabId: "2",
+        recurse: true,
+      });
       const {calledOnce} = stub;
       stub.restore();
       assert.isTrue(calledOnce, "called");
@@ -300,7 +304,11 @@ describe("main", () => {
                                   new browser.runtime.Port({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
-      const res = await func("foo", "1", "2", "https://example.com");
+      const res = await func("foo", {
+        windowId: "1",
+        tabId: "2",
+        portKey: "https://example.com",
+      });
       assert.strictEqual(port.postMessage.callCount, i + 1, "called");
       assert.deepEqual(res, [], "result");
     });
@@ -313,8 +321,26 @@ describe("main", () => {
                                   new browser.runtime.Port({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
-      const res = await func("foo", "1", "2");
+      const res = await func("foo", {
+        windowId: "1",
+        tabId: "2",
+      });
       assert.strictEqual(port.postMessage.callCount, i + 1, "called");
+      assert.deepEqual(res, [], "result");
+    });
+
+    it("should not call function", async () => {
+      const {ports} = mjs;
+      ports.set("1", new Map());
+      ports.get("1").set("2", new Map());
+      ports.get("1").get("2").set("https://example.com",
+                                  new browser.runtime.Port({name: "bar"}));
+      const port = ports.get("1").get("2").get("https://example.com");
+      const i = port.postMessage.callCount;
+      const res = await func("foo", {
+        windowId: "1",
+      });
+      assert.strictEqual(port.postMessage.callCount, i, "not called");
       assert.deepEqual(res, [], "result");
     });
 
@@ -326,12 +352,15 @@ describe("main", () => {
                                   new browser.runtime.Port({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
-      const res = await func("foo", "1");
+      const res = await func("foo", {
+        windowId: "1",
+        recurse: true,
+      });
       assert.strictEqual(port.postMessage.callCount, i + 1, "called");
       assert.deepEqual(res, [[]], "result");
     });
 
-    it("should call function", async () => {
+    it("should not call function", async () => {
       const {ports} = mjs;
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
@@ -340,6 +369,21 @@ describe("main", () => {
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const res = await func("foo");
+      assert.strictEqual(port.postMessage.callCount, i, "not called");
+      assert.deepEqual(res, [], "result");
+    });
+
+    it("should call function", async () => {
+      const {ports} = mjs;
+      ports.set("1", new Map());
+      ports.get("1").set("2", new Map());
+      ports.get("1").get("2").set("https://example.com",
+                                  new browser.runtime.Port({name: "bar"}));
+      const port = ports.get("1").get("2").get("https://example.com");
+      const i = port.postMessage.callCount;
+      const res = await func("foo", {
+        recurse: true,
+      });
       assert.strictEqual(port.postMessage.callCount, i + 1, "called");
       assert.deepEqual(res, [[[]]], "result");
     });
@@ -466,51 +510,6 @@ describe("main", () => {
         id: 2,
         windowId: 1,
       }]);
-      const res = await func();
-      assert.strictEqual(browser.tabs.query.callCount, i + 1, "called");
-      assert.deepEqual(res, [], "result");
-      browser.tabs.query.flush();
-    });
-  });
-
-  describe("restore content script", () => {
-    const func = mjs.restoreContentScript;
-    beforeEach(() => {
-      const {ports, vars} = mjs;
-      ports.clear();
-      vars[IS_WEBEXT] = false;
-    });
-    afterEach(() => {
-      const {ports, vars} = mjs;
-      ports.clear();
-      vars[IS_WEBEXT] = false;
-    });
-
-    it("should not call function", async () => {
-      const {ports} = mjs;
-      const i = browser.tabs.query.callCount;
-      browser.tabs.query.resolves([]);
-      ports.set("foo", "bar");
-      const res = await func();
-      assert.strictEqual(browser.tabs.query.callCount, i, "not called");
-      assert.isNull(res, "result");
-      browser.tabs.query.flush();
-    });
-
-    it("should call function", async () => {
-      const i = browser.tabs.query.callCount;
-      browser.tabs.query.resolves([]);
-      const res = await func();
-      assert.strictEqual(browser.tabs.query.callCount, i + 2, "called");
-      assert.deepEqual(res, [], "result");
-      browser.tabs.query.flush();
-    });
-
-    it("should call function", async () => {
-      const {vars} = mjs;
-      const i = browser.tabs.query.callCount;
-      browser.tabs.query.resolves([]);
-      vars[IS_WEBEXT] = true;
       const res = await func();
       assert.strictEqual(browser.tabs.query.callCount, i + 1, "called");
       assert.deepEqual(res, [], "result");
@@ -1807,6 +1806,88 @@ describe("main", () => {
       assert.deepEqual(res, [undefined], "result");
     });
 
+    it("should not call function", async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      const msg = {
+        [PORT_CONNECT]: true,
+      };
+      const res = await func(msg);
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i, "not called");
+      assert.deepEqual(res, [], "result");
+    });
+
+    it("should not call function", async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      const msg = {
+        [PORT_CONNECT]: true,
+      };
+      const sender = {};
+      const res = await func(msg, sender);
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i, "not called");
+      assert.deepEqual(res, [], "result");
+    });
+
+    it("should not call function", async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      const msg = {
+        [PORT_CONNECT]: true,
+      };
+      const sender = {
+        tab: {},
+      };
+      const res = await func(msg, sender);
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i, "not called");
+      assert.deepEqual(res, [], "result");
+    });
+
+    it("should not call function", async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      const msg = {
+        [PORT_CONNECT]: true,
+      };
+      const sender = {
+        tab: {
+          id: -1,
+          windowId: 1,
+        },
+      };
+      const res = await func(msg, sender);
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i, "not called");
+      assert.deepEqual(res, [], "result");
+    });
+
+    it("should not call function", async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      const msg = {
+        [PORT_CONNECT]: true,
+      };
+      const sender = {
+        tab: {
+          id: 1,
+          windowId: -1,
+        },
+      };
+      const res = await func(msg, sender);
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i, "not called");
+      assert.deepEqual(res, [], "result");
+    });
+
+    it("should not call function", async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      const msg = {
+        [PORT_CONNECT]: true,
+      };
+      const sender = {
+        tab: {
+          id: 1,
+          windowId: 2,
+        },
+      };
+      const res = await func(msg, sender);
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, "called");
+      assert.deepEqual(res, [null], "result");
+    });
+
     it("should call function", async () => {
       const {hostStatus} = mjs;
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
@@ -2904,6 +2985,7 @@ describe("main", () => {
       ports.set("1", new Map());
       const i = host.postMessage.callCount;
       browser.windows.getAll.withArgs({
+        populate: false,
         windowTypes: ["normal"],
       }).resolves([{
         incognito: true,

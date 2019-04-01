@@ -36,7 +36,8 @@
   const MOUSE_BUTTON_RIGHT = 2;
   const NS_URI = "nsURI";
   const ONLY_EDITABLE = "enableOnlyEditable";
-  const PORT_NAME = "portContent";
+  const PORT_CONNECT = "connectPort";
+  const PORT_CONTENT = "portContent";
   const RANGE_SEP = "Next Range";
   const SUBST = "index";
   const SYNC_AUTO = "enableSyncAuto";
@@ -65,6 +66,7 @@
     [ONLY_EDITABLE]: false,
     [SYNC_AUTO]: false,
     [SYNC_AUTO_URL]: null,
+    port: null,
   };
 
   /**
@@ -831,15 +833,13 @@
     return elm || null;
   };
 
-  /* port */
-  const port = runtime.connect({name: PORT_NAME});
-
   /**
    * post message
    * @param {*} msg - message
    * @returns {void}
    */
   const postMsg = async msg => {
+    const {port} = vars;
     if (port && msg) {
       port.postMessage(msg);
     }
@@ -1611,11 +1611,11 @@
 
   /* handlers */
   /**
-   * handle message
+   * handle port message
    * @param {*} msg - message
    * @returns {Promise.<Array>} - results of each handler
    */
-  const handleMsg = async msg => {
+  const handlePortMsg = async msg => {
     const func = [];
     const items = msg && Object.entries(msg);
     if (items && items.length) {
@@ -1648,7 +1648,7 @@
             func.push(postEachDataId(value));
             break;
           case VARS_SET:
-            func.push(handleMsg(value));
+            func.push(handlePortMsg(value));
             break;
           default:
         }
@@ -1737,8 +1737,94 @@
     return func || null;
   };
 
+  /* port */
+  /**
+   * request port connection
+   * @returns {AsyncFunction} - sendMessage()
+   */
+  const requestPortConnection = async () => {
+    const msg = {
+      [PORT_CONNECT]: {
+        name: PORT_CONTENT,
+      },
+    };
+    return runtime.sendMessage(msg);
+  };
+
+  /**
+   * handle disconnected port
+   * @param {Object} port - runtime.Port
+   * @returns {AsyncFunction} - requestPortConnection()
+   */
+  const handleDisconnectedPort = port => {
+    vars.port = null;
+    return requestPortConnection();
+  };
+
+  /**
+   * connect port
+   * @param {Object} port - runtime.Port
+   * @returns {void}
+   */
+  const handleConnectedPort = port => {
+    if (isObjectNotEmpty(port) && port.name === PORT_CONTENT) {
+      port.onMessage.addListener(msg => handlePortMsg(msg).catch(throwErr));
+      port.onDisconnect.addListener(handleDisconnectedPort);
+      vars.port = port;
+    } else {
+      vars.port = null;
+    }
+  };
+
+  /**
+   * check port
+   * @returns {?AsyncFunction} - requestPortConnection() / handleConnectedPort()
+   */
+  const checkPort = async () => {
+    let func;
+    if (vars.port) {
+      func = requestPortConnection();
+    } else {
+      const port = runtime.connect({
+        name: PORT_CONTENT,
+      });
+      if (port) {
+        func = handleConnectedPort(port);
+      }
+    }
+    return func || null;
+  };
+
+  /**
+   * handle message
+   * @param {*} msg - message
+   * @returns {Promise.<Array>} - results of each handler
+   */
+  const handleMsg = async msg => {
+    const func = [];
+    if (isObjectNotEmpty(msg)) {
+      const items = Object.entries(msg);
+      for (const item of items) {
+        const [key, value] = item;
+        switch (key) {
+          case PORT_CONNECT: {
+            if (value) {
+              const port = runtime.connect({
+                name: PORT_CONTENT,
+              });
+              func.push(handleConnectedPort(port));
+            }
+            break;
+          }
+          default:
+        }
+      }
+    }
+    return Promise.all(func);
+  };
+
   /* listeners */
-  port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+  runtime.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
   window.addEventListener("mousedown",
                           evt => handleBeforeContextMenu(evt).catch(throwErr),
@@ -1749,6 +1835,7 @@
 
   /* startup */
   Promise.all([
+    checkPort(),
     extendObjItems(fileExt, FILE_EXT),
     extendObjItems(nsURI, NS_URI),
     extendObjItems(liveEdit, LIVE_EDIT),
