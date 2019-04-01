@@ -9,7 +9,7 @@ import {
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   getActiveTab, getActiveTabId, getCurrentWindow, getEnabledTheme, getStorage,
-  getWindow, isTab, sendMessage, setStorage,
+  getWindow, sendMessage, setStorage,
 } from "./browser.js";
 
 /* api */

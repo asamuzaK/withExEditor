@@ -79,6 +79,20 @@
   };
 
   /**
+   * log error
+   * @param {!Object} e - Error
+   * @returns {boolean} - false
+   */
+  const logErr = e => {
+    if (e && e.message) {
+      console.error(e.message);
+    } else {
+      console.error(e);
+    }
+    return false;
+  };
+
+  /**
    * get type
    * @param {*} o - object to check
    * @returns {string} - type of object
@@ -1756,8 +1770,12 @@
    * @param {Object} port - runtime.Port
    * @returns {AsyncFunction} - requestPortConnection()
    */
-  const handleDisconnectedPort = port => {
+  const handleDisconnectedPort = async port => {
+    const e = port.error || runtime.lastError;
     vars.port = null;
+    if (e) {
+      logErr(e);
+    }
     return requestPortConnection();
   };
 
@@ -1766,10 +1784,12 @@
    * @param {Object} port - runtime.Port
    * @returns {void}
    */
-  const handleConnectedPort = port => {
+  const handleConnectedPort = async port => {
     if (isObjectNotEmpty(port) && port.name === PORT_CONTENT) {
       port.onMessage.addListener(msg => handlePortMsg(msg).catch(throwErr));
-      port.onDisconnect.addListener(handleDisconnectedPort);
+      port.onDisconnect.addListener(p =>
+        handleDisconnectedPort(p).catch(throwErr)
+      );
       vars.port = port;
     } else {
       vars.port = null;
