@@ -184,7 +184,7 @@ export const portPostMsg = async (msg, opt = {}) => {
         const items = portsWin.keys();
         for (const itemKey of items) {
           func.push(portPostMsg(msg, {
-            recurse, windowId,
+            windowId,
             tabId: itemKey,
           }));
         }
