@@ -1431,6 +1431,19 @@ describe("main", () => {
     const func = mjs.extractEditorConfig;
 
     it("should call function", async () => {
+      const res = await func();
+      assert.deepEqual(res, [
+        undefined,
+        [],
+        [
+          undefined,
+          undefined,
+          undefined,
+        ],
+      ], "result");
+    });
+
+    it("should call function", async () => {
       const data = {
         editorConfigTimestamp: 1,
         editorName: "foo",

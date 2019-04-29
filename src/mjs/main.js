@@ -482,11 +482,10 @@ export const updateContextMenu = async type => {
       if (menuItems[menuItemId]) {
         if (key === MODE_SOURCE) {
           const title = varsLocal[mode] || varsLocal[menuItemId];
-          if (title) {
-            func.push(contextMenus.update(menuItemId, {title}));
-          }
-        } else if (key === MODE_EDIT) {
-          func.push(contextMenus.update(menuItemId, {enabled}));
+          title && func.push(contextMenus.update(menuItemId, {title}));
+        } else {
+          key === MODE_EDIT &&
+            func.push(contextMenus.update(menuItemId, {enabled}));
         }
       }
     }
@@ -568,9 +567,9 @@ export const extractEditorConfig = async (data = {}) => {
     EDITOR_FILE_NAME,
     EDITOR_LABEL,
   ]);
-  const editorFileName = store[EDITOR_FILE_NAME] &&
+  const editorFileName = store && store[EDITOR_FILE_NAME] &&
                            store[EDITOR_FILE_NAME].value;
-  const editorLabel = store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
+  const editorLabel = store && store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
   const editorNewLabel = editorFileName === editorName && editorLabel ||
                          executable && editorName || "";
   return Promise.all([
@@ -620,9 +619,7 @@ export const extractEditorConfig = async (data = {}) => {
  */
 export const reloadExt = async (reload = false) => {
   if (reload) {
-    if (host) {
-      host.disconnect();
-    }
+    host && host.disconnect();
     runtime.reload();
   }
 };
@@ -945,13 +942,11 @@ export const onWindowFocusChanged = async () => {
     const tId = await getActiveTabId(id);
     const windowId = stringifyPositiveInt(id, true);
     const tabId = stringifyPositiveInt(tId, true);
-    if (windowId && tabId) {
-      func.push(portPostMsg({
-        [TMP_FILE_REQ]: true,
-      }, {
-        windowId, tabId,
-      }));
-    }
+    windowId && tabId && func.push(portPostMsg({
+      [TMP_FILE_REQ]: true,
+    }, {
+      windowId, tabId,
+    }));
     func.push(updateContextMenu());
   }
   func.push(syncUI());

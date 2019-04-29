@@ -237,9 +237,7 @@ export const preventEvent = evt => {
  */
 export const addReloadExtensionListener = async () => {
   const elm = document.getElementById(EXT_RELOAD);
-  if (elm) {
-    elm.addEventListener("click", handleReloadExtensionClick);
-  }
+  elm && elm.addEventListener("click", handleReloadExtensionClick);
 };
 
 /**
@@ -248,9 +246,7 @@ export const addReloadExtensionListener = async () => {
  */
 export const addSyncUrlsInputListener = async () => {
   const elm = document.getElementById(SYNC_AUTO_URL);
-  if (elm) {
-    elm.addEventListener("input", handleSyncUrlsInputInput);
-  }
+  elm && elm.addEventListener("input", handleSyncUrlsInputInput);
 };
 
 /**
