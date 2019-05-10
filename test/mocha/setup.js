@@ -23,7 +23,7 @@ const createJsdom = () => {
 const {window} = createJsdom();
 const {document} = window;
 
-const schema = new Schema().arrange({name: "sinon-chrome"});
+const schema = new Schema("central").arrange({name: "sinon-chrome"});
 const browser = new Api(schema).create();
 
 /* mock runtime.Port */
