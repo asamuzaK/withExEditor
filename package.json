@@ -33,6 +33,7 @@
     "nyc": "^14.1.0",
     "sinon": "^7.3.2",
     "sinon-chrome": "^3.0.1",
+    "webext-schema": "^0.5.1",
     "webextension-polyfill": "^0.4.0"
   },
   "version": "6.0.1"
