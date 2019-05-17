@@ -24,7 +24,7 @@
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
     "@babel/register": "^7.4.4",
-    "addons-linter": "^1.9.2",
+    "addons-linter": "^1.9.3",
     "chai": "^4.2.0",
     "eslint": "^5.16.0",
     "jsdom": "^15.1.0",
@@ -36,5 +36,5 @@
     "webext-schema": "^0.6.0",
     "webextension-polyfill": "^0.4.0"
   },
-  "version": "6.0.1"
+  "version": "6.0.2"
 }
