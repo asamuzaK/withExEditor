@@ -351,6 +351,21 @@ export const menuItems = {
 };
 
 /**
+ * set context menu items
+ * @param {string} key - key
+ * @param {string} value - value
+ * @returns {void}
+ */
+export const setMenuItems = async (key, value) => {
+  if (!isString(key)) {
+    throw new TypeError(`Expected String but got ${getType(key)}.`);
+  }
+  if (menuItems.hasOwnProperty(key)) {
+    menuItems[key] = value || null;
+  }
+};
+
+/**
  * init context menu items
  * @returns {void}
  */
@@ -425,8 +440,14 @@ export const createMenuItem = async (id, contexts) => {
     if (menuItems[id]) {
       await contextMenus.update(id, opt);
     } else {
-      opt.id = id;
-      menuItems[id] = await contextMenus.create(opt);
+      const menuItemOpt = {
+        id,
+        contexts: opt.contexts,
+        enabled: opt.enabled,
+        title: opt.title,
+      };
+      const menuItemId = await contextMenus.create(menuItemOpt);
+      await setMenuItems(id, menuItemId);
     }
   }
 };

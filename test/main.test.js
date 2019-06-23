@@ -830,6 +830,47 @@ describe("main", () => {
     });
   });
 
+  describe("set context menu items", () => {
+    const func = mjs.setMenuItems;
+    beforeEach(() => {
+      const {menuItems} = mjs;
+      menuItems[MODE_SOURCE] = null;
+      menuItems[MODE_SELECTION] = null;
+      menuItems[MODE_EDIT] = null;
+    });
+    afterEach(() => {
+      const {menuItems} = mjs;
+      menuItems[MODE_SOURCE] = null;
+      menuItems[MODE_SELECTION] = null;
+      menuItems[MODE_EDIT] = null;
+    });
+
+    it("should throw", async () => {
+      await func().catch(e => {
+        assert.instanceOf(e, TypeError, "error");
+        assert.strictEqual(e.message, "Expected String but got Undefined.");
+      });
+    });
+
+    it("should throw", async () => {
+      const {menuItems} = mjs;
+      await func(MODE_SOURCE, "foo");
+      assert.strictEqual(menuItems[MODE_SOURCE], "foo", "result");
+    });
+
+    it("should throw", async () => {
+      const {menuItems} = mjs;
+      await func(MODE_SELECTION, "foo");
+      assert.strictEqual(menuItems[MODE_SELECTION], "foo", "result");
+    });
+
+    it("should throw", async () => {
+      const {menuItems} = mjs;
+      await func(MODE_EDIT, "foo");
+      assert.strictEqual(menuItems[MODE_EDIT], "foo", "result");
+    });
+  });
+
   describe("init context menu items", () => {
     const func = mjs.initMenuItems;
     beforeEach(() => {
