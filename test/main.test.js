@@ -1949,6 +1949,28 @@ describe("main", () => {
       const msg = {
         [HOST_VERSION]: {
           isLatest: true,
+          latest: "1.2.3",
+        },
+      };
+      const res = await func(msg);
+      assert.strictEqual(
+        browser.browserAction.setBadgeBackgroundColor.callCount,
+        i + 1, "called"
+      );
+      assert.strictEqual(browser.browserAction.setBadgeText.callCount, j + 1,
+                         "called");
+      assert.isTrue(hostStatus[HOST_COMPAT], "compat");
+      assert.isNull(hostStatus[HOST_VERSION_LATEST], "latest");
+      assert.deepEqual(res, [[undefined, undefined]], "result");
+    });
+
+    it("should call function", async () => {
+      const {hostStatus} = mjs;
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const msg = {
+        [HOST_VERSION]: {
+          isLatest: true,
           result: 1,
           latest: "1.2.3",
         },
