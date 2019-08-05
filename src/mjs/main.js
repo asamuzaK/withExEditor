@@ -738,7 +738,6 @@ export const handleMsg = async (msg, sender) => {
           }));
           break;
         case HOST_VERSION: {
-          console.log({[HOST_VERSION]: value});
           if (isObjectNotEmpty(value)) {
             const {isLatest, latest, result} = value;
             hostStatus[HOST_VERSION_LATEST] = !isLatest && latest || null;
