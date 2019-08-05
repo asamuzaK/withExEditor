@@ -741,7 +741,10 @@ export const handleMsg = async (msg, sender) => {
           if (isObjectNotEmpty(value)) {
             const {isLatest, latest, result} = value;
             hostStatus[HOST_VERSION_LATEST] = !isLatest && latest || null;
-            if (Number.isInteger(result)) {
+            if (isLatest) {
+              hostStatus[HOST_COMPAT] = !!isLatest;
+              func.push(toggleBadge());
+            } else if (Number.isInteger(result)) {
               hostStatus[HOST_COMPAT] = result >= 0;
               func.push(toggleBadge());
             }
