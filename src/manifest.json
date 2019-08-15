@@ -68,7 +68,6 @@
     "page": "html/options.html"
   },
   "permissions": [
-    "<all_urls>",
     "activeTab",
     "contextMenus",
     "nativeMessaging",
