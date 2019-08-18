@@ -852,22 +852,49 @@ describe("main", () => {
       });
     });
 
-    it("should throw", async () => {
+    it("should not set value", async () => {
+      const {menuItems} = mjs;
+      await func("foo", "bar");
+      assert.isUndefined(menuItems.foo, "result");
+    });
+
+    it("should set value", async () => {
       const {menuItems} = mjs;
       await func(MODE_SOURCE, "foo");
       assert.strictEqual(menuItems[MODE_SOURCE], "foo", "result");
     });
 
-    it("should throw", async () => {
+    it("should set null", async () => {
+      const {menuItems} = mjs;
+      menuItems[MODE_SOURCE] = "foo";
+      await func(MODE_SOURCE);
+      assert.isNull(menuItems[MODE_SOURCE], "result");
+    });
+
+    it("should set value", async () => {
       const {menuItems} = mjs;
       await func(MODE_SELECTION, "foo");
       assert.strictEqual(menuItems[MODE_SELECTION], "foo", "result");
     });
 
-    it("should throw", async () => {
+    it("should set null", async () => {
+      const {menuItems} = mjs;
+      menuItems[MODE_SELECTION] = "foo";
+      await func(MODE_SELECTION);
+      assert.isNull(menuItems[MODE_SELECTION], "result");
+    });
+
+    it("should set value", async () => {
       const {menuItems} = mjs;
       await func(MODE_EDIT, "foo");
       assert.strictEqual(menuItems[MODE_EDIT], "foo", "result");
+    });
+
+    it("should set null", async () => {
+      const {menuItems} = mjs;
+      menuItems[MODE_EDIT] = "foo";
+      await func(MODE_EDIT);
+      assert.isNull(menuItems[MODE_EDIT], "result");
     });
   });
 
