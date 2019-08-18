@@ -1,5 +1,6 @@
 /**
  * migrate.js
+ * NOTE: Do not remove until Firefox 68.2 get released
  */
 
 import {
