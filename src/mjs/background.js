@@ -9,9 +9,6 @@ import {
   getAllStorage, setStorage,
 } from "./browser.js";
 import {
-  migrateStorage,
-} from "./migrate.js";
-import {
   handleCmd, handleDisconnectedHost, handleMsg, handlePort, host,
   onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
   onWindowRemoved, openOptionsPage, postContextMenuData, setDefaultIcon,
@@ -69,5 +66,4 @@ document.addEventListener("DOMContentLoaded", () => Promise.all([
   setStorage({[NS_URI]: nsUriData}),
   setStorage({[FILE_EXT]: fileExtData}),
   setStorage({[LIVE_EDIT]: liveEditData}),
-  migrateStorage(),
 ]).catch(throwErr));
