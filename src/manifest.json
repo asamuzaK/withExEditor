@@ -45,7 +45,7 @@
         "lib/browser-polyfill.min.js",
         "js/content.js"
       ],
-      "matches": ["<all_urls>"],
+      "matches": ["*://*/*", "file:///*"],
       "run_at": "document_idle"
     }
   ],
@@ -76,5 +76,5 @@
     "tabs"
   ],
   "short_name": "__MSG_extensionName__",
-  "version": "6.1.0a2"
+  "version": "6.1.0a3"
 }
