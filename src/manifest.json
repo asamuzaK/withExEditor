@@ -45,7 +45,10 @@
         "lib/browser-polyfill.min.js",
         "js/content.js"
       ],
-      "matches": ["*://*/*", "file:///*"],
+      "matches": [
+        "*://*/*",
+        "file:///*"
+      ],
       "run_at": "document_idle"
     }
   ],
