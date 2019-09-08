@@ -142,7 +142,8 @@ textarea {
   max-width: calc(100% - 1rem);
 }
 .info {
-  padding: 0.1em 0.2em;
+  border-radius: 4px;
+  padding: 0.2em 0.5em;
   background-color: #008EA4;
   color: white;
 }
