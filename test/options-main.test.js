@@ -12,7 +12,7 @@ import * as mjs from "../src/mjs/options-main.js";
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION,
-  HOST_VERSION_LATEST, STORAGE_SET, SYNC_AUTO_URL, WARN,
+  HOST_VERSION_LATEST, INFO, STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "../src/mjs/constant.js";
 
 describe("options-main", () => {
@@ -229,10 +229,12 @@ describe("options-main", () => {
       const body = document.querySelector("body");
       const arg = {hostLatestVersion: null};
       elm.id = HOST_VERSION_LATEST;
+      elm.classList.add(INFO);
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(browser.i18n.getMessage.callCount, i, "not called");
       assert.strictEqual(elm.textContent, "", "text");
+      assert.isFalse(elm.classList.contains(INFO), "class");
     });
 
     it("should add string", async () => {
@@ -241,9 +243,11 @@ describe("options-main", () => {
       const body = document.querySelector("body");
       const arg = {hostLatestVersion: "1.2.3"};
       elm.id = HOST_VERSION_LATEST;
+      elm.classList.remove(INFO);
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.textContent, "hostLatestVersion,v1.2.3", "text");
+      assert.isTrue(elm.classList.contains(INFO), "class");
       browser.i18n.getMessage.flush();
     });
 

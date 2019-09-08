@@ -141,6 +141,11 @@ textarea {
 .status {
   max-width: calc(100% - 1rem);
 }
+.info {
+  padding: 0.1em 0.2em;
+  background-color: #008EA4;
+  color: white;
+}
 .warn {
   color: #D70022;
 }
