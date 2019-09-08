@@ -25,7 +25,7 @@ import {
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK, HOST_VERSION_LATEST,
   ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
-  ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE,
+  ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE, INFO_COLOR, INFO_TEXT,
   IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
@@ -296,19 +296,28 @@ export const setIcon = async (id = varsLocal[ICON_ID]) => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const toggleBadge = async () => {
+  const func = [];
   let color, text;
   if (hostStatus[HOST_CONNECTION] && hostStatus[HOST_COMPAT] &&
       varsLocal[IS_EXECUTABLE]) {
-    color = [0, 0, 0, 0];
-    text = "";
+    if (hostStatus[HOST_VERSION_LATEST]) {
+      color = INFO_COLOR;
+      text = INFO_TEXT;
+    } else {
+      color = [0, 0, 0, 0];
+      text = "";
+    }
   } else {
     color = WARN_COLOR;
     text = WARN_TEXT;
   }
-  return Promise.all([
+  func.push(
     browserAction.setBadgeBackgroundColor({color}),
-    browserAction.setBadgeText({text}),
-  ]);
+    browserAction.setBadgeText({text})
+  );
+  text && typeof browserAction.setBadgeTextColor === "function" &&
+    func.push(browserAction.setBadgeTextColor({color: "white"}));
+  return Promise.all(func);
 };
 
 /**
