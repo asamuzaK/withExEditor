@@ -16,7 +16,7 @@ const {i18n, runtime} = browser;
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
-  HOST_VERSION_LATEST, STORAGE_SET, SYNC_AUTO_URL, WARN,
+  HOST_VERSION_LATEST, INFO, STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "./constant.js";
 const PORT_NAME = "portOptions";
 
@@ -97,9 +97,11 @@ export const extractHostStatus = async status => {
   const version = document.getElementById(HOST_VERSION);
   if (latest) {
     if (hostLatestVersion) {
+      latest.classList.add(INFO);
       latest.textContent =
         i18n.getMessage("hostLatestVersion", `v${hostLatestVersion}`);
     } else {
+      latest.classList.remove(INFO);
       latest.textContent = "";
     }
   }
