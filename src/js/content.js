@@ -417,7 +417,7 @@
         elm = await appendChild(elm, range.cloneContents());
       }
     }
-    return elm && (new XMLSerializer()).serializeToString(elm) || null;
+    return elm && new XMLSerializer().serializeToString(elm) || null;
   };
 
   /**
@@ -521,7 +521,7 @@
         frag.append(obj, document.createTextNode("\n"));
       }
     }
-    return frag && (new XMLSerializer()).serializeToString(frag) || null;
+    return frag && new XMLSerializer().serializeToString(frag) || null;
   };
 
   /**
