@@ -36,31 +36,31 @@ import {
 browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
 commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
 contextMenus.onClicked.addListener((info, tab) =>
-  postContextMenuData(info, tab).catch(throwErr)
+  postContextMenuData(info, tab).catch(throwErr),
 );
 host.onDisconnect.addListener(port =>
-  handleDisconnectedHost(port).then(toggleBadge).catch(throwErr)
+  handleDisconnectedHost(port).then(toggleBadge).catch(throwErr),
 );
 host.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 runtime.onConnect.addListener(port => handlePort(port).catch(throwErr));
 runtime.onMessage.addListener((msg, sender) =>
-  handleMsg(msg, sender).catch(throwErr)
+  handleMsg(msg, sender).catch(throwErr),
 );
 storage.onChanged.addListener(data =>
-  setVars(data).then(syncUI).catch(throwErr)
+  setVars(data).then(syncUI).catch(throwErr),
 );
 tabs.onActivated.addListener(info => onTabActivated(info).catch(throwErr));
 tabs.onUpdated.addListener((id, info, tab) =>
-  onTabUpdated(id, info, tab).catch(throwErr)
+  onTabUpdated(id, info, tab).catch(throwErr),
 );
 tabs.onRemoved.addListener((id, info) =>
-  onTabRemoved(id, info).catch(throwErr)
+  onTabRemoved(id, info).catch(throwErr),
 );
 windows.onFocusChanged.addListener(windowId =>
-  onWindowFocusChanged(windowId).catch(throwErr)
+  onWindowFocusChanged(windowId).catch(throwErr),
 );
 windows.onRemoved.addListener(windowId =>
-  onWindowRemoved(windowId).catch(throwErr)
+  onWindowRemoved(windowId).catch(throwErr),
 );
 
 /* startup */

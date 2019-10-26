@@ -313,7 +313,7 @@ export const toggleBadge = async () => {
   }
   func.push(
     browserAction.setBadgeBackgroundColor({color}),
-    browserAction.setBadgeText({text})
+    browserAction.setBadgeText({text}),
   );
   text && typeof browserAction.setBadgeTextColor === "function" &&
     func.push(browserAction.setBadgeTextColor({color: "white"}));
@@ -691,7 +691,7 @@ export const handleHostMsg = async msg => {
           hostPostMsg({
             [EDITOR_CONFIG_GET]: true,
             [HOST_VERSION_CHECK]: HOST_VERSION_MIN,
-          })
+          }),
         );
         break;
       case "warn":

@@ -543,7 +543,7 @@
         } else if (node.nodeType === Node.TEXT_NODE) {
           arr.push(
             node.nodeValue.replace(/^\s*/, "")
-              .replace(/([^\n])$/, (m, c) => `${c}\n`)
+              .replace(/([^\n])$/, (m, c) => `${c}\n`),
           );
         }
       }
@@ -774,15 +774,15 @@
         if (prefix) {
           items = Array.from(
             document.querySelectorAll(
-              ancestorId && `#${ancestorId} *|*` || `${rootLocalName} *|*`
-            )
+              ancestorId && `#${ancestorId} *|*` || `${rootLocalName} *|*`,
+            ),
           ).filter(item => {
             const {localName: itemLocalName} = item;
             return itemLocalName === `${prefix}:${localName}` && item;
           });
         } else {
           items = document.querySelectorAll(
-            ancestorId && `#${ancestorId} ${localName}` || localName
+            ancestorId && `#${ancestorId} ${localName}` || localName,
           );
         }
         if (items && items.length) {
@@ -827,7 +827,7 @@
           if (prefix) {
             const {localName: rootLocalName} = document.documentElement;
             const nodeList = document.querySelectorAll(
-              ancestorId && `#${ancestorId} *|*` || `#${rootLocalName} *|*`
+              ancestorId && `#${ancestorId} *|*` || `#${rootLocalName} *|*`,
             );
             items = Array.from(nodeList).filter(item => {
               const {localName: itemLocalName} = item;
@@ -835,7 +835,7 @@
             });
           } else {
             items = document.querySelectorAll(
-              ancestorId && `#${ancestorId} ${localName}` || localName
+              ancestorId && `#${ancestorId} ${localName}` || localName,
             );
           }
           elm = items && items[queryIndex];
@@ -1788,7 +1788,7 @@
     if (isObjectNotEmpty(port) && port.name === PORT_CONTENT) {
       port.onMessage.addListener(msg => handlePortMsg(msg).catch(throwErr));
       port.onDisconnect.addListener(p =>
-        handleDisconnectedPort(p).catch(throwErr)
+        handleDisconnectedPort(p).catch(throwErr),
       );
       vars.port = port;
     } else {

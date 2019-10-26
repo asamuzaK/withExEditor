@@ -578,14 +578,14 @@ describe("main", () => {
       browser.browserAction.setBadgeTextColor.callsFake(arg => arg);
       const res = await func();
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1,
-        "called"
+        "called",
       );
       assert.deepEqual(res, [
         {
@@ -617,13 +617,13 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        "called"
+        "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k, "not called"
+        browser.browserAction.setBadgeTextColor.callCount, k, "not called",
       );
       assert.deepEqual(res, [
         {
@@ -652,13 +652,13 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        "called"
+        "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.deepEqual(res, [
         {
@@ -690,13 +690,13 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        "called"
+        "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.deepEqual(res, [
         {
@@ -728,13 +728,13 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        "called"
+        "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.deepEqual(res, [
         {
@@ -767,13 +767,13 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        "called"
+        "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.deepEqual(res, [
         {
@@ -2079,13 +2079,13 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.isTrue(hostStatus[HOST_COMPAT], "compat");
       assert.isNull(hostStatus[HOST_VERSION_LATEST], "latest");
@@ -2106,13 +2106,13 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.isTrue(hostStatus[HOST_COMPAT], "compat");
       assert.isNull(hostStatus[HOST_VERSION_LATEST], "latest");
@@ -2133,13 +2133,13 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.isTrue(hostStatus[HOST_COMPAT], "compat");
       assert.strictEqual(hostStatus[HOST_VERSION_LATEST], "1.2.3", "latest");
@@ -2157,13 +2157,13 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i, "not called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i, "not called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j, "not called"
+        browser.browserAction.setBadgeText.callCount, j, "not called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k, "not called"
+        browser.browserAction.setBadgeTextColor.callCount, k, "not called",
       );
       assert.deepEqual(res, [], "result");
     });
@@ -2177,13 +2177,13 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i, "not called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i, "not called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j, "not called"
+        browser.browserAction.setBadgeText.callCount, j, "not called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k, "not called"
+        browser.browserAction.setBadgeTextColor.callCount, k, "not called",
       );
       assert.deepEqual(res, [], "result");
     });
@@ -2397,7 +2397,7 @@ describe("main", () => {
       const res = await func(port);
       assert.strictEqual(
         ports.get("1").get("2").get("https://example.com").name,
-        PORT_CONTENT, "port"
+        PORT_CONTENT, "port",
       );
       assert.strictEqual(port.postMessage.callCount, i + 1, "called port msg");
       assert.strictEqual(browser.contextMenus.create.callCount, k + 3,
@@ -2430,7 +2430,7 @@ describe("main", () => {
       const res = await func(port);
       assert.strictEqual(
         ports.get("1").get("2").get("https://example.com").name,
-        PORT_CONTENT, "port"
+        PORT_CONTENT, "port",
       );
       assert.strictEqual(port.postMessage.callCount, i + 1, "called port msg");
       assert.isFalse(varsLocal[MENU_ENABLED], "menu enabled");
@@ -2495,13 +2495,13 @@ describe("main", () => {
       const res = await func();
       assert.isFalse(hostStatus[HOST_CONNECTION], "value");
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
     });
@@ -2546,16 +2546,16 @@ describe("main", () => {
       };
       const res = await func(info);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called"
+        browser.contextMenus.create.callCount, l, "not called",
       );
       assert.isFalse(varsLocal[MENU_ENABLED], "value");
       assert.deepEqual(res, [
@@ -2591,16 +2591,16 @@ describe("main", () => {
       };
       const res = await func(info);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l + 3, "called"
+        browser.contextMenus.create.callCount, l + 3, "called",
       );
       assert.strictEqual(port.postMessage.callCount, m + 1, "called");
       assert.isTrue(varsLocal[MENU_ENABLED], "value");
@@ -2642,16 +2642,16 @@ describe("main", () => {
       };
       const res = await func(info);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called"
+        browser.contextMenus.create.callCount, l, "not called",
       );
       assert.strictEqual(port.postMessage.callCount, m, "not called");
       assert.isFalse(varsLocal[MENU_ENABLED], "value");
@@ -2688,16 +2688,16 @@ describe("main", () => {
       };
       const res = await func(info);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called"
+        browser.contextMenus.create.callCount, l, "not called",
       );
       assert.strictEqual(port.postMessage.callCount, m, "not called");
       assert.isFalse(varsLocal[MENU_ENABLED], "value");
@@ -2774,19 +2774,19 @@ describe("main", () => {
       const m = browser.contextMenus.update.callCount;
       const res = await func(2, {status: "complete"}, {active: true});
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called"
+        browser.contextMenus.create.callCount, l, "not called",
       );
       assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called"
+        browser.contextMenus.update.callCount, m, "not called",
       );
       assert.deepEqual(res, [
         [],
@@ -2819,19 +2819,19 @@ describe("main", () => {
       });
       assert.isTrue(varsLocal[MENU_ENABLED], "value");
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l + 3, "called"
+        browser.contextMenus.create.callCount, l + 3, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called"
+        browser.contextMenus.update.callCount, m, "not called",
       );
       assert.deepEqual(res, [
         [
@@ -2999,19 +2999,19 @@ describe("main", () => {
       });
       const res = await func();
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called"
+        browser.contextMenus.create.callCount, l, "not called",
       );
       assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called"
+        browser.contextMenus.update.callCount, m, "not called",
       );
       assert.deepEqual(res, [
         [
@@ -3039,19 +3039,19 @@ describe("main", () => {
       });
       const res = await func();
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called"
+        browser.contextMenus.create.callCount, l, "not called",
       );
       assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called"
+        browser.contextMenus.update.callCount, m, "not called",
       );
       assert.deepEqual(res, [
         [
@@ -3079,19 +3079,19 @@ describe("main", () => {
       });
       const res = await func();
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called"
+        browser.contextMenus.create.callCount, l, "not called",
       );
       assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called"
+        browser.contextMenus.update.callCount, m, "not called",
       );
       assert.deepEqual(res, [
         [
@@ -3134,19 +3134,19 @@ describe("main", () => {
       }]);
       const res = await func(1);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l + 3, "called"
+        browser.contextMenus.create.callCount, l + 3, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called"
+        browser.contextMenus.update.callCount, m, "not called",
       );
       assert.strictEqual(port.postMessage.callCount, n + 1, "called");
       assert.deepEqual(res, [
@@ -3198,19 +3198,19 @@ describe("main", () => {
       }]);
       const res = await func(1);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called"
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.create.callCount, l + 3, "called"
+        browser.contextMenus.create.callCount, l + 3, "called",
       );
       assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called"
+        browser.contextMenus.update.callCount, m, "not called",
       );
       assert.strictEqual(port.postMessage.callCount, n + 1, "called");
       assert.deepEqual(res, [
@@ -3729,10 +3729,10 @@ describe("main", () => {
         "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, "called"
+        browser.browserAction.setBadgeText.callCount, j + 1, "called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called"
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
       assert.deepEqual(res, [[undefined, undefined, undefined]], "result");
     });
@@ -3753,10 +3753,10 @@ describe("main", () => {
         "not called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j, "not called"
+        browser.browserAction.setBadgeText.callCount, j, "not called",
       );
       assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k, "not called"
+        browser.browserAction.setBadgeTextColor.callCount, k, "not called",
       );
       assert.deepEqual(res, [], "result");
     });
