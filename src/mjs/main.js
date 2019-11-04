@@ -14,8 +14,9 @@ import {
 
 /* api */
 const {
-  browserAction, contextMenus, i18n, notifications, runtime, tabs, windows,
+  browserAction, i18n, notifications, runtime, tabs, windows,
 } = browser;
+const menus = browser.menus || browser.contextMenus;
 
 /* constants */
 import {
@@ -204,7 +205,7 @@ export const portPostMsg = async (msg, opt = {}) => {
 
 /**
  * post context menu data
- * @param {Object} info - contextMenus.OnClickData
+ * @param {Object} info - menus.OnClickData
  * @param {Object} tab - tabs.Tab
  * @returns {?AsyncFunction} - portPostMsg()
  */
@@ -447,7 +448,7 @@ export const createMenuItem = async (id, contexts) => {
       opt.visible = !vars[ONLY_EDITABLE];
     }
     if (menuItems[id]) {
-      await contextMenus.update(id, opt);
+      await menus.update(id, opt);
     } else {
       const menuItemOpt = {
         id,
@@ -455,7 +456,7 @@ export const createMenuItem = async (id, contexts) => {
         enabled: opt.enabled,
         title: opt.title,
       };
-      const menuItemId = await contextMenus.create(menuItemOpt);
+      const menuItemId = await menus.create(menuItemOpt);
       await setMenuItems(id, menuItemId);
     }
   }
@@ -496,7 +497,7 @@ export const createMenuItems = async () => {
  * @returns {AsyncFunction} - Promise chain
  */
 export const restoreContextMenu = async () =>
-  contextMenus.removeAll().then(initMenuItems).then(createMenuItems);
+  menus.removeAll().then(initMenuItems).then(createMenuItems);
 
 /**
  * update context menu
@@ -512,10 +513,10 @@ export const updateContextMenu = async type => {
       if (menuItems[menuItemId]) {
         if (key === MODE_SOURCE) {
           const title = varsLocal[mode] || varsLocal[menuItemId];
-          title && func.push(contextMenus.update(menuItemId, {title}));
+          title && func.push(menus.update(menuItemId, {title}));
         } else {
           key === MODE_EDIT &&
-            func.push(contextMenus.update(menuItemId, {enabled}));
+            func.push(menus.update(menuItemId, {enabled}));
         }
       }
     }
@@ -536,7 +537,7 @@ export const updateContextMenu = async type => {
         } else {
           opt.visible = !vars[ONLY_EDITABLE];
         }
-        func.push(contextMenus.update(item, opt));
+        func.push(menus.update(item, opt));
       } else if (enabled) {
         const bool = !vars[ONLY_EDITABLE];
         switch (item) {

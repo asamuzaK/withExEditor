@@ -1136,18 +1136,16 @@ describe("main", () => {
 
     it("should not call function", async () => {
       const {menuItems} = mjs;
-      const i = browser.contextMenus.update.callCount;
-      const j = browser.contextMenus.create.callCount;
+      const i = browser.menus.update.callCount;
+      const j = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.contextMenus.create.callsFake(opt => {
+      browser.menus.create.callsFake(opt => {
         const {id} = opt;
         return id;
       });
       await func("foo", []);
-      assert.strictEqual(browser.contextMenus.update.callCount, i,
-                         "not called");
-      assert.strictEqual(browser.contextMenus.create.callCount, j,
-                         "not called");
+      assert.strictEqual(browser.menus.update.callCount, i, "not called");
+      assert.strictEqual(browser.menus.create.callCount, j, "not called");
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
@@ -1156,18 +1154,16 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {menuItems} = mjs;
-      const i = browser.contextMenus.update.callCount;
-      const j = browser.contextMenus.create.callCount;
+      const i = browser.menus.update.callCount;
+      const j = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.contextMenus.create.callsFake(opt => {
+      browser.menus.create.callsFake(opt => {
         const {id} = opt;
         return id;
       });
       await func(MODE_SOURCE, []);
-      assert.strictEqual(browser.contextMenus.update.callCount, i,
-                         "not called");
-      assert.strictEqual(browser.contextMenus.create.callCount, j + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i, "not called");
+      assert.strictEqual(browser.menus.create.callCount, j + 1, "called");
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
@@ -1176,20 +1172,18 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {menuItems, varsLocal} = mjs;
-      const i = browser.contextMenus.update.callCount;
-      const j = browser.contextMenus.create.callCount;
+      const i = browser.menus.update.callCount;
+      const j = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.contextMenus.create.callsFake(opt => {
+      browser.menus.create.callsFake(opt => {
         const {id} = opt;
         return id;
       });
       varsLocal[MENU_ENABLED] = true;
       varsLocal[IS_EXECUTABLE] = true;
       await func(MODE_SOURCE, []);
-      assert.strictEqual(browser.contextMenus.update.callCount, i,
-                         "not called");
-      assert.strictEqual(browser.contextMenus.create.callCount, j + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i, "not called");
+      assert.strictEqual(browser.menus.create.callCount, j + 1, "called");
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
@@ -1198,19 +1192,17 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {menuItems} = mjs;
-      const i = browser.contextMenus.update.callCount;
-      const j = browser.contextMenus.create.callCount;
+      const i = browser.menus.update.callCount;
+      const j = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.contextMenus.create.callsFake(opt => {
+      browser.menus.create.callsFake(opt => {
         const {id} = opt;
         return id;
       });
       menuItems[MODE_SOURCE] = MODE_SOURCE;
       await func(MODE_SOURCE, []);
-      assert.strictEqual(browser.contextMenus.update.callCount, i + 1,
-                         "called");
-      assert.strictEqual(browser.contextMenus.create.callCount, j,
-                         "not called");
+      assert.strictEqual(browser.menus.update.callCount, i + 1, "called");
+      assert.strictEqual(browser.menus.create.callCount, j, "not called");
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
@@ -1219,18 +1211,16 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {menuItems} = mjs;
-      const i = browser.contextMenus.update.callCount;
-      const j = browser.contextMenus.create.callCount;
+      const i = browser.menus.update.callCount;
+      const j = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.contextMenus.create.callsFake(opt => {
+      browser.menus.create.callsFake(opt => {
         const {id} = opt;
         return id;
       });
       await func(MODE_SELECTION, []);
-      assert.strictEqual(browser.contextMenus.update.callCount, i,
-                         "not called");
-      assert.strictEqual(browser.contextMenus.create.callCount, j + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i, "not called");
+      assert.strictEqual(browser.menus.create.callCount, j + 1, "called");
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.strictEqual(menuItems[MODE_SELECTION], MODE_SELECTION, "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
@@ -1239,18 +1229,16 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {menuItems} = mjs;
-      const i = browser.contextMenus.update.callCount;
-      const j = browser.contextMenus.create.callCount;
+      const i = browser.menus.update.callCount;
+      const j = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.contextMenus.create.callsFake(opt => {
+      browser.menus.create.callsFake(opt => {
         const {id} = opt;
         return id;
       });
       await func(MODE_EDIT, []);
-      assert.strictEqual(browser.contextMenus.update.callCount, i,
-                         "not called");
-      assert.strictEqual(browser.contextMenus.create.callCount, j + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i, "not called");
+      assert.strictEqual(browser.menus.create.callCount, j + 1, "called");
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.strictEqual(menuItems[MODE_EDIT], MODE_EDIT, "menu");
@@ -1278,20 +1266,18 @@ describe("main", () => {
     });
 
     it("should call function", async () => {
-      const i = browser.contextMenus.create.callCount;
+      const i = browser.menus.create.callCount;
       const res = await func();
-      assert.strictEqual(browser.contextMenus.create.callCount, i + 3,
-                         "called");
+      assert.strictEqual(browser.menus.create.callCount, i + 3, "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
     });
 
     it("should call function", async () => {
       const {vars} = mjs;
-      const i = browser.contextMenus.create.callCount;
+      const i = browser.menus.create.callCount;
       vars[ONLY_EDITABLE] = true;
       const res = await func();
-      assert.strictEqual(browser.contextMenus.create.callCount, i + 1,
-                         "called");
+      assert.strictEqual(browser.menus.create.callCount, i + 1, "called");
       assert.deepEqual(res, [undefined], "result");
     });
   });
@@ -1316,14 +1302,12 @@ describe("main", () => {
     });
 
     it("should call function", async () => {
-      const i = browser.contextMenus.removeAll.callCount;
-      const j = browser.contextMenus.create.callCount;
-      browser.contextMenus.removeAll.resolves(undefined);
+      const i = browser.menus.removeAll.callCount;
+      const j = browser.menus.create.callCount;
+      browser.menus.removeAll.resolves(undefined);
       const res = await func();
-      assert.strictEqual(browser.contextMenus.removeAll.callCount, i + 1,
-                         "called");
-      assert.strictEqual(browser.contextMenus.create.callCount, j + 3,
-                         "called");
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, "called");
+      assert.strictEqual(browser.menus.create.callCount, j + 3, "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
     });
   });
@@ -1360,21 +1344,19 @@ describe("main", () => {
     });
 
     it("should call function", async () => {
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       const res = await func();
-      assert.strictEqual(browser.contextMenus.update.callCount, i + 3,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i + 3, "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
       browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       const res = await func();
-      assert.strictEqual(browser.contextMenus.update.callCount, i + 3,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i + 3, "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
       browser.i18n.getMessage.flush();
     });
@@ -1382,7 +1364,7 @@ describe("main", () => {
     it("should call function", async () => {
       const {menuItems, vars, varsLocal} = mjs;
       const items = Object.keys(menuItems);
-      const i = browser.contextMenus.create.callCount;
+      const i = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       varsLocal[MENU_ENABLED] = true;
       varsLocal[IS_EXECUTABLE] = true;
@@ -1391,8 +1373,7 @@ describe("main", () => {
         menuItems[item] = null;
       }
       const res = await func();
-      assert.strictEqual(browser.contextMenus.create.callCount, i + 3,
-                         "called");
+      assert.strictEqual(browser.menus.create.callCount, i + 3, "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
       browser.i18n.getMessage.flush();
     });
@@ -1400,7 +1381,7 @@ describe("main", () => {
     it("should not call function", async () => {
       const {menuItems, vars, varsLocal} = mjs;
       const items = Object.keys(menuItems);
-      const i = browser.contextMenus.create.callCount;
+      const i = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       varsLocal[MENU_ENABLED] = false;
       vars[ONLY_EDITABLE] = false;
@@ -1408,8 +1389,7 @@ describe("main", () => {
         menuItems[item] = null;
       }
       const res = await func();
-      assert.strictEqual(browser.contextMenus.create.callCount, i,
-                         "not called");
+      assert.strictEqual(browser.menus.create.callCount, i, "not called");
       assert.deepEqual(res, [], "result");
       browser.i18n.getMessage.flush();
     });
@@ -1417,7 +1397,7 @@ describe("main", () => {
     it("should call function", async () => {
       const {menuItems, vars, varsLocal} = mjs;
       const items = Object.keys(menuItems);
-      const i = browser.contextMenus.create.callCount;
+      const i = browser.menus.create.callCount;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       varsLocal[MENU_ENABLED] = true;
       varsLocal[IS_EXECUTABLE] = true;
@@ -1426,14 +1406,13 @@ describe("main", () => {
         menuItems[item] = null;
       }
       const res = await func();
-      assert.strictEqual(browser.contextMenus.create.callCount, i + 1,
-                         "called");
+      assert.strictEqual(browser.menus.create.callCount, i + 1, "called");
       assert.deepEqual(res, [undefined], "result");
       browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       const opt = {
         [MODE_EDIT]: {
           enabled: true,
@@ -1441,14 +1420,13 @@ describe("main", () => {
         },
       };
       const res = await func(opt);
-      assert.strictEqual(browser.contextMenus.update.callCount, i + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i + 1, "called");
       assert.deepEqual(res, [undefined], "result");
     });
 
     it("should call function", async () => {
       const {varsLocal} = mjs;
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       const opt = {
         [MODE_SOURCE]: {
           enabled: true,
@@ -1458,14 +1436,13 @@ describe("main", () => {
       };
       varsLocal[MODE_SOURCE] = "foo";
       const res = await func(opt);
-      assert.strictEqual(browser.contextMenus.update.callCount, i + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i + 1, "called");
       assert.deepEqual(res, [undefined], "result");
     });
 
     it("should call function", async () => {
       const {varsLocal} = mjs;
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       const opt = {
         [MODE_SOURCE]: {
           enabled: true,
@@ -1476,14 +1453,13 @@ describe("main", () => {
       varsLocal[MODE_SOURCE] = "foo";
       varsLocal[MODE_SVG] = "bar";
       const res = await func(opt);
-      assert.strictEqual(browser.contextMenus.update.callCount, i + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i + 1, "called");
       assert.deepEqual(res, [undefined], "result");
     });
 
     it("should call function", async () => {
       const {varsLocal} = mjs;
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       const opt = {
         [MODE_SOURCE]: {
           enabled: true,
@@ -1493,13 +1469,12 @@ describe("main", () => {
       };
       varsLocal[MODE_SOURCE] = "foo";
       const res = await func(opt);
-      assert.strictEqual(browser.contextMenus.update.callCount, i + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i + 1, "called");
       assert.deepEqual(res, [undefined], "result");
     });
 
     it("should not call function", async () => {
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       const opt = {
         [MODE_SOURCE]: {
           enabled: true,
@@ -1508,13 +1483,12 @@ describe("main", () => {
         },
       };
       const res = await func(opt);
-      assert.strictEqual(browser.contextMenus.update.callCount, i,
-                         "not called");
+      assert.strictEqual(browser.menus.update.callCount, i, "not called");
       assert.deepEqual(res, [], "result");
     });
 
     it("should not call function", async () => {
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       const opt = {
         [MODE_SOURCE]: {
           enabled: true,
@@ -1522,8 +1496,7 @@ describe("main", () => {
         },
       };
       const res = await func(opt);
-      assert.strictEqual(browser.contextMenus.update.callCount, i,
-                         "not called");
+      assert.strictEqual(browser.menus.update.callCount, i, "not called");
       assert.deepEqual(res, [], "result");
     });
   });
@@ -2215,7 +2188,7 @@ describe("main", () => {
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const j = browser.storage.local.set.callCount;
-      const k = browser.contextMenus.removeAll.callCount;
+      const k = browser.menus.removeAll.callCount;
       const msg = {
         [EDITOR_CONFIG_RES]: {},
       };
@@ -2223,8 +2196,7 @@ describe("main", () => {
       const res = await func(msg);
       assert.strictEqual(port.postMessage.callCount, i + 1, "called");
       assert.strictEqual(browser.storage.local.set.callCount, j + 1, "called");
-      assert.strictEqual(browser.contextMenus.removeAll.callCount, k + 1,
-                         "called");
+      assert.strictEqual(browser.menus.removeAll.callCount, k + 1, "called");
       assert.deepEqual(res, [
         [
           undefined,
@@ -2282,7 +2254,7 @@ describe("main", () => {
     it("should call function", async () => {
       const {menuItems} = mjs;
       menuItems[MODE_EDIT] = MODE_EDIT;
-      const i = browser.contextMenus.update.callCount;
+      const i = browser.menus.update.callCount;
       const msg = {
         [CONTEXT_MENU]: {
           [MODE_EDIT]: {
@@ -2292,8 +2264,7 @@ describe("main", () => {
         },
       };
       const res = await func(msg);
-      assert.strictEqual(browser.contextMenus.update.callCount, i + 1,
-                         "called");
+      assert.strictEqual(browser.menus.update.callCount, i + 1, "called");
       assert.deepEqual(res, [[undefined]], "result");
     });
   });
@@ -2392,17 +2363,17 @@ describe("main", () => {
         },
       });
       const i = port.postMessage.callCount;
-      const k = browser.contextMenus.create.callCount;
-      const l = browser.contextMenus.update.callCount;
+      const k = browser.menus.create.callCount;
+      const l = browser.menus.update.callCount;
       const res = await func(port);
       assert.strictEqual(
         ports.get("1").get("2").get("https://example.com").name,
         PORT_CONTENT, "port",
       );
       assert.strictEqual(port.postMessage.callCount, i + 1, "called port msg");
-      assert.strictEqual(browser.contextMenus.create.callCount, k + 3,
+      assert.strictEqual(browser.menus.create.callCount, k + 3,
                          "called menus create");
-      assert.strictEqual(browser.contextMenus.update.callCount, l,
+      assert.strictEqual(browser.menus.update.callCount, l,
                          "not called menus update");
       assert.isTrue(varsLocal[MENU_ENABLED], "menu enabled");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
@@ -2425,8 +2396,8 @@ describe("main", () => {
         },
       });
       const i = port.postMessage.callCount;
-      const k = browser.contextMenus.create.callCount;
-      const l = browser.contextMenus.update.callCount;
+      const k = browser.menus.create.callCount;
+      const l = browser.menus.update.callCount;
       const res = await func(port);
       assert.strictEqual(
         ports.get("1").get("2").get("https://example.com").name,
@@ -2434,9 +2405,9 @@ describe("main", () => {
       );
       assert.strictEqual(port.postMessage.callCount, i + 1, "called port msg");
       assert.isFalse(varsLocal[MENU_ENABLED], "menu enabled");
-      assert.strictEqual(browser.contextMenus.create.callCount, k,
+      assert.strictEqual(browser.menus.create.callCount, k,
                          "not called menus create");
-      assert.strictEqual(browser.contextMenus.update.callCount, l,
+      assert.strictEqual(browser.menus.update.callCount, l,
                          "not called menus update");
       assert.isNull(res, "result");
     });
@@ -2458,15 +2429,15 @@ describe("main", () => {
         },
       });
       const i = port.postMessage.callCount;
-      const k = browser.contextMenus.create.callCount;
-      const l = browser.contextMenus.update.callCount;
+      const k = browser.menus.create.callCount;
+      const l = browser.menus.update.callCount;
       const res = await func(port);
       assert.isFalse(ports.has("1"), "port");
       assert.strictEqual(port.postMessage.callCount, i, "not called port msg");
       assert.isFalse(varsLocal[MENU_ENABLED], "menu enabled");
-      assert.strictEqual(browser.contextMenus.create.callCount, k,
+      assert.strictEqual(browser.menus.create.callCount, k,
                          "not called menus create");
-      assert.strictEqual(browser.contextMenus.update.callCount, l,
+      assert.strictEqual(browser.menus.update.callCount, l,
                          "not called menus update");
       assert.isNull(res, "result");
     });
@@ -2539,7 +2510,7 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
+      const l = browser.menus.create.callCount;
       const info = {
         tabId: -1,
         windowId: -1,
@@ -2554,9 +2525,7 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l, "not called");
       assert.isFalse(varsLocal[MENU_ENABLED], "value");
       assert.deepEqual(res, [
         [],
@@ -2583,7 +2552,7 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
+      const l = browser.menus.create.callCount;
       const m = port.postMessage.callCount;
       const info = {
         tabId: 2,
@@ -2599,9 +2568,7 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l + 3, "called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l + 3, "called");
       assert.strictEqual(port.postMessage.callCount, m + 1, "called");
       assert.isTrue(varsLocal[MENU_ENABLED], "value");
       assert.deepEqual(res, [
@@ -2634,7 +2601,7 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
+      const l = browser.menus.create.callCount;
       const m = port.postMessage.callCount;
       const info = {
         tabId: 3,
@@ -2650,9 +2617,7 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l, "not called");
       assert.strictEqual(port.postMessage.callCount, m, "not called");
       assert.isFalse(varsLocal[MENU_ENABLED], "value");
       assert.deepEqual(res, [
@@ -2680,7 +2645,7 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
+      const l = browser.menus.create.callCount;
       const m = port.postMessage.callCount;
       const info = {
         tabId: 2,
@@ -2696,9 +2661,7 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l, "not called");
       assert.strictEqual(port.postMessage.callCount, m, "not called");
       assert.isFalse(varsLocal[MENU_ENABLED], "value");
       assert.deepEqual(res, [
@@ -2770,8 +2733,8 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
-      const m = browser.contextMenus.update.callCount;
+      const l = browser.menus.create.callCount;
+      const m = browser.menus.update.callCount;
       const res = await func(2, {status: "complete"}, {active: true});
       assert.strictEqual(
         browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
@@ -2782,12 +2745,8 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called",
-      );
-      assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l, "not called");
+      assert.strictEqual(browser.menus.update.callCount, m, "not called");
       assert.deepEqual(res, [
         [],
         [
@@ -2802,8 +2761,8 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
-      const m = browser.contextMenus.update.callCount;
+      const l = browser.menus.create.callCount;
+      const m = browser.menus.update.callCount;
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
@@ -2827,12 +2786,8 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l + 3, "called",
-      );
-      assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l + 3, "called");
+      assert.strictEqual(browser.menus.update.callCount, m, "not called");
       assert.deepEqual(res, [
         [
           undefined,
@@ -2990,8 +2945,8 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
-      const m = browser.contextMenus.update.callCount;
+      const l = browser.menus.create.callCount;
+      const m = browser.menus.update.callCount;
       browser.windows.getCurrent.resolves({
         focused: false,
         id: 1,
@@ -3007,12 +2962,8 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called",
-      );
-      assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l, "not called");
+      assert.strictEqual(browser.menus.update.callCount, m, "not called");
       assert.deepEqual(res, [
         [
           undefined,
@@ -3030,8 +2981,8 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
-      const m = browser.contextMenus.update.callCount;
+      const l = browser.menus.create.callCount;
+      const m = browser.menus.update.callCount;
       browser.windows.getCurrent.resolves({
         focused: true,
         id: browser.windows.WINDOW_ID_NONE,
@@ -3047,12 +2998,8 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called",
-      );
-      assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l, "not called");
+      assert.strictEqual(browser.menus.update.callCount, m, "not called");
       assert.deepEqual(res, [
         [
           undefined,
@@ -3070,8 +3017,8 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
-      const m = browser.contextMenus.update.callCount;
+      const l = browser.menus.create.callCount;
+      const m = browser.menus.update.callCount;
       browser.windows.getCurrent.resolves({
         focused: true,
         id: 1,
@@ -3087,12 +3034,8 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l, "not called",
-      );
-      assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l, "not called");
+      assert.strictEqual(browser.menus.update.callCount, m, "not called");
       assert.deepEqual(res, [
         [
           undefined,
@@ -3117,8 +3060,8 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
-      const m = browser.contextMenus.update.callCount;
+      const l = browser.menus.create.callCount;
+      const m = browser.menus.update.callCount;
       const n = port.postMessage.callCount;
       browser.windows.getCurrent.resolves({
         focused: true,
@@ -3142,12 +3085,8 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l + 3, "called",
-      );
-      assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l + 3, "called");
+      assert.strictEqual(browser.menus.update.callCount, m, "not called");
       assert.strictEqual(port.postMessage.callCount, n + 1, "called");
       assert.deepEqual(res, [
         [],
@@ -3181,8 +3120,8 @@ describe("main", () => {
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
-      const l = browser.contextMenus.create.callCount;
-      const m = browser.contextMenus.update.callCount;
+      const l = browser.menus.create.callCount;
+      const m = browser.menus.update.callCount;
       const n = port.postMessage.callCount;
       browser.windows.getCurrent.resolves({
         focused: true,
@@ -3206,12 +3145,8 @@ describe("main", () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, "called",
       );
-      assert.strictEqual(
-        browser.contextMenus.create.callCount, l + 3, "called",
-      );
-      assert.strictEqual(
-        browser.contextMenus.update.callCount, m, "not called",
-      );
+      assert.strictEqual(browser.menus.create.callCount, l + 3, "called");
+      assert.strictEqual(browser.menus.update.callCount, m, "not called");
       assert.strictEqual(port.postMessage.callCount, n + 1, "called");
       assert.deepEqual(res, [
         [],
@@ -3530,14 +3465,13 @@ describe("main", () => {
                                   }));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
-      const j = browser.contextMenus.removeAll.callCount;
+      const j = browser.menus.removeAll.callCount;
       const res = await func(ONLY_EDITABLE, {
         checked: true,
       }, true);
       assert.isTrue(vars[ONLY_EDITABLE], "value");
       assert.strictEqual(port.postMessage.callCount, i + 1, "called");
-      assert.strictEqual(browser.contextMenus.removeAll.callCount, j + 1,
-                         "called");
+      assert.strictEqual(browser.menus.removeAll.callCount, j + 1, "called");
       assert.deepEqual(res, [
         [[[]]],
         [undefined],
@@ -3686,14 +3620,13 @@ describe("main", () => {
 
     it("should set value", async () => {
       const {varsLocal} = mjs;
-      const i = browser.contextMenus.create.callCount;
+      const i = browser.menus.create.callCount;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func(EDITOR_LABEL, {
         value: "foo",
       }, true);
       assert.strictEqual(varsLocal[EDITOR_LABEL], "foo", "value");
-      assert.strictEqual(browser.contextMenus.create.callCount, i + 3,
-                         "called");
+      assert.strictEqual(browser.menus.create.callCount, i + 3, "called");
       assert.deepEqual(res, [
         undefined,
         [undefined, undefined, undefined],
@@ -3702,14 +3635,13 @@ describe("main", () => {
 
     it("should set value", async () => {
       const {varsLocal} = mjs;
-      const i = browser.contextMenus.create.callCount;
+      const i = browser.menus.create.callCount;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func(EDITOR_LABEL, {
         value: "foo",
       });
       assert.strictEqual(varsLocal[EDITOR_LABEL], "foo", "value");
-      assert.strictEqual(browser.contextMenus.create.callCount, i,
-                         "not called");
+      assert.strictEqual(browser.menus.create.callCount, i, "not called");
       assert.deepEqual(res, [undefined], "result");
     });
 
