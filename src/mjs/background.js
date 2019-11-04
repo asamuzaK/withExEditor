@@ -20,9 +20,9 @@ import nsUriData from "./ns-uri.js";
 
 /* api */
 const {
-  browserAction, commands, contextMenus, runtime, storage,
-  tabs, windows,
+  browserAction, commands, runtime, storage, tabs, windows,
 } = browser;
+const menus = browser.menus || browser.contextMenus;
 
 /* constants */
 import {
@@ -32,7 +32,7 @@ import {
 /* listeners */
 browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
 commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
-contextMenus.onClicked.addListener((info, tab) =>
+menus.onClicked.addListener((info, tab) =>
   postContextMenuData(info, tab).catch(throwErr),
 );
 host.onDisconnect.addListener(port =>
