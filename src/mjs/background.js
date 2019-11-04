@@ -32,13 +32,13 @@ import {
 /* listeners */
 browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
 commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
-menus.onClicked.addListener((info, tab) =>
-  postContextMenuData(info, tab).catch(throwErr),
-);
 host.onDisconnect.addListener(port =>
   handleDisconnectedHost(port).then(toggleBadge).catch(throwErr),
 );
 host.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+menus.onClicked.addListener((info, tab) =>
+  postContextMenuData(info, tab).catch(throwErr),
+);
 runtime.onConnect.addListener(port => handlePort(port).catch(throwErr));
 runtime.onMessage.addListener((msg, sender) =>
   handleMsg(msg, sender).catch(throwErr),
