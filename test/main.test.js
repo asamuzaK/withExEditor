@@ -8,7 +8,7 @@
 import {assert} from "chai";
 import {afterEach, beforeEach, describe, it} from "mocha";
 import sinon from "sinon";
-import {browser} from "./mocha/setup.js";
+import {browser, mockPort} from "./mocha/setup.js";
 import * as mjs from "../src/mjs/main.js";
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
@@ -27,10 +27,17 @@ import {
 
 describe("main", () => {
   beforeEach(() => {
+    browser._sandbox.reset();
+    browser.i18n.getMessage.callsFake((...args) => args.toString());
+    browser.menus.removeAll.resolves(undefined);
+    browser.permissions.contains.resolves(true);
+    browser.runtime.connect.callsFake(mockPort);
+    browser.runtime.connectNative.callsFake(mockPort);
     global.browser = browser;
   });
   afterEach(() => {
     delete global.browser;
+    browser._sandbox.reset();
   });
 
   it("should get browser object", () => {
@@ -278,7 +285,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "bar"}));
+                                  browser.runtime.connect({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const stub = sinon.stub(console, "error");
       port.postMessage.throws();
@@ -300,7 +307,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "bar"}));
+                                  browser.runtime.connect({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const res = await func("foo", {
@@ -317,7 +324,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "bar"}));
+                                  browser.runtime.connect({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const res = await func("foo", {
@@ -333,7 +340,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "bar"}));
+                                  browser.runtime.connect({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const res = await func("foo", {
@@ -348,7 +355,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "bar"}));
+                                  browser.runtime.connect({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const res = await func("foo", {
@@ -364,7 +371,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "bar"}));
+                                  browser.runtime.connect({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const res = await func("foo");
@@ -377,7 +384,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "bar"}));
+                                  browser.runtime.connect({name: "bar"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const res = await func("foo", {
@@ -471,7 +478,6 @@ describe("main", () => {
       });
       assert.strictEqual(browser.tabs.query.callCount, i + 1, "called");
       assert.isNull(res, "result");
-      browser.tabs.query.flush();
     });
 
     it("should call function", async () => {
@@ -487,7 +493,6 @@ describe("main", () => {
       });
       assert.strictEqual(browser.tabs.query.callCount, i + 1, "called");
       assert.deepEqual(res, [], "result");
-      browser.tabs.query.flush();
     });
   });
 
@@ -500,7 +505,6 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(browser.tabs.query.callCount, i + 1, "called");
       assert.isNull(res, "result");
-      browser.tabs.query.flush();
     });
 
     it("should call function", async () => {
@@ -512,7 +516,6 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(browser.tabs.query.callCount, i + 1, "called");
       assert.deepEqual(res, [], "result");
-      browser.tabs.query.flush();
     });
   });
 
@@ -531,8 +534,6 @@ describe("main", () => {
       assert.deepEqual(res, {
         path: "img/icon.svg",
       }, "result");
-      browser.runtime.getURL.flush();
-      browser.browserAction.setIcon.flush();
     });
 
     it("should call function", async () => {
@@ -547,8 +548,6 @@ describe("main", () => {
       assert.deepEqual(res, {
         path: "img/icon.svg#foo",
       }, "result");
-      browser.runtime.getURL.flush();
-      browser.browserAction.setIcon.flush();
     });
   });
 
@@ -598,9 +597,6 @@ describe("main", () => {
           color: "white",
         },
       ], "result");
-      browser.browserAction.setBadgeBackgroundColor.flush();
-      browser.browserAction.setBadgeText.flush();
-      browser.browserAction.setBadgeTextColor.flush();
     });
 
     it("should call function", async () => {
@@ -633,9 +629,6 @@ describe("main", () => {
           text: "",
         },
       ], "result");
-      browser.browserAction.setBadgeBackgroundColor.flush();
-      browser.browserAction.setBadgeText.flush();
-      browser.browserAction.setBadgeTextColor.flush();
     });
 
     it("should call function", async () => {
@@ -671,9 +664,6 @@ describe("main", () => {
           color: "white",
         },
       ], "result");
-      browser.browserAction.setBadgeBackgroundColor.flush();
-      browser.browserAction.setBadgeText.flush();
-      browser.browserAction.setBadgeTextColor.flush();
     });
 
     it("should call function", async () => {
@@ -709,9 +699,6 @@ describe("main", () => {
           color: "white",
         },
       ], "result");
-      browser.browserAction.setBadgeBackgroundColor.flush();
-      browser.browserAction.setBadgeText.flush();
-      browser.browserAction.setBadgeTextColor.flush();
     });
 
     it("should call function", async () => {
@@ -747,9 +734,6 @@ describe("main", () => {
           color: "white",
         },
       ], "result");
-      browser.browserAction.setBadgeBackgroundColor.flush();
-      browser.browserAction.setBadgeText.flush();
-      browser.browserAction.setBadgeTextColor.flush();
     });
 
     it("should call function", async () => {
@@ -786,9 +770,6 @@ describe("main", () => {
           color: "white",
         },
       ], "result");
-      browser.browserAction.setBadgeBackgroundColor.flush();
-      browser.browserAction.setBadgeText.flush();
-      browser.browserAction.setBadgeTextColor.flush();
     });
   });
 
@@ -812,7 +793,6 @@ describe("main", () => {
       await func();
       assert.strictEqual(browser.management.getAll.callCount, i + 1, "called");
       assert.strictEqual(varsLocal[ICON_ID], "", "value");
-      browser.management.getAll.flush();
     });
 
     it("should set value", async () => {
@@ -838,7 +818,6 @@ describe("main", () => {
       await func();
       assert.strictEqual(browser.management.getAll.callCount, i + 1, "called");
       assert.strictEqual(varsLocal[ICON_ID], "", "value");
-      browser.management.getAll.flush();
     });
 
     it("should set value", async () => {
@@ -865,7 +844,6 @@ describe("main", () => {
       await func();
       assert.strictEqual(browser.management.getAll.callCount, i + 1, "called");
       assert.strictEqual(varsLocal[ICON_ID], ICON_DARK_ID, "value");
-      browser.management.getAll.flush();
     });
 
     it("should set value", async () => {
@@ -891,7 +869,6 @@ describe("main", () => {
       await func();
       assert.strictEqual(browser.management.getAll.callCount, i + 1, "called");
       assert.strictEqual(varsLocal[ICON_ID], ICON_LIGHT_ID, "value");
-      browser.management.getAll.flush();
     });
 
     it("should set value", async () => {
@@ -917,7 +894,6 @@ describe("main", () => {
       await func();
       assert.strictEqual(browser.management.getAll.callCount, i + 1, "called");
       assert.strictEqual(varsLocal[ICON_ID], ICON_DARK_ID, "value");
-      browser.management.getAll.flush();
     });
   });
 
@@ -1149,7 +1125,6 @@ describe("main", () => {
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1167,7 +1142,6 @@ describe("main", () => {
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1187,7 +1161,6 @@ describe("main", () => {
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1206,7 +1179,6 @@ describe("main", () => {
       assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1224,7 +1196,6 @@ describe("main", () => {
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.strictEqual(menuItems[MODE_SELECTION], MODE_SELECTION, "menu");
       assert.isNull(menuItems[MODE_EDIT], "menu");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1242,7 +1213,6 @@ describe("main", () => {
       assert.isNull(menuItems[MODE_SOURCE], "menu");
       assert.isNull(menuItems[MODE_SELECTION], "menu");
       assert.strictEqual(menuItems[MODE_EDIT], MODE_EDIT, "menu");
-      browser.i18n.getMessage.flush();
     });
   });
 
@@ -1349,7 +1319,6 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(browser.menus.update.callCount, i + 3, "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1358,7 +1327,6 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(browser.menus.update.callCount, i + 3, "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1375,7 +1343,6 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 3, "called");
       assert.deepEqual(res, [undefined, undefined, undefined], "result");
-      browser.i18n.getMessage.flush();
     });
 
     it("should not call function", async () => {
@@ -1391,7 +1358,6 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i, "not called");
       assert.deepEqual(res, [], "result");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1408,7 +1374,6 @@ describe("main", () => {
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 1, "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.i18n.getMessage.flush();
     });
 
     it("should call function", async () => {
@@ -1595,7 +1560,6 @@ describe("main", () => {
       const res = await func(data);
       assert.deepEqual(res, [undefined, [], [undefined, undefined, undefined]],
                        "result");
-      browser.storage.local.get.flush();
     });
 
     it("should call function", async () => {
@@ -1611,7 +1575,6 @@ describe("main", () => {
       const res = await func(data);
       assert.deepEqual(res, [undefined, [], [undefined, undefined, undefined]],
                        "result");
-      browser.storage.local.get.flush();
     });
   });
 
@@ -1647,7 +1610,6 @@ describe("main", () => {
       assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
                          "called");
       assert.isUndefined(res, "result");
-      browser.runtime.openOptionsPage.flush();
     });
   });
 
@@ -1716,7 +1678,6 @@ describe("main", () => {
         false,
         "warn",
       ], "result");
-      browser.notifications.create.flush();
     });
 
     it("should call function", async () => {
@@ -1734,7 +1695,6 @@ describe("main", () => {
       assert.strictEqual(browser.notifications.create.callCount, i + 1,
                          "called");
       assert.deepEqual(res, ["warn"], "result");
-      browser.notifications.create.flush();
     });
 
     it("should call function", async () => {
@@ -1755,7 +1715,6 @@ describe("main", () => {
         false,
         "error",
       ], "result");
-      browser.notifications.create.flush();
     });
 
     it("should call function", async () => {
@@ -1773,7 +1732,6 @@ describe("main", () => {
       assert.strictEqual(browser.notifications.create.callCount, i + 1,
                          "called");
       assert.deepEqual(res, ["error"], "result");
-      browser.notifications.create.flush();
     });
 
     it("should call function", async () => {
@@ -1794,7 +1752,6 @@ describe("main", () => {
         false,
         `${PROCESS_CHILD}_stderr`,
       ], "result");
-      browser.notifications.create.flush();
     });
 
     it("should call function", async () => {
@@ -1852,7 +1809,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "foo"}));
+                                  browser.runtime.connect({name: "foo"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const j = port.postMessage.callCount;
       browser.tabs.query.resolves([{
@@ -1870,7 +1827,6 @@ describe("main", () => {
       assert.strictEqual(browser.tabs.query.callCount, i + 1, "called");
       assert.strictEqual(port.postMessage.callCount, j + 1, "called");
       assert.deepEqual(res, [[]], "result");
-      browser.tabs.query.flush();
     });
 
     it("should call function", async () => {
@@ -1879,7 +1835,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "foo"}));
+                                  browser.runtime.connect({name: "foo"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const j = port.postMessage.callCount;
       browser.tabs.query.resolves([{
@@ -1897,7 +1853,6 @@ describe("main", () => {
       assert.strictEqual(browser.tabs.query.callCount, i + 1, "called");
       assert.strictEqual(port.postMessage.callCount, j + 1, "called");
       assert.deepEqual(res, [[]], "result");
-      browser.tabs.query.flush();
     });
 
     it("should call function", async () => {
@@ -1905,7 +1860,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "foo"}));
+                                  browser.runtime.connect({name: "foo"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const msg = {
@@ -1923,7 +1878,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "foo"}));
+                                  browser.runtime.connect({name: "foo"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const msg = {
@@ -2052,7 +2007,8 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2079,7 +2035,8 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2106,7 +2063,8 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2130,7 +2088,8 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i, "not called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i,
+        "not called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j, "not called",
@@ -2150,7 +2109,8 @@ describe("main", () => {
       };
       const res = await func(msg);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i, "not called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i,
+        "not called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j, "not called",
@@ -2184,7 +2144,7 @@ describe("main", () => {
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
       ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({name: "foo"}));
+                                  browser.runtime.connect({name: "foo"}));
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const j = browser.storage.local.set.callCount;
@@ -2204,7 +2164,6 @@ describe("main", () => {
           [undefined, undefined, undefined],
         ],
       ], "result");
-      browser.storage.local.get.flush();
     });
 
     it("should call function", async () => {
@@ -2338,17 +2297,17 @@ describe("main", () => {
     });
 
     it("should get null", async () => {
-      const port = new browser.runtime.Port({
+      const port = {
         name: PORT_CONTENT,
         sender: {},
-      });
+      };
       const res = await func(port);
       assert.isNull(res, "result");
     });
 
     it("should call function", async () => {
       const {ports, varsLocal} = mjs;
-      const port = new browser.runtime.Port({
+      const port = browser.runtime.connect({
         name: PORT_CONTENT,
         sender: {
           frameId: 0,
@@ -2381,7 +2340,7 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {ports, varsLocal} = mjs;
-      const port = new browser.runtime.Port({
+      const port = browser.runtime.connect({
         name: PORT_CONTENT,
         sender: {
           frameId: 0,
@@ -2414,7 +2373,7 @@ describe("main", () => {
 
     it("should not call function", async () => {
       const {ports, varsLocal} = mjs;
-      const port = new browser.runtime.Port({
+      const port = browser.runtime.connect({
         name: PORT_CONTENT,
         sender: {
           frameId: 0,
@@ -2466,7 +2425,8 @@ describe("main", () => {
       const res = await func();
       assert.isFalse(hostStatus[HOST_CONNECTION], "value");
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2517,7 +2477,8 @@ describe("main", () => {
       };
       const res = await func(info);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2542,12 +2503,10 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {ports, varsLocal} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       const port = ports.get("1").get("2").get("https://example.com");
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
@@ -2560,7 +2519,8 @@ describe("main", () => {
       };
       const res = await func(info);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2591,12 +2551,10 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {ports, varsLocal} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       const port = ports.get("1").get("2").get("https://example.com");
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
@@ -2609,7 +2567,8 @@ describe("main", () => {
       };
       const res = await func(info);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2635,12 +2594,10 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {ports, varsLocal} = mjs;
+      const stubPort = browser.runtime.connect({name: "foo"});
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: "foo",
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       const port = ports.get("1").get("2").get("https://example.com");
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
@@ -2653,7 +2610,8 @@ describe("main", () => {
       };
       const res = await func(info);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2737,7 +2695,8 @@ describe("main", () => {
       const m = browser.menus.update.callCount;
       const res = await func(2, {status: "complete"}, {active: true});
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2758,6 +2717,7 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {ports, varsLocal} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
       const k = browser.browserAction.setBadgeTextColor.callCount;
@@ -2765,10 +2725,7 @@ describe("main", () => {
       const m = browser.menus.update.callCount;
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       const res = await func(2, {
         status: "complete",
       }, {
@@ -2833,31 +2790,26 @@ describe("main", () => {
 
     it("should get empty array", async () => {
       const {host, ports} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       const i = host.postMessage.callCount;
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       browser.windows.get.withArgs(1).rejects(new Error("error"));
       const res = await func(3, {windowId: 1});
       assert.strictEqual(ports.get("1").size, 1, "size");
       assert.isTrue(ports.get("1").has("2"), "has");
       assert.strictEqual(host.postMessage.callCount, i, "not called");
       assert.deepEqual(res, [], "result");
-      browser.windows.get.flush();
     });
 
     it("should get empty array", async () => {
       const {host, ports} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       const i = host.postMessage.callCount;
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       browser.windows.get.withArgs(1).resolves({
         incognito: false,
       });
@@ -2866,57 +2818,72 @@ describe("main", () => {
       assert.isTrue(ports.get("1").has("2"), "has");
       assert.strictEqual(host.postMessage.callCount, i, "not called");
       assert.deepEqual(res, [], "result");
-      browser.windows.get.flush();
     });
 
     it("should call function", async () => {
       const {host, ports} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
+      const stubPort2 = browser.runtime.connect({name: PORT_CONTENT});
       const i = host.postMessage.callCount;
+      const j = browser.windows.get.withArgs(1, null).callCount;
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       ports.get("1").set("3", new Map());
-      ports.get("1").get("3").set("https://www.example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
-      browser.windows.get.withArgs(1).resolves({
+      ports.get("1").get("3").set("https://www.example.com", stubPort2);
+      browser.windows.get.withArgs(1, null).resolves({
         incognito: false,
       });
       const res = await func(2, {windowId: 1});
       assert.strictEqual(ports.get("1").size, 1, "size");
       assert.isFalse(ports.get("1").has("2"), "has");
       assert.strictEqual(host.postMessage.callCount, i + 1, "called");
+      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
+                         "called");
       assert.deepEqual(res, [null, undefined], "result");
-      browser.windows.get.flush();
     });
 
     it("should call function", async () => {
       const {host, ports} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       const i = host.postMessage.callCount;
+      const j = browser.windows.get.withArgs(1, null).callCount;
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       ports.get("1").set("3", new Map());
-      ports.get("1").get("3").set("https://www.example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
-      browser.windows.get.withArgs(1).resolves({
+      ports.get("1").get("3").set("https://www.example.com", stubPort);
+      browser.windows.get.withArgs(1, null).resolves({
         incognito: true,
       });
       const res = await func(2, {windowId: 1});
       assert.strictEqual(ports.get("1").size, 1, "size");
       assert.isFalse(ports.get("1").has("2"), "has");
       assert.strictEqual(host.postMessage.callCount, i + 1, "called");
+      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
+                         "called");
       assert.deepEqual(res, [null, undefined], "result");
-      browser.windows.get.flush();
+    });
+
+    it("should call function", async () => {
+      const {host, ports} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
+      const i = host.postMessage.callCount;
+      const j = browser.windows.get.withArgs(1, null).callCount;
+      ports.set("2", new Map());
+      ports.get("2").set("2", new Map());
+      ports.get("2").get("2").set("https://example.com", stubPort);
+      ports.get("2").set("3", new Map());
+      ports.get("2").get("3").set("https://www.example.com", stubPort);
+      browser.windows.get.withArgs(1, null).resolves({
+        incognito: true,
+      });
+      const res = await func(2, {windowId: 1});
+      assert.strictEqual(ports.get("2").size, 2, "size");
+      assert.strictEqual(host.postMessage.callCount, i, "not called");
+      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
+                         "called");
+      assert.deepEqual(res, [], "result");
     });
   });
 
@@ -2954,7 +2921,8 @@ describe("main", () => {
       });
       const res = await func();
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -2974,7 +2942,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
     });
 
     it("should call function", async () => {
@@ -2990,7 +2957,8 @@ describe("main", () => {
       });
       const res = await func();
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -3010,7 +2978,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
     });
 
     it("should call function", async () => {
@@ -3050,12 +3017,10 @@ describe("main", () => {
 
     it("should call function", async () => {
       const {ports} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       const port = ports.get("1").get("2").get("https://example.com");
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
@@ -3077,7 +3042,8 @@ describe("main", () => {
       }]);
       const res = await func(1);
       assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, "called",
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        "called",
       );
       assert.strictEqual(
         browser.browserAction.setBadgeText.callCount, j + 1, "called",
@@ -3104,18 +3070,14 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
-      browser.tabs.query.flush();
     });
 
     it("should call function", async () => {
       const {ports} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       const port = ports.get("1").get("2").get("https://example.com");
       const i = browser.browserAction.setBadgeBackgroundColor.callCount;
       const j = browser.browserAction.setBadgeText.callCount;
@@ -3164,8 +3126,6 @@ describe("main", () => {
           ],
         ],
       ], "result");
-      browser.windows.getCurrent.flush();
-      browser.tabs.query.flush();
     });
   });
 
@@ -3201,7 +3161,6 @@ describe("main", () => {
       assert.isFalse(ports.has("1"), "restored");
       assert.strictEqual(host.postMessage.callCount, i + 1, "called");
       assert.deepEqual(res, [null, undefined], "result");
-      browser.windows.getAll.flush();
     });
 
     it("should not restore ports", async () => {
@@ -3217,7 +3176,6 @@ describe("main", () => {
       assert.isTrue(ports.has("1"), "not restored");
       assert.strictEqual(host.postMessage.callCount, i + 1, "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.windows.getAll.flush();
     });
 
     it("should not call function", async () => {
@@ -3234,7 +3192,6 @@ describe("main", () => {
       assert.isFalse(ports.has("1"), "restored");
       assert.strictEqual(host.postMessage.callCount, i, "not called");
       assert.deepEqual(res, [null], "result");
-      browser.windows.getAll.flush();
     });
   });
 
@@ -3261,17 +3218,14 @@ describe("main", () => {
       assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
                          "called");
       assert.isUndefined(res, "result");
-      browser.runtime.openOptionsPage.flush();
     });
 
     it("should call function", async () => {
       const {ports} = mjs;
+      const stubPort = browser.runtime.connect({name: PORT_CONTENT});
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", stubPort);
       const port = ports.get("1").get("2").get("https://example.com");
       const i = port.postMessage.callCount;
       const j = browser.tabs.query.callCount;
@@ -3287,7 +3241,6 @@ describe("main", () => {
       assert.strictEqual(port.postMessage.callCount, i + 1, "called");
       assert.strictEqual(browser.tabs.query.callCount, j + 1, "called");
       assert.deepEqual(res, [], "result");
-      browser.tabs.query.flush();
     });
   });
 
@@ -3295,12 +3248,12 @@ describe("main", () => {
     const func = mjs.portPostVar;
     beforeEach(() => {
       const {ports} = mjs;
+      const port = browser.runtime.connect({
+        name: PORT_CONTENT,
+      });
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
+      ports.get("1").get("2").set("https://example.com", port);
     });
     afterEach(() => {
       const {ports} = mjs;
@@ -3376,13 +3329,12 @@ describe("main", () => {
 
     it("should set value", async () => {
       const {ports, vars} = mjs;
+      const port = browser.runtime.connect({
+        name: PORT_CONTENT,
+      });
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
-      const port = ports.get("1").get("2").get("https://example.com");
+      ports.get("1").get("2").set("https://example.com", port);
       const i = port.postMessage.callCount;
       const res = await func(SYNC_AUTO_URL, {
         value: "https://example.com",
@@ -3403,13 +3355,12 @@ describe("main", () => {
 
     it("should set value", async () => {
       const {ports, vars} = mjs;
+      const port = browser.runtime.connect({
+        name: PORT_CONTENT,
+      });
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
-      const port = ports.get("1").get("2").get("https://example.com");
+      ports.get("1").get("2").set("https://example.com", port);
       const i = port.postMessage.callCount;
       const res = await func(SYNC_AUTO, {
         checked: true,
@@ -3430,13 +3381,12 @@ describe("main", () => {
 
     it("should set value", async () => {
       const {ports, vars} = mjs;
+      const port = browser.runtime.connect({
+        name: PORT_CONTENT,
+      });
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
-      const port = ports.get("1").get("2").get("https://example.com");
+      ports.get("1").get("2").set("https://example.com", port);
       const i = port.postMessage.callCount;
       const res = await func(ONLY_EDITABLE, {
         checked: true,
@@ -3457,13 +3407,12 @@ describe("main", () => {
 
     it("should set value", async () => {
       const {ports, vars} = mjs;
+      const port = browser.runtime.connect({
+        name: PORT_CONTENT,
+      });
       ports.set("1", new Map());
       ports.get("1").set("2", new Map());
-      ports.get("1").get("2").set("https://example.com",
-                                  new browser.runtime.Port({
-                                    name: PORT_CONTENT,
-                                  }));
-      const port = ports.get("1").get("2").get("https://example.com");
+      ports.get("1").get("2").set("https://example.com", port);
       const i = port.postMessage.callCount;
       const j = browser.menus.removeAll.callCount;
       const res = await func(ONLY_EDITABLE, {
@@ -3490,7 +3439,6 @@ describe("main", () => {
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
                          "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.runtime.getURL.flush();
     });
 
     it("should set value", async () => {
@@ -3505,7 +3453,6 @@ describe("main", () => {
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
                          "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.runtime.getURL.flush();
     });
 
     it("should set value", async () => {
@@ -3520,7 +3467,6 @@ describe("main", () => {
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
                          "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.runtime.getURL.flush();
     });
 
     it("should set value", async () => {
@@ -3535,7 +3481,6 @@ describe("main", () => {
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
                          "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.runtime.getURL.flush();
     });
 
     it("should set value", async () => {
@@ -3550,7 +3495,6 @@ describe("main", () => {
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
                          "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.runtime.getURL.flush();
     });
 
     it("should set value", async () => {
@@ -3565,7 +3509,6 @@ describe("main", () => {
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
                          "called");
       assert.deepEqual(res, [undefined], "result");
-      browser.runtime.getURL.flush();
     });
 
     it("should set value but not call function", async () => {
@@ -3580,7 +3523,6 @@ describe("main", () => {
       assert.strictEqual(browser.browserAction.setIcon.callCount, i,
                          "not called");
       assert.deepEqual(res, [], "result");
-      browser.runtime.getURL.flush();
     });
 
     it("should not set value", async () => {
@@ -3595,7 +3537,6 @@ describe("main", () => {
       assert.strictEqual(browser.browserAction.setIcon.callCount, i,
                          "not called");
       assert.deepEqual(res, [], "result");
-      browser.runtime.getURL.flush();
     });
 
     it("should call function", async () => {

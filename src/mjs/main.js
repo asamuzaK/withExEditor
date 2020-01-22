@@ -480,12 +480,9 @@ export const createMenuItems = async () => {
           func.push(createMenuItem(item, ["selection"]));
         }
         break;
-      case MODE_SOURCE:
-        if (bool) {
-          func.push(createMenuItem(item, ["frame", "page"]));
-        }
-        break;
       default:
+        item === MODE_SOURCE && bool &&
+          func.push(createMenuItem(item, ["frame", "page"]));
     }
   }
   return Promise.all(func);
@@ -549,12 +546,9 @@ export const updateContextMenu = async type => {
               func.push(createMenuItem(item, ["selection"]));
             }
             break;
-          case MODE_SOURCE:
-            if (bool) {
-              func.push(createMenuItem(item, ["frame", "page"]));
-            }
-            break;
           default:
+            item === MODE_SOURCE && bool &&
+              func.push(createMenuItem(item, ["frame", "page"]));
         }
       }
     }
@@ -942,7 +936,7 @@ export const onTabRemoved = async (id, info) => {
   }
   const {windowId: wId} = info;
   const func = [];
-  const win = await getWindow(wId).catch(logErr);
+  const win = await getWindow(wId);
   if (win) {
     const {incognito} = win;
     const windowId = stringifyPositiveInt(wId, true);

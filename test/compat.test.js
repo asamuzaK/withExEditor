@@ -5,7 +5,7 @@
 import {JSDOM} from "jsdom";
 import {assert} from "chai";
 import {afterEach, beforeEach, describe, it} from "mocha";
-import {browser} from "./mocha/setup.js";
+import {browser, mockPort} from "./mocha/setup.js";
 import * as mjs from "../src/mjs/compat.js";
 import {WEBEXT_ID} from "../src/mjs/constant.js";
 
@@ -26,6 +26,12 @@ describe("compat", () => {
     const dom = createJsdom();
     window = dom && dom.window;
     document = window && window.document;
+    browser._sandbox.reset();
+    browser.i18n.getMessage.callsFake((...args) => args.toString());
+    browser.menus.removeAll.resolves(undefined);
+    browser.permissions.contains.resolves(true);
+    browser.runtime.connect.callsFake(mockPort);
+    browser.runtime.connectNative.callsFake(mockPort);
     global.browser = browser;
     global.window = window;
     global.document = document;
@@ -36,6 +42,7 @@ describe("compat", () => {
     delete global.browser;
     delete global.window;
     delete global.document;
+    browser._sandbox.reset();
   });
 
   it("should get browser object", () => {
