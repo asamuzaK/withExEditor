@@ -478,10 +478,8 @@ export const createMenuItems = async () => {
       case MODE_SELECTION:
         bool && func.push(createMenuItem(item, ["selection"]));
         break;
-      case MODE_SOURCE:
-        bool && func.push(createMenuItem(item, ["frame", "page"]));
-        break;
       default:
+        bool && func.push(createMenuItem(item, ["frame", "page"]));
     }
   }
   return Promise.all(func);
@@ -543,10 +541,8 @@ export const updateContextMenu = async type => {
           case MODE_SELECTION:
             bool && func.push(createMenuItem(item, ["selection"]));
             break;
-          case MODE_SOURCE:
-            bool && func.push(createMenuItem(item, ["frame", "page"]));
-            break;
           default:
+            bool && func.push(createMenuItem(item, ["frame", "page"]));
         }
       }
     }
