@@ -1497,16 +1497,19 @@ describe("content", () => {
       const p = document.createElement("p");
       const span = document.createElement("span");
       const span2 = document.createElement("span");
+      const br = document.createElement("br");
       const body = document.querySelector("body");
       span.classList.add("bar");
       span.textContent = "baz";
+      br.classList.add("bar");
       span2.classList.add("bar");
       span2.textContent = "qux";
       p.appendChild(span);
+      p.appendChild(br);
       p.appendChild(span2);
       body.appendChild(p);
       const res = func(p, "foo");
-      assert.strictEqual(res, "baz\nqux", "result");
+      assert.strictEqual(res, "baz\n\nqux", "result");
     });
   });
 
@@ -3600,7 +3603,7 @@ describe("content", () => {
   });
 
   describe("handle disconnected port", () => {
-    const func = cjs.portOnDisconnect;
+    const func = cjs.handleDisconnectedPort;
     const lastErrorDefaultValue = browser.runtime.lastError;
     beforeEach(() => {
       cjs.vars.port = mockPort({name: PORT_CONTENT});
@@ -3655,6 +3658,63 @@ describe("content", () => {
                          "called");
       assert.isNull(cjs.vars.port, "port");
       assert.deepEqual(res, {}, "result");
+    });
+  });
+
+  describe("port on disconnect", () => {
+    const func = cjs.portOnDisconnect;
+    const lastErrorDefaultValue = browser.runtime.lastError;
+    beforeEach(() => {
+      cjs.vars.port = mockPort({name: PORT_CONTENT});
+    });
+    afterEach(() => {
+      cjs.vars.port = null;
+    });
+
+    it("should not log error", async () => {
+      const stubConsole = sinon.stub(console, "error");
+      const i = browser.runtime.sendMessage.callCount;
+      browser.runtime.lastError = null;
+      cjs.vars.port.error = null;
+      const res = await func(cjs.vars.port);
+      const {called: calledConsole} = stubConsole;
+      stubConsole.restore();
+      browser.runtime.lastError = lastErrorDefaultValue;
+      assert.isFalse(calledConsole, "not called console");
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+                         "called");
+      assert.isNull(cjs.vars.port, "port");
+      assert.deepEqual(res, {}, "result");
+    });
+  });
+
+  describe("port on message", () => {
+    const func = cjs.portOnMsg;
+    beforeEach(() => {
+      cjs.dataIds.clear();
+      cjs.vars[ID_TAB] = "";
+      cjs.vars[ID_WIN] = "";
+      cjs.vars[SYNC_AUTO] = false;
+      cjs.vars[SYNC_AUTO_URL] = null;
+      cjs.vars.port = mockPort({name: PORT_CONTENT});
+    });
+    afterEach(() => {
+      cjs.dataIds.clear();
+      cjs.vars[ID_TAB] = "";
+      cjs.vars[ID_WIN] = "";
+      cjs.vars[SYNC_AUTO] = false;
+      cjs.vars[SYNC_AUTO_URL] = null;
+      cjs.vars.port = null;
+    });
+
+    it("should set values", async () => {
+      const res = await func({
+        [ID_TAB]: "1",
+        [ID_WIN]: "2",
+      });
+      assert.strictEqual(cjs.vars[ID_TAB], "1", "tab");
+      assert.strictEqual(cjs.vars[ID_WIN], "2", "window");
+      assert.deepEqual(res, [], "result");
     });
   });
 
@@ -3744,6 +3804,26 @@ describe("content", () => {
       });
       assert.isNull(cjs.vars.port, "port");
       assert.deepEqual(res, [], "result");
+    });
+
+    it("should set port", async () => {
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
+      const res = await func({
+        [PORT_CONNECT]: true,
+      });
+      assert.isObject(cjs.vars.port, "port");
+      assert.strictEqual(cjs.vars.port.name, PORT_CONTENT, "name");
+      assert.deepEqual(res, [undefined], "result");
+    });
+  });
+
+  describe("runtime on message", () => {
+    const func = cjs.runtimeOnMsg;
+    beforeEach(() => {
+      cjs.vars.port = null;
+    });
+    afterEach(() => {
+      cjs.vars.port = null;
     });
 
     it("should set port", async () => {
@@ -4038,6 +4118,16 @@ describe("content", () => {
       assert.deepEqual(cjs.vars[CONTEXT_NODE], target, "node");
       assert.strictEqual(cjs.vars[CONTEXT_MODE], MODE_SOURCE, "mode");
       assert.isNull(res, "result");
+    });
+  });
+
+  describe("startup", () => {
+    const func = cjs.startup;
+
+    it("should get result", async () => {
+      const res = await func();
+      assert.isArray(res, "result");
+      assert.strictEqual(res.length, 4, "length");
     });
   });
 });

@@ -735,7 +735,11 @@ const getLiveEditContent = (elm, key) => {
     if (items && items.length) {
       const arr = [];
       for (const item of items) {
-        arr.push(item.textContent);
+        if (item.localName === "br") {
+          arr.push("");
+        } else {
+          arr.push(item.textContent);
+        }
       }
       content = arr.join("\n");
     }
@@ -1582,12 +1586,26 @@ const handlePortMsg = async msg => {
  * @param {Object} port - runtime.Port
  * @returns {AsyncFunction} - requestPortConnection()
  */
-const portOnDisconnect = async port => {
+const handleDisconnectedPort = async port => {
   const e = port.error || runtime.lastError;
   vars.port = null;
   e && logErr(e);
   return requestPortConnection();
 };
+
+/**
+ * port on disconnect
+ * @param {Object} port - runtime.Port
+ * @returns {AsyncFunction} - handleDisconnectedPort()
+ */
+const portOnDisconnect = port => handleDisconnectedPort(port).catch(throwErr);
+
+/**
+ * port on message
+ * @param {*} msg - message
+ * @returns {AsyncFunction} - handlePortMsg()
+ */
+const portOnMsg = msg => handlePortMsg(msg).catch(throwErr);
 
 /**
  * handle connected port
@@ -1596,8 +1614,8 @@ const portOnDisconnect = async port => {
  */
 const portOnConnect = async port => {
   if (isObjectNotEmpty(port) && port.name === PORT_CONTENT) {
-    port.onMessage.addListener(msg => handlePortMsg(msg).catch(throwErr));
-    port.onDisconnect.addListener(p => portOnDisconnect(p).catch(throwErr));
+    port.onMessage.addListener(portOnMsg);
+    port.onDisconnect.addListener(portOnDisconnect);
     vars.port = port;
   } else {
     vars.port = null;
@@ -1642,6 +1660,13 @@ const handleMsg = async msg => {
   }
   return Promise.all(func);
 };
+
+/**
+ * runtime on message
+ * @param {*} msg - message
+ * @returns {AsyncFunction} - handleMsg();
+ */
+const runtimeOnMsg = msg => handleMsg(msg).catch(throwErr);
 
 /* handle events */
 /**
@@ -1736,7 +1761,7 @@ const startup = () => Promise.all([
 ]).catch(throwErr);
 
 /* listeners */
-runtime.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+runtime.onMessage.addListener(runtimeOnMsg);
 window.addEventListener("mousedown", handleBeforeContextMenu, true);
 window.addEventListener("keydown", handleKeyDown, true);
 window.addEventListener("load", startup);
@@ -1778,6 +1803,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     getType,
     getXmlnsPrefixedNamespace,
     handleBeforeContextMenu,
+    handleDisconnectedPort,
     handleKeyDown,
     handleMsg,
     handlePortMsg,
@@ -1791,6 +1817,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     matchDocUrl,
     portOnConnect,
     portOnDisconnect,
+    portOnMsg,
     postContent,
     postEachDataId,
     postMsg,
@@ -1802,10 +1829,12 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     replaceLiveEditContent,
     requestPortConnection,
     requestTmpFile,
+    runtimeOnMsg,
     setAttributeNS,
     setDataId,
     setDataIdController,
     setTmpFileData,
+    startup,
     syncText,
     throwErr,
     updateTmpFileData,
