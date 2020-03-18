@@ -49,7 +49,7 @@
         "*://*/*",
         "file:///*"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ],
   "default_locale": "en",

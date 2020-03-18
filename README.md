@@ -47,8 +47,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 ### View Selection with *exEditor*
 
 * Shows a generated DOM tree of selection in XML format.
-* If there are multiple ranges in selection, each range will be shown with a comment as a delimiter.
-* If the selection is not DOM parsable (like JavaScript, CSS), a file that contains only the range of text selected will be created.
+* If the selection is not DOM parsable (like JavaScript, CSS), a source file will be created.
 
 ### Edit Text with *exEditor*
 

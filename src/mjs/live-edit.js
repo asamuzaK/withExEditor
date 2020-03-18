@@ -6,7 +6,7 @@ export default {
   aceEditor: {
     className: "ace_editor",
     getContent: ".ace_line",
-    setContent: ".ace_editor > textarea",
+    setContent: ".ace_text-input",
   },
   codeMirror: {
     className: "CodeMirror",
