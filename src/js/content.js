@@ -1765,6 +1765,7 @@ runtime.onMessage.addListener(runtimeOnMsg);
 window.addEventListener("mousedown", handleBeforeContextMenu, true);
 window.addEventListener("keydown", handleKeyDown, true);
 window.addEventListener("load", startup);
+document.readyState === "complete" && startup();
 
 /* export for tests */
 if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
