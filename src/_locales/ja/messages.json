@@ -38,6 +38,12 @@
   "hostVersion_true": {
     "message": "適合"
   },
+  "isExecutable_false": {
+    "message": "実行不可"
+  },
+  "isExecutable_true": {
+    "message": "実行可能"
+  },
   "modeEditText": {
     "message": "テキストを $LABEL$ で編集",
     "placeholders": {
@@ -279,6 +285,9 @@
   },
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "ホワイトアイコン"
+  },
+  "optionsIsExecutableDetail": {
+    "message": "状態が「不明」や「実行不可」となっている場合は、ホストでセットアップスクリプトを実行してください。"
   },
   "optionsNotifyHostError": {
     "message": "ホストのエラーを通知"

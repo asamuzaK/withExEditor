@@ -13,7 +13,7 @@ import {
 } from "./compat.js";
 import {
   addFormSubmitListener, addInputChangeListener, addReloadExtensionListener,
-  addSyncUrlsInputListener, getHostStatus, handleMsg, port,
+  addSyncUrlsInputListener, getEditorConfig, getHostStatus, handleMsg, port,
   setValuesFromStorage,
 } from "./options-main.js";
 
@@ -29,5 +29,6 @@ document.addEventListener("DOMContentLoaded", () => Promise.all([
   addReloadExtensionListener(),
   addFormSubmitListener(),
   getHostStatus(),
+  getEditorConfig(),
   disableIncompatibleInputs(),
 ]).catch(throwErr));
