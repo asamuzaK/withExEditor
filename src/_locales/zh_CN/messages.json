@@ -275,7 +275,7 @@
     "message": "白图标"
   },
   "optionsIsExecutableDetail": {
-    "message": "If \"Unknown\" or \"Not executable\", run the setup script on the host."
+    "message": "If \"Unknown\" or \"Not Executable\", run the setup script on the host."
   },
   "optionsNotifyHostError": {
     "message": "通知主机错误"
