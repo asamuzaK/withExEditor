@@ -14,9 +14,10 @@ const {i18n, runtime} = browser;
 
 /* constants */
 import {
-  EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
+  EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
+  EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
-  HOST_VERSION_LATEST, INFO, STORAGE_SET, SYNC_AUTO_URL, WARN,
+  HOST_VERSION_LATEST, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "./constant.js";
 const PORT_NAME = "portOptions";
 
@@ -39,6 +40,12 @@ export const postMsg = async msg => {
  * @returns {AsyncFunction} - port message
  */
 export const getHostStatus = async () => postMsg({[HOST_STATUS_GET]: true});
+
+/**
+ * get editor config
+ * @returns {AsyncFunction} - port message
+ */
+export const getEditorConfig = async () => postMsg({[EDITOR_CONFIG_GET]: true});
 
 /**
  * create pref
@@ -69,8 +76,17 @@ export const createPref = async (elm, executable = false) => {
  */
 export const extractEditorConfig = async (obj = {}) => {
   const {editorLabel, editorName, executable} = obj;
+  const isExecutable = document.getElementById(IS_EXECUTABLE);
   const name = document.getElementById(EDITOR_FILE_NAME);
   const label = document.getElementById(EDITOR_LABEL);
+  if (isExecutable) {
+    isExecutable.textContent = i18n.getMessage(`isExecutable_${!!executable}`);
+    if (executable) {
+      isExecutable.classList.remove(WARN);
+    } else {
+      isExecutable.classList.add(WARN);
+    }
+  }
   if (name) {
     name.value = editorName || "";
   }

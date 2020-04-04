@@ -12,7 +12,7 @@ import * as mjs from "../src/mjs/options-main.js";
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION,
-  HOST_VERSION_LATEST, INFO, STORAGE_SET, SYNC_AUTO_URL, WARN,
+  HOST_VERSION_LATEST, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN,
 } from "../src/mjs/constant.js";
 
 describe("options-main", () => {
@@ -83,6 +83,16 @@ describe("options-main", () => {
     });
   });
 
+  describe("get editor config", () => {
+    const func = mjs.getEditorConfig;
+
+    it("should call function", async () => {
+      const i = mjs.port.postMessage.callCount;
+      await func();
+      assert.strictEqual(mjs.port.postMessage.callCount, i + 1, "called");
+    });
+  });
+
   describe("create pref", () => {
     const func = mjs.createPref;
 
@@ -112,6 +122,30 @@ describe("options-main", () => {
 
   describe("extract editor config", () => {
     const func = mjs.extractEditorConfig;
+
+    it("should add warning", async () => {
+      browser.i18n.getMessage.withArgs("isExecutable_false").returns("foo");
+      const elm = document.createElement("p");
+      const body = document.querySelector("body");
+      const arg = {executable: false};
+      elm.id = IS_EXECUTABLE;
+      body.appendChild(elm);
+      await func(arg);
+      assert.strictEqual(elm.textContent, "foo", "text");
+      assert.isTrue(elm.classList.contains(WARN), "class");
+    });
+
+    it("should remove warning", async () => {
+      browser.i18n.getMessage.withArgs("isExecutable_true").returns("foo");
+      const elm = document.createElement("p");
+      const body = document.querySelector("body");
+      const arg = {executable: true};
+      elm.id = IS_EXECUTABLE;
+      body.appendChild(elm);
+      await func(arg);
+      assert.strictEqual(elm.textContent, "foo", "text");
+      assert.isFalse(elm.classList.contains(WARN), "class");
+    });
 
     it("should set attr even if no argument given", async () => {
       const elm = document.createElement("input");

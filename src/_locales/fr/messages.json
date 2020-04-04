@@ -38,6 +38,12 @@
   "hostVersion_true": {
     "message": "Compatible"
   },
+  "isExecutable_false": {
+    "message": "Not Executable"
+  },
+  "isExecutable_true": {
+    "message": "Executable"
+  },
   "modeEditText": {
     "message": "Editer Text avec $LABEL$",
     "placeholders": {
@@ -267,6 +273,9 @@
   },
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "Icone blanche"
+  },
+  "optionsIsExecutableDetail": {
+    "message": "If \"Unknown\" or \"Not executable\", run the setup script on the host."
   },
   "optionsNotifyHostError": {
     "message": "Notifier les érreures d'hôte"
