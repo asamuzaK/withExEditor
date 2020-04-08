@@ -274,6 +274,9 @@
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "Icone blanche"
   },
+  "optionsIsExecutable": {
+    "message": "Editor State"
+  },
   "optionsIsExecutableDetail": {
     "message": "If \"Unknown\" or \"Not Executable\", run the setup script on the host."
   },

@@ -286,6 +286,9 @@
   "optionsIconWhiteLabel_ariaLabel": {
     "message": "ホワイトアイコン"
   },
+  "optionsIsExecutable": {
+    "message": "エディタの状態"
+  },
   "optionsIsExecutableDetail": {
     "message": "状態が「不明」や「実行不可」となっている場合は、ホストでセットアップスクリプトを実行してください。"
   },
