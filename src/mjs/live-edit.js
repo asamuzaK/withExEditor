@@ -13,4 +13,9 @@ export default {
     getContent: ".CodeMirror-line",
     setContent: ".CodeMirror > div > textarea",
   },
+  draftEditor: {
+    className: "public-DraftEditor-content",
+    getContent: "[data-text=\"true\"]",
+    setContent: "self",
+  },
 };

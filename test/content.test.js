@@ -57,8 +57,9 @@ describe("content", () => {
   };
   let window, document;
   const globalKeys = [
-    "DOMTokenList", "DOMParser", "FocusEvent", "Headers", "InputEvent",
-    "KeyboardEvent", "Node", "NodeList", "XMLSerializer",
+    "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "FocusEvent",
+    "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList",
+    "XMLSerializer",
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
   const isContentEditable = elm => {
@@ -94,6 +95,42 @@ describe("content", () => {
     global.document = document;
     global.fetch = sinon.stub();
     for (const key of globalKeys) {
+      // Not implemented in jsdom
+      if (!window[key]) {
+        if (key === "ClipboardEvent") {
+          window[key] = class ClipboardEvent extends window.Event {
+            constructor(arg, initEvt) {
+              super(arg, initEvt);
+              this.clipboardData = null;
+            }
+          };
+        } else if (key === "DataTransfer") {
+          window[key] = class DataTransfer {
+            constructor() {
+              this._items = new Map();
+              this.types;
+            }
+            get types() {
+              return Array.from(this._items.keys());
+            }
+            clearData(formats) {
+              if (Array.isArray(formats)) {
+                for (const format of formats) {
+                  this._items.remove(format);
+                }
+              } else {
+                !formats && this._items.clear();
+              }
+            }
+            getData(type) {
+              return this._items.get(type);
+            }
+            setData(type, value) {
+              this._items.set(type, value);
+            }
+          };
+        }
+      }
       global[key] = window[key];
     }
   });
@@ -309,6 +346,69 @@ describe("content", () => {
     });
   });
 
+  describe("dispatch clipboard event", () => {
+    const func = cjs.dispatchClipboardEvent;
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const text = document.createTextNode("foo");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      p.appendChild(text);
+      body.appendChild(p);
+      func(text);
+      assert.isFalse(spy.called, "called");
+    });
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const text = document.createTextNode("foo");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      p.appendChild(text);
+      body.appendChild(p);
+      func(text, "foo");
+      assert.isFalse(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "copy", {
+        bubbles: true,
+        cancelable: true,
+      });
+      assert.isTrue(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "cut", {
+        bubbles: true,
+        cancelable: true,
+      });
+      assert.isTrue(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: new DataTransfer(),
+      });
+      assert.isTrue(spy.called, "called");
+    });
+  });
+
   describe("dispatch focus event", () => {
     const func = cjs.dispatchFocusEvent;
 
@@ -347,12 +447,63 @@ describe("content", () => {
       assert.isFalse(spy.called, "called");
     });
 
-    it("should call function", () => {
+    it("should not call function", () => {
       const p = document.createElement("p");
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
       func(p);
+      assert.isFalse(spy.called, "called");
+    });
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "foo");
+      assert.isFalse(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "beforeinput");
+      assert.isTrue(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+      });
+      assert.isTrue(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "input");
+      assert.isTrue(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "input", {
+        bubbles: true,
+        cancelable: false,
+      });
       assert.isTrue(spy.called, "called");
     });
   });
@@ -3193,6 +3344,22 @@ describe("content", () => {
         setContent: ".foo > textarea",
       });
       func(body, "bar baz", "foo");
+      assert.isFalse(stub.called, "not dispatched");
+    });
+
+    it("should not replace content", () => {
+      const stub = sinon.stub();
+      const elm = document.createElement("div");
+      const text = document.createElement("p");
+      const body = document.querySelector("body");
+      elm.classList.add("foo");
+      elm.appendChild(text);
+      body.addEventListener("input", stub, true);
+      body.appendChild(elm);
+      cjs.liveEdit.set("foo", {
+        setContent: ".foo > p",
+      });
+      func(body, "bar baz", "foo");
       assert.isFalse(stub.called, "dispatched");
     });
 
@@ -3211,6 +3378,28 @@ describe("content", () => {
       func(body, "bar baz", "foo");
       assert.isTrue(stub.called, "dispatched");
       assert.strictEqual(text.value, "bar baz", "content");
+    });
+
+    it("should replace content", () => {
+      const stub1 = sinon.stub();
+      const stub2 = sinon.stub();
+      const stub3 = sinon.stub();
+      const elm = document.createElement("div");
+      const text = document.createElement("p");
+      const body = document.querySelector("body");
+      elm.classList.add("public-DraftEditor-content");
+      elm.appendChild(text);
+      body.addEventListener("paste", stub1, true);
+      body.addEventListener("beforeinput", stub2, true);
+      body.addEventListener("input", stub3, true);
+      body.appendChild(elm);
+      cjs.liveEdit.set("draftEditor", {
+        setContent: "self",
+      });
+      func(body, "bar baz", "draftEditor");
+      assert.isTrue(stub1.called, "dispatched");
+      assert.isTrue(stub2.called, "dispatched");
+      assert.isTrue(stub3.called, "dispatched");
     });
   });
 

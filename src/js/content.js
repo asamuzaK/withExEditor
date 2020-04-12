@@ -186,9 +186,27 @@ const matchDocUrl = arr => {
 
 /* dispatch events */
 /**
- * dispatch focus event
+ * dispatch clipboard event
  * @param {Object} elm - Element
  * @param {string} type - event type
+ * @param {Object} opt - init options
+ * @returns {void}
+ */
+const dispatchClipboardEvent = (elm, type, opt = {
+  bubbles: true,
+  cancelable: true,
+  clipboardData: null,
+}) => {
+  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+      isString(type) && /^(?:c(?:opy|ut)|paste)$/.test(type)) {
+    const evt = new ClipboardEvent(type, opt);
+    elm.dispatchEvent(evt);
+  }
+};
+
+/**
+ * dispatch focus event
+ * @param {Object} elm - Element
  * @returns {void}
  */
 const dispatchFocusEvent = elm => {
@@ -205,15 +223,27 @@ const dispatchFocusEvent = elm => {
 /**
  * dispatch input event
  * @param {Object} elm - element
+ * @param {string} type - event type
+ * @param {Object} opt - init options
  * @returns {void}
  */
-const dispatchInputEvent = elm => {
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
-    const opt = {
-      bubbles: true,
-      cancelable: false,
-    };
-    const evt = new InputEvent("input", opt);
+const dispatchInputEvent = (elm, type, opt) => {
+  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+      isString(type) && /^(?:before)?input$/.test(type)) {
+    if (!isObjectNotEmpty(opt)) {
+      if (type === "input") {
+        opt = {
+          bubbles: true,
+          cancelable: false,
+        };
+      } else {
+        opt = {
+          bubbles: true,
+          cancelable: true,
+        };
+      }
+    }
+    const evt = new InputEvent(type, opt);
     elm.dispatchEvent(evt);
   }
 };
@@ -1393,7 +1423,7 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
         }
       }
       node.appendChild(frag);
-      dispatchInputEvent(elm);
+      dispatchInputEvent(elm, "input");
     }
   }
 };
@@ -1415,7 +1445,7 @@ const replaceEditControlValue = (elm, value) => {
     const changed = elm.value !== value;
     if (changed) {
       elm.value = value;
-      dispatchInputEvent(elm);
+      dispatchInputEvent(elm, "input");
     }
   }
 };
@@ -1431,28 +1461,74 @@ const replaceLiveEditContent = (elm, value, key) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE && isString(value) &&
       liveEdit.has(key)) {
     const {setContent} = liveEdit.get(key);
-    const liveElm = elm.querySelector(setContent);
-    if (isEditControl(liveElm)) {
-      const ctrlA = {
-        code: "KeyA",
-        ctrlKey: true,
-        key: "a",
-        keyCode: KEY_CODE_A,
-      };
-      const backSpace = {
-        code: "Backspace",
-        key: "Backspace",
-        keyCode: KEY_CODE_BS,
-      };
-      dispatchFocusEvent(liveElm);
-      dispatchKeyboardEvent(liveElm, "keydown", ctrlA);
-      dispatchKeyboardEvent(liveElm, "keypress", ctrlA);
-      dispatchKeyboardEvent(liveElm, "keyup", ctrlA);
-      dispatchKeyboardEvent(liveElm, "keydown", backSpace);
-      dispatchKeyboardEvent(liveElm, "keypress", backSpace);
-      dispatchKeyboardEvent(liveElm, "keyup", backSpace);
-      liveElm.value = value.replace(/\u200B/g, "");
-      dispatchInputEvent(liveElm);
+    let liveElm;
+    if (setContent === "self") {
+      liveElm = elm;
+    } else {
+      liveElm = elm.querySelector(setContent);
+    }
+    if (liveElm) {
+      document.activeElement !== liveElm && dispatchFocusEvent(liveElm);
+      // Draft.js
+      if (key === "draftEditor") {
+        const range = document.createRange();
+        const sel = window.getSelection();
+        const dataTrans = new DataTransfer();
+        const frag = createParagraphedContent(value);
+        const content = new XMLSerializer().serializeToString(frag);
+        range.selectNodeContents(liveElm);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        dataTrans.setData(MIME_HTML, content);
+        dataTrans.setData(MIME_PLAIN, value);
+        // FIXME: neither paste nor beforeinput succeeds
+        dispatchClipboardEvent(liveElm, "paste", {
+          bubbles: true,
+          cancelable: true,
+          clipboardData: dataTrans,
+        });
+        dispatchInputEvent(liveElm, "beforeinput", {
+          bubbles: true,
+          cancelable: true,
+          data: value,
+          //dataTransfer: dataTrans,
+          //inputType: "insertFromPaste",
+          inputType: "insertText",
+        });
+        dispatchInputEvent(liveElm, "input", {
+          bubbles: true,
+          cancelable: false,
+          data: value,
+          //dataTransfer: dataTrans,
+          //inputType: "insertFromPaste",
+          inputType: "insertText",
+        });
+      } else if (isEditControl(liveElm)) {
+        const ctrlA = {
+          code: "KeyA",
+          ctrlKey: true,
+          key: "a",
+          keyCode: KEY_CODE_A,
+        };
+        const backSpace = {
+          code: "Backspace",
+          key: "Backspace",
+          keyCode: KEY_CODE_BS,
+        };
+        dispatchKeyboardEvent(liveElm, "keydown", ctrlA);
+        dispatchKeyboardEvent(liveElm, "keypress", ctrlA);
+        dispatchKeyboardEvent(liveElm, "keyup", ctrlA);
+        dispatchKeyboardEvent(liveElm, "keydown", backSpace);
+        dispatchKeyboardEvent(liveElm, "keypress", backSpace);
+        dispatchKeyboardEvent(liveElm, "keyup", backSpace);
+        liveElm.value = value.replace(/\u200B/g, "");
+        dispatchInputEvent(liveElm, "input", {
+          data: value,
+          bubbles: true,
+          cancelable: false,
+          inputType: "insertText",
+        });
+      }
     }
   }
 };
@@ -1462,7 +1538,7 @@ const replaceLiveEditContent = (elm, value, key) => {
  * @param {Object} obj - sync data object
  * @returns {Promise.<Array>} - results of each handler
  */
-const syncText = async (obj = {}) => {
+const syncText = (obj = {}) => {
   const {data, value} = obj;
   const func = [];
   if (isObjectNotEmpty(data)) {
@@ -1784,6 +1860,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     createXmlBasedDom,
     dataIds,
     determineContentProcess,
+    dispatchClipboardEvent,
     dispatchFocusEvent,
     dispatchInputEvent,
     dispatchKeyboardEvent,
