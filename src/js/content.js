@@ -222,7 +222,7 @@ const dispatchFocusEvent = elm => {
 
 /**
  * dispatch input event
- * @param {Object} elm - element
+ * @param {Object} elm - Element
  * @param {string} type - event type
  * @param {Object} opt - init options
  * @returns {void}
