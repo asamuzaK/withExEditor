@@ -204,16 +204,28 @@ const dispatchFocusEvent = elm => {
 
 /**
  * dispatch input event
- * @param {Object} elm - element
+ * @param {Object} elm - Element
+ * @param {string} type - event type
+ * @param {Object} opt - init options
  * @returns {void}
  */
-const dispatchInputEvent = elm => {
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
-    const opt = {
-      bubbles: true,
-      cancelable: false,
-    };
-    const evt = new InputEvent("input", opt);
+const dispatchInputEvent = (elm, type, opt) => {
+  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+      isString(type) && /^(?:before)?input$/.test(type)) {
+    if (!isObjectNotEmpty(opt)) {
+      if (type === "input") {
+        opt = {
+          bubbles: true,
+          cancelable: false,
+        };
+      } else {
+        opt = {
+          bubbles: true,
+          cancelable: true,
+        };
+      }
+    }
+    const evt = new InputEvent(type, opt);
     elm.dispatchEvent(evt);
   }
 };
@@ -1393,7 +1405,12 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
         }
       }
       node.appendChild(frag);
-      dispatchInputEvent(elm);
+      dispatchInputEvent(elm, "input", {
+        bubbles: true,
+        cancelable: false,
+        data: value,
+        inputType: "insertText",
+      });
     }
   }
 };
@@ -1415,7 +1432,12 @@ const replaceEditControlValue = (elm, value) => {
     const changed = elm.value !== value;
     if (changed) {
       elm.value = value;
-      dispatchInputEvent(elm);
+      dispatchInputEvent(elm, "input", {
+        bubbles: true,
+        cancelable: false,
+        data: value,
+        inputType: "insertText",
+      });
     }
   }
 };
@@ -1452,7 +1474,12 @@ const replaceLiveEditContent = (elm, value, key) => {
       dispatchKeyboardEvent(liveElm, "keypress", backSpace);
       dispatchKeyboardEvent(liveElm, "keyup", backSpace);
       liveElm.value = value.replace(/\u200B/g, "");
-      dispatchInputEvent(liveElm);
+      dispatchInputEvent(liveElm, "input", {
+        bubbles: true,
+        cancelable: false,
+        data: value,
+        inputType: "insertText",
+      });
     }
   }
 };

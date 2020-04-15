@@ -347,12 +347,63 @@ describe("content", () => {
       assert.isFalse(spy.called, "called");
     });
 
-    it("should call function", () => {
+    it("should not call function", () => {
       const p = document.createElement("p");
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
       func(p);
+      assert.isFalse(spy.called, "called");
+    });
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "foo");
+      assert.isFalse(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "beforeinput");
+      assert.isTrue(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+      });
+      assert.isTrue(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "input");
+      assert.isTrue(spy.called, "called");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      func(p, "input", {
+        bubbles: true,
+        cancelable: false,
+      });
       assert.isTrue(spy.called, "called");
     });
   });
