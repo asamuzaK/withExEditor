@@ -1405,6 +1405,12 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
         }
       }
       node.appendChild(frag);
+      dispatchInputEvent(elm, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+        data: value,
+        inputType: "insertText",
+      });
       dispatchInputEvent(elm, "input", {
         bubbles: true,
         cancelable: false,
