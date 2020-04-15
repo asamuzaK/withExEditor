@@ -1431,7 +1431,14 @@ const replaceEditControlValue = (elm, value) => {
     }
     const changed = elm.value !== value;
     if (changed) {
+      value = value.replace(/\u200B/g, "");
       elm.value = value;
+      dispatchInputEvent(elm, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+        data: value,
+        inputType: "insertText",
+      });
       dispatchInputEvent(elm, "input", {
         bubbles: true,
         cancelable: false,
@@ -1473,7 +1480,14 @@ const replaceLiveEditContent = (elm, value, key) => {
       dispatchKeyboardEvent(liveElm, "keydown", backSpace);
       dispatchKeyboardEvent(liveElm, "keypress", backSpace);
       dispatchKeyboardEvent(liveElm, "keyup", backSpace);
-      liveElm.value = value.replace(/\u200B/g, "");
+      value = value.replace(/\u200B/g, "");
+      liveElm.value = value;
+      dispatchInputEvent(elm, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+        data: value,
+        inputType: "insertText",
+      });
       dispatchInputEvent(liveElm, "input", {
         bubbles: true,
         cancelable: false,
