@@ -189,17 +189,19 @@ const matchDocUrl = arr => {
  * dispatch focus event
  * @param {Object} elm - Element
  * @param {string} type - event type
- * @returns {void}
+ * @returns {boolean} - event permitted
  */
 const dispatchFocusEvent = elm => {
+  let res;
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
     const opt = {
       bubbles: false,
       cancelable: false,
     };
     const evt = new FocusEvent("focus", opt);
-    elm.dispatchEvent(evt);
+    res = elm.dispatchEvent(evt);
   }
+  return !!res;
 };
 
 /**
@@ -207,9 +209,10 @@ const dispatchFocusEvent = elm => {
  * @param {Object} elm - Element
  * @param {string} type - event type
  * @param {Object} opt - init options
- * @returns {void}
+ * @returns {boolean} - event permitted
  */
 const dispatchInputEvent = (elm, type, opt) => {
+  let res;
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       isString(type) && /^(?:before)?input$/.test(type)) {
     if (!isObjectNotEmpty(opt)) {
@@ -226,8 +229,9 @@ const dispatchInputEvent = (elm, type, opt) => {
       }
     }
     const evt = new InputEvent(type, opt);
-    elm.dispatchEvent(evt);
+    res = elm.dispatchEvent(evt);
   }
+  return !!res;
 };
 
 /**
@@ -235,9 +239,10 @@ const dispatchInputEvent = (elm, type, opt) => {
  * @param {Object} elm - Element
  * @param {string} type - event type
  * @param {Object} keyOpt - key options
- * @returns {void}
+ * @returns {boolean} - event permitted
  */
 const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
+  let res;
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       isString(type) && /^key(?:down|press|up)$/.test(type) &&
       isObjectNotEmpty(keyOpt)) {
@@ -258,9 +263,10 @@ const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
         shiftKey: !!shiftKey,
       };
       const evt = new KeyboardEvent(type, opt);
-      elm.dispatchEvent(evt);
+      res = elm.dispatchEvent(evt);
     }
   }
+  return !!res;
 };
 
 /* file extension */

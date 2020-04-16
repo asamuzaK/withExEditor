@@ -319,8 +319,9 @@ describe("content", () => {
       const body = document.querySelector("body");
       p.appendChild(text);
       body.appendChild(p);
-      func(text);
+      const res = func(text);
       assert.isFalse(spy.called, "called");
+      assert.isFalse(res, "result");
     });
 
     it("should call function", () => {
@@ -328,8 +329,9 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p);
+      const res = func(p);
       assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
     });
   });
 
@@ -343,8 +345,9 @@ describe("content", () => {
       const body = document.querySelector("body");
       p.appendChild(text);
       body.appendChild(p);
-      func(text);
+      const res = func(text);
       assert.isFalse(spy.called, "called");
+      assert.isFalse(res, "result");
     });
 
     it("should not call function", () => {
@@ -352,8 +355,9 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p);
+      const res = func(p);
       assert.isFalse(spy.called, "called");
+      assert.isFalse(res, "result");
     });
 
     it("should not call function", () => {
@@ -361,8 +365,9 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p, "foo");
+      const res = func(p, "foo");
       assert.isFalse(spy.called, "called");
+      assert.isFalse(res, "result");
     });
 
     it("should call function", () => {
@@ -370,8 +375,9 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p, "beforeinput");
+      const res = func(p, "beforeinput");
       assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
     });
 
     it("should call function", () => {
@@ -379,11 +385,12 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p, "beforeinput", {
+      const res = func(p, "beforeinput", {
         bubbles: true,
         cancelable: true,
       });
       assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
     });
 
     it("should call function", () => {
@@ -391,8 +398,9 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p, "input");
+      const res = func(p, "input");
       assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
     });
 
     it("should call function", () => {
@@ -400,11 +408,12 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p, "input", {
+      const res = func(p, "input", {
         bubbles: true,
         cancelable: false,
       });
       assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
     });
   });
 
@@ -418,8 +427,9 @@ describe("content", () => {
       const body = document.querySelector("body");
       p.appendChild(text);
       body.appendChild(p);
-      func(text);
+      const res = func(text);
       assert.isFalse(spy.called, "called");
+      assert.isFalse(res, "result");
     });
 
     it("should call function", () => {
@@ -427,13 +437,14 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p, "keydown", {
+      const res = func(p, "keydown", {
         key: "a",
         code: "KeyA",
         keyCode: KEY_CODE_A,
         ctrlKey: true,
       });
       assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
     });
 
     it("should not call function", () => {
@@ -441,13 +452,14 @@ describe("content", () => {
       const spy = sinon.spy(p, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(p);
-      func(p, "keydown", {
+      const res = func(p, "keydown", {
         key: undefined,
         code: "KeyA",
         keyCode: KEY_CODE_A,
         ctrlKey: true,
       });
       assert.isFalse(spy.called, "called");
+      assert.isFalse(res, "result");
     });
   });
 
