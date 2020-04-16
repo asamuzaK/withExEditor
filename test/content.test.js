@@ -57,8 +57,9 @@ describe("content", () => {
   };
   let window, document;
   const globalKeys = [
-    "DOMTokenList", "DOMParser", "FocusEvent", "Headers", "InputEvent",
-    "KeyboardEvent", "Node", "NodeList", "XMLSerializer",
+    "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "FocusEvent",
+    "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList",
+    "XMLSerializer",
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
   const isContentEditable = elm => {
@@ -94,6 +95,40 @@ describe("content", () => {
     global.document = document;
     global.fetch = sinon.stub();
     for (const key of globalKeys) {
+      // Not implemented in jsdom
+      if (!window[key]) {
+        if (key === "ClipboardEvent") {
+          window[key] = class ClipboardEvent extends window.Event {
+            constructor(arg, initEvt) {
+              super(arg, initEvt);
+              this.clipboardData = initEvt.clipboardData || null;
+            }
+          };
+        } else if (key === "DataTransfer") {
+          window[key] = class DataTransfer {
+            constructor() {
+              this._items = new Map();
+              this.types;
+            }
+            get types() {
+              return Array.from(this._items.keys());
+            }
+            clearData(format) {
+              if (format) {
+                this._items.remove(format);
+              } else {
+                this._items.clear();
+              }
+            }
+            getData(type) {
+              return this._items.get(type) || "";
+            }
+            setData(type, value) {
+              this._items.set(type, value);
+            }
+          };
+        }
+      }
       global[key] = window[key];
     }
   });
@@ -305,6 +340,76 @@ describe("content", () => {
         1,
         document.location.href,
       ]);
+      assert.isTrue(res, "result");
+    });
+  });
+
+  describe("dispatch clipboard event", () => {
+    const func = cjs.dispatchClipboardEvent;
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const text = document.createTextNode("foo");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      p.appendChild(text);
+      body.appendChild(p);
+      const res = func(text);
+      assert.isFalse(spy.called, "called");
+      assert.isFalse(res, "result");
+    });
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const text = document.createTextNode("foo");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      p.appendChild(text);
+      body.appendChild(p);
+      const res = func(text, "foo");
+      assert.isFalse(spy.called, "called");
+      assert.isFalse(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const res = func(p, "copy", {
+        bubbles: true,
+        cancelable: true,
+      });
+      assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const res = func(p, "cut", {
+        bubbles: true,
+        cancelable: true,
+      });
+      assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const dataTrans = new DataTransfer();
+      dataTrans.setData("text/plain", "foo");
+      const res = func(p, "paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: dataTrans,
+      });
+      assert.isTrue(spy.called, "called");
       assert.isTrue(res, "result");
     });
   });

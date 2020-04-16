@@ -185,6 +185,34 @@ const matchDocUrl = arr => {
 };
 
 /* dispatch events */
+/* dispatch clipboard event
+ * @param {Object} elm - Element
+ * @param {string} type - event type
+ * @param {Object} opt - init options
+ * @returns {boolean} - event permitted
+ */
+const dispatchClipboardEvent = (elm, type, opt = {
+  bubbles: true,
+  cancelable: true,
+  clipboardData: null,
+}) => {
+  let res;
+  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+      isString(type) && /^(?:c(?:opy|ut)|paste)$/.test(type)) {
+    const evt = new ClipboardEvent(type, opt);
+    const {clipboardData} = opt;
+    if (clipboardData) {
+      const {types} = clipboardData;
+      for (const mime of types) {
+        const value = clipboardData.getData(mime);
+        evt.clipboardData.setData(mime, value);
+      }
+    }
+    res = elm.dispatchEvent(evt);
+  }
+  return !!res;
+};
+
 /**
  * dispatch focus event
  * @param {Object} elm - Element
@@ -1837,6 +1865,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     createXmlBasedDom,
     dataIds,
     determineContentProcess,
+    dispatchClipboardEvent,
     dispatchFocusEvent,
     dispatchInputEvent,
     dispatchKeyboardEvent,
