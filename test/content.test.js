@@ -520,6 +520,22 @@ describe("content", () => {
       assert.isTrue(spy.called, "called");
       assert.isTrue(res, "result");
     });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      const dataTrans = new DataTransfer();
+      dataTrans.setData("text/plain", "foo");
+      body.appendChild(p);
+      const res = func(p, "input", {
+        bubbles: true,
+        cancelable: false,
+        dataTransfer: dataTrans,
+      });
+      assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
+    });
   });
 
   describe("dispatch keyboard event", () => {
@@ -3244,6 +3260,21 @@ describe("content", () => {
       assert.strictEqual(p.firstChild.nodeValue, "foo", "value");
     });
 
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent").returns(false);
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      p.appendChild(span);
+      body.appendChild(p);
+      func(p, p, "foo");
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(p.childNodes.length, 1, "length");
+      assert.strictEqual(p.firstChild.nodeType, 1, "child node type");
+      assert.strictEqual(p.firstChild.localName, "span", "local name");
+      assert.isFalse(p.firstChild.hasChildNodes(), "child nodes");
+    });
+
     it("should not call function", () => {
       const p = document.createElement("p");
       const spy = sinon.spy(p, "dispatchEvent");
@@ -3260,8 +3291,8 @@ describe("content", () => {
 
     it("should call function", () => {
       const p = document.createElement("p");
-      const spy = sinon.spy(p, "dispatchEvent");
       const span = document.createElement("span");
+      const spy = sinon.spy(span, "dispatchEvent");
       const body = document.querySelector("body");
       p.appendChild(span);
       body.appendChild(p);

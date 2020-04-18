@@ -257,6 +257,17 @@ const dispatchInputEvent = (elm, type, opt) => {
       }
     }
     const evt = new InputEvent(type, opt);
+    const {dataTransfer} = opt;
+    if (dataTransfer) {
+      const {types} = dataTransfer;
+      if (!evt.dataTransfer) {
+        evt.dataTransfer = new DataTransfer();
+      }
+      for (const mime of types) {
+        const value = dataTransfer.getData(mime);
+        evt.dataTransfer.setData(mime, value);
+      }
+    }
     res = elm.dispatchEvent(evt);
   }
   return !!res;
@@ -1414,7 +1425,7 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
 };
 
 /**
- * replace content of editable element
+ * replace content of content editable element
  * @param {Object} elm - owner element
  * @param {Object} node - editable element
  * @param {string} value - value
@@ -1426,31 +1437,52 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
     const changed = value !== node.textContent.replace(/^\s*/, "")
       .replace(/\n +/g, "\n").replace(/([^\n])$/, (m, c) => `${c}\n`);
     if (changed) {
-      const frag = document.createDocumentFragment();
+      const sel = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(node);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      const dataTrans = new DataTransfer();
+      const contentFrag = createParagraphedContent(value, ns);
       if (elm === node) {
-        const cnt = createParagraphedContent(value, ns);
-        frag.appendChild(cnt);
-      } else {
-        frag.appendChild(document.createTextNode(value));
+        const contentStr = new XMLSerializer().serializeToString(contentFrag);
+        dataTrans.setData(MIME_HTML, contentStr);
       }
-      if (node.hasChildNodes()) {
-        while (node.firstChild) {
-          node.removeChild(node.firstChild);
-        }
-      }
-      node.appendChild(frag);
-      dispatchInputEvent(elm, "beforeinput", {
+      dataTrans.setData(MIME_PLAIN, value);
+      const permitted = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
-        data: value,
-        inputType: "insertText",
+        clipboardData: dataTrans,
       });
-      dispatchInputEvent(elm, "input", {
+      if (permitted) {
+        const frag = document.createDocumentFragment();
+        if (elm === node) {
+          frag.appendChild(contentFrag);
+        } else {
+          frag.appendChild(document.createTextNode(value));
+        }
+        sel.removeAllRanges();
+        if (node.hasChildNodes()) {
+          while (node.firstChild) {
+            node.removeChild(node.firstChild);
+          }
+        }
+        node.appendChild(frag);
+      }
+      // TODO: add `ranges: []` in init options
+      dispatchInputEvent(node, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: dataTrans,
+        inputType: "insertFromPaste",
+      });
+      dispatchInputEvent(node, "input", {
         bubbles: true,
         cancelable: false,
-        data: value,
-        inputType: "insertText",
+        dataTransfer: dataTrans,
+        inputType: "insertFromPaste",
       });
+      sel.collapse(node);
     }
   }
 };
