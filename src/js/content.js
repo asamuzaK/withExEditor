@@ -1442,6 +1442,15 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
       range.selectNodeContents(node);
       sel.removeAllRanges();
       sel.addRange(range);
+      // TODO: StaticRange not implemented in Blink yet
+      /*
+      const targetRange = new StaticRange({
+        startContainer: sel.anchorNode,
+        startOffset: sel.anchorOffset,
+        endContainer: sel.focusNode,
+        endOffset: sel.focusOffset,
+      });
+      */
       const dataTrans = new DataTransfer();
       const contentFrag = createParagraphedContent(value, ns);
       if (elm === node) {
@@ -1449,23 +1458,16 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
         dataTrans.setData(MIME_HTML, contentStr);
       }
       dataTrans.setData(MIME_PLAIN, value);
-      // TODO: StaticRange not implemented in Blink yet
-      /*
-      const targetRange = new StaticRange({
-        startContainer: node.firstElementChild,
-        startOffset: 0,
-        endContainer: node.lastElementChild,
-        endOffset: node.childNodes.length,
-      });
-      */
       // TODO: beforeinput not enabled by default in Gecko yet
+      /*
       dispatchInputEvent(node, "beforeinput", {
         bubbles: true,
         cancelable: true,
         dataTransfer: dataTrans,
         inputType: "insertFromPaste",
-        //ranges: [targetRange],
+        ranges: [targetRange],
       });
+      */
       const permitted = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
