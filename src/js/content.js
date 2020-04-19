@@ -1449,6 +1449,23 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
         dataTrans.setData(MIME_HTML, contentStr);
       }
       dataTrans.setData(MIME_PLAIN, value);
+      // TODO: StaticRange not implemented in Blink yet
+      /*
+      const targetRange = new StaticRange({
+        startContainer: node.firstElementChild,
+        startOffset: 0,
+        endContainer: node.lastElementChild,
+        endOffset: node.childNodes.length,
+      });
+      */
+      // TODO: beforeinput not enabled by default in Gecko yet
+      dispatchInputEvent(node, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: dataTrans,
+        inputType: "insertFromPaste",
+        //ranges: [targetRange],
+      });
       const permitted = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
@@ -1461,28 +1478,16 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
         } else {
           frag.appendChild(document.createTextNode(value));
         }
-        sel.removeAllRanges();
-        if (node.hasChildNodes()) {
-          while (node.firstChild) {
-            node.removeChild(node.firstChild);
-          }
-        }
+        sel.deleteFromDocument();
         node.appendChild(frag);
       }
-      // TODO: add `ranges: []` in init options
-      dispatchInputEvent(node, "beforeinput", {
-        bubbles: true,
-        cancelable: true,
-        dataTransfer: dataTrans,
-        inputType: "insertFromPaste",
-      });
+      sel.collapse(node);
       dispatchInputEvent(node, "input", {
         bubbles: true,
         cancelable: false,
         dataTransfer: dataTrans,
         inputType: "insertFromPaste",
       });
-      sel.collapse(node);
     }
   }
 };

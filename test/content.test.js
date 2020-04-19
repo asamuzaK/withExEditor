@@ -58,7 +58,7 @@ describe("content", () => {
   let window, document;
   const globalKeys = [
     "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "FocusEvent",
-    "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList",
+    "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList", "StaticRange",
     "XMLSerializer",
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
@@ -3244,35 +3244,7 @@ describe("content", () => {
       assert.isFalse(spy.called, "not called");
       assert.strictEqual(p.childNodes.length, 1, "length");
       assert.deepEqual(p.firstChild, span, "child");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const spy = sinon.spy(p, "dispatchEvent");
-      const span = document.createElement("span");
-      const body = document.querySelector("body");
-      p.appendChild(span);
-      body.appendChild(p);
-      func(p, p, "foo");
-      assert.isTrue(spy.called, "called");
-      assert.strictEqual(p.childNodes.length, 1, "length");
-      assert.strictEqual(p.firstChild.nodeType, 3, "child");
-      assert.strictEqual(p.firstChild.nodeValue, "foo", "value");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent").returns(false);
-      const span = document.createElement("span");
-      const body = document.querySelector("body");
-      p.appendChild(span);
-      body.appendChild(p);
-      func(p, p, "foo");
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(p.childNodes.length, 1, "length");
-      assert.strictEqual(p.firstChild.nodeType, 1, "child node type");
-      assert.strictEqual(p.firstChild.localName, "span", "local name");
-      assert.isFalse(p.firstChild.hasChildNodes(), "child nodes");
+      assert.isFalse(span.hasChildNodes(), "content");
     });
 
     it("should not call function", () => {
@@ -3284,23 +3256,88 @@ describe("content", () => {
       p.appendChild(span);
       body.appendChild(p);
       func(p, p, "foo\n");
-      assert.isFalse(spy.called, "called");
+      assert.isFalse(spy.called, "not called");
       assert.strictEqual(p.childNodes.length, 1, "length");
       assert.deepEqual(p.firstChild, span, "child");
+      assert.strictEqual(span.textContent, "foo", "content");
     });
 
     it("should call function", () => {
-      const p = document.createElement("p");
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(div);
+      func(div, div, "foo\n");
+      assert.isTrue(spy.called, "called");
+      assert.strictEqual(div.childNodes.length, 2, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "div", "name");
+      assert.strictEqual(div.firstChild.textContent, "foo", "content");
+      assert.strictEqual(div.lastChild.nodeType, 3, "child");
+      assert.strictEqual(div.lastChild.nodeValue, "\n", "value");
+      assert.strictEqual(div.textContent, "foo\n", "content");
+    });
+
+    it("should call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(div);
+      func(div, div, "foo\nbar\n");
+      assert.isTrue(spy.called, "called");
+      assert.strictEqual(div.childNodes.length, 4, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "div", "name");
+      assert.strictEqual(div.firstChild.textContent, "foo", "content");
+      assert.strictEqual(div.lastChild.nodeType, 3, "child");
+      assert.strictEqual(div.lastChild.nodeValue, "\n", "value");
+      assert.strictEqual(div.textContent, "foo\nbar\n", "content");
+    });
+
+    it("should call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = "bar";
+      div.appendChild(span);
+      body.appendChild(div);
+      func(div, div, "foo\n");
+      assert.isTrue(spy.called, "called");
+      assert.strictEqual(div.childNodes.length, 2, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "div", "name");
+      assert.strictEqual(div.firstChild.textContent, "foo", "content");
+      assert.strictEqual(div.lastChild.nodeType, 3, "child");
+      assert.strictEqual(div.lastChild.nodeValue, "\n", "value");
+      assert.strictEqual(div.textContent, "foo\n", "content");
+    });
+
+    it("should call function", () => {
+      const div = document.createElement("div");
       const span = document.createElement("span");
       const spy = sinon.spy(span, "dispatchEvent");
       const body = document.querySelector("body");
-      p.appendChild(span);
-      body.appendChild(p);
-      func(p, span, "foo");
+      span.textContent = "bar";
+      div.appendChild(span);
+      body.appendChild(div);
+      func(div, span, "foo\n");
       assert.isTrue(spy.called, "called");
-      assert.strictEqual(span.childNodes.length, 1, "length");
-      assert.strictEqual(span.firstChild.nodeType, 3, "child");
-      assert.strictEqual(span.firstChild.nodeValue, "foo", "value");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "foo\n", "content");
+      assert.strictEqual(div.textContent, "foo\n", "content");
+    });
+
+    it("should call function", () => {
+      const div = document.createElement("div");
+      const stub = sinon.stub(div, "dispatchEvent").returns(false);
+      const body = document.querySelector("body");
+      body.appendChild(div);
+      func(div, div, "foo\nbar\n");
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(div.childNodes.length, 0, "length");
     });
   });
 
