@@ -2024,22 +2024,11 @@ const startup = () => Promise.all([
   extendObjItems(liveEdit, LIVE_EDIT),
 ]).catch(throwErr);
 
-/**
- * handle ready state change
- * @param {Object} evt - event
- * @returns {?AsyncFunction} - startup()
- */
-/*
-const handleReadyStateChange = () =>
-  document.readyState === "complete" && startup();
-*/
-
 /* listeners */
 runtime.onMessage.addListener(runtimeOnMsg);
 window.addEventListener("mousedown", handleBeforeContextMenu, true);
 window.addEventListener("keydown", handleKeyDown, true);
 window.addEventListener("load", startup);
-//document.addEventListener("readystatechange", startup);
 document.readyState === "complete" && startup();
 
 /* export for tests */
