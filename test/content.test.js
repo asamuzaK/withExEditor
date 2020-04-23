@@ -12,6 +12,7 @@ const cjs = require("../src/js/content.js");
 
 /* constants */
 const CONTENT_GET = "getContent";
+const CONTENT_VALUE = "contentValue";
 const CONTEXT_MODE = "contextMode";
 const CONTEXT_NODE = "contextNode";
 const FILE_NOT_FOUND_TIMESTAMP = -1;
@@ -58,8 +59,8 @@ describe("content", () => {
   let window, document;
   const globalKeys = [
     "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "FocusEvent",
-    "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList", "StaticRange",
-    "XMLSerializer",
+    "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList", "Selection",
+    "StaticRange", "XMLSerializer",
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
   const isContentEditable = elm => {
@@ -3230,8 +3231,227 @@ describe("content", () => {
     });
   });
 
+  describe("paste content on selection change", () => {
+    const func = cjs.pasteContent;
+    beforeEach(() => {
+      cjs.vars[CONTENT_VALUE] = null;
+      cjs.vars[CONTEXT_NODE] = null;
+    });
+    afterEach(() => {
+      cjs.vars[CONTENT_VALUE] = null;
+      cjs.vars[CONTEXT_NODE] = null;
+    });
+
+    it("should get false", () => {
+      const res = func();
+      assert.isFalse(res, "result");
+    });
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      cjs.vars[CONTEXT_NODE] = p;
+      const res = func();
+      assert.isFalse(spy.called, "not called");
+      assert.isFalse(res, "result");
+    });
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      p.textContent = "foo";
+      body.appendChild(p);
+      cjs.vars[CONTENT_VALUE] = "bar";
+      cjs.vars[CONTEXT_NODE] = p;
+      const sel = document.getSelection();
+      sel.selectAllChildren(p);
+      const res = func();
+      assert.isFalse(spy.called, "not called");
+      assert.isFalse(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent").returns(true);
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      cjs.vars[CONTENT_VALUE] = "bar";
+      cjs.vars[CONTEXT_NODE] = p;
+      const sel = document.getSelection();
+      sel.collapse(p);
+      const res = func();
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.isTrue(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent").returns(true);
+      const spy = sinon.spy(document, "removeEventListener");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      cjs.vars[CONTENT_VALUE] = "bar";
+      cjs.vars[CONTEXT_NODE] = p;
+      const sel = document.getSelection();
+      sel.collapse(p);
+      const evt = {
+        type: "selectionchange",
+      };
+      const res = func(evt);
+      assert.isTrue(stub.called, "called");
+      assert.isTrue(spy.called, "called removeEventlistener");
+      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.isTrue(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent");
+      stub.onFirstCall().returns(false);
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      cjs.vars[CONTENT_VALUE] = "bar";
+      cjs.vars[CONTEXT_NODE] = p;
+      const sel = document.getSelection();
+      sel.collapse(p);
+      const res = func();
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 1, "call count");
+      assert.isFalse(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent");
+      stub.onFirstCall().returns(true);
+      stub.onSecondCall().returns(false);
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      cjs.vars[CONTENT_VALUE] = "bar";
+      cjs.vars[CONTEXT_NODE] = p;
+      const sel = document.getSelection();
+      sel.collapse(p);
+      const res = func();
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 2, "call count");
+      assert.isFalse(res, "result");
+    });
+
+    it("should log error and call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent").returns(true);
+      stub.onFirstCall().throws(new Error("error"));
+      const stubErr = sinon.stub(console, "error");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      cjs.vars[CONTENT_VALUE] = "bar";
+      cjs.vars[CONTEXT_NODE] = p;
+      const sel = document.getSelection();
+      sel.collapse(p);
+      const res = func();
+      const {called: errorCalled} = stubErr;
+      stubErr.restore();
+      assert.isTrue(errorCalled, "error called");
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.isTrue(res, "result");
+    });
+  });
+
+  describe("dispatch cut event which deletes selection", () => {
+    const func = cjs.cutContent;
+
+    it("should get false", () => {
+      const res = func();
+      assert.isFalse(res, "result");
+    });
+
+    it("should not call function", () => {
+      const p = document.createElement("p");
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const res = func(p);
+      assert.isFalse(spy.called, "not called");
+      assert.isFalse(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent").returns(true);
+      const body = document.querySelector("body");
+      p.textContent = "foo";
+      body.appendChild(p);
+      const sel = document.getSelection();
+      sel.selectAllChildren(p);
+      const res = func(p, sel);
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.isTrue(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent").returns(true);
+      stub.onFirstCall().returns(false);
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const sel = document.getSelection();
+      sel.collapse(p);
+      const res = func(p, sel);
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 1, "call count");
+      assert.isFalse(res, "result");
+    });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent");
+      stub.onFirstCall().returns(true);
+      stub.onSecondCall().returns(false);
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const sel = document.getSelection();
+      sel.collapse(p);
+      const res = func(p, sel);
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 2, "call count");
+      assert.isFalse(res, "result");
+    });
+
+    it("should log error and call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent").returns(true);
+      stub.onFirstCall().throws(new Error("error"));
+      const stubErr = sinon.stub(console, "error");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const sel = document.getSelection();
+      sel.collapse(p);
+      const res = func(p, sel);
+      const {called: errorCalled} = stubErr;
+      stubErr.restore();
+      assert.isTrue(errorCalled, "error called");
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.isTrue(res, "result");
+    });
+  });
+
   describe("replace content of editable element", () => {
     const func = cjs.replaceContent;
+    beforeEach(() => {
+      cjs.vars[CONTENT_VALUE] = null;
+      cjs.vars[CONTEXT_NODE] = null;
+    });
+    afterEach(() => {
+      cjs.vars[CONTENT_VALUE] = null;
+      cjs.vars[CONTEXT_NODE] = null;
+    });
 
     it("should not call function", () => {
       const p = document.createElement("p");
@@ -3267,6 +3487,7 @@ describe("content", () => {
       const spy = sinon.spy(div, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
       func(div, div, "foo\n");
       assert.isTrue(spy.called, "called");
       assert.strictEqual(div.childNodes.length, 2, "length");
@@ -3283,6 +3504,7 @@ describe("content", () => {
       const spy = sinon.spy(div, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
       func(div, div, "foo\nbar\n");
       assert.isTrue(spy.called, "called");
       assert.strictEqual(div.childNodes.length, 4, "length");
@@ -3302,6 +3524,7 @@ describe("content", () => {
       span.textContent = "bar";
       div.appendChild(span);
       body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
       func(div, div, "foo\n");
       assert.isTrue(spy.called, "called");
       assert.strictEqual(div.childNodes.length, 2, "length");
@@ -3320,6 +3543,7 @@ describe("content", () => {
       const body = document.querySelector("body");
       span.textContent = "bar";
       div.appendChild(span);
+      cjs.vars[CONTEXT_NODE] = div;
       body.appendChild(div);
       func(div, span, "foo\n");
       assert.isTrue(spy.called, "called");
@@ -3330,11 +3554,12 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "foo\n", "content");
     });
 
-    it("should call function", () => {
+    it("should not replace content", () => {
       const div = document.createElement("div");
       const stub = sinon.stub(div, "dispatchEvent").returns(false);
       const body = document.querySelector("body");
       body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
       func(div, div, "foo\nbar\n");
       assert.isTrue(stub.called, "called");
       assert.strictEqual(div.childNodes.length, 0, "length");
@@ -3389,6 +3614,17 @@ describe("content", () => {
 
     it("should call function", () => {
       const elm = document.createElement("textarea");
+      const stub = sinon.stub(elm, "dispatchEvent").returns(false);
+      const body = document.querySelector("body");
+      elm.value = "foo\nbar";
+      body.appendChild(elm);
+      func(elm, "foo\nbar baz\nqux\n");
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(elm.value, "foo\nbar", "value");
+    });
+
+    it("should call function", () => {
+      const elm = document.createElement("textarea");
       const spy = sinon.spy(elm, "dispatchEvent");
       const body = document.querySelector("body");
       elm.value = "foo\nbar baz\nqux";
@@ -3399,7 +3635,7 @@ describe("content", () => {
     });
   });
 
-  describe("replaceLiveEditContent", () => {
+  describe("replace live edit content", () => {
     const func = cjs.replaceLiveEditContent;
     beforeEach(() => {
       cjs.liveEdit.clear();
@@ -3456,11 +3692,15 @@ describe("content", () => {
       cjs.dataIds.clear();
       cjs.liveEdit.clear();
       cjs.vars[ID_TAB] = null;
+      cjs.vars[CONTEXT_NODE] = null;
+      cjs.vars[CONTENT_VALUE] = null;
     });
     afterEach(() => {
       cjs.dataIds.clear();
       cjs.liveEdit.clear();
       cjs.vars[ID_TAB] = null;
+      cjs.vars[CONTEXT_NODE] = null;
+      cjs.vars[CONTENT_VALUE] = null;
     });
 
     it("should get empty array", async () => {
@@ -3606,6 +3846,7 @@ describe("content", () => {
       }
       body.appendChild(elm);
       cjs.vars[ID_TAB] = "1";
+      cjs.vars[CONTEXT_NODE] = elm;
       const res = await func({
         data: {
           dataId: "bar",
@@ -3634,6 +3875,7 @@ describe("content", () => {
       div.appendChild(elm);
       body.appendChild(div);
       cjs.vars[ID_TAB] = "1";
+      cjs.vars[CONTEXT_NODE] = elm;
       const res = await func({
         data: {
           dataId: "bar",

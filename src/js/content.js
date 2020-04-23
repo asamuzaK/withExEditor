@@ -12,6 +12,7 @@ const {
 
 /* constants */
 const CONTENT_GET = "getContent";
+const CONTENT_VALUE = "contentValue";
 const CONTEXT_MENU = "contextMenu";
 const CONTEXT_MODE = "contextMode";
 const CONTEXT_NODE = "contextNode";
@@ -57,6 +58,7 @@ const XMLNS = "xmlns";
 
 /* variables */
 const vars = {
+  [CONTENT_VALUE]: null,
   [CONTEXT_MODE]: null,
   [CONTEXT_NODE]: null,
   [ID_TAB]: "",
@@ -185,7 +187,8 @@ const matchDocUrl = arr => {
 };
 
 /* dispatch events */
-/* dispatch clipboard event
+/**
+ * dispatch clipboard event
  * @param {Object} elm - Element
  * @param {string} type - event type
  * @param {Object} opt - init options
@@ -1205,7 +1208,7 @@ const createContentData = async (elm, mode) => {
     liveEditKey: null,
     syncAuto: false,
   };
-  const sel = window.getSelection();
+  const sel = document.getSelection();
   const {anchorNode, isCollapsed} = sel;
   if (elm && mode) {
     switch (mode) {
@@ -1319,7 +1322,7 @@ const postContent = async (elm, mode) => {
 const getContextMode = elm => {
   const {
     anchorNode, focusNode, isCollapsed, rangeCount,
-  } = window.getSelection();
+  } = document.getSelection();
   let mode = MODE_SOURCE;
   if (elm) {
     elm = !isCollapsed &&
@@ -1425,6 +1428,149 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
 };
 
 /**
+ * paste content on selection change
+ * @param {Object} evt - event
+ * @returns {boolean} - true if not prevented, false otherwise
+ */
+const pasteContent = evt => {
+  let res;
+  const node = vars[CONTEXT_NODE];
+  const value = vars[CONTENT_VALUE];
+  const sel = document.getSelection();
+  if (node && node.nodeType === Node.ELEMENT_NODE && isString(value) &&
+      sel.isCollapsed) {
+    const dataTrans = new DataTransfer();
+    sel.selectAllChildren(node);
+    dataTrans.setData(MIME_PLAIN, value);
+    // TODO: StaticRange() constructor not implemented in Blink yet
+    /*
+    const insertTarget = new StaticRange({
+      startContainer: sel.anchorNode,
+      startOffset: sel.anchorOffset,
+      endContainer: sel.focusNode,
+      endOffset: sel.focusOffset,
+    });
+    */
+    const insertTarget = {
+      startContainer: sel.anchorNode,
+      startOffset: sel.anchorOffset,
+      endContainer: sel.focusNode,
+      endOffset: sel.focusOffset,
+      collapsed: sel.isCollapsed,
+    };
+    // TODO: beforeinput not enabled by default in Gecko yet
+    let beforeInputNotPrevented;
+    try {
+      beforeInputNotPrevented = dispatchInputEvent(node, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+        dataTransfer: dataTrans,
+        inputType: "insertFromPaste",
+        ranges: [insertTarget],
+      });
+    } catch (e) {
+      logErr(e);
+      beforeInputNotPrevented = true;
+    }
+    let pasteNotPrevented, dispatchKeyup;
+    if (beforeInputNotPrevented) {
+      // FIXME: dispatch ctrl+v keydown for react
+      pasteNotPrevented = dispatchClipboardEvent(node, "paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: dataTrans,
+      });
+      dispatchKeyup = true;
+    }
+    vars[CONTENT_VALUE] = null;
+    evt && evt.type === "selectionchange" &&
+      document.removeEventListener("selectionchange", pasteContent);
+    res = beforeInputNotPrevented && pasteNotPrevented;
+    if (res) {
+      dispatchInputEvent(node, "input", {
+        bubbles: true,
+        cancelable: false,
+        dataTransfer: dataTrans,
+        inputType: "insertFromPaste",
+        ranges: [insertTarget],
+      });
+    }
+    // FIXME:
+    if (dispatchKeyup) {
+      // dispatch ctrl+x keyup for react
+    }
+  }
+  return !!res;
+};
+
+/**
+ * dispatch cut event which deletes selection
+ * @param {Object} node - node
+ * @param {Object} sel - selection
+ * @returns {boolean} - true if not prevented, false otherwise
+ */
+const cutContent = (node, sel) => {
+  let res;
+  if (node && node.nodeType === Node.ELEMENT_NODE && sel instanceof Selection) {
+    // TODO: StaticRange() constructor not implemented in Blink yet
+    /*
+    const deleteTarget = new StaticRange({
+      startContainer: sel.anchorNode,
+      startOffset: sel.anchorOffset,
+      endContainer: sel.focusNode,
+      endOffset: sel.focusOffset,
+    });
+    */
+    const deleteTarget = {
+      startContainer: sel.anchorNode,
+      startOffset: sel.anchorOffset,
+      endContainer: sel.focusNode,
+      endOffset: sel.focusOffset,
+      collapsed: sel.isCollapsed,
+    };
+    // TODO: beforeinput not enabled by default in Gecko yet
+    let beforeInputNotPrevented;
+    try {
+      document.addEventListener("selectionchange", pasteContent);
+      beforeInputNotPrevented = dispatchInputEvent(node, "beforeinput", {
+        bubbles: true,
+        cancelable: true,
+        inputType: "deleteByCut",
+        ranges: [deleteTarget],
+      });
+    } catch (e) {
+      logErr(e);
+      beforeInputNotPrevented = true;
+    }
+    let cutNotPrevented, dispatchKeyup;
+    if (beforeInputNotPrevented) {
+      // FIXME: dispatch ctrl+x keydown for react
+      cutNotPrevented = dispatchClipboardEvent(node, "cut", {
+        bubbles: true,
+        cancelable: true,
+      });
+      dispatchKeyup = true;
+    }
+    res = beforeInputNotPrevented && cutNotPrevented;
+    if (res) {
+      document.removeEventListener("selectionchange", pasteContent);
+      sel.deleteFromDocument();
+      dispatchInputEvent(node, "input", {
+        bubbles: true,
+        cancelable: false,
+        inputType: "deleteByCut",
+        ranges: [deleteTarget],
+      });
+    }
+    // FIXME:
+    if (dispatchKeyup) {
+      // dispatch ctrl+x keyup for react
+    }
+  }
+  return !!res;
+};
+
+/**
  * replace content of content editable element
  * @param {Object} elm - owner element
  * @param {Object} node - editable element
@@ -1437,59 +1583,21 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
     const changed = value !== node.textContent.replace(/^\s*/, "")
       .replace(/\n +/g, "\n").replace(/([^\n])$/, (m, c) => `${c}\n`);
     if (changed) {
-      const sel = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(node);
-      sel.removeAllRanges();
-      sel.addRange(range);
-      // TODO: StaticRange not implemented in Blink yet
-      /*
-      const targetRange = new StaticRange({
-        startContainer: sel.anchorNode,
-        startOffset: sel.anchorOffset,
-        endContainer: sel.focusNode,
-        endOffset: sel.focusOffset,
-      });
-      */
-      const dataTrans = new DataTransfer();
-      const contentFrag = createParagraphedContent(value, ns);
-      if (elm === node) {
-        const contentStr = new XMLSerializer().serializeToString(contentFrag);
-        dataTrans.setData(MIME_HTML, contentStr);
-      }
-      dataTrans.setData(MIME_PLAIN, value);
-      // TODO: beforeinput not enabled by default in Gecko yet
-      /*
-      dispatchInputEvent(node, "beforeinput", {
-        bubbles: true,
-        cancelable: true,
-        dataTransfer: dataTrans,
-        inputType: "insertFromPaste",
-        ranges: [targetRange],
-      });
-      */
-      const permitted = dispatchClipboardEvent(node, "paste", {
-        bubbles: true,
-        cancelable: true,
-        clipboardData: dataTrans,
-      });
-      if (permitted) {
+      const sel = document.getSelection();
+      sel.collapse(null);
+      sel.selectAllChildren(node);
+      vars[CONTENT_VALUE] = value;
+      if (cutContent(node, sel) && pasteContent()) {
         const frag = document.createDocumentFragment();
+        const contentFrag = createParagraphedContent(value, ns);
         if (elm === node) {
           frag.appendChild(contentFrag);
         } else {
           frag.appendChild(document.createTextNode(value));
         }
-        sel.deleteFromDocument();
         node.appendChild(frag);
+        vars[CONTENT_VALUE] = null;
       }
-      sel.collapse(node);
-      dispatchInputEvent(node, "input", {
-        bubbles: true,
-        cancelable: false,
-        dataTransfer: dataTrans,
-        inputType: "insertFromPaste",
-      });
     }
   }
 };
@@ -1511,19 +1619,21 @@ const replaceEditControlValue = (elm, value) => {
     const changed = elm.value !== value;
     if (changed) {
       value = value.replace(/\u200B/g, "");
-      elm.value = value;
-      dispatchInputEvent(elm, "beforeinput", {
+      const beforeInputNotPrevented = dispatchInputEvent(elm, "beforeinput", {
         bubbles: true,
         cancelable: true,
         data: value,
         inputType: "insertText",
       });
-      dispatchInputEvent(elm, "input", {
-        bubbles: true,
-        cancelable: false,
-        data: value,
-        inputType: "insertText",
-      });
+      if (beforeInputNotPrevented) {
+        elm.value = value;
+        dispatchInputEvent(elm, "input", {
+          bubbles: true,
+          cancelable: false,
+          data: value,
+          inputType: "insertText",
+        });
+      }
     }
   }
 };
@@ -1541,6 +1651,7 @@ const replaceLiveEditContent = (elm, value, key) => {
     const {setContent} = liveEdit.get(key);
     const liveElm = elm.querySelector(setContent);
     if (isEditControl(liveElm)) {
+      // FIXME: add metaKey for mac
       const ctrlA = {
         code: "KeyA",
         ctrlKey: true,
@@ -1560,13 +1671,13 @@ const replaceLiveEditContent = (elm, value, key) => {
       dispatchKeyboardEvent(liveElm, "keypress", backSpace);
       dispatchKeyboardEvent(liveElm, "keyup", backSpace);
       value = value.replace(/\u200B/g, "");
-      liveElm.value = value;
-      dispatchInputEvent(elm, "beforeinput", {
+      dispatchInputEvent(liveElm, "beforeinput", {
         bubbles: true,
         cancelable: true,
         data: value,
         inputType: "insertText",
       });
+      liveElm.value = value;
       dispatchInputEvent(liveElm, "input", {
         bubbles: true,
         cancelable: false,
@@ -1582,7 +1693,7 @@ const replaceLiveEditContent = (elm, value, key) => {
  * @param {Object} obj - sync data object
  * @returns {Promise.<Array>} - results of each handler
  */
-const syncText = async (obj = {}) => {
+const syncText = (obj = {}) => {
   const {data, value} = obj;
   const func = [];
   if (isObjectNotEmpty(data)) {
@@ -1800,7 +1911,7 @@ const handleBeforeContextMenu = evt => {
   if (button === MOUSE_BUTTON_RIGHT || key === "ContextMenu" ||
       shiftKey && key === "F10") {
     const {localName, namespaceURI, type} = target;
-    const {anchorNode, focusNode, isCollapsed} = window.getSelection();
+    const {anchorNode, focusNode, isCollapsed} = document.getSelection();
     const mode = namespaceURI === nsURI.math && MODE_MATHML ||
                  namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
     const isChildNodeText = isContentTextNode(target);
@@ -1880,11 +1991,22 @@ const startup = () => Promise.all([
   extendObjItems(liveEdit, LIVE_EDIT),
 ]).catch(throwErr);
 
+/**
+ * handle ready state change
+ * @param {Object} evt - event
+ * @returns {?AsyncFunction} - startup()
+ */
+/*
+const handleReadyStateChange = () =>
+  document.readyState === "complete" && startup();
+*/
+
 /* listeners */
 runtime.onMessage.addListener(runtimeOnMsg);
 window.addEventListener("mousedown", handleBeforeContextMenu, true);
 window.addEventListener("keydown", handleKeyDown, true);
 window.addEventListener("load", startup);
+//document.addEventListener("readystatechange", startup);
 document.readyState === "complete" && startup();
 
 /* export for tests */
@@ -1902,6 +2024,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     createRangeArr,
     createTmpFileData,
     createXmlBasedDom,
+    cutContent,
     dataIds,
     determineContentProcess,
     dispatchClipboardEvent,
@@ -1937,6 +2060,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     liveEdit,
     logErr,
     matchDocUrl,
+    pasteContent,
     portOnConnect,
     portOnDisconnect,
     portOnMsg,
