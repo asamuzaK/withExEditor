@@ -3666,7 +3666,7 @@ describe("main", () => {
       browser.runtime.getPlatformInfo.resolves({
         os: "mac",
       });
-      const res = await func();
+      await func();
       assert.isTrue(mjs.vars[IS_MAC], "result");
     });
 
@@ -3674,7 +3674,7 @@ describe("main", () => {
       browser.runtime.getPlatformInfo.resolves({
         os: "foo",
       });
-      const res = await func();
+      await func();
       assert.isFalse(mjs.vars[IS_MAC], "result");
     });
   });
