@@ -1519,7 +1519,9 @@ const pasteContent = evt => {
     }
     let pasteNotPrevented, dispatchKeyup;
     if (beforeInputNotPrevented) {
-      // FIXME: dispatch ctrl+v keydown for react
+      // FIXME: dispatch keydown, keypress for react, but no success
+      dispatchKeyboardEvent(node, "keydown", KeyCtrlV);
+      dispatchKeyboardEvent(node, "keypress", KeyCtrlV);
       pasteNotPrevented = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
@@ -1540,10 +1542,7 @@ const pasteContent = evt => {
         ranges: [insertTarget],
       });
     }
-    // FIXME:
-    if (dispatchKeyup) {
-      // dispatch ctrl+x keyup for react
-    }
+    dispatchKeyup && dispatchKeyboardEvent(node, "keyup", KeyCtrlV);
   }
   return !!res;
 };
@@ -1589,7 +1588,9 @@ const cutContent = (node, sel) => {
     }
     let cutNotPrevented, dispatchKeyup;
     if (beforeInputNotPrevented) {
-      // FIXME: dispatch ctrl+x keydown for react
+      // FIXME: dispatch keydown, keypress for react, but no success
+      dispatchKeyboardEvent(node, "keydown", KeyCtrlX);
+      dispatchKeyboardEvent(node, "keypress", KeyCtrlX);
       cutNotPrevented = dispatchClipboardEvent(node, "cut", {
         bubbles: true,
         cancelable: true,
@@ -1607,10 +1608,7 @@ const cutContent = (node, sel) => {
         ranges: [deleteTarget],
       });
     }
-    // FIXME:
-    if (dispatchKeyup) {
-      // dispatch ctrl+x keyup for react
-    }
+    dispatchKeyup && dispatchKeyboardEvent(node, "keyup", KeyCtrlX);
   }
   return !!res;
 };

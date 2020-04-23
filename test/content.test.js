@@ -3349,7 +3349,7 @@ describe("content", () => {
       sel.collapse(p);
       const res = func();
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.strictEqual(stub.callCount, 6, "call count");
       assert.isTrue(res, "result");
     });
 
@@ -3369,7 +3369,7 @@ describe("content", () => {
       const res = func(evt);
       assert.isTrue(stub.called, "called");
       assert.isTrue(spy.called, "called removeEventlistener");
-      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.strictEqual(stub.callCount, 6, "call count");
       assert.isTrue(res, "result");
     });
 
@@ -3402,7 +3402,7 @@ describe("content", () => {
       sel.collapse(p);
       const res = func();
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 2, "call count");
+      assert.strictEqual(stub.callCount, 5, "call count");
       assert.isFalse(res, "result");
     });
 
@@ -3422,7 +3422,7 @@ describe("content", () => {
       stubErr.restore();
       assert.isTrue(errorCalled, "error called");
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.strictEqual(stub.callCount, 6, "call count");
       assert.isTrue(res, "result");
     });
   });
@@ -3455,7 +3455,7 @@ describe("content", () => {
       sel.selectAllChildren(p);
       const res = func(p, sel);
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.strictEqual(stub.callCount, 6, "call count");
       assert.isTrue(res, "result");
     });
 
@@ -3484,7 +3484,7 @@ describe("content", () => {
       sel.collapse(p);
       const res = func(p, sel);
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 2, "call count");
+      assert.strictEqual(stub.callCount, 5, "call count");
       assert.isFalse(res, "result");
     });
 
@@ -3502,7 +3502,7 @@ describe("content", () => {
       stubErr.restore();
       assert.isTrue(errorCalled, "error called");
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.strictEqual(stub.callCount, 6, "call count");
       assert.isTrue(res, "result");
     });
   });
