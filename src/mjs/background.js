@@ -12,7 +12,7 @@ import {
   handleCmd, handleDisconnectedHost, handleMsg, handlePort, host,
   onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
   onWindowRemoved, openOptionsPage, postContextMenuData, setDefaultIcon,
-  setVars, syncUI, toggleBadge,
+  setOs, setVars, syncUI, toggleBadge,
 } from "./main.js";
 import fileExtData from "./file-ext.js";
 import liveEditData from "./live-edit.js";
@@ -62,7 +62,7 @@ windows.onRemoved.addListener(windowId =>
 
 /* startup */
 document.addEventListener("DOMContentLoaded", () => Promise.all([
-  setDefaultIcon().then(getAllStorage).then(setVars).then(syncUI),
+  setOs().then(setDefaultIcon).then(getAllStorage).then(setVars).then(syncUI),
   setStorage({[NS_URI]: nsUriData}),
   setStorage({[FILE_EXT]: fileExtData}),
   setStorage({[LIVE_EDIT]: liveEditData}),

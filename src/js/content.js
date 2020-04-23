@@ -22,8 +22,11 @@ const FILE_NOT_FOUND_TIMESTAMP = -1;
 const ID_TAB = "tabId";
 const ID_WIN = "windowId";
 const INCOGNITO = "incognito";
+const IS_MAC = "isMac";
 const KEY_CODE_A = 65;
 const KEY_CODE_BS = 8;
+const KEY_CODE_V = 86;
+const KEY_CODE_X = 88;
 const LABEL = "withExEditor";
 const LIVE_EDIT = "liveEdit";
 const LOCAL_FILE_VIEW = "viewLocalFile";
@@ -64,6 +67,7 @@ const vars = {
   [ID_TAB]: "",
   [ID_WIN]: "",
   [INCOGNITO]: false,
+  [IS_MAC]: false,
   [ONLY_EDITABLE]: false,
   [SYNC_AUTO]: false,
   [SYNC_AUTO_URL]: null,
@@ -186,6 +190,47 @@ const matchDocUrl = arr => {
   return !!bool;
 };
 
+/* common shortcut keys */
+const KeyBackSpace = {
+  code: "Backspace",
+  key: "Backspace",
+  keyCode: KEY_CODE_BS,
+};
+
+const KeyCtrlA = {
+  code: "KeyA",
+  key: "a",
+  keyCode: KEY_CODE_A,
+};
+
+const KeyCtrlV = {
+  code: "KeyV",
+  key: "v",
+  keyCode: KEY_CODE_V,
+};
+
+const KeyCtrlX = {
+  code: "KeyX",
+  key: "x",
+  keyCode: KEY_CODE_X,
+};
+
+/**
+ * set modifier keys
+ * @param {boolean} bool - is mac
+ * @returns {void}
+ */
+const setModifierKeys = (bool = vars[IS_MAC]) => {
+  const keys = [KeyCtrlA, KeyCtrlV, KeyCtrlX];
+  for (const key of keys) {
+    if (bool) {
+      key.metaKey = true;
+    } else {
+      key.ctrlKey = true;
+    }
+  }
+};
+
 /* dispatch events */
 /**
  * dispatch clipboard event
@@ -296,8 +341,8 @@ const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
         key, code, keyCode,
         altKey: !!altKey,
         bubbles: true,
-        ctrlKey: !!ctrlKey,
         cancelable: true,
+        ctrlKey: !!ctrlKey,
         locale: "",
         location: 0,
         metaKey: !!metaKey,
@@ -1651,25 +1696,11 @@ const replaceLiveEditContent = (elm, value, key) => {
     const {setContent} = liveEdit.get(key);
     const liveElm = elm.querySelector(setContent);
     if (isEditControl(liveElm)) {
-      // FIXME: add metaKey for mac
-      const ctrlA = {
-        code: "KeyA",
-        ctrlKey: true,
-        key: "a",
-        keyCode: KEY_CODE_A,
-      };
-      const backSpace = {
-        code: "Backspace",
-        key: "Backspace",
-        keyCode: KEY_CODE_BS,
-      };
       dispatchFocusEvent(liveElm);
-      dispatchKeyboardEvent(liveElm, "keydown", ctrlA);
-      dispatchKeyboardEvent(liveElm, "keypress", ctrlA);
-      dispatchKeyboardEvent(liveElm, "keyup", ctrlA);
-      dispatchKeyboardEvent(liveElm, "keydown", backSpace);
-      dispatchKeyboardEvent(liveElm, "keypress", backSpace);
-      dispatchKeyboardEvent(liveElm, "keyup", backSpace);
+      dispatchKeyboardEvent(liveElm, "keydown", KeyCtrlA);
+      dispatchKeyboardEvent(liveElm, "keyup", KeyCtrlA);
+      dispatchKeyboardEvent(liveElm, "keydown", KeyBackSpace);
+      dispatchKeyboardEvent(liveElm, "keyup", KeyBackSpace);
       value = value.replace(/\u200B/g, "");
       dispatchInputEvent(liveElm, "beforeinput", {
         bubbles: true,
@@ -1789,6 +1820,10 @@ const handlePortMsg = async msg => {
         case ONLY_EDITABLE:
         case SYNC_AUTO:
           vars[key] = !!value;
+          break;
+        case IS_MAC:
+          vars[key] = !!value;
+          func.push(setModifierKeys(value));
           break;
         case TMP_FILE_RES:
           func.push(syncText(value));
@@ -2057,6 +2092,9 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     isEditable,
     isObjectNotEmpty,
     isString,
+    KeyCtrlA,
+    KeyCtrlV,
+    KeyCtrlX,
     liveEdit,
     logErr,
     matchDocUrl,
@@ -2079,6 +2117,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     setAttributeNS,
     setDataId,
     setDataIdController,
+    setModifierKeys,
     setTmpFileData,
     startup,
     syncText,

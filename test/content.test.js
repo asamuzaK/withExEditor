@@ -19,6 +19,7 @@ const FILE_NOT_FOUND_TIMESTAMP = -1;
 const ID_TAB = "tabId";
 const ID_WIN = "windowId";
 const INCOGNITO = "incognito";
+const IS_MAC = "isMac";
 const KEY_CODE_A = 65;
 const LABEL = "withExEditor";
 const LOCAL_FILE_VIEW = "viewLocalFile";
@@ -342,6 +343,70 @@ describe("content", () => {
         document.location.href,
       ]);
       assert.isTrue(res, "result");
+    });
+  });
+
+  describe("set modifier keys", () => {
+    const func = cjs.setModifierKeys;
+    beforeEach(() => {
+      cjs.vars[IS_MAC] = false;
+      delete cjs.KeyCtrlA.ctrlKey;
+      delete cjs.KeyCtrlA.metaKey;
+      delete cjs.KeyCtrlV.ctrlKey;
+      delete cjs.KeyCtrlV.metaKey;
+      delete cjs.KeyCtrlX.ctrlKey;
+      delete cjs.KeyCtrlX.metaKey;
+    });
+    afterEach(() => {
+      cjs.vars[IS_MAC] = false;
+      delete cjs.KeyCtrlA.ctrlKey;
+      delete cjs.KeyCtrlA.metaKey;
+      delete cjs.KeyCtrlV.ctrlKey;
+      delete cjs.KeyCtrlV.metaKey;
+      delete cjs.KeyCtrlX.ctrlKey;
+      delete cjs.KeyCtrlX.metaKey;
+    });
+
+    it("should set value", () => {
+      func(true);
+      assert.isTrue(cjs.KeyCtrlA.metaKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlA.ctrlKey, "meta");
+      assert.isTrue(cjs.KeyCtrlV.metaKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlV.ctrlKey, "meta");
+      assert.isTrue(cjs.KeyCtrlX.metaKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlX.ctrlKey, "meta");
+    });
+
+    it("should set value", () => {
+      func(false);
+      assert.isUndefined(cjs.KeyCtrlA.metaKey, "meta");
+      assert.isTrue(cjs.KeyCtrlA.ctrlKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlV.metaKey, "meta");
+      assert.isTrue(cjs.KeyCtrlV.ctrlKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlX.metaKey, "meta");
+      assert.isTrue(cjs.KeyCtrlX.ctrlKey, "meta");
+    });
+
+    it("should set value", () => {
+      cjs.vars[IS_MAC] = true;
+      func();
+      assert.isTrue(cjs.KeyCtrlA.metaKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlA.ctrlKey, "meta");
+      assert.isTrue(cjs.KeyCtrlV.metaKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlV.ctrlKey, "meta");
+      assert.isTrue(cjs.KeyCtrlX.metaKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlX.ctrlKey, "meta");
+    });
+
+    it("should set value", () => {
+      cjs.vars[IS_MAC] = false;
+      func();
+      assert.isUndefined(cjs.KeyCtrlA.metaKey, "meta");
+      assert.isTrue(cjs.KeyCtrlA.ctrlKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlV.metaKey, "meta");
+      assert.isTrue(cjs.KeyCtrlV.ctrlKey, "meta");
+      assert.isUndefined(cjs.KeyCtrlX.metaKey, "meta");
+      assert.isTrue(cjs.KeyCtrlX.ctrlKey, "meta");
     });
   });
 
@@ -3975,10 +4040,17 @@ describe("content", () => {
       cjs.vars[ID_TAB] = "";
       cjs.vars[ID_WIN] = "";
       cjs.vars[INCOGNITO] = false;
+      cjs.vars[IS_MAC] = false;
       cjs.vars[ONLY_EDITABLE] = false;
       cjs.vars[SYNC_AUTO] = false;
       cjs.vars[SYNC_AUTO_URL] = null;
       cjs.vars.port = mockPort({name: PORT_CONTENT});
+      delete cjs.KeyCtrlA.ctrlKey;
+      delete cjs.KeyCtrlA.metaKey;
+      delete cjs.KeyCtrlV.ctrlKey;
+      delete cjs.KeyCtrlV.metaKey;
+      delete cjs.KeyCtrlX.ctrlKey;
+      delete cjs.KeyCtrlX.metaKey;
     });
     afterEach(() => {
       cjs.dataIds.clear();
@@ -3987,10 +4059,17 @@ describe("content", () => {
       cjs.vars[ID_TAB] = "";
       cjs.vars[ID_WIN] = "";
       cjs.vars[INCOGNITO] = false;
+      cjs.vars[IS_MAC] = false;
       cjs.vars[ONLY_EDITABLE] = false;
       cjs.vars[SYNC_AUTO] = false;
       cjs.vars[SYNC_AUTO_URL] = null;
       cjs.vars.port = null;
+      delete cjs.KeyCtrlA.ctrlKey;
+      delete cjs.KeyCtrlA.metaKey;
+      delete cjs.KeyCtrlV.ctrlKey;
+      delete cjs.KeyCtrlV.metaKey;
+      delete cjs.KeyCtrlX.ctrlKey;
+      delete cjs.KeyCtrlX.metaKey;
     });
 
     it("should get empty array", async () => {
@@ -4027,6 +4106,16 @@ describe("content", () => {
       assert.isTrue(cjs.vars[ONLY_EDITABLE], "editable");
       assert.isTrue(cjs.vars[SYNC_AUTO], "sync");
       assert.deepEqual(res, [], "result");
+    });
+
+    it("should set values", async () => {
+      const res = await func({
+        [IS_MAC]: true,
+      });
+      assert.isTrue(cjs.vars[IS_MAC], "vars");
+      assert.isTrue(cjs.KeyCtrlA.metaKey, "metakey");
+      assert.isUndefined(cjs.KeyCtrlA.ctlrKey, "ctrlkey");
+      assert.deepEqual(res, [undefined], "result");
     });
 
     it("should call function", async () => {

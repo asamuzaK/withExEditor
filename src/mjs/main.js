@@ -8,8 +8,8 @@ import {
 } from "./common.js";
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
-  getActiveTab, getActiveTabId, getCurrentWindow, getEnabledTheme, getStorage,
-  getWindow, sendMessage, setStorage,
+  getActiveTab, getActiveTabId, getCurrentWindow, getEnabledTheme, getOs,
+  getStorage, getWindow, sendMessage, setStorage,
 } from "./browser.js";
 
 /* api */
@@ -27,7 +27,7 @@ import {
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK, HOST_VERSION_LATEST,
   ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
   ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE, INFO_COLOR, INFO_TEXT,
-  IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
+  IS_EXECUTABLE, IS_MAC, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
   STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT,
@@ -39,6 +39,7 @@ const HOST_VERSION_MIN = "v5.0.0-b.2.1";
 
 /* variables */
 export const vars = {
+  [IS_MAC]: false,
   [IS_WEBEXT]: runtime.id === WEBEXT_ID,
   [ONLY_EDITABLE]: false,
   [SYNC_AUTO]: false,
@@ -1123,4 +1124,13 @@ export const setVars = async (data = {}) => {
     func.push(setVar(key, newValue || value, !!newValue));
   }
   return Promise.all(func);
+};
+
+/**
+ * set OS
+ * @returns {void}
+ */
+export const setOs = async () => {
+  const os = await getOs();
+  vars[IS_MAC] = os === "mac";
 };

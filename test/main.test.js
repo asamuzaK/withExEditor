@@ -17,7 +17,7 @@ import {
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST,
   ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
   ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE, INFO_COLOR, INFO_TEXT,
-  IS_EXECUTABLE, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
+  IS_EXECUTABLE, IS_MAC, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
   STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT,
@@ -3650,6 +3650,32 @@ describe("main", () => {
         },
       });
       assert.deepEqual(res, [[]], "result");
+    });
+  });
+
+  describe("set OS", () => {
+    const func = mjs.setOs;
+    beforeEach(() => {
+      mjs.vars[IS_MAC] = false;
+    });
+    afterEach(() => {
+      mjs.vars[IS_MAC] = false;
+    });
+
+    it("should set variables", async () => {
+      browser.runtime.getPlatformInfo.resolves({
+        os: "mac",
+      });
+      const res = await func();
+      assert.isTrue(mjs.vars[IS_MAC], "result");
+    });
+
+    it("should set variables", async () => {
+      browser.runtime.getPlatformInfo.resolves({
+        os: "foo",
+      });
+      const res = await func();
+      assert.isFalse(mjs.vars[IS_MAC], "result");
     });
   });
 });
