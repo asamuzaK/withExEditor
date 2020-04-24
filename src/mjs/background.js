@@ -11,8 +11,8 @@ import {
 import {
   handleCmd, handleDisconnectedHost, handleMsg, handlePort, host,
   onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
-  onWindowRemoved, openOptionsPage, postContextMenuData, setDefaultIcon,
-  setOs, setVars, syncUI, toggleBadge,
+  onWindowRemoved, openOptionsPage, postContextMenuData, setOs, setVars,
+  toggleBadge,
 } from "./main.js";
 import fileExtData from "./file-ext.js";
 import liveEditData from "./live-edit.js";
@@ -33,7 +33,7 @@ import {
 browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
 commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
 host.onDisconnect.addListener(port =>
-  handleDisconnectedHost(port).then(toggleBadge).catch(throwErr),
+  handleDisconnectedHost(port).catch(throwErr),
 );
 host.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 menus.onClicked.addListener((info, tab) =>
@@ -44,7 +44,7 @@ runtime.onMessage.addListener((msg, sender) =>
   handleMsg(msg, sender).catch(throwErr),
 );
 storage.onChanged.addListener(data =>
-  setVars(data).then(syncUI).catch(throwErr),
+  setVars(data).catch(throwErr),
 );
 tabs.onActivated.addListener(info => onTabActivated(info).catch(throwErr));
 tabs.onUpdated.addListener((id, info, tab) =>
@@ -62,7 +62,7 @@ windows.onRemoved.addListener(windowId =>
 
 /* startup */
 document.addEventListener("DOMContentLoaded", () => Promise.all([
-  setOs().then(setDefaultIcon).then(getAllStorage).then(setVars).then(syncUI),
+  setOs().then(getAllStorage).then(setVars).then(toggleBadge),
   setStorage({[NS_URI]: nsUriData}),
   setStorage({[FILE_EXT]: fileExtData}),
   setStorage({[LIVE_EDIT]: liveEditData}),

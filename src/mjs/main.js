@@ -8,8 +8,8 @@ import {
 } from "./common.js";
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
-  getActiveTab, getActiveTabId, getCurrentWindow, getEnabledTheme, getOs,
-  getStorage, getWindow, sendMessage, setStorage,
+  getActiveTab, getActiveTabId, getCurrentWindow, getOs, getStorage, getWindow,
+  sendMessage, setStorage,
 } from "./browser.js";
 
 /* api */
@@ -25,12 +25,12 @@ import {
   EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK, HOST_VERSION_LATEST,
-  ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_DARK_ID, ICON_ID,
-  ICON_LIGHT, ICON_LIGHT_ID, ICON_WHITE, INFO_COLOR, INFO_TEXT,
+  ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_ID, ICON_LIGHT,
+  ICON_WHITE, INFO_COLOR, INFO_TEXT,
   IS_EXECUTABLE, IS_MAC, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
-  STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL, THEME_DARK, THEME_LIGHT,
+  STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE, TMP_FILE_CREATE,
   TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ,
   TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID,
@@ -322,38 +322,6 @@ export const toggleBadge = async () => {
   return Promise.all(func);
 };
 
-/**
- * set default icon
- * @returns {void}
- */
-export const setDefaultIcon = async () => {
-  const items = await getEnabledTheme();
-  if (Array.isArray(items) && items.length) {
-    for (const item of items) {
-      const {id} = item;
-      switch (id) {
-        case THEME_DARK: {
-          varsLocal[ICON_ID] = ICON_LIGHT_ID;
-          break;
-        }
-        case THEME_LIGHT: {
-          varsLocal[ICON_ID] = ICON_DARK_ID;
-          break;
-        }
-        default: {
-          if (vars[IS_WEBEXT]) {
-            varsLocal[ICON_ID] = ICON_DARK_ID;
-          } else {
-            varsLocal[ICON_ID] = "";
-          }
-        }
-      }
-    }
-  } else {
-    varsLocal[ICON_ID] = "";
-  }
-};
-
 /* context menu items */
 export const menuItems = {
   [MODE_SOURCE]: null,
@@ -564,16 +532,6 @@ export const cacheMenuItemTitle = async () => {
     varsLocal[item] = i18n.getMessage(title, [label, accKey]);
   }
 };
-
-/* UI */
-/**
- * synchronize UI components
- * @returns {Promise.<Array>} - results of each handler
- */
-export const syncUI = async () => Promise.all([
-  setIcon(varsLocal[ICON_ID]),
-  toggleBadge(),
-]);
 
 /* editor config */
 /**
@@ -881,7 +839,7 @@ export const onTabActivated = async info => {
       windowId, tabId,
     }));
   }
-  func.push(updateContextMenu(), syncUI());
+  func.push(updateContextMenu());
   return Promise.all(func);
 };
 
@@ -913,7 +871,7 @@ export const onTabUpdated = async (id, info, tab) => {
       varsLocal[MENU_ENABLED] = false;
     }
     if (status === "complete") {
-      func.push(updateContextMenu(), syncUI());
+      func.push(updateContextMenu());
     }
   }
   return Promise.all(func);
@@ -972,7 +930,6 @@ export const onWindowFocusChanged = async () => {
     }));
     func.push(updateContextMenu());
   }
-  func.push(syncUI());
   return Promise.all(func);
 };
 
