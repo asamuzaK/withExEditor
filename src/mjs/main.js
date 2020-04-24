@@ -1036,9 +1036,7 @@ export const setVar = async (item, obj, changed = false) => {
       case ICON_WHITE:
         if (checked) {
           varsLocal[ICON_ID] = value;
-          if (changed) {
-            func.push(setIcon(value));
-          }
+          func.push(setIcon(value));
         }
         break;
       case ONLY_EDITABLE:

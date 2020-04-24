@@ -3157,9 +3157,9 @@ describe("main", () => {
         value: "#auto",
       });
       assert.strictEqual(varsLocal[ICON_ID], "#auto", "value");
-      assert.strictEqual(browser.browserAction.setIcon.callCount, i,
-                         "not called");
-      assert.deepEqual(res, [], "result");
+      assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
+                         "called");
+      assert.deepEqual(res, [undefined], "result");
     });
 
     it("should not set value", async () => {
