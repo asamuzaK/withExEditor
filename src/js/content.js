@@ -1517,17 +1517,14 @@ const pasteContent = evt => {
       logErr(e);
       beforeInputNotPrevented = true;
     }
-    let pasteNotPrevented, dispatchKeyup;
+    let pasteNotPrevented;
     if (beforeInputNotPrevented) {
-      // FIXME: dispatch keydown, keypress for react, but no success
-      dispatchKeyboardEvent(node, "keydown", KeyCtrlV);
-      dispatchKeyboardEvent(node, "keypress", KeyCtrlV);
+      // TODO: add support for React, issue #123
       pasteNotPrevented = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
         clipboardData: dataTrans,
       });
-      dispatchKeyup = true;
     }
     vars[CONTENT_VALUE] = null;
     evt && evt.type === "selectionchange" &&
@@ -1542,7 +1539,6 @@ const pasteContent = evt => {
         ranges: [insertTarget],
       });
     }
-    dispatchKeyup && dispatchKeyboardEvent(node, "keyup", KeyCtrlV);
   }
   return !!res;
 };
@@ -1586,16 +1582,13 @@ const cutContent = (node, sel) => {
       logErr(e);
       beforeInputNotPrevented = true;
     }
-    let cutNotPrevented, dispatchKeyup;
+    let cutNotPrevented;
     if (beforeInputNotPrevented) {
-      // FIXME: dispatch keydown, keypress for react, but no success
-      dispatchKeyboardEvent(node, "keydown", KeyCtrlX);
-      dispatchKeyboardEvent(node, "keypress", KeyCtrlX);
+      // TODO: add support for React, issue #123
       cutNotPrevented = dispatchClipboardEvent(node, "cut", {
         bubbles: true,
         cancelable: true,
       });
-      dispatchKeyup = true;
     }
     res = beforeInputNotPrevented && cutNotPrevented;
     if (res) {
@@ -1608,7 +1601,6 @@ const cutContent = (node, sel) => {
         ranges: [deleteTarget],
       });
     }
-    dispatchKeyup && dispatchKeyboardEvent(node, "keyup", KeyCtrlX);
   }
   return !!res;
 };
