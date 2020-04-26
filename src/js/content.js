@@ -1509,6 +1509,9 @@ const pasteContent = evt => {
       beforeInputNotPrevented = dispatchInputEvent(node, "beforeinput", {
         bubbles: true,
         cancelable: true,
+        // TODO: use plain text value instead?
+        //data: value,
+        //inputType: "insertText",
         dataTransfer: dataTrans,
         inputType: "insertFromPaste",
         ranges: [insertTarget],
@@ -1520,6 +1523,7 @@ const pasteContent = evt => {
     let pasteNotPrevented;
     if (beforeInputNotPrevented) {
       // TODO: add support for React, issue #123
+      // NOTE: maybe synthetic paste turns drag data store mode to protected?
       pasteNotPrevented = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
