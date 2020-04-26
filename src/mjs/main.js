@@ -456,7 +456,7 @@ export const createMenuItems = async () => {
 
 /**
  * restore context menu
- * NOTE: Remove in future release. Use updateContextMenu instead.
+ * TODO: Remove in future release. Use updateContextMenu instead.
  * @returns {AsyncFunction} - Promise chain
  */
 export const restoreContextMenu = async () =>
