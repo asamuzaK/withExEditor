@@ -42,6 +42,9 @@
              M -17.67767,74.246212 -62.932504,28.991378
              -0.70710678,-33.234019 44.547727,12.020815 Z"/>
   </symbol>
+  <symbol id="background">
+    <path d="M 20,20 H 84 V 108 H 20 Z"/>
+  </symbol>
   <g id="black" fill="#000">
     <use href="#outline"/>
   </g>
@@ -64,6 +67,7 @@
     <use href="#outline"/>
   </g>
   <g id="color">
+    <use href="#background" fill="#FFF"/>
     <use href="#frame" fill="#002147"/>
     <use href="#pen" fill="#E66000"/>
   </g>
