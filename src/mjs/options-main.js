@@ -26,6 +26,7 @@ export const port = runtime.connect({name: PORT_NAME});
 
 /**
  * post message
+ *
  * @param {*} msg - message
  * @returns {void}
  */
@@ -37,21 +38,24 @@ export const postMsg = async msg => {
 
 /**
  * get host status
- * @returns {AsyncFunction} - port message
+ *
+ * @returns {Function} - postMsg()
  */
 export const getHostStatus = async () => postMsg({[HOST_STATUS_GET]: true});
 
 /**
  * get editor config
- * @returns {AsyncFunction} - port message
+ *
+ * @returns {Function} - postMsg()
  */
 export const getEditorConfig = async () => postMsg({[EDITOR_CONFIG_GET]: true});
 
 /**
  * create pref
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @param {boolean} executable - executable
- * @returns {Object} - pref data
+ * @returns {object} - pref data
  */
 export const createPref = async (elm, executable = false) => {
   const id = elm && elm.id;
@@ -71,6 +75,7 @@ export const createPref = async (elm, executable = false) => {
 
 /**
  * extract editor config
+ *
  * @param {string} obj - editor config object
  * @returns {void}
  */
@@ -103,7 +108,8 @@ export const extractEditorConfig = async (obj = {}) => {
 
 /**
  * extract host status
- * @param {Object} status - host status
+ *
+ * @param {object} status - host status
  * @returns {void}
  */
 export const extractHostStatus = async status => {
@@ -141,8 +147,9 @@ export const extractHostStatus = async status => {
 
 /**
  * extract sync urls input
- * @param {!Object} evt - Event
- * @returns {?AsyncFunction} - post message
+ *
+ * @param {!object} evt - Event
+ * @returns {?Function} - postMsg()
  */
 export const extractSyncUrls = async evt => {
   const {target} = evt;
@@ -172,7 +179,8 @@ export const extractSyncUrls = async evt => {
 
 /**
  * store pref
- * @param {!Object} evt - Event
+ *
+ * @param {!object} evt - Event
  * @returns {Promise.<Array>} - results of each handler
  */
 export const storePref = async evt => {
@@ -206,8 +214,9 @@ export const storePref = async evt => {
 /* event handlers */
 /**
  * handle reloadExtension click
- * @param {!Object} evt - Event
- * @returns {?AsyncFunction} - postMsg()
+ *
+ * @param {!object} evt - Event
+ * @returns {?Function} - postMsg()
  */
 export const handleReloadExtensionClick = evt => {
   const {currentTarget, target} = evt;
@@ -225,22 +234,25 @@ export const handleReloadExtensionClick = evt => {
 
 /**
  * handle sync urls input
- * @param {!Object} evt - Event
- * @returns {AsyncFunction} - extractSyncUrls()
+ *
+ * @param {!object} evt - Event
+ * @returns {Function} - extractSyncUrls()
  */
 export const handleSyncUrlsInputInput = evt =>
   extractSyncUrls(evt).catch(throwErr);
 
 /**
  * handle input change
- * @param {!Object} evt - Event
- * @returns {AsyncFunction} - storePref()
+ *
+ * @param {!object} evt - Event
+ * @returns {Function} - storePref()
  */
 export const handleInputChange = evt => storePref(evt).catch(throwErr);
 
 /**
  * prevent event
- * @param {!Object} evt - Event
+ *
+ * @param {!object} evt - Event
  * @returns {void}
  */
 export const preventEvent = evt => {
@@ -251,6 +263,7 @@ export const preventEvent = evt => {
 /* html */
 /**
  * add event listener to reload extension button
+ *
  * @returns {void}
  */
 export const addReloadExtensionListener = async () => {
@@ -260,6 +273,7 @@ export const addReloadExtensionListener = async () => {
 
 /**
  * add event listener to sync urls textarea
+ *
  * @returns {void}
  */
 export const addSyncUrlsInputListener = async () => {
@@ -269,6 +283,7 @@ export const addSyncUrlsInputListener = async () => {
 
 /**
  * add event listener to input elements
+ *
  * @returns {void}
  */
 export const addInputChangeListener = async () => {
@@ -280,6 +295,7 @@ export const addInputChangeListener = async () => {
 
 /**
  * add event listener to form elements
+ *
  * @returns {void}
  */
 export const addFormSubmitListener = async () => {
@@ -291,7 +307,8 @@ export const addFormSubmitListener = async () => {
 
 /**
  * set html input value
- * @param {Object} data - data
+ *
+ * @param {object} data - data
  * @returns {void}
  */
 export const setHtmlInputValue = async (data = {}) => {
@@ -320,6 +337,7 @@ export const setHtmlInputValue = async (data = {}) => {
 
 /**
  * set html input values from storage
+ *
  * @returns {Promise.<Array>} - results of each handler
  */
 export const setValuesFromStorage = async () => {
@@ -339,6 +357,7 @@ export const setValuesFromStorage = async () => {
 /* handler */
 /**
  * handle message
+ *
  * @param {*} msg - message
  * @returns {Promise.<Array>} - results of each handler
  */

@@ -77,7 +77,8 @@ const vars = {
 /* common */
 /**
  * throw error
- * @param {!Object} e - Error
+ *
+ * @param {!object} e - Error
  * @throws
  */
 const throwErr = e => {
@@ -86,7 +87,8 @@ const throwErr = e => {
 
 /**
  * log error
- * @param {!Object} e - Error
+ *
+ * @param {!object} e - Error
  * @returns {boolean} - false
  */
 const logErr = e => {
@@ -100,6 +102,7 @@ const logErr = e => {
 
 /**
  * get type
+ *
  * @param {*} o - object to check
  * @returns {string} - type of object
  */
@@ -108,6 +111,7 @@ const getType = o =>
 
 /**
  * is string
+ *
  * @param {*} o - object to check
  * @returns {boolean} - result
  */
@@ -115,6 +119,7 @@ const isString = o => typeof o === "string" || o instanceof String;
 
 /**
  * is object, and not an empty object
+ *
  * @param {*} o - object to check;
  * @returns {boolean} - result
  */
@@ -125,6 +130,7 @@ const isObjectNotEmpty = o => {
 
 /**
  * strip HTML tags and decode HTML escaped characters
+ *
  * @param {string} str - html string
  * @returns {string} - converted string
  */
@@ -140,6 +146,7 @@ const getDecodedContent = str => {
 /* file utils */
 /**
  * get file name from URI path
+ *
  * @param {string} uri - URI
  * @param {string} subst - substitute file name
  * @returns {string} - file name
@@ -161,6 +168,7 @@ const getFileNameFromURI = (uri, subst = LABEL) => {
 
 /**
  * check whether given array of URLs matches document URL
+ *
  * @param {Array} arr - array of URLs
  * @returns {boolean} - result
  */
@@ -217,6 +225,7 @@ const KeyCtrlX = {
 
 /**
  * set modifier keys
+ *
  * @param {boolean} bool - is mac
  * @returns {void}
  */
@@ -234,9 +243,10 @@ const setModifierKeys = (bool = vars[IS_MAC]) => {
 /* dispatch events */
 /**
  * dispatch clipboard event
- * @param {Object} elm - Element
+ *
+ * @param {object} elm - Element
  * @param {string} type - event type
- * @param {Object} opt - init options
+ * @param {object} opt - init options
  * @returns {boolean} - event permitted
  */
 const dispatchClipboardEvent = (elm, type, opt = {
@@ -263,8 +273,8 @@ const dispatchClipboardEvent = (elm, type, opt = {
 
 /**
  * dispatch focus event
- * @param {Object} elm - Element
- * @param {string} type - event type
+ *
+ * @param {object} elm - Element
  * @returns {boolean} - event permitted
  */
 const dispatchFocusEvent = elm => {
@@ -282,9 +292,10 @@ const dispatchFocusEvent = elm => {
 
 /**
  * dispatch input event
- * @param {Object} elm - Element
+ *
+ * @param {object} elm - Element
  * @param {string} type - event type
- * @param {Object} opt - init options
+ * @param {object} opt - init options
  * @returns {boolean} - event permitted
  */
 const dispatchInputEvent = (elm, type, opt) => {
@@ -323,9 +334,10 @@ const dispatchInputEvent = (elm, type, opt) => {
 
 /**
  * dispatch keyboard event
- * @param {Object} elm - Element
+ *
+ * @param {object} elm - Element
  * @param {string} type - event type
- * @param {Object} keyOpt - key options
+ * @param {object} keyOpt - key options
  * @returns {boolean} - event permitted
  */
 const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
@@ -386,6 +398,7 @@ const fileExt = {
 
 /**
  * get file extension from media type
+ *
  * @param {string} media - media type
  * @param {string} subst - substitute file extension
  * @returns {string} - file extension
@@ -420,8 +433,9 @@ const nsURI = {
 
 /**
  * get namespace of node from ancestor
- * @param {Object} node - element node
- * @returns {Object} - namespace data
+ *
+ * @param {object} node - element node
+ * @returns {object} - namespace data
  */
 const getNodeNS = node => {
   const ns = {node: null, localName: null, namespaceURI: null};
@@ -452,7 +466,8 @@ const getNodeNS = node => {
 
 /**
  * get xmlns prefixed namespace
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @param {string} attr - attribute
  * @returns {string} - namespace
  */
@@ -472,8 +487,9 @@ const getXmlnsPrefixedNamespace = (elm, attr) => {
 
 /**
  * set namespaced attribute
- * @param {Object} elm - element to append attributes
- * @param {Object} node - element node to get attributes from
+ *
+ * @param {object} elm - element to append attributes
+ * @param {object} node - element node to get attributes from
  * @returns {void}
  */
 const setAttributeNS = (elm, node = {}) => {
@@ -492,8 +508,9 @@ const setAttributeNS = (elm, node = {}) => {
 
 /**
  * create namespaced element
- * @param {Object} node - element node to create element from
- * @returns {Object} - namespaced element
+ *
+ * @param {object} node - element node to create element from
+ * @returns {object} - namespaced element
  */
 const createElement = node => {
   let elm;
@@ -510,8 +527,9 @@ const createElement = node => {
 
 /**
  * create document fragment from nodes array
+ *
  * @param {Array} nodes - nodes array
- * @returns {Object} - document fragment
+ * @returns {object} - document fragment
  */
 const createFragment = nodes => {
   const frag = document.createDocumentFragment();
@@ -528,9 +546,10 @@ const createFragment = nodes => {
 
 /**
  * append child nodes
- * @param {Object} elm - container element
- * @param {Object} node - node containing child nodes to append
- * @returns {Object} - element
+ *
+ * @param {object} elm - container element
+ * @param {object} node - node containing child nodes to append
+ * @returns {object} - element
  */
 const appendChildNodes = (elm, node) => {
   const parent = createElement(elm);
@@ -561,7 +580,8 @@ const appendChildNodes = (elm, node) => {
 
 /**
  * create DOM of MathML / SVG
- * @param {Object} node - element node
+ *
+ * @param {object} node - element node
  * @returns {?string} - serialized node string
  */
 const createXmlBasedDom = node => {
@@ -585,7 +605,8 @@ const createXmlBasedDom = node => {
 
 /**
  * create range array
- * @param {Object} range - range
+ *
+ * @param {object} range - range
  * @returns {?Promise.<Array>} - range array
  */
 const createRangeArr = range => {
@@ -611,7 +632,8 @@ const createRangeArr = range => {
 
 /**
  * create DOM from selection range
- * @param {Object} sel - selection
+ *
+ * @param {object} sel - selection
  * @returns {?string} - serialized node string
  */
 const createDomFromSelectionRange = sel => {
@@ -628,7 +650,8 @@ const createDomFromSelectionRange = sel => {
 
 /**
  * get text
- * @param {Object} nodes - nodes
+ *
+ * @param {object} nodes - nodes
  * @returns {string} - text
  */
 const getText = nodes => {
@@ -656,7 +679,8 @@ const getText = nodes => {
 
 /**
  * get ancestor element ID
- * @param {Object} elm - element node
+ *
+ * @param {object} elm - element node
  * @returns {?string} - ID
  */
 const getAncestorId = elm => {
@@ -677,7 +701,8 @@ const getAncestorId = elm => {
 
 /**
  * node or ancestor is editable
- * @param {Object} node - element node
+ *
+ * @param {object} node - element node
  * @returns {boolean} - result
  */
 const isEditable = node => {
@@ -696,7 +721,8 @@ const isEditable = node => {
 
 /**
  * content is text node
- * @param {Object} node - element node
+ *
+ * @param {object} node - element node
  * @returns {boolean} - result
  */
 const isContentTextNode = node => {
@@ -716,7 +742,8 @@ const isContentTextNode = node => {
 
 /**
  * is text edit control element
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @returns {boolean} - result
  */
 const isEditControl = elm => {
@@ -732,8 +759,9 @@ const isEditControl = elm => {
 
 /**
  * get editable element from ancestor
- * @param {Object} node - node
- * @returns {Object} - editable element
+ *
+ * @param {object} node - node
+ * @returns {object} - editable element
  */
 const getEditableElm = node => {
   let elm;
@@ -755,6 +783,7 @@ const getEditableElm = node => {
 /* post messages */
 /**
  * post message
+ *
  * @param {*} msg - message
  * @returns {void}
  */
@@ -767,7 +796,8 @@ const postMsg = async msg => {
 
 /**
  * request port connection
- * @returns {AsyncFunction} - sendMessage()
+ *
+ * @returns {Function} - sendMessage()
  */
 const requestPortConnection = async () => {
   const msg = {
@@ -783,7 +813,8 @@ const liveEdit = new Map();
 
 /**
  * get live edit key from class list
- * @param {Object} classList - DOMTokenList
+ *
+ * @param {object} classList - DOMTokenList
  * @returns {?string} - live edit key
  */
 const getLiveEditKeyFromClassList = classList => {
@@ -802,8 +833,9 @@ const getLiveEditKeyFromClassList = classList => {
 
 /**
  * get live edit element from ancestor
- * @param {Object} node - node
- * @returns {Object} - live edit element
+ *
+ * @param {object} node - node
+ * @returns {object} - live edit element
  */
 const getLiveEditElm = node => {
   let elm;
@@ -828,7 +860,8 @@ const getLiveEditElm = node => {
 
 /**
  * get live edit content
- * @param {Object} elm - Element
+ *
+ * @param {object} elm - Element
  * @param {string} key - key
  * @returns {?string} - content
  */
@@ -857,9 +890,10 @@ const dataIds = new Map();
 
 /**
  * set data ID
+ *
  * @param {string} dataId - data ID
- * @param {Object} data - data
- * @returns {Object} - dataIds object
+ * @param {object} data - data
+ * @returns {object} - dataIds object
  */
 const setDataId = (dataId, data) => {
   if (!isString(dataId)) {
@@ -883,6 +917,7 @@ const setDataId = (dataId, data) => {
 
 /**
  * remove data ID
+ *
  * @param {string} dataId - data ID
  * @returns {boolean} - result
  */
@@ -890,8 +925,9 @@ const removeDataId = dataId => dataIds.delete(dataId);
 
 /**
  * get target element from data ID
+ *
  * @param {string} dataId - data ID
- * @returns {Object} - target element
+ * @returns {object} - target element
  */
 const getTargetElementFromDataId = dataId => {
   if (!isString(dataId)) {
@@ -925,8 +961,9 @@ const getTargetElementFromDataId = dataId => {
 
 /**
  * create ID data
- * @param {Object} elm - target element
- * @returns {Object} - ID data
+ *
+ * @param {object} elm - target element
+ * @returns {object} - ID data
  */
 const createIdData = elm => {
   let data;
@@ -975,6 +1012,7 @@ const createIdData = elm => {
 
 /**
  * post each data ID
+ *
  * @param {boolean} bool - post data ID
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -991,8 +1029,9 @@ const postEachDataId = async (bool = false) => {
 
 /**
  * post temporary file data
+ *
  * @param {string} dataId - data ID
- * @returns {?AsyncFunction} - post message
+ * @returns {?Function} - postMsg()
  */
 const postTmpFileData = async dataId => {
   let func;
@@ -1006,7 +1045,8 @@ const postTmpFileData = async dataId => {
 /* temporary file data */
 /**
  * set temporary file data
- * @param {Object} data - temporary file data
+ *
+ * @param {object} data - temporary file data
  * @returns {?Function} - set data ID
  */
 const setTmpFileData = (data = {}) => {
@@ -1023,7 +1063,8 @@ const setTmpFileData = (data = {}) => {
 
 /**
  * update temporary file data
- * @param {Object} obj - temporary file data object
+ *
+ * @param {object} obj - temporary file data object
  * @returns {?Function} - set data ID
  */
 const updateTmpFileData = (obj = {}) => {
@@ -1040,7 +1081,8 @@ const updateTmpFileData = (obj = {}) => {
 
 /**
  * remove temporary file data
- * @param {Ojbect} obj - temporary file data object
+ *
+ * @param {object} obj - temporary file data object
  * @returns {?Function} - remove data ID
  */
 const removeTmpFileData = (obj = {}) => {
@@ -1058,8 +1100,9 @@ const removeTmpFileData = (obj = {}) => {
 
 /**
  * fetch file source and create temporary file data
- * @param {Object} data - content data
- * @returns {Object} - temporary file data
+ *
+ * @param {object} data - content data
+ * @returns {object} - temporary file data
  */
 const fetchSource = async (data = {}) => {
   const {
@@ -1102,8 +1145,9 @@ const fetchSource = async (data = {}) => {
 
 /**
  * create temporary file data
- * @param {Object} data - content data
- * @returns {Object} - temporary file data
+ *
+ * @param {object} data - content data
+ * @returns {object} - temporary file data
  */
 const createTmpFileData = async (data = {}) => {
   const {contentType, documentURI: uri} = document;
@@ -1160,7 +1204,8 @@ const createTmpFileData = async (data = {}) => {
 
 /**
  * request temporary file
- * @param {!Object} evt - Event
+ *
+ * @param {!object} evt - Event
  * @returns {Promise.<Array>} - results of each handler
  */
 const requestTmpFile = evt => {
@@ -1201,7 +1246,8 @@ const requestTmpFile = evt => {
 
 /**
  * set data ID controller
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @param {string} dataId - data ID
  * @returns {void}
  */
@@ -1236,9 +1282,10 @@ const setDataIdController = (elm, dataId) => {
 /* content data */
 /**
  * create content data
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @param {string} mode - context mode
- * @returns {Object} - content data
+ * @returns {object} - content data
  */
 const createContentData = async (elm, mode) => {
   const {incognito, enableSyncAuto, syncAutoUrls, tabId, windowId} = vars;
@@ -1318,8 +1365,9 @@ const createContentData = async (elm, mode) => {
 
 /**
  * create content data message
- * @param {Object} data - temporary file data
- * @returns {Object} - message
+ *
+ * @param {object} data - temporary file data
+ * @returns {object} - message
  */
 const createContentDataMsg = async data => {
   let msg;
@@ -1343,7 +1391,8 @@ const createContentDataMsg = async data => {
 
 /**
  * post content data
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @param {string} mode - context mode
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -1361,7 +1410,8 @@ const postContent = async (elm, mode) => {
 
 /**
  * get context mode
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @returns {string} - context mode
  */
 const getContextMode = elm => {
@@ -1395,8 +1445,9 @@ const getContextMode = elm => {
 
 /**
  * determine content process
- * @param {Object} obj - context menu obj
- * @returns {AsyncFunction} - post content
+ *
+ * @param {object} obj - context menu obj
+ * @returns {Function} - postContent()
  */
 const determineContentProcess = (obj = {}) => {
   const {info} = obj;
@@ -1416,9 +1467,10 @@ const determineContentProcess = (obj = {}) => {
 /* synchronize text */
 /**
  * create paragraphed content
+ *
  * @param {string} value - value
  * @param {string} ns - namespace URI
- * @returns {Object} - document fragment
+ * @returns {object} - document fragment
  */
 const createParagraphedContent = (value, ns = nsURI.html) => {
   const arr = isString(value) && value.split("\n") || [""];
@@ -1474,7 +1526,8 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
 
 /**
  * paste content on selection change
- * @param {Object} evt - event
+ *
+ * @param {object} evt - event
  * @returns {boolean} - true if not prevented, false otherwise
  */
 const pasteContent = evt => {
@@ -1549,8 +1602,9 @@ const pasteContent = evt => {
 
 /**
  * dispatch cut event which deletes selection
- * @param {Object} node - node
- * @param {Object} sel - selection
+ *
+ * @param {object} node - node
+ * @param {object} sel - selection
  * @returns {boolean} - true if not prevented, false otherwise
  */
 const cutContent = (node, sel) => {
@@ -1611,8 +1665,9 @@ const cutContent = (node, sel) => {
 
 /**
  * replace content of content editable element
- * @param {Object} elm - owner element
- * @param {Object} node - editable element
+ *
+ * @param {object} elm - owner element
+ * @param {object} node - editable element
  * @param {string} value - value
  * @param {string} ns - namespace URI
  * @returns {void}
@@ -1643,7 +1698,8 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
 
 /**
  * replace text edit control element value
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @param {string} value - value
  * @returns {void}
  */
@@ -1679,7 +1735,8 @@ const replaceEditControlValue = (elm, value) => {
 
 /**
  * replace live edit content
- * @param {Object} elm - element
+ *
+ * @param {object} elm - element
  * @param {string} value - value
  * @param {string} key - key
  * @returns {void}
@@ -1715,7 +1772,8 @@ const replaceLiveEditContent = (elm, value, key) => {
 
 /**
  * get target element and synchronize text
- * @param {Object} obj - sync data object
+ *
+ * @param {object} obj - sync data object
  * @returns {Promise.<Array>} - results of each handler
  */
 const syncText = (obj = {}) => {
@@ -1768,9 +1826,10 @@ const syncText = (obj = {}) => {
 /* local storage */
 /**
  * extend object items from local storage
- * @param {Object} obj - object to extend items
+ *
+ * @param {object} obj - object to extend items
  * @param {string} key - local storage key
- * @returns {Object} - extended object
+ * @returns {object} - extended object
  */
 const extendObjItems = async (obj, key) => {
   if (obj) {
@@ -1793,6 +1852,7 @@ const extendObjItems = async (obj, key) => {
 /* port */
 /**
  * handle port message
+ *
  * @param {*} msg - message
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -1843,8 +1903,9 @@ const handlePortMsg = async msg => {
 
 /**
  * handle disconnected port
- * @param {Object} port - runtime.Port
- * @returns {AsyncFunction} - requestPortConnection()
+ *
+ * @param {object} port - runtime.Port
+ * @returns {Function} - requestPortConnection()
  */
 const handleDisconnectedPort = async port => {
   const e = port.error || runtime.lastError;
@@ -1855,21 +1916,24 @@ const handleDisconnectedPort = async port => {
 
 /**
  * port on disconnect
- * @param {Object} port - runtime.Port
- * @returns {AsyncFunction} - handleDisconnectedPort()
+ *
+ * @param {object} port - runtime.Port
+ * @returns {Function} - handleDisconnectedPort()
  */
 const portOnDisconnect = port => handleDisconnectedPort(port).catch(throwErr);
 
 /**
  * port on message
+ *
  * @param {*} msg - message
- * @returns {AsyncFunction} - handlePortMsg()
+ * @returns {Function} - handlePortMsg()
  */
 const portOnMsg = msg => handlePortMsg(msg).catch(throwErr);
 
 /**
  * handle connected port
- * @param {Object} port - runtime.Port
+ *
+ * @param {object} port - runtime.Port
  * @returns {void}
  */
 const portOnConnect = async port => {
@@ -1884,7 +1948,8 @@ const portOnConnect = async port => {
 
 /**
  * check port
- * @returns {AsyncFunction} - requestPortConnection() / portOnConnect()
+ *
+ * @returns {Function} - requestPortConnection() / portOnConnect()
  */
 const checkPort = async () => {
   let func;
@@ -1901,6 +1966,7 @@ const checkPort = async () => {
 
 /**
  * handle message
+ *
  * @param {*} msg - message
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -1923,16 +1989,18 @@ const handleMsg = async msg => {
 
 /**
  * runtime on message
+ *
  * @param {*} msg - message
- * @returns {AsyncFunction} - handleMsg();
+ * @returns {Function} - handleMsg();
  */
 const runtimeOnMsg = msg => handleMsg(msg).catch(throwErr);
 
 /* handle events */
 /**
  * handle before contextmenu event
- * @param {!Object} evt - Event
- * @returns {?AsyncFunction} - post message
+ *
+ * @param {!object} evt - Event
+ * @returns {?Function} - postMsg()
  */
 const handleBeforeContextMenu = evt => {
   const {button, key, shiftKey, target} = evt;
@@ -1981,7 +2049,8 @@ const handleBeforeContextMenu = evt => {
 
 /**
  * handle keydown event
- * @param {!Object} evt - Event
+ *
+ * @param {!object} evt - Event
  * @returns {?Function} - handleBeforeContextMenu()
  */
 const handleKeyDown = evt => {
@@ -2011,6 +2080,7 @@ const handleKeyDown = evt => {
 
 /**
  * startup
+ *
  * @returns {Promise.<Array>} - promise chain
  */
 const startup = () => Promise.all([

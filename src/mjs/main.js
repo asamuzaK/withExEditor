@@ -68,6 +68,7 @@ export const hostStatus = {
 
 /**
  * post message to host
+ *
  * @param {*} msg - message
  * @returns {void}
  */
@@ -82,9 +83,10 @@ export const ports = new Map();
 
 /**
  * create ports map
+ *
  * @param {string} windowId - window ID
  * @param {string} tabId - tabId
- * @returns {Object} - Map
+ * @returns {object} - Map
  */
 export const createPortsMap = async (windowId, tabId) => {
   if (!isString(windowId)) {
@@ -105,8 +107,9 @@ export const createPortsMap = async (windowId, tabId) => {
 
 /**
  * restore ports collection
- * @param {Object} data - disconnected port data
- * @returns {?AsyncFunction} - restorePorts() (recursive)
+ *
+ * @param {object} data - disconnected port data
+ * @returns {?Function} - restorePorts() (recursive)
  */
 export const restorePorts = async (data = {}) => {
   const {tabId, windowId} = data;
@@ -125,8 +128,9 @@ export const restorePorts = async (data = {}) => {
 
 /**
  * remove port from ports collection
- * @param {Object} port - removed port
- * @returns {?AsyncFunction} - hostPostMsg()
+ *
+ * @param {object} port - removed port
+ * @returns {?Function} - hostPostMsg()
  */
 export const removePort = async (port = {}) => {
   const {sender} = port;
@@ -158,8 +162,9 @@ export const removePort = async (port = {}) => {
 
 /**
  * post message to port
+ *
  * @param {*} msg - message
- * @param {Object} opt - option
+ * @param {object} opt - option
  * @returns {Promise.<Array>} - results of each handler
  */
 export const portPostMsg = async (msg, opt = {}) => {
@@ -206,9 +211,10 @@ export const portPostMsg = async (msg, opt = {}) => {
 
 /**
  * post context menu data
- * @param {Object} info - menus.OnClickData
- * @param {Object} tab - tabs.Tab
- * @returns {?AsyncFunction} - portPostMsg()
+ *
+ * @param {object} info - menus.OnClickData
+ * @param {object} tab - tabs.Tab
+ * @returns {?Function} - portPostMsg()
  */
 export const postContextMenuData = async (info, tab) => {
   let func;
@@ -231,9 +237,10 @@ export const postContextMenuData = async (info, tab) => {
 
 /**
  * post tmp file data
+ *
  * @param {string} key - message key
  * @param {*} msg - message
- * @returns {?AsyncFunction} - portPostMsg()
+ * @returns {?Function} - portPostMsg()
  */
 export const postTmpFileData = async (key, msg) => {
   if (!isString(key)) {
@@ -262,7 +269,8 @@ export const postTmpFileData = async (key, msg) => {
 
 /**
  * post get content message to active tab
- * @returns {?AsyncFunction} - portPostMsg()
+ *
+ * @returns {?Function} - portPostMsg()
  */
 export const postGetContent = async () => {
   const tab = await getActiveTab();
@@ -284,8 +292,9 @@ export const postGetContent = async () => {
 /* icon */
 /**
  * set icon
+ *
  * @param {string} id - icon fragment id
- * @returns {AsyncFunction} - set icon
+ * @returns {Function} - browserAction.setIcon()
  */
 export const setIcon = async (id = varsLocal[ICON_ID]) => {
   const icon = runtime.getURL(ICON);
@@ -295,6 +304,7 @@ export const setIcon = async (id = varsLocal[ICON_ID]) => {
 
 /**
  * toggle badge
+ *
  * @returns {Promise.<Array>} - results of each handler
  */
 export const toggleBadge = async () => {
@@ -331,6 +341,7 @@ export const menuItems = {
 
 /**
  * set context menu items
+ *
  * @param {string} key - key
  * @param {string} value - value
  * @returns {void}
@@ -346,6 +357,7 @@ export const setMenuItems = async (key, value) => {
 
 /**
  * init context menu items
+ *
  * @returns {void}
  */
 export const initMenuItems = async () => {
@@ -358,6 +370,7 @@ export const initMenuItems = async () => {
 /**
  * get access key
  * NOTE: sync
+ *
  * @param {string} id - menu item ID
  * @returns {string} - accesskey
  */
@@ -391,6 +404,7 @@ export const getAccesskey = id => {
 
 /**
  * create context menu item
+ *
  * @param {string} id - menu item ID
  * @param {Array} contexts - contexts
  * @returns {void}
@@ -433,6 +447,7 @@ export const createMenuItem = async (id, contexts) => {
 
 /**
  * create context menu items
+ *
  * @returns {Promise.<Array>} - results of each handler
  */
 export const createMenuItems = async () => {
@@ -457,14 +472,16 @@ export const createMenuItems = async () => {
 /**
  * restore context menu
  * TODO: Remove in future release. Use updateContextMenu instead.
- * @returns {AsyncFunction} - Promise chain
+ *
+ * @returns {Function} - promise chain
  */
 export const restoreContextMenu = async () =>
   menus.removeAll().then(initMenuItems).then(createMenuItems);
 
 /**
  * update context menu
- * @param {Object} type - context type data
+ *
+ * @param {object} type - context type data
  * @returns {Promise.<Array>} - results of each handler
  */
 export const updateContextMenu = async type => {
@@ -521,6 +538,7 @@ export const updateContextMenu = async type => {
 
 /**
  * cache localized context menu item title
+ *
  * @returns {void}
  */
 export const cacheMenuItemTitle = async () => {
@@ -536,7 +554,8 @@ export const cacheMenuItemTitle = async () => {
 /* editor config */
 /**
  * extract editor config data
- * @param {Object} data - editor config data
+ *
+ * @param {object} data - editor config data
  * @returns {Promise.<Array>} - results of each handler
  */
 export const extractEditorConfig = async (data = {}) => {
@@ -592,6 +611,7 @@ export const extractEditorConfig = async (data = {}) => {
 /* extension */
 /**
  * reload extension
+ *
  * @param {boolean} reload - reload
  * @returns {void}
  */
@@ -605,13 +625,15 @@ export const reloadExt = async (reload = false) => {
 /* handlers */
 /**
  * open options page
- * @returns {?AsyncFunction} - open options page
+ *
+ * @returns {?Function} - runtime.openOptionsPage()
  */
 export const openOptionsPage = async () => runtime.openOptionsPage();
 
 /**
  * handle host message
- * @param {Object} msg - message
+ *
+ * @param {object} msg - message
  * @returns {Promise.<Array>} - result of each handler
  */
 export const handleHostMsg = async msg => {
@@ -659,8 +681,9 @@ export const handleHostMsg = async msg => {
 
 /**
  * handle message
+ *
  * @param {*} msg - message
- * @param {Object} sender - sender
+ * @param {object} sender - sender
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleMsg = async (msg, sender) => {
@@ -750,22 +773,25 @@ export const handleMsg = async (msg, sender) => {
 
 /**
  * handle port on disconnect
- * @param {Object} port - runtime.Port
- * @returns {AsyncFunction} - removePort()
+ *
+ * @param {object} port - runtime.Port
+ * @returns {Function} - removePort()
  */
 export const handlePortOnDisconnect = port => removePort(port).catch(throwErr);
 
 /**
  * handle port on message
+ *
  * @param {*} msg - message
- * @returns {AsyncFunction} - handleMsg()
+ * @returns {Function} - handleMsg()
  */
 export const handlePortOnMsg = msg => handleMsg(msg).catch(throwErr);
 
 /**
  * handle connected port
- * @param {Object} port - runtime.Port
- * @returns {?AsyncFunction} - updateContextMenu()
+ *
+ * @param {object} port - runtime.Port
+ * @returns {?Function} - updateContextMenu()
  */
 export const handlePort = async (port = {}) => {
   const {name: portName, sender} = port;
@@ -799,7 +825,8 @@ export const handlePort = async (port = {}) => {
 
 /**
  * handle disconnected host
- * @returns {AsyncFunction} - toggle badge
+ *
+ * @returns {Function} - toggleBadge()
  */
 export const handleDisconnectedHost = async () => {
   hostStatus[HOST_CONNECTION] = false;
@@ -808,7 +835,8 @@ export const handleDisconnectedHost = async () => {
 
 /**
  * handle tab activated
- * @param {!Object} info - activated tab info
+ *
+ * @param {!object} info - activated tab info
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onTabActivated = async info => {
@@ -845,9 +873,10 @@ export const onTabActivated = async info => {
 
 /**
  * handle tab updated
+ *
  * @param {!number} id - tabId
- * @param {!Object} info - changed tab info
- * @param {!Object} tab - tabs.Tab
+ * @param {!object} info - changed tab info
+ * @param {!object} tab - tabs.Tab
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onTabUpdated = async (id, info, tab) => {
@@ -879,8 +908,9 @@ export const onTabUpdated = async (id, info, tab) => {
 
 /**
  * handle tab removed
+ *
  * @param {!number} id - tabId
- * @param {!Object} info - removed tab info
+ * @param {!object} info - removed tab info
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onTabRemoved = async (id, info) => {
@@ -913,6 +943,7 @@ export const onTabRemoved = async (id, info) => {
 
 /**
  * handle window focus changed
+ *
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onWindowFocusChanged = async () => {
@@ -935,6 +966,7 @@ export const onWindowFocusChanged = async () => {
 
 /**
  * handle window removed
+ *
  * @param {!number} id - windowId
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -956,8 +988,9 @@ export const onWindowRemoved = async id => {
 
 /**
  * handle command
+ *
  * @param {!string} cmd - command
- * @returns {?AsyncFunction} - command handler function
+ * @returns {?Function} - postGetContent() / openOptionsPage()
  */
 export const handleCmd = async cmd => {
   if (!isString(cmd)) {
@@ -979,8 +1012,9 @@ export const handleCmd = async cmd => {
 /* handle variables */
 /**
  * post variable
- * @param {Object} obj - variable object
- * @returns {?AsyncFunction} - portPostMsg()
+ *
+ * @param {object} obj - variable object
+ * @returns {?Function} - portPostMsg()
  */
 export const portPostVar = async obj => {
   let func;
@@ -996,8 +1030,9 @@ export const portPostVar = async obj => {
 
 /**
  * set variable
+ *
  * @param {string} item - item
- * @param {Object} obj - value object
+ * @param {object} obj - value object
  * @param {boolean} changed - changed
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -1068,7 +1103,8 @@ export const setVar = async (item, obj, changed = false) => {
 
 /**
  * set variables
- * @param {Object} data - data
+ *
+ * @param {object} data - data
  * @returns {Promise.<Array>} - results of each handler
  */
 export const setVars = async (data = {}) => {
@@ -1083,6 +1119,7 @@ export const setVars = async (data = {}) => {
 
 /**
  * set OS
+ *
  * @returns {void}
  */
 export const setOs = async () => {

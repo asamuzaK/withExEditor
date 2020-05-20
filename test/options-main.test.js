@@ -18,7 +18,8 @@ import {
 describe("options-main", () => {
   /**
    * create jsdom
-   * @returns {Object} - jsdom instance
+   *
+   * @returns {object} - jsdom instance
    */
   const createJsdom = () => {
     const domstr = "<!DOCTYPE html><html><head></head><body></body></html>";
