@@ -607,7 +607,7 @@ const createXmlBasedDom = node => {
  * create range array
  *
  * @param {object} range - range
- * @returns {?Promise.<Array>} - range array
+ * @returns {Array} - range array
  */
 const createRangeArr = range => {
   const arr = [];
@@ -1206,7 +1206,7 @@ const createTmpFileData = async (data = {}) => {
  * request temporary file
  *
  * @param {!object} evt - Event
- * @returns {Promise.<Array>} - results of each handler
+ * @returns {Promise.<Array|Error>} - promise chain
  */
 const requestTmpFile = evt => {
   const func = [];
@@ -2081,7 +2081,7 @@ const handleKeyDown = evt => {
 /**
  * startup
  *
- * @returns {Promise.<Array>} - promise chain
+ * @returns {Promise.<Array|Error>} - promise chain
  */
 const startup = () => Promise.all([
   checkPort(),
