@@ -877,8 +877,7 @@ const getLiveEditContent = (elm, key) => {
     if (items && items.length) {
       const arr = [];
       for (const item of items) {
-        const {localName} = item;
-        if (localName === "br") {
+        if (item.localName === "br") {
           arr.push("");
         } else if (isEditControl(item)) {
           arr.push(item.value);
