@@ -303,17 +303,10 @@ const dispatchInputEvent = (elm, type, opt) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       isString(type) && /^(?:before)?input$/.test(type)) {
     if (!isObjectNotEmpty(opt)) {
-      if (type === "input") {
-        opt = {
-          bubbles: true,
-          cancelable: false,
-        };
-      } else {
-        opt = {
-          bubbles: true,
-          cancelable: true,
-        };
-      }
+      opt = {
+        bubbles: true,
+        cancelable: type === "beforeinput",
+      };
     }
     const evt = new InputEvent(type, opt);
     const {dataTransfer} = opt;
@@ -845,8 +838,14 @@ const getLiveEditElm = node => {
     const isHtml = !namespaceURI || namespaceURI === nsURI.html;
     if (isHtml) {
       for (const item of items) {
-        const {className} = item;
-        if (classList.contains(className)) {
+        const {className, isIframe} = item;
+        if (isIframe) {
+          const iframe = node.querySelector(`iframe.${className}`);
+          if (iframe) {
+            elm = iframe;
+            break;
+          }
+        } else if (classList.contains(className)) {
           elm = node;
           !elm.isContentEditable && elm.setAttribute("contenteditable", "");
           break;
@@ -868,13 +867,21 @@ const getLiveEditElm = node => {
 const getLiveEditContent = (elm, key) => {
   let content;
   if (elm && elm.nodeType === Node.ELEMENT_NODE && liveEdit.has(key)) {
-    const {getContent} = liveEdit.get(key);
-    const items = elm.querySelectorAll(getContent);
+    const {getContent, isIframe} = liveEdit.get(key);
+    let items;
+    if (isIframe && elm.contentDocument) {
+      items = elm.contentDocument.querySelectorAll(getContent);
+    } else {
+      items = elm.querySelectorAll(getContent);
+    }
     if (items && items.length) {
       const arr = [];
       for (const item of items) {
-        if (item.localName === "br") {
+        const {localName} = item;
+        if (localName === "br") {
           arr.push("");
+        } else if (isEditControl(item)) {
+          arr.push(item.value);
         } else {
           arr.push(item.textContent);
         }
@@ -1452,7 +1459,8 @@ const getContextMode = elm => {
 const determineContentProcess = (obj = {}) => {
   const {info} = obj;
   const isTop = window.top.location.href === document.URL;
-  const elm = vars[CONTEXT_NODE] || isTop && document.documentElement;
+  const elm = vars[CONTEXT_NODE] || isTop && document.activeElement;
+  console.log(elm);
   let mode;
   if (info) {
     const {menuItemId} = info;
@@ -1744,8 +1752,13 @@ const replaceEditControlValue = (elm, value) => {
 const replaceLiveEditContent = (elm, value, key) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE && isString(value) &&
       liveEdit.has(key)) {
-    const {setContent} = liveEdit.get(key);
-    const liveElm = elm.querySelector(setContent);
+    const {isIframe, setContent} = liveEdit.get(key);
+    let liveElm;
+    if (isIframe && elm.contentDocument) {
+      liveElm = elm.contentDocument.querySelector(setContent);
+    } else {
+      liveElm = elm.querySelector(setContent);
+    }
     if (isEditControl(liveElm)) {
       dispatchFocusEvent(liveElm);
       dispatchKeyboardEvent(liveElm, "keydown", KeyCtrlA);

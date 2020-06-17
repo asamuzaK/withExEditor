@@ -13,4 +13,10 @@ export default {
     getContent: ".CodeMirror-line",
     setContent: ".CodeMirror > div > textarea",
   },
+  tiddlyWiki: {
+    isIframe: true,
+    className: "tc-edit-texteditor-body",
+    getContent: "body > textarea:nth-child(1)",
+    setContent: "body > textarea:nth-child(1)",
+  },
 };
