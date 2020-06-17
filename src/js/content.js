@@ -1460,7 +1460,6 @@ const determineContentProcess = (obj = {}) => {
   const {info} = obj;
   const isTop = window.top.location.href === document.URL;
   const elm = vars[CONTEXT_NODE] || isTop && document.activeElement;
-  console.log(elm);
   let mode;
   if (info) {
     const {menuItemId} = info;
