@@ -1,13 +1,12 @@
 /**
  * options-main.test.js
  */
-/* eslint-disable no-magic-numbers */
+/* eslint-disable max-nested-callbacks, no-magic-numbers */
 
-import {JSDOM} from "jsdom";
 import {assert} from "chai";
 import {afterEach, beforeEach, describe, it} from "mocha";
+import {browser, createJsdom, mockPort} from "./mocha/setup.js";
 import sinon from "sinon";
-import {browser, mockPort} from "./mocha/setup.js";
 import * as mjs from "../src/mjs/options-main.js";
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
@@ -16,18 +15,6 @@ import {
 } from "../src/mjs/constant.js";
 
 describe("options-main", () => {
-  /**
-   * create jsdom
-   *
-   * @returns {object} - jsdom instance
-   */
-  const createJsdom = () => {
-    const domstr = "<!DOCTYPE html><html><head></head><body></body></html>";
-    const opt = {
-      runScripts: "dangerously",
-    };
-    return new JSDOM(domstr, opt);
-  };
   let window, document;
   beforeEach(() => {
     const dom = createJsdom();

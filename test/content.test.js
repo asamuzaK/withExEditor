@@ -3,10 +3,9 @@
  */
 /* eslint-disable no-magic-numbers, prefer-destructuring */
 
-const {JSDOM} = require("jsdom");
 const {assert} = require("chai");
 const {afterEach, beforeEach, describe, it} = require("mocha");
-const {browser} = require("./mocha/setup.js");
+const {browser, createJsdom, mockPort} = require("./mocha/setup.js");
 const sinon = require("sinon");
 const cjs = require("../src/js/content.js");
 
@@ -42,22 +41,6 @@ const TMP_FILE_RES = "resTmpFile";
 const VARS_SET = "setVars";
 
 describe("content", () => {
-  /**
-   * create jsdom
-   *
-   * @returns {object} - jsdom instance
-   */
-  const createJsdom = () => {
-    const domstr = "<!DOCTYPE html><html><head></head><body></body></html>";
-    const opt = {
-      runScripts: "dangerously",
-      url: "https://localhost",
-      beforeParse(window) {
-        window.prompt = sinon.stub().callsFake((...args) => args.toString());
-      },
-    };
-    return new JSDOM(domstr, opt);
-  };
   let window, document;
   const globalKeys = [
     "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "FocusEvent",
@@ -79,11 +62,6 @@ describe("content", () => {
       bool = true;
     }
     return !!bool;
-  };
-  const mockPort = ({name}) => {
-    const port = Object.assign({}, browser.runtime.Port);
-    port.name = name;
-    return port;
   };
 
   beforeEach(() => {
@@ -2280,12 +2258,7 @@ describe("content", () => {
     });
 
     it("should get object", async () => {
-      const domstr = "<!DOCTYPE html><html><head></head><body></body></html>";
-      const opt = {
-        runScripts: "dangerously",
-        url: "file:///foo/bar",
-      };
-      const dom = new JSDOM(domstr, opt);
+      const dom = createJsdom("file:///foo/bar");
       window = dom.window;
       document = window.document;
       global.window = window;
@@ -2767,12 +2740,7 @@ describe("content", () => {
     });
 
     it("should get default object", async () => {
-      const domstr = "<!DOCTYPE html><html><head></head><body></body></html>";
-      const opt = {
-        runScripts: "dangerously",
-        url: "file:///foo/bar",
-      };
-      const dom = new JSDOM(domstr, opt);
+      const dom = createJsdom("file:///foo/bar");
       window = dom.window;
       document = window.document;
       global.window = window;
@@ -3278,12 +3246,7 @@ describe("content", () => {
     });
 
     it("should get content", () => {
-      const domstr = "<!DOCTYPE html><html><head></head><body></body></html>";
-      const opt = {
-        runScripts: "dangerously",
-        url: "file:///foo/bar",
-      };
-      const dom = new JSDOM(domstr, opt);
+      const dom = createJsdom("file:///foo/bar");
       window = dom.window;
       document = window.document;
       if (typeof document.queryCommandValue !== "function") {

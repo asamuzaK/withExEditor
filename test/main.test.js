@@ -7,8 +7,8 @@
 
 import {assert} from "chai";
 import {afterEach, beforeEach, describe, it} from "mocha";
-import sinon from "sinon";
 import {browser, mockPort} from "./mocha/setup.js";
+import sinon from "sinon";
 import * as mjs from "../src/mjs/main.js";
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
