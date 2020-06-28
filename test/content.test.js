@@ -4452,6 +4452,18 @@ describe("content", () => {
       assert.isNull(res, "result");
     });
 
+    it("should not call function", async () => {
+      const i = cjs.vars.port.postMessage.callCount;
+      const target = document.querySelector("body");
+      const res = await func({
+        target,
+        key: "a",
+        shiftKey: true,
+      });
+      assert.strictEqual(cjs.vars.port.postMessage.callCount, i, "not called");
+      assert.isNull(res, "result");
+    });
+
     it("should call function", async () => {
       const i = cjs.vars.port.postMessage.callCount;
       const target = document.querySelector("body");
