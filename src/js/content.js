@@ -1531,21 +1531,22 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
 };
 
 /**
- * paste content on selection change
+ * paste content
  *
- * @param {object} evt - event
+ * @param {object} elm - owner element
+ * @param {object} node - editable element
+ * @param {string} ns - namespace URI
  * @returns {boolean} - true if not prevented, false otherwise
  */
-const pasteContent = evt => {
+const pasteContent = (elm, node, ns = nsURI.html) => {
   let res;
-  const node = vars[CONTEXT_NODE];
   const value = vars[CONTENT_VALUE];
   const sel = document.getSelection();
-  if (node && node.nodeType === Node.ELEMENT_NODE && isString(value) &&
-      sel.isCollapsed) {
+  if (node && node.nodeType === Node.ELEMENT_NODE && isString(value)) {
     const dataTrans = new DataTransfer();
-    sel.selectAllChildren(node);
     dataTrans.setData(MIME_PLAIN, value);
+    sel.collapse(null);
+    sel.selectAllChildren(node);
     // TODO: StaticRange() constructor not implemented in Blink yet
     /*
     const insertTarget = new StaticRange({
@@ -1562,109 +1563,52 @@ const pasteContent = evt => {
       endOffset: sel.focusOffset,
       collapsed: sel.isCollapsed,
     };
-    // TODO: beforeinput not enabled by default in Gecko yet
-    let beforeInputNotPrevented;
-    try {
-      beforeInputNotPrevented = dispatchInputEvent(node, "beforeinput", {
-        bubbles: true,
-        cancelable: true,
-        // TODO: use plain text value instead?
-        //data: value,
-        //inputType: "insertText",
-        dataTransfer: dataTrans,
-        inputType: "insertFromPaste",
-        ranges: [insertTarget],
-      });
-    } catch (e) {
-      logErr(e);
-      beforeInputNotPrevented = true;
-    }
-    let pasteNotPrevented;
-    if (beforeInputNotPrevented) {
-      // TODO: add support for React, issue #123
-      // NOTE: maybe synthetic paste turns drag data store mode to protected?
-      pasteNotPrevented = dispatchClipboardEvent(node, "paste", {
-        bubbles: true,
-        cancelable: true,
-        clipboardData: dataTrans,
-      });
-    }
-    vars[CONTENT_VALUE] = null;
-    evt && evt.type === "selectionchange" &&
-      document.removeEventListener("selectionchange", pasteContent);
-    res = beforeInputNotPrevented && pasteNotPrevented;
-    if (res) {
-      dispatchInputEvent(node, "input", {
-        bubbles: true,
-        cancelable: false,
-        dataTransfer: dataTrans,
-        inputType: "insertFromPaste",
-        ranges: [insertTarget],
-      });
-    }
-  }
-  return !!res;
-};
-
-/**
- * dispatch cut event which deletes selection
- *
- * @param {object} node - node
- * @param {object} sel - selection
- * @returns {boolean} - true if not prevented, false otherwise
- */
-const cutContent = (node, sel) => {
-  let res;
-  if (node && node.nodeType === Node.ELEMENT_NODE && sel instanceof Selection) {
-    // TODO: StaticRange() constructor not implemented in Blink yet
-    /*
-    const deleteTarget = new StaticRange({
-      startContainer: sel.anchorNode,
-      startOffset: sel.anchorOffset,
-      endContainer: sel.focusNode,
-      endOffset: sel.focusOffset,
+    // TODO: add support for React, issue #123
+    // NOTE: maybe synthetic paste turns drag data store mode to protected?
+    const pasteNotPrevented = dispatchClipboardEvent(node, "paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: dataTrans,
     });
-    */
-    const deleteTarget = {
-      startContainer: sel.anchorNode,
-      startOffset: sel.anchorOffset,
-      endContainer: sel.focusNode,
-      endOffset: sel.focusOffset,
-      collapsed: sel.isCollapsed,
-    };
-    // TODO: beforeinput not enabled by default in Gecko yet
-    let beforeInputNotPrevented;
-    try {
-      document.addEventListener("selectionchange", pasteContent);
-      beforeInputNotPrevented = dispatchInputEvent(node, "beforeinput", {
-        bubbles: true,
-        cancelable: true,
-        inputType: "deleteByCut",
-        ranges: [deleteTarget],
-      });
-    } catch (e) {
-      logErr(e);
-      beforeInputNotPrevented = true;
+    if (pasteNotPrevented) {
+      // TODO: beforeinput not enabled by default in Gecko yet
+      try {
+        res = dispatchInputEvent(node, "beforeinput", {
+          bubbles: true,
+          cancelable: true,
+          // TODO: use plain text value instead?
+          //data: value,
+          //inputType: "insertText",
+          dataTransfer: dataTrans,
+          inputType: "insertFromPaste",
+          ranges: [insertTarget],
+        });
+      } catch (e) {
+        logErr(e);
+        res = true;
+      }
+    } else {
+      res = false;
     }
-    let cutNotPrevented;
-    if (beforeInputNotPrevented) {
-      // TODO: add support for React, issue #123
-      cutNotPrevented = dispatchClipboardEvent(node, "cut", {
-        bubbles: true,
-        cancelable: true,
-      });
-    }
-    res = beforeInputNotPrevented && cutNotPrevented;
     if (res) {
-      document.removeEventListener("selectionchange", pasteContent);
+      const frag = document.createDocumentFragment();
+      if (elm === node) {
+        const contentFrag = createParagraphedContent(value, ns);
+        frag.appendChild(contentFrag);
+      } else {
+        frag.appendChild(document.createTextNode(value));
+      }
       sel.deleteFromDocument();
+      node.appendChild(frag);
       dispatchInputEvent(node, "input", {
         bubbles: true,
         cancelable: false,
-        inputType: "deleteByCut",
-        ranges: [deleteTarget],
+        dataTransfer: dataTrans,
+        inputType: "insertFromPaste",
+        ranges: [insertTarget],
       });
     }
+    sel.collapse(null);
   }
   return !!res;
 };
@@ -1683,19 +1627,8 @@ const replaceContent = (elm, node, value, ns = nsURI.html) => {
     const changed = value !== node.textContent.replace(/^\s*/, "")
       .replace(/\n +/g, "\n").replace(/([^\n])$/, (m, c) => `${c}\n`);
     if (changed) {
-      const sel = document.getSelection();
-      sel.collapse(null);
-      sel.selectAllChildren(node);
       vars[CONTENT_VALUE] = value;
-      if (cutContent(node, sel) && pasteContent()) {
-        const frag = document.createDocumentFragment();
-        const contentFrag = createParagraphedContent(value, ns);
-        if (elm === node) {
-          frag.appendChild(contentFrag);
-        } else {
-          frag.appendChild(document.createTextNode(value));
-        }
-        node.appendChild(frag);
+      if (pasteContent(elm, node, ns)) {
         vars[CONTENT_VALUE] = null;
       }
     }
@@ -2123,7 +2056,6 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     createRangeArr,
     createTmpFileData,
     createXmlBasedDom,
-    cutContent,
     dataIds,
     determineContentProcess,
     dispatchClipboardEvent,

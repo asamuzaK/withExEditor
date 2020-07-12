@@ -3301,7 +3301,7 @@ describe("content", () => {
     });
   });
 
-  describe("paste content on selection change", () => {
+  describe("paste content", () => {
     const func = cjs.pasteContent;
     beforeEach(() => {
       cjs.vars[CONTENT_VALUE] = null;
@@ -3352,28 +3352,8 @@ describe("content", () => {
       cjs.vars[CONTEXT_NODE] = p;
       const sel = document.getSelection();
       sel.collapse(p);
-      const res = func();
+      const res = func(p, p);
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
-      assert.isTrue(res, "result");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      const spy = sinon.spy(document, "removeEventListener");
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      cjs.vars[CONTENT_VALUE] = "bar";
-      cjs.vars[CONTEXT_NODE] = p;
-      const sel = document.getSelection();
-      sel.collapse(p);
-      const evt = {
-        type: "selectionchange",
-      };
-      const res = func(evt);
-      assert.isTrue(stub.called, "called");
-      assert.isTrue(spy.called, "called removeEventlistener");
       assert.strictEqual(stub.callCount, 3, "call count");
       assert.isTrue(res, "result");
     });
@@ -3381,14 +3361,14 @@ describe("content", () => {
     it("should call function", () => {
       const p = document.createElement("p");
       const stub = sinon.stub(p, "dispatchEvent");
-      stub.onFirstCall().returns(false);
+      stub.onSecondCall().returns(false);
       const body = document.querySelector("body");
       body.appendChild(p);
       cjs.vars[CONTENT_VALUE] = "bar";
       cjs.vars[CONTEXT_NODE] = p;
       const sel = document.getSelection();
       sel.collapse(p);
-      const res = func();
+      const res = func(p, p);
       assert.isTrue(stub.called, "called");
       assert.strictEqual(stub.callCount, 1, "call count");
       assert.isFalse(res, "result");
@@ -3405,16 +3385,35 @@ describe("content", () => {
       cjs.vars[CONTEXT_NODE] = p;
       const sel = document.getSelection();
       sel.collapse(p);
-      const res = func();
+      const res = func(p, p);
       assert.isTrue(stub.called, "called");
       assert.strictEqual(stub.callCount, 2, "call count");
       assert.isFalse(res, "result");
     });
 
+    it("should call function", () => {
+      const div = document.createElement("div");
+      const span = document.createElement("span");
+      const spy = sinon.spy(span, "dispatchEvent");
+      const body = document.querySelector("body");
+      span.textContent = "foo";
+      div.appendChild(span);
+      cjs.vars[CONTENT_VALUE] = "bar\n";
+      cjs.vars[CONTEXT_NODE] = div;
+      body.appendChild(div);
+      func(div, span);
+      assert.isTrue(spy.called, "called");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "bar\n", "content");
+      assert.strictEqual(div.textContent, "bar\n", "content");
+    });
+
     it("should log error and call function", () => {
       const p = document.createElement("p");
       const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      stub.onFirstCall().throws(new Error("error"));
+      stub.onSecondCall().throws(new Error("error"));
       const stubErr = sinon.stub(console, "error");
       const body = document.querySelector("body");
       body.appendChild(p);
@@ -3422,87 +3421,7 @@ describe("content", () => {
       cjs.vars[CONTEXT_NODE] = p;
       const sel = document.getSelection();
       sel.collapse(p);
-      const res = func();
-      const {called: errorCalled} = stubErr;
-      stubErr.restore();
-      assert.isTrue(errorCalled, "error called");
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
-      assert.isTrue(res, "result");
-    });
-  });
-
-  describe("dispatch cut event which deletes selection", () => {
-    const func = cjs.cutContent;
-
-    it("should get false", () => {
-      const res = func();
-      assert.isFalse(res, "result");
-    });
-
-    it("should not call function", () => {
-      const p = document.createElement("p");
-      const spy = sinon.spy(p, "dispatchEvent");
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      const res = func(p);
-      assert.isFalse(spy.called, "not called");
-      assert.isFalse(res, "result");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      const body = document.querySelector("body");
-      p.textContent = "foo";
-      body.appendChild(p);
-      const sel = document.getSelection();
-      sel.selectAllChildren(p);
-      const res = func(p, sel);
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
-      assert.isTrue(res, "result");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      stub.onFirstCall().returns(false);
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      const sel = document.getSelection();
-      sel.collapse(p);
-      const res = func(p, sel);
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 1, "call count");
-      assert.isFalse(res, "result");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent");
-      stub.onFirstCall().returns(true);
-      stub.onSecondCall().returns(false);
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      const sel = document.getSelection();
-      sel.collapse(p);
-      const res = func(p, sel);
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 2, "call count");
-      assert.isFalse(res, "result");
-    });
-
-    it("should log error and call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      stub.onFirstCall().throws(new Error("error"));
-      const stubErr = sinon.stub(console, "error");
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      const sel = document.getSelection();
-      sel.collapse(p);
-      const res = func(p, sel);
+      const res = func(p, p);
       const {called: errorCalled} = stubErr;
       stubErr.restore();
       assert.isTrue(errorCalled, "error called");
