@@ -11,7 +11,7 @@ export default {
   codeMirror: {
     className: "CodeMirror",
     getContent: ".CodeMirror-line",
-    setContent: ".CodeMirror > div > textarea",
+    setContent: ".CodeMirror > div:nth-child(1) > textarea:nth-child(1)",
   },
   tiddlyWiki: {
     isIframe: true,
