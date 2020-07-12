@@ -11,7 +11,6 @@ const cjs = require("../src/js/content.js");
 
 /* constants */
 const CONTENT_GET = "getContent";
-const CONTENT_VALUE = "contentValue";
 const CONTEXT_MODE = "contextMode";
 const CONTEXT_NODE = "contextNode";
 const FILE_NOT_FOUND_TIMESTAMP = -1;
@@ -3301,144 +3300,12 @@ describe("content", () => {
     });
   });
 
-  describe("paste content", () => {
-    const func = cjs.pasteContent;
-    beforeEach(() => {
-      cjs.vars[CONTENT_VALUE] = null;
-      cjs.vars[CONTEXT_NODE] = null;
-    });
-    afterEach(() => {
-      cjs.vars[CONTENT_VALUE] = null;
-      cjs.vars[CONTEXT_NODE] = null;
-    });
-
-    it("should get false", () => {
-      const res = func();
-      assert.isFalse(res, "result");
-    });
-
-    it("should not call function", () => {
-      const p = document.createElement("p");
-      const spy = sinon.spy(p, "dispatchEvent");
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      cjs.vars[CONTEXT_NODE] = p;
-      const res = func();
-      assert.isFalse(spy.called, "not called");
-      assert.isFalse(res, "result");
-    });
-
-    it("should not call function", () => {
-      const p = document.createElement("p");
-      const spy = sinon.spy(p, "dispatchEvent");
-      const body = document.querySelector("body");
-      p.textContent = "foo";
-      body.appendChild(p);
-      cjs.vars[CONTENT_VALUE] = "bar";
-      cjs.vars[CONTEXT_NODE] = p;
-      const sel = document.getSelection();
-      sel.selectAllChildren(p);
-      const res = func();
-      assert.isFalse(spy.called, "not called");
-      assert.isFalse(res, "result");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      cjs.vars[CONTENT_VALUE] = "bar";
-      cjs.vars[CONTEXT_NODE] = p;
-      const sel = document.getSelection();
-      sel.collapse(p);
-      const res = func(p, p);
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
-      assert.isTrue(res, "result");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent");
-      stub.onSecondCall().returns(false);
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      cjs.vars[CONTENT_VALUE] = "bar";
-      cjs.vars[CONTEXT_NODE] = p;
-      const sel = document.getSelection();
-      sel.collapse(p);
-      const res = func(p, p);
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 1, "call count");
-      assert.isFalse(res, "result");
-    });
-
-    it("should call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent");
-      stub.onFirstCall().returns(true);
-      stub.onSecondCall().returns(false);
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      cjs.vars[CONTENT_VALUE] = "bar";
-      cjs.vars[CONTEXT_NODE] = p;
-      const sel = document.getSelection();
-      sel.collapse(p);
-      const res = func(p, p);
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 2, "call count");
-      assert.isFalse(res, "result");
-    });
-
-    it("should call function", () => {
-      const div = document.createElement("div");
-      const span = document.createElement("span");
-      const spy = sinon.spy(span, "dispatchEvent");
-      const body = document.querySelector("body");
-      span.textContent = "foo";
-      div.appendChild(span);
-      cjs.vars[CONTENT_VALUE] = "bar\n";
-      cjs.vars[CONTEXT_NODE] = div;
-      body.appendChild(div);
-      func(div, span);
-      assert.isTrue(spy.called, "called");
-      assert.strictEqual(div.childNodes.length, 1, "length");
-      assert.strictEqual(div.firstChild.nodeType, 1, "child");
-      assert.strictEqual(div.firstChild.localName, "span", "name");
-      assert.strictEqual(div.firstChild.textContent, "bar\n", "content");
-      assert.strictEqual(div.textContent, "bar\n", "content");
-    });
-
-    it("should log error and call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      stub.onSecondCall().throws(new Error("error"));
-      const stubErr = sinon.stub(console, "error");
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      cjs.vars[CONTENT_VALUE] = "bar";
-      cjs.vars[CONTEXT_NODE] = p;
-      const sel = document.getSelection();
-      sel.collapse(p);
-      const res = func(p, p);
-      const {called: errorCalled} = stubErr;
-      stubErr.restore();
-      assert.isTrue(errorCalled, "error called");
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
-      assert.isTrue(res, "result");
-    });
-  });
-
   describe("replace content of editable element", () => {
-    const func = cjs.replaceContent;
+    const func = cjs.replaceEditableContent;
     beforeEach(() => {
-      cjs.vars[CONTENT_VALUE] = null;
       cjs.vars[CONTEXT_NODE] = null;
     });
     afterEach(() => {
-      cjs.vars[CONTENT_VALUE] = null;
       cjs.vars[CONTEXT_NODE] = null;
     });
 
@@ -3543,6 +3410,23 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "foo\n", "content");
     });
 
+    it("should log error and call function", () => {
+      const p = document.createElement("p");
+      const stub = sinon.stub(p, "dispatchEvent").returns(true);
+      stub.onSecondCall().throws(new Error("error"));
+      const stubErr = sinon.stub(console, "error");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      cjs.vars[CONTEXT_NODE] = p;
+      func(p, p, "bar");
+      const {called: errorCalled} = stubErr;
+      stubErr.restore();
+      assert.isTrue(errorCalled, "error called");
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.strictEqual(p.textContent, "bar", "content");
+    });
+
     it("should not replace content", () => {
       const div = document.createElement("div");
       const stub = sinon.stub(div, "dispatchEvent").returns(false);
@@ -3552,6 +3436,25 @@ describe("content", () => {
       func(div, div, "foo\nbar\n");
       assert.isTrue(stub.called, "called");
       assert.strictEqual(div.childNodes.length, 0, "length");
+    });
+
+    it("should call function", () => {
+      const div = document.createElement("div");
+      const span = document.createElement("span");
+      const stub = sinon.stub(span, "dispatchEvent").returns(true);
+      stub.onSecondCall().returns(false);
+      const body = document.querySelector("body");
+      span.textContent = "bar";
+      div.appendChild(span);
+      cjs.vars[CONTEXT_NODE] = div;
+      body.appendChild(div);
+      func(div, span, "foo\n");
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "bar", "content");
+      assert.strictEqual(div.textContent, "bar", "content");
     });
   });
 
@@ -3701,14 +3604,12 @@ describe("content", () => {
       cjs.liveEdit.clear();
       cjs.vars[ID_TAB] = null;
       cjs.vars[CONTEXT_NODE] = null;
-      cjs.vars[CONTENT_VALUE] = null;
     });
     afterEach(() => {
       cjs.dataIds.clear();
       cjs.liveEdit.clear();
       cjs.vars[ID_TAB] = null;
       cjs.vars[CONTEXT_NODE] = null;
-      cjs.vars[CONTENT_VALUE] = null;
     });
 
     it("should get empty array", async () => {

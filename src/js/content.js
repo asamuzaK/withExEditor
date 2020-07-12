@@ -12,7 +12,6 @@ const {
 
 /* constants */
 const CONTENT_GET = "getContent";
-const CONTENT_VALUE = "contentValue";
 const CONTEXT_MENU = "contextMenu";
 const CONTEXT_MODE = "contextMode";
 const CONTEXT_NODE = "contextNode";
@@ -61,7 +60,6 @@ const XMLNS = "xmlns";
 
 /* variables */
 const vars = {
-  [CONTENT_VALUE]: null,
   [CONTEXT_MODE]: null,
   [CONTEXT_NODE]: null,
   [ID_TAB]: "",
@@ -1531,89 +1529,6 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
 };
 
 /**
- * paste content
- *
- * @param {object} elm - owner element
- * @param {object} node - editable element
- * @param {string} ns - namespace URI
- * @returns {boolean} - true if not prevented, false otherwise
- */
-const pasteContent = (elm, node, ns = nsURI.html) => {
-  let res;
-  const value = vars[CONTENT_VALUE];
-  const sel = document.getSelection();
-  if (node && node.nodeType === Node.ELEMENT_NODE && isString(value)) {
-    const dataTrans = new DataTransfer();
-    dataTrans.setData(MIME_PLAIN, value);
-    sel.collapse(null);
-    sel.selectAllChildren(node);
-    // TODO: StaticRange() constructor not implemented in Blink yet
-    /*
-    const insertTarget = new StaticRange({
-      startContainer: sel.anchorNode,
-      startOffset: sel.anchorOffset,
-      endContainer: sel.focusNode,
-      endOffset: sel.focusOffset,
-    });
-    */
-    const insertTarget = {
-      startContainer: sel.anchorNode,
-      startOffset: sel.anchorOffset,
-      endContainer: sel.focusNode,
-      endOffset: sel.focusOffset,
-      collapsed: sel.isCollapsed,
-    };
-    // TODO: add support for React, issue #123
-    // NOTE: maybe synthetic paste turns drag data store mode to protected?
-    const pasteNotPrevented = dispatchClipboardEvent(node, "paste", {
-      bubbles: true,
-      cancelable: true,
-      clipboardData: dataTrans,
-    });
-    if (pasteNotPrevented) {
-      // TODO: beforeinput not enabled by default in Gecko yet
-      try {
-        res = dispatchInputEvent(node, "beforeinput", {
-          bubbles: true,
-          cancelable: true,
-          // TODO: use plain text value instead?
-          //data: value,
-          //inputType: "insertText",
-          dataTransfer: dataTrans,
-          inputType: "insertFromPaste",
-          ranges: [insertTarget],
-        });
-      } catch (e) {
-        logErr(e);
-        res = true;
-      }
-    } else {
-      res = false;
-    }
-    if (res) {
-      const frag = document.createDocumentFragment();
-      if (elm === node) {
-        const contentFrag = createParagraphedContent(value, ns);
-        frag.appendChild(contentFrag);
-      } else {
-        frag.appendChild(document.createTextNode(value));
-      }
-      sel.deleteFromDocument();
-      node.appendChild(frag);
-      dispatchInputEvent(node, "input", {
-        bubbles: true,
-        cancelable: false,
-        dataTransfer: dataTrans,
-        inputType: "insertFromPaste",
-        ranges: [insertTarget],
-      });
-    }
-    sel.collapse(null);
-  }
-  return !!res;
-};
-
-/**
  * replace content of content editable element
  *
  * @param {object} elm - owner element
@@ -1622,14 +1537,74 @@ const pasteContent = (elm, node, ns = nsURI.html) => {
  * @param {string} ns - namespace URI
  * @returns {void}
  */
-const replaceContent = (elm, node, value, ns = nsURI.html) => {
+const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
   if (node && node.nodeType === Node.ELEMENT_NODE && isString(value)) {
     const changed = value !== node.textContent.replace(/^\s*/, "")
       .replace(/\n +/g, "\n").replace(/([^\n])$/, (m, c) => `${c}\n`);
     if (changed) {
-      vars[CONTENT_VALUE] = value;
-      if (pasteContent(elm, node, ns)) {
-        vars[CONTENT_VALUE] = null;
+      const dataTransfer = new DataTransfer();
+      const contentFrag = createParagraphedContent(value, ns);
+      dataTransfer.setData(MIME_PLAIN, value);
+      dataTransfer.setData(MIME_HTML,
+                           new XMLSerializer().serializeToString(contentFrag));
+      // TODO: add support for React, issue #123
+      // NOTE: maybe synthetic paste turns drag data store mode to protected?
+      let res = dispatchClipboardEvent(node, "paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: dataTransfer,
+      });
+      if (res) {
+        const sel = document.getSelection();
+        sel.collapse(null);
+        sel.selectAllChildren(node);
+        // TODO: StaticRange() constructor not implemented in Blink yet
+        /*
+        const insertTarget = new StaticRange({
+          startContainer: sel.anchorNode,
+          startOffset: sel.anchorOffset,
+          endContainer: sel.focusNode,
+          endOffset: sel.focusOffset,
+        });
+        */
+        const insertTarget = {
+          startContainer: sel.anchorNode,
+          startOffset: sel.anchorOffset,
+          endContainer: sel.focusNode,
+          endOffset: sel.focusOffset,
+          collapsed: sel.isCollapsed,
+        };
+        // TODO: beforeinput not enabled by default in Gecko yet
+        try {
+          res = dispatchInputEvent(node, "beforeinput", {
+            dataTransfer,
+            bubbles: true,
+            cancelable: true,
+            inputType: "insertFromPaste",
+            ranges: [insertTarget],
+          });
+        } catch (e) {
+          logErr(e);
+          res = true;
+        }
+        if (res) {
+          const frag = document.createDocumentFragment();
+          if (elm === node) {
+            frag.appendChild(contentFrag);
+          } else {
+            frag.appendChild(document.createTextNode(value));
+          }
+          sel.deleteFromDocument();
+          node.appendChild(frag);
+          dispatchInputEvent(node, "input", {
+            dataTransfer,
+            bubbles: true,
+            cancelable: false,
+            inputType: "insertFromPaste",
+            ranges: [insertTarget],
+          });
+        }
+        sel.collapse(null);
       }
     }
   }
@@ -1746,12 +1721,12 @@ const syncText = (obj = {}) => {
             );
           } else if (controller) {
             func.push(
-              replaceContent(controller, elm, value, namespaceURI),
+              replaceEditableContent(controller, elm, value, namespaceURI),
               setDataId(dataId, data),
             );
           } else if (elm.isContentEditable) {
             func.push(
-              replaceContent(elm, elm, value, namespaceURI),
+              replaceEditableContent(elm, elm, value, namespaceURI),
               setDataId(dataId, data),
             );
           } else {
@@ -2094,7 +2069,6 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     liveEdit,
     logErr,
     matchDocUrl,
-    pasteContent,
     portOnConnect,
     portOnDisconnect,
     portOnMsg,
@@ -2104,8 +2078,8 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     postTmpFileData,
     removeDataId,
     removeTmpFileData,
-    replaceContent,
     replaceEditControlValue,
+    replaceEditableContent,
     replaceLiveEditContent,
     requestPortConnection,
     requestTmpFile,
