@@ -42,9 +42,9 @@ const VARS_SET = "setVars";
 describe("content", () => {
   let window, document;
   const globalKeys = [
-    "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "FocusEvent",
-    "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList", "Selection",
-    "StaticRange", "XMLSerializer",
+    "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "Event",
+    "FocusEvent", "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList",
+    "Selection", "StaticRange", "XMLSerializer",
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
   const isContentEditable = elm => {
@@ -385,6 +385,52 @@ describe("content", () => {
       assert.isTrue(cjs.KeyCtrlV.ctrlKey, "meta");
       assert.isUndefined(cjs.KeyCtrlX.metaKey, "meta");
       assert.isTrue(cjs.KeyCtrlX.ctrlKey, "meta");
+    });
+  });
+
+  describe("dispatch event", () => {
+    const func = cjs.dispatchEvent;
+
+    it("should not call function", () => {
+      const spy = sinon.spy(document, "dispatchEvent");
+      const res = func(document);
+      assert.isFalse(spy.called, "not called");
+      assert.isFalse(res, "result");
+    });
+
+    it("should not call function", () => {
+      const spy = sinon.spy(document, "dispatchEvent");
+      const res = func(document, "foo");
+      assert.isFalse(spy.called, "not called");
+      assert.isFalse(res, "result");
+    });
+
+    it("should not call function", () => {
+      const spy = sinon.spy(document, "dispatchEvent");
+      const res = func(document, "foo", {});
+      assert.isFalse(spy.called, "not called");
+      assert.isFalse(res, "result");
+    });
+
+    it("should call function", () => {
+      const spy = sinon.spy(document, "dispatchEvent");
+      const res = func(document, "foo", {
+        bubbles: false,
+        cancelable: false,
+      });
+      assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
+    });
+
+    it("should call function", () => {
+      const body = document.querySelector("body");
+      const spy = sinon.spy(body, "dispatchEvent");
+      const res = func(body, "foo", {
+        bubbles: false,
+        cancelable: false,
+      });
+      assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
     });
   });
 
@@ -3367,7 +3413,7 @@ describe("content", () => {
         dataId: "foo",
         value: "foo\n",
       });
-      assert.strictEqual(spy.callCount, 6, "called");
+      assert.strictEqual(spy.callCount, 4, "called");
       assert.strictEqual(div.childNodes.length, 2, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "div", "name");
@@ -3420,7 +3466,7 @@ describe("content", () => {
         dataId: "foo",
         value: "foo\nbar\n",
       });
-      assert.strictEqual(spy.callCount, 6, "called");
+      assert.strictEqual(spy.callCount, 4, "called");
       assert.strictEqual(div.childNodes.length, 4, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "div", "name");
@@ -3482,7 +3528,7 @@ describe("content", () => {
         dataId: "foo",
         value: "foo\n",
       });
-      assert.strictEqual(spy.callCount, 6, "called");
+      assert.strictEqual(spy.callCount, 4, "called");
       assert.strictEqual(div.childNodes.length, 2, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "div", "name");
@@ -3552,7 +3598,7 @@ describe("content", () => {
         dataId: "foo",
         value: "foo\n",
       });
-      assert.strictEqual(spy.callCount, 6, "called");
+      assert.strictEqual(spy.callCount, 4, "called");
       assert.strictEqual(div.childNodes.length, 1, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "span", "name");
@@ -3589,7 +3635,7 @@ describe("content", () => {
     it("should log error and call function", () => {
       const p = document.createElement("p");
       const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      stub.onCall(4).throws(new Error("error"));
+      stub.onCall(2).throws(new Error("error"));
       const stubErr = sinon.stub(console, "error");
       const body = document.querySelector("body");
       body.appendChild(p);
@@ -3603,14 +3649,14 @@ describe("content", () => {
       stubErr.restore();
       assert.isTrue(errorCalled, "error called");
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 6, "call count");
+      assert.strictEqual(stub.callCount, 4, "call count");
       assert.strictEqual(p.textContent, "bar", "content");
     });
 
     it("should not replace content", () => {
       const div = document.createElement("div");
       const stub = sinon.stub(div, "dispatchEvent").returns(true);
-      stub.onCall(3).returns(false);
+      stub.onCall(1).returns(false);
       const body = document.querySelector("body");
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
@@ -3620,7 +3666,7 @@ describe("content", () => {
         value: "foo\nbar\n",
       });
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 4, "call count");
+      assert.strictEqual(stub.callCount, 2, "call count");
       assert.strictEqual(div.childNodes.length, 0, "length");
     });
 
@@ -3628,7 +3674,7 @@ describe("content", () => {
       const div = document.createElement("div");
       const span = document.createElement("span");
       const stub = sinon.stub(span, "dispatchEvent").returns(true);
-      stub.onCall(4).returns(false);
+      stub.onCall(2).returns(false);
       const body = document.querySelector("body");
       div.id = "div";
       span.textContent = "bar";
@@ -3642,7 +3688,7 @@ describe("content", () => {
         value: "foo\n",
       });
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 5, "call count");
+      assert.strictEqual(stub.callCount, 3, "call count");
       assert.strictEqual(div.childNodes.length, 1, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "span", "name");

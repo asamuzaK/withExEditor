@@ -240,6 +240,24 @@ const setModifierKeys = (bool = vars[IS_MAC]) => {
 
 /* dispatch events */
 /**
+ * dispatch event
+ *
+ * @param {object} target - target
+ * @param {string} type - type
+ * @param {object} opt - options
+ * @returns {boolean} - event permitted
+ */
+const dispatchEvent = (target, type, opt) => {
+  let res;
+  if ((target === document || target.nodeType === Node.ELEMENT_NODE) &&
+      isString(type) && isObjectNotEmpty(opt)) {
+    const evt = new Event(type, opt);
+    res = target.dispatchEvent(evt);
+  }
+  return !!res;
+};
+
+/**
  * dispatch clipboard event
  *
  * @param {object} elm - Element
@@ -1552,9 +1570,11 @@ const replaceEditableContent = (node, opt = {}) => {
       dataTransfer.setData(MIME_HTML,
                            new XMLSerializer().serializeToString(pContent));
       dispatchFocusEvent(node);
-      dispatchKeyboardEvent(node, "keydown", KeyCtrlA);
-      dispatchKeyboardEvent(node, "keyup", KeyCtrlA);
       sel.selectAllChildren(node);
+      dispatchEvent(document, "selectionchange", {
+        bubbles: false,
+        cancelable: false,
+      });
       // TODO: add support for React, issue #123
       // NOTE: maybe synthetic paste turns drag data store mode to protected?
       let res = dispatchClipboardEvent(node, "paste", {
@@ -1612,6 +1632,10 @@ const replaceEditableContent = (node, opt = {}) => {
         }
       }
       sel.collapseToEnd();
+      dispatchEvent(document, "selectionchange", {
+        bubbles: false,
+        cancelable: false,
+      });
       delete data.mutex;
       setDataId(dataId, data);
     }
@@ -2062,6 +2086,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     dataIds,
     determineContentProcess,
     dispatchClipboardEvent,
+    dispatchEvent,
     dispatchFocusEvent,
     dispatchInputEvent,
     dispatchKeyboardEvent,
