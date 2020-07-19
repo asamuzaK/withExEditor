@@ -1563,18 +1563,14 @@ const replaceEditableContent = (node, opt = {}) => {
     if (changed && !data.mutex) {
       const sel = document.getSelection();
       const dataTransfer = new DataTransfer();
-      const pContent = createParagraphedContent(value, namespaceURI);
       data.mutex = true;
       setDataId(dataId, data);
-      dataTransfer.setData(MIME_PLAIN, value);
-      dataTransfer.setData(MIME_HTML,
-                           new XMLSerializer().serializeToString(pContent));
-      dispatchFocusEvent(node);
       sel.selectAllChildren(node);
       dispatchEvent(document, "selectionchange", {
         bubbles: false,
         cancelable: false,
       });
+      dataTransfer.setData(MIME_PLAIN, value);
       // TODO: add support for React, issue #123
       // NOTE: maybe synthetic paste turns drag data store mode to protected?
       let res = dispatchClipboardEvent(node, "paste", {
@@ -1618,6 +1614,7 @@ const replaceEditableContent = (node, opt = {}) => {
           if (ctrl) {
             frag.appendChild(document.createTextNode(value));
           } else {
+            const pContent = createParagraphedContent(value, namespaceURI);
             frag.appendChild(pContent);
           }
           sel.deleteFromDocument();
@@ -1631,11 +1628,13 @@ const replaceEditableContent = (node, opt = {}) => {
           });
         }
       }
-      sel.collapseToEnd();
-      dispatchEvent(document, "selectionchange", {
-        bubbles: false,
-        cancelable: false,
-      });
+      if (!sel.isCollapsed) {
+        sel.collapseToEnd();
+        dispatchEvent(document, "selectionchange", {
+          bubbles: false,
+          cancelable: false,
+        });
+      }
       delete data.mutex;
       setDataId(dataId, data);
     }
