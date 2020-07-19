@@ -1542,11 +1542,16 @@ const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
     const changed = value !== node.textContent.replace(/^\s*/, "")
       .replace(/\n +/g, "\n").replace(/([^\n])$/, (m, c) => `${c}\n`);
     if (changed) {
+      const sel = document.getSelection();
       const dataTransfer = new DataTransfer();
       const contentFrag = createParagraphedContent(value, ns);
       dataTransfer.setData(MIME_PLAIN, value);
       dataTransfer.setData(MIME_HTML,
                            new XMLSerializer().serializeToString(contentFrag));
+      dispatchFocusEvent(node);
+      dispatchKeyboardEvent(node, "keydown", KeyCtrlA);
+      dispatchKeyboardEvent(node, "keyup", KeyCtrlA);
+      sel.selectAllChildren(node);
       // TODO: add support for React, issue #123
       // NOTE: maybe synthetic paste turns drag data store mode to protected?
       let res = dispatchClipboardEvent(node, "paste", {
@@ -1555,9 +1560,6 @@ const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
         clipboardData: dataTransfer,
       });
       if (res) {
-        const sel = document.getSelection();
-        sel.collapse(null);
-        sel.selectAllChildren(node);
         // TODO: StaticRange() constructor not implemented in Blink yet
         /*
         const insertTarget = new StaticRange({
@@ -1604,8 +1606,8 @@ const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
             ranges: [insertTarget],
           });
         }
-        sel.collapse(null);
       }
+      sel.collapseToEnd();
     }
   }
 };

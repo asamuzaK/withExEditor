@@ -3345,7 +3345,7 @@ describe("content", () => {
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
       func(div, div, "foo\n");
-      assert.isTrue(spy.called, "called");
+      assert.strictEqual(spy.callCount, 6, "called");
       assert.strictEqual(div.childNodes.length, 2, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "div", "name");
@@ -3362,7 +3362,7 @@ describe("content", () => {
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
       func(div, div, "foo\nbar\n");
-      assert.isTrue(spy.called, "called");
+      assert.strictEqual(spy.callCount, 6, "called");
       assert.strictEqual(div.childNodes.length, 4, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "div", "name");
@@ -3382,7 +3382,7 @@ describe("content", () => {
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
       func(div, div, "foo\n");
-      assert.isTrue(spy.called, "called");
+      assert.strictEqual(spy.callCount, 6, "called");
       assert.strictEqual(div.childNodes.length, 2, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "div", "name");
@@ -3402,7 +3402,7 @@ describe("content", () => {
       cjs.vars[CONTEXT_NODE] = div;
       body.appendChild(div);
       func(div, span, "foo\n");
-      assert.isTrue(spy.called, "called");
+      assert.strictEqual(spy.callCount, 6, "called");
       assert.strictEqual(div.childNodes.length, 1, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "span", "name");
@@ -3413,7 +3413,7 @@ describe("content", () => {
     it("should log error and call function", () => {
       const p = document.createElement("p");
       const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      stub.onSecondCall().throws(new Error("error"));
+      stub.onCall(4).throws(new Error("error"));
       const stubErr = sinon.stub(console, "error");
       const body = document.querySelector("body");
       body.appendChild(p);
@@ -3423,18 +3423,20 @@ describe("content", () => {
       stubErr.restore();
       assert.isTrue(errorCalled, "error called");
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
+      assert.strictEqual(stub.callCount, 6, "call count");
       assert.strictEqual(p.textContent, "bar", "content");
     });
 
     it("should not replace content", () => {
       const div = document.createElement("div");
-      const stub = sinon.stub(div, "dispatchEvent").returns(false);
+      const stub = sinon.stub(div, "dispatchEvent").returns(true);
+      stub.onCall(3).returns(false);
       const body = document.querySelector("body");
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
       func(div, div, "foo\nbar\n");
       assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 4, "call count");
       assert.strictEqual(div.childNodes.length, 0, "length");
     });
 
@@ -3442,7 +3444,7 @@ describe("content", () => {
       const div = document.createElement("div");
       const span = document.createElement("span");
       const stub = sinon.stub(span, "dispatchEvent").returns(true);
-      stub.onSecondCall().returns(false);
+      stub.onCall(4).returns(false);
       const body = document.querySelector("body");
       span.textContent = "bar";
       div.appendChild(span);
@@ -3450,6 +3452,7 @@ describe("content", () => {
       body.appendChild(div);
       func(div, span, "foo\n");
       assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 5, "call count");
       assert.strictEqual(div.childNodes.length, 1, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "span", "name");
