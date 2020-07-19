@@ -3303,9 +3303,11 @@ describe("content", () => {
   describe("replace content of editable element", () => {
     const func = cjs.replaceEditableContent;
     beforeEach(() => {
+      cjs.dataIds.clear();
       cjs.vars[CONTEXT_NODE] = null;
     });
     afterEach(() => {
+      cjs.dataIds.clear();
       cjs.vars[CONTEXT_NODE] = null;
     });
 
@@ -3316,7 +3318,7 @@ describe("content", () => {
       const body = document.querySelector("body");
       p.appendChild(span);
       body.appendChild(p);
-      func(p, p);
+      func(p);
       assert.isFalse(spy.called, "not called");
       assert.strictEqual(p.childNodes.length, 1, "length");
       assert.deepEqual(p.firstChild, span, "child");
@@ -3331,11 +3333,27 @@ describe("content", () => {
       span.textContent = "foo";
       p.appendChild(span);
       body.appendChild(p);
-      func(p, p, "foo\n");
+      func(p, {
+        value: "foo\n",
+      });
       assert.isFalse(spy.called, "not called");
       assert.strictEqual(p.childNodes.length, 1, "length");
       assert.deepEqual(p.firstChild, span, "child");
       assert.strictEqual(span.textContent, "foo", "content");
+    });
+
+    it("should not call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      func(div, {
+        value: "foo\n",
+      });
+      assert.isFalse(spy.called, "not called");
+      assert.strictEqual(div.childNodes.length, 0, "length");
+      assert.strictEqual(div.textContent, "", "content");
     });
 
     it("should call function", () => {
@@ -3344,7 +3362,11 @@ describe("content", () => {
       const body = document.querySelector("body");
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
-      func(div, div, "foo\n");
+      cjs.dataIds.set("foo", {});
+      func(div, {
+        dataId: "foo",
+        value: "foo\n",
+      });
       assert.strictEqual(spy.callCount, 6, "called");
       assert.strictEqual(div.childNodes.length, 2, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
@@ -3355,13 +3377,49 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "foo\n", "content");
     });
 
+    it("should not call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(div, {
+        dataId: "foo",
+        value: "foo\n",
+      });
+      assert.isFalse(spy.called, "not called");
+      assert.strictEqual(div.childNodes.length, 0, "length");
+      assert.strictEqual(div.textContent, "", "content");
+    });
+
+    it("should not call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      func(div, {
+        value: "foo\nbar\n",
+      });
+      assert.isFalse(spy.called, "not called");
+      assert.strictEqual(div.childNodes.length, 0, "length");
+      assert.strictEqual(div.textContent, "", "content");
+    });
+
     it("should call function", () => {
       const div = document.createElement("div");
       const spy = sinon.spy(div, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
-      func(div, div, "foo\nbar\n");
+      cjs.dataIds.set("foo", {});
+      func(div, {
+        dataId: "foo",
+        value: "foo\nbar\n",
+      });
       assert.strictEqual(spy.callCount, 6, "called");
       assert.strictEqual(div.childNodes.length, 4, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
@@ -3372,6 +3430,44 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "foo\nbar\n", "content");
     });
 
+    it("should not call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(div, {
+        dataId: "foo",
+        value: "foo\nbar\n",
+      });
+      assert.isFalse(spy.called, "not called");
+      assert.strictEqual(div.childNodes.length, 0, "length");
+      assert.strictEqual(div.textContent, "", "content");
+    });
+
+    it("should not call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = "bar";
+      div.appendChild(span);
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      func(div, {
+        value: "foo\n",
+      });
+      assert.isFalse(spy.called, "not called");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "bar", "content");
+      assert.strictEqual(div.textContent, "bar", "content");
+    });
+
     it("should call function", () => {
       const div = document.createElement("div");
       const spy = sinon.spy(div, "dispatchEvent");
@@ -3381,7 +3477,11 @@ describe("content", () => {
       div.appendChild(span);
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
-      func(div, div, "foo\n");
+      cjs.dataIds.set("foo", {});
+      func(div, {
+        dataId: "foo",
+        value: "foo\n",
+      });
       assert.strictEqual(spy.callCount, 6, "called");
       assert.strictEqual(div.childNodes.length, 2, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
@@ -3392,22 +3492,98 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "foo\n", "content");
     });
 
+    it("should not call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = "bar";
+      div.appendChild(span);
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(div, {
+        dataId: "foo",
+        value: "foo\n",
+      });
+      assert.isFalse(spy.called, "not called");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "bar", "content");
+      assert.strictEqual(div.textContent, "bar", "content");
+    });
+
+    it("should not call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = "bar";
+      div.appendChild(span);
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      func(div, {
+        value: "foo\n",
+      });
+      assert.isFalse(spy.called, "not called");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "bar", "content");
+      assert.strictEqual(div.textContent, "bar", "content");
+    });
+
     it("should call function", () => {
       const div = document.createElement("div");
       const span = document.createElement("span");
       const spy = sinon.spy(span, "dispatchEvent");
       const body = document.querySelector("body");
+      div.id = "div";
       span.textContent = "bar";
       div.appendChild(span);
       cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {});
       body.appendChild(div);
-      func(div, span, "foo\n");
+      func(span, {
+        controlledBy: "#div",
+        dataId: "foo",
+        value: "foo\n",
+      });
       assert.strictEqual(spy.callCount, 6, "called");
       assert.strictEqual(div.childNodes.length, 1, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "span", "name");
       assert.strictEqual(div.firstChild.textContent, "foo\n", "content");
       assert.strictEqual(div.textContent, "foo\n", "content");
+    });
+
+    it("should not call function", () => {
+      const div = document.createElement("div");
+      const span = document.createElement("span");
+      const spy = sinon.spy(span, "dispatchEvent");
+      const body = document.querySelector("body");
+      div.id = "div";
+      span.textContent = "bar";
+      div.appendChild(span);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      body.appendChild(div);
+      func(span, {
+        controlledBy: "#div",
+        dataId: "foo",
+        value: "foo\n",
+      });
+      assert.isFalse(spy.called, "not called");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "bar", "content");
+      assert.strictEqual(div.textContent, "bar", "content");
     });
 
     it("should log error and call function", () => {
@@ -3418,7 +3594,11 @@ describe("content", () => {
       const body = document.querySelector("body");
       body.appendChild(p);
       cjs.vars[CONTEXT_NODE] = p;
-      func(p, p, "bar");
+      cjs.dataIds.set("foo", {});
+      func(p, {
+        dataId: "foo",
+        value: "bar",
+      });
       const {called: errorCalled} = stubErr;
       stubErr.restore();
       assert.isTrue(errorCalled, "error called");
@@ -3434,7 +3614,11 @@ describe("content", () => {
       const body = document.querySelector("body");
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
-      func(div, div, "foo\nbar\n");
+      cjs.dataIds.set("foo", {});
+      func(div, {
+        dataId: "foo",
+        value: "foo\nbar\n",
+      });
       assert.isTrue(stub.called, "called");
       assert.strictEqual(stub.callCount, 4, "call count");
       assert.strictEqual(div.childNodes.length, 0, "length");
@@ -3446,11 +3630,17 @@ describe("content", () => {
       const stub = sinon.stub(span, "dispatchEvent").returns(true);
       stub.onCall(4).returns(false);
       const body = document.querySelector("body");
+      div.id = "div";
       span.textContent = "bar";
       div.appendChild(span);
       cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {});
       body.appendChild(div);
-      func(div, span, "foo\n");
+      func(span, {
+        controlledBy: "#div",
+        dataId: "foo",
+        value: "foo\n",
+      });
       assert.isTrue(stub.called, "called");
       assert.strictEqual(stub.callCount, 5, "call count");
       assert.strictEqual(div.childNodes.length, 1, "length");
@@ -3463,13 +3653,21 @@ describe("content", () => {
 
   describe("replace text edit control element value", () => {
     const func = cjs.replaceEditControlValue;
+    beforeEach(() => {
+      cjs.dataIds.clear();
+    });
+    afterEach(() => {
+      cjs.dataIds.clear();
+    });
 
     it("should not call function", () => {
       const elm = document.createElement("p");
       const spy = sinon.spy(elm, "dispatchEvent");
       const body = document.querySelector("body");
       body.appendChild(elm);
-      func(elm, "foo");
+      func(elm, {
+        value: "foo",
+      });
       assert.isFalse(spy.called, "not called");
       assert.isUndefined(elm.value, "value");
     });
@@ -3485,13 +3683,30 @@ describe("content", () => {
       assert.strictEqual(elm.value, "foo", "value");
     });
 
+    it("should not call function", () => {
+      const elm = document.createElement("input");
+      const spy = sinon.spy(elm, "dispatchEvent");
+      const body = document.querySelector("body");
+      elm.value = "foo";
+      body.appendChild(elm);
+      func(elm, {
+        value: "bar\n",
+      });
+      assert.isFalse(spy.called, "called");
+      assert.strictEqual(elm.value, "foo", "value");
+    });
+
     it("should call function", () => {
       const elm = document.createElement("input");
       const spy = sinon.spy(elm, "dispatchEvent");
       const body = document.querySelector("body");
       elm.value = "foo";
       body.appendChild(elm);
-      func(elm, "bar\n");
+      cjs.dataIds.set("foo", {});
+      func(elm, {
+        dataId: "foo",
+        value: "bar\n",
+      });
       assert.isTrue(spy.called, "called");
       assert.strictEqual(elm.value, "bar", "value");
     });
@@ -3502,9 +3717,41 @@ describe("content", () => {
       const body = document.querySelector("body");
       elm.value = "foo";
       body.appendChild(elm);
-      func(elm, "foo\n");
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(elm, {
+        dataId: "foo",
+        value: "bar\n",
+      });
+      assert.isFalse(spy.called, "called");
+      assert.strictEqual(elm.value, "foo", "value");
+    });
+
+    it("should not call function", () => {
+      const elm = document.createElement("input");
+      const spy = sinon.spy(elm, "dispatchEvent");
+      const body = document.querySelector("body");
+      elm.value = "foo";
+      body.appendChild(elm);
+      func(elm, {
+        value: "foo\n",
+      });
       assert.isFalse(spy.called, "note called");
       assert.strictEqual(elm.value, "foo", "value");
+    });
+
+    it("should not call function", () => {
+      const elm = document.createElement("textarea");
+      const stub = sinon.stub(elm, "dispatchEvent").returns(false);
+      const body = document.querySelector("body");
+      elm.value = "foo\nbar";
+      body.appendChild(elm);
+      func(elm, {
+        value: "foo\nbar baz\nqux\n",
+      });
+      assert.isFalse(stub.called, "not called");
+      assert.strictEqual(elm.value, "foo\nbar", "value");
     });
 
     it("should call function", () => {
@@ -3513,8 +3760,42 @@ describe("content", () => {
       const body = document.querySelector("body");
       elm.value = "foo\nbar";
       body.appendChild(elm);
-      func(elm, "foo\nbar baz\nqux\n");
+      cjs.dataIds.set("foo", {});
+      func(elm, {
+        dataId: "foo",
+        value: "foo\nbar baz\nqux\n",
+      });
       assert.isTrue(stub.called, "called");
+      assert.strictEqual(elm.value, "foo\nbar", "value");
+    });
+
+    it("should not call function", () => {
+      const elm = document.createElement("textarea");
+      const stub = sinon.stub(elm, "dispatchEvent").returns(false);
+      const body = document.querySelector("body");
+      elm.value = "foo\nbar";
+      body.appendChild(elm);
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(elm, {
+        dataId: "foo",
+        value: "foo\nbar baz\nqux\n",
+      });
+      assert.isFalse(stub.called, "called");
+      assert.strictEqual(elm.value, "foo\nbar", "value");
+    });
+
+    it("should not call function", () => {
+      const elm = document.createElement("textarea");
+      const spy = sinon.spy(elm, "dispatchEvent");
+      const body = document.querySelector("body");
+      elm.value = "foo\nbar";
+      body.appendChild(elm);
+      func(elm, {
+        value: "foo\nbar baz\nqux\n",
+      });
+      assert.isFalse(spy.called, "called");
       assert.strictEqual(elm.value, "foo\nbar", "value");
     });
 
@@ -3524,18 +3805,41 @@ describe("content", () => {
       const body = document.querySelector("body");
       elm.value = "foo\nbar baz\nqux";
       body.appendChild(elm);
-      func(elm, "foo\nbar baz\nqux\n");
+      cjs.dataIds.set("foo", {});
+      func(elm, {
+        dataId: "foo",
+        value: "foo\nbar baz\nqux\nquux\n",
+      });
       assert.isTrue(spy.called, "called");
-      assert.strictEqual(elm.value, "foo\nbar baz\nqux\n", "value");
+      assert.strictEqual(elm.value, "foo\nbar baz\nqux\nquux\n", "value");
+    });
+
+    it("should not call function", () => {
+      const elm = document.createElement("textarea");
+      const spy = sinon.spy(elm, "dispatchEvent");
+      const body = document.querySelector("body");
+      elm.value = "foo\nbar";
+      body.appendChild(elm);
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(elm, {
+        dataId: "foo",
+        value: "foo\nbar baz\nqux\n",
+      });
+      assert.isFalse(spy.called, "called");
+      assert.strictEqual(elm.value, "foo\nbar", "value");
     });
   });
 
   describe("replace live edit content", () => {
     const func = cjs.replaceLiveEditContent;
     beforeEach(() => {
+      cjs.dataIds.clear();
       cjs.liveEdit.clear();
     });
     afterEach(() => {
+      cjs.dataIds.clear();
       cjs.liveEdit.clear();
     });
 
@@ -3547,7 +3851,7 @@ describe("content", () => {
       assert.isFalse(stub.called, "not dispatched");
     });
 
-    it("should replace content", () => {
+    it("should not replace content", () => {
       const stub = sinon.stub();
       const elm = document.createElement("div");
       const text = document.createElement("p");
@@ -3559,8 +3863,31 @@ describe("content", () => {
       cjs.liveEdit.set("foo", {
         setContent: ".foo > textarea",
       });
-      func(body, "bar baz", "foo");
-      assert.isFalse(stub.called, "dispatched");
+      func(body, {
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
+      assert.isFalse(stub.called, "not dispatched");
+    });
+
+    it("should not replace content", () => {
+      const stub = sinon.stub();
+      const elm = document.createElement("div");
+      const text = document.createElement("textarea");
+      const body = document.querySelector("body");
+      elm.classList.add("foo");
+      elm.appendChild(text);
+      body.addEventListener("input", stub, true);
+      body.appendChild(elm);
+      cjs.liveEdit.set("foo", {
+        setContent: ".foo > textarea",
+      });
+      func(body, {
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
+      assert.isFalse(stub.called, "not dispatched");
+      assert.strictEqual(text.value, "", "content");
     });
 
     it("should replace content", () => {
@@ -3575,9 +3902,60 @@ describe("content", () => {
       cjs.liveEdit.set("foo", {
         setContent: ".foo > textarea",
       });
-      func(body, "bar baz", "foo");
+      cjs.dataIds.set("foo", {});
+      func(body, {
+        dataId: "foo",
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
       assert.isTrue(stub.called, "dispatched");
       assert.strictEqual(text.value, "bar baz", "content");
+    });
+
+    it("should not replace content", () => {
+      const stub = sinon.stub();
+      const elm = document.createElement("div");
+      const text = document.createElement("textarea");
+      const body = document.querySelector("body");
+      elm.classList.add("foo");
+      elm.appendChild(text);
+      body.addEventListener("input", stub, true);
+      body.appendChild(elm);
+      cjs.liveEdit.set("foo", {
+        setContent: ".foo > textarea",
+      });
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(body, {
+        dataId: "foo",
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
+      assert.isFalse(stub.called, "not dispatched");
+      assert.strictEqual(text.value, "", "content");
+    });
+
+    it("should not replace content", () => {
+      const stub = sinon.stub();
+      const iframe = document.createElement("iframe");
+      const body = document.querySelector("body");
+      iframe.classList.add("foo");
+      body.appendChild(iframe);
+      const text = iframe.contentDocument.createElement("textarea");
+      const innerBody = iframe.contentDocument.body;
+      innerBody.appendChild(text);
+      innerBody.addEventListener("input", stub, true);
+      cjs.liveEdit.set("foo", {
+        isIframe: true,
+        setContent: "body > textarea",
+      });
+      func(iframe, {
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
+      assert.isFalse(stub.called, "not dispatched");
+      assert.strictEqual(text.value, "", "content");
     });
 
     it("should replace content", () => {
@@ -3594,9 +3972,40 @@ describe("content", () => {
         isIframe: true,
         setContent: "body > textarea",
       });
-      func(iframe, "bar baz", "foo");
+      cjs.dataIds.set("foo", {});
+      func(iframe, {
+        dataId: "foo",
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
       assert.isTrue(stub.called, "dispatched");
       assert.strictEqual(text.value, "bar baz", "content");
+    });
+
+    it("should not replace content", () => {
+      const stub = sinon.stub();
+      const iframe = document.createElement("iframe");
+      const body = document.querySelector("body");
+      iframe.classList.add("foo");
+      body.appendChild(iframe);
+      const text = iframe.contentDocument.createElement("textarea");
+      const innerBody = iframe.contentDocument.body;
+      innerBody.appendChild(text);
+      innerBody.addEventListener("input", stub, true);
+      cjs.liveEdit.set("foo", {
+        isIframe: true,
+        setContent: "body > textarea",
+      });
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(iframe, {
+        dataId: "foo",
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
+      assert.isFalse(stub.called, "not dispatched");
+      assert.strictEqual(text.value, "", "content");
     });
   });
 
@@ -3720,9 +4129,49 @@ describe("content", () => {
       assert.strictEqual(cjs.dataIds.size, 1, "size");
       assert.isTrue(cjs.dataIds.has("bar"));
       assert.strictEqual(elm.value, "foo", "content");
-      assert.strictEqual(res.length, 2, "length");
-      assert.isUndefined(res[0], "result");
-      assert.instanceOf(res[1], Map, "result");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should replace content and set data ID", async () => {
+      const elm = document.createElement("textarea");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      body.appendChild(elm);
+      cjs.vars[ID_TAB] = "1";
+      cjs.dataIds.set("bar", {});
+      const res = await func({
+        data: {
+          dataId: "bar",
+          tabId: "1",
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(elm.value, "foo", "content");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should get empty array", async () => {
+      const elm = document.createElement("textarea");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      body.appendChild(elm);
+      cjs.vars[ID_TAB] = "1";
+      cjs.dataIds.set("bar", {
+        mutex: true,
+      });
+      const res = await func({
+        data: {
+          dataId: "bar",
+          tabId: "1",
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(elm.value, "", "content");
+      assert.deepEqual(res, [], "length");
     });
 
     it("should replace content and set data ID", async () => {
@@ -3743,9 +4192,53 @@ describe("content", () => {
       assert.strictEqual(cjs.dataIds.size, 1, "size");
       assert.isTrue(cjs.dataIds.has("bar"));
       assert.strictEqual(elm.value, "foo", "content");
-      assert.strictEqual(res.length, 2, "length");
-      assert.isUndefined(res[0], "result");
-      assert.instanceOf(res[1], Map, "result");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should replace content and set data ID", async () => {
+      const elm = document.createElement("textarea");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      body.appendChild(elm);
+      cjs.vars[ID_TAB] = "1";
+      cjs.dataIds.set("bar", {});
+      const res = await func({
+        data: {
+          dataId: "bar",
+          tabId: "1",
+          timestamp: 2,
+          lastUpdate: 1,
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(elm.value, "foo", "content");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should get empty array", async () => {
+      const elm = document.createElement("textarea");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      body.appendChild(elm);
+      cjs.vars[ID_TAB] = "1";
+      cjs.dataIds.set("bar", {
+        mutex: true,
+      });
+      const res = await func({
+        data: {
+          dataId: "bar",
+          tabId: "1",
+          timestamp: 2,
+          lastUpdate: 1,
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(elm.value, "", "content");
+      assert.deepEqual(res, [], "length");
     });
 
     it("should replace content and set data ID", async () => {
@@ -3769,9 +4262,59 @@ describe("content", () => {
       assert.strictEqual(cjs.dataIds.size, 1, "size");
       assert.isTrue(cjs.dataIds.has("bar"));
       assert.strictEqual(elm.textContent, "foo", "content");
-      assert.strictEqual(res.length, 2, "length");
-      assert.isUndefined(res[0], "result");
-      assert.instanceOf(res[1], Map, "result");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should replace content and set data ID", async () => {
+      const elm = document.createElement("p");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      elm.setAttribute("contenteditable", "true");
+      if (typeof elm.isContentEditable !== "boolean") {
+        elm.isContentEditable = isContentEditable(elm);
+      }
+      body.appendChild(elm);
+      cjs.vars[ID_TAB] = "1";
+      cjs.vars[CONTEXT_NODE] = elm;
+      cjs.dataIds.set("bar", {});
+      const res = await func({
+        data: {
+          dataId: "bar",
+          tabId: "1",
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(elm.textContent, "foo", "content");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should get empty array", async () => {
+      const elm = document.createElement("p");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      elm.setAttribute("contenteditable", "true");
+      if (typeof elm.isContentEditable !== "boolean") {
+        elm.isContentEditable = isContentEditable(elm);
+      }
+      body.appendChild(elm);
+      cjs.vars[ID_TAB] = "1";
+      cjs.vars[CONTEXT_NODE] = elm;
+      cjs.dataIds.set("bar", {
+        mutex: true,
+      });
+      const res = await func({
+        data: {
+          dataId: "bar",
+          tabId: "1",
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(elm.textContent, "", "content");
+      assert.deepEqual(res, [], "length");
     });
 
     it("should replace content and set data ID", async () => {
@@ -3799,9 +4342,67 @@ describe("content", () => {
       assert.strictEqual(cjs.dataIds.size, 1, "size");
       assert.isTrue(cjs.dataIds.has("bar"));
       assert.strictEqual(elm.textContent, "foo", "content");
-      assert.strictEqual(res.length, 2, "length");
-      assert.isUndefined(res[0], "result");
-      assert.instanceOf(res[1], Map, "result");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should replace content and set data ID", async () => {
+      const div = document.createElement("div");
+      const elm = document.createElement("p");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      elm.setAttribute("contenteditable", "true");
+      if (typeof elm.isContentEditable !== "boolean") {
+        elm.isContentEditable = isContentEditable(elm);
+      }
+      div.id = "baz";
+      div.appendChild(elm);
+      body.appendChild(div);
+      cjs.vars[ID_TAB] = "1";
+      cjs.vars[CONTEXT_NODE] = elm;
+      cjs.dataIds.set("bar", {});
+      const res = await func({
+        data: {
+          dataId: "bar",
+          controlledBy: "baz",
+          tabId: "1",
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(elm.textContent, "foo", "content");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should get empty array", async () => {
+      const div = document.createElement("div");
+      const elm = document.createElement("p");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      elm.setAttribute("contenteditable", "true");
+      if (typeof elm.isContentEditable !== "boolean") {
+        elm.isContentEditable = isContentEditable(elm);
+      }
+      div.id = "baz";
+      div.appendChild(elm);
+      body.appendChild(div);
+      cjs.vars[ID_TAB] = "1";
+      cjs.vars[CONTEXT_NODE] = elm;
+      cjs.dataIds.set("bar", {
+        mutex: true,
+      });
+      const res = await func({
+        data: {
+          dataId: "bar",
+          controlledBy: "baz",
+          tabId: "1",
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(elm.textContent, "", "content");
+      assert.deepEqual(res, [], "length");
     });
 
     it("should replace content and set data ID", async () => {
@@ -3828,9 +4429,65 @@ describe("content", () => {
       assert.strictEqual(cjs.dataIds.size, 1, "size");
       assert.isTrue(cjs.dataIds.has("bar"));
       assert.strictEqual(text.value, "foo", "content");
-      assert.strictEqual(res.length, 2, "length");
-      assert.isUndefined(res[0], "result");
-      assert.instanceOf(res[1], Map, "result");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should replace content and set data ID", async () => {
+      const elm = document.createElement("div");
+      const text = document.createElement("textarea");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      elm.classList.add("baz");
+      elm.appendChild(text);
+      body.appendChild(elm);
+      cjs.liveEdit.set("baz", {
+        className: "baz",
+        setContent: ".baz > textarea",
+      });
+      cjs.vars[ID_TAB] = "1";
+      cjs.dataIds.set("bar", {});
+      const res = await func({
+        data: {
+          dataId: "bar",
+          tabId: "1",
+          liveEditKey: "baz",
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(text.value, "foo", "content");
+      assert.deepEqual(res, [undefined], "length");
+    });
+
+    it("should get empty array", async () => {
+      const elm = document.createElement("div");
+      const text = document.createElement("textarea");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      elm.classList.add("baz");
+      elm.appendChild(text);
+      body.appendChild(elm);
+      cjs.liveEdit.set("baz", {
+        className: "baz",
+        setContent: ".baz > textarea",
+      });
+      cjs.vars[ID_TAB] = "1";
+      cjs.dataIds.set("bar", {
+        mutex: true,
+      });
+      const res = await func({
+        data: {
+          dataId: "bar",
+          tabId: "1",
+          liveEditKey: "baz",
+        },
+        value: "foo",
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, "size");
+      assert.isTrue(cjs.dataIds.has("bar"));
+      assert.strictEqual(text.value, "", "content");
+      assert.deepEqual(res, [], "length");
     });
   });
 
