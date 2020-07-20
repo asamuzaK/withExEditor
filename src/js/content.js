@@ -240,6 +240,24 @@ const setModifierKeys = (bool = vars[IS_MAC]) => {
 
 /* dispatch events */
 /**
+ * dispatch event
+ *
+ * @param {object} target - target
+ * @param {string} type - type
+ * @param {object} opt - options
+ * @returns {boolean} - event permitted
+ */
+const dispatchEvent = (target, type, opt) => {
+  let res;
+  if ((target === document || target.nodeType === Node.ELEMENT_NODE) &&
+      isString(type) && isObjectNotEmpty(opt)) {
+    const evt = new Event(type, opt);
+    res = target.dispatchEvent(evt);
+  }
+  return !!res;
+};
+
+/**
  * dispatch clipboard event
  *
  * @param {object} elm - Element
@@ -1531,22 +1549,28 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
 /**
  * replace content of content editable element
  *
- * @param {object} elm - owner element
  * @param {object} node - editable element
- * @param {string} value - value
- * @param {string} ns - namespace URI
+ * @param {object} opt - options
  * @returns {void}
  */
-const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
-  if (node && node.nodeType === Node.ELEMENT_NODE && isString(value)) {
+const replaceEditableContent = (node, opt = {}) => {
+  const {controlledBy, dataId, namespaceURI, value} = opt;
+  if (node && node.nodeType === Node.ELEMENT_NODE &&
+      dataIds.has(dataId) && isString(value)) {
     const changed = value !== node.textContent.replace(/^\s*/, "")
       .replace(/\n +/g, "\n").replace(/([^\n])$/, (m, c) => `${c}\n`);
-    if (changed) {
+    const data = dataIds.get(dataId);
+    if (changed && !data.mutex) {
+      const sel = document.getSelection();
       const dataTransfer = new DataTransfer();
-      const contentFrag = createParagraphedContent(value, ns);
+      data.mutex = true;
+      setDataId(dataId, data);
+      sel.selectAllChildren(node);
+      dispatchEvent(document, "selectionchange", {
+        bubbles: false,
+        cancelable: false,
+      });
       dataTransfer.setData(MIME_PLAIN, value);
-      dataTransfer.setData(MIME_HTML,
-                           new XMLSerializer().serializeToString(contentFrag));
       // TODO: add support for React, issue #123
       // NOTE: maybe synthetic paste turns drag data store mode to protected?
       let res = dispatchClipboardEvent(node, "paste", {
@@ -1555,9 +1579,6 @@ const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
         clipboardData: dataTransfer,
       });
       if (res) {
-        const sel = document.getSelection();
-        sel.collapse(null);
-        sel.selectAllChildren(node);
         // TODO: StaticRange() constructor not implemented in Blink yet
         /*
         const insertTarget = new StaticRange({
@@ -1588,11 +1609,13 @@ const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
           res = true;
         }
         if (res) {
+          const ctrl = controlledBy && getTargetElementFromDataId(controlledBy);
           const frag = document.createDocumentFragment();
-          if (elm === node) {
-            frag.appendChild(contentFrag);
-          } else {
+          if (ctrl) {
             frag.appendChild(document.createTextNode(value));
+          } else {
+            const pContent = createParagraphedContent(value, namespaceURI);
+            frag.appendChild(pContent);
           }
           sel.deleteFromDocument();
           node.appendChild(frag);
@@ -1604,8 +1627,16 @@ const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
             ranges: [insertTarget],
           });
         }
-        sel.collapse(null);
       }
+      if (!sel.isCollapsed) {
+        sel.collapseToEnd();
+        dispatchEvent(document, "selectionchange", {
+          bubbles: false,
+          cancelable: false,
+        });
+      }
+      delete data.mutex;
+      setDataId(dataId, data);
     }
   }
 };
@@ -1614,35 +1645,40 @@ const replaceEditableContent = (elm, node, value, ns = nsURI.html) => {
  * replace text edit control element value
  *
  * @param {object} elm - element
- * @param {string} value - value
+ * @param {object} opt - options
  * @returns {void}
  */
-const replaceEditControlValue = (elm, value) => {
+const replaceEditControlValue = (elm, opt = {}) => {
+  const {dataId, value} = opt;
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
-      /^(?:input|textarea)$/.test(elm.localName) && isString(value)) {
+      /^(?:input|textarea)$/.test(elm.localName) &&
+      dataIds.has(dataId) && isString(value)) {
+    let dataValue = value.replace(/\u200B/g, "");
     if (/^input$/.test(elm.localName)) {
-      while (value.length && /[\f\n\t\r\v]$/.test(value)) {
-        value = value.replace(/[\f\n\t\r\v]$/, "");
-      }
+      dataValue = dataValue.trim();
     }
-    const changed = elm.value !== value;
-    if (changed) {
-      value = value.replace(/\u200B/g, "");
+    const changed = elm.value !== dataValue;
+    const data = dataIds.get(dataId);
+    if (changed && !data.mutex) {
+      data.mutex = true;
+      setDataId(dataId, data);
       const beforeInputNotPrevented = dispatchInputEvent(elm, "beforeinput", {
         bubbles: true,
         cancelable: true,
-        data: value,
+        data: dataValue,
         inputType: "insertText",
       });
       if (beforeInputNotPrevented) {
-        elm.value = value;
+        elm.value = dataValue;
         dispatchInputEvent(elm, "input", {
           bubbles: true,
           cancelable: false,
-          data: value,
+          data: dataValue,
           inputType: "insertText",
         });
       }
+      delete data.mutex;
+      setDataId(dataId, data);
     }
   }
 };
@@ -1651,40 +1687,45 @@ const replaceEditControlValue = (elm, value) => {
  * replace live edit content
  *
  * @param {object} elm - element
- * @param {string} value - value
- * @param {string} key - key
+ * @param {object} opt - options
  * @returns {void}
  */
-const replaceLiveEditContent = (elm, value, key) => {
-  if (elm && elm.nodeType === Node.ELEMENT_NODE && isString(value) &&
-      liveEdit.has(key)) {
-    const {isIframe, setContent} = liveEdit.get(key);
+const replaceLiveEditContent = (elm, opt = {}) => {
+  const {dataId, liveEditKey, value} = opt;
+  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+      dataIds.has(dataId) && liveEdit.has(liveEditKey) && isString(value)) {
+    const {isIframe, setContent} = liveEdit.get(liveEditKey);
     let liveElm;
     if (isIframe && elm.contentDocument) {
       liveElm = elm.contentDocument.querySelector(setContent);
     } else {
       liveElm = elm.querySelector(setContent);
     }
-    if (isEditControl(liveElm)) {
+    const data = dataIds.get(dataId);
+    if (isEditControl(liveElm) && !data.mutex) {
+      const dataValue = value.replace(/\u200B/g, "");
+      data.mutex = true;
+      setDataId(dataId, data);
       dispatchFocusEvent(liveElm);
       dispatchKeyboardEvent(liveElm, "keydown", KeyCtrlA);
       dispatchKeyboardEvent(liveElm, "keyup", KeyCtrlA);
       dispatchKeyboardEvent(liveElm, "keydown", KeyBackSpace);
       dispatchKeyboardEvent(liveElm, "keyup", KeyBackSpace);
-      value = value.replace(/\u200B/g, "");
       dispatchInputEvent(liveElm, "beforeinput", {
         bubbles: true,
         cancelable: true,
-        data: value,
+        data: dataValue,
         inputType: "insertText",
       });
-      liveElm.value = value;
+      liveElm.value = dataValue;
       dispatchInputEvent(liveElm, "input", {
         bubbles: true,
         cancelable: false,
-        data: value,
+        data: dataValue,
         inputType: "insertText",
       });
+      delete data.mutex;
+      setDataId(dataId, data);
     }
   }
 };
@@ -1711,29 +1752,39 @@ const syncText = (obj = {}) => {
         } else if (!lastUpdate ||
                    Number.isInteger(timestamp) &&
                    Number.isInteger(lastUpdate) && timestamp > lastUpdate) {
-          const controller =
-            controlledBy && getTargetElementFromDataId(controlledBy);
+          const storedData = dataIds.get(dataId);
           data.lastUpdate = timestamp;
           if (liveEdit.has(liveEditKey)) {
-            func.push(
-              replaceLiveEditContent(elm, value, liveEditKey),
-              setDataId(dataId, data),
-            );
-          } else if (controller) {
-            func.push(
-              replaceEditableContent(controller, elm, value, namespaceURI),
-              setDataId(dataId, data),
-            );
+            if (storedData) {
+              !storedData.mutex && func.push(replaceLiveEditContent(elm, {
+                dataId, liveEditKey, value,
+              }));
+            } else {
+              setDataId(dataId, data);
+              func.push(replaceLiveEditContent(elm, {
+                dataId, liveEditKey, value,
+              }));
+            }
           } else if (elm.isContentEditable) {
-            func.push(
-              replaceEditableContent(elm, elm, value, namespaceURI),
-              setDataId(dataId, data),
-            );
-          } else {
-            /^(?:input|textarea)$/.test(elm.localName) && func.push(
-              replaceEditControlValue(elm, value),
-              setDataId(dataId, data),
-            );
+            if (storedData) {
+              !storedData.mutex && func.push(replaceEditableContent(elm, {
+                controlledBy, dataId, namespaceURI, value,
+              }));
+            } else {
+              setDataId(dataId, data);
+              func.push(replaceEditableContent(elm, {
+                controlledBy, dataId, namespaceURI, value,
+              }));
+            }
+          } else if (/^(?:input|textarea)$/.test(elm.localName)) {
+            if (storedData) {
+              !storedData.mutex && func.push(replaceEditControlValue(elm, {
+                dataId, value,
+              }));
+            } else {
+              setDataId(dataId, data);
+              func.push(replaceEditControlValue(elm, {dataId, value}));
+            }
           }
         }
       }
@@ -2034,6 +2085,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     dataIds,
     determineContentProcess,
     dispatchClipboardEvent,
+    dispatchEvent,
     dispatchFocusEvent,
     dispatchInputEvent,
     dispatchKeyboardEvent,
