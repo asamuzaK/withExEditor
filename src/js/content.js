@@ -1577,6 +1577,7 @@ const replaceEditableContent = (node, opt = {}) => {
         bubbles: true,
         cancelable: true,
         clipboardData: dataTransfer,
+        composed: true,
       });
       if (res) {
         // TODO: StaticRange() constructor not implemented in Blink yet
