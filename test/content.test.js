@@ -1613,8 +1613,8 @@ describe("content", () => {
     });
   });
 
-  describe("get live edit key from class list", () => {
-    const func = cjs.getLiveEditKeyFromClassList;
+  describe("get live edit key", () => {
+    const func = cjs.getLiveEditKey;
     beforeEach(() => {
       const editors = {
         foo: {
@@ -1641,7 +1641,7 @@ describe("content", () => {
       p.classList.add("bar");
       body.appendChild(p);
       cjs.liveEdit.clear();
-      const res = func(p.classList);
+      const res = func(p);
       assert.isNull(res, "result");
     });
 
@@ -1649,7 +1649,7 @@ describe("content", () => {
       const p = document.createElement("p");
       const body = document.querySelector("body");
       body.appendChild(p);
-      const res = func(p.classList);
+      const res = func(p);
       assert.isNull(res, "result");
     });
 
@@ -1658,7 +1658,7 @@ describe("content", () => {
       const body = document.querySelector("body");
       p.classList.add("baz");
       body.appendChild(p);
-      const res = func(p.classList);
+      const res = func(p);
       assert.isNull(res, "result");
     });
 
@@ -1667,7 +1667,7 @@ describe("content", () => {
       const body = document.querySelector("body");
       p.classList.add("bar");
       body.appendChild(p);
-      const res = func(p.classList);
+      const res = func(p);
       assert.strictEqual(res, "foo", "result");
     });
 
@@ -1676,7 +1676,7 @@ describe("content", () => {
       const body = document.querySelector("body");
       p.classList.add("baz");
       body.appendChild(p);
-      const res = func(p.classList);
+      const res = func(p);
       assert.isNull(res, "result");
     });
   });

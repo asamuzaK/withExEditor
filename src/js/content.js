@@ -821,14 +821,15 @@ const requestPortConnection = async () => {
 const liveEdit = new Map();
 
 /**
- * get live edit key from class list
+ * get live edit key
  *
- * @param {object} classList - DOMTokenList
+ * @param {object} elm - element
  * @returns {?string} - live edit key
  */
-const getLiveEditKeyFromClassList = classList => {
+const getLiveEditKey = elm => {
   let liveEditKey;
-  if (classList instanceof DOMTokenList && classList.length) {
+  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+    const {classList} = elm;
     for (const [key, value] of liveEdit) {
       const {className} = value;
       liveEditKey = classList.contains(className) && key;
@@ -1247,8 +1248,7 @@ const requestTmpFile = evt => {
           func.push(postTmpFileData(dataId));
         }
       } else {
-        const liveEditKey =
-          getLiveEditKeyFromClassList(currentTarget.classList);
+        const liveEditKey = getLiveEditKey(currentTarget);
         const liveEditData = liveEdit.get(liveEditKey);
         if (isObjectNotEmpty(liveEditData)) {
           const {setContent} = liveEditData;
@@ -1330,10 +1330,8 @@ const createContentData = async (elm, mode) => {
         const obj = createIdData(elm);
         if (obj) {
           const {dataId} = obj;
-          const {
-            childNodes, classList, isContentEditable, namespaceURI, value,
-          } = elm;
-          const liveEditKey = getLiveEditKeyFromClassList(classList);
+          const {childNodes, isContentEditable, namespaceURI, value} = elm;
+          const liveEditKey = getLiveEditKey(elm);
           const isHtml = !namespaceURI || namespaceURI === nsURI.html;
           isHtml && elm.addEventListener("focus", requestTmpFile, true);
           !dataIds.has(dataId) && setDataId(dataId, obj);
@@ -2100,7 +2098,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     getFileNameFromURI,
     getLiveEditContent,
     getLiveEditElm,
-    getLiveEditKeyFromClassList,
+    getLiveEditKey,
     getNodeNS,
     getTargetElementFromDataId,
     getText,
