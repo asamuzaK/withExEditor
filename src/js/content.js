@@ -1044,7 +1044,8 @@ const postEachDataId = async (bool = false) => {
   if (bool) {
     dataIds.forEach((value, key) => {
       const elm = getTargetElementFromDataId(key);
-      elm && func.push(postMsg({[TMP_FILE_GET]: value}));
+      const {controls} = value;
+      elm && !controls && func.push(postMsg({[TMP_FILE_GET]: value}));
     });
   }
   return Promise.all(func);
@@ -1610,11 +1611,11 @@ const replaceEditableContent = (node, opt = {}) => {
         if (res) {
           const ctrl = controlledBy && getTargetElementFromDataId(controlledBy);
           const frag = document.createDocumentFragment();
-          if (ctrl) {
-            frag.appendChild(document.createTextNode(value));
-          } else {
+          if (ctrl && ctrl === node || !ctrl) {
             const pContent = createParagraphedContent(value, namespaceURI);
             frag.appendChild(pContent);
+          } else {
+            frag.appendChild(document.createTextNode(value));
           }
           sel.deleteFromDocument();
           node.appendChild(frag);
@@ -1751,6 +1752,7 @@ const syncText = (obj = {}) => {
         } else if (!lastUpdate ||
                    Number.isInteger(timestamp) &&
                    Number.isInteger(lastUpdate) && timestamp > lastUpdate) {
+          const ctrl = controlledBy && getTargetElementFromDataId(controlledBy);
           const storedData = dataIds.get(dataId);
           data.lastUpdate = timestamp;
           if (liveEdit.has(liveEditKey)) {
@@ -1764,7 +1766,7 @@ const syncText = (obj = {}) => {
                 dataId, liveEditKey, value,
               }));
             }
-          } else if (elm.isContentEditable) {
+          } else if (ctrl || elm.isContentEditable) {
             if (storedData) {
               !storedData.mutex && func.push(replaceEditableContent(elm, {
                 controlledBy, dataId, namespaceURI, value,
