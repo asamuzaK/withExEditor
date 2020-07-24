@@ -1043,8 +1043,8 @@ const postEachDataId = async (bool = false) => {
   const func = [];
   if (bool) {
     dataIds.forEach((value, key) => {
-      const elm = getTargetElementFromDataId(key);
       const {controls} = value;
+      const elm = getTargetElementFromDataId(key);
       elm && !controls && func.push(postMsg({[TMP_FILE_GET]: value}));
     });
   }
@@ -1570,8 +1570,6 @@ const replaceEditableContent = (node, opt = {}) => {
         cancelable: false,
       });
       dataTransfer.setData(MIME_PLAIN, value);
-      // TODO: add support for React, issue #123
-      // NOTE: maybe synthetic paste turns drag data store mode to protected?
       let res = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
