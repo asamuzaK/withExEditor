@@ -1747,42 +1747,32 @@ const syncText = (obj = {}) => {
       if (elm) {
         if (timestamp === FILE_NOT_FOUND_TIMESTAMP) {
           func.push(removeDataId(dataId));
-        } else if (!lastUpdate ||
-                   Number.isInteger(timestamp) &&
-                   Number.isInteger(lastUpdate) && timestamp > lastUpdate) {
-          const ctrl = controlledBy && getTargetElementFromDataId(controlledBy);
+        } else {
           const storedData = dataIds.get(dataId);
-          data.lastUpdate = timestamp;
-          if (liveEdit.has(liveEditKey)) {
-            if (storedData) {
-              !storedData.mutex && func.push(replaceLiveEditContent(elm, {
-                dataId, liveEditKey, value,
-              }));
-            } else {
+          const mutex = storedData && storedData.mutex;
+          const isUpdated = !lastUpdate ||
+                            Number.isInteger(timestamp) &&
+                            Number.isInteger(lastUpdate) &&
+                            timestamp > lastUpdate;
+          if (!mutex && isUpdated) {
+            const ctrl =
+              controlledBy && getTargetElementFromDataId(controlledBy);
+            data.lastUpdate = timestamp;
+            if (liveEdit.has(liveEditKey)) {
               setDataId(dataId, data);
               func.push(replaceLiveEditContent(elm, {
                 dataId, liveEditKey, value,
               }));
-            }
-          } else if (ctrl || elm.isContentEditable) {
-            if (storedData) {
-              !storedData.mutex && func.push(replaceEditableContent(elm, {
-                controlledBy, dataId, namespaceURI, value,
-              }));
-            } else {
+            } else if (ctrl || elm.isContentEditable) {
               setDataId(dataId, data);
               func.push(replaceEditableContent(elm, {
                 controlledBy, dataId, namespaceURI, value,
               }));
-            }
-          } else if (/^(?:input|textarea)$/.test(elm.localName)) {
-            if (storedData) {
-              !storedData.mutex && func.push(replaceEditControlValue(elm, {
+            } else if (/^(?:input|textarea)$/.test(elm.localName)) {
+              setDataId(dataId, data);
+              func.push(replaceEditControlValue(elm, {
                 dataId, value,
               }));
-            } else {
-              setDataId(dataId, data);
-              func.push(replaceEditControlValue(elm, {dataId, value}));
             }
           }
         }
