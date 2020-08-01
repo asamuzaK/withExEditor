@@ -1472,7 +1472,7 @@ const getContextMode = elm => {
  */
 const determineContentProcess = (obj = {}) => {
   const {info} = obj;
-  const isTop = window.top.location.href === document.URL;
+  const isTop = window.top === window.self;
   const elm = vars[CONTEXT_NODE] || isTop && document.activeElement;
   let mode;
   if (info) {
