@@ -1798,8 +1798,8 @@ const replaceLiveEditContent = (elm, opt = {}) => {
         });
         delete data.mutex;
         setDataId(dataId, data);
-      } else if (liveElm.isContentEditable) {
-        replaceEditableContent(liveElm, opt);
+      } else {
+        liveElm.isContentEditable && replaceEditableContent(liveElm, opt);
       }
     }
   }
