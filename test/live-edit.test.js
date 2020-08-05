@@ -8,7 +8,7 @@ import liveEdit from "../src/mjs/live-edit.js";
 
 describe("live-edit", () => {
   it("should get key and value", () => {
-    const itemKeys = ["aceEditor", "codeMirror", "tiddlyWiki"];
+    const itemKeys = ["aceEditor", "codeMirror", "tiddlyWiki", "tinyMCE"];
     const items = Object.entries(liveEdit);
     for (const [key, value] of items) {
       assert.isTrue(itemKeys.includes(key));
