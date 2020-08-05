@@ -249,7 +249,8 @@ const setModifierKeys = (bool = vars[IS_MAC]) => {
  */
 const dispatchEvent = (target, type, opt) => {
   let res;
-  if ((target === document || target.nodeType === Node.ELEMENT_NODE) &&
+  if ((target.nodeType === Node.DOCUMENT_NODE ||
+       target.nodeType === Node.ELEMENT_NODE) &&
       isString(type) && isObjectNotEmpty(opt)) {
     const evt = new Event(type, opt);
     res = target.dispatchEvent(evt);
@@ -661,29 +662,65 @@ const createDomFromSelectionRange = sel => {
  * get text
  *
  * @param {object} nodes - nodes
+ * @param {boolean} pre - preformatted
  * @returns {string} - text
  */
-const getText = nodes => {
+const getText = (nodes, pre = false) => {
   const arr = [];
-  let text;
-  if (nodes instanceof NodeList) {
-    for (const node of nodes) {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        if (node.localName === "br") {
-          arr.push("\n");
+  const nodeArr = nodes && Array.from(nodes);
+  if (nodeArr) {
+    const blocks = [
+      "address", "article", "aside", "blockquote", "details", "dialog", "dd",
+      "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form",
+      "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table",
+      "ul",
+    ];
+    const headings = ["h1", "h2", "h3", "h4", "h5", "h6", "hgroup"];
+    const phrasings = [
+      "a", "abbr", "b", "bdo", "cite", "code", "data", "datalist", "del", "dfn",
+      "em", "i", "ins", "kbd", "mark", "map", "meter", "output", "progress",
+      "q", "ruby", "samp", "small", "span", "strong", "sub", "sup", "time",
+      "var",
+    ];
+    for (const node of nodeArr) {
+      const parent = node.parentNode;
+      pre = pre || parent.localName === "pre";
+      if (node && node.nodeType === Node.ELEMENT_NODE) {
+        if (node.hasChildNodes()) {
+          arr.push(getText(node.childNodes, pre));
+          if (blocks.includes(parent.localName) ||
+              headings.includes(parent.localName)) {
+            if (node === parent.lastChild) {
+              arr.push("\n");
+            } else {
+              !pre && phrasings.includes(node.localName) && arr.push(" ");
+            }
+          }
         } else {
-          node.hasChildNodes() && arr.push(getText(node.childNodes));
+          node.localName === "br" && arr.push("\n");
         }
-      } else {
-        node.nodeType === Node.TEXT_NODE && arr.push(
-          node.nodeValue.replace(/^\s*/, "")
-            .replace(/([^\n])$/, (m, c) => `${c}\n`),
-        );
+      } else if (node && node.nodeType === Node.TEXT_NODE) {
+        if (pre) {
+          arr.push(node.nodeValue);
+        } else if (headings.includes(parent.localName) &&
+                   node === parent.lastChild) {
+          arr.push(
+            node.nodeValue.replace(/^\s*/, "")
+              .replace(/([^\n])$/, (m, c) => `${c}\n\n`),
+          );
+        } else if (phrasings.includes(parent.localName) &&
+                   node === parent.lastChild) {
+          arr.push(node.nodeValue.replace(/^\s*/, ""));
+        } else {
+          arr.push(
+            node.nodeValue.replace(/^\s*/, "")
+              .replace(/([^\n])$/, (m, c) => `${c}\n`),
+          );
+        }
       }
     }
-    text = arr.join("");
   }
-  return text || "";
+  return arr.join("");
 };
 
 /**
@@ -789,6 +826,25 @@ const getEditableElm = node => {
   return elm || null;
 };
 
+/**
+ * get editable element of content document
+ * NOTE: currently not in use
+ *
+ * @param {object} elm - Element
+ * @returns {object} - Element
+ */
+const getContentDocumentEditableElm = elm => {
+  let editableElm;
+  if (elm && elm.nodeType === Node.ELEMENT_NODE && elm.contentDocument) {
+    const selectors = [
+      "[contenteditable=\"true\"]",
+      "[contenteditable=\"\"]",
+    ];
+    editableElm = elm.contentDocument.querySelector(selectors.join(","));
+  }
+  return editableElm || null;
+};
+
 /* post messages */
 /**
  * post message
@@ -829,10 +885,17 @@ const liveEdit = new Map();
 const getLiveEditKey = elm => {
   let liveEditKey;
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
-    const {classList} = elm;
     for (const [key, value] of liveEdit) {
-      const {className} = value;
-      liveEditKey = classList.contains(className) && key;
+      const {className, getContent, isIframe, setContent} = value;
+      if (isIframe && elm.contentDocument) {
+        if ((!className || elm.classList.contains(className)) &&
+            elm.contentDocument.querySelector(getContent) &&
+            elm.contentDocument.querySelector(setContent)) {
+          liveEditKey = key;
+        }
+      } else if (elm.classList.contains(className)) {
+        liveEditKey = key;
+      }
       if (liveEditKey) {
         break;
       }
@@ -855,12 +918,16 @@ const getLiveEditElm = node => {
     const isHtml = !namespaceURI || namespaceURI === nsURI.html;
     if (isHtml) {
       for (const item of items) {
-        const {className, isIframe} = item;
+        const {className, getContent, isIframe, setContent} = item;
         if (isIframe) {
-          const iframe = node.querySelector(`iframe.${className}`);
-          if (iframe) {
-            elm = iframe;
-            break;
+          const iframes = node.querySelectorAll("iframe");
+          for (const iframe of iframes) {
+            if ((!className || iframe.classList.contains(className)) &&
+                iframe.contentDocument.querySelector(getContent) &&
+                iframe.contentDocument.querySelector(setContent)) {
+              elm = iframe;
+              break;
+            }
           }
         } else if (classList.contains(className)) {
           elm = node;
@@ -898,6 +965,12 @@ const getLiveEditContent = (elm, key) => {
           arr.push("");
         } else if (isEditControl(item)) {
           arr.push(item.value);
+        } else if (item.isContentEditable) {
+          if (item.hasChildNodes()) {
+            arr.push(getText(item.childNodes));
+          } else {
+            arr.push("\n");
+          }
         } else {
           arr.push(item.textContent);
         }
@@ -1560,12 +1633,12 @@ const replaceEditableContent = (node, opt = {}) => {
       .replace(/\n +/g, "\n").replace(/([^\n])$/, (m, c) => `${c}\n`);
     const data = dataIds.get(dataId);
     if (changed && !data.mutex) {
-      const sel = document.getSelection();
+      const sel = node.ownerDocument.getSelection();
       const dataTransfer = new DataTransfer();
       data.mutex = true;
       setDataId(dataId, data);
       sel.selectAllChildren(node);
-      dispatchEvent(document, "selectionchange", {
+      dispatchEvent(node.ownerDocument, "selectionchange", {
         bubbles: false,
         cancelable: false,
       });
@@ -1628,7 +1701,7 @@ const replaceEditableContent = (node, opt = {}) => {
       }
       if (!sel.isCollapsed) {
         sel.collapseToEnd();
-        dispatchEvent(document, "selectionchange", {
+        dispatchEvent(node.ownerDocument, "selectionchange", {
           bubbles: false,
           cancelable: false,
         });
@@ -1693,37 +1766,41 @@ const replaceLiveEditContent = (elm, opt = {}) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       dataIds.has(dataId) && liveEdit.has(liveEditKey) && isString(value)) {
     const {isIframe, setContent} = liveEdit.get(liveEditKey);
+    const data = dataIds.get(dataId);
     let liveElm;
     if (isIframe && elm.contentDocument) {
       liveElm = elm.contentDocument.querySelector(setContent);
     } else {
       liveElm = elm.querySelector(setContent);
     }
-    const data = dataIds.get(dataId);
-    if (isEditControl(liveElm) && !data.mutex) {
-      const dataValue = value.replace(/\u200B/g, "");
-      data.mutex = true;
-      setDataId(dataId, data);
-      dispatchFocusEvent(liveElm);
-      dispatchKeyboardEvent(liveElm, "keydown", KeyCtrlA);
-      dispatchKeyboardEvent(liveElm, "keyup", KeyCtrlA);
-      dispatchKeyboardEvent(liveElm, "keydown", KeyBackSpace);
-      dispatchKeyboardEvent(liveElm, "keyup", KeyBackSpace);
-      dispatchInputEvent(liveElm, "beforeinput", {
-        bubbles: true,
-        cancelable: true,
-        data: dataValue,
-        inputType: "insertText",
-      });
-      liveElm.value = dataValue;
-      dispatchInputEvent(liveElm, "input", {
-        bubbles: true,
-        cancelable: false,
-        data: dataValue,
-        inputType: "insertText",
-      });
-      delete data.mutex;
-      setDataId(dataId, data);
+    if (liveElm && !data.mutex) {
+      if (isEditControl(liveElm)) {
+        const dataValue = value.replace(/\u200B/g, "");
+        data.mutex = true;
+        setDataId(dataId, data);
+        dispatchFocusEvent(liveElm);
+        dispatchKeyboardEvent(liveElm, "keydown", KeyCtrlA);
+        dispatchKeyboardEvent(liveElm, "keyup", KeyCtrlA);
+        dispatchKeyboardEvent(liveElm, "keydown", KeyBackSpace);
+        dispatchKeyboardEvent(liveElm, "keyup", KeyBackSpace);
+        dispatchInputEvent(liveElm, "beforeinput", {
+          bubbles: true,
+          cancelable: true,
+          data: dataValue,
+          inputType: "insertText",
+        });
+        liveElm.value = dataValue;
+        dispatchInputEvent(liveElm, "input", {
+          bubbles: true,
+          cancelable: false,
+          data: dataValue,
+          inputType: "insertText",
+        });
+        delete data.mutex;
+        setDataId(dataId, data);
+      } else if (liveElm.isContentEditable) {
+        replaceEditableContent(liveElm, opt);
+      }
     }
   }
 };
@@ -2081,6 +2158,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     extendObjItems,
     fetchSource,
     getAncestorId,
+    getContentDocumentEditableElm,
     getContextMode,
     getDecodedContent,
     getEditableElm,

@@ -19,4 +19,10 @@ export default {
     getContent: "body > textarea:nth-child(1)",
     setContent: "body > textarea:nth-child(1)",
   },
+  tinyMCE: {
+    isIframe: true,
+    className: null,
+    getContent: "#tinymce",
+    setContent: "#tinymce",
+  },
 };

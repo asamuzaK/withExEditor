@@ -1281,7 +1281,7 @@ describe("content", () => {
       assert.strictEqual(res, "", "result");
     });
 
-    it("should get empty string", () => {
+    it("should get string", () => {
       const p = document.createElement("p");
       const span = document.createElement("span");
       const br = document.createElement("br");
@@ -1293,7 +1293,48 @@ describe("content", () => {
       p.appendChild(document.createTextNode("  baz  qux"));
       body.appendChild(p);
       const res = func(document.querySelectorAll("p"));
-      assert.strictEqual(res, "foo\n\nbar\nbaz  qux\n", "result");
+      assert.strictEqual(res, "foo\n\nbar baz  qux\n", "result");
+    });
+
+    it("should get string", () => {
+      const sec = document.createElement("section");
+      const h1 = document.createElement("h1");
+      const p = document.createElement("p");
+      const p2 = document.createElement("p");
+      const p3 = document.createElement("p3");
+      const img = document.createElement("img");
+      const cmt = document.createComment("comment");
+      const body = document.querySelector("body");
+      h1.textContent = "foo bar";
+      p.textContent = "  baz qux";
+      p2.textContent = "  quux";
+      p3.appendChild(img);
+      p3.appendChild(document.createTextNode("corge"));
+      sec.appendChild(h1);
+      sec.appendChild(p);
+      sec.appendChild(cmt);
+      sec.appendChild(p2);
+      sec.appendChild(p3);
+      body.appendChild(sec);
+      const res = func(document.querySelectorAll("section"));
+      assert.strictEqual(res, "foo bar\n\nbaz qux\nquux\ncorge\n\n", "result");
+    });
+
+    it("should get string", () => {
+      const pre = document.createElement("pre");
+      const span = document.createElement("span");
+      const span2 = document.createElement("span");
+      const body = document.querySelector("body");
+      pre.appendChild(document.createTextNode("  foo bar\n  "));
+      span.textContent = "baz";
+      pre.appendChild(span);
+      pre.appendChild(document.createTextNode(" qux "));
+      span2.textContent = "quux";
+      pre.appendChild(span2);
+      pre.appendChild(document.createTextNode("\n"));
+      body.appendChild(pre);
+      const res = func(document.querySelectorAll("pre"));
+      assert.strictEqual(res, "  foo bar\n  baz qux quux\n", "result");
     });
   });
 
@@ -1573,6 +1614,84 @@ describe("content", () => {
     });
   });
 
+  describe("get editable element of content document", () => {
+    const func = cjs.getContentDocumentEditableElm;
+
+    it("should get null", () => {
+      const res = func();
+      assert.isNull(res, "result");
+    });
+
+    it("should get null", () => {
+      const p = document.createElement("p");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const res = func(p);
+      assert.isNull(res, "result");
+    });
+
+    it("should get null", () => {
+      const iframe = document.createElement("iframe");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      const res = func(iframe);
+      assert.isNull(res, "result");
+    });
+
+    it("should get null", () => {
+      const iframe = document.createElement("iframe");
+      const div = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      iframe.contentDocument.body.appendChild(div);
+      const res = func(iframe);
+      assert.isNull(res, "result");
+    });
+
+    it("should get result", () => {
+      const iframe = document.createElement("iframe");
+      const div = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      div.setAttribute("contenteditable", "");
+      iframe.contentDocument.body.appendChild(div);
+      const res = func(iframe);
+      assert.deepEqual(res, div, "result");
+    });
+
+    it("should get result", () => {
+      const iframe = document.createElement("iframe");
+      const div = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      div.setAttribute("contenteditable", "true");
+      iframe.contentDocument.body.appendChild(div);
+      const res = func(iframe);
+      assert.deepEqual(res, div, "result");
+    });
+
+    it("should get null", () => {
+      const iframe = document.createElement("iframe");
+      const div = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      div.setAttribute("contenteditable", "false");
+      iframe.contentDocument.body.appendChild(div);
+      const res = func(iframe);
+      assert.isNull(res, "result");
+    });
+
+    it("should get null", () => {
+      const iframe = document.createElement("iframe");
+      const text = document.createElement("textarea");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      iframe.contentDocument.body.appendChild(text);
+      const res = func(iframe);
+      assert.isNull(res, "result");
+    });
+  });
+
   describe("post message", () => {
     const func = cjs.postMsg;
     beforeEach(() => {
@@ -1618,7 +1737,19 @@ describe("content", () => {
     beforeEach(() => {
       const editors = {
         foo: {
+          className: "foo",
+        },
+        bar: {
+          isIframe: true,
           className: "bar",
+          getContent: "#qux",
+          setContent: "#qux",
+        },
+        baz: {
+          isIframe: true,
+          className: null,
+          getContent: "#baz",
+          setContent: "#baz",
         },
       };
       const items = Object.entries(editors);
@@ -1638,7 +1769,7 @@ describe("content", () => {
     it("should get null", () => {
       const p = document.createElement("p");
       const body = document.querySelector("body");
-      p.classList.add("bar");
+      p.classList.add("foo");
       body.appendChild(p);
       cjs.liveEdit.clear();
       const res = func(p);
@@ -1656,7 +1787,7 @@ describe("content", () => {
     it("should get null", () => {
       const p = document.createElement("p");
       const body = document.querySelector("body");
-      p.classList.add("baz");
+      p.classList.add("quux");
       body.appendChild(p);
       const res = func(p);
       assert.isNull(res, "result");
@@ -1665,7 +1796,7 @@ describe("content", () => {
     it("should get value", () => {
       const p = document.createElement("p");
       const body = document.querySelector("body");
-      p.classList.add("bar");
+      p.classList.add("foo");
       body.appendChild(p);
       const res = func(p);
       assert.strictEqual(res, "foo", "result");
@@ -1674,10 +1805,33 @@ describe("content", () => {
     it("should get null", () => {
       const p = document.createElement("p");
       const body = document.querySelector("body");
-      p.classList.add("baz");
+      p.classList.add("quux");
       body.appendChild(p);
       const res = func(p);
       assert.isNull(res, "result");
+    });
+
+    it("should get value", () => {
+      const iframe = document.createElement("iframe");
+      const div = document.createElement("div");
+      const body = document.querySelector("body");
+      iframe.classList.add("bar");
+      body.appendChild(iframe);
+      div.id = "qux";
+      iframe.contentDocument.body.appendChild(div);
+      const res = func(iframe);
+      assert.strictEqual(res, "bar", "result");
+    });
+
+    it("should get value", () => {
+      const iframe = document.createElement("iframe");
+      const div = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      div.id = "baz";
+      iframe.contentDocument.body.appendChild(div);
+      const res = func(iframe);
+      assert.strictEqual(res, "baz", "result");
     });
   });
 
@@ -1686,11 +1840,25 @@ describe("content", () => {
     beforeEach(() => {
       const editors = {
         foo: {
+          className: "foo",
+        },
+        bar: {
+          isIframe: true,
           className: "bar",
+          getContent: "body > textarea",
+          setContent: "body > textarea",
         },
         baz: {
           isIframe: true,
-          className: "qux",
+          className: "baz",
+          getContent: "#qux",
+          setContent: "#qux",
+        },
+        quux: {
+          isIframe: true,
+          className: null,
+          getContent: "#qux",
+          setContent: "#qux",
         },
       };
       const items = Object.entries(editors);
@@ -1726,7 +1894,7 @@ describe("content", () => {
     it("should get element", () => {
       const p = document.createElement("p");
       const body = document.querySelector("body");
-      p.classList.add("bar");
+      p.classList.add("foo");
       body.appendChild(p);
       const res = func(p);
       assert.deepEqual(res, p, "result");
@@ -1735,10 +1903,11 @@ describe("content", () => {
     it("should get null", () => {
       const div = document.createElement("div");
       const iframe = document.createElement("iframe");
+      const elm = document.createElement("textarea");
       const body = document.querySelector("body");
-      iframe.classList.add("bar");
       div.appendChild(iframe);
       body.appendChild(div);
+      iframe.contentDocument.body.appendChild(elm);
       const res = func(div);
       assert.isNull(res, "result");
     });
@@ -1746,10 +1915,41 @@ describe("content", () => {
     it("should get element", () => {
       const div = document.createElement("div");
       const iframe = document.createElement("iframe");
+      const elm = document.createElement("textarea");
       const body = document.querySelector("body");
-      iframe.classList.add("qux");
       div.appendChild(iframe);
       body.appendChild(div);
+      iframe.classList.add("bar");
+      iframe.contentDocument.body.appendChild(elm);
+      const res = func(div);
+      assert.deepEqual(res, iframe, "result");
+    });
+
+    it("should get element", () => {
+      const div = document.createElement("div");
+      const iframe = document.createElement("iframe");
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      div.appendChild(iframe);
+      body.appendChild(div);
+      elm.setAttribute("contenteditable", "true");
+      elm.id = "qux";
+      iframe.contentDocument.body.appendChild(elm);
+      const res = func(div);
+      assert.deepEqual(res, iframe, "result");
+    });
+
+    it("should get element", () => {
+      const div = document.createElement("div");
+      const iframe = document.createElement("iframe");
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      div.appendChild(iframe);
+      body.appendChild(div);
+      elm.setAttribute("contenteditable", "true");
+      elm.id = "qux";
+      iframe.classList.add("baz");
+      iframe.contentDocument.body.appendChild(elm);
       const res = func(div);
       assert.deepEqual(res, iframe, "result");
     });
@@ -1762,9 +1962,12 @@ describe("content", () => {
         foo: {
           getContent: ".bar",
         },
-        baz: {
+        bar: {
           isIframe: true,
           getContent: "body > textarea",
+        },
+        baz: {
+          getContent: "#baz",
         },
       };
       const items = Object.entries(editors);
@@ -1823,8 +2026,53 @@ describe("content", () => {
       const textarea = iframe.contentDocument.createElement("textarea");
       textarea.value = "foo\nbar\nbaz";
       iframe.contentDocument.body.appendChild(textarea);
-      const res = func(iframe, "baz");
+      const res = func(iframe, "bar");
       assert.strictEqual(res, "foo\nbar\nbaz", "result");
+    });
+
+    it("should get result", () => {
+      const div = document.createElement("div");
+      const body = document.querySelector("body");
+      div.setAttribute("contenteditable", "true");
+      if (typeof div.isContentEditable !== "boolean") {
+        div.isContentEditable = isContentEditable(div);
+      }
+      div.id = "baz";
+      body.appendChild(div);
+      const res = func(body, "baz");
+      assert.strictEqual(res, "\n", "result");
+    });
+
+    it("should get result", () => {
+      const div = document.createElement("div");
+      const sec = document.createElement("section");
+      const h1 = document.createElement("h1");
+      const p = document.createElement("p");
+      const p2 = document.createElement("p");
+      const p3 = document.createElement("p3");
+      const img = document.createElement("img");
+      const cmt = document.createComment("comment");
+      const body = document.querySelector("body");
+      div.setAttribute("contenteditable", "true");
+      if (typeof div.isContentEditable !== "boolean") {
+        div.isContentEditable = isContentEditable(div);
+      }
+      div.id = "baz";
+      h1.textContent = "foo bar";
+      p.textContent = "  baz qux";
+      p2.textContent = "  quux";
+      p3.appendChild(img);
+      p3.appendChild(document.createTextNode("corge"));
+      sec.appendChild(h1);
+      sec.appendChild(p);
+      sec.appendChild(cmt);
+      sec.appendChild(p2);
+      sec.appendChild(p3);
+      div.appendChild(sec);
+      body.appendChild(div);
+      const res = func(body, "baz");
+      assert.strictEqual(res, "foo bar\n\nbaz qux\nquux\ncorge\n\n\n",
+                         "result");
     });
   });
 
@@ -4052,6 +4300,88 @@ describe("content", () => {
       });
       assert.isFalse(stub.called, "not dispatched");
       assert.strictEqual(text.value, "", "content");
+    });
+
+    it("should replace content", () => {
+      const stub = sinon.stub();
+      const iframe = document.createElement("iframe");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      const div = iframe.contentDocument.createElement("div");
+      div.id = "bar";
+      div.setAttribute("contenteditable", "true");
+      if (typeof div.isContentEditable !== "boolean") {
+        div.isContentEditable = isContentEditable(div);
+      }
+      const innerBody = iframe.contentDocument.body;
+      innerBody.appendChild(div);
+      innerBody.addEventListener("input", stub, true);
+      cjs.liveEdit.set("foo", {
+        isIframe: true,
+        setContent: "#bar",
+      });
+      cjs.dataIds.set("foo", {});
+      func(iframe, {
+        dataId: "foo",
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
+      assert.isTrue(stub.called, "dispatched");
+      assert.strictEqual(div.textContent, "bar baz", "content");
+    });
+
+    it("should not replace content", () => {
+      const stub = sinon.stub();
+      const iframe = document.createElement("iframe");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      const div = iframe.contentDocument.createElement("div");
+      div.id = "bar";
+      div.setAttribute("contenteditable", "true");
+      if (typeof div.isContentEditable !== "boolean") {
+        div.isContentEditable = isContentEditable(div);
+      }
+      const innerBody = iframe.contentDocument.body;
+      innerBody.appendChild(div);
+      innerBody.addEventListener("input", stub, true);
+      cjs.liveEdit.set("foo", {
+        isIframe: true,
+        setContent: "#bar",
+      });
+      cjs.dataIds.set("foo", {
+        mutex: true,
+      });
+      func(iframe, {
+        dataId: "foo",
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
+      assert.isFalse(stub.called, "not dispatched");
+      assert.strictEqual(div.textContent, "", "content");
+    });
+
+    it("should not replace content", () => {
+      const stub = sinon.stub();
+      const iframe = document.createElement("iframe");
+      const body = document.querySelector("body");
+      body.appendChild(iframe);
+      const div = iframe.contentDocument.createElement("div");
+      div.id = "bar";
+      const innerBody = iframe.contentDocument.body;
+      innerBody.appendChild(div);
+      innerBody.addEventListener("input", stub, true);
+      cjs.liveEdit.set("foo", {
+        isIframe: true,
+        setContent: "#bar",
+      });
+      cjs.dataIds.set("foo", {});
+      func(iframe, {
+        dataId: "foo",
+        liveEditKey: "foo",
+        value: "bar baz",
+      });
+      assert.isFalse(stub.called, "not dispatched");
+      assert.strictEqual(div.textContent, "", "content");
     });
   });
 
