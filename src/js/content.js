@@ -280,7 +280,11 @@ const dispatchClipboardEvent = (elm, type, opt = {
       const {types} = clipboardData;
       for (const mime of types) {
         const value = clipboardData.getData(mime);
-        evt.clipboardData.setData(mime, value);
+        if (evt.wrappedJSObject) {
+          evt.wrappedJSObject.clipboardData.setData(mime, value);
+        } else {
+          evt.clipboardData.setData(mime, value);
+        }
       }
     }
     res = elm.dispatchEvent(evt);
@@ -923,6 +927,7 @@ const getLiveEditElm = node => {
           const iframes = node.querySelectorAll("iframe");
           for (const iframe of iframes) {
             if ((!className || iframe.classList.contains(className)) &&
+                iframe.contentDocument &&
                 iframe.contentDocument.querySelector(getContent) &&
                 iframe.contentDocument.querySelector(setContent)) {
               elm = iframe;
