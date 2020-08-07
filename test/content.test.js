@@ -502,6 +502,30 @@ describe("content", () => {
       assert.isTrue(spy.called, "called");
       assert.isTrue(res, "result");
     });
+
+    it("should call function", () => {
+      const p = document.createElement("p");
+      const stubSetData = sinon.stub();
+      ClipboardEvent.prototype.wrappedJSObject = {
+        clipboardData: {
+          setData: stubSetData,
+        },
+      };
+      const spy = sinon.spy(p, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const dataTrans = new DataTransfer();
+      dataTrans.setData("text/plain", "foo");
+      const res = func(p, "paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData: dataTrans,
+      });
+      assert.isTrue(stubSetData.called, "called");
+      assert.isTrue(spy.called, "called");
+      assert.isTrue(res, "result");
+      delete ClipboardEvent.prototype.wrappedJSObject;
+    });
   });
 
   describe("dispatch focus event", () => {
