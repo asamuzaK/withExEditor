@@ -653,8 +653,10 @@ describe("content", () => {
 
     it("should call function", () => {
       const stubSetData = sinon.stub();
-      DataTransfer.prototype.wrappedJSObject = {
-        setData: stubSetData,
+      InputEvent.prototype.wrappedJSObject = {
+        dataTransfer: {
+          setData: stubSetData,
+        },
       };
       const p = document.createElement("p");
       const spy = sinon.spy(p, "dispatchEvent");
@@ -670,13 +672,15 @@ describe("content", () => {
       assert.isTrue(stubSetData.called, "called");
       assert.isTrue(spy.called, "called");
       assert.isTrue(res, "result");
-      delete DataTransfer.prototype.wrappedJSObject;
+      delete InputEvent.prototype.wrappedJSObject;
     });
 
     it("should call function", () => {
       const stubSetData = sinon.stub();
-      DataTransfer.prototype.wrappedJSObject = {
-        setData: stubSetData,
+      InputEvent.prototype.wrappedJSObject = {
+        dataTransfer: {
+          setData: stubSetData,
+        },
       };
       const p = document.createElement("p");
       const spy = sinon.spy(p, "dispatchEvent");
@@ -692,7 +696,7 @@ describe("content", () => {
       assert.isTrue(stubSetData.called, "called");
       assert.isTrue(spy.called, "called");
       assert.isTrue(res, "result");
-      delete DataTransfer.prototype.wrappedJSObject;
+      delete InputEvent.prototype.wrappedJSObject;
     });
   });
 

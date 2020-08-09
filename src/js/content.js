@@ -332,14 +332,14 @@ const dispatchInputEvent = (elm, type, opt) => {
     const evt = new InputEvent(type, opt);
     const {dataTransfer} = opt;
     if (dataTransfer) {
-      const {types} = dataTransfer;
       if (!evt.dataTransfer) {
         evt.dataTransfer = new DataTransfer();
       }
+      const {types} = dataTransfer;
       for (const mime of types) {
         const value = dataTransfer.getData(mime);
-        if (evt.dataTransfer.wrappedJSObject) {
-          evt.dataTransfer.wrappedJSObject.setData(mime, value);
+        if (evt.wrappedJSObject) {
+          evt.wrappedJSObject.dataTransfer.setData(mime, value);
         } else {
           evt.dataTransfer.setData(mime, value);
         }
