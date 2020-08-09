@@ -269,7 +269,7 @@ const dispatchEvent = (target, type, opt) => {
 const dispatchClipboardEvent = (elm, type, opt = {
   bubbles: true,
   cancelable: true,
-  clipboardData: null,
+  composed: true,
 }) => {
   let res;
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
@@ -338,7 +338,11 @@ const dispatchInputEvent = (elm, type, opt) => {
       }
       for (const mime of types) {
         const value = dataTransfer.getData(mime);
-        evt.dataTransfer.setData(mime, value);
+        if (evt.dataTransfer.wrappedJSObject) {
+          evt.dataTransfer.wrappedJSObject.setData(mime, value);
+        } else {
+          evt.dataTransfer.setData(mime, value);
+        }
       }
     }
     res = elm.dispatchEvent(evt);
