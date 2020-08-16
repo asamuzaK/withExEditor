@@ -1660,6 +1660,7 @@ const replaceEditableContent = (node, opt = {}) => {
       });
       if (res) {
         // TODO: StaticRange() constructor not implemented in Blink yet
+        // See https://bugs.chromium.org/p/chromium/issues/detail?id=992606
         /*
         const insertTarget = new StaticRange({
           startContainer: sel.anchorNode,
@@ -1676,6 +1677,7 @@ const replaceEditableContent = (node, opt = {}) => {
           collapsed: sel.isCollapsed,
         };
         // TODO: beforeinput not enabled by default in Gecko yet
+        // See https://bugzilla.mozilla.org/show_bug.cgi?id=1609291
         try {
           res = dispatchInputEvent(node, "beforeinput", {
             dataTransfer,
