@@ -680,8 +680,7 @@ const getText = (nodes, pre = false) => {
     const blocks = [
       "address", "article", "aside", "blockquote", "details", "dialog", "dd",
       "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form",
-      "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table",
-      "ul",
+      "header", "li", "main", "nav", "ol", "p", "pre", "section", "table", "ul",
     ];
     const headings = ["h1", "h2", "h3", "h4", "h5", "h6", "hgroup"];
     const phrasings = [
@@ -691,7 +690,7 @@ const getText = (nodes, pre = false) => {
       "var",
     ];
     for (const node of nodeArr) {
-      const parent = node.parentNode;
+      const {lastChild: child, parentNode: parent} = node;
       pre = pre || parent.localName === "pre";
       if (node && node.nodeType === Node.ELEMENT_NODE) {
         if (node.hasChildNodes()) {
@@ -699,31 +698,29 @@ const getText = (nodes, pre = false) => {
           if (blocks.includes(parent.localName) ||
               headings.includes(parent.localName)) {
             if (node === parent.lastChild) {
-              arr.push("\n");
+              (child.nodeType === Node.TEXT_NODE && child.nodeValue ||
+               child.nodeType === Node.ELEMENT_NODE &&
+               phrasings.includes(node.localName) &&
+               phrasings.includes(child.localName)) && arr.push("\n");
             } else {
               !pre && phrasings.includes(node.localName) && arr.push(" ");
             }
           }
         } else {
+          // TODO: How to handle other empty elements? img, hr
           node.localName === "br" && arr.push("\n");
         }
       } else if (node && node.nodeType === Node.TEXT_NODE) {
         if (pre) {
           arr.push(node.nodeValue);
-        } else if (headings.includes(parent.localName) &&
+        } else if ((blocks.includes(parent.localName) ||
+                    headings.includes(parent.localName)) &&
                    node === parent.lastChild) {
           arr.push(
-            node.nodeValue.replace(/^\s*/, "")
-              .replace(/([^\n])$/, (m, c) => `${c}\n\n`),
+            node.nodeValue.trim().replace(/([^\n])$/, (m, c) => `${c}\n`),
           );
-        } else if (phrasings.includes(parent.localName) &&
-                   node === parent.lastChild) {
-          arr.push(node.nodeValue.replace(/^\s*/, ""));
         } else {
-          arr.push(
-            node.nodeValue.replace(/^\s*/, "")
-              .replace(/([^\n])$/, (m, c) => `${c}\n`),
-          );
+          arr.push(node.nodeValue.trim());
         }
       }
     }
