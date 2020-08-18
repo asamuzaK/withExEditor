@@ -690,16 +690,17 @@ const getText = (nodes, pre = false) => {
       "var",
     ];
     const spacings = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
-    // TODO: tables
-    //const tabdelims = ["td", "th"];
+    const tablecells = ["td", "th"];
+    const tablerows = ["tr"];
     for (const node of nodeArr) {
       const {lastChild: child, parentNode: parent} = node;
       pre = pre || parent.localName === "pre";
       if (node && node.nodeType === Node.ELEMENT_NODE) {
         if (node.hasChildNodes()) {
-          node !== parent.firstElementChild &&
-          spacings.includes(node.localName) &&
+          if (spacings.includes(node.localName) &&
+              node !== parent.firstElementChild) {
             arr.push("\n");
+          }
           arr.push(getText(node.childNodes, pre));
           if (blocks.includes(parent.localName) ||
               spacings.includes(parent.localName)) {
@@ -712,10 +713,15 @@ const getText = (nodes, pre = false) => {
               !pre && phrasings.includes(node.localName) && arr.push(" ");
             }
           }
-          node !== parent.lastElementChild &&
-          spacings.includes(node.localName) &&
-          !spacings.includes(node.nextElementSibling.localName) &&
+          if (tablecells.includes(node.localName) &&
+              node !== parent.lastElementChild) {
+            arr.push("\t");
+          } else if (tablerows.includes(node.localName) ||
+                     spacings.includes(node.localName) &&
+                     node !== parent.lastElementChild &&
+                     !spacings.includes(node.nextElementSibling.localName)) {
             arr.push("\n");
+          }
         } else {
           // TODO: How to handle other empty elements? img, hr
           node.localName === "br" && arr.push("\n");

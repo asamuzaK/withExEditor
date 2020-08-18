@@ -1558,6 +1558,36 @@ describe("content", () => {
       const res = func(document.querySelectorAll("pre"));
       assert.strictEqual(res, "  foo bar\n  baz qux quux\n", "result");
     });
+
+    it("should get string", () => {
+      const table = document.createElement("table");
+      const tr = document.createElement("tr");
+      const tr2 = document.createElement("tr");
+      const th = document.createElement("th");
+      const th2 = document.createElement("th");
+      const th3 = document.createElement("th");
+      const td = document.createElement("td");
+      const td2 = document.createElement("td");
+      const td3 = document.createElement("td");
+      const body = document.querySelector("body");
+      th.textContent = "foo";
+      th2.textContent = "bar";
+      th3.textContent = "baz";
+      td.textContent = "qux";
+      td2.textContent = "quux";
+      td3.textContent = "corge";
+      tr.appendChild(th);
+      tr.appendChild(th2);
+      tr.appendChild(th3);
+      tr2.appendChild(td);
+      tr2.appendChild(td2);
+      tr2.appendChild(td3);
+      table.appendChild(tr);
+      table.appendChild(tr2);
+      body.appendChild(table);
+      const res = func(document.querySelectorAll("table"));
+      assert.strictEqual(res, "foo\tbar\tbaz\nqux\tquux\tcorge\n", "result");
+    });
   });
 
   describe("get ancestor element ID", () => {
