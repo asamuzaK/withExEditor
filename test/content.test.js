@@ -1499,7 +1499,7 @@ describe("content", () => {
       const h1 = document.createElement("h1");
       const p = document.createElement("p");
       const p2 = document.createElement("p");
-      const p3 = document.createElement("p3");
+      const p3 = document.createElement("p");
       const img = document.createElement("img");
       const cmt = document.createComment("comment");
       const body = document.querySelector("body");
@@ -1515,7 +1515,31 @@ describe("content", () => {
       sec.appendChild(p3);
       body.appendChild(sec);
       const res = func(document.querySelectorAll("section"));
-      assert.strictEqual(res, "foo bar\nbaz qux\nquux\ncorge\n", "result");
+      assert.strictEqual(res, "foo bar\n\nbaz qux\n\nquux\n\ncorge\n\n", "result");
+    });
+
+    it("should get string", () => {
+      const sec = document.createElement("section");
+      const h1 = document.createElement("h1");
+      const p = document.createElement("div");
+      const p2 = document.createElement("div");
+      const p3 = document.createElement("div");
+      const img = document.createElement("img");
+      const cmt = document.createComment("comment");
+      const body = document.querySelector("body");
+      h1.textContent = "foo bar";
+      p.textContent = "  baz qux";
+      p2.textContent = "  quux";
+      p3.appendChild(img);
+      p3.appendChild(document.createTextNode("corge"));
+      sec.appendChild(h1);
+      sec.appendChild(p);
+      sec.appendChild(cmt);
+      sec.appendChild(p2);
+      sec.appendChild(p3);
+      body.appendChild(sec);
+      const res = func(document.querySelectorAll("section"));
+      assert.strictEqual(res, "foo bar\n\nbaz qux\nquux\ncorge\n\n", "result");
     });
 
     it("should get string", () => {
@@ -2269,7 +2293,39 @@ describe("content", () => {
       div.appendChild(sec);
       body.appendChild(div);
       const res = func(body, "baz");
-      assert.strictEqual(res, "foo bar\nbaz qux\nquux\ncorge\n\n",
+      assert.strictEqual(res, "foo bar\n\nbaz qux\n\nquux\n\ncorge\n\n",
+                         "result");
+    });
+
+    it("should get result", () => {
+      const div = document.createElement("div");
+      const sec = document.createElement("section");
+      const h1 = document.createElement("h1");
+      const p = document.createElement("div");
+      const p2 = document.createElement("div");
+      const p3 = document.createElement("div");
+      const img = document.createElement("img");
+      const cmt = document.createComment("comment");
+      const body = document.querySelector("body");
+      div.setAttribute("contenteditable", "true");
+      if (typeof div.isContentEditable !== "boolean") {
+        div.isContentEditable = isContentEditable(div);
+      }
+      div.id = "baz";
+      h1.textContent = "foo bar";
+      p.textContent = "  baz qux";
+      p2.textContent = "  quux";
+      p3.appendChild(img);
+      p3.appendChild(document.createTextNode("corge"));
+      sec.appendChild(h1);
+      sec.appendChild(p);
+      sec.appendChild(cmt);
+      sec.appendChild(p2);
+      sec.appendChild(p3);
+      div.appendChild(sec);
+      body.appendChild(div);
+      const res = func(body, "baz");
+      assert.strictEqual(res, "foo bar\n\nbaz qux\nquux\ncorge\n\n",
                          "result");
     });
   });

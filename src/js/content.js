@@ -680,23 +680,29 @@ const getText = (nodes, pre = false) => {
     const blocks = [
       "address", "article", "aside", "blockquote", "details", "dialog", "dd",
       "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form",
-      "header", "li", "main", "nav", "ol", "p", "pre", "section", "table", "ul",
+      "header", "hgroup", "li", "main", "nav", "ol", "pre", "section", "table",
+      "ul",
     ];
-    const headings = ["h1", "h2", "h3", "h4", "h5", "h6", "hgroup"];
     const phrasings = [
       "a", "abbr", "b", "bdo", "cite", "code", "data", "datalist", "del", "dfn",
       "em", "i", "ins", "kbd", "mark", "map", "meter", "output", "progress",
       "q", "ruby", "samp", "small", "span", "strong", "sub", "sup", "time",
       "var",
     ];
+    const spacings = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
+    // TODO: tables
+    //const tabdelims = ["td", "th"];
     for (const node of nodeArr) {
       const {lastChild: child, parentNode: parent} = node;
       pre = pre || parent.localName === "pre";
       if (node && node.nodeType === Node.ELEMENT_NODE) {
         if (node.hasChildNodes()) {
+          node !== parent.firstElementChild &&
+          spacings.includes(node.localName) &&
+            arr.push("\n");
           arr.push(getText(node.childNodes, pre));
           if (blocks.includes(parent.localName) ||
-              headings.includes(parent.localName)) {
+              spacings.includes(parent.localName)) {
             if (node === parent.lastChild) {
               (child.nodeType === Node.TEXT_NODE && child.nodeValue ||
                child.nodeType === Node.ELEMENT_NODE &&
@@ -706,6 +712,10 @@ const getText = (nodes, pre = false) => {
               !pre && phrasings.includes(node.localName) && arr.push(" ");
             }
           }
+          node !== parent.lastElementChild &&
+          spacings.includes(node.localName) &&
+          !spacings.includes(node.nextElementSibling.localName) &&
+            arr.push("\n");
         } else {
           // TODO: How to handle other empty elements? img, hr
           node.localName === "br" && arr.push("\n");
@@ -714,7 +724,7 @@ const getText = (nodes, pre = false) => {
         if (pre) {
           arr.push(node.nodeValue);
         } else if ((blocks.includes(parent.localName) ||
-                    headings.includes(parent.localName)) &&
+                    spacings.includes(parent.localName)) &&
                    node === parent.lastChild) {
           arr.push(
             node.nodeValue.trim().replace(/([^\n])$/, (m, c) => `${c}\n`),
