@@ -677,6 +677,7 @@ const getText = (nodes, pre = false) => {
   const arr = [];
   const nodeArr = nodes && Array.from(nodes);
   if (nodeArr) {
+    const alttexts = ["area", "img", "input"];
     const blocks = [
       "address", "article", "aside", "blockquote", "details", "dialog", "dd",
       "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form",
@@ -693,50 +694,66 @@ const getText = (nodes, pre = false) => {
     const tablecells = ["td", "th"];
     const tablerows = ["tr"];
     for (const node of nodeArr) {
-      const {lastChild: child, parentNode: parent} = node;
-      pre = pre || parent.localName === "pre";
-      if (node && node.nodeType === Node.ELEMENT_NODE) {
+      const {
+        lastChild, localName: nodeName, nodeType, nodeValue: value, parentNode,
+      } = node;
+      const {
+        firstElementChild: parentFirstElmChild,
+        lastElementChild: parentLastElmChild,
+        lastChild: parentLastChild, localName: parentName,
+      } = parentNode;
+      const isParentBlock = blocks.includes(parentName) ||
+                            spacings.includes(parentName);
+      pre = pre || parentName === "pre";
+      if (nodeType === Node.ELEMENT_NODE) {
         if (node.hasChildNodes()) {
-          if (spacings.includes(node.localName) &&
-              node !== parent.firstElementChild) {
+          if (spacings.includes(nodeName) && node !== parentFirstElmChild) {
             arr.push("\n");
           }
           arr.push(getText(node.childNodes, pre));
-          if (blocks.includes(parent.localName) ||
-              spacings.includes(parent.localName)) {
-            if (node === parent.lastChild) {
-              (child.nodeType === Node.TEXT_NODE && child.nodeValue ||
-               child.nodeType === Node.ELEMENT_NODE &&
-               phrasings.includes(node.localName) &&
-               phrasings.includes(child.localName)) && arr.push("\n");
+          if (isParentBlock) {
+            if (node === parentLastChild) {
+              const isLastChild = lastChild.nodeType === Node.TEXT_NODE &&
+                                  lastChild.nodeValue ||
+                                  lastChild.nodeType === Node.ELEMENT_NODE &&
+                                  phrasings.includes(nodeName) &&
+                                  phrasings.includes(lastChild.localName);
+              isLastChild && arr.push("\n");
             } else {
-              !pre && phrasings.includes(node.localName) && arr.push(" ");
+              !pre && phrasings.includes(nodeName) && arr.push(" ");
             }
           }
-          if (tablecells.includes(node.localName) &&
-              node !== parent.lastElementChild) {
+          if (tablecells.includes(nodeName) && node !== parentLastElmChild) {
             arr.push("\t");
-          } else if (tablerows.includes(node.localName) ||
-                     spacings.includes(node.localName) &&
-                     node !== parent.lastElementChild &&
+          } else if (tablerows.includes(nodeName) ||
+                     spacings.includes(nodeName) &&
+                     node !== parentLastElmChild &&
                      !spacings.includes(node.nextElementSibling.localName)) {
             arr.push("\n");
           }
+        } else if (alttexts.includes(nodeName)) {
+          if ((nodeName !== "input" || node.type === "image") && node.alt) {
+            arr.push(node.alt);
+            if (isParentBlock &&
+                (node === parentLastChild ||
+                 node === parentLastElmChild &&
+                 node.nextSibling.nodeType === Node.TEXT_NODE &&
+                 /^\s*$/.test(node.nextSibling.nodeValue))) {
+              arr.push("\n");
+            } else {
+              arr.push(" ");
+            }
+          }
         } else {
-          // TODO: How to handle other empty elements? img, hr
-          node.localName === "br" && arr.push("\n");
+          nodeName === "br" && arr.push("\n");
         }
-      } else if (node && node.nodeType === Node.TEXT_NODE) {
+      } else if (nodeType === Node.TEXT_NODE) {
         if (pre) {
-          arr.push(node.nodeValue);
-        } else if ((blocks.includes(parent.localName) ||
-                    spacings.includes(parent.localName)) &&
-                   node === parent.lastChild) {
-          arr.push(
-            node.nodeValue.trim().replace(/([^\n])$/, (m, c) => `${c}\n`),
-          );
+          arr.push(value);
+        } else if (isParentBlock && node === parentLastChild) {
+          arr.push(value.trim().replace(/([^\n])$/, (m, c) => `${c}\n`));
         } else {
-          arr.push(node.nodeValue.trim());
+          arr.push(value.trim());
         }
       }
     }

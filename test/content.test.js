@@ -1588,6 +1588,74 @@ describe("content", () => {
       const res = func(document.querySelectorAll("table"));
       assert.strictEqual(res, "foo\tbar\tbaz\nqux\tquux\tcorge\n", "result");
     });
+
+    it("should get empty string", () => {
+      const p = document.createElement("p");
+      const img = document.createElement("img");
+      const body = document.querySelector("body");
+      p.appendChild(img);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const img = document.createElement("img");
+      const body = document.querySelector("body");
+      img.alt = "foo";
+      p.appendChild(img);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const img = document.createElement("img");
+      const body = document.querySelector("body");
+      img.alt = "foo";
+      p.appendChild(img);
+      p.appendChild(document.createTextNode(" "));
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const img = document.createElement("img");
+      const body = document.querySelector("body");
+      img.alt = "foo";
+      p.appendChild(img);
+      p.appendChild(document.createTextNode("  bar  "));
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo bar\n", "result");
+    });
+
+    it("should get empty string", () => {
+      const p = document.createElement("p");
+      const input = document.createElement("input");
+      const body = document.querySelector("body");
+      input.alt = "foo";
+      p.appendChild(input);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const input = document.createElement("input");
+      const body = document.querySelector("body");
+      input.alt = "foo";
+      input.type = "image";
+      p.appendChild(input);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
   });
 
   describe("get ancestor element ID", () => {
