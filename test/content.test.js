@@ -1353,19 +1353,145 @@ describe("content", () => {
       assert.strictEqual(res, "", "result");
     });
 
+    it("should get empty string", () => {
+      const p = document.createElement("p");
+      const body = document.querySelector("body");
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "", "result");
+    });
+
+    it("should get empty string", () => {
+      const p = document.createElement("p");
+      const body = document.querySelector("body");
+      p.textContent = "\n";
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "", "result");
+    });
+
+    it("should get empty string", () => {
+      const p = document.createElement("p");
+      const body = document.querySelector("body");
+      p.textContent = " ";
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const body = document.querySelector("body");
+      p.textContent = "foo";
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const body = document.querySelector("body");
+      p.textContent = " foo ";
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const body = document.querySelector("body");
+      p.textContent = " foo \n";
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get empty string", () => {
+      const p = document.createElement("p");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = "";
+      p.appendChild(span);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "", "result");
+    });
+
     it("should get string", () => {
       const p = document.createElement("p");
       const span = document.createElement("span");
-      const br = document.createElement("br");
       const body = document.querySelector("body");
-      p.textContent = "foo";
-      span.textContent = "bar";
-      p.appendChild(br);
+      span.textContent = "foo";
       p.appendChild(span);
-      p.appendChild(document.createTextNode("  baz  qux"));
       body.appendChild(p);
       const res = func(document.querySelectorAll("p"));
-      assert.strictEqual(res, "foo\n\nbar baz  qux\n", "result");
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = " foo ";
+      p.appendChild(span);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const em = document.createElement("em");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = "foo";
+      em.appendChild(span);
+      p.appendChild(em);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const em = document.createElement("em");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = "foo";
+      em.textContent = "bar";
+      p.appendChild(span);
+      p.appendChild(document.createTextNode(" "));
+      p.appendChild(em);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo bar\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const br = document.createElement("br");
+      const body = document.querySelector("body");
+      p.appendChild(br);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "\n", "result");
+    });
+
+    it("should get string", () => {
+      const pre = document.createElement("pre");
+      const span = document.createElement("span");
+      const span2 = document.createElement("span");
+      const body = document.querySelector("body");
+      pre.appendChild(document.createTextNode("  foo bar\n  "));
+      span.textContent = "baz";
+      pre.appendChild(span);
+      pre.appendChild(document.createTextNode(" qux "));
+      span2.textContent = "quux";
+      pre.appendChild(span2);
+      pre.appendChild(document.createTextNode("\n"));
+      body.appendChild(pre);
+      const res = func(document.querySelectorAll("pre"));
+      assert.strictEqual(res, "  foo bar\n  baz qux quux\n", "result");
     });
 
     it("should get string", () => {
@@ -1373,7 +1499,31 @@ describe("content", () => {
       const h1 = document.createElement("h1");
       const p = document.createElement("p");
       const p2 = document.createElement("p");
-      const p3 = document.createElement("p3");
+      const p3 = document.createElement("p");
+      const img = document.createElement("img");
+      const cmt = document.createComment("comment");
+      const body = document.querySelector("body");
+      h1.textContent = "foo bar";
+      p.textContent = "  baz qux";
+      p2.textContent = "  quux";
+      p3.appendChild(img);
+      p3.appendChild(document.createTextNode("corge"));
+      sec.appendChild(h1);
+      sec.appendChild(p);
+      sec.appendChild(cmt);
+      sec.appendChild(p2);
+      sec.appendChild(p3);
+      body.appendChild(sec);
+      const res = func(document.querySelectorAll("section"));
+      assert.strictEqual(res, "foo bar\n\nbaz qux\n\nquux\n\ncorge\n\n", "result");
+    });
+
+    it("should get string", () => {
+      const sec = document.createElement("section");
+      const h1 = document.createElement("h1");
+      const p = document.createElement("div");
+      const p2 = document.createElement("div");
+      const p3 = document.createElement("div");
       const img = document.createElement("img");
       const cmt = document.createComment("comment");
       const body = document.querySelector("body");
@@ -1407,6 +1557,104 @@ describe("content", () => {
       body.appendChild(pre);
       const res = func(document.querySelectorAll("pre"));
       assert.strictEqual(res, "  foo bar\n  baz qux quux\n", "result");
+    });
+
+    it("should get string", () => {
+      const table = document.createElement("table");
+      const tr = document.createElement("tr");
+      const tr2 = document.createElement("tr");
+      const th = document.createElement("th");
+      const th2 = document.createElement("th");
+      const th3 = document.createElement("th");
+      const td = document.createElement("td");
+      const td2 = document.createElement("td");
+      const td3 = document.createElement("td");
+      const body = document.querySelector("body");
+      th.textContent = "foo";
+      th2.textContent = "bar";
+      th3.textContent = "baz";
+      td.textContent = "qux";
+      td2.textContent = "quux";
+      td3.textContent = "corge";
+      tr.appendChild(th);
+      tr.appendChild(th2);
+      tr.appendChild(th3);
+      tr2.appendChild(td);
+      tr2.appendChild(td2);
+      tr2.appendChild(td3);
+      table.appendChild(tr);
+      table.appendChild(tr2);
+      body.appendChild(table);
+      const res = func(document.querySelectorAll("table"));
+      assert.strictEqual(res, "foo\tbar\tbaz\nqux\tquux\tcorge\n", "result");
+    });
+
+    it("should get empty string", () => {
+      const p = document.createElement("p");
+      const img = document.createElement("img");
+      const body = document.querySelector("body");
+      p.appendChild(img);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const img = document.createElement("img");
+      const body = document.querySelector("body");
+      img.alt = "foo";
+      p.appendChild(img);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const img = document.createElement("img");
+      const body = document.querySelector("body");
+      img.alt = "foo";
+      p.appendChild(img);
+      p.appendChild(document.createTextNode(" "));
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const img = document.createElement("img");
+      const body = document.querySelector("body");
+      img.alt = "foo";
+      p.appendChild(img);
+      p.appendChild(document.createTextNode("  bar  "));
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo bar\n", "result");
+    });
+
+    it("should get empty string", () => {
+      const p = document.createElement("p");
+      const input = document.createElement("input");
+      const body = document.querySelector("body");
+      input.alt = "foo";
+      p.appendChild(input);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
+      const input = document.createElement("input");
+      const body = document.querySelector("body");
+      input.alt = "foo";
+      input.type = "image";
+      p.appendChild(input);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"));
+      assert.strictEqual(res, "foo\n", "result");
     });
   });
 
@@ -2121,7 +2369,7 @@ describe("content", () => {
       const h1 = document.createElement("h1");
       const p = document.createElement("p");
       const p2 = document.createElement("p");
-      const p3 = document.createElement("p3");
+      const p3 = document.createElement("p");
       const img = document.createElement("img");
       const cmt = document.createComment("comment");
       const body = document.querySelector("body");
@@ -2143,7 +2391,39 @@ describe("content", () => {
       div.appendChild(sec);
       body.appendChild(div);
       const res = func(body, "baz");
-      assert.strictEqual(res, "foo bar\n\nbaz qux\nquux\ncorge\n\n\n",
+      assert.strictEqual(res, "foo bar\n\nbaz qux\n\nquux\n\ncorge\n\n",
+                         "result");
+    });
+
+    it("should get result", () => {
+      const div = document.createElement("div");
+      const sec = document.createElement("section");
+      const h1 = document.createElement("h1");
+      const p = document.createElement("div");
+      const p2 = document.createElement("div");
+      const p3 = document.createElement("div");
+      const img = document.createElement("img");
+      const cmt = document.createComment("comment");
+      const body = document.querySelector("body");
+      div.setAttribute("contenteditable", "true");
+      if (typeof div.isContentEditable !== "boolean") {
+        div.isContentEditable = isContentEditable(div);
+      }
+      div.id = "baz";
+      h1.textContent = "foo bar";
+      p.textContent = "  baz qux";
+      p2.textContent = "  quux";
+      p3.appendChild(img);
+      p3.appendChild(document.createTextNode("corge"));
+      sec.appendChild(h1);
+      sec.appendChild(p);
+      sec.appendChild(cmt);
+      sec.appendChild(p2);
+      sec.appendChild(p3);
+      div.appendChild(sec);
+      body.appendChild(div);
+      const res = func(body, "baz");
+      assert.strictEqual(res, "foo bar\n\nbaz qux\nquux\ncorge\n\n",
                          "result");
     });
   });
@@ -3211,7 +3491,7 @@ describe("content", () => {
       const res = await func(text, MODE_EDIT);
       assert.strictEqual(res.mode, MODE_EDIT, "mode");
       assert.strictEqual(res.dataId, "html_text_0", "dataId");
-      assert.strictEqual(res.value, "foo\n", "value");
+      assert.strictEqual(res.value, "foo", "value");
       assert.strictEqual(res.namespaceURI, "http://www.w3.org/2000/svg", "ns");
       assert.strictEqual(cjs.dataIds.size, 1, "size");
       assert.isTrue(cjs.dataIds.has("html_text_0"), "dataId");
@@ -3261,7 +3541,7 @@ describe("content", () => {
       const res = await func(text, MODE_EDIT);
       assert.strictEqual(res.mode, MODE_EDIT, "mode");
       assert.strictEqual(res.dataId, "html_text_0", "dataId");
-      assert.strictEqual(res.value, "foo\n", "value");
+      assert.strictEqual(res.value, "foo", "value");
       assert.strictEqual(res.namespaceURI, "http://www.w3.org/2000/svg", "ns");
       assert.strictEqual(cjs.dataIds.size, 1, "size");
       assert.isTrue(cjs.dataIds.has("html_text_0"), "dataId");

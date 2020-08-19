@@ -677,53 +677,83 @@ const getText = (nodes, pre = false) => {
   const arr = [];
   const nodeArr = nodes && Array.from(nodes);
   if (nodeArr) {
+    const alttexts = ["area", "img", "input"];
     const blocks = [
       "address", "article", "aside", "blockquote", "details", "dialog", "dd",
       "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form",
-      "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table",
+      "header", "hgroup", "li", "main", "nav", "ol", "pre", "section", "table",
       "ul",
     ];
-    const headings = ["h1", "h2", "h3", "h4", "h5", "h6", "hgroup"];
     const phrasings = [
       "a", "abbr", "b", "bdo", "cite", "code", "data", "datalist", "del", "dfn",
       "em", "i", "ins", "kbd", "mark", "map", "meter", "output", "progress",
       "q", "ruby", "samp", "small", "span", "strong", "sub", "sup", "time",
       "var",
     ];
+    const spacings = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
+    const tablecells = ["td", "th"];
+    const tablerows = ["tr"];
     for (const node of nodeArr) {
-      const parent = node.parentNode;
-      pre = pre || parent.localName === "pre";
-      if (node && node.nodeType === Node.ELEMENT_NODE) {
+      const {
+        lastChild, localName: nodeName, nodeType, nodeValue: value, parentNode,
+      } = node;
+      const {
+        firstElementChild: parentFirstElmChild,
+        lastElementChild: parentLastElmChild,
+        lastChild: parentLastChild, localName: parentName,
+      } = parentNode;
+      const isParentBlock = blocks.includes(parentName) ||
+                            spacings.includes(parentName);
+      pre = pre || parentName === "pre";
+      if (nodeType === Node.ELEMENT_NODE) {
         if (node.hasChildNodes()) {
+          if (spacings.includes(nodeName) && node !== parentFirstElmChild) {
+            arr.push("\n");
+          }
           arr.push(getText(node.childNodes, pre));
-          if (blocks.includes(parent.localName) ||
-              headings.includes(parent.localName)) {
-            if (node === parent.lastChild) {
+          if (isParentBlock) {
+            if (node === parentLastChild) {
+              const isLastChild = lastChild.nodeType === Node.TEXT_NODE &&
+                                  lastChild.nodeValue ||
+                                  lastChild.nodeType === Node.ELEMENT_NODE &&
+                                  phrasings.includes(nodeName) &&
+                                  phrasings.includes(lastChild.localName);
+              isLastChild && arr.push("\n");
+            } else {
+              !pre && phrasings.includes(nodeName) && arr.push(" ");
+            }
+          }
+          if (tablecells.includes(nodeName) && node !== parentLastElmChild) {
+            arr.push("\t");
+          } else if (tablerows.includes(nodeName) ||
+                     spacings.includes(nodeName) &&
+                     node !== parentLastElmChild &&
+                     !spacings.includes(node.nextElementSibling.localName)) {
+            arr.push("\n");
+          }
+        } else if (alttexts.includes(nodeName)) {
+          if ((nodeName !== "input" || node.type === "image") && node.alt) {
+            arr.push(node.alt);
+            if (isParentBlock &&
+                (node === parentLastChild ||
+                 node === parentLastElmChild &&
+                 node.nextSibling.nodeType === Node.TEXT_NODE &&
+                 /^\s*$/.test(node.nextSibling.nodeValue))) {
               arr.push("\n");
             } else {
-              !pre && phrasings.includes(node.localName) && arr.push(" ");
+              arr.push(" ");
             }
           }
         } else {
-          node.localName === "br" && arr.push("\n");
+          nodeName === "br" && arr.push("\n");
         }
-      } else if (node && node.nodeType === Node.TEXT_NODE) {
+      } else if (nodeType === Node.TEXT_NODE) {
         if (pre) {
-          arr.push(node.nodeValue);
-        } else if (headings.includes(parent.localName) &&
-                   node === parent.lastChild) {
-          arr.push(
-            node.nodeValue.replace(/^\s*/, "")
-              .replace(/([^\n])$/, (m, c) => `${c}\n\n`),
-          );
-        } else if (phrasings.includes(parent.localName) &&
-                   node === parent.lastChild) {
-          arr.push(node.nodeValue.replace(/^\s*/, ""));
+          arr.push(value);
+        } else if (isParentBlock && node === parentLastChild) {
+          arr.push(value.trim().replace(/([^\n])$/, (m, c) => `${c}\n`));
         } else {
-          arr.push(
-            node.nodeValue.replace(/^\s*/, "")
-              .replace(/([^\n])$/, (m, c) => `${c}\n`),
-          );
+          arr.push(value.trim());
         }
       }
     }
