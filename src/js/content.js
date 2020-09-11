@@ -956,7 +956,7 @@ const getLiveEditElm = node => {
     const isHtml = !namespaceURI || namespaceURI === nsURI.html;
     if (isHtml) {
       for (const item of items) {
-        const {className, getContent, isIframe, setContent} = item;
+        const {attributes, className, getContent, isIframe, setContent} = item;
         if (isIframe) {
           const iframes = node.querySelectorAll("iframe");
           for (const iframe of iframes) {
@@ -969,9 +969,25 @@ const getLiveEditElm = node => {
             }
           }
         } else if (classList.contains(className)) {
-          elm = node;
-          !elm.isContentEditable && elm.setAttribute("contenteditable", "");
-          break;
+          if (attributes) {
+            const attrs = Object.entries(attributes);
+            let bool;
+            for (const [key, value] of attrs) {
+              bool = node.hasAttribute(key) && node.getAttribute(key) === value;
+              if (!bool) {
+                break;
+              }
+            }
+            if (bool) {
+              elm = node;
+            }
+          } else {
+            elm = node;
+          }
+          if (elm) {
+            !elm.isContentEditable && elm.setAttribute("contenteditable", "");
+            break;
+          }
         }
       }
     }

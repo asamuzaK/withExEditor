@@ -2180,6 +2180,15 @@ describe("content", () => {
           getContent: "#qux",
           setContent: "#qux",
         },
+        corge: {
+          className: "corge",
+          attributes: {
+            role: "textbox",
+            "aria-multiline": "true",
+          },
+          getContent: "_self",
+          setContent: "_self",
+        },
       };
       const items = Object.entries(editors);
       for (const [key, value] of items) {
@@ -2272,6 +2281,30 @@ describe("content", () => {
       iframe.contentDocument.body.appendChild(elm);
       const res = func(div);
       assert.deepEqual(res, iframe, "result");
+    });
+
+    it("should get null", () => {
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      elm.classList.add("corge");
+      elm.setAttribute("contenteditable", "true");
+      elm.setAttribute("role", "textbox");
+      elm.setAttribute("aria-multiline", "false");
+      body.appendChild(elm);
+      const res = func(elm);
+      assert.isNull(res, "result");
+    });
+
+    it("should get element", () => {
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      elm.classList.add("corge");
+      elm.setAttribute("contenteditable", "true");
+      elm.setAttribute("role", "textbox");
+      elm.setAttribute("aria-multiline", "true");
+      body.appendChild(elm);
+      const res = func(elm);
+      assert.deepEqual(res, elm, "result");
     });
   });
 
