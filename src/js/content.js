@@ -41,6 +41,7 @@ const NS_URI = "nsURI";
 const ONLY_EDITABLE = "enableOnlyEditable";
 const PORT_CONNECT = "connectPort";
 const PORT_CONTENT = "portContent";
+const SELF = "_self";
 const SUBST = "index";
 const SYNC_AUTO = "enableSyncAuto";
 const SYNC_AUTO_URL = "syncAutoUrls";
@@ -695,7 +696,8 @@ const getText = (nodes, pre = false) => {
     const tablerows = ["tr"];
     for (const node of nodeArr) {
       const {
-        lastChild, localName: nodeName, nodeType, nodeValue: value, parentNode,
+        lastChild, localName: nodeName, nextElementSibling: nextElm, nodeType,
+        nodeValue: value, parentNode,
       } = node;
       const {
         firstElementChild: parentFirstElmChild,
@@ -720,7 +722,9 @@ const getText = (nodes, pre = false) => {
                                   phrasings.includes(lastChild.localName);
               isLastChild && arr.push("\n");
             } else {
-              !pre && phrasings.includes(nodeName) && arr.push(" ");
+              const isPhrase = (!nextElm || nextElm.localName !== "br") &&
+                               !pre && phrasings.includes(nodeName);
+              isPhrase && arr.push(" ");
             }
           }
           if (tablecells.includes(nodeName) && node !== parentLastElmChild) {
@@ -1008,7 +1012,9 @@ const getLiveEditContent = (elm, key) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE && liveEdit.has(key)) {
     const {getContent, isIframe} = liveEdit.get(key);
     let items;
-    if (isIframe && elm.contentDocument) {
+    if (getContent === SELF) {
+      items = [elm];
+    } else if (isIframe && elm.contentDocument) {
       items = elm.contentDocument.querySelectorAll(getContent);
     } else {
       items = elm.querySelectorAll(getContent);
@@ -1825,7 +1831,9 @@ const replaceLiveEditContent = (elm, opt = {}) => {
     const {isIframe, setContent} = liveEdit.get(liveEditKey);
     const data = dataIds.get(dataId);
     let liveElm;
-    if (isIframe && elm.contentDocument) {
+    if (setContent === SELF) {
+      liveElm = elm;
+    } else if (isIframe && elm.contentDocument) {
       liveElm = elm.contentDocument.querySelector(setContent);
     } else {
       liveElm = elm.querySelector(setContent);
