@@ -41,9 +41,23 @@ const NS_URI = "nsURI";
 const ONLY_EDITABLE = "enableOnlyEditable";
 const PORT_CONNECT = "connectPort";
 const PORT_CONTENT = "portContent";
+const SELF = "_self";
 const SUBST = "index";
 const SYNC_AUTO = "enableSyncAuto";
 const SYNC_AUTO_URL = "syncAutoUrls";
+const TAGS_ALT = ["area", "img", "input"];
+const TAGS_BLOCK = [
+  "address", "article", "aside", "blockquote", "details", "dialog", "dd", "div",
+  "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "header",
+  "hgroup", "li", "main", "nav", "ol", "pre", "section", "table", "ul",
+];
+const TAGS_PHRASING = [
+  "a", "abbr", "b", "bdo", "cite", "code", "data", "datalist", "del", "dfn",
+  "em", "i", "ins", "kbd", "mark", "map", "meter", "output", "progress", "q",
+  "ruby", "samp", "small", "span", "strong", "sub", "sup", "time", "var",
+];
+const TAGS_SPACING = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
+const TAGS_CELL = ["td", "th"];
 const TMP_FILES = "tmpFiles";
 const TMP_FILES_PB = "tmpFilesPb";
 const TMP_FILE_CREATE = "createTmpFile";
@@ -677,84 +691,73 @@ const getText = (nodes, pre = false) => {
   const arr = [];
   const nodeArr = nodes && Array.from(nodes);
   if (nodeArr) {
-    const alttexts = ["area", "img", "input"];
-    const blocks = [
-      "address", "article", "aside", "blockquote", "details", "dialog", "dd",
-      "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form",
-      "header", "hgroup", "li", "main", "nav", "ol", "pre", "section", "table",
-      "ul",
-    ];
-    const phrasings = [
-      "a", "abbr", "b", "bdo", "cite", "code", "data", "datalist", "del", "dfn",
-      "em", "i", "ins", "kbd", "mark", "map", "meter", "output", "progress",
-      "q", "ruby", "samp", "small", "span", "strong", "sub", "sup", "time",
-      "var",
-    ];
-    const spacings = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
-    const tablecells = ["td", "th"];
-    const tablerows = ["tr"];
     for (const node of nodeArr) {
       const {
-        lastChild, localName: nodeName, nodeType, nodeValue: value, parentNode,
+        lastChild, localName: nodeName, nextElementSibling: nextElm, nodeType,
+        nodeValue: value, parentNode,
       } = node;
       const {
         firstElementChild: parentFirstElmChild,
         lastElementChild: parentLastElmChild,
         lastChild: parentLastChild, localName: parentName,
       } = parentNode;
-      const isParentBlock = blocks.includes(parentName) ||
-                            spacings.includes(parentName);
+      const isParentBlock = TAGS_BLOCK.includes(parentName) ||
+                            TAGS_SPACING.includes(parentName);
       pre = pre || parentName === "pre";
-      if (nodeType === Node.ELEMENT_NODE) {
-        if (node.hasChildNodes()) {
-          if (spacings.includes(nodeName) && node !== parentFirstElmChild) {
-            arr.push("\n");
-          }
-          arr.push(getText(node.childNodes, pre));
-          if (isParentBlock) {
-            if (node === parentLastChild) {
-              const isLastChild = lastChild.nodeType === Node.TEXT_NODE &&
-                                  lastChild.nodeValue ||
-                                  lastChild.nodeType === Node.ELEMENT_NODE &&
-                                  phrasings.includes(nodeName) &&
-                                  phrasings.includes(lastChild.localName);
-              isLastChild && arr.push("\n");
-            } else {
-              !pre && phrasings.includes(nodeName) && arr.push(" ");
-            }
-          }
-          if (tablecells.includes(nodeName) && node !== parentLastElmChild) {
-            arr.push("\t");
-          } else if (tablerows.includes(nodeName) ||
-                     spacings.includes(nodeName) &&
-                     node !== parentLastElmChild &&
-                     !spacings.includes(node.nextElementSibling.localName)) {
-            arr.push("\n");
-          }
-        } else if (alttexts.includes(nodeName)) {
-          if ((nodeName !== "input" || node.type === "image") && node.alt) {
-            arr.push(node.alt);
-            if (isParentBlock &&
-                (node === parentLastChild ||
-                 node === parentLastElmChild &&
-                 node.nextSibling.nodeType === Node.TEXT_NODE &&
-                 /^\s*$/.test(node.nextSibling.nodeValue))) {
+      switch (nodeType) {
+        case Node.ELEMENT_NODE: {
+          if (node.hasChildNodes()) {
+            TAGS_SPACING.includes(nodeName) && node !== parentFirstElmChild &&
               arr.push("\n");
-            } else {
-              arr.push(" ");
+            arr.push(getText(node.childNodes, pre));
+            if (isParentBlock) {
+              if (node === parentLastChild) {
+                const isLastChild = lastChild.nodeType === Node.TEXT_NODE &&
+                                    lastChild.nodeValue ||
+                                    lastChild.nodeType === Node.ELEMENT_NODE &&
+                                    TAGS_PHRASING.includes(nodeName) &&
+                                    TAGS_PHRASING.includes(lastChild.localName);
+                isLastChild && arr.push("\n");
+              } else {
+                const isPhrase = (!nextElm || nextElm.localName !== "br") &&
+                                 !pre && TAGS_PHRASING.includes(nodeName);
+                isPhrase && arr.push(" ");
+              }
             }
+            if (TAGS_CELL.includes(nodeName) && node !== parentLastElmChild) {
+              arr.push("\t");
+            } else if (nodeName === "tr" ||
+                       TAGS_SPACING.includes(nodeName) &&
+                       node !== parentLastElmChild &&
+                       !TAGS_SPACING.includes(nextElm.localName)) {
+              arr.push("\n");
+            }
+          } else if (TAGS_ALT.includes(nodeName)) {
+            if ((nodeName !== "input" || node.type === "image") && node.alt) {
+              const trail = isParentBlock && (
+                node === parentLastChild ||
+                node === parentLastElmChild &&
+                node.nextSibling.nodeType === Node.TEXT_NODE &&
+                /^\s*$/.test(node.nextSibling.nodeValue)
+              ) && "\n" || " ";
+              arr.push(`${node.alt}${trail}`);
+            }
+          } else {
+            nodeName === "br" && arr.push("\n");
           }
-        } else {
-          nodeName === "br" && arr.push("\n");
+          break;
         }
-      } else if (nodeType === Node.TEXT_NODE) {
-        if (pre) {
-          arr.push(value);
-        } else if (isParentBlock && node === parentLastChild) {
-          arr.push(value.trim().replace(/([^\n])$/, (m, c) => `${c}\n`));
-        } else {
-          arr.push(value.trim());
+        case Node.TEXT_NODE: {
+          if (pre) {
+            arr.push(value);
+          } else if (isParentBlock && node === parentLastChild) {
+            arr.push(value.trim().replace(/([^\n])$/, (m, c) => `${c}\n`));
+          } else {
+            arr.push(value.trim());
+          }
+          break;
         }
+        default:
       }
     }
   }
@@ -956,7 +959,7 @@ const getLiveEditElm = node => {
     const isHtml = !namespaceURI || namespaceURI === nsURI.html;
     if (isHtml) {
       for (const item of items) {
-        const {className, getContent, isIframe, setContent} = item;
+        const {attributes, className, getContent, isIframe, setContent} = item;
         if (isIframe) {
           const iframes = node.querySelectorAll("iframe");
           for (const iframe of iframes) {
@@ -969,9 +972,25 @@ const getLiveEditElm = node => {
             }
           }
         } else if (classList.contains(className)) {
-          elm = node;
-          !elm.isContentEditable && elm.setAttribute("contenteditable", "");
-          break;
+          if (attributes) {
+            const attrs = Object.entries(attributes);
+            let bool;
+            for (const [key, value] of attrs) {
+              bool = node.hasAttribute(key) && node.getAttribute(key) === value;
+              if (!bool) {
+                break;
+              }
+            }
+            if (bool) {
+              elm = node;
+            }
+          } else {
+            elm = node;
+          }
+          if (elm) {
+            !elm.isContentEditable && elm.setAttribute("contenteditable", "");
+            break;
+          }
         }
       }
     }
@@ -992,7 +1011,9 @@ const getLiveEditContent = (elm, key) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE && liveEdit.has(key)) {
     const {getContent, isIframe} = liveEdit.get(key);
     let items;
-    if (isIframe && elm.contentDocument) {
+    if (getContent === SELF) {
+      items = [elm];
+    } else if (isIframe && elm.contentDocument) {
       items = elm.contentDocument.querySelectorAll(getContent);
     } else {
       items = elm.querySelectorAll(getContent);
@@ -1809,7 +1830,9 @@ const replaceLiveEditContent = (elm, opt = {}) => {
     const {isIframe, setContent} = liveEdit.get(liveEditKey);
     const data = dataIds.get(dataId);
     let liveElm;
-    if (isIframe && elm.contentDocument) {
+    if (setContent === SELF) {
+      liveElm = elm;
+    } else if (isIframe && elm.contentDocument) {
       liveElm = elm.contentDocument.querySelector(setContent);
     } else {
       liveElm = elm.querySelector(setContent);
