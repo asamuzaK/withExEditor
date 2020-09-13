@@ -1806,15 +1806,18 @@ const replaceEditControlValue = (elm, opt = {}) => {
       });
       if (beforeInputNotPrevented) {
         elm.value = dataValue;
+        delete data.mutex;
+        setDataId(dataId, data);
         dispatchInputEvent(elm, "input", {
           bubbles: true,
           cancelable: false,
           data: dataValue,
           inputType: "insertText",
         });
+      } else {
+        delete data.mutex;
+        setDataId(dataId, data);
       }
-      delete data.mutex;
-      setDataId(dataId, data);
     }
   }
 };
@@ -1857,14 +1860,14 @@ const replaceLiveEditContent = (elm, opt = {}) => {
           inputType: "insertText",
         });
         liveElm.value = dataValue;
+        delete data.mutex;
+        setDataId(dataId, data);
         dispatchInputEvent(liveElm, "input", {
           bubbles: true,
           cancelable: false,
           data: dataValue,
           inputType: "insertText",
         });
-        delete data.mutex;
-        setDataId(dataId, data);
       } else {
         liveElm.isContentEditable && replaceEditableContent(liveElm, opt);
       }
