@@ -693,8 +693,8 @@ const getText = (nodes, pre = false) => {
   if (nodeArr) {
     for (const node of nodeArr) {
       const {
-        lastChild, localName: nodeName, nextElementSibling: nextElm, nodeType,
-        nodeValue: value, parentNode,
+        alt, lastChild, localName: nodeName, nextElementSibling: nextElm,
+        nextSibling, nodeType, nodeValue: value, parentNode,
       } = node;
       const {
         firstElementChild: parentFirstElmChild,
@@ -735,14 +735,14 @@ const getText = (nodes, pre = false) => {
               arr.push("\n");
             }
           } else if (TAGS_ALT.includes(nodeName)) {
-            if ((nodeName !== "input" || node.type === "image") && node.alt) {
+            if ((nodeName !== "input" || node.type === "image") && alt) {
               const trail = isParentBlock && (
                 node === parentLastChild ||
                 node === parentLastElmChild &&
-                node.nextSibling.nodeType === Node.TEXT_NODE &&
-                /^\s*$/.test(node.nextSibling.nodeValue)
+                nextSibling.nodeType === Node.TEXT_NODE &&
+                /^\s*$/.test(nextSibling.nodeValue)
               ) && "\n" || " ";
-              arr.push(`${node.alt}${trail}`);
+              arr.push(`${alt}${trail}`);
             }
           } else {
             nodeName === "br" && arr.push("\n");
@@ -867,25 +867,6 @@ const getEditableElm = node => {
     }
   }
   return elm || null;
-};
-
-/**
- * get editable element of content document
- * NOTE: currently not in use
- *
- * @param {object} elm - Element
- * @returns {object} - Element
- */
-const getContentDocumentEditableElm = elm => {
-  let editableElm;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE && elm.contentDocument) {
-    const selectors = [
-      "[contenteditable=\"true\"]",
-      "[contenteditable=\"\"]",
-    ];
-    editableElm = elm.contentDocument.querySelector(selectors.join(","));
-  }
-  return editableElm || null;
 };
 
 /* post messages */
@@ -2230,7 +2211,6 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     extendObjItems,
     fetchSource,
     getAncestorId,
-    getContentDocumentEditableElm,
     getContextMode,
     getDecodedContent,
     getEditableElm,
