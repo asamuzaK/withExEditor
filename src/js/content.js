@@ -51,13 +51,13 @@ const TAGS_BLOCK = [
   "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "header",
   "hgroup", "li", "main", "nav", "ol", "pre", "section", "table", "ul",
 ];
+const TAGS_BLOCK_SPACING = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
 const TAGS_PHRASING = [
   "a", "abbr", "b", "bdo", "cite", "code", "data", "datalist", "del", "dfn",
   "em", "i", "ins", "kbd", "mark", "map", "meter", "output", "progress", "q",
   "ruby", "samp", "small", "span", "strong", "sub", "sup", "time", "var",
 ];
-const TAGS_SPACING = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
-const TAGS_TABLECELL = ["td", "th"];
+const TAGS_TABLE_CELL = ["td", "th"];
 const TMP_FILES = "tmpFiles";
 const TMP_FILES_PB = "tmpFilesPb";
 const TMP_FILE_CREATE = "createTmpFile";
@@ -702,12 +702,13 @@ const getText = (nodes, pre = false) => {
         lastChild: parentLastChild, localName: parentName,
       } = parentNode;
       const isParentBlock = TAGS_BLOCK.includes(parentName) ||
-                            TAGS_SPACING.includes(parentName);
+                            TAGS_BLOCK_SPACING.includes(parentName);
       pre = pre || parentName === "pre";
       switch (nodeType) {
         case Node.ELEMENT_NODE: {
           if (node.hasChildNodes()) {
-            TAGS_SPACING.includes(nodeName) && node !== parentFirstElmChild &&
+            TAGS_BLOCK_SPACING.includes(nodeName) &&
+            node !== parentFirstElmChild &&
               arr.push("\n");
             arr.push(getText(node.childNodes, pre));
             if (isParentBlock) {
@@ -724,13 +725,13 @@ const getText = (nodes, pre = false) => {
                 isPhrase && arr.push(" ");
               }
             }
-            if (TAGS_TABLECELL.includes(nodeName) &&
+            if (TAGS_TABLE_CELL.includes(nodeName) &&
                 node !== parentLastElmChild) {
               arr.push("\t");
             } else if (nodeName === "tr" ||
-                       TAGS_SPACING.includes(nodeName) &&
+                       TAGS_BLOCK_SPACING.includes(nodeName) &&
                        node !== parentLastElmChild &&
-                       !TAGS_SPACING.includes(nextElm.localName)) {
+                       !TAGS_BLOCK_SPACING.includes(nextElm.localName)) {
               arr.push("\n");
             }
           } else if (TAGS_ALT.includes(nodeName)) {
