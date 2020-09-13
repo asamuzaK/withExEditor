@@ -1752,6 +1752,8 @@ const replaceEditableContent = (node, opt = {}) => {
           }
           sel.deleteFromDocument();
           node.appendChild(frag);
+          delete data.mutex;
+          setDataId(dataId, data);
           dispatchInputEvent(node, "input", {
             dataTransfer,
             bubbles: true,
@@ -1760,6 +1762,9 @@ const replaceEditableContent = (node, opt = {}) => {
             ranges: [insertTarget],
           });
         }
+      } else {
+        delete data.mutex;
+        setDataId(dataId, data);
       }
       if (!sel.isCollapsed) {
         sel.collapseToEnd();
@@ -1768,8 +1773,6 @@ const replaceEditableContent = (node, opt = {}) => {
           cancelable: false,
         });
       }
-      delete data.mutex;
-      setDataId(dataId, data);
     }
   }
 };
