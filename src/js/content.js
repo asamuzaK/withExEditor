@@ -57,7 +57,7 @@ const TAGS_PHRASING = [
   "ruby", "samp", "small", "span", "strong", "sub", "sup", "time", "var",
 ];
 const TAGS_SPACING = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
-const TAGS_CELL = ["td", "th"];
+const TAGS_TABLECELL = ["td", "th"];
 const TMP_FILES = "tmpFiles";
 const TMP_FILES_PB = "tmpFilesPb";
 const TMP_FILE_CREATE = "createTmpFile";
@@ -724,7 +724,8 @@ const getText = (nodes, pre = false) => {
                 isPhrase && arr.push(" ");
               }
             }
-            if (TAGS_CELL.includes(nodeName) && node !== parentLastElmChild) {
+            if (TAGS_TABLECELL.includes(nodeName) &&
+                node !== parentLastElmChild) {
               arr.push("\t");
             } else if (nodeName === "tr" ||
                        TAGS_SPACING.includes(nodeName) &&
