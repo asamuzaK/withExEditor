@@ -2,8 +2,6 @@
  * live-edit.js
  */
 
-const SELF = "_self";
-
 export default {
   aceEditor: {
     className: "ace_editor",
@@ -14,15 +12,6 @@ export default {
     className: "CodeMirror",
     getContent: ".CodeMirror-line",
     setContent: ".CodeMirror > div:nth-child(1) > textarea:nth-child(1)",
-  },
-  gmail: {
-    className: "editable",
-    attributes: {
-      "aria-multiline": "true",
-      role: "textbox",
-    },
-    getContent: SELF,
-    setContent: SELF,
   },
   tiddlyWiki: {
     isIframe: true,

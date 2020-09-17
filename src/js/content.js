@@ -41,7 +41,6 @@ const NS_URI = "nsURI";
 const ONLY_EDITABLE = "enableOnlyEditable";
 const PORT_CONNECT = "connectPort";
 const PORT_CONTENT = "portContent";
-const SELF = "_self";
 const SUBST = "index";
 const SYNC_AUTO = "enableSyncAuto";
 const SYNC_AUTO_URL = "syncAutoUrls";
@@ -942,7 +941,7 @@ const getLiveEditElm = node => {
     const isHtml = !namespaceURI || namespaceURI === nsURI.html;
     if (isHtml) {
       for (const item of items) {
-        const {attributes, className, getContent, isIframe, setContent} = item;
+        const {className, getContent, isIframe, setContent} = item;
         if (isIframe) {
           const iframes = node.querySelectorAll("iframe");
           for (const iframe of iframes) {
@@ -955,25 +954,9 @@ const getLiveEditElm = node => {
             }
           }
         } else if (classList.contains(className)) {
-          if (attributes) {
-            const attrs = Object.entries(attributes);
-            let bool;
-            for (const [key, value] of attrs) {
-              bool = node.hasAttribute(key) && node.getAttribute(key) === value;
-              if (!bool) {
-                break;
-              }
-            }
-            if (bool) {
-              elm = node;
-            }
-          } else {
-            elm = node;
-          }
-          if (elm) {
-            !elm.isContentEditable && elm.setAttribute("contenteditable", "");
-            break;
-          }
+          elm = node;
+          !elm.isContentEditable && elm.setAttribute("contenteditable", "");
+          break;
         }
       }
     }
@@ -994,9 +977,7 @@ const getLiveEditContent = (elm, key) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE && liveEdit.has(key)) {
     const {getContent, isIframe} = liveEdit.get(key);
     let items;
-    if (getContent === SELF) {
-      items = [elm];
-    } else if (isIframe && elm.contentDocument) {
+    if (isIframe && elm.contentDocument) {
       items = elm.contentDocument.querySelectorAll(getContent);
     } else {
       items = elm.querySelectorAll(getContent);
@@ -1819,9 +1800,7 @@ const replaceLiveEditContent = (elm, opt = {}) => {
     const {isIframe, setContent} = liveEdit.get(liveEditKey);
     const data = dataIds.get(dataId);
     let liveElm;
-    if (setContent === SELF) {
-      liveElm = elm;
-    } else if (isIframe && elm.contentDocument) {
+    if (isIframe && elm.contentDocument) {
       liveElm = elm.contentDocument.querySelector(setContent);
     } else {
       liveElm = elm.querySelector(setContent);

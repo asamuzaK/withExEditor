@@ -2102,15 +2102,6 @@ describe("content", () => {
           getContent: "#qux",
           setContent: "#qux",
         },
-        corge: {
-          className: "corge",
-          attributes: {
-            role: "textbox",
-            "aria-multiline": "true",
-          },
-          getContent: "_self",
-          setContent: "_self",
-        },
       };
       const items = Object.entries(editors);
       for (const [key, value] of items) {
@@ -2204,30 +2195,6 @@ describe("content", () => {
       const res = func(div);
       assert.deepEqual(res, iframe, "result");
     });
-
-    it("should get null", () => {
-      const elm = document.createElement("div");
-      const body = document.querySelector("body");
-      elm.classList.add("corge");
-      elm.setAttribute("contenteditable", "true");
-      elm.setAttribute("role", "textbox");
-      elm.setAttribute("aria-multiline", "false");
-      body.appendChild(elm);
-      const res = func(elm);
-      assert.isNull(res, "result");
-    });
-
-    it("should get element", () => {
-      const elm = document.createElement("div");
-      const body = document.querySelector("body");
-      elm.classList.add("corge");
-      elm.setAttribute("contenteditable", "true");
-      elm.setAttribute("role", "textbox");
-      elm.setAttribute("aria-multiline", "true");
-      body.appendChild(elm);
-      const res = func(elm);
-      assert.deepEqual(res, elm, "result");
-    });
   });
 
   describe("get live edit content", () => {
@@ -2243,9 +2210,6 @@ describe("content", () => {
         },
         baz: {
           getContent: "#baz",
-        },
-        qux: {
-          getContent: "_self",
         },
       };
       const items = Object.entries(editors);
@@ -2295,26 +2259,6 @@ describe("content", () => {
       body.appendChild(p);
       const res = func(p, "foo");
       assert.strictEqual(res, "baz\n\nqux", "result");
-    });
-
-    it("should get result", () => {
-      const p = document.createElement("p");
-      const span = document.createElement("span");
-      const span2 = document.createElement("span");
-      const br = document.createElement("br");
-      const body = document.querySelector("body");
-      span.textContent = "foo";
-      span2.textContent = "bar";
-      p.setAttribute("contenteditable", "");
-      if (typeof p.isContentEditable !== "boolean") {
-        p.isContentEditable = isContentEditable(p);
-      }
-      p.appendChild(span);
-      p.appendChild(br);
-      p.appendChild(span2);
-      body.appendChild(p);
-      const res = func(p, "qux");
-      assert.strictEqual(res, "foo\nbar\n", "result");
     });
 
     it("should get result", () => {
@@ -4558,56 +4502,6 @@ describe("content", () => {
       });
       assert.isFalse(stub.called, "not dispatched");
       assert.strictEqual(text.value, "", "content");
-    });
-
-    it("should replace content", () => {
-      const stub = sinon.stub();
-      const elm = document.createElement("div");
-      const body = document.querySelector("body");
-      elm.classList.add("foo");
-      elm.setAttribute("contenteditable", "true");
-      if (typeof elm.isContentEditable !== "boolean") {
-        elm.isContentEditable = isContentEditable(elm);
-      }
-      body.addEventListener("input", stub, true);
-      body.appendChild(elm);
-      cjs.liveEdit.set("foo", {
-        setContent: "_self",
-      });
-      cjs.dataIds.set("foo", {});
-      func(elm, {
-        dataId: "foo",
-        liveEditKey: "foo",
-        value: "bar baz",
-      });
-      assert.isTrue(stub.called, "dispatched");
-      assert.strictEqual(elm.textContent, "bar baz", "content");
-    });
-
-    it("should not replace content", () => {
-      const stub = sinon.stub();
-      const elm = document.createElement("div");
-      const body = document.querySelector("body");
-      elm.classList.add("foo");
-      elm.setAttribute("contenteditable", "true");
-      if (typeof elm.isContentEditable !== "boolean") {
-        elm.isContentEditable = isContentEditable(elm);
-      }
-      body.addEventListener("input", stub, true);
-      body.appendChild(elm);
-      cjs.liveEdit.set("foo", {
-        setContent: "_self",
-      });
-      cjs.dataIds.set("foo", {
-        mutex: true,
-      });
-      func(elm, {
-        dataId: "foo",
-        liveEditKey: "foo",
-        value: "bar baz",
-      });
-      assert.isFalse(stub.called, "not dispatched");
-      assert.strictEqual(elm.textContent, "", "content");
     });
 
     it("should not replace content", () => {
