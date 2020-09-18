@@ -3813,6 +3813,26 @@ describe("content", () => {
     });
 
     it("should get content", () => {
+      const res = func("foo\r\nbar baz\r\n\r\nqux");
+      assert.strictEqual(res.nodeType, 11, "nodeType");
+      assert.strictEqual(res.childNodes.length, 7, "length");
+      assert.strictEqual(res.childNodes[0].nodeType, 1, "contentType");
+      assert.strictEqual(res.childNodes[0].textContent, "foo", "value");
+      assert.strictEqual(res.childNodes[1].nodeType, 3, "contentType");
+      assert.strictEqual(res.childNodes[1].nodeValue, "\n", "value");
+      assert.strictEqual(res.childNodes[2].nodeType, 1, "contentType");
+      assert.strictEqual(res.childNodes[2].textContent, "bar baz", "value");
+      assert.strictEqual(res.childNodes[3].nodeType, 3, "contentType");
+      assert.strictEqual(res.childNodes[3].nodeValue, "\n", "value");
+      assert.strictEqual(res.childNodes[4].nodeType, 1, "contentType");
+      assert.strictEqual(res.childNodes[4].firstChild.localName, "br", "value");
+      assert.strictEqual(res.childNodes[5].nodeType, 3, "contentType");
+      assert.strictEqual(res.childNodes[5].nodeValue, "\n", "value");
+      assert.strictEqual(res.childNodes[6].nodeType, 1, "contentType");
+      assert.strictEqual(res.childNodes[6].textContent, "qux", "value");
+    });
+
+    it("should get content", () => {
       const dom = createJsdom("file:///foo/bar");
       window = dom.window;
       document = window.document;
