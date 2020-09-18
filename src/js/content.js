@@ -1453,7 +1453,7 @@ const createContentData = async (elm, mode) => {
             setDataIdController(elm, dataId);
           }
           if (!incognito && enableSyncAuto && isString(syncAutoUrls)) {
-            data.syncAuto = matchDocUrl(syncAutoUrls.split("\n"));
+            data.syncAuto = matchDocUrl(syncAutoUrls.split(/\r?\n/));
           }
         }
         break;
@@ -1591,7 +1591,7 @@ const determineContentProcess = (obj = {}) => {
  * @returns {object} - document fragment
  */
 const createParagraphedContent = (value, ns = nsURI.html) => {
-  const arr = isString(value) && value.split("\n") || [""];
+  const arr = isString(value) && value.split(/\r?\n/) || [""];
   const l = arr.length;
   const frag = document.createDocumentFragment();
   if (l === 1) {
