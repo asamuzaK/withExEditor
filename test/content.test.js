@@ -1469,6 +1469,21 @@ describe("content", () => {
 
     it("should get string", () => {
       const p = document.createElement("p");
+      const em = document.createElement("em");
+      const span = document.createElement("span");
+      const body = document.querySelector("body");
+      span.textContent = "foo";
+      em.textContent = "bar";
+      p.appendChild(span);
+      p.appendChild(document.createTextNode("\n"));
+      p.appendChild(em);
+      body.appendChild(p);
+      const res = func(document.querySelectorAll("p"), true);
+      assert.strictEqual(res, "foo\nbar\n", "result");
+    });
+
+    it("should get string", () => {
+      const p = document.createElement("p");
       const br = document.createElement("br");
       const body = document.querySelector("body");
       p.appendChild(br);
@@ -1711,11 +1726,11 @@ describe("content", () => {
       const span = document.createElement("span");
       const body = document.querySelector("body");
       p.setAttribute("contenteditable", "true");
-      p.appendChild(span);
-      body.appendChild(p);
       if (typeof p.isContentEditable !== "boolean") {
         p.isContentEditable = isContentEditable(p);
       }
+      p.appendChild(span);
+      body.appendChild(p);
       const res = func(span);
       assert.isTrue(p.isContentEditable, "prop");
       assert.isTrue(res, "result");
@@ -1726,11 +1741,11 @@ describe("content", () => {
       const span = document.createElement("span");
       const body = document.querySelector("body");
       p.setAttribute("contenteditable", "");
-      p.appendChild(span);
-      body.appendChild(p);
       if (typeof p.isContentEditable !== "boolean") {
         p.isContentEditable = isContentEditable(p);
       }
+      p.appendChild(span);
+      body.appendChild(p);
       const res = func(span);
       assert.isTrue(p.isContentEditable, "prop");
       assert.isTrue(res, "result");
@@ -1741,11 +1756,11 @@ describe("content", () => {
       const span = document.createElement("span");
       const body = document.querySelector("body");
       p.setAttribute("contenteditable", "false");
-      p.appendChild(span);
-      body.appendChild(p);
       if (typeof p.isContentEditable !== "boolean") {
         p.isContentEditable = isContentEditable(p);
       }
+      p.appendChild(span);
+      body.appendChild(p);
       const res = func(span);
       assert.isFalse(p.isContentEditable, "prop");
       assert.isFalse(res, "result");
@@ -1756,11 +1771,11 @@ describe("content", () => {
       const span = document.createElement("span");
       const body = document.querySelector("body");
       p.setAttribute("contenteditable", "foo");
-      p.appendChild(span);
-      body.appendChild(p);
       if (typeof p.isContentEditable !== "boolean") {
         p.isContentEditable = isContentEditable(p);
       }
+      p.appendChild(span);
+      body.appendChild(p);
       const res = func(span);
       assert.isFalse(p.isContentEditable, "prop");
       assert.isFalse(res, "result");
@@ -1793,10 +1808,10 @@ describe("content", () => {
       const body = document.querySelector("body");
       p.textContent = "foo";
       p.setAttribute("contenteditable", "true");
-      body.appendChild(p);
       if (typeof p.isContentEditable !== "boolean") {
         p.isContentEditable = isContentEditable(p);
       }
+      body.appendChild(p);
       const res = func(p);
       assert.isTrue(res, "result");
     });
@@ -1810,11 +1825,11 @@ describe("content", () => {
       text.textContent = "foo";
       svg.appendChild(text);
       div.setAttribute("contenteditable", "true");
-      div.appendChild(svg);
-      body.appendChild(div);
       if (typeof div.isContentEditable !== "boolean") {
         div.isContentEditable = isContentEditable(div);
       }
+      div.appendChild(svg);
+      body.appendChild(div);
       const res = func(text);
       assert.isTrue(res, "result");
     });
@@ -1828,11 +1843,11 @@ describe("content", () => {
       text.textContent = "foo";
       svg.appendChild(text);
       div.setAttribute("contenteditable", "true");
-      div.appendChild(svg);
-      body.appendChild(div);
       if (typeof div.isContentEditable !== "boolean") {
         div.isContentEditable = isContentEditable(div);
       }
+      div.appendChild(svg);
+      body.appendChild(div);
       const res = func(svg);
       assert.isFalse(res, "result");
     });
@@ -2175,6 +2190,9 @@ describe("content", () => {
       div.appendChild(iframe);
       body.appendChild(div);
       elm.setAttribute("contenteditable", "true");
+      if (typeof elm.isContentEditable !== "boolean") {
+        elm.isContentEditable = isContentEditable(elm);
+      }
       elm.id = "qux";
       iframe.contentDocument.body.appendChild(elm);
       const res = func(div);
@@ -2189,6 +2207,9 @@ describe("content", () => {
       div.appendChild(iframe);
       body.appendChild(div);
       elm.setAttribute("contenteditable", "true");
+      if (typeof elm.isContentEditable !== "boolean") {
+        elm.isContentEditable = isContentEditable(elm);
+      }
       elm.id = "qux";
       iframe.classList.add("baz");
       iframe.contentDocument.body.appendChild(elm);
@@ -2253,12 +2274,16 @@ describe("content", () => {
       br.classList.add("bar");
       span2.classList.add("bar");
       span2.textContent = "qux";
+      p.setAttribute("contenteditable", "true");
+      if (typeof p.isContentEditable !== "boolean") {
+        p.isContentEditable = isContentEditable(p);
+      }
       p.appendChild(span);
       p.appendChild(br);
       p.appendChild(span2);
       body.appendChild(p);
       const res = func(p, "foo");
-      assert.strictEqual(res, "baz\n\nqux", "result");
+      assert.strictEqual(res, "baz\nqux", "result");
     });
 
     it("should get result", () => {
@@ -3353,17 +3378,21 @@ describe("content", () => {
       const p = document.createElement("p");
       const span = document.createElement("span");
       const span2 = document.createElement("span");
+      const br = document.createElement("br");
       const body = document.querySelector("body");
       span.textContent = "baz qux";
       span.classList.add("bar");
       span2.textContent = "quux";
       span2.classList.add("bar");
+      br.classList.add("bar");
       p.id = "foobar";
       p.classList.add("foo");
+      p.setAttribute("contenteditable", "true");
       if (typeof p.isContentEditable !== "boolean") {
         p.isContentEditable = isContentEditable(p);
       }
       p.appendChild(span);
+      p.appendChild(br);
       p.appendChild(span2);
       body.appendChild(p);
       const res = await func(p, MODE_EDIT);
@@ -3384,6 +3413,7 @@ describe("content", () => {
       span.classList.add("bar");
       p.id = "foobar";
       p.classList.add("foo");
+      p.setAttribute("contenteditable", "true");
       if (typeof p.isContentEditable !== "boolean") {
         p.isContentEditable = isContentEditable(p);
       }

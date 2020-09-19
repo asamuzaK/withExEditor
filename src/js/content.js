@@ -986,12 +986,12 @@ const getLiveEditContent = (elm, key) => {
       const arr = [];
       for (const item of items) {
         if (item.localName === "br") {
-          arr.push("");
+          arr.push("\n");
         } else if (isEditControl(item)) {
           arr.push(item.value);
         } else if (item.isContentEditable) {
           if (item.hasChildNodes()) {
-            arr.push(getText(item.childNodes));
+            arr.push(getText(item.childNodes, elm.localName === "pre"));
           } else {
             arr.push("\n");
           }
@@ -999,7 +999,7 @@ const getLiveEditContent = (elm, key) => {
           arr.push(item.textContent);
         }
       }
-      content = arr.join("\n");
+      content = arr.join("");
     }
   }
   return content || null;
@@ -1693,6 +1693,7 @@ const replaceEditableContent = (node, opt = {}) => {
         };
         // TODO: beforeinput not enabled by default in Gecko yet
         // See https://bugzilla.mozilla.org/show_bug.cgi?id=1609291
+        // See also https://bugzilla.mozilla.org/show_bug.cgi?id=1665530
         try {
           res = dispatchInputEvent(node, "beforeinput", {
             dataTransfer,
