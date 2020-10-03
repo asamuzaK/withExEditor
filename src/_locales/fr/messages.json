@@ -154,6 +154,9 @@
       }
     }
   },
+  "optionsEditTextSettings": {
+    "message": "Editer Text"
+  },
   "optionsEditorLabel": {
     "message": ""
   },
