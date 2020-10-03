@@ -1345,7 +1345,7 @@ describe("content", () => {
   });
 
   describe("create DOM of MathML / SVG", () => {
-    const func = cjs.createXmlBasedDom;
+    const func = cjs.createXmlBasedDomString;
 
     it("should get null", () => {
       const res = func();
@@ -1510,7 +1510,7 @@ describe("content", () => {
   });
 
   describe("create DOM from selection range", () => {
-    const func = cjs.createDomFromSelectionRange;
+    const func = cjs.createDomStringFromSelectionRange;
 
     it("should get null", () => {
       const res = func();
@@ -1549,6 +1549,55 @@ describe("content", () => {
     it("should throw", () => {
       assert.throws(() => func("foo", "image/png"),
                     "Unsupported mime type image/png.");
+    });
+
+    it("should get null", () => {
+      const res = func("<html></html>", "text/html");
+      assert.isNull(res, "result");
+    });
+
+    it("should get result", () => {
+      const res = func("<xml></xml>", "text/xml");
+      assert.strictEqual(res,
+                         "<xml xmlns=\"http://www.w3.org/1999/xhtml\"></xml>",
+                         "result");
+    });
+
+    it("should get result", () => {
+      const res = func("<xml></xml>", "application/xml");
+      assert.strictEqual(res,
+                         "<xml xmlns=\"http://www.w3.org/1999/xhtml\"></xml>",
+                         "result");
+    });
+
+    it("should get result", () => {
+      const res = func("<html></html>", "application/xhtml+xml");
+      assert.strictEqual(res,
+                         "<html xmlns=\"http://www.w3.org/1999/xhtml\"></html>",
+                         "result");
+    });
+
+    it("should get result", () => {
+      const res = func("<html xmlns=\"http://www.w3.org/1999/xhtml\"></html>",
+                       "application/xhtml+xml");
+      assert.strictEqual(res,
+                         "<html xmlns=\"http://www.w3.org/1999/xhtml\"></html>",
+                         "result");
+    });
+
+    it("should get result", () => {
+      const res = func("<svg></svg>", "image/svg+xml");
+      assert.strictEqual(res,
+                         "<svg xmlns=\"http://www.w3.org/1999/xhtml\"></svg>",
+                         "result");
+    });
+
+    it("should get result", () => {
+      const res = func("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>",
+                       "image/svg+xml");
+      assert.strictEqual(res,
+                         "<svg xmlns=\"http://www.w3.org/2000/svg\"/>",
+                         "result");
     });
 
     it("should throw", () => {

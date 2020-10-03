@@ -640,7 +640,7 @@ const appendChildNodes = (elm, node) => {
  * @param {object} node - element node
  * @returns {?string} - serialized node string
  */
-const createXmlBasedDom = node => {
+const createXmlBasedDomString = node => {
   let elm;
   if (node) {
     const root = document.documentElement;
@@ -692,7 +692,7 @@ const createRangeArr = range => {
  * @param {object} sel - selection
  * @returns {?string} - serialized node string
  */
-const createDomFromSelectionRange = sel => {
+const createDomStringFromSelectionRange = sel => {
   let frag;
   if (sel && sel.rangeCount) {
     const rangeArr = createRangeArr(sel.getRangeAt(0));
@@ -738,9 +738,8 @@ const createDomString = (value, mime) => {
           if (child instanceof HTMLUnknownElement) {
             frag = null;
             break;
-          } else {
-            frag.appendChild(child.cloneNode(true));
           }
+          frag.appendChild(child.cloneNode(true));
         }
       }
     }
@@ -1533,7 +1532,7 @@ const createContentData = async (elm, mode) => {
       }
       case MODE_MATHML:
       case MODE_SVG: {
-        const obj = createXmlBasedDom(elm);
+        const obj = createXmlBasedDomString(elm);
         if (obj) {
           data.mode = mode;
           data.value = obj;
@@ -1541,7 +1540,7 @@ const createContentData = async (elm, mode) => {
         break;
       }
       case MODE_SELECTION: {
-        const obj = createDomFromSelectionRange(sel);
+        const obj = createDomStringFromSelectionRange(sel);
         if (obj) {
           data.mode = mode;
           data.value = obj;
@@ -2285,7 +2284,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     checkPort,
     createContentData,
     createContentDataMsg,
-    createDomFromSelectionRange,
+    createDomStringFromSelectionRange,
     createDomString,
     createElement,
     createFragment,
@@ -2294,7 +2293,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     createRangeArr,
     createReplacingContent,
     createTmpFileData,
-    createXmlBasedDom,
+    createXmlBasedDomString,
     dataIds,
     determineContentProcess,
     dispatchClipboardEvent,
