@@ -1117,7 +1117,10 @@ describe("content", () => {
       const body = document.querySelector("body");
       elm2.setAttribute("data-foo", "bar");
       elm2.setAttribute("href", "javascript:void(0)");
-      elm2.setAttribute("ping", "https://example.com javascript:void(0)");
+      elm2.setAttribute(
+        "ping",
+        "https://example.com javascript:void(0)   https://example.net",
+      );
       body.appendChild(elm2);
       func(elm, elm2);
       assert.isTrue(elm.hasAttribute("data-foo"), "attr");
