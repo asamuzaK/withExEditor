@@ -538,13 +538,11 @@ const setAttributeNS = (elm, node = {}) => {
           case "poster":
           case "src": {
             const {protocol} = new URL(value, origin);
-            if (/https?/.test(protocol)) {
-              elm.setAttributeNS(ns, attrName, value);
-            }
+            /https?/.test(protocol) && elm.setAttributeNS(ns, attrName, value);
             break;
           }
           case "ping": {
-            const urls = value.split(" ");
+            const urls = value.split(/\s+/);
             let bool = true;
             for (const url of urls) {
               const {protocol} = new URL(url, origin);
