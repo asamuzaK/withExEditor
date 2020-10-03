@@ -1,7 +1,7 @@
 /**
  * content.test.js
  */
-/* eslint-disable no-magic-numbers, prefer-destructuring */
+/* eslint-disable no-magic-numbers, no-script-url, prefer-destructuring */
 
 const {assert} = require("chai");
 const {afterEach, beforeEach, describe, it} = require("mocha");
@@ -1026,6 +1026,192 @@ describe("content", () => {
     });
 
     it("should set attributes", async () => {
+      const elm = document.createElement("p");
+      const elm2 = document.createElement("p");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("onclick", "alert(1)");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isFalse(elm.hasAttribute("onclick"), "func");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("object");
+      const elm2 = document.createElement("object");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("data", "https://example.com");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("data"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("object");
+      const elm2 = document.createElement("object");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("data", "../baz");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("data"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("object");
+      const elm2 = document.createElement("object");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("data", "javascript:void(0)");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isFalse(elm.hasAttribute("data"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("a");
+      const elm2 = document.createElement("a");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("href", "https://example.com");
+      elm2.setAttribute("ping", "https://example.com https://example.net");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("href"), "url");
+      assert.isTrue(elm.hasAttribute("ping"), "ping url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("a");
+      const elm2 = document.createElement("a");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("href", "../");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("href"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("a");
+      const elm2 = document.createElement("a");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("href", "javascript:void(0)");
+      elm2.setAttribute("ping", "https://example.com javascript:void(0)");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isFalse(elm.hasAttribute("href"), "url");
+      assert.isFalse(elm.hasAttribute("ping"), "ping url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length - 2,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("video");
+      const elm2 = document.createElement("video");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("poster", "https://example.com");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("poster"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("video");
+      const elm2 = document.createElement("video");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("poster", "../baz");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("poster"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("video");
+      const elm2 = document.createElement("video");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("poster", "javascript:void(0)");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isFalse(elm.hasAttribute("poster"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("img");
+      const elm2 = document.createElement("img");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("src", "https://example.com");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("src"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("img");
+      const elm2 = document.createElement("img");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("src", "../baz");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("src"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("img");
+      const elm2 = document.createElement("img");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("src", "javascript:void(0)");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isFalse(elm.hasAttribute("src"), "url");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       const svg2 =
         document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -1342,6 +1528,89 @@ describe("content", () => {
       assert.strictEqual(res,
                          "<p xmlns=\"http://www.w3.org/1999/xhtml\">foo</p>\n",
                          "result");
+    });
+  });
+
+  describe("create DOM string", () => {
+    const func = cjs.createDomString;
+
+    it("should throw", () => {
+      assert.throws(() => func(), "Expected String but got Undefined.");
+    });
+
+    it("should throw", () => {
+      assert.throws(() => func("foo"), "Expected String but got Undefined.");
+    });
+
+    it("should throw", () => {
+      assert.throws(() => func("foo", "image/png"),
+                    "Unsupported mime type image/png.");
+    });
+
+    it("should throw", () => {
+      assert.throws(() => func("<", "text/xml"),
+                    "Error while parsing DOM string.");
+    });
+
+    it("should throw", () => {
+      assert.throws(() => func("", "text/xml"),
+                    "Error while parsing DOM string.");
+    });
+
+    it("should throw", () => {
+      assert.throws(() => func("foo <em>bar</em>", "application/xhtml+xml"),
+                    "Error while parsing DOM string.");
+    });
+
+    it("should throw", () => {
+      assert.throws(
+        () => func("Example <foo@example.dom> wrote:\nfoo", "text/html"),
+      );
+    });
+
+    it("should get null", () => {
+      const res = func("", "text/html");
+      assert.isNull(res, "result");
+    });
+
+    it("should get null", () => {
+      const res = func("foo bar\nbaz", "text/html");
+      assert.isNull(res, "result");
+    });
+
+    it("should get result", () => {
+      const res = func("foo <em>bar</em>\nbaz", "text/html");
+      assert.strictEqual(
+        res,
+        "foo <em xmlns=\"http://www.w3.org/1999/xhtml\">bar</em>\nbaz",
+        "result",
+      );
+    });
+
+    it("should get result", () => {
+      const res =
+        func("<div>foo</div>\n<div>bar</div>\n", "text/html");
+      assert.strictEqual(
+        res,
+        "<div xmlns=\"http://www.w3.org/1999/xhtml\">foo</div>\n<div xmlns=\"http://www.w3.org/1999/xhtml\">bar</div>\n",
+        "result",
+      );
+    });
+
+    it("should get result", () => {
+      const res = func("<foo/>", "text/xml");
+      assert.strictEqual(res,
+                         "<foo xmlns=\"http://www.w3.org/1999/xhtml\"></foo>",
+                         "result");
+    });
+
+    it("should get result", () => {
+      const res = func("<em>foo</em>\n", "application/xhtml+xml");
+      assert.strictEqual(
+        res,
+        "<em xmlns=\"http://www.w3.org/1999/xhtml\">foo</em>",
+        "result",
+      );
     });
   });
 
@@ -4261,6 +4530,66 @@ describe("content", () => {
       });
       assert.isTrue(stub.called, "called");
       assert.strictEqual(stub.callCount, 2, "call count");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "bar", "content");
+      assert.strictEqual(div.textContent, "bar", "content");
+    });
+
+    it("should call function", () => {
+      const div = document.createElement("div");
+      const span = document.createElement("span");
+      const stub = sinon.stub(span, "dispatchEvent").returns(true);
+      stub.onCall(1).returns(false);
+      const stubErr = sinon.stub(console, "error");
+      const body = document.querySelector("body");
+      div.id = "div";
+      span.textContent = "bar";
+      div.appendChild(span);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {});
+      body.appendChild(div);
+      func(span, {
+        controlledBy: "#div",
+        dataId: "foo",
+        value: "<div>foo</div>\n<div>bar</div>\n",
+      });
+      const {calledOnce: errCalled} = stubErr;
+      stubErr.restore();
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 2, "call count");
+      assert.isFalse(errCalled, "error called");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "bar", "content");
+      assert.strictEqual(div.textContent, "bar", "content");
+    });
+
+    it("should call function", () => {
+      const div = document.createElement("div");
+      const span = document.createElement("span");
+      const stub = sinon.stub(span, "dispatchEvent").returns(true);
+      stub.onCall(1).returns(false);
+      const stubErr = sinon.stub(console, "error");
+      const body = document.querySelector("body");
+      div.id = "div";
+      span.textContent = "bar";
+      div.appendChild(span);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {});
+      body.appendChild(div);
+      func(span, {
+        controlledBy: "#div",
+        dataId: "foo",
+        value: "foo <foo@example.dom> wrote:\nbar\n",
+      });
+      const {calledOnce: errCalled} = stubErr;
+      stubErr.restore();
+      assert.isTrue(stub.called, "called");
+      assert.strictEqual(stub.callCount, 2, "call count");
+      assert.isTrue(errCalled, "error called");
       assert.strictEqual(div.childNodes.length, 1, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "span", "name");

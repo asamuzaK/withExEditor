@@ -528,10 +528,37 @@ const setAttributeNS = (elm, node = {}) => {
   if (elm && attributes && attributes.length) {
     for (const attr of attributes) {
       const {localName, name, namespaceURI, prefix, value} = attr;
-      if (typeof node[name] !== "function") {
+      if (typeof node[name] !== "function" && !localName.startsWith("on")) {
         const attrName = prefix && `${prefix}:${localName}` || localName;
         const ns = namespaceURI || prefix && nsURI[prefix] || null;
-        elm.setAttributeNS(ns, attrName, value);
+        const {origin} = document.location;
+        switch (localName) {
+          case "data":
+          case "href":
+          case "poster":
+          case "src": {
+            const {protocol} = new URL(value, origin);
+            if (/https?/.test(protocol)) {
+              elm.setAttributeNS(ns, attrName, value);
+            }
+            break;
+          }
+          case "ping": {
+            const urls = value.split(" ");
+            let bool = true;
+            for (const url of urls) {
+              const {protocol} = new URL(url, origin);
+              if (!/https?/.test(protocol)) {
+                bool = false;
+                break;
+              }
+            }
+            bool && elm.setAttributeNS(ns, attrName, value);
+            break;
+          }
+          default:
+            elm.setAttributeNS(ns, attrName, value);
+        }
       }
     }
   }
@@ -610,7 +637,7 @@ const appendChildNodes = (elm, node) => {
 };
 
 /**
- * create DOM of MathML / SVG
+ * create DOM string of MathML / SVG
  *
  * @param {object} node - element node
  * @returns {?string} - serialized node string
@@ -662,7 +689,7 @@ const createRangeArr = range => {
 };
 
 /**
- * create DOM from selection range
+ * create DOM string from selection range
  *
  * @param {object} sel - selection
  * @returns {?string} - serialized node string
@@ -675,6 +702,49 @@ const createDomFromSelectionRange = sel => {
     for (const range of rangeArr) {
       frag.appendChild(range);
     }
+  }
+  return frag && new XMLSerializer().serializeToString(frag) || null;
+};
+
+/**
+ *
+ * create DOM string
+ *
+ * @param {string} value - string value
+ * @param {string} mime - mime type
+ * @returns {?string} - serialized node string
+ */
+const createDomString = (value, mime) => {
+  if (!isString(value)) {
+    throw new TypeError(`Expected String but got ${getType(value)}.`);
+  }
+  if (!isString(mime)) {
+    throw new TypeError(`Expected String but got ${getType(mime)}.`);
+  }
+  if (!/text\/(?:ht|x)ml|application\/(?:xhtml\+)?xml|image\/svg\+xml/.test(mime)) {
+    throw new Error(`Unsupported mime type ${mime}.`);
+  }
+  let frag;
+  const dom = new DOMParser().parseFromString(value, mime);
+  if (dom.querySelector("parsererror")) {
+    throw new Error("Error while parsing DOM string.");
+  }
+  const {body, documentElement: root} = dom;
+  if (mime === MIME_HTML) {
+    const elm = appendChildNodes(body, body.cloneNode(true));
+    if (elm.hasChildNodes()) {
+      const {childNodes, firstElementChild} = body;
+      if (firstElementChild) {
+        frag = document.createDocumentFragment();
+        for (const child of childNodes) {
+          frag.appendChild(child.cloneNode(true));
+        }
+      }
+    }
+  } else {
+    const elm = appendChildNodes(root, root.cloneNode(true));
+    frag = document.createDocumentFragment();
+    frag.appendChild(elm);
   }
   return frag && new XMLSerializer().serializeToString(frag) || null;
 };
@@ -1659,6 +1729,13 @@ const replaceEditableContent = (node, opt = {}) => {
     if (changed && !data.mutex) {
       const sel = node.ownerDocument.getSelection();
       const dataTransfer = new DataTransfer();
+      let domstr;
+      try {
+        domstr = createDomString(value, MIME_HTML);
+      } catch (e) {
+        logErr(e);
+        domstr = null;
+      }
       data.mutex = true;
       setDataId(dataId, data);
       sel.selectAllChildren(node);
@@ -1667,6 +1744,7 @@ const replaceEditableContent = (node, opt = {}) => {
         cancelable: false,
       });
       dataTransfer.setData(MIME_PLAIN, value);
+      domstr && dataTransfer.setData(MIME_HTML, domstr);
       let res = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
@@ -2174,6 +2252,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     createContentData,
     createContentDataMsg,
     createDomFromSelectionRange,
+    createDomString,
     createElement,
     createFragment,
     createIdData,
