@@ -4201,6 +4201,157 @@ describe("content", () => {
     });
   });
 
+  describe("create replacing content", () => {
+    const func = cjs.createReplacingContent;
+
+    it("should not have child nodes", () => {
+      const res = func();
+      assert.isFalse(res.hasChildNodes(), "child nodes");
+    });
+
+    it("should not have child nodes", () => {
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(elm);
+      const res = func(elm);
+      assert.isFalse(res.hasChildNodes(), "child nodes");
+    });
+
+    it("should not have child nodes", () => {
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(elm);
+      const opt = {
+        domstr: true,
+      };
+      const res = func(elm, opt);
+      assert.isFalse(res.hasChildNodes(), "child nodes");
+    });
+
+    it("should not have child nodes", () => {
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(elm);
+      const opt = {
+        value: true,
+      };
+      const res = func(elm, opt);
+      assert.isFalse(res.hasChildNodes(), "child nodes");
+    });
+
+    it("should have child nodes", () => {
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      body.appendChild(elm);
+      const opt = {
+        value: "foo",
+      };
+      const res = func(elm, opt);
+      assert.isTrue(res.hasChildNodes(), "child nodes");
+      assert.strictEqual(res.childNodes.length, 1, "length");
+      assert.strictEqual(res.childNodes[0].nodeType, 3, "type");
+      assert.strictEqual(res.childNodes[0].nodeValue, "foo", "value");
+      assert.strictEqual(res.textContent, "foo", "text");
+    });
+
+    it("should have child nodes", () => {
+      const elm = document.createElement("div");
+      const elm2 = document.createElement("div");
+      const body = document.querySelector("body");
+      elm2.id = "bar";
+      body.appendChild(elm);
+      body.appendChild(elm2);
+      const opt = {
+        controlledBy: "bar",
+        value: "foo",
+      };
+      const res = func(elm, opt);
+      assert.isTrue(res.hasChildNodes(), "child nodes");
+      assert.strictEqual(res.childNodes.length, 1, "length");
+      assert.strictEqual(res.childNodes[0].nodeType, 3, "type");
+      assert.strictEqual(res.childNodes[0].nodeValue, "foo", "value");
+      assert.strictEqual(res.textContent, "foo", "text");
+    });
+
+    it("should have child nodes", () => {
+      const elm = document.createElement("div");
+      const elm2 = document.createElement("div");
+      const body = document.querySelector("body");
+      elm2.id = "bar";
+      body.appendChild(elm);
+      body.appendChild(elm2);
+      const opt = {
+        value: "foo\nbar\n",
+      };
+      const res = func(elm, opt);
+      assert.isTrue(res.hasChildNodes(), "child nodes");
+      assert.strictEqual(res.childNodes.length, 4, "length");
+      assert.strictEqual(res.firstChild.nodeType, 1, "type");
+      assert.strictEqual(res.firstChild.textContent, "foo", "content");
+      assert.strictEqual(res.lastChild.nodeType, 3, "type");
+      assert.strictEqual(res.lastChild.nodeValue, "\n", "value");
+      assert.strictEqual(res.textContent, "foo\nbar\n", "text");
+    });
+
+    it("should have child nodes", () => {
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      body.appendChild(elm);
+      const opt = {
+        controlledBy: "bar",
+        value: "foo\nbar\n",
+      };
+      const res = func(elm, opt);
+      assert.isTrue(res.hasChildNodes(), "child nodes");
+      assert.strictEqual(res.childNodes.length, 4, "length");
+      assert.strictEqual(res.firstChild.nodeType, 1, "type");
+      assert.strictEqual(res.firstChild.textContent, "foo", "content");
+      assert.strictEqual(res.lastChild.nodeType, 3, "type");
+      assert.strictEqual(res.lastChild.nodeValue, "\n", "value");
+      assert.strictEqual(res.textContent, "foo\nbar\n", "text");
+    });
+
+    it("should have child nodes", () => {
+      const elm = document.createElement("div");
+      const elm2 = document.createElement("div");
+      const body = document.querySelector("body");
+      elm2.id = "bar";
+      body.appendChild(elm);
+      body.appendChild(elm2);
+      const opt = {
+        domstr: "<p>foo</p>\n<p>bar</p>\n",
+      };
+      const res = func(elm, opt);
+      assert.isTrue(res.hasChildNodes(), "child nodes");
+      assert.strictEqual(res.childNodes.length, 4, "length");
+      assert.strictEqual(res.firstChild.nodeType, 1, "type");
+      assert.strictEqual(res.firstChild.textContent, "foo", "content");
+      assert.strictEqual(res.lastChild.nodeType, 3, "type");
+      assert.strictEqual(res.lastChild.nodeValue, "\n", "value");
+      assert.strictEqual(res.textContent, "foo\nbar\n", "text");
+    });
+
+    it("should have child nodes", () => {
+      const elm = document.createElement("div");
+      const body = document.querySelector("body");
+      elm.id = "bar";
+      body.appendChild(elm);
+      const opt = {
+        controlledBy: "bar",
+        domstr: "<p>foo</p>\n<p>bar</p>\n",
+      };
+      const res = func(elm, opt);
+      assert.isTrue(res.hasChildNodes(), "child nodes");
+      assert.strictEqual(res.childNodes.length, 4, "length");
+      assert.strictEqual(res.firstChild.nodeType, 1, "type");
+      assert.strictEqual(res.firstChild.textContent, "foo", "content");
+      assert.strictEqual(res.lastChild.nodeType, 3, "type");
+      assert.strictEqual(res.lastChild.nodeValue, "\n", "value");
+      assert.strictEqual(res.textContent, "foo\nbar\n", "text");
+    });
+  });
+
   describe("replace content of editable element", () => {
     const func = cjs.replaceEditableContent;
     beforeEach(() => {
@@ -4325,6 +4476,27 @@ describe("content", () => {
       assert.strictEqual(div.childNodes.length, 4, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "div", "name");
+      assert.strictEqual(div.firstChild.textContent, "foo", "content");
+      assert.strictEqual(div.lastChild.nodeType, 3, "child");
+      assert.strictEqual(div.lastChild.nodeValue, "\n", "value");
+      assert.strictEqual(div.textContent, "foo\nbar\n", "content");
+    });
+
+    it("should call function", () => {
+      const div = document.createElement("div");
+      const spy = sinon.spy(div, "dispatchEvent");
+      const body = document.querySelector("body");
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {});
+      func(div, {
+        dataId: "foo",
+        value: "<p>foo</p>\n<p>bar</p>\n",
+      });
+      assert.strictEqual(spy.callCount, 3, "called");
+      assert.strictEqual(div.childNodes.length, 4, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "p", "name");
       assert.strictEqual(div.firstChild.textContent, "foo", "content");
       assert.strictEqual(div.lastChild.nodeType, 3, "child");
       assert.strictEqual(div.lastChild.nodeValue, "\n", "value");

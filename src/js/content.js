@@ -1716,6 +1716,42 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
 };
 
 /**
+ *
+ * create replacing content
+ *
+ * @param {object} node - node
+ * @param {object} opt - options
+ * @returns {object} - document fragment
+ */
+const createReplacingContent = (node, opt = {}) => {
+  const frag = document.createDocumentFragment();
+  if (node && node.nodeType === Node.ELEMENT_NODE) {
+    const {controlledBy, domstr, namespaceURI, value} = opt;
+    const ctrl = controlledBy && isString(controlledBy) &&
+                   getTargetElementFromDataId(controlledBy);
+    if (ctrl && ctrl === node || !ctrl) {
+      if (domstr && isString(domstr)) {
+        const dom = new DOMParser().parseFromString(domstr, MIME_HTML);
+        const {
+          body: {
+            childNodes,
+          },
+        } = dom;
+        for (const child of childNodes) {
+          frag.appendChild(child.cloneNode(true));
+        }
+      } else if (isString(value)) {
+        const pContent = createParagraphedContent(value, namespaceURI);
+        frag.appendChild(pContent);
+      }
+    } else {
+      isString(value) && frag.appendChild(document.createTextNode(value));
+    }
+  }
+  return frag;
+};
+
+/**
  * replace content of content editable element
  *
  * @param {object} node - editable element
@@ -1788,14 +1824,9 @@ const replaceEditableContent = (node, opt = {}) => {
           res = true;
         }
         if (res) {
-          const ctrl = controlledBy && getTargetElementFromDataId(controlledBy);
-          const frag = document.createDocumentFragment();
-          if (ctrl && ctrl === node || !ctrl) {
-            const pContent = createParagraphedContent(value, namespaceURI);
-            frag.appendChild(pContent);
-          } else {
-            frag.appendChild(document.createTextNode(value));
-          }
+          const frag = createReplacingContent(node, {
+            controlledBy, domstr, namespaceURI, value,
+          });
           sel.deleteFromDocument();
           node.appendChild(frag);
           delete data.mutex;
@@ -2261,6 +2292,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     createIdData,
     createParagraphedContent,
     createRangeArr,
+    createReplacingContent,
     createTmpFileData,
     createXmlBasedDom,
     dataIds,
