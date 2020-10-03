@@ -735,7 +735,12 @@ const createDomString = (value, mime) => {
       if (firstElementChild) {
         frag = document.createDocumentFragment();
         for (const child of childNodes) {
-          frag.appendChild(child.cloneNode(true));
+          if (child instanceof HTMLUnknownElement) {
+            frag = null;
+            break;
+          } else {
+            frag.appendChild(child.cloneNode(true));
+          }
         }
       }
     }

@@ -43,8 +43,9 @@ describe("content", () => {
   let window, document;
   const globalKeys = [
     "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "Event",
-    "FocusEvent", "Headers", "InputEvent", "KeyboardEvent", "Node", "NodeList",
-    "Selection", "StaticRange", "XMLSerializer",
+    "FocusEvent", "Headers", "HTMLUnknownElement", "InputEvent",
+    "KeyboardEvent", "Node", "NodeList", "Selection", "StaticRange",
+    "XMLSerializer",
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
   const isContentEditable = elm => {
@@ -1578,6 +1579,16 @@ describe("content", () => {
 
     it("should get null", () => {
       const res = func("foo bar\nbaz", "text/html");
+      assert.isNull(res, "result");
+    });
+
+    it("should get null", () => {
+      const res = func("foo <bar>baz</bar>\nqux", "text/html");
+      assert.isNull(res, "result");
+    });
+
+    it("should get null", () => {
+      const res = func("<<foo>>", "text/html");
       assert.isNull(res, "result");
     });
 
