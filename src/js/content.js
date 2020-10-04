@@ -575,8 +575,12 @@ const createElement = node => {
     const ns = namespaceURI || prefix && nsURI[prefix] ||
                getNodeNS(node).namespaceURI || nsURI.html;
     const name = prefix && `${prefix}:${localName}` || localName;
-    elm = document.createElementNS(ns, name);
-    attributes && setAttributeNS(elm, node);
+    if (localName === "script") {
+      elm = document.createTextNode("");
+    } else {
+      elm = document.createElementNS(ns, name);
+      attributes && setAttributeNS(elm, node);
+    }
   }
   return elm || null;
 };

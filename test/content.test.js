@@ -1243,6 +1243,15 @@ describe("content", () => {
       assert.isNull(res, "result");
     });
 
+    it("should get empty string", () => {
+      const elm = document.createElement("script");
+      const body = document.querySelector("body");
+      body.appendChild(elm);
+      const res = func(elm);
+      assert.strictEqual(res.nodeType, Node.TEXT_NODE, "nodeType");
+      assert.strictEqual(res.nodeValue, "", "nodeValue");
+    });
+
     it("should get result", () => {
       const elm = document.createElement("p");
       const body = document.querySelector("body");
