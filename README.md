@@ -51,8 +51,10 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 ### Edit Text with *exEditor*
 
-* Enabled on input elements, textarea element and editable elements.
-* Edited contents will be synchronized when you go back to the browser.
+* Enabled on input elements, textarea elements and content editable elements like rich text editors.
+* The contents edited and saved in the external editor are synchronized when you go back to the browser.
+* When editing the contents of a rich text editor, you can markup the contents in HTML.
+  However, keep in mind that the rich text editor may change your markup.
 
 ***
 
