@@ -1544,8 +1544,8 @@ describe("content", () => {
     });
   });
 
-  describe("create DOM string", () => {
-    const func = cjs.createDomString;
+  describe("serialize DOM string", () => {
+    const func = cjs.serializeDomString;
 
     it("should throw", () => {
       assert.throws(() => func(), "Expected String but got Undefined.");

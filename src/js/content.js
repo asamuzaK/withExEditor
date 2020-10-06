@@ -710,15 +710,15 @@ const createDomStringFromSelectionRange = sel => {
 
 /**
  *
- * create DOM string
+ * serialize DOM string
  *
- * @param {string} value - string value
+ * @param {string} domstr - DOM string
  * @param {string} mime - mime type
- * @returns {?string} - serialized node string
+ * @returns {?string} - serialized DOM string
  */
-const createDomString = (value, mime) => {
-  if (!isString(value)) {
-    throw new TypeError(`Expected String but got ${getType(value)}.`);
+const serializeDomString = (domstr, mime) => {
+  if (!isString(domstr)) {
+    throw new TypeError(`Expected String but got ${getType(domstr)}.`);
   }
   if (!isString(mime)) {
     throw new TypeError(`Expected String but got ${getType(mime)}.`);
@@ -727,7 +727,7 @@ const createDomString = (value, mime) => {
     throw new Error(`Unsupported mime type ${mime}.`);
   }
   let frag;
-  const dom = new DOMParser().parseFromString(value, mime);
+  const dom = new DOMParser().parseFromString(domstr, mime);
   if (dom.querySelector("parsererror")) {
     throw new Error("Error while parsing DOM string.");
   }
@@ -1773,7 +1773,7 @@ const replaceEditableContent = (node, opt = {}) => {
       const dataTransfer = new DataTransfer();
       let domstr;
       try {
-        domstr = createDomString(value, MIME_HTML);
+        domstr = serializeDomString(value, MIME_HTML);
       } catch (e) {
         logErr(e);
         domstr = null;
@@ -2289,7 +2289,6 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     createContentData,
     createContentDataMsg,
     createDomStringFromSelectionRange,
-    createDomString,
     createElement,
     createFragment,
     createIdData,
@@ -2357,6 +2356,7 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     setDataIdController,
     setModifierKeys,
     setTmpFileData,
+    serializeDomString,
     startup,
     syncText,
     throwErr,
