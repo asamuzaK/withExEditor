@@ -554,6 +554,10 @@ const setAttributeNS = (elm, node = {}) => {
             bool && elm.setAttributeNS(ns, attrName, value);
             break;
           }
+          case "value": {
+            elm.setAttributeNS(ns, attrName, "");
+            break;
+          }
           default:
             elm.setAttributeNS(ns, attrName, value);
         }
@@ -1794,26 +1798,22 @@ const replaceEditableContent = (node, opt = {}) => {
         composed: true,
       });
       if (res) {
+        const {
+          collapsed, endContainer, endOffset, startContainer, StartOffset,
+        } = sel.getRangeAt(0);
         // TODO: StaticRange() constructor not implemented in Blink yet
         // See https://bugs.chromium.org/p/chromium/issues/detail?id=992606
         /*
         const insertTarget = new StaticRange({
-          startContainer: sel.anchorNode,
-          startOffset: sel.anchorOffset,
-          endContainer: sel.focusNode,
-          endOffset: sel.focusOffset,
+          endContainer, endOffset, startContainer, startOffset,
         });
         */
         const insertTarget = {
-          startContainer: sel.anchorNode,
-          startOffset: sel.anchorOffset,
-          endContainer: sel.focusNode,
-          endOffset: sel.focusOffset,
-          collapsed: sel.isCollapsed,
+          collapsed, endContainer, endOffset, startContainer, StartOffset,
         };
         // TODO: beforeinput not enabled by default in Gecko yet
-        // See https://bugzilla.mozilla.org/show_bug.cgi?id=1609291
-        // See also https://bugzilla.mozilla.org/show_bug.cgi?id=1665530
+        // See https://bugzilla.mozilla.org/show_bug.cgi?id=1665530
+        // Note: InputEvent.getTargetRanges() has been implemented in Firefox 75
         try {
           res = dispatchInputEvent(node, "beforeinput", {
             dataTransfer,

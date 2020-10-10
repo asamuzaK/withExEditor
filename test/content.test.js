@@ -1216,6 +1216,44 @@ describe("content", () => {
     });
 
     it("should set attributes", async () => {
+      const elm = document.createElement("input");
+      const elm2 = document.createElement("input");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("value", "foo bar");
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("value"), "attr");
+      assert.strictEqual(elm2.getAttribute("value"), "foo bar",
+                         "original attr value");
+      assert.strictEqual(elm.getAttribute("value"), "", "cloned attr value");
+      assert.strictEqual(elm2.value, "foo bar", "original value");
+      assert.strictEqual(elm.value, "", "cloned value");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
+      const elm = document.createElement("input");
+      const elm2 = document.createElement("input");
+      const body = document.querySelector("body");
+      elm2.setAttribute("data-foo", "bar");
+      elm2.setAttribute("value", "");
+      elm2.value = "foo bar";
+      body.appendChild(elm2);
+      func(elm, elm2);
+      assert.isTrue(elm.hasAttribute("data-foo"), "attr");
+      assert.isTrue(elm.hasAttribute("value"), "attr");
+      assert.strictEqual(elm2.getAttribute("value"), "", "original attr value");
+      assert.strictEqual(elm.getAttribute("value"), "", "cloned attr value");
+      assert.strictEqual(elm2.value, "foo bar", "original value");
+      assert.strictEqual(elm.value, "", "cloned value");
+      assert.strictEqual(elm.attributes.length, elm2.attributes.length,
+                         "length");
+    });
+
+    it("should set attributes", async () => {
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       const svg2 =
         document.createElementNS("http://www.w3.org/2000/svg", "svg");
