@@ -1791,13 +1791,13 @@ const replaceEditableContent = (node, opt = {}) => {
       });
       dataTransfer.setData(MIME_PLAIN, value);
       domstr && dataTransfer.setData(MIME_HTML, domstr);
-      let res = dispatchClipboardEvent(node, "paste", {
+      let proceed = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
         clipboardData: dataTransfer,
         composed: true,
       });
-      if (res) {
+      if (proceed) {
         const {
           collapsed, endContainer, endOffset, startContainer, startOffset,
         } = sel.getRangeAt(0);
@@ -1815,7 +1815,7 @@ const replaceEditableContent = (node, opt = {}) => {
         // See https://bugzilla.mozilla.org/show_bug.cgi?id=1665530
         // Note: InputEvent.getTargetRanges() has been implemented in Firefox 75
         try {
-          res = dispatchInputEvent(node, "beforeinput", {
+          proceed = dispatchInputEvent(node, "beforeinput", {
             dataTransfer,
             bubbles: true,
             cancelable: true,
@@ -1824,9 +1824,9 @@ const replaceEditableContent = (node, opt = {}) => {
           });
         } catch (e) {
           logErr(e);
-          res = true;
+          proceed = true;
         }
-        if (res) {
+        if (proceed) {
           const frag = createReplacingContent(node, {
             controlledBy, domstr, namespaceURI, value,
           });
@@ -1878,13 +1878,13 @@ const replaceEditControlValue = (elm, opt = {}) => {
     if (changed && !data.mutex) {
       data.mutex = true;
       setDataId(dataId, data);
-      const beforeInputNotPrevented = dispatchInputEvent(elm, "beforeinput", {
+      const proceed = dispatchInputEvent(elm, "beforeinput", {
         bubbles: true,
         cancelable: true,
         data: dataValue,
         inputType: "insertText",
       });
-      if (beforeInputNotPrevented) {
+      if (proceed) {
         elm.value = dataValue;
         delete data.mutex;
         setDataId(dataId, data);
