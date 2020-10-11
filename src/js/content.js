@@ -728,7 +728,7 @@ const serializeDomString = (domstr, mime) => {
     throw new TypeError(`Expected String but got ${getType(mime)}.`);
   }
   if (!/text\/(?:ht|x)ml|application\/(?:xhtml\+)?xml|image\/svg\+xml/.test(mime)) {
-    throw new Error(`Unsupported mime type ${mime}.`);
+    throw new TypeError(`Unsupported MIME type ${mime}.`);
   }
   let frag;
   const dom = new DOMParser().parseFromString(domstr, mime);
@@ -2351,12 +2351,12 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     requestPortConnection,
     requestTmpFile,
     runtimeOnMsg,
+    serializeDomString,
     setAttributeNS,
     setDataId,
     setDataIdController,
     setModifierKeys,
     setTmpFileData,
-    serializeDomString,
     startup,
     syncText,
     throwErr,
