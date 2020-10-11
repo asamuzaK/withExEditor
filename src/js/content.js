@@ -1799,18 +1799,18 @@ const replaceEditableContent = (node, opt = {}) => {
       });
       if (res) {
         const {
-          collapsed, endContainer, endOffset, startContainer, StartOffset,
+          collapsed, endContainer, endOffset, startContainer, startOffset,
         } = sel.getRangeAt(0);
-        // TODO: StaticRange() constructor not implemented in Blink yet
-        // See https://bugs.chromium.org/p/chromium/issues/detail?id=992606
-        /*
-        const insertTarget = new StaticRange({
-          endContainer, endOffset, startContainer, startOffset,
-        });
-        */
-        const insertTarget = {
-          collapsed, endContainer, endOffset, startContainer, StartOffset,
-        };
+        let insertTarget;
+        if (typeof StaticRange !== "undefined") {
+          insertTarget = new StaticRange({
+            endContainer, endOffset, startContainer, startOffset,
+          });
+        } else {
+          insertTarget = {
+            collapsed, endContainer, endOffset, startContainer, startOffset,
+          };
+        }
         // TODO: beforeinput not enabled by default in Gecko yet
         // See https://bugzilla.mozilla.org/show_bug.cgi?id=1665530
         // Note: InputEvent.getTargetRanges() has been implemented in Firefox 75

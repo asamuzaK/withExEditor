@@ -4878,6 +4878,31 @@ describe("content", () => {
       assert.strictEqual(div.firstChild.textContent, "bar", "content");
       assert.strictEqual(div.textContent, "bar", "content");
     });
+
+    it("should call function", () => {
+      delete global.StaticRange;
+      const div = document.createElement("div");
+      const span = document.createElement("span");
+      const spy = sinon.spy(span, "dispatchEvent");
+      const body = document.querySelector("body");
+      div.id = "div";
+      span.textContent = "bar";
+      div.appendChild(span);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set("foo", {});
+      body.appendChild(div);
+      func(span, {
+        controlledBy: "#div",
+        dataId: "foo",
+        value: "foo\n",
+      });
+      assert.strictEqual(spy.callCount, 3, "called");
+      assert.strictEqual(div.childNodes.length, 1, "length");
+      assert.strictEqual(div.firstChild.nodeType, 1, "child");
+      assert.strictEqual(div.firstChild.localName, "span", "name");
+      assert.strictEqual(div.firstChild.textContent, "foo\n", "content");
+      assert.strictEqual(div.textContent, "foo\n", "content");
+    });
   });
 
   describe("replace text edit control element value", () => {
