@@ -1802,7 +1802,7 @@ const replaceEditableContent = (node, opt = {}) => {
           collapsed, endContainer, endOffset, startContainer, startOffset,
         } = sel.getRangeAt(0);
         let insertTarget;
-        if (typeof StaticRange !== "undefined") {
+        if (typeof StaticRange === "function") {
           insertTarget = new StaticRange({
             endContainer, endOffset, startContainer, startOffset,
           });
