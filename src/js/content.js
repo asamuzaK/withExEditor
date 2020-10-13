@@ -1775,7 +1775,7 @@ const replaceEditableContent = (node, opt = {}) => {
     if (changed && !data.mutex) {
       const sel = node.ownerDocument.getSelection();
       const dataTransfer = new DataTransfer();
-      let domstr;
+      let domstr, proceed;
       try {
         domstr = serializeDomString(value, MIME_HTML);
       } catch (e) {
@@ -1791,7 +1791,7 @@ const replaceEditableContent = (node, opt = {}) => {
       });
       dataTransfer.setData(MIME_PLAIN, value);
       domstr && dataTransfer.setData(MIME_HTML, domstr);
-      let proceed = dispatchClipboardEvent(node, "paste", {
+      proceed = dispatchClipboardEvent(node, "paste", {
         bubbles: true,
         cancelable: true,
         clipboardData: dataTransfer,
@@ -1802,6 +1802,8 @@ const replaceEditableContent = (node, opt = {}) => {
           collapsed, endContainer, endOffset, startContainer, startOffset,
         } = sel.getRangeAt(0);
         let insertTarget;
+        // TODO: StaticRange() constructor not yet implemented in Blink
+        // See https://bugs.chromium.org/p/chromium/issues/detail?id=992606
         if (typeof StaticRange === "function") {
           insertTarget = new StaticRange({
             endContainer, endOffset, startContainer, startOffset,
@@ -1811,7 +1813,7 @@ const replaceEditableContent = (node, opt = {}) => {
             collapsed, endContainer, endOffset, startContainer, startOffset,
           };
         }
-        // TODO: beforeinput not enabled by default in Gecko yet
+        // TODO: beforeinput not yet enabled by default in Gecko
         // See https://bugzilla.mozilla.org/show_bug.cgi?id=1665530
         // Note: InputEvent.getTargetRanges() has been implemented in Firefox 75
         try {
