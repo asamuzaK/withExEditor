@@ -77,7 +77,12 @@ describe("content", () => {
     global.fetch = sinon.stub();
     for (const key of globalKeys) {
       // Not implemented in jsdom
-      if (!window[key]) {
+      if (key === "InputEvent" &&
+          typeof window.InputEvent.prototype.getTargetRanges !== "function") {
+        Object.defineProperty(window.InputEvent.prototype, "getTargetRanges", {
+          value: sinon.stub(),
+        });
+      } else if (!window[key]) {
         if (key === "ClipboardEvent") {
           window[key] = class ClipboardEvent extends window.Event {
             constructor(arg, initEvt) {
@@ -4557,7 +4562,7 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "", "content");
     });
 
-    it("should call function", () => {
+    it("should replace content", () => {
       const div = document.createElement("div");
       const spy = sinon.spy(div, "dispatchEvent");
       const body = document.querySelector("body");
@@ -4578,7 +4583,7 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "foo\nbar\n", "content");
     });
 
-    it("should call function", () => {
+    it("should replace content", () => {
       const div = document.createElement("div");
       const spy = sinon.spy(div, "dispatchEvent");
       const body = document.querySelector("body");
@@ -4637,7 +4642,7 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "bar", "content");
     });
 
-    it("should call function", () => {
+    it("should replace content", () => {
       const div = document.createElement("div");
       const spy = sinon.spy(div, "dispatchEvent");
       const span = document.createElement("span");
@@ -4705,7 +4710,7 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "bar", "content");
     });
 
-    it("should call function", () => {
+    it("should replace content", () => {
       const div = document.createElement("div");
       const span = document.createElement("span");
       const spy = sinon.spy(span, "dispatchEvent");
@@ -4755,27 +4760,6 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "bar", "content");
     });
 
-    it("should log error and call function", () => {
-      const p = document.createElement("p");
-      const stub = sinon.stub(p, "dispatchEvent").returns(true);
-      stub.onCall(1).throws(new Error("error"));
-      const stubErr = sinon.stub(console, "error");
-      const body = document.querySelector("body");
-      body.appendChild(p);
-      cjs.vars[CONTEXT_NODE] = p;
-      cjs.dataIds.set("foo", {});
-      func(p, {
-        dataId: "foo",
-        value: "bar",
-      });
-      const {called: errorCalled} = stubErr;
-      stubErr.restore();
-      assert.isTrue(errorCalled, "error called");
-      assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 3, "call count");
-      assert.strictEqual(p.textContent, "bar", "content");
-    });
-
     it("should not replace content", () => {
       const div = document.createElement("div");
       const stub = sinon.stub(div, "dispatchEvent").returns(true);
@@ -4793,7 +4777,7 @@ describe("content", () => {
       assert.strictEqual(div.childNodes.length, 0, "length");
     });
 
-    it("should call function", () => {
+    it("should not replace content", () => {
       const div = document.createElement("div");
       const span = document.createElement("span");
       const stub = sinon.stub(span, "dispatchEvent").returns(true);
@@ -4819,11 +4803,10 @@ describe("content", () => {
       assert.strictEqual(div.textContent, "bar", "content");
     });
 
-    it("should call function", () => {
+    it("should replace content", () => {
       const div = document.createElement("div");
       const span = document.createElement("span");
       const stub = sinon.stub(span, "dispatchEvent").returns(true);
-      stub.onCall(1).returns(false);
       const stubErr = sinon.stub(console, "error");
       const body = document.querySelector("body");
       div.id = "div";
@@ -4835,25 +4818,27 @@ describe("content", () => {
       func(span, {
         controlledBy: "#div",
         dataId: "foo",
-        value: "<div>foo</div>\n<div>bar</div>\n",
+        value: "<span>foo</span>\n<span>bar</span>\n",
       });
       const {calledOnce: errCalled} = stubErr;
       stubErr.restore();
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 2, "call count");
+      assert.strictEqual(stub.callCount, 3, "call count");
       assert.isFalse(errCalled, "error called");
       assert.strictEqual(div.childNodes.length, 1, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "span", "name");
-      assert.strictEqual(div.firstChild.textContent, "bar", "content");
-      assert.strictEqual(div.textContent, "bar", "content");
+      assert.strictEqual(div.firstChild.childNodes.length, 4, "child length");
+      assert.strictEqual(div.firstChild.firstChild.nodeType, 1, "child first");
+      assert.strictEqual(div.firstChild.lastChild.nodeType, 3, "child last");
+      assert.strictEqual(div.firstChild.textContent, "foo\nbar\n", "content");
+      assert.strictEqual(div.textContent, "foo\nbar\n", "content");
     });
 
-    it("should call function", () => {
+    it("should replace content", () => {
       const div = document.createElement("div");
       const span = document.createElement("span");
       const stub = sinon.stub(span, "dispatchEvent").returns(true);
-      stub.onCall(1).returns(false);
       const stubErr = sinon.stub(console, "error");
       const body = document.querySelector("body");
       div.id = "div";
@@ -4870,16 +4855,16 @@ describe("content", () => {
       const {calledOnce: errCalled} = stubErr;
       stubErr.restore();
       assert.isTrue(stub.called, "called");
-      assert.strictEqual(stub.callCount, 2, "call count");
+      assert.strictEqual(stub.callCount, 3, "call count");
       assert.isTrue(errCalled, "error called");
       assert.strictEqual(div.childNodes.length, 1, "length");
       assert.strictEqual(div.firstChild.nodeType, 1, "child");
       assert.strictEqual(div.firstChild.localName, "span", "name");
-      assert.strictEqual(div.firstChild.textContent, "bar", "content");
-      assert.strictEqual(div.textContent, "bar", "content");
+      assert.strictEqual(div.firstChild.textContent, "foo <foo@example.dom> wrote:\nbar\n", "content");
+      assert.strictEqual(div.textContent, "foo <foo@example.dom> wrote:\nbar\n", "content");
     });
 
-    it("should call function", () => {
+    it("should replace content", () => {
       delete global.StaticRange;
       const div = document.createElement("div");
       const span = document.createElement("span");

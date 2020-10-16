@@ -1816,7 +1816,7 @@ const replaceEditableContent = (node, opt = {}) => {
         // TODO: beforeinput not yet enabled by default in Gecko
         // See https://bugzilla.mozilla.org/show_bug.cgi?id=1665530
         // Note: InputEvent.getTargetRanges() has been implemented in Firefox 75
-        try {
+        if (typeof InputEvent.prototype.getTargetRanges === "function") {
           proceed = dispatchInputEvent(node, "beforeinput", {
             dataTransfer,
             bubbles: true,
@@ -1824,9 +1824,6 @@ const replaceEditableContent = (node, opt = {}) => {
             inputType: "insertFromPaste",
             ranges: [insertTarget],
           });
-        } catch (e) {
-          logErr(e);
-          proceed = true;
         }
         if (proceed) {
           const frag = createReplacingContent(node, {
