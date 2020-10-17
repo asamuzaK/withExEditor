@@ -115,7 +115,9 @@ describe("content", () => {
           };
         }
       }
-      global[key] = window[key];
+      if (window[key] && !global[key]) {
+        global[key] = window[key];
+      }
     }
   });
   afterEach(() => {

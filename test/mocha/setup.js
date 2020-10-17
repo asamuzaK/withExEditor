@@ -68,6 +68,57 @@ global.window = window;
 global.document = document;
 global.browser = browser;
 
+const globalKeys = [
+  "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "Event",
+  "FocusEvent", "Headers", "HTMLUnknownElement", "InputEvent",
+  "KeyboardEvent", "Node", "NodeList", "Selection", "StaticRange",
+  "XMLSerializer",
+];
+for (const key of globalKeys) {
+  // Not implemented in jsdom
+  if (key === "InputEvent" &&
+      typeof window.InputEvent.prototype.getTargetRanges !== "function") {
+    Object.defineProperty(window.InputEvent.prototype, "getTargetRanges", {
+      value: sinon.stub(),
+    });
+  } else if (!window[key]) {
+    if (key === "ClipboardEvent") {
+      window[key] = class ClipboardEvent extends window.Event {
+        constructor(arg, initEvt) {
+          super(arg, initEvt);
+          this.clipboardData = initEvt.clipboardData || null;
+        }
+      };
+    } else if (key === "DataTransfer") {
+      window[key] = class DataTransfer {
+        constructor() {
+          this._items = new Map();
+          this.types;
+        }
+        get types() {
+          return Array.from(this._items.keys());
+        }
+        clearData(format) {
+          if (format) {
+            this._items.remove(format);
+          } else {
+            this._items.clear();
+          }
+        }
+        getData(type) {
+          return this._items.get(type) || "";
+        }
+        setData(type, value) {
+          this._items.set(type, value);
+        }
+      };
+    }
+  }
+  if (window[key] && !global[key]) {
+    global[key] = window[key];
+  }
+}
+
 module.exports = {
   browser, createJsdom, mockPort,
 };
