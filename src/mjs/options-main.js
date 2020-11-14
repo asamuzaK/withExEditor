@@ -48,7 +48,9 @@ export const getHostStatus = async () => postMsg({ [HOST_STATUS_GET]: true });
  *
  * @returns {Function} - postMsg()
  */
-export const getEditorConfig = async () => postMsg({ [EDITOR_CONFIG_GET]: true });
+export const getEditorConfig = async () => postMsg({
+  [EDITOR_CONFIG_GET]: true
+});
 
 /**
  * create pref
