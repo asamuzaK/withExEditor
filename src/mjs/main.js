@@ -566,7 +566,7 @@ export const extractEditorConfig = async (data = {}) => {
     EDITOR_LABEL
   ]);
   const editorFileName = store && store[EDITOR_FILE_NAME] &&
-                           store[EDITOR_FILE_NAME].value;
+                         store[EDITOR_FILE_NAME].value;
   const editorLabel = store && store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
   const editorNewLabel = (editorFileName === editorName && editorLabel) ||
                          (executable && editorName) || '';
