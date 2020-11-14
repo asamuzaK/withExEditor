@@ -6,8 +6,8 @@
 const TYPE_FROM = 8;
 const TYPE_TO = -1;
 const VERSION_PART =
-  "(?:0|[1-9]\\d{0,3}|[1-5]\\d{4}|6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5]))))";
-const PRE_PART = "(?:e(\\d+)?[A-z]+|[A-df-z][A-z]*)(?:-?[A-z\\d]+)*|[A-z]+";
+  '(?:0|[1-9]\\d{0,3}|[1-5]\\d{4}|6(?:[0-4]\\d{3}|5(?:[0-4]\\d{2}|5(?:[0-2]\\d|3[0-5]))))';
+const PRE_PART = '(?:e(\\d+)?[A-z]+|[A-df-z][A-z]*)(?:-?[A-z\\d]+)*|[A-z]+';
 const VERSION_TOOLKIT =
   `(${VERSION_PART}(?:\\.${VERSION_PART}){0,3})(${PRE_PART})?`;
 const VERSION_TOOLKIT_REGEXP = new RegExp(`^(?:${VERSION_TOOLKIT})$`);
@@ -79,7 +79,7 @@ export const getType = o =>
  * @param {*} o - object to check
  * @returns {boolean} - result
  */
-export const isString = o => typeof o === "string" || o instanceof String;
+export const isString = o => typeof o === 'string' || o instanceof String;
 
 /**
  * is object, and not an empty object
@@ -101,7 +101,7 @@ export const isObjectNotEmpty = o => {
  */
 export const stringifyPositiveInt = (i, zero = false) => {
   let str;
-  if (Number.isSafeInteger(i) && (i > 0 || zero && i === 0)) {
+  if (Number.isSafeInteger(i) && (i > 0 || (zero && i === 0))) {
     str = `${i}`;
   }
   return str || null;
@@ -138,7 +138,7 @@ export const escapeMatchingChars = (str, re) => {
   if (!(re instanceof RegExp)) {
     throw new TypeError(`Expected RegExp but got ${getType(str)}.`);
   }
-  return re.global && str.replace(re, (m, c) => `\\${c}`) || null;
+  return re.global ? str.replace(re, (m, c) => `\\${c}`) : null;
 };
 
 /**
@@ -176,13 +176,13 @@ export const parseVersion = version => {
   }
   const [, vRelease, vPre] = version.match(VERSION_TOOLKIT_REGEXP);
   const [major, minor, patch, build] =
-    vRelease.split(".").map(parseStringifiedInt);
+    vRelease.split('.').map(parseStringifiedInt);
   let pre;
   if (vPre) {
     pre = [vPre];
   }
   return {
-    version, major, minor, patch, build, pre,
+    version, major, minor, patch, build, pre
   };
 };
 
@@ -195,7 +195,7 @@ export const parseVersion = version => {
 export const removeQueryFromURI = uri => {
   if (isString(uri)) {
     const query = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
-    uri = uri.replace(query, "");
+    uri = uri.replace(query, '');
   }
   return uri;
 };
@@ -233,17 +233,18 @@ export const dispatchKeyboardEvt = (elm, type, keyOpt) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       isString(type) && /^key(?:down|press|up)$/.test(type) &&
       isObjectNotEmpty(keyOpt)) {
-    const {altKey, code, ctrlKey, key, shiftKey, metaKey} = keyOpt;
+    const { altKey, code, ctrlKey, key, shiftKey, metaKey } = keyOpt;
     if (isString(key) && isString(code)) {
       const opt = {
-        code, key,
+        code,
+        key,
         altKey: !!altKey,
         ctrlKey: !!ctrlKey,
-        locale: "",
+        locale: '',
         location: 0,
         metaKey: !!metaKey,
         repeat: false,
-        shiftKey: !!shiftKey,
+        shiftKey: !!shiftKey
       };
       const evt = new KeyboardEvent(type, opt);
       elm.dispatchEvent(evt);
@@ -261,9 +262,9 @@ export const dispatchChangeEvt = elm => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
     const opt = {
       bubbles: true,
-      cancelable: false,
+      cancelable: false
     };
-    const evt = new Event("change", opt);
+    const evt = new Event('change', opt);
     elm.dispatchEvent(evt);
   }
 };
@@ -278,9 +279,9 @@ export const dispatchInputEvt = elm => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
     const opt = {
       bubbles: true,
-      cancelable: false,
+      cancelable: false
     };
-    const evt = new InputEvent("input", opt);
+    const evt = new InputEvent('input', opt);
     elm.dispatchEvent(evt);
   }
 };
@@ -292,7 +293,7 @@ export const dispatchInputEvt = elm => {
  * @returns {object} - element
  */
 export const focusElement = evt => {
-  const {target} = evt;
+  const { target } = evt;
   if (target) {
     target.focus();
   }

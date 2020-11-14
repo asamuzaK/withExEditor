@@ -2,22 +2,22 @@
  * file-ext.test.js
  */
 
-import {assert} from "chai";
-import {describe, it} from "mocha";
-import fileExt from "../src/mjs/file-ext.js";
+import { assert } from 'chai';
+import { describe, it } from 'mocha';
+import fileExt from '../src/mjs/file-ext.js';
 
-describe("file-ext", () => {
-  it("should get key", () => {
-    const itemKeys = ["application", "image", "text"];
+describe('file-ext', () => {
+  it('should get key', () => {
+    const itemKeys = ['application', 'image', 'text'];
     const items = Object.keys(fileExt);
     for (const key of items) {
       assert.isTrue(itemKeys.includes(key));
     }
   });
 
-  describe("application", () => {
-    it("should get string", () => {
-      const subItemKeys = ["json", "xml"];
+  describe('application', () => {
+    it('should get string', () => {
+      const subItemKeys = ['json', 'xml'];
       const items = Object.entries(fileExt.application);
       for (const [key, value] of items) {
         assert.isString(key);
@@ -34,9 +34,9 @@ describe("file-ext", () => {
     });
   });
 
-  describe("image", () => {
-    it("should get string", () => {
-      const subItemKeys = ["xml"];
+  describe('image', () => {
+    it('should get string', () => {
+      const subItemKeys = ['xml'];
       const items = Object.entries(fileExt.image);
       for (const [key, value] of items) {
         assert.isString(key);
@@ -53,8 +53,8 @@ describe("file-ext", () => {
     });
   });
 
-  describe("text", () => {
-    it("should get string", () => {
+  describe('text', () => {
+    it('should get string', () => {
       const items = Object.entries(fileExt.text);
       for (const [key, value] of items) {
         assert.isString(key);

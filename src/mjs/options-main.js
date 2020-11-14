@@ -3,26 +3,26 @@
  */
 
 import {
-  isObjectNotEmpty, isString, logErr, throwErr,
-} from "./common.js";
+  isObjectNotEmpty, isString, logErr, throwErr
+} from './common.js';
 import {
-  getStorage, removePermission, requestPermission,
-} from "./browser.js";
-
-/* api */
-const {i18n, runtime} = browser;
+  getStorage, removePermission, requestPermission
+} from './browser.js';
 
 /* constants */
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
   EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
-  HOST_VERSION_LATEST, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN,
-} from "./constant.js";
-const PORT_NAME = "portOptions";
+  HOST_VERSION_LATEST, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN
+} from './constant.js';
+
+/* api */
+const { i18n, runtime } = browser;
+const PORT_NAME = 'portOptions';
 
 /* port */
-export const port = runtime.connect({name: PORT_NAME});
+export const port = runtime.connect({ name: PORT_NAME });
 
 /**
  * post message
@@ -41,14 +41,14 @@ export const postMsg = async msg => {
  *
  * @returns {Function} - postMsg()
  */
-export const getHostStatus = async () => postMsg({[HOST_STATUS_GET]: true});
+export const getHostStatus = async () => postMsg({ [HOST_STATUS_GET]: true });
 
 /**
  * get editor config
  *
  * @returns {Function} - postMsg()
  */
-export const getEditorConfig = async () => postMsg({[EDITOR_CONFIG_GET]: true});
+export const getEditorConfig = async () => postMsg({ [EDITOR_CONFIG_GET]: true });
 
 /**
  * create pref
@@ -59,18 +59,19 @@ export const getEditorConfig = async () => postMsg({[EDITOR_CONFIG_GET]: true});
  */
 export const createPref = async (elm, executable = false) => {
   const id = elm && elm.id;
-  return id && {
+  const data = id && {
     [STORAGE_SET]: {
       [id]: {
         id,
         app: {
-          executable: !!executable,
+          executable: !!executable
         },
         checked: !!elm.checked,
-        value: elm.value || "",
-      },
-    },
-  } || null;
+        value: elm.value || ''
+      }
+    }
+  };
+  return data || null;
 };
 
 /**
@@ -80,7 +81,7 @@ export const createPref = async (elm, executable = false) => {
  * @returns {void}
  */
 export const extractEditorConfig = async (obj = {}) => {
-  const {editorLabel, editorName, executable} = obj;
+  const { editorLabel, editorName, executable } = obj;
   const isExecutable = document.getElementById(IS_EXECUTABLE);
   const name = document.getElementById(EDITOR_FILE_NAME);
   const label = document.getElementById(EDITOR_LABEL);
@@ -93,14 +94,14 @@ export const extractEditorConfig = async (obj = {}) => {
     }
   }
   if (name) {
-    name.value = editorName || "";
+    name.value = editorName || '';
   }
   if (label) {
     if (executable && (editorLabel || editorName)) {
       label.value = editorLabel || editorName;
       label.disabled = false;
     } else {
-      label.value = "";
+      label.value = '';
       label.disabled = true;
     }
   }
@@ -113,7 +114,7 @@ export const extractEditorConfig = async (obj = {}) => {
  * @returns {void}
  */
 export const extractHostStatus = async status => {
-  const {hostCompatibility, hostConnection, hostLatestVersion} = status;
+  const { hostCompatibility, hostConnection, hostLatestVersion } = status;
   const latest = document.getElementById(HOST_VERSION_LATEST);
   const connect = document.getElementById(HOST_CONNECTION);
   const version = document.getElementById(HOST_VERSION);
@@ -121,10 +122,10 @@ export const extractHostStatus = async status => {
     if (hostLatestVersion) {
       latest.classList.add(INFO);
       latest.textContent =
-        i18n.getMessage("hostLatestVersion", `v${hostLatestVersion}`);
+        i18n.getMessage('hostLatestVersion', `v${hostLatestVersion}`);
     } else {
       latest.classList.remove(INFO);
-      latest.textContent = "";
+      latest.textContent = '';
     }
   }
   if (connect) {
@@ -152,9 +153,9 @@ export const extractHostStatus = async status => {
  * @returns {?Function} - postMsg()
  */
 export const extractSyncUrls = async evt => {
-  const {target} = evt;
-  const {value} = target;
-  const items = isString(value) && value.split("\n");
+  const { target } = evt;
+  const { value } = target;
+  const items = isString(value) && value.split('\n');
   let func;
   if (items && items.length) {
     let bool = false;
@@ -184,11 +185,11 @@ export const extractSyncUrls = async evt => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const storePref = async evt => {
-  const {target} = evt;
-  const {checked, id, name, type} = target;
+  const { target } = evt;
+  const { checked, id, name, type } = target;
   const func = [];
   if (id && isString(id)) {
-    if (type === "radio") {
+    if (type === 'radio') {
       const nodes = document.querySelectorAll(`[name=${name}]`);
       for (const node of nodes) {
         func.push(createPref(node).then(postMsg));
@@ -197,9 +198,9 @@ export const storePref = async evt => {
       switch (id) {
         case HOST_ERR_NOTIFY:
           if (checked) {
-            target.checked = await requestPermission(["notifications"]);
+            target.checked = await requestPermission(['notifications']);
           } else {
-            await removePermission(["notifications"]);
+            await removePermission(['notifications']);
           }
           func.push(createPref(target).then(postMsg));
           break;
@@ -219,12 +220,12 @@ export const storePref = async evt => {
  * @returns {?Function} - postMsg()
  */
 export const handleReloadExtensionClick = evt => {
-  const {currentTarget, target} = evt;
+  const { currentTarget, target } = evt;
   let func;
   const reload = currentTarget === target;
   if (reload) {
     func = postMsg({
-      [EXT_RELOAD]: reload,
+      [EXT_RELOAD]: reload
     }).catch(throwErr);
   }
   evt.stopPropagation();
@@ -268,7 +269,7 @@ export const preventEvent = evt => {
  */
 export const addReloadExtensionListener = async () => {
   const elm = document.getElementById(EXT_RELOAD);
-  elm && elm.addEventListener("click", handleReloadExtensionClick);
+  elm && elm.addEventListener('click', handleReloadExtensionClick);
 };
 
 /**
@@ -278,7 +279,7 @@ export const addReloadExtensionListener = async () => {
  */
 export const addSyncUrlsInputListener = async () => {
   const elm = document.getElementById(SYNC_AUTO_URL);
-  elm && elm.addEventListener("input", handleSyncUrlsInputInput);
+  elm && elm.addEventListener('input', handleSyncUrlsInputInput);
 };
 
 /**
@@ -287,9 +288,9 @@ export const addSyncUrlsInputListener = async () => {
  * @returns {void}
  */
 export const addInputChangeListener = async () => {
-  const nodes = document.querySelectorAll("input");
+  const nodes = document.querySelectorAll('input');
   for (const node of nodes) {
-    node.addEventListener("change", handleInputChange);
+    node.addEventListener('change', handleInputChange);
   }
 };
 
@@ -299,9 +300,9 @@ export const addInputChangeListener = async () => {
  * @returns {void}
  */
 export const addFormSubmitListener = async () => {
-  const nodes = document.querySelectorAll("form");
+  const nodes = document.querySelectorAll('form');
   for (const node of nodes) {
-    node.addEventListener("submit", preventEvent);
+    node.addEventListener('submit', preventEvent);
   }
 };
 
@@ -312,24 +313,24 @@ export const addFormSubmitListener = async () => {
  * @returns {void}
  */
 export const setHtmlInputValue = async (data = {}) => {
-  const {checked, id: dataId, value} = data;
+  const { checked, id: dataId, value } = data;
   const elm = dataId && document.getElementById(dataId);
   if (elm) {
-    const {id, type} = elm;
+    const { id, type } = elm;
     switch (type) {
-      case "checkbox":
-      case "radio":
+      case 'checkbox':
+      case 'radio':
         elm.checked = !!checked;
         break;
-      case "text":
-        elm.value = isString(value) && value || "";
+      case 'text':
+        elm.value = isString(value) ? value : '';
         if (id === EDITOR_LABEL && elm.value) {
           elm.disabled = false;
         }
         break;
       default:
         if (id === SYNC_AUTO_URL) {
-          elm.value = isString(value) && value || "";
+          elm.value = isString(value) ? value : '';
         }
     }
   }

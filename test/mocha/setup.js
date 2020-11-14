@@ -2,10 +2,10 @@
  * setup.js
  */
 
-"use strict";
-const {JSDOM} = require("jsdom");
-const {Schema} = require("webext-schema");
-const sinon = require("sinon");
+'use strict';
+const { JSDOM } = require('jsdom');
+const { Schema } = require('webext-schema');
+const sinon = require('sinon');
 
 /**
  * create jsdom
@@ -14,19 +14,19 @@ const sinon = require("sinon");
  * @returns {object} - jsdom instance
  */
 const createJsdom = url => {
-  const domstr = "<!DOCTYPE html><html><head></head><body></body></html>";
+  const domstr = '<!DOCTYPE html><html><head></head><body></body></html>';
   const opt = {
-    runScripts: "dangerously",
-    url: url || "https://localhost",
+    runScripts: 'dangerously',
+    url: url || 'https://localhost',
     beforeParse(window) {
       window.alert = sinon.stub().callsFake((...args) => args.toString());
-    },
+    }
   };
   return new JSDOM(domstr, opt);
 };
 
-const {window} = createJsdom();
-const {document} = window;
+const { window } = createJsdom();
+const { document } = window;
 
 /**
  * get channel
@@ -40,7 +40,7 @@ const getChannel = () => {
   if (args.length) {
     [ch] = reg.exec(args);
   } else {
-    ch = "beta";
+    ch = 'beta';
   }
   return ch;
 };
@@ -51,7 +51,7 @@ console.log(`Channel: ${channel}`);
 
 const browser = new Schema(channel).mock();
 
-const mockPort = ({name, sender}) => {
+const mockPort = ({ name, sender }) => {
   const port = Object.assign({}, browser.runtime.Port);
   port.name = name;
   port.sender = sender;
@@ -69,35 +69,36 @@ global.document = document;
 global.browser = browser;
 
 const globalKeys = [
-  "ClipboardEvent", "DataTransfer", "DOMTokenList", "DOMParser", "Event",
-  "FocusEvent", "Headers", "HTMLUnknownElement", "InputEvent",
-  "KeyboardEvent", "Node", "NodeList", "Selection", "StaticRange",
-  "XMLSerializer",
+  'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'Event',
+  'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
+  'KeyboardEvent', 'Node', 'NodeList', 'Selection', 'StaticRange',
+  'XMLSerializer'
 ];
 for (const key of globalKeys) {
   // Not implemented in jsdom
-  if (key === "InputEvent" &&
-      typeof window.InputEvent.prototype.getTargetRanges !== "function") {
-    Object.defineProperty(window.InputEvent.prototype, "getTargetRanges", {
-      value: sinon.stub(),
+  if (key === 'InputEvent' &&
+      typeof window.InputEvent.prototype.getTargetRanges !== 'function') {
+    Object.defineProperty(window.InputEvent.prototype, 'getTargetRanges', {
+      value: sinon.stub()
     });
   } else if (!window[key]) {
-    if (key === "ClipboardEvent") {
+    if (key === 'ClipboardEvent') {
       window[key] = class ClipboardEvent extends window.Event {
         constructor(arg, initEvt) {
           super(arg, initEvt);
           this.clipboardData = initEvt.clipboardData || null;
         }
       };
-    } else if (key === "DataTransfer") {
+    } else if (key === 'DataTransfer') {
       window[key] = class DataTransfer {
         constructor() {
           this._items = new Map();
-          this.types;
         }
+
         get types() {
           return Array.from(this._items.keys());
         }
+
         clearData(format) {
           if (format) {
             this._items.remove(format);
@@ -105,9 +106,11 @@ for (const key of globalKeys) {
             this._items.clear();
           }
         }
+
         getData(type) {
-          return this._items.get(type) || "";
+          return this._items.get(type) || '';
         }
+
         setData(type, value) {
           this._items.set(type, value);
         }
@@ -120,5 +123,5 @@ for (const key of globalKeys) {
 }
 
 module.exports = {
-  browser, createJsdom, mockPort,
+  browser, createJsdom, mockPort
 };

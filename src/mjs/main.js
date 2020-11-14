@@ -4,19 +4,13 @@
 
 import {
   getType, isObjectNotEmpty, isString, logErr, logMsg, logWarn,
-  removeQueryFromURI, stringifyPositiveInt, throwErr,
-} from "./common.js";
+  removeQueryFromURI, stringifyPositiveInt, throwErr
+} from './common.js';
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   getActiveTab, getActiveTabId, getCurrentWindow, getOs, getStorage, getWindow,
-  sendMessage, setStorage,
-} from "./browser.js";
-
-/* api */
-const {
-  browserAction, i18n, notifications, runtime, tabs, windows,
-} = browser;
-const menus = browser.menus || browser.contextMenus;
+  sendMessage, setStorage
+} from './browser.js';
 
 /* constants */
 import {
@@ -33,9 +27,15 @@ import {
   STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE, TMP_FILE_CREATE,
   TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ,
-  TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID,
-} from "./constant.js";
-const HOST_VERSION_MIN = "v5.0.0-b.2.1";
+  TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID
+} from './constant.js';
+
+/* api */
+const {
+  browserAction, i18n, notifications, runtime, tabs, windows
+} = browser;
+const menus = browser.menus || browser.contextMenus;
+const HOST_VERSION_MIN = 'v5.0.0-b.2.1';
 
 /* variables */
 export const vars = {
@@ -43,17 +43,17 @@ export const vars = {
   [IS_WEBEXT]: runtime.id === WEBEXT_ID,
   [ONLY_EDITABLE]: false,
   [SYNC_AUTO]: false,
-  [SYNC_AUTO_URL]: null,
+  [SYNC_AUTO_URL]: null
 };
 
 export const varsLocal = {
-  [EDITOR_LABEL]: "",
-  [ICON_ID]: "",
+  [EDITOR_LABEL]: '',
+  [ICON_ID]: '',
   [IS_EXECUTABLE]: false,
   [MENU_ENABLED]: false,
-  [MODE_MATHML]: "",
-  [MODE_SOURCE]: "",
-  [MODE_SVG]: "",
+  [MODE_MATHML]: '',
+  [MODE_SOURCE]: '',
+  [MODE_SVG]: ''
 };
 
 /* native application host */
@@ -63,7 +63,7 @@ export const host = runtime.connectNative(HOST);
 export const hostStatus = {
   [HOST_COMPAT]: false,
   [HOST_CONNECTION]: false,
-  [HOST_VERSION_LATEST]: null,
+  [HOST_VERSION_LATEST]: null
 };
 
 /**
@@ -112,13 +112,13 @@ export const createPortsMap = async (windowId, tabId) => {
  * @returns {?Function} - restorePorts() (recursive)
  */
 export const restorePorts = async (data = {}) => {
-  const {tabId, windowId} = data;
+  const { tabId, windowId } = data;
   let func;
   if (windowId && tabId && ports.has(windowId)) {
     const portsWin = ports.get(windowId);
     portsWin.delete(tabId);
     if (portsWin.size === 0) {
-      func = restorePorts({windowId});
+      func = restorePorts({ windowId });
     }
   } else if (windowId) {
     ports.delete(windowId);
@@ -133,11 +133,11 @@ export const restorePorts = async (data = {}) => {
  * @returns {?Function} - hostPostMsg()
  */
 export const removePort = async (port = {}) => {
-  const {sender} = port;
+  const { sender } = port;
   let func;
   if (isObjectNotEmpty(sender)) {
-    const {tab, url} = sender;
-    const {incognito, windowId: wId, id: tId} = tab;
+    const { tab, url } = sender;
+    const { incognito, windowId: wId, id: tId } = tab;
     const windowId = stringifyPositiveInt(wId, true);
     const portsWin = ports.get(windowId);
     if (portsWin) {
@@ -145,14 +145,15 @@ export const removePort = async (port = {}) => {
       const portsTab = portsWin.get(tabId);
       if (portsTab) {
         const portUrl = removeQueryFromURI(url);
-        const {hostname} = new URL(portUrl);
+        const { hostname } = new URL(portUrl);
         portsTab.delete(portUrl);
         func = hostPostMsg({
           [TMP_FILE_DATA_REMOVE]: {
-            tabId, windowId,
-            dir: incognito && TMP_FILES_PB || TMP_FILES,
-            host: hostname,
-          },
+            tabId,
+            windowId,
+            dir: incognito ? TMP_FILES_PB : TMP_FILES,
+            host: hostname
+          }
         });
       }
     }
@@ -170,7 +171,7 @@ export const removePort = async (port = {}) => {
 export const portPostMsg = async (msg, opt = {}) => {
   const func = [];
   if (msg) {
-    const {windowId, tabId, portKey, recurse} = opt;
+    const { windowId, tabId, portKey, recurse } = opt;
     const portsWin = isString(windowId) && ports.get(windowId);
     const portsTab = portsWin && isString(tabId) && portsWin.get(tabId);
     const port = portsTab && isString(portKey) && portsTab.get(portKey);
@@ -192,7 +193,7 @@ export const portPostMsg = async (msg, opt = {}) => {
         for (const itemKey of items) {
           func.push(portPostMsg(msg, {
             windowId,
-            tabId: itemKey,
+            tabId: itemKey
           }));
         }
       } else {
@@ -200,7 +201,7 @@ export const portPostMsg = async (msg, opt = {}) => {
         for (const itemKey of items) {
           func.push(portPostMsg(msg, {
             recurse,
-            windowId: itemKey,
+            windowId: itemKey
           }));
         }
       }
@@ -219,16 +220,16 @@ export const portPostMsg = async (msg, opt = {}) => {
 export const postContextMenuData = async (info, tab) => {
   let func;
   if (info && tab) {
-    const {frameUrl, pageUrl} = info;
-    const {windowId: wId, id: tId} = tab;
+    const { frameUrl, pageUrl } = info;
+    const { windowId: wId, id: tId } = tab;
     const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(tId, true);
     const portKey = removeQueryFromURI(frameUrl || pageUrl);
     if (windowId && tabId && portKey) {
       func = portPostMsg({
-        [CONTENT_GET]: {info, tab},
+        [CONTENT_GET]: { info, tab }
       }, {
-        windowId, tabId, portKey,
+        windowId, tabId, portKey
       });
     }
   }
@@ -248,17 +249,17 @@ export const postTmpFileData = async (key, msg) => {
   }
   let func;
   if (msg) {
-    const {data} = msg;
+    const { data } = msg;
     if (data) {
-      const {tabId, windowId} = data;
+      const { tabId, windowId } = data;
       if (isString(tabId) && /^\d+$/.test(tabId) &&
           isString(windowId) && /^\d+$/.test(windowId)) {
         const activeTabId = await getActiveTabId(windowId * 1);
         if (activeTabId === tabId * 1) {
           func = portPostMsg({
-            [key]: msg,
+            [key]: msg
           }, {
-            windowId, tabId,
+            windowId, tabId
           });
         }
       }
@@ -276,14 +277,14 @@ export const postGetContent = async () => {
   const tab = await getActiveTab();
   let func;
   if (tab) {
-    const {id: tId, windowId: wId} = tab;
+    const { id: tId, windowId: wId } = tab;
     const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(tId, true);
     const msg = {
-      [CONTENT_GET]: {tab},
+      [CONTENT_GET]: { tab }
     };
     func = portPostMsg(msg, {
-      windowId, tabId,
+      windowId, tabId
     });
   }
   return func || null;
@@ -299,7 +300,7 @@ export const postGetContent = async () => {
 export const setIcon = async (id = varsLocal[ICON_ID]) => {
   const icon = runtime.getURL(ICON);
   const path = `${icon}${id}`;
-  return browserAction.setIcon({path});
+  return browserAction.setIcon({ path });
 };
 
 /**
@@ -317,18 +318,18 @@ export const toggleBadge = async () => {
       text = INFO_TEXT;
     } else {
       color = [0, 0, 0, 0];
-      text = "";
+      text = '';
     }
   } else {
     color = WARN_COLOR;
     text = WARN_TEXT;
   }
   func.push(
-    browserAction.setBadgeBackgroundColor({color}),
-    browserAction.setBadgeText({text}),
+    browserAction.setBadgeBackgroundColor({ color }),
+    browserAction.setBadgeText({ text })
   );
-  text && typeof browserAction.setBadgeTextColor === "function" &&
-    func.push(browserAction.setBadgeTextColor({color: "white"}));
+  text && typeof browserAction.setBadgeTextColor === 'function' &&
+    func.push(browserAction.setBadgeTextColor({ color: 'white' }));
   return Promise.all(func);
 };
 
@@ -336,7 +337,7 @@ export const toggleBadge = async () => {
 export const menuItems = {
   [MODE_SOURCE]: null,
   [MODE_SELECTION]: null,
-  [MODE_EDIT]: null,
+  [MODE_EDIT]: null
 };
 
 /**
@@ -350,7 +351,7 @@ export const setMenuItems = async (key, value) => {
   if (!isString(key)) {
     throw new TypeError(`Expected String but got ${getType(key)}.`);
   }
-  if (menuItems.hasOwnProperty(key)) {
+  if (Object.prototype.hasOwnProperty.call(menuItems, key)) {
     menuItems[key] = value || null;
   }
 };
@@ -382,9 +383,9 @@ export const getAccesskey = id => {
   switch (id) {
     case MODE_EDIT:
       if (vars[IS_WEBEXT]) {
-        key = "(&E)";
+        key = '(&E)';
       } else {
-        key = " (&E)";
+        key = ' (&E)';
       }
       break;
     case MODE_MATHML:
@@ -392,14 +393,14 @@ export const getAccesskey = id => {
     case MODE_SOURCE:
     case MODE_SVG:
       if (vars[IS_WEBEXT]) {
-        key = "(&V)";
+        key = '(&V)';
       } else {
-        key = " (&V)";
+        key = ' (&V)';
       }
       break;
     default:
   }
-  return key || "";
+  return key || '';
 };
 
 /**
@@ -416,14 +417,14 @@ export const createMenuItem = async (id, contexts) => {
   if (!Array.isArray(contexts)) {
     throw new TypeError(`Expected Array but got ${getType(contexts)}.`);
   }
-  if (menuItems.hasOwnProperty(id)) {
+  if (Object.prototype.hasOwnProperty.call(menuItems, id)) {
     const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
     const accKey = getAccesskey(id);
     const title = `${id}_key`;
     const opt = {
       contexts,
       enabled: !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE],
-      title: i18n.getMessage(title, [label, accKey]),
+      title: i18n.getMessage(title, [label, accKey])
     };
     if (id === MODE_EDIT) {
       opt.visible = true;
@@ -437,7 +438,7 @@ export const createMenuItem = async (id, contexts) => {
         id,
         contexts: opt.contexts,
         enabled: opt.enabled,
-        title: opt.title,
+        title: opt.title
       };
       const menuItemId = await menus.create(menuItemOpt);
       await setMenuItems(id, menuItemId);
@@ -457,13 +458,13 @@ export const createMenuItems = async () => {
   for (const item of items) {
     switch (item) {
       case MODE_EDIT:
-        func.push(createMenuItem(item, ["editable"]));
+        func.push(createMenuItem(item, ['editable']));
         break;
       case MODE_SELECTION:
-        bool && func.push(createMenuItem(item, ["selection"]));
+        bool && func.push(createMenuItem(item, ['selection']));
         break;
       default:
-        bool && func.push(createMenuItem(item, ["frame", "page"]));
+        bool && func.push(createMenuItem(item, ['frame', 'page']));
     }
   }
   return Promise.all(func);
@@ -489,14 +490,14 @@ export const updateContextMenu = async type => {
   if (isObjectNotEmpty(type)) {
     const items = Object.entries(type);
     for (const [key, value] of items) {
-      const {enabled, menuItemId, mode} = value;
+      const { enabled, menuItemId, mode } = value;
       if (menuItems[menuItemId]) {
         if (key === MODE_SOURCE) {
           const title = varsLocal[mode] || varsLocal[menuItemId];
-          title && func.push(menus.update(menuItemId, {title}));
+          title && func.push(menus.update(menuItemId, { title }));
         } else {
           key === MODE_EDIT &&
-            func.push(menus.update(menuItemId, {enabled}));
+            func.push(menus.update(menuItemId, { enabled }));
         }
       }
     }
@@ -510,7 +511,7 @@ export const updateContextMenu = async type => {
         const accKey = getAccesskey(item);
         const opt = {
           enabled,
-          title: i18n.getMessage(title, [label, accKey]),
+          title: i18n.getMessage(title, [label, accKey])
         };
         if (item === MODE_EDIT) {
           opt.visible = true;
@@ -522,13 +523,13 @@ export const updateContextMenu = async type => {
         const bool = !vars[ONLY_EDITABLE];
         switch (item) {
           case MODE_EDIT:
-            func.push(createMenuItem(item, ["editable"]));
+            func.push(createMenuItem(item, ['editable']));
             break;
           case MODE_SELECTION:
-            bool && func.push(createMenuItem(item, ["selection"]));
+            bool && func.push(createMenuItem(item, ['selection']));
             break;
           default:
-            bool && func.push(createMenuItem(item, ["frame", "page"]));
+            bool && func.push(createMenuItem(item, ['frame', 'page']));
         }
       }
     }
@@ -559,52 +560,54 @@ export const cacheMenuItemTitle = async () => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const extractEditorConfig = async (data = {}) => {
-  const {editorConfigTimestamp, editorName, executable} = data;
+  const { editorConfigTimestamp, editorName, executable } = data;
   const store = await getStorage([
     EDITOR_FILE_NAME,
-    EDITOR_LABEL,
+    EDITOR_LABEL
   ]);
   const editorFileName = store && store[EDITOR_FILE_NAME] &&
                            store[EDITOR_FILE_NAME].value;
   const editorLabel = store && store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
-  const editorNewLabel = editorFileName === editorName && editorLabel ||
-                         executable && editorName || "";
+  const editorNewLabel = (editorFileName === editorName && editorLabel) ||
+                         (executable && editorName) || '';
   return Promise.all([
     setStorage({
       [EDITOR_CONFIG_TS]: {
         id: EDITOR_CONFIG_TS,
         app: {
-          executable: !!executable,
+          executable: !!executable
         },
         checked: false,
-        value: editorConfigTimestamp || 0,
+        value: editorConfigTimestamp || 0
       },
       [EDITOR_FILE_NAME]: {
         id: EDITOR_FILE_NAME,
         app: {
-          executable: !!executable,
+          executable: !!executable
         },
         checked: false,
-        value: executable && editorName || "",
+        value: executable ? editorName : ''
       },
       [EDITOR_LABEL]: {
         id: EDITOR_LABEL,
         app: {
-          executable: false,
+          executable: false
         },
         checked: false,
-        value: editorNewLabel,
-      },
+        value: editorNewLabel
+      }
     }),
     portPostMsg({
       [EDITOR_CONFIG_RES]: {
-        editorConfigTimestamp, editorName, executable,
-        editorLabel: editorNewLabel,
-      },
+        editorConfigTimestamp,
+        editorName,
+        executable,
+        editorLabel: editorNewLabel
+      }
     }, {
-      recurse: true,
+      recurse: true
     }),
-    restoreContextMenu(),
+    restoreContextMenu()
   ]);
 };
 
@@ -639,32 +642,33 @@ export const openOptionsPage = async () => runtime.openOptionsPage();
 export const handleHostMsg = async msg => {
   const func = [];
   if (isObjectNotEmpty(msg)) {
-    const {message, status} = msg;
+    const { message, status } = msg;
     const log = message && `${HOST}: ${message}`;
     const iconUrl = runtime.getURL(ICON);
     const notifyMsg = {
-      iconUrl, message,
+      iconUrl,
+      message,
       title: `${HOST}: ${status}`,
-      type: "basic",
+      type: 'basic'
     };
     switch (status) {
       case `${PROCESS_CHILD}_stderr`:
-      case "error":
+      case 'error':
         if (log) {
           func.push(logErr(log));
         }
         func.push(createNotification(status, notifyMsg));
         break;
-      case "ready":
+      case 'ready':
         hostStatus[HOST_CONNECTION] = true;
         func.push(
           hostPostMsg({
             [EDITOR_CONFIG_GET]: true,
-            [HOST_VERSION_CHECK]: HOST_VERSION_MIN,
-          }),
+            [HOST_VERSION_CHECK]: HOST_VERSION_MIN
+          })
         );
         break;
-      case "warn":
+      case 'warn':
         if (log) {
           func.push(logWarn(log));
         }
@@ -699,7 +703,7 @@ export const handleMsg = async (msg, sender) => {
         case LOCAL_FILE_VIEW:
         case TMP_FILE_CREATE:
         case TMP_FILE_GET:
-          func.push(hostPostMsg({[key]: value}));
+          func.push(hostPostMsg({ [key]: value }));
           break;
         case EDITOR_CONFIG_RES:
           func.push(extractEditorConfig(value));
@@ -712,15 +716,15 @@ export const handleMsg = async (msg, sender) => {
           break;
         case HOST_STATUS_GET:
           func.push(portPostMsg({
-            [HOST_STATUS]: hostStatus,
+            [HOST_STATUS]: hostStatus
           }, {
-            recurse: true,
+            recurse: true
           }));
           break;
         case HOST_VERSION: {
           if (isObjectNotEmpty(value)) {
-            const {isLatest, latest, result} = value;
-            hostStatus[HOST_VERSION_LATEST] = !isLatest && latest || null;
+            const { isLatest, latest, result } = value;
+            hostStatus[HOST_VERSION_LATEST] = !isLatest ? latest : null;
             if (isLatest) {
               hostStatus[HOST_COMPAT] = !!isLatest;
               func.push(toggleBadge());
@@ -736,14 +740,14 @@ export const handleMsg = async (msg, sender) => {
           break;
         case PORT_CONNECT: {
           if (sender) {
-            const {tab} = sender;
+            const { tab } = sender;
             if (tab) {
-              const {id: tabId, windowId} = tab;
+              const { id: tabId, windowId } = tab;
               if (Number.isInteger(tabId) && tabId !== tabs.TAB_ID_NONE &&
                   Number.isInteger(windowId) &&
                   windowId !== windows.WINDOW_ID_NONE) {
                 func.push(sendMessage(tabId, {
-                  [PORT_CONNECT]: true,
+                  [PORT_CONNECT]: true
                 }));
               }
             }
@@ -755,9 +759,9 @@ export const handleMsg = async (msg, sender) => {
           break;
         case TMP_FILE_DATA_PORT:
           func.push(portPostMsg({
-            [key]: value,
+            [key]: value
           }, {
-            recurse: true,
+            recurse: true
           }));
           break;
         case TMP_FILE_DATA_REMOVE:
@@ -794,12 +798,12 @@ export const handlePortOnMsg = msg => handleMsg(msg).catch(throwErr);
  * @returns {?Function} - updateContextMenu()
  */
 export const handlePort = async (port = {}) => {
-  const {name: portName, sender} = port;
+  const { name: portName, sender } = port;
   let func;
   if (sender) {
-    const {frameId, tab, url} = sender;
+    const { frameId, tab, url } = sender;
     if (tab) {
-      const {active, id: tId, incognito, status, windowId: wId} = tab;
+      const { active, id: tId, incognito, status, windowId: wId } = tab;
       const windowId = stringifyPositiveInt(wId, true);
       const tabId = stringifyPositiveInt(tId, true);
       if (windowId && tabId && url) {
@@ -809,12 +813,14 @@ export const handlePort = async (port = {}) => {
         port.onMessage.addListener(handlePortOnMsg);
         portsTab.set(portUrl, port);
         port.postMessage({
-          incognito, tabId, windowId,
-          [VARS_SET]: vars,
+          incognito,
+          tabId,
+          windowId,
+          [VARS_SET]: vars
         });
       }
       if (portName === PORT_CONTENT && frameId === 0 && active &&
-          status === "complete") {
+          status === 'complete') {
         varsLocal[MENU_ENABLED] = true;
         func = updateContextMenu();
       }
@@ -840,7 +846,7 @@ export const handleDisconnectedHost = async () => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onTabActivated = async info => {
-  const {tabId: tId, windowId: wId} = info;
+  const { tabId: tId, windowId: wId } = info;
   const windowId = stringifyPositiveInt(wId, true);
   const tabId = stringifyPositiveInt(tId, true);
   const func = [];
@@ -851,7 +857,7 @@ export const onTabActivated = async info => {
     const items = portsTab && portsTab.values();
     if (items) {
       for (const item of items) {
-        const {name} = item;
+        const { name } = item;
         bool = name === PORT_CONTENT;
         if (bool) {
           break;
@@ -862,9 +868,9 @@ export const onTabActivated = async info => {
   varsLocal[MENU_ENABLED] = bool || false;
   if (bool) {
     func.push(portPostMsg({
-      [TMP_FILE_REQ]: bool,
+      [TMP_FILE_REQ]: bool
     }, {
-      windowId, tabId,
+      windowId, tabId
     }));
   }
   func.push(updateContextMenu());
@@ -883,10 +889,10 @@ export const onTabUpdated = async (id, info, tab) => {
   if (!Number.isInteger(id)) {
     throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
-  const {active, url, windowId: wId} = tab;
+  const { active, url, windowId: wId } = tab;
   const func = [];
   if (active) {
-    const {status} = info;
+    const { status } = info;
     const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(id, true);
     const portUrl = removeQueryFromURI(url);
@@ -894,12 +900,12 @@ export const onTabUpdated = async (id, info, tab) => {
     const portsTab = portsWin && portsWin.get(tabId);
     const port = portsTab && portsTab.get(portUrl);
     if (port) {
-      const {name} = port;
+      const { name } = port;
       varsLocal[MENU_ENABLED] = name === PORT_CONTENT;
     } else {
       varsLocal[MENU_ENABLED] = false;
     }
-    if (status === "complete") {
+    if (status === 'complete') {
       func.push(updateContextMenu());
     }
   }
@@ -917,24 +923,25 @@ export const onTabRemoved = async (id, info) => {
   if (!Number.isInteger(id)) {
     throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
-  const {windowId: wId} = info;
+  const { windowId: wId } = info;
   const func = [];
   const win = await getWindow(wId);
   if (win) {
-    const {incognito} = win;
+    const { incognito } = win;
     const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(id, true);
     const portsWin = ports.get(windowId);
     const portsTab = portsWin && portsWin.get(tabId);
     if (portsTab) {
       func.push(
-        restorePorts({windowId, tabId}),
+        restorePorts({ windowId, tabId }),
         hostPostMsg({
           [TMP_FILE_DATA_REMOVE]: {
-            tabId, windowId,
-            dir: incognito && TMP_FILES_PB || TMP_FILES,
-          },
-        }),
+            tabId,
+            windowId,
+            dir: incognito ? TMP_FILES_PB : TMP_FILES
+          }
+        })
       );
     }
   }
@@ -948,16 +955,16 @@ export const onTabRemoved = async (id, info) => {
  */
 export const onWindowFocusChanged = async () => {
   const win = await getCurrentWindow();
-  const {focused, id, type} = win;
+  const { focused, id, type } = win;
   const func = [];
-  if (focused && id !== windows.WINDOW_ID_NONE && type === "normal") {
+  if (focused && id !== windows.WINDOW_ID_NONE && type === 'normal') {
     const tId = await getActiveTabId(id);
     const windowId = stringifyPositiveInt(id, true);
     const tabId = stringifyPositiveInt(tId, true);
     windowId && tabId && func.push(portPostMsg({
-      [TMP_FILE_REQ]: true,
+      [TMP_FILE_REQ]: true
     }, {
-      windowId, tabId,
+      windowId, tabId
     }));
     func.push(updateContextMenu());
   }
@@ -978,10 +985,10 @@ export const onWindowRemoved = async id => {
   const bool = await checkIncognitoWindowExists();
   const func = [];
   if (windowId) {
-    func.push(restorePorts({windowId}));
+    func.push(restorePorts({ windowId }));
   }
   if (!bool) {
-    func.push(hostPostMsg({[TMP_FILES_PB_REMOVE]: !bool}));
+    func.push(hostPostMsg({ [TMP_FILES_PB_REMOVE]: !bool }));
   }
   return Promise.all(func);
 };
@@ -1020,9 +1027,9 @@ export const portPostVar = async obj => {
   let func;
   if (obj) {
     func = portPostMsg({
-      [VARS_SET]: obj,
+      [VARS_SET]: obj
     }, {
-      recurse: true,
+      recurse: true
     });
   }
   return func || null;
@@ -1042,7 +1049,7 @@ export const setVar = async (item, obj, changed = false) => {
   }
   const func = [];
   if (isObjectNotEmpty(obj)) {
-    const {app, checked, value} = obj;
+    const { app, checked, value } = obj;
     const hasPorts = ports.size > 0;
     switch (item) {
       case EDITOR_FILE_NAME:
@@ -1077,7 +1084,7 @@ export const setVar = async (item, obj, changed = false) => {
       case ONLY_EDITABLE:
         vars[item] = !!checked;
         if (hasPorts) {
-          func.push(portPostVar({[item]: !!checked}));
+          func.push(portPostVar({ [item]: !!checked }));
         }
         if (changed) {
           func.push(restoreContextMenu());
@@ -1086,13 +1093,13 @@ export const setVar = async (item, obj, changed = false) => {
       case SYNC_AUTO:
         vars[item] = !!checked;
         if (hasPorts) {
-          func.push(portPostVar({[item]: !!checked}));
+          func.push(portPostVar({ [item]: !!checked }));
         }
         break;
       case SYNC_AUTO_URL:
         vars[item] = value;
         if (hasPorts) {
-          func.push(portPostVar({[item]: value}));
+          func.push(portPostVar({ [item]: value }));
         }
         break;
       default:
@@ -1111,7 +1118,7 @@ export const setVars = async (data = {}) => {
   const items = Object.entries(data);
   const func = [];
   for (const [key, value] of items) {
-    const {newValue} = value;
+    const { newValue } = value;
     func.push(setVar(key, newValue || value, !!newValue));
   }
   return Promise.all(func);
@@ -1124,5 +1131,5 @@ export const setVars = async (data = {}) => {
  */
 export const setOs = async () => {
   const os = await getOs();
-  vars[IS_MAC] = os === "mac";
+  vars[IS_MAC] = os === 'mac';
 };

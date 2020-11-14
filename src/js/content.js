@@ -1,88 +1,88 @@
 /**
  * content.js
  */
-"use strict";
+'use strict';
 /* api */
 const {
   runtime,
   storage: {
-    local: localStorage,
-  },
+    local: localStorage
+  }
 } = browser;
 
 /* constants */
-const CONTENT_GET = "getContent";
-const CONTEXT_MENU = "contextMenu";
-const CONTEXT_MODE = "contextMode";
-const CONTEXT_NODE = "contextNode";
-const FILE_EXT = "fileExt";
+const CONTENT_GET = 'getContent';
+const CONTEXT_MENU = 'contextMenu';
+const CONTEXT_MODE = 'contextMode';
+const CONTEXT_NODE = 'contextNode';
+const FILE_EXT = 'fileExt';
 const FILE_LEN = 128;
 const FILE_NOT_FOUND_TIMESTAMP = -1;
-const ID_TAB = "tabId";
-const ID_WIN = "windowId";
-const INCOGNITO = "incognito";
-const IS_MAC = "isMac";
+const ID_TAB = 'tabId';
+const ID_WIN = 'windowId';
+const INCOGNITO = 'incognito';
+const IS_MAC = 'isMac';
 const KEY_CODE_A = 65;
 const KEY_CODE_BS = 8;
 const KEY_CODE_V = 86;
 const KEY_CODE_X = 88;
-const LABEL = "withExEditor";
-const LIVE_EDIT = "liveEdit";
-const LOCAL_FILE_VIEW = "viewLocalFile";
-const MIME_HTML = "text/html";
-const MIME_PLAIN = "text/plain";
-const MODE_EDIT = "modeEditText";
-const MODE_MATHML = "modeViewMathML";
-const MODE_SELECTION = "modeViewSelection";
-const MODE_SOURCE = "modeViewSource";
-const MODE_SVG = "modeViewSVG";
+const LABEL = 'withExEditor';
+const LIVE_EDIT = 'liveEdit';
+const LOCAL_FILE_VIEW = 'viewLocalFile';
+const MIME_HTML = 'text/html';
+const MIME_PLAIN = 'text/plain';
+const MODE_EDIT = 'modeEditText';
+const MODE_MATHML = 'modeViewMathML';
+const MODE_SELECTION = 'modeViewSelection';
+const MODE_SOURCE = 'modeViewSource';
+const MODE_SVG = 'modeViewSVG';
 const MOUSE_BUTTON_RIGHT = 2;
-const NS_URI = "nsURI";
-const ONLY_EDITABLE = "enableOnlyEditable";
-const PORT_CONNECT = "connectPort";
-const PORT_CONTENT = "portContent";
-const SUBST = "index";
-const SYNC_AUTO = "enableSyncAuto";
-const SYNC_AUTO_URL = "syncAutoUrls";
-const TAGS_ALT = ["area", "img", "input"];
+const NS_URI = 'nsURI';
+const ONLY_EDITABLE = 'enableOnlyEditable';
+const PORT_CONNECT = 'connectPort';
+const PORT_CONTENT = 'portContent';
+const SUBST = 'index';
+const SYNC_AUTO = 'enableSyncAuto';
+const SYNC_AUTO_URL = 'syncAutoUrls';
+const TAGS_ALT = ['area', 'img', 'input'];
 const TAGS_BLOCK = [
-  "address", "article", "aside", "blockquote", "details", "dialog", "dd", "div",
-  "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "header",
-  "hgroup", "li", "main", "nav", "ol", "pre", "section", "table", "ul",
+  'address', 'article', 'aside', 'blockquote', 'details', 'dialog', 'dd', 'div',
+  'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'header',
+  'hgroup', 'li', 'main', 'nav', 'ol', 'pre', 'section', 'table', 'ul'
 ];
-const TAGS_BLOCK_SPACING = ["h1", "h2", "h3", "h4", "h5", "h6", "p"];
+const TAGS_BLOCK_SPACING = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'];
 const TAGS_PHRASING = [
-  "a", "abbr", "b", "bdo", "cite", "code", "data", "datalist", "del", "dfn",
-  "em", "i", "ins", "kbd", "mark", "map", "meter", "output", "progress", "q",
-  "ruby", "samp", "small", "span", "strong", "sub", "sup", "time", "var",
+  'a', 'abbr', 'b', 'bdo', 'cite', 'code', 'data', 'datalist', 'del', 'dfn',
+  'em', 'i', 'ins', 'kbd', 'mark', 'map', 'meter', 'output', 'progress', 'q',
+  'ruby', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'var'
 ];
-const TAGS_TABLE_CELL = ["td", "th"];
-const TMP_FILES = "tmpFiles";
-const TMP_FILES_PB = "tmpFilesPb";
-const TMP_FILE_CREATE = "createTmpFile";
-const TMP_FILE_DATA_PORT = "portTmpFileData";
-const TMP_FILE_DATA_REMOVE = "removeTmpFileData";
-const TMP_FILE_GET = "getTmpFile";
-const TMP_FILE_REQ = "requestTmpFile";
-const TMP_FILE_RES = "resTmpFile";
+const TAGS_TABLE_CELL = ['td', 'th'];
+const TMP_FILES = 'tmpFiles';
+const TMP_FILES_PB = 'tmpFilesPb';
+const TMP_FILE_CREATE = 'createTmpFile';
+const TMP_FILE_DATA_PORT = 'portTmpFileData';
+const TMP_FILE_DATA_REMOVE = 'removeTmpFileData';
+const TMP_FILE_GET = 'getTmpFile';
+const TMP_FILE_REQ = 'requestTmpFile';
+const TMP_FILE_RES = 'resTmpFile';
 const TYPE_FROM = 8;
 const TYPE_TO = -1;
-const VARS_SET = "setVars";
-const W3C = "http://www.w3.org/";
-const XMLNS = "xmlns";
+const VARS_SET = 'setVars';
+const W3C = 'http://www.w3.org/';
+const XMLNS = 'xmlns';
 
 /* variables */
 const vars = {
   [CONTEXT_MODE]: null,
   [CONTEXT_NODE]: null,
-  [ID_TAB]: "",
-  [ID_WIN]: "",
+  [ID_TAB]: '',
+  [ID_WIN]: '',
   [INCOGNITO]: false,
   [IS_MAC]: false,
   [ONLY_EDITABLE]: false,
   [SYNC_AUTO]: false,
   [SYNC_AUTO_URL]: null,
-  port: null,
+  port: null
 };
 
 /* common */
@@ -126,7 +126,7 @@ const getType = o =>
  * @param {*} o - object to check
  * @returns {boolean} - result
  */
-const isString = o => typeof o === "string" || o instanceof String;
+const isString = o => typeof o === 'string' || o instanceof String;
 
 /**
  * is object, and not an empty object
@@ -150,8 +150,8 @@ const getDecodedContent = str => {
     throw new TypeError(`Expected String but got ${getType(str)}.`);
   }
   const doc = new DOMParser().parseFromString(str, MIME_HTML);
-  return doc.body.textContent.replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-    .replace(/&amp;/g, "&");
+  return doc.body.textContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
 };
 
 /* file utils */
@@ -168,13 +168,13 @@ const getFileNameFromURI = (uri, subst = LABEL) => {
   }
   let file;
   const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/;
-  const {pathname, protocol} = new URL(uri);
+  const { pathname, protocol } = new URL(uri);
   if (pathname && reg.test(pathname) &&
       protocol && !/^(?:blob|data):/.test(protocol)) {
     const [, fileName] = reg.exec(pathname);
     file = decodeURIComponent(fileName);
   }
-  return file && file.length < FILE_LEN && file || subst;
+  return file && file.length < FILE_LEN ? file : subst;
 };
 
 /**
@@ -187,13 +187,13 @@ const matchDocUrl = arr => {
   let bool;
   if (Array.isArray(arr) && arr.length) {
     const {
-      protocol: docProtocol, hostname: docHost, href: docHref,
+      protocol: docProtocol, hostname: docHost, href: docHref
     } = document.location;
     for (const item of arr) {
       if (isString(item)) {
         try {
           const {
-            protocol: itemProtocol, hostname: itemHost, href: itemHref,
+            protocol: itemProtocol, hostname: itemHost, href: itemHref
           } = new URL(item.trim());
           if (docProtocol === itemProtocol && docHost === itemHost &&
               docHref.startsWith(itemHref)) {
@@ -211,27 +211,27 @@ const matchDocUrl = arr => {
 
 /* common shortcut keys */
 const KeyBackSpace = {
-  code: "Backspace",
-  key: "Backspace",
-  keyCode: KEY_CODE_BS,
+  code: 'Backspace',
+  key: 'Backspace',
+  keyCode: KEY_CODE_BS
 };
 
 const KeyCtrlA = {
-  code: "KeyA",
-  key: "a",
-  keyCode: KEY_CODE_A,
+  code: 'KeyA',
+  key: 'a',
+  keyCode: KEY_CODE_A
 };
 
 const KeyCtrlV = {
-  code: "KeyV",
-  key: "v",
-  keyCode: KEY_CODE_V,
+  code: 'KeyV',
+  key: 'v',
+  keyCode: KEY_CODE_V
 };
 
 const KeyCtrlX = {
-  code: "KeyX",
-  key: "x",
-  keyCode: KEY_CODE_X,
+  code: 'KeyX',
+  key: 'x',
+  keyCode: KEY_CODE_X
 };
 
 /**
@@ -282,15 +282,15 @@ const dispatchEvent = (target, type, opt) => {
 const dispatchClipboardEvent = (elm, type, opt = {
   bubbles: true,
   cancelable: true,
-  composed: true,
+  composed: true
 }) => {
   let res;
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       isString(type) && /^(?:c(?:opy|ut)|paste)$/.test(type)) {
     const evt = new ClipboardEvent(type, opt);
-    const {clipboardData} = opt;
+    const { clipboardData } = opt;
     if (clipboardData) {
-      const {types} = clipboardData;
+      const { types } = clipboardData;
       for (const mime of types) {
         const value = clipboardData.getData(mime);
         if (evt.wrappedJSObject) {
@@ -316,9 +316,9 @@ const dispatchFocusEvent = elm => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
     const opt = {
       bubbles: false,
-      cancelable: false,
+      cancelable: false
     };
-    const evt = new FocusEvent("focus", opt);
+    const evt = new FocusEvent('focus', opt);
     res = elm.dispatchEvent(evt);
   }
   return !!res;
@@ -339,16 +339,16 @@ const dispatchInputEvent = (elm, type, opt) => {
     if (!isObjectNotEmpty(opt)) {
       opt = {
         bubbles: true,
-        cancelable: type === "beforeinput",
+        cancelable: type === 'beforeinput'
       };
     }
     const evt = new InputEvent(type, opt);
-    const {dataTransfer} = opt;
+    const { dataTransfer } = opt;
     if (dataTransfer) {
       if (!evt.dataTransfer) {
         evt.dataTransfer = new DataTransfer();
       }
-      const {types} = dataTransfer;
+      const { types } = dataTransfer;
       for (const mime of types) {
         const value = dataTransfer.getData(mime);
         if (evt.wrappedJSObject) {
@@ -377,20 +377,22 @@ const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
       isString(type) && /^key(?:down|press|up)$/.test(type) &&
       isObjectNotEmpty(keyOpt)) {
     const {
-      altKey, code, ctrlKey, key, keyCode, metaKey, shiftKey,
+      altKey, code, ctrlKey, key, keyCode, metaKey, shiftKey
     } = keyOpt;
     if (isString(key) && isString(code) && Number.isInteger(keyCode)) {
       const opt = {
-        key, code, keyCode,
+        key,
+        code,
+        keyCode,
         altKey: !!altKey,
         bubbles: true,
         cancelable: true,
         ctrlKey: !!ctrlKey,
-        locale: "",
+        locale: '',
         location: 0,
         metaKey: !!metaKey,
         repeat: false,
-        shiftKey: !!shiftKey,
+        shiftKey: !!shiftKey
       };
       const evt = new KeyboardEvent(type, opt);
       res = elm.dispatchEvent(evt);
@@ -402,29 +404,29 @@ const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
 /* file extension */
 const fileExt = {
   application: {
-    javascript: "js",
+    javascript: 'js',
     json: {
-      json: "json",
+      json: 'json'
     },
     xml: {
-      mathml: "mml",
-      xhtml: "xhtml",
-      xml: "xml",
-      xslt: "xsl",
-    },
+      mathml: 'mml',
+      xhtml: 'xhtml',
+      xml: 'xml',
+      xslt: 'xsl'
+    }
   },
   image: {
     xml: {
-      svg: "svg",
-    },
+      svg: 'svg'
+    }
   },
   text: {
-    css: "css",
-    javascript: "js",
-    html: "html",
-    plain: "txt",
-    xml: "xml",
-  },
+    css: 'css',
+    javascript: 'js',
+    html: 'html',
+    plain: 'txt',
+    xml: 'xml'
+  }
 };
 
 /**
@@ -434,15 +436,15 @@ const fileExt = {
  * @param {string} subst - substitute file extension
  * @returns {string} - file extension
  */
-const getFileExtension = (media = MIME_PLAIN, subst = "txt") => {
+const getFileExtension = (media = MIME_PLAIN, subst = 'txt') => {
   let ext;
   const arr =
     /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
   if (arr) {
     const [, type, subtype, suf] = arr;
-    const suffix = suf ||
-                   type === "application" && /^(?:json|xml)$/.test(subtype) &&
-                   subtype;
+    const suffix =
+      suf ||
+      (type === 'application' && /^(?:json|xml)$/.test(subtype) && subtype);
     const item = suffix && fileExt[type][suffix];
     if (item) {
       ext = item[subtype] || item[suffix];
@@ -459,7 +461,7 @@ const nsURI = {
   html: `${W3C}1999/xhtml`,
   math: `${W3C}1998/Math/MathML`,
   svg: `${W3C}2000/svg`,
-  xmlns: `${W3C}2000/xmlns/`,
+  xmlns: `${W3C}2000/xmlns/`
 };
 
 /**
@@ -469,7 +471,7 @@ const nsURI = {
  * @returns {object} - namespace data
  */
 const getNodeNS = node => {
-  const ns = {node: null, localName: null, namespaceURI: null};
+  const ns = { node: null, localName: null, namespaceURI: null };
   if (node.namespaceURI) {
     ns.node = node;
     ns.localName = node.localName;
@@ -477,7 +479,7 @@ const getNodeNS = node => {
   } else {
     const root = document.documentElement;
     while (node && node !== root && !ns.node) {
-      const {localName, parentNode, namespaceURI} = node;
+      const { localName, parentNode, namespaceURI } = node;
       if (namespaceURI) {
         ns.node = node;
         ns.localName = localName;
@@ -489,7 +491,7 @@ const getNodeNS = node => {
     if (!ns.node) {
       ns.node = root;
       ns.localName = root.localName;
-      ns.namespaceURI = root.getAttribute(XMLNS) || nsURI[root.localName] || "";
+      ns.namespaceURI = root.getAttribute(XMLNS) || nsURI[root.localName] || '';
     }
   }
   return ns;
@@ -507,8 +509,8 @@ const getXmlnsPrefixedNamespace = (elm, attr) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
     let node = elm;
     while (node && node.parentNode && !ns) {
-      if (node.hasAttributeNS("", `xmlns:${attr}`)) {
-        ns = node.getAttributeNS("", `xmlns:${attr}`);
+      if (node.hasAttributeNS('', `xmlns:${attr}`)) {
+        ns = node.getAttributeNS('', `xmlns:${attr}`);
       }
       node = node.parentNode;
     }
@@ -524,28 +526,28 @@ const getXmlnsPrefixedNamespace = (elm, attr) => {
  * @returns {void}
  */
 const setAttributeNS = (elm, node = {}) => {
-  const {attributes} = node;
+  const { attributes } = node;
   if (elm && attributes && attributes.length) {
     for (const attr of attributes) {
-      const {localName, name, namespaceURI, prefix, value} = attr;
-      if (typeof node[name] !== "function" && !localName.startsWith("on")) {
-        const attrName = prefix && `${prefix}:${localName}` || localName;
-        const ns = namespaceURI || prefix && nsURI[prefix] || null;
-        const {origin} = document.location;
+      const { localName, name, namespaceURI, prefix, value } = attr;
+      if (typeof node[name] !== 'function' && !localName.startsWith('on')) {
+        const attrName = prefix ? `${prefix}:${localName}` : localName;
+        const ns = namespaceURI || (prefix && nsURI[prefix]) || null;
+        const { origin } = document.location;
         switch (localName) {
-          case "data":
-          case "href":
-          case "poster":
-          case "src": {
-            const {protocol} = new URL(value, origin);
+          case 'data':
+          case 'href':
+          case 'poster':
+          case 'src': {
+            const { protocol } = new URL(value, origin);
             /https?/.test(protocol) && elm.setAttributeNS(ns, attrName, value);
             break;
           }
-          case "ping": {
+          case 'ping': {
             const urls = value.split(/\s+/);
             let bool = true;
             for (const url of urls) {
-              const {protocol} = new URL(url, origin);
+              const { protocol } = new URL(url, origin);
               if (!/https?/.test(protocol)) {
                 bool = false;
                 break;
@@ -554,8 +556,8 @@ const setAttributeNS = (elm, node = {}) => {
             bool && elm.setAttributeNS(ns, attrName, value);
             break;
           }
-          case "value": {
-            elm.setAttributeNS(ns, attrName, "");
+          case 'value': {
+            elm.setAttributeNS(ns, attrName, '');
             break;
           }
           default:
@@ -575,12 +577,12 @@ const setAttributeNS = (elm, node = {}) => {
 const createElement = node => {
   let elm;
   if (node && node.nodeType === Node.ELEMENT_NODE) {
-    const {attributes, localName, namespaceURI, prefix} = node;
-    const ns = namespaceURI || prefix && nsURI[prefix] ||
+    const { attributes, localName, namespaceURI, prefix } = node;
+    const ns = namespaceURI || (prefix && nsURI[prefix]) ||
                getNodeNS(node).namespaceURI || nsURI.html;
-    const name = prefix && `${prefix}:${localName}` || localName;
-    if (localName === "script") {
-      elm = document.createTextNode("");
+    const name = prefix ? `${prefix}:${localName}` : localName;
+    if (localName === 'script') {
+      elm = document.createTextNode('');
     } else {
       elm = document.createElementNS(ns, name);
       attributes && setAttributeNS(elm, node);
@@ -622,13 +624,13 @@ const appendChildNodes = (elm, node) => {
     const arr = [];
     const nodes = node.childNodes;
     for (const child of nodes) {
-      const {nodeType, nodeValue, parentNode} = child;
+      const { nodeType, nodeValue, parentNode } = child;
       if (nodeType === Node.ELEMENT_NODE) {
         child === parentNode.firstChild &&
-          arr.push(document.createTextNode("\n"));
+          arr.push(document.createTextNode('\n'));
         arr.push(appendChildNodes(child, child.cloneNode(true)));
         child === parentNode.lastChild &&
-          arr.push(document.createTextNode("\n"));
+          arr.push(document.createTextNode('\n'));
       } else {
         nodeType === Node.TEXT_NODE &&
           arr.push(document.createTextNode(nodeValue));
@@ -664,7 +666,7 @@ const createXmlBasedDomString = node => {
       elm = appendChildNodes(elm, range.cloneContents());
     }
   }
-  return elm && `${new XMLSerializer().serializeToString(elm)}\n` || null;
+  return elm ? `${new XMLSerializer().serializeToString(elm)}\n` : null;
 };
 
 /**
@@ -688,7 +690,7 @@ const createRangeArr = range => {
     }
     arr.push(
       appendChildNodes(ancestor, range.cloneContents()),
-      document.createTextNode("\n"),
+      document.createTextNode('\n')
     );
   }
   return arr;
@@ -709,7 +711,7 @@ const createDomStringFromSelectionRange = sel => {
       frag.appendChild(range);
     }
   }
-  return frag && new XMLSerializer().serializeToString(frag) || null;
+  return frag ? new XMLSerializer().serializeToString(frag) : null;
 };
 
 /**
@@ -732,14 +734,14 @@ const serializeDomString = (domstr, mime) => {
   }
   let frag;
   const dom = new DOMParser().parseFromString(domstr, mime);
-  if (dom.querySelector("parsererror")) {
-    throw new Error("Error while parsing DOM string.");
+  if (dom.querySelector('parsererror')) {
+    throw new Error('Error while parsing DOM string.');
   }
-  const {body, documentElement: root} = dom;
+  const { body, documentElement: root } = dom;
   if (mime === MIME_HTML) {
     const elm = appendChildNodes(body, body.cloneNode(true));
     if (elm.hasChildNodes()) {
-      const {childNodes, firstElementChild} = body;
+      const { childNodes, firstElementChild } = body;
       if (firstElementChild) {
         frag = document.createDocumentFragment();
         for (const child of childNodes) {
@@ -756,7 +758,7 @@ const serializeDomString = (domstr, mime) => {
     frag = document.createDocumentFragment();
     frag.appendChild(elm);
   }
-  return frag && new XMLSerializer().serializeToString(frag) || null;
+  return frag ? new XMLSerializer().serializeToString(frag) : null;
 };
 
 /**
@@ -773,58 +775,62 @@ const getText = (nodes, pre = false) => {
     for (const node of nodeArr) {
       const {
         alt, lastChild, localName: nodeName, nextElementSibling: nextElm,
-        nextSibling, nodeType, nodeValue: value, parentNode,
+        nextSibling, nodeType, nodeValue: value, parentNode
       } = node;
       const {
         firstElementChild: parentFirstElmChild,
         lastElementChild: parentLastElmChild,
-        lastChild: parentLastChild, localName: parentName,
+        lastChild: parentLastChild, localName: parentName
       } = parentNode;
       const isParentBlock = TAGS_BLOCK.includes(parentName) ||
                             TAGS_BLOCK_SPACING.includes(parentName);
-      pre = pre || parentName === "pre";
+      pre = pre || parentName === 'pre';
       switch (nodeType) {
         case Node.ELEMENT_NODE: {
           if (node.hasChildNodes()) {
             TAGS_BLOCK_SPACING.includes(nodeName) &&
             node !== parentFirstElmChild &&
-              arr.push("\n");
+              arr.push('\n');
             arr.push(getText(node.childNodes, pre));
             if (isParentBlock) {
               if (node === parentLastChild) {
-                const isLastChild = lastChild.nodeType === Node.TEXT_NODE &&
-                                    lastChild.nodeValue ||
-                                    lastChild.nodeType === Node.ELEMENT_NODE &&
-                                    TAGS_PHRASING.includes(nodeName) &&
-                                    TAGS_PHRASING.includes(lastChild.localName);
-                isLastChild && arr.push("\n");
+                const isLastChild =
+                  (lastChild.nodeType === Node.TEXT_NODE &&
+                   lastChild.nodeValue) ||
+                  (lastChild.nodeType === Node.ELEMENT_NODE &&
+                   TAGS_PHRASING.includes(nodeName) &&
+                   TAGS_PHRASING.includes(lastChild.localName));
+                isLastChild && arr.push('\n');
               } else {
-                const isPhrase = (!nextElm || nextElm.localName !== "br") &&
+                const isPhrase = (!nextElm || nextElm.localName !== 'br') &&
                                  !pre && TAGS_PHRASING.includes(nodeName);
-                isPhrase && arr.push(" ");
+                isPhrase && arr.push(' ');
               }
             }
             if (TAGS_TABLE_CELL.includes(nodeName) &&
                 node !== parentLastElmChild) {
-              arr.push("\t");
-            } else if (nodeName === "tr" ||
-                       TAGS_BLOCK_SPACING.includes(nodeName) &&
-                       node !== parentLastElmChild &&
-                       !TAGS_BLOCK_SPACING.includes(nextElm.localName)) {
-              arr.push("\n");
+              arr.push('\t');
+            } else if (nodeName === 'tr' ||
+                       (TAGS_BLOCK_SPACING.includes(nodeName) &&
+                        node !== parentLastElmChild &&
+                        !TAGS_BLOCK_SPACING.includes(nextElm.localName))) {
+              arr.push('\n');
             }
           } else if (TAGS_ALT.includes(nodeName)) {
-            if ((nodeName !== "input" || node.type === "image") && alt) {
-              const trail = isParentBlock && (
-                node === parentLastChild ||
-                node === parentLastElmChild &&
-                nextSibling.nodeType === Node.TEXT_NODE &&
-                /^\s*$/.test(nextSibling.nodeValue)
-              ) && "\n" || " ";
+            if ((nodeName !== 'input' || node.type === 'image') && alt) {
+              const trail =
+                isParentBlock && (
+                  node === parentLastChild ||
+                  (node === parentLastElmChild &&
+                   nextSibling.nodeType === Node.TEXT_NODE &&
+                   /^\s*$/.test(nextSibling.nodeValue))
+                )
+                  ? '\n'
+                  : ' ';
               arr.push(`${alt}${trail}`);
             }
           } else {
-            nodeName === "br" && arr.push("\n");
+            nodeName === 'br' && arr.push('\n');
           }
           break;
         }
@@ -842,7 +848,7 @@ const getText = (nodes, pre = false) => {
       }
     }
   }
-  return arr.join("");
+  return arr.join('');
 };
 
 /**
@@ -856,7 +862,7 @@ const getAncestorId = elm => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
     let node = elm;
     while (node && node.parentNode) {
-      const {id: nodeId} = node;
+      const { id: nodeId } = node;
       if (nodeId) {
         ancestorId = nodeId;
         break;
@@ -874,7 +880,7 @@ const getAncestorId = elm => {
  * @returns {boolean} - result
  */
 const isEditable = node => {
-  let elm = node, editable;
+  let elm = node; let editable;
   while (elm && elm.parentNode) {
     if (!elm.namespaceURI || elm.namespaceURI === nsURI.html) {
       editable = elm.isContentEditable;
@@ -917,10 +923,10 @@ const isContentTextNode = node => {
 const isEditControl = elm => {
   let bool;
   if (elm) {
-    const {localName, type} = elm;
-    bool = localName === "textarea" ||
-           localName === "input" &&
-           (!type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type));
+    const { localName, type } = elm;
+    bool = localName === 'textarea' ||
+           (localName === 'input' &&
+            (!type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type)));
   }
   return !!bool;
 };
@@ -937,7 +943,7 @@ const getEditableElm = node => {
     elm = node;
   } else {
     while (node && node.parentNode) {
-      if (node.hasAttribute("contenteditable") && node.isContentEditable &&
+      if (node.hasAttribute('contenteditable') && node.isContentEditable &&
           (!node.namespaceURI || node.namespaceURI === nsURI.html)) {
         elm = node;
         break;
@@ -956,7 +962,7 @@ const getEditableElm = node => {
  * @returns {void}
  */
 const postMsg = async msg => {
-  const {port} = vars;
+  const { port } = vars;
   if (port && msg) {
     port.postMessage(msg);
   }
@@ -970,8 +976,8 @@ const postMsg = async msg => {
 const requestPortConnection = async () => {
   const msg = {
     [PORT_CONNECT]: {
-      name: PORT_CONTENT,
-    },
+      name: PORT_CONTENT
+    }
   };
   return runtime.sendMessage(msg);
 };
@@ -989,7 +995,7 @@ const getLiveEditKey = elm => {
   let liveEditKey;
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
     for (const [key, value] of liveEdit) {
-      const {className, getContent, isIframe, setContent} = value;
+      const { className, getContent, isIframe, setContent } = value;
       if (isIframe && elm.contentDocument) {
         if ((!className || elm.classList.contains(className)) &&
             elm.contentDocument.querySelector(getContent) &&
@@ -1017,13 +1023,13 @@ const getLiveEditElm = node => {
   let elm;
   const items = Array.from(liveEdit.values());
   while (node && node.parentNode && !elm) {
-    const {classList, namespaceURI} = node;
+    const { classList, namespaceURI } = node;
     const isHtml = !namespaceURI || namespaceURI === nsURI.html;
     if (isHtml) {
       for (const item of items) {
-        const {className, getContent, isIframe, setContent} = item;
+        const { className, getContent, isIframe, setContent } = item;
         if (isIframe) {
-          const iframes = node.querySelectorAll("iframe");
+          const iframes = node.querySelectorAll('iframe');
           for (const iframe of iframes) {
             if ((!className || iframe.classList.contains(className)) &&
                 iframe.contentDocument &&
@@ -1035,7 +1041,7 @@ const getLiveEditElm = node => {
           }
         } else if (classList.contains(className)) {
           elm = node;
-          !elm.isContentEditable && elm.setAttribute("contenteditable", "");
+          !elm.isContentEditable && elm.setAttribute('contenteditable', '');
           break;
         }
       }
@@ -1055,7 +1061,7 @@ const getLiveEditElm = node => {
 const getLiveEditContent = (elm, key) => {
   let content;
   if (elm && elm.nodeType === Node.ELEMENT_NODE && liveEdit.has(key)) {
-    const {getContent, isIframe} = liveEdit.get(key);
+    const { getContent, isIframe } = liveEdit.get(key);
     let items;
     if (isIframe && elm.contentDocument) {
       items = elm.contentDocument.querySelectorAll(getContent);
@@ -1065,21 +1071,21 @@ const getLiveEditContent = (elm, key) => {
     if (items && items.length) {
       const arr = [];
       for (const item of items) {
-        if (item.localName === "br") {
-          arr.push("\n");
+        if (item.localName === 'br') {
+          arr.push('\n');
         } else if (isEditControl(item)) {
           arr.push(item.value);
         } else if (item.isContentEditable) {
           if (item.hasChildNodes()) {
-            arr.push(getText(item.childNodes, elm.localName === "pre"));
+            arr.push(getText(item.childNodes, elm.localName === 'pre'));
           } else {
-            arr.push("\n");
+            arr.push('\n');
           }
         } else {
           arr.push(item.textContent);
         }
       }
-      content = arr.join("");
+      content = arr.join('');
     }
   }
   return content || null;
@@ -1137,19 +1143,18 @@ const getTargetElementFromDataId = dataId => {
   if (!elm) {
     const data = dataIds.get(dataId);
     if (isObjectNotEmpty(data)) {
-      const {ancestorId, localName, prefix, queryIndex} = data;
+      const { ancestorId, localName, prefix, queryIndex } = data;
       if (localName && Number.isInteger(queryIndex)) {
         let items;
         if (prefix) {
-          const query = ancestorId && `#${ancestorId} *|*` ||
+          const query = (ancestorId && `#${ancestorId} *|*`) ||
                         `${document.documentElement.localName} *|*`;
           items = Array.from(document.querySelectorAll(query)).filter(item => {
-            const {localName: itemLocalName} = item;
+            const { localName: itemLocalName } = item;
             return itemLocalName === localName && item;
           });
         } else {
-          const query = ancestorId && `#${ancestorId} ${localName}` ||
-                        localName;
+          const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
           items = document.querySelectorAll(query);
         }
         elm = items[queryIndex];
@@ -1168,23 +1173,24 @@ const getTargetElementFromDataId = dataId => {
 const createIdData = elm => {
   let data;
   if (elm) {
-    const {id, localName, prefix} = elm;
+    const { id, localName, prefix } = elm;
     if (id) {
-      data = {dataId: id};
+      data = { dataId: id };
     } else {
       const ancestorId = getAncestorId(elm);
-      const {localName: rootLocalName} = document.documentElement;
-      let items, queryIndex, i = 0, l;
+      const { localName: rootLocalName } = document.documentElement;
+      let items; let queryIndex; let i = 0; let l;
       if (prefix) {
-        const query = ancestorId && `#${ancestorId} *|*` ||
-                      `${rootLocalName} *|*`;
+        const query = ancestorId
+          ? `#${ancestorId} *|*`
+          : `${rootLocalName} *|*`;
         items = Array.from(document.querySelectorAll(query)).filter(item => {
-          const {localName: itemLocalName} = item;
+          const { localName: itemLocalName } = item;
           return itemLocalName === localName && item;
         });
         l = items.length;
       } else {
-        const query = ancestorId && `#${ancestorId} ${localName}` || localName;
+        const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
         items = document.querySelectorAll(query);
         l = items.length;
       }
@@ -1197,12 +1203,12 @@ const createIdData = elm => {
         i++;
       }
       if (Number.isInteger(queryIndex)) {
-        const targetElm = prefix && `${prefix}:${localName}` || localName;
-        const dataId = ancestorId &&
-                       `${ancestorId}_${targetElm}_${queryIndex}` ||
-                       `${rootLocalName}_${targetElm}_${queryIndex}`;
+        const targetElm = prefix ? `${prefix}:${localName}` : localName;
+        const dataId = ancestorId
+          ? `${ancestorId}_${targetElm}_${queryIndex}`
+          : `${rootLocalName}_${targetElm}_${queryIndex}`;
         data = {
-          ancestorId, localName, prefix, queryIndex, dataId,
+          ancestorId, localName, prefix, queryIndex, dataId
         };
       }
     }
@@ -1220,9 +1226,9 @@ const postEachDataId = async (bool = false) => {
   const func = [];
   if (bool) {
     dataIds.forEach((value, key) => {
-      const {controls} = value;
+      const { controls } = value;
       const elm = getTargetElementFromDataId(key);
-      elm && !controls && func.push(postMsg({[TMP_FILE_GET]: value}));
+      elm && !controls && func.push(postMsg({ [TMP_FILE_GET]: value }));
     });
   }
   return Promise.all(func);
@@ -1238,7 +1244,7 @@ const postTmpFileData = async dataId => {
   let func;
   const data = dataIds.get(dataId);
   if (data) {
-    func = postMsg({[TMP_FILE_GET]: data});
+    func = postMsg({ [TMP_FILE_GET]: data });
   }
   return func || null;
 };
@@ -1254,7 +1260,7 @@ const setTmpFileData = (data = {}) => {
   let func;
   const tmpFileData = data[TMP_FILE_CREATE];
   if (tmpFileData) {
-    const {dataId, mode} = tmpFileData;
+    const { dataId, mode } = tmpFileData;
     if (mode === MODE_EDIT && dataId) {
       func = setDataId(dataId, tmpFileData);
     }
@@ -1270,9 +1276,9 @@ const setTmpFileData = (data = {}) => {
  */
 const updateTmpFileData = (obj = {}) => {
   let func;
-  const {data} = obj;
+  const { data } = obj;
   if (data) {
-    const {dataId, mode} = data;
+    const { dataId, mode } = data;
     if (mode === MODE_EDIT && dataId) {
       func = setDataId(dataId, data);
     }
@@ -1288,9 +1294,9 @@ const updateTmpFileData = (obj = {}) => {
  */
 const removeTmpFileData = (obj = {}) => {
   let func;
-  const {data} = obj;
+  const { data } = obj;
   if (data) {
-    const {dataId, tabId, timestamp} = data;
+    const { dataId, tabId, timestamp } = data;
     if (dataId && tabId === vars[ID_TAB] &&
         timestamp === FILE_NOT_FOUND_TIMESTAMP) {
       func = removeDataId(dataId);
@@ -1307,37 +1313,37 @@ const removeTmpFileData = (obj = {}) => {
  */
 const fetchSource = async (data = {}) => {
   const {
-    characterSet, contentType, documentURI: uri, location: {protocol},
+    characterSet, contentType, documentURI: uri, location: { protocol }
   } = document;
   let obj;
-  if (protocol === "file:") {
+  if (protocol === 'file:') {
     obj = {
-      [LOCAL_FILE_VIEW]: {uri},
+      [LOCAL_FILE_VIEW]: { uri }
     };
   } else {
     const headers = new Headers({
       Charset: characterSet,
-      "Content-Type": contentType,
+      'Content-Type': contentType
     });
     const opt = {
       headers,
-      cache: "force-cache",
-      credentials: "include",
-      method: "GET",
-      mode: "cors",
+      cache: 'force-cache',
+      credentials: 'include',
+      method: 'GET',
+      mode: 'cors'
     };
     const res = await fetch(uri, opt);
     if (res) {
-      const {dir, host, incognito, mode, tabId, windowId} = data;
-      const [type] = res.headers.get("Content-Type").split(";");
+      const { dir, host, incognito, mode, tabId, windowId } = data;
+      const [type] = res.headers.get('Content-Type').split(';');
       const dataId = getFileNameFromURI(uri, SUBST);
       const extType = getFileExtension(type);
       const value = await res.text();
       obj = {
         [TMP_FILE_CREATE]: {
-          dataId, dir, extType, host, incognito, mode, tabId, windowId,
+          dataId, dir, extType, host, incognito, mode, tabId, windowId
         },
-        value,
+        value
       };
     }
   }
@@ -1351,34 +1357,43 @@ const fetchSource = async (data = {}) => {
  * @returns {object} - temporary file data
  */
 const createTmpFileData = async (data = {}) => {
-  const {contentType, documentURI: uri} = document;
+  const { contentType, documentURI: uri } = document;
   const {
-    dir, host, incognito, liveEditKey, mode, syncAuto, tabId, value, windowId,
+    dir, host, incognito, liveEditKey, mode, syncAuto, tabId, value, windowId
   } = data;
-  let {dataId, namespaceURI} = data, extType, tmpFileData;
-  namespaceURI = namespaceURI || "";
+  let { dataId, namespaceURI } = data; let extType; let tmpFileData;
+  namespaceURI = namespaceURI || '';
   switch (mode) {
     case MODE_EDIT:
       if (dataId) {
-        extType = ".txt";
+        extType = '.txt';
         tmpFileData = {
           [TMP_FILE_CREATE]: {
-            dataId, dir, extType, host, incognito, liveEditKey, mode,
-            namespaceURI, syncAuto, tabId, windowId,
+            dataId,
+            dir,
+            extType,
+            host,
+            incognito,
+            liveEditKey,
+            mode,
+            namespaceURI,
+            syncAuto,
+            tabId,
+            windowId
           },
-          value,
+          value
         };
       }
       break;
     case MODE_MATHML:
     case MODE_SVG:
       if (value && (dataId = getFileNameFromURI(uri, SUBST))) {
-        extType = mode === MODE_MATHML && ".mml" || ".svg";
+        extType = mode === MODE_MATHML ? '.mml' : '.svg';
         tmpFileData = {
           [TMP_FILE_CREATE]: {
-            dataId, dir, extType, host, incognito, mode, tabId, windowId,
+            dataId, dir, extType, host, incognito, mode, tabId, windowId
           },
-          value,
+          value
         };
       }
       break;
@@ -1386,12 +1401,12 @@ const createTmpFileData = async (data = {}) => {
       dataId = getFileNameFromURI(uri, SUBST);
       if (dataId && value &&
           /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
-        extType = ".xml";
+        extType = '.xml';
         tmpFileData = {
           [TMP_FILE_CREATE]: {
-            dataId, dir, extType, host, incognito, mode, tabId, windowId,
+            dataId, dir, extType, host, incognito, mode, tabId, windowId
           },
-          value,
+          value
         };
       }
       break;
@@ -1411,13 +1426,13 @@ const createTmpFileData = async (data = {}) => {
  */
 const requestTmpFile = evt => {
   const func = [];
-  const {target, currentTarget} = evt;
+  const { target, currentTarget } = evt;
   const data = createIdData(currentTarget);
   if (data) {
-    const {dataId} = data;
+    const { dataId } = data;
     if (dataIds.has(dataId)) {
       if (target === currentTarget) {
-        const {controls} = dataIds.get(dataId);
+        const { controls } = dataIds.get(dataId);
         if (controls) {
           controls.forEach(id => {
             dataIds.has(id) && func.push(postTmpFileData(id));
@@ -1429,7 +1444,7 @@ const requestTmpFile = evt => {
         const liveEditKey = getLiveEditKey(currentTarget);
         const liveEditData = liveEdit.get(liveEditKey);
         if (isObjectNotEmpty(liveEditData)) {
-          const {setContent} = liveEditData;
+          const { setContent } = liveEditData;
           const items = document.querySelectorAll(setContent);
           for (const item of items) {
             if (item === target) {
@@ -1456,8 +1471,8 @@ const setDataIdController = (elm, dataId) => {
   if (ctrl && dataId) {
     const ctrlData = createIdData(ctrl);
     if (ctrlData) {
-      const {dataId: ctrlId} = ctrlData;
-      ctrl.addEventListener("focus", requestTmpFile, true);
+      const { dataId: ctrlId } = ctrlData;
+      ctrl.addEventListener('focus', requestTmpFile, true);
       if (dataIds.has(ctrlId)) {
         const data = dataIds.get(ctrlId);
         if (Array.isArray(data.controls)) {
@@ -1473,7 +1488,7 @@ const setDataIdController = (elm, dataId) => {
         setDataId(ctrlId, ctrlData);
       }
       setDataId(dataId, {
-        controlledBy: ctrlId,
+        controlledBy: ctrlId
       });
     }
   }
@@ -1488,47 +1503,49 @@ const setDataIdController = (elm, dataId) => {
  * @returns {object} - content data
  */
 const createContentData = async (elm, mode) => {
-  const {incognito, enableSyncAuto, syncAutoUrls, tabId, windowId} = vars;
+  const { incognito, enableSyncAuto, syncAutoUrls, tabId, windowId } = vars;
   const data = {
-    incognito, tabId, windowId,
+    incognito,
+    tabId,
+    windowId,
     mode: MODE_SOURCE,
-    dir: incognito && TMP_FILES_PB || TMP_FILES,
+    dir: incognito ? TMP_FILES_PB : TMP_FILES,
     host: document.location.hostname || LABEL,
     dataId: null,
     namespaceURI: null,
     value: null,
     liveEditKey: null,
-    syncAuto: false,
+    syncAuto: false
   };
   const sel = document.getSelection();
-  const {anchorNode, isCollapsed} = sel;
+  const { anchorNode, isCollapsed } = sel;
   if (elm && mode) {
     switch (mode) {
       case MODE_EDIT: {
         const obj = createIdData(elm);
         if (obj) {
-          const {dataId} = obj;
-          const {childNodes, isContentEditable, namespaceURI, value} = elm;
+          const { dataId } = obj;
+          const { childNodes, isContentEditable, namespaceURI, value } = elm;
           const liveEditKey = getLiveEditKey(elm);
           const isHtml = !namespaceURI || namespaceURI === nsURI.html;
-          isHtml && elm.addEventListener("focus", requestTmpFile, true);
+          isHtml && elm.addEventListener('focus', requestTmpFile, true);
           !dataIds.has(dataId) && setDataId(dataId, obj);
           if (liveEditKey) {
             data.mode = mode;
             data.dataId = dataId;
-            data.value = getLiveEditContent(elm, liveEditKey) || "";
+            data.value = getLiveEditContent(elm, liveEditKey) || '';
             data.liveEditKey = liveEditKey;
           } else if (isCollapsed && isEditControl(elm)) {
             data.mode = mode;
             data.dataId = dataId;
-            data.value = value || "";
+            data.value = value || '';
           } else {
             if (!isContentEditable && !isCollapsed && anchorNode) {
               elm = anchorNode.parentNode;
             }
             data.mode = mode;
             data.dataId = dataId;
-            data.value = elm.hasChildNodes() && getText(childNodes) || "";
+            data.value = elm.hasChildNodes() ? getText(childNodes) : '';
             data.namespaceURI = namespaceURI || getNodeNS(elm).namespaceURI;
             setDataIdController(elm, dataId);
           }
@@ -1574,13 +1591,13 @@ const createContentDataMsg = async data => {
       msg = {
         [TMP_FILE_CREATE]: {
           data: data[TMP_FILE_CREATE],
-          value: data.value,
-        },
+          value: data.value
+        }
       };
     } else if (data[LOCAL_FILE_VIEW]) {
-      const {uri} = data[LOCAL_FILE_VIEW];
+      const { uri } = data[LOCAL_FILE_VIEW];
       msg = {
-        [LOCAL_FILE_VIEW]: uri,
+        [LOCAL_FILE_VIEW]: uri
       };
     }
   }
@@ -1600,7 +1617,7 @@ const postContent = async (elm, mode) => {
     const data = await createContentData(elm, mode).then(createTmpFileData);
     func.push(
       createContentDataMsg(data).then(postMsg),
-      setTmpFileData(data),
+      setTmpFileData(data)
     );
   }
   return Promise.all(func);
@@ -1614,19 +1631,19 @@ const postContent = async (elm, mode) => {
  */
 const getContextMode = elm => {
   const {
-    anchorNode, focusNode, isCollapsed, rangeCount,
+    anchorNode, focusNode, isCollapsed, rangeCount
   } = document.getSelection();
   let mode = MODE_SOURCE;
   if (elm) {
-    elm = !isCollapsed &&
-          (anchorNode.nodeType === Node.TEXT_NODE && anchorNode.parentNode ||
-           focusNode.nodeType === Node.TEXT_NODE && focusNode.parentNode) ||
+    elm = (!isCollapsed &&
+           ((anchorNode.nodeType === Node.TEXT_NODE && anchorNode.parentNode) ||
+            (focusNode.nodeType === Node.TEXT_NODE && focusNode.parentNode))) ||
           elm;
     if ((elm.isContentEditable || isEditControl(elm) ||
          isContentTextNode(elm)) &&
         (isCollapsed ||
-         rangeCount && anchorNode.parentNode === focusNode.parentNode &&
-         elm !== document.documentElement)) {
+         (rangeCount && anchorNode.parentNode === focusNode.parentNode &&
+          elm !== document.documentElement))) {
       mode = MODE_EDIT;
     } else if (isCollapsed) {
       if (elm.namespaceURI === nsURI.math) {
@@ -1648,14 +1665,14 @@ const getContextMode = elm => {
  * @returns {Function} - postContent()
  */
 const determineContentProcess = (obj = {}) => {
-  const {info} = obj;
+  const { info } = obj;
   const isTop = window.top === window.self;
-  const elm = vars[CONTEXT_NODE] || isTop && document.activeElement;
+  const elm = vars[CONTEXT_NODE] || (isTop && document.activeElement);
   let mode;
   if (info) {
-    const {menuItemId} = info;
-    mode = menuItemId !== MODE_SOURCE && menuItemId || vars[CONTEXT_MODE] ||
-           isTop && MODE_SOURCE;
+    const { menuItemId } = info;
+    mode = (menuItemId !== MODE_SOURCE && menuItemId) || vars[CONTEXT_MODE] ||
+           (isTop && MODE_SOURCE);
   } else {
     mode = getContextMode(elm);
   }
@@ -1671,7 +1688,7 @@ const determineContentProcess = (obj = {}) => {
  * @returns {object} - document fragment
  */
 const createParagraphedContent = (value, ns = nsURI.html) => {
-  const arr = isString(value) && value.split(/\r?\n/) || [""];
+  const arr = isString(value) ? value.split(/\r?\n/) : [''];
   const l = arr.length;
   const frag = document.createDocumentFragment();
   if (l === 1) {
@@ -1679,20 +1696,20 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
     if (text) {
       frag.appendChild(document.createTextNode(text));
     } else {
-      frag.appendChild(document.createTextNode("\n"));
+      frag.appendChild(document.createTextNode('\n'));
     }
   } else {
-    const sep = document.queryCommandValue("defaultParagraphSeparator");
+    const sep = document.queryCommandValue('defaultParagraphSeparator');
     let i = 0;
     while (i < l) {
       const text = arr[i];
       if (ns === nsURI.html) {
-        if (sep === "div" || sep === "p") {
+        if (sep === 'div' || sep === 'p') {
           const elm = document.createElementNS(ns, sep);
           if (text) {
             elm.appendChild(document.createTextNode(text));
           } else if (i < l - 1) {
-            const br = document.createElementNS(ns, "br");
+            const br = document.createElementNS(ns, 'br');
             elm.appendChild(br);
           }
           elm.hasChildNodes() && frag.appendChild(elm);
@@ -1700,21 +1717,21 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
           if (text) {
             frag.appendChild(document.createTextNode(text));
           } else {
-            const br = document.createElementNS(ns, "br");
+            const br = document.createElementNS(ns, 'br');
             frag.appendChild(br);
           }
           if (i < l - 1) {
-            const br = document.createElementNS(ns, "br");
+            const br = document.createElementNS(ns, 'br');
             frag.appendChild(br);
           }
         }
       } else if (text) {
         frag.appendChild(document.createTextNode(text));
       } else {
-        frag.appendChild(document.createTextNode(""));
+        frag.appendChild(document.createTextNode(''));
       }
       if (i < l - 1) {
-        frag.appendChild(document.createTextNode("\n"));
+        frag.appendChild(document.createTextNode('\n'));
       }
       i++;
     }
@@ -1733,16 +1750,16 @@ const createParagraphedContent = (value, ns = nsURI.html) => {
 const createReplacingContent = (node, opt = {}) => {
   const frag = document.createDocumentFragment();
   if (node && node.nodeType === Node.ELEMENT_NODE) {
-    const {controlledBy, domstr, namespaceURI, value} = opt;
+    const { controlledBy, domstr, namespaceURI, value } = opt;
     const ctrl = controlledBy && isString(controlledBy) &&
-                   getTargetElementFromDataId(controlledBy);
-    if (ctrl && ctrl === node || !ctrl) {
+                 getTargetElementFromDataId(controlledBy);
+    if (!ctrl || ctrl === node) {
       if (domstr && isString(domstr)) {
         const dom = new DOMParser().parseFromString(domstr, MIME_HTML);
         const {
           body: {
-            childNodes,
-          },
+            childNodes
+          }
         } = dom;
         for (const child of childNodes) {
           frag.appendChild(child.cloneNode(true));
@@ -1766,11 +1783,11 @@ const createReplacingContent = (node, opt = {}) => {
  * @returns {void}
  */
 const replaceEditableContent = (node, opt = {}) => {
-  const {controlledBy, dataId, namespaceURI, value} = opt;
+  const { controlledBy, dataId, namespaceURI, value } = opt;
   if (node && node.nodeType === Node.ELEMENT_NODE &&
       dataIds.has(dataId) && isString(value)) {
-    const changed = value !== node.textContent.replace(/^\s*/, "")
-      .replace(/\n +/g, "\n").replace(/([^\n])$/, (m, c) => `${c}\n`);
+    const changed = value !== node.textContent.replace(/^\s*/, '')
+      .replace(/\n +/g, '\n').replace(/([^\n])$/, (m, c) => `${c}\n`);
     const data = dataIds.get(dataId);
     if (changed && !data.mutex) {
       const sel = node.ownerDocument.getSelection();
@@ -1785,60 +1802,60 @@ const replaceEditableContent = (node, opt = {}) => {
       data.mutex = true;
       setDataId(dataId, data);
       sel.selectAllChildren(node);
-      dispatchEvent(node.ownerDocument, "selectionchange", {
+      dispatchEvent(node.ownerDocument, 'selectionchange', {
         bubbles: false,
-        cancelable: false,
+        cancelable: false
       });
       dataTransfer.setData(MIME_PLAIN, value);
       domstr && dataTransfer.setData(MIME_HTML, domstr);
-      proceed = dispatchClipboardEvent(node, "paste", {
+      proceed = dispatchClipboardEvent(node, 'paste', {
         bubbles: true,
         cancelable: true,
         clipboardData: dataTransfer,
-        composed: true,
+        composed: true
       });
       if (proceed) {
         const {
-          collapsed, endContainer, endOffset, startContainer, startOffset,
+          collapsed, endContainer, endOffset, startContainer, startOffset
         } = sel.getRangeAt(0);
         let insertTarget;
         // TODO: StaticRange() constructor not yet implemented in Blink
         // See https://bugs.chromium.org/p/chromium/issues/detail?id=992606
-        if (typeof StaticRange === "function") {
+        if (typeof StaticRange === 'function') {
           insertTarget = new StaticRange({
-            endContainer, endOffset, startContainer, startOffset,
+            endContainer, endOffset, startContainer, startOffset
           });
         } else {
           insertTarget = {
-            collapsed, endContainer, endOffset, startContainer, startOffset,
+            collapsed, endContainer, endOffset, startContainer, startOffset
           };
         }
         // TODO: beforeinput not yet enabled by default in Gecko
         // See https://bugzilla.mozilla.org/show_bug.cgi?id=1665530
         // Note: InputEvent.getTargetRanges() has been implemented in Firefox 75
-        if (typeof InputEvent.prototype.getTargetRanges === "function") {
-          proceed = dispatchInputEvent(node, "beforeinput", {
+        if (typeof InputEvent.prototype.getTargetRanges === 'function') {
+          proceed = dispatchInputEvent(node, 'beforeinput', {
             dataTransfer,
             bubbles: true,
             cancelable: true,
-            inputType: "insertFromPaste",
-            ranges: [insertTarget],
+            inputType: 'insertFromPaste',
+            ranges: [insertTarget]
           });
         }
         if (proceed) {
           const frag = createReplacingContent(node, {
-            controlledBy, domstr, namespaceURI, value,
+            controlledBy, domstr, namespaceURI, value
           });
           sel.deleteFromDocument();
           node.appendChild(frag);
           delete data.mutex;
           setDataId(dataId, data);
-          dispatchInputEvent(node, "input", {
+          dispatchInputEvent(node, 'input', {
             dataTransfer,
             bubbles: true,
             cancelable: false,
-            inputType: "insertFromPaste",
-            ranges: [insertTarget],
+            inputType: 'insertFromPaste',
+            ranges: [insertTarget]
           });
         }
       } else {
@@ -1847,9 +1864,9 @@ const replaceEditableContent = (node, opt = {}) => {
       }
       if (!sel.isCollapsed) {
         sel.collapseToEnd();
-        dispatchEvent(node.ownerDocument, "selectionchange", {
+        dispatchEvent(node.ownerDocument, 'selectionchange', {
           bubbles: false,
-          cancelable: false,
+          cancelable: false
         });
       }
     }
@@ -1864,11 +1881,11 @@ const replaceEditableContent = (node, opt = {}) => {
  * @returns {void}
  */
 const replaceEditControlValue = (elm, opt = {}) => {
-  const {dataId, value} = opt;
+  const { dataId, value } = opt;
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       /^(?:input|textarea)$/.test(elm.localName) &&
       dataIds.has(dataId) && isString(value)) {
-    let dataValue = value.replace(/\u200B/g, "");
+    let dataValue = value.replace(/\u200B/g, '');
     if (/^input$/.test(elm.localName)) {
       dataValue = dataValue.trim();
     }
@@ -1877,21 +1894,21 @@ const replaceEditControlValue = (elm, opt = {}) => {
     if (changed && !data.mutex) {
       data.mutex = true;
       setDataId(dataId, data);
-      const proceed = dispatchInputEvent(elm, "beforeinput", {
+      const proceed = dispatchInputEvent(elm, 'beforeinput', {
         bubbles: true,
         cancelable: true,
         data: dataValue,
-        inputType: "insertText",
+        inputType: 'insertText'
       });
       if (proceed) {
         elm.value = dataValue;
         delete data.mutex;
         setDataId(dataId, data);
-        dispatchInputEvent(elm, "input", {
+        dispatchInputEvent(elm, 'input', {
           bubbles: true,
           cancelable: false,
           data: dataValue,
-          inputType: "insertText",
+          inputType: 'insertText'
         });
       } else {
         delete data.mutex;
@@ -1909,10 +1926,10 @@ const replaceEditControlValue = (elm, opt = {}) => {
  * @returns {void}
  */
 const replaceLiveEditContent = (elm, opt = {}) => {
-  const {dataId, liveEditKey, value} = opt;
+  const { dataId, liveEditKey, value } = opt;
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       dataIds.has(dataId) && liveEdit.has(liveEditKey) && isString(value)) {
-    const {isIframe, setContent} = liveEdit.get(liveEditKey);
+    const { isIframe, setContent } = liveEdit.get(liveEditKey);
     const data = dataIds.get(dataId);
     let liveElm;
     if (isIframe && elm.contentDocument) {
@@ -1922,28 +1939,28 @@ const replaceLiveEditContent = (elm, opt = {}) => {
     }
     if (liveElm && !data.mutex) {
       if (isEditControl(liveElm)) {
-        const dataValue = value.replace(/\u200B/g, "");
+        const dataValue = value.replace(/\u200B/g, '');
         data.mutex = true;
         setDataId(dataId, data);
         dispatchFocusEvent(liveElm);
-        dispatchKeyboardEvent(liveElm, "keydown", KeyCtrlA);
-        dispatchKeyboardEvent(liveElm, "keyup", KeyCtrlA);
-        dispatchKeyboardEvent(liveElm, "keydown", KeyBackSpace);
-        dispatchKeyboardEvent(liveElm, "keyup", KeyBackSpace);
-        dispatchInputEvent(liveElm, "beforeinput", {
+        dispatchKeyboardEvent(liveElm, 'keydown', KeyCtrlA);
+        dispatchKeyboardEvent(liveElm, 'keyup', KeyCtrlA);
+        dispatchKeyboardEvent(liveElm, 'keydown', KeyBackSpace);
+        dispatchKeyboardEvent(liveElm, 'keyup', KeyBackSpace);
+        dispatchInputEvent(liveElm, 'beforeinput', {
           bubbles: true,
           cancelable: true,
           data: dataValue,
-          inputType: "insertText",
+          inputType: 'insertText'
         });
         liveElm.value = dataValue;
         delete data.mutex;
         setDataId(dataId, data);
-        dispatchInputEvent(liveElm, "input", {
+        dispatchInputEvent(liveElm, 'input', {
           bubbles: true,
           cancelable: false,
           data: dataValue,
-          inputType: "insertText",
+          inputType: 'insertText'
         });
       } else {
         liveElm.isContentEditable && replaceEditableContent(liveElm, opt);
@@ -1959,12 +1976,12 @@ const replaceLiveEditContent = (elm, opt = {}) => {
  * @returns {Promise.<Array>} - results of each handler
  */
 const syncText = (obj = {}) => {
-  const {data, value} = obj;
+  const { data, value } = obj;
   const func = [];
   if (isObjectNotEmpty(data)) {
     const {
       controlledBy, dataId, lastUpdate, liveEditKey, namespaceURI, tabId,
-      timestamp,
+      timestamp
     } = data;
     if (dataId && tabId === vars[ID_TAB]) {
       const elm = getTargetElementFromDataId(dataId);
@@ -1975,9 +1992,9 @@ const syncText = (obj = {}) => {
           const storedData = dataIds.get(dataId);
           const mutex = storedData && storedData.mutex;
           const isUpdated = !lastUpdate ||
-                            Number.isInteger(timestamp) &&
-                            Number.isInteger(lastUpdate) &&
-                            timestamp > lastUpdate;
+                            (Number.isInteger(timestamp) &&
+                             Number.isInteger(lastUpdate) &&
+                             timestamp > lastUpdate);
           if (!mutex && isUpdated) {
             const ctrl =
               controlledBy && getTargetElementFromDataId(controlledBy);
@@ -1985,17 +2002,17 @@ const syncText = (obj = {}) => {
             if (liveEdit.has(liveEditKey)) {
               setDataId(dataId, data);
               func.push(replaceLiveEditContent(elm, {
-                dataId, liveEditKey, value,
+                dataId, liveEditKey, value
               }));
             } else if (ctrl || elm.isContentEditable) {
               setDataId(dataId, data);
               func.push(replaceEditableContent(elm, {
-                controlledBy, dataId, namespaceURI, value,
+                controlledBy, dataId, namespaceURI, value
               }));
             } else if (/^(?:input|textarea)$/.test(elm.localName)) {
               setDataId(dataId, data);
               func.push(replaceEditControlValue(elm, {
-                dataId, value,
+                dataId, value
               }));
             }
           }
@@ -2140,7 +2157,7 @@ const checkPort = async () => {
     func = requestPortConnection();
   } else {
     const port = runtime.connect({
-      name: PORT_CONTENT,
+      name: PORT_CONTENT
     });
     func = portOnConnect(port);
   }
@@ -2160,7 +2177,7 @@ const handleMsg = async msg => {
     for (const [key, value] of items) {
       if (key === PORT_CONNECT && value) {
         const port = runtime.connect({
-          name: PORT_CONTENT,
+          name: PORT_CONTENT
         });
         func.push(portOnConnect(port));
         break;
@@ -2186,19 +2203,19 @@ const runtimeOnMsg = msg => handleMsg(msg).catch(throwErr);
  * @returns {?Function} - postMsg()
  */
 const handleBeforeContextMenu = evt => {
-  const {button, key, shiftKey, target} = evt;
+  const { button, key, shiftKey, target } = evt;
   let func;
-  if (button === MOUSE_BUTTON_RIGHT || key === "ContextMenu" ||
-      shiftKey && key === "F10") {
-    const {localName, namespaceURI, type} = target;
-    const {anchorNode, focusNode, isCollapsed} = document.getSelection();
-    const mode = namespaceURI === nsURI.math && MODE_MATHML ||
-                 namespaceURI === nsURI.svg && MODE_SVG || MODE_SOURCE;
+  if (button === MOUSE_BUTTON_RIGHT || key === 'ContextMenu' ||
+      (shiftKey && key === 'F10')) {
+    const { localName, namespaceURI, type } = target;
+    const { anchorNode, focusNode, isCollapsed } = document.getSelection();
+    const mode = (namespaceURI === nsURI.math && MODE_MATHML) ||
+                 (namespaceURI === nsURI.svg && MODE_SVG) || MODE_SOURCE;
     const isChildNodeText = isContentTextNode(target);
     const editableElm = getEditableElm(target);
     const liveEditElm = getLiveEditElm(target);
     let enabled;
-    if (localName === "input") {
+    if (localName === 'input') {
       enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
     } else {
       enabled = isCollapsed || !!liveEditElm || !!editableElm ||
@@ -2206,25 +2223,27 @@ const handleBeforeContextMenu = evt => {
     }
     vars[CONTEXT_MODE] = mode;
     if (liveEditElm) {
-      vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
-                           liveEditElm || isChildNodeText && target || null;
+      vars[CONTEXT_NODE] =
+        ((!namespaceURI || namespaceURI === nsURI.html) && liveEditElm) ||
+        (isChildNodeText && target) || null;
     } else if (editableElm) {
-      vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
-                           editableElm || isChildNodeText && target || null;
+      vars[CONTEXT_NODE] =
+        ((!namespaceURI || namespaceURI === nsURI.html) && editableElm) ||
+        (isChildNodeText && target) || null;
     } else {
-      vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] && target || null;
+      vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] ? target : null;
     }
     func = postMsg({
       [CONTEXT_MENU]: {
         [MODE_EDIT]: {
           enabled,
-          menuItemId: MODE_EDIT,
+          menuItemId: MODE_EDIT
         },
         [MODE_SOURCE]: {
           mode,
-          menuItemId: MODE_SOURCE,
-        },
-      },
+          menuItemId: MODE_SOURCE
+        }
+      }
     }).catch(throwErr);
   }
   return func || null;
@@ -2237,25 +2256,27 @@ const handleBeforeContextMenu = evt => {
  * @returns {?Function} - handleBeforeContextMenu()
  */
 const handleKeyDown = evt => {
-  const {key, shiftKey, target} = evt;
+  const { key, shiftKey, target } = evt;
   let func;
-  if (key === "ContextMenu" || shiftKey && key === "F10") {
+  if (key === 'ContextMenu' || (shiftKey && key === 'F10')) {
     func = handleBeforeContextMenu(evt);
   } else if (target && /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
-    const {namespaceURI} = target;
+    const { namespaceURI } = target;
     const mode = getContextMode(target);
     const isChildNodeText = isContentTextNode(target);
     const editableElm = getEditableElm(target);
     const liveEditElm = getLiveEditElm(target);
     vars[CONTEXT_MODE] = mode;
     if (liveEditElm) {
-      vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
-                           liveEditElm || isChildNodeText && target || null;
+      vars[CONTEXT_NODE] =
+        ((!namespaceURI || namespaceURI === nsURI.html) && liveEditElm) ||
+        (isChildNodeText && target) || null;
     } else if (editableElm) {
-      vars[CONTEXT_NODE] = (!namespaceURI || namespaceURI === nsURI.html) &&
-                           editableElm || isChildNodeText && target || null;
+      vars[CONTEXT_NODE] =
+        ((!namespaceURI || namespaceURI === nsURI.html) && editableElm) ||
+        (isChildNodeText && target) || null;
     } else {
-      vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] && target || null;
+      vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] ? target : null;
     }
   }
   return func || null;
@@ -2270,18 +2291,19 @@ const startup = () => Promise.all([
   checkPort(),
   extendObjItems(fileExt, FILE_EXT),
   extendObjItems(nsURI, NS_URI),
-  extendObjItems(liveEdit, LIVE_EDIT),
+  extendObjItems(liveEdit, LIVE_EDIT)
 ]).catch(throwErr);
 
 /* listeners */
 runtime.onMessage.addListener(runtimeOnMsg);
-window.addEventListener("mousedown", handleBeforeContextMenu, true);
-window.addEventListener("keydown", handleKeyDown, true);
-window.addEventListener("load", startup);
-document.readyState === "complete" && startup();
+window.addEventListener('mousedown', handleBeforeContextMenu, true);
+window.addEventListener('keydown', handleKeyDown, true);
+window.addEventListener('load', startup);
+document.readyState === 'complete' && startup();
 
 /* export for tests */
-if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
+if (typeof module !== 'undefined' &&
+    Object.prototype.hasOwnProperty.call(module, 'exports')) {
   module.exports = {
     appendChildNodes,
     checkPort,
@@ -2360,6 +2382,6 @@ if (typeof module !== "undefined" && module.hasOwnProperty("exports")) {
     syncText,
     throwErr,
     updateTmpFileData,
-    vars,
+    vars
   };
 }

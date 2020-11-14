@@ -3,25 +3,25 @@
  */
 
 import {
-  throwErr,
-} from "./common.js";
+  throwErr
+} from './common.js';
 import {
-  localizeHtml,
-} from "./localize.js";
+  localizeHtml
+} from './localize.js';
 import {
-  disableIncompatibleInputs,
-} from "./compat.js";
+  disableIncompatibleInputs
+} from './compat.js';
 import {
   addFormSubmitListener, addInputChangeListener, addReloadExtensionListener,
   addSyncUrlsInputListener, getEditorConfig, getHostStatus, handleMsg, port,
-  setValuesFromStorage,
-} from "./options-main.js";
+  setValuesFromStorage
+} from './options-main.js';
 
 /* listener */
 port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
 
 /* startup */
-document.addEventListener("DOMContentLoaded", () => Promise.all([
+document.addEventListener('DOMContentLoaded', () => Promise.all([
   localizeHtml(),
   setValuesFromStorage(),
   addInputChangeListener(),
@@ -30,5 +30,5 @@ document.addEventListener("DOMContentLoaded", () => Promise.all([
   addFormSubmitListener(),
   getHostStatus(),
   getEditorConfig(),
-  disableIncompatibleInputs(),
+  disableIncompatibleInputs()
 ]).catch(throwErr));
