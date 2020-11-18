@@ -2,24 +2,21 @@
  * options-main.js
  */
 
-import {
-  isObjectNotEmpty, isString, logErr, throwErr
-} from './common.js';
-import {
-  getStorage, removePermission, requestPermission
-} from './browser.js';
-
-/* constants */
+/* shared */
+import { isObjectNotEmpty, isString, logErr, throwErr } from './common.js';
+import { getStorage, removePermission, requestPermission } from './browser.js';
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
   EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
   HOST_VERSION_LATEST, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN
 } from './constant.js';
-const PORT_NAME = 'portOptions';
 
 /* api */
 const { i18n, runtime } = browser;
+
+/* constant */
+const PORT_NAME = 'portOptions';
 
 /* port */
 export const port = runtime.connect({ name: PORT_NAME });

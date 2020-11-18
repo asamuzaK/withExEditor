@@ -2,15 +2,10 @@
  * options.js
  */
 
-import {
-  throwErr
-} from './common.js';
-import {
-  localizeHtml
-} from './localize.js';
-import {
-  disableIncompatibleInputs
-} from './compat.js';
+/* shared */
+import { throwErr } from './common.js';
+import { localizeHtml } from './localize.js';
+import { disableIncompatibleInputs } from './compat.js';
 import {
   addFormSubmitListener, addInputChangeListener, addReloadExtensionListener,
   addSyncUrlsInputListener, getEditorConfig, getHostStatus, handleMsg, port,

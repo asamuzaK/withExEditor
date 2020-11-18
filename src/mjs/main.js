@@ -2,6 +2,7 @@
  * main.js
  */
 
+/* shared */
 import {
   getType, isObjectNotEmpty, isString, logErr, logMsg, logWarn,
   removeQueryFromURI, stringifyPositiveInt, throwErr
@@ -11,8 +12,6 @@ import {
   getActiveTab, getActiveTabId, getCurrentWindow, getOs, getStorage, getWindow,
   sendMessage, setStorage
 } from './browser.js';
-
-/* constants */
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET,
   EDITOR_CONFIG_RES, EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME,
@@ -29,13 +28,15 @@ import {
   TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ,
   TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID
 } from './constant.js';
-const HOST_VERSION_MIN = 'v5.0.0-b.2.1';
 
 /* api */
 const {
   browserAction, i18n, notifications, runtime, tabs, windows
 } = browser;
 const menus = browser.menus || browser.contextMenus;
+
+/* constant */
+const HOST_VERSION_MIN = 'v5.0.0-b.2.1';
 
 /* variables */
 export const vars = {

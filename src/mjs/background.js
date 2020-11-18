@@ -2,12 +2,9 @@
  * background.js
  */
 
-import {
-  throwErr
-} from './common.js';
-import {
-  getAllStorage, setStorage
-} from './browser.js';
+/* shared */
+import { throwErr } from './common.js';
+import { getAllStorage, setStorage } from './browser.js';
 import {
   handleCmd, handleDisconnectedHost, handleMsg, handlePort, host,
   onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
@@ -17,8 +14,6 @@ import {
 import fileExtData from './file-ext.js';
 import liveEditData from './live-edit.js';
 import nsUriData from './ns-uri.js';
-
-/* constants */
 import {
   FILE_EXT, LIVE_EDIT, NS_URI
 } from './constant.js';
