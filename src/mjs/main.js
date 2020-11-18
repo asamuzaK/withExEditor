@@ -29,13 +29,13 @@ import {
   TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ,
   TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID
 } from './constant.js';
+const HOST_VERSION_MIN = 'v5.0.0-b.2.1';
 
 /* api */
 const {
   browserAction, i18n, notifications, runtime, tabs, windows
 } = browser;
 const menus = browser.menus || browser.contextMenus;
-const HOST_VERSION_MIN = 'v5.0.0-b.2.1';
 
 /* variables */
 export const vars = {

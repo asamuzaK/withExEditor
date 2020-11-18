@@ -16,10 +16,10 @@ import {
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
   HOST_VERSION_LATEST, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN
 } from './constant.js';
+const PORT_NAME = 'portOptions';
 
 /* api */
 const { i18n, runtime } = browser;
-const PORT_NAME = 'portOptions';
 
 /* port */
 export const port = runtime.connect({ name: PORT_NAME });
