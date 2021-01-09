@@ -1826,6 +1826,7 @@ const replaceEditableContent = (node, opt = {}) => {
             endContainer, endOffset, startContainer, startOffset
           });
         } catch (e) {
+          logErr(e);
           insertTarget = {
             collapsed, endContainer, endOffset, startContainer, startOffset
           };
