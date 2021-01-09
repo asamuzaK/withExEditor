@@ -41,6 +41,9 @@
   "content_scripts": [
     {
       "all_frames": true,
+      "exclude_matches": [
+        "*://sourceforge.net/*"
+      ],
       "js": [
         "lib/browser-polyfill.min.js",
         "js/content.js"
