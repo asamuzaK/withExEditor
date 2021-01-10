@@ -1041,7 +1041,6 @@ const getLiveEditElm = node => {
           }
         } else if (classList.contains(className)) {
           elm = node;
-          !elm.isContentEditable && elm.setAttribute('contenteditable', '');
           break;
         }
       }
@@ -1082,7 +1081,13 @@ const getLiveEditContent = (elm, key) => {
             arr.push('\n');
           }
         } else {
-          arr.push(item.textContent);
+          const isPreFormatted =
+            elm.localName === 'pre' || item.localName === 'pre';
+          if (isPreFormatted) {
+            arr.push(`${item.textContent}\n`);
+          } else {
+            arr.push(item.textContent);
+          }
         }
       }
       content = arr.join('');
