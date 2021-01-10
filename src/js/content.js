@@ -1797,9 +1797,10 @@ const replaceEditableContent = (node, opt = {}) => {
     if (changed && !data.mutex) {
       const sel = node.ownerDocument.getSelection();
       const dataTransfer = new DataTransfer();
+      const dataValue = value.replace(/\u200B/g, '');
       let domstr, proceed;
       try {
-        domstr = serializeDomString(value, MIME_HTML);
+        domstr = serializeDomString(dataValue, MIME_HTML);
       } catch (e) {
         logErr(e);
         domstr = null;
@@ -1811,7 +1812,7 @@ const replaceEditableContent = (node, opt = {}) => {
         bubbles: false,
         cancelable: false
       });
-      dataTransfer.setData(MIME_PLAIN, value);
+      dataTransfer.setData(MIME_PLAIN, dataValue);
       domstr && dataTransfer.setData(MIME_HTML, domstr);
       proceed = dispatchClipboardEvent(node, 'paste', {
         bubbles: true,
@@ -1850,7 +1851,10 @@ const replaceEditableContent = (node, opt = {}) => {
         }
         if (proceed) {
           const frag = createReplacingContent(node, {
-            controlledBy, domstr, namespaceURI, value
+            controlledBy,
+            domstr,
+            namespaceURI,
+            value: dataValue
           });
           sel.deleteFromDocument();
           node.appendChild(frag);
@@ -1968,8 +1972,13 @@ const replaceLiveEditContent = (elm, opt = {}) => {
           data: dataValue,
           inputType: 'insertText'
         });
-      } else {
-        liveElm.isContentEditable && replaceEditableContent(liveElm, opt);
+      } else if (liveElm.isContentEditable) {
+        dispatchFocusEvent(liveElm);
+        dispatchKeyboardEvent(liveElm, 'keydown', KeyCtrlA);
+        dispatchKeyboardEvent(liveElm, 'keyup', KeyCtrlA);
+        dispatchKeyboardEvent(liveElm, 'keydown', KeyBackSpace);
+        dispatchKeyboardEvent(liveElm, 'keyup', KeyBackSpace);
+        replaceEditableContent(liveElm, opt);
       }
     }
   }
