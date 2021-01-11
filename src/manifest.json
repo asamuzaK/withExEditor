@@ -41,9 +41,6 @@
   "content_scripts": [
     {
       "all_frames": true,
-      "exclude_matches": [
-        "*://sourceforge.net/*"
-      ],
       "js": [
         "lib/browser-polyfill.min.js",
         "js/content.js"
@@ -81,5 +78,5 @@
     "tabs"
   ],
   "short_name": "__MSG_extensionName__",
-  "version": "7.3.2a1"
+  "version": "7.3.2a3"
 }

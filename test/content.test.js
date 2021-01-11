@@ -2675,6 +2675,38 @@ describe('content', () => {
     });
 
     it('should get result', () => {
+      const div = document.createElement('div');
+      const pre = document.createElement('pre');
+      const pre2 = document.createElement('pre');
+      const body = document.querySelector('body');
+      pre.classList.add('bar');
+      pre.textContent = 'baz';
+      pre2.classList.add('bar');
+      pre2.textContent = 'qux';
+      div.appendChild(pre);
+      div.appendChild(pre2);
+      body.appendChild(div);
+      const res = func(div, 'foo');
+      assert.strictEqual(res, 'baz\nqux\n', 'result');
+    });
+
+    it('should get result', () => {
+      const pre = document.createElement('pre');
+      const span = document.createElement('span');
+      const span2 = document.createElement('span');
+      const body = document.querySelector('body');
+      span.classList.add('bar');
+      span.textContent = 'baz';
+      span2.classList.add('bar');
+      span2.textContent = 'qux';
+      pre.appendChild(span);
+      pre.appendChild(span2);
+      body.appendChild(pre);
+      const res = func(pre, 'foo');
+      assert.strictEqual(res, 'baz\nqux\n', 'result');
+    });
+
+    it('should get result', () => {
       const iframe = document.createElement('iframe');
       const body = document.querySelector('body');
       body.appendChild(iframe);
