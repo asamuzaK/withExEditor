@@ -660,54 +660,6 @@ describe('content', () => {
       assert.isTrue(spy.called, 'called');
       assert.isTrue(res, 'result');
     });
-
-    it('should call function', () => {
-      const stubSetData = sinon.stub();
-      InputEvent.prototype.wrappedJSObject = {
-        dataTransfer: {
-          setData: stubSetData
-        }
-      };
-      const p = document.createElement('p');
-      const spy = sinon.spy(p, 'dispatchEvent');
-      const body = document.querySelector('body');
-      const dataTrans = new DataTransfer();
-      dataTrans.setData('text/plain', 'foo');
-      body.appendChild(p);
-      const res = func(p, 'beforeinput', {
-        bubbles: true,
-        cancelable: true,
-        dataTransfer: dataTrans
-      });
-      assert.isTrue(stubSetData.called, 'called');
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
-      delete InputEvent.prototype.wrappedJSObject;
-    });
-
-    it('should call function', () => {
-      const stubSetData = sinon.stub();
-      InputEvent.prototype.wrappedJSObject = {
-        dataTransfer: {
-          setData: stubSetData
-        }
-      };
-      const p = document.createElement('p');
-      const spy = sinon.spy(p, 'dispatchEvent');
-      const body = document.querySelector('body');
-      const dataTrans = new DataTransfer();
-      dataTrans.setData('text/plain', 'foo');
-      body.appendChild(p);
-      const res = func(p, 'input', {
-        bubbles: true,
-        cancelable: false,
-        dataTransfer: dataTrans
-      });
-      assert.isTrue(stubSetData.called, 'called');
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
-      delete InputEvent.prototype.wrappedJSObject;
-    });
   });
 
   describe('dispatch keyboard event', () => {
