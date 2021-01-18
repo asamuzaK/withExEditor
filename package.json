@@ -31,10 +31,10 @@
     "@babel/register": "^7.12.10",
     "addons-linter": "^2.16.0",
     "chai": "^4.2.0",
-    "eslint": "^7.17.0",
+    "eslint": "^7.18.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsdoc": "^31.0.3",
+    "eslint-plugin-jsdoc": "^31.0.7",
     "eslint-plugin-no-unsanitized": "^3.1.4",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
@@ -46,5 +46,5 @@
     "webext-schema": "^1.4.3",
     "webextension-polyfill": "^0.7.0"
   },
-  "version": "7.3.2"
+  "version": "7.3.3"
 }
