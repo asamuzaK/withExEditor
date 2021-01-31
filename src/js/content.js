@@ -1820,8 +1820,7 @@ const replaceEditableContent = (node, opt = {}) => {
         const {
           collapsed, endContainer, endOffset, startContainer, startOffset
         } = sel.getRangeAt(0);
-        // TODO: StaticRange() constructor not yet implemented in Blink
-        // See https://bugs.chromium.org/p/chromium/issues/detail?id=992606
+        // TODO: remove try-catch after Chrome 90 Stable is released
         let insertTarget;
         try {
           insertTarget = new StaticRange({
