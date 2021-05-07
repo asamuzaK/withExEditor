@@ -1242,13 +1242,12 @@ describe('content', () => {
       assert.isNull(res, 'result');
     });
 
-    it('should get empty string', () => {
+    it('should get null', () => {
       const elm = document.createElement('script');
       const body = document.querySelector('body');
       body.appendChild(elm);
       const res = func(elm);
-      assert.strictEqual(res.nodeType, Node.TEXT_NODE, 'nodeType');
-      assert.strictEqual(res.nodeValue, '', 'nodeValue');
+      assert.isNull(res, 'result');
     });
 
     it('should get result', () => {
@@ -1277,6 +1276,27 @@ describe('content', () => {
       assert.strictEqual(res.localName, 'div', 'localName');
       assert.isTrue(res.hasAttribute('data-foo'), 'attr');
     });
+
+    it('should get result', () => {
+      const elm = document.createElement('foo');
+      const body = document.querySelector('body');
+      elm.setAttribute('bar', 'baz');
+      body.appendChild(elm);
+      const res = func(elm);
+      assert.isTrue(res instanceof HTMLUnknownElement, 'instance');
+      assert.strictEqual(res.localName, 'foo', 'localName');
+      assert.isFalse(res.hasAttribute('bar'), 'attr');
+    });
+
+    it('should throw', async () => {
+      const dom =
+        new DOMParser().parseFromString('<foo@example.com>', 'text/html');
+      const { body: domBody } = dom;
+      const { firstElementChild: elm } = domBody;
+      const body = document.querySelector('body');
+      body.appendChild(elm);
+      assert.throws(() => func(elm));
+    });
   });
 
   describe('create document fragment from nodes array', () => {
@@ -1293,6 +1313,7 @@ describe('content', () => {
       arr.push(
         document.createTextNode('\n'),
         document.createComment('foo'),
+        null,
         document.createElement('p')
       );
       const res = func(arr);
@@ -1614,7 +1635,17 @@ describe('content', () => {
     });
 
     it('should throw', () => {
+      assert.throws(() => func('</>', 'text/xml'),
+        'Error while parsing DOM string.');
+    });
+
+    it('should throw', () => {
       assert.throws(() => func('', 'text/xml'),
+        'Error while parsing DOM string.');
+    });
+
+    it('should throw', () => {
+      assert.throws(() => func('<xml></xml><xml></xml>', 'text/xml'),
         'Error while parsing DOM string.');
     });
 
@@ -1623,30 +1654,76 @@ describe('content', () => {
         'Error while parsing DOM string.');
     });
 
-    it('should throw', () => {
-      assert.throws(
-        () => func('Example <foo@example.dom> wrote:\nfoo', 'text/html')
-      );
-    });
-
     it('should get null', () => {
       const res = func('', 'text/html');
       assert.isNull(res, 'result');
     });
 
     it('should get null', () => {
+      const res = func('', 'text/html', true);
+      assert.isNull(res, 'result');
+    });
+
+    it('should get null', () => {
+      const stubErr = sinon.stub(console, 'error');
+      const res = func('Example <foo@example.dom> wrote:\nfoo', 'text/html');
+      const { calledOnce } = stubErr;
+      stubErr.restore();
+      assert.isTrue(calledOnce, 'error');
+      assert.isNull(res, 'result');
+    });
+
+    it('should get null', () => {
+      const stubErr = sinon.stub(console, 'error');
+      const res =
+        func('Example <foo@example.dom> wrote:\nfoo', 'text/html', true);
+      const { calledOnce } = stubErr;
+      stubErr.restore();
+      assert.isTrue(calledOnce, 'error');
+      assert.isNull(res, 'result');
+    });
+
+    it('should get result', () => {
       const res = func('foo bar\nbaz', 'text/html');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, 'foo bar\nbaz', 'result');
     });
 
     it('should get null', () => {
-      const res = func('foo <bar>baz</bar>\nqux', 'text/html');
+      const res = func('foo bar\nbaz', 'text/html', true);
       assert.isNull(res, 'result');
     });
 
-    it('should get null', () => {
+    it('should get result', () => {
       const res = func('<<foo>>', 'text/html');
-      assert.isNull(res, 'result');
+      assert.strictEqual(
+        res,
+        '&lt;<foo xmlns="http://www.w3.org/1999/xhtml">&gt;</foo>',
+        'result'
+      );
+    });
+
+    it('should get result', () => {
+      const res = func('<<foo>>', 'text/html', true);
+      assert.strictEqual(
+        res,
+        '&lt;<foo xmlns="http://www.w3.org/1999/xhtml">&gt;</foo>',
+        'result'
+      );
+    });
+
+    it('should get result', () => {
+      const res = func('<<script>>', 'text/html');
+      assert.strictEqual(res, '&lt;', 'result');
+    });
+
+    it('should get result', () => {
+      const res =
+        func('<div>foo <bar foobar="foobar">baz</bar>\nqux</div>', 'text/html');
+      assert.strictEqual(
+        res,
+        '<div xmlns="http://www.w3.org/1999/xhtml">foo <bar>baz</bar>\nqux</div>',
+        'result'
+      );
     });
 
     it('should get result', () => {
@@ -1654,6 +1731,30 @@ describe('content', () => {
       assert.strictEqual(
         res,
         'foo <em xmlns="http://www.w3.org/1999/xhtml">bar</em>\nbaz',
+        'result'
+      );
+    });
+
+    it('should get result', () => {
+      const res = func('foo <em onclick="alert(1)">bar</em>\nbaz', 'text/html');
+      assert.strictEqual(
+        res,
+        'foo <em xmlns="http://www.w3.org/1999/xhtml">bar</em>\nbaz',
+        'result'
+      );
+    });
+
+    it('should get result', () => {
+      const res = func('foo <script>alert(1)</script>\nbar', 'text/html');
+      assert.strictEqual(res, 'foo \nbar', 'result');
+    });
+
+    it('should get result', () => {
+      const res =
+        func('foo <div><script>alert(1)</script></div>\nbar', 'text/html');
+      assert.strictEqual(
+        res,
+        'foo <div xmlns="http://www.w3.org/1999/xhtml">\n\n</div>\nbar',
         'result'
       );
     });
@@ -1680,6 +1781,34 @@ describe('content', () => {
       assert.strictEqual(
         res,
         '<em xmlns="http://www.w3.org/1999/xhtml">foo</em>',
+        'result'
+      );
+    });
+
+    it('should get result', () => {
+      const res =
+        func('<div><em>foo</em> bar</div>\n', 'application/xhtml+xml');
+      assert.strictEqual(
+        res,
+        '<div xmlns="http://www.w3.org/1999/xhtml">\n<em>foo</em> bar</div>',
+        'result'
+      );
+    });
+
+    it('should get result', () => {
+      const res = func('<div><em onclick="alert(1)">foo</em> bar</div>\n', 'application/xhtml+xml');
+      assert.strictEqual(
+        res,
+        '<div xmlns="http://www.w3.org/1999/xhtml">\n<em>foo</em> bar</div>',
+        'result'
+      );
+    });
+
+    it('should get result', () => {
+      const res = func('<div><script>alert(1)</script> foo</div>\n', 'application/xhtml+xml');
+      assert.strictEqual(
+        res,
+        '<div xmlns="http://www.w3.org/1999/xhtml">\n foo</div>',
         'result'
       );
     });
@@ -4508,7 +4637,8 @@ describe('content', () => {
 
     it('should call function', () => {
       const div = document.createElement('div');
-      const spy = sinon.spy(div, 'dispatchEvent');
+      const stubEvt = sinon.stub(div, 'dispatchEvent');
+      stubEvt.returns(true);
       const body = document.querySelector('body');
       body.appendChild(div);
       cjs.vars[CONTEXT_NODE] = div;
@@ -4517,7 +4647,7 @@ describe('content', () => {
         dataId: 'foo',
         value: 'foo\n'
       });
-      assert.strictEqual(spy.callCount, 3, 'called');
+      assert.strictEqual(stubEvt.callCount, 3, 'called');
       assert.strictEqual(div.childNodes.length, 2, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
       assert.strictEqual(div.firstChild.localName, 'div', 'name');
@@ -4525,6 +4655,24 @@ describe('content', () => {
       assert.strictEqual(div.lastChild.nodeType, 3, 'child');
       assert.strictEqual(div.lastChild.nodeValue, '\n', 'value');
       assert.strictEqual(div.textContent, 'foo\n', 'content');
+    });
+
+    it('should call function', () => {
+      const div = document.createElement('div');
+      const stubEvt = sinon.stub(div, 'dispatchEvent');
+      stubEvt.onFirstCall().returns(true);
+      stubEvt.onSecondCall().returns(false);
+      const body = document.querySelector('body');
+      body.appendChild(div);
+      cjs.vars[CONTEXT_NODE] = div;
+      cjs.dataIds.set('foo', {});
+      func(div, {
+        dataId: 'foo',
+        value: 'foo\n'
+      });
+      assert.strictEqual(stubEvt.callCount, 2, 'called');
+      assert.strictEqual(div.childNodes.length, 0, 'length');
+      assert.strictEqual(div.textContent, '', 'content');
     });
 
     it('should not call function', () => {

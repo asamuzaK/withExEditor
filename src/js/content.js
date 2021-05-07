@@ -578,10 +578,11 @@ const createElement = node => {
                getNodeNS(node).namespaceURI || nsURI.html;
     const name = prefix ? `${prefix}:${localName}` : localName;
     if (localName === 'script') {
-      elm = document.createTextNode('');
+      elm = null;
     } else {
       elm = document.createElementNS(ns, name);
-      attributes && setAttributeNS(elm, node);
+      attributes && !(node instanceof HTMLUnknownElement) &&
+        setAttributeNS(elm, node);
     }
   }
   return elm || null;
@@ -597,8 +598,9 @@ const createFragment = nodes => {
   const frag = document.createDocumentFragment();
   if (Array.isArray(nodes)) {
     for (const node of nodes) {
-      if (node.nodeType === Node.ELEMENT_NODE ||
-          node.nodeType === Node.TEXT_NODE) {
+      if (node &&
+          (node.nodeType === Node.ELEMENT_NODE ||
+           node.nodeType === Node.TEXT_NODE)) {
         frag.appendChild(node);
       }
     }
@@ -716,9 +718,10 @@ const createDomStringFromSelectionRange = sel => {
  *
  * @param {string} domstr - DOM string
  * @param {string} mime - mime type
+ * @param {boolean} reqElm - require first element child
  * @returns {?string} - serialized DOM string
  */
-const serializeDomString = (domstr, mime) => {
+const serializeDomString = (domstr, mime, reqElm = false) => {
   if (!isString(domstr)) {
     throw new TypeError(`Expected String but got ${getType(domstr)}.`);
   }
@@ -734,25 +737,30 @@ const serializeDomString = (domstr, mime) => {
     throw new Error('Error while parsing DOM string.');
   }
   const { body, documentElement: root } = dom;
-  if (mime === MIME_HTML) {
-    const elm = appendChildNodes(body, body.cloneNode(true));
-    if (elm.hasChildNodes()) {
+  try {
+    if (mime === MIME_HTML) {
       const { childNodes, firstElementChild } = body;
-      if (firstElementChild) {
+      if (body.hasChildNodes() && (!reqElm || firstElementChild)) {
         frag = document.createDocumentFragment();
         for (const child of childNodes) {
-          if (child instanceof HTMLUnknownElement) {
-            frag = null;
-            break;
+          if (child.nodeType === Node.ELEMENT_NODE) {
+            const elm = appendChildNodes(child, child.cloneNode(true));
+            elm && elm.nodeType === Node.ELEMENT_NODE &&
+              frag.appendChild(elm);
+          } else {
+            child.nodeType === Node.TEXT_NODE && child.nodeValue &&
+              frag.appendChild(document.createTextNode(child.nodeValue));
           }
-          frag.appendChild(child.cloneNode(true));
         }
       }
+    } else {
+      const elm = appendChildNodes(root, root.cloneNode(true));
+      frag = document.createDocumentFragment();
+      frag.appendChild(elm);
     }
-  } else {
-    const elm = appendChildNodes(root, root.cloneNode(true));
-    frag = document.createDocumentFragment();
-    frag.appendChild(elm);
+  } catch (e) {
+    logErr(e);
+    frag = null;
   }
   return frag ? new XMLSerializer().serializeToString(frag) : null;
 };
@@ -1794,13 +1802,7 @@ const replaceEditableContent = (node, opt = {}) => {
       const sel = node.ownerDocument.getSelection();
       const dataTransfer = new DataTransfer();
       const dataValue = value.replace(/\u200B/g, '');
-      let domstr, proceed;
-      try {
-        domstr = serializeDomString(dataValue, MIME_HTML);
-      } catch (e) {
-        logErr(e);
-        domstr = null;
-      }
+      const domstr = serializeDomString(dataValue, MIME_HTML, true);
       data.mutex = true;
       setDataId(dataId, data);
       sel.selectAllChildren(node);
@@ -1810,7 +1812,7 @@ const replaceEditableContent = (node, opt = {}) => {
       });
       dataTransfer.setData(MIME_PLAIN, dataValue);
       domstr && dataTransfer.setData(MIME_HTML, domstr);
-      proceed = dispatchClipboardEvent(node, 'paste', {
+      let proceed = dispatchClipboardEvent(node, 'paste', {
         bubbles: true,
         cancelable: true,
         clipboardData: dataTransfer,
