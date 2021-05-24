@@ -31,8 +31,7 @@
     <path d="m107.52 3.5156-60 60 16.969 16.969 60-60-16.969-16.969z"/>
     <path d="m0 0v24h12l12-12-12-12z" transform="translate(60,85) rotate(135)"/>
   </symbol>
-  <g id="context" fill="context-fill rgb(91,91,102)"
-     fill-opacity="context-fill-opacity 1.0">
+  <g id="context" fill="context-fill rgb(91,91,102)">
     <use href="#outline"/>
   </g>
   <g id="current" fill="context-fill currentColor">
