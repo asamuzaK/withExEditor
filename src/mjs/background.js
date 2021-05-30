@@ -8,8 +8,8 @@ import { getAllStorage, setStorage } from './browser.js';
 import {
   handleCmd, handleDisconnectedHost, handleMsg, handlePort, host,
   onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
-  onWindowRemoved, openOptionsPage, postContextMenuData, setOs, setVars,
-  toggleBadge
+  onWindowRemoved, openOptionsPage, postContextMenuData, setDefaultIcon, setOs,
+  setVars, toggleBadge
 } from './main.js';
 import fileExtData from './file-ext.js';
 import liveEditData from './live-edit.js';
@@ -57,7 +57,8 @@ windows.onRemoved.addListener(windowId =>
 
 /* startup */
 document.addEventListener('DOMContentLoaded', () => Promise.all([
-  setOs().then(getAllStorage).then(setVars).then(toggleBadge),
+  setOs().then(getAllStorage).then(setVars).then(setDefaultIcon)
+    .then(toggleBadge),
   setStorage({ [NS_URI]: nsUriData }),
   setStorage({ [FILE_EXT]: fileExtData }),
   setStorage({ [LIVE_EDIT]: liveEditData })

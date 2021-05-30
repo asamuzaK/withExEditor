@@ -12,7 +12,8 @@ import {
   EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST,
-  ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_ID, ICON_LIGHT, ICON_WHITE,
+  ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_CONTEXT_ID, ICON_DARK, ICON_ID,
+  ICON_LIGHT, ICON_WHITE,
   INFO_COLOR, INFO_TEXT, IS_EXECUTABLE, IS_MAC, IS_WEBEXT,
   LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
@@ -544,6 +545,79 @@ describe('main', () => {
         'called');
       assert.deepEqual(res, {
         path: 'img/icon.svg#foo'
+      }, 'result');
+    });
+  });
+
+  describe('set default icon', () => {
+    const func = mjs.setDefaultIcon;
+    beforeEach(() => {
+      const { vars, varsLocal } = mjs;
+      vars[IS_WEBEXT] = false;
+      varsLocal[ICON_ID] = '';
+    });
+    afterEach(() => {
+      const { vars, varsLocal } = mjs;
+      vars[IS_WEBEXT] = false;
+      varsLocal[ICON_ID] = '';
+    });
+
+    it('should get null', async () => {
+      const i = browser.runtime.getURL.callCount;
+      const j = browser.browserAction.setIcon.callCount;
+      browser.runtime.getURL.callsFake(arg => arg);
+      browser.browserAction.setIcon.callsFake(arg => arg);
+      const res = await func();
+      assert.strictEqual(browser.runtime.getURL.callCount, i, 'not called');
+      assert.strictEqual(browser.browserAction.setIcon.callCount, j,
+        'not called');
+      assert.isNull(res, 'result');
+    });
+
+    it('should get null', async () => {
+      const { vars, varsLocal } = mjs;
+      const i = browser.runtime.getURL.callCount;
+      const j = browser.browserAction.setIcon.callCount;
+      browser.runtime.getURL.callsFake(arg => arg);
+      browser.browserAction.setIcon.callsFake(arg => arg);
+      vars[IS_WEBEXT] = true;
+      varsLocal[ICON_ID] = '#foo';
+      const res = await func();
+      assert.strictEqual(browser.runtime.getURL.callCount, i, 'not called');
+      assert.strictEqual(browser.browserAction.setIcon.callCount, j,
+        'not called');
+      assert.isNull(res, 'result');
+    });
+
+    it('should get null', async () => {
+      const { vars, varsLocal } = mjs;
+      const i = browser.runtime.getURL.callCount;
+      const j = browser.browserAction.setIcon.callCount;
+      browser.runtime.getURL.callsFake(arg => arg);
+      browser.browserAction.setIcon.callsFake(arg => arg);
+      vars[IS_WEBEXT] = false;
+      varsLocal[ICON_ID] = '';
+      const res = await func();
+      assert.strictEqual(browser.runtime.getURL.callCount, i, 'not called');
+      assert.strictEqual(browser.browserAction.setIcon.callCount, j,
+        'not called');
+      assert.isNull(res, 'result');
+    });
+
+    it('should call function', async () => {
+      const { vars, varsLocal } = mjs;
+      const i = browser.runtime.getURL.callCount;
+      const j = browser.browserAction.setIcon.callCount;
+      browser.runtime.getURL.callsFake(arg => arg);
+      browser.browserAction.setIcon.callsFake(arg => arg);
+      vars[IS_WEBEXT] = true;
+      varsLocal[ICON_ID] = '';
+      const res = await func();
+      assert.strictEqual(browser.runtime.getURL.callCount, i + 1, 'called');
+      assert.strictEqual(browser.browserAction.setIcon.callCount, j + 1,
+        'called');
+      assert.deepEqual(res, {
+        path: 'img/icon.svg#context'
       }, 'result');
     });
   });

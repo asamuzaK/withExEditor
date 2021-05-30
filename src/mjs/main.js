@@ -18,8 +18,8 @@ import {
   EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK, HOST_VERSION_LATEST,
-  ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_ID, ICON_LIGHT,
-  ICON_WHITE, INFO_COLOR, INFO_TEXT,
+  ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_CONTEXT_ID, ICON_DARK, ICON_ID,
+  ICON_LIGHT, ICON_WHITE, INFO_COLOR, INFO_TEXT,
   IS_EXECUTABLE, IS_MAC, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
@@ -302,6 +302,19 @@ export const setIcon = async (id = varsLocal[ICON_ID]) => {
   const icon = runtime.getURL(ICON);
   const path = `${icon}${id}`;
   return browserAction.setIcon({ path });
+};
+
+/**
+ * set default icon
+ *
+ * @returns {?Function} - setIcon()
+ */
+export const setDefaultIcon = async () => {
+  let func;
+  if (vars[IS_WEBEXT] && !varsLocal[ICON_ID]) {
+    func = setIcon(ICON_CONTEXT_ID);
+  }
+  return func || null;
 };
 
 /**
