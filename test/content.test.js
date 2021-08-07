@@ -3088,6 +3088,113 @@ describe('content', () => {
     });
   });
 
+  describe('get queried items', () => {
+    const func = cjs.getQueriedItems;
+
+    it('should get empty array', () => {
+      const res = func();
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get empty array', () => {
+      const res = func('foo');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get result', () => {
+      const div = document.createElement('div');
+      const p = document.createElement('p');
+      const body = document.querySelector('body');
+      div.id = 'foo';
+      div.appendChild(p);
+      body.appendChild(div);
+      const res = func(p);
+      assert.deepEqual(res, [p], 'result');
+    });
+
+    it('should get result', () => {
+      const div = document.createElement('div');
+      const p = document.createElement('p');
+      const p2 = document.createElement('p');
+      const body = document.querySelector('body');
+      div.id = 'foo';
+      div.appendChild(p);
+      div.appendChild(p2);
+      body.appendChild(div);
+      const res = func(p2);
+      assert.deepEqual(res, [p, p2], 'result');
+    });
+
+    it('should get result', () => {
+      const div = document.createElement('div');
+      const div2 = document.createElement('div');
+      const p = document.createElement('p');
+      const p2 = document.createElement('p');
+      const body = document.querySelector('body');
+      div.id = 'foo';
+      div.appendChild(p);
+      div2.id = 'bar';
+      div2.appendChild(p2);
+      body.appendChild(div);
+      body.appendChild(div2);
+      const res = func(p2);
+      assert.deepEqual(res, [p2], 'result');
+    });
+
+    it('should get result', () => {
+      const div = document.createElement('div');
+      const div2 = document.createElement('div');
+      const p = document.createElement('p');
+      const p2 = document.createElement('p');
+      const body = document.querySelector('body');
+      div.appendChild(p);
+      div2.appendChild(p2);
+      body.appendChild(div);
+      body.appendChild(div2);
+      const res = func(p2);
+      assert.deepEqual(res, [p, p2], 'result');
+    });
+
+    it('should get result', () => {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const fo =
+        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      const p =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const div =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:div');
+      const body = document.querySelector('body');
+      svg.id = 'foo';
+      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
+        'http://www.w3.org/1999/xhtml');
+      fo.appendChild(p);
+      fo.appendChild(div);
+      svg.appendChild(fo);
+      body.appendChild(svg);
+      const res = func(p);
+      assert.deepEqual(res, [p], 'result');
+    });
+
+    it('should get result', () => {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const fo =
+        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      const p =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const div =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:div');
+      const body = document.querySelector('body');
+      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
+        'http://www.w3.org/1999/xhtml');
+      fo.appendChild(p);
+      fo.appendChild(div);
+      svg.appendChild(fo);
+      body.appendChild(svg);
+      const res = func(p);
+      assert.deepEqual(res, [p], 'result');
+    });
+  });
+
   describe('create ID data', () => {
     const func = cjs.createIdData;
 
@@ -3392,6 +3499,22 @@ describe('content', () => {
     });
 
     it('should get object', async () => {
+      global.fetch.resolves({
+        headers: {
+          get: sinon.stub().returns('')
+        },
+        text: sinon.stub().returns('foo')
+      });
+      const res = await func({
+        mode: MODE_SOURCE
+      });
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+        'prop');
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(res.value, 'foo', 'value');
+    });
+
+    it('should get object', async () => {
       const res = await func({
         mode: MODE_EDIT,
         dataId: 'foo',
@@ -3401,6 +3524,23 @@ describe('content', () => {
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(res.value, 'bar', 'value');
+    });
+
+    it('should get object', async () => {
+      const res = await func({
+        mode: MODE_EDIT,
+        dataId: 'foo',
+        namespaceURI: 'http://www.w3.org/1999/xhtml',
+        value: 'bar'
+      });
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+        'prop');
+      assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
+      assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
+      assert.strictEqual(res.createTmpFile.namespaceURI,
+        'http://www.w3.org/1999/xhtml', 'value');
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });

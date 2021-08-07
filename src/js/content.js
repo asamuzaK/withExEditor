@@ -166,9 +166,9 @@ const getFileNameFromURI = (uri, subst = LABEL) => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
-  let file;
   const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/;
   const { pathname, protocol } = new URL(uri);
+  let file;
   if (pathname && reg.test(pathname) &&
       protocol && !/^(?:blob|data):/.test(protocol)) {
     const [, fileName] = reg.exec(pathname);
@@ -433,9 +433,9 @@ const fileExt = {
  * @returns {string} - file extension
  */
 const getFileExtension = (media = MIME_PLAIN, subst = 'txt') => {
-  let ext;
   const arr =
     /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
+  let ext;
   if (arr) {
     const [, type, subtype, suf] = arr;
     const suffix =
@@ -731,12 +731,12 @@ const serializeDomString = (domstr, mime, reqElm = false) => {
   if (!/text\/(?:ht|x)ml|application\/(?:xhtml\+)?xml|image\/svg\+xml/.test(mime)) {
     throw new TypeError(`Unsupported MIME type ${mime}.`);
   }
-  let frag;
   const dom = new DOMParser().parseFromString(domstr, mime);
   if (dom.querySelector('parsererror')) {
     throw new Error('Error while parsing DOM string.');
   }
   const { body, documentElement: root } = dom;
+  let frag;
   try {
     if (mime === MIME_HTML) {
       const { childNodes, firstElementChild } = body;
@@ -884,15 +884,15 @@ const getAncestorId = elm => {
  * @returns {boolean} - result
  */
 const isEditable = node => {
-  let elm = node; let editable;
-  while (elm && elm.parentNode) {
-    if (!elm.namespaceURI || elm.namespaceURI === nsURI.html) {
-      editable = elm.isContentEditable;
+  let editable;
+  while (node && node.parentNode) {
+    if (!node.namespaceURI || node.namespaceURI === nsURI.html) {
+      editable = node.isContentEditable;
     }
     if (editable) {
       break;
     }
-    elm = elm.parentNode;
+    node = node.parentNode;
   }
   return !!editable;
 };
@@ -1024,8 +1024,8 @@ const getLiveEditKey = elm => {
  * @returns {object} - live edit element
  */
 const getLiveEditElm = node => {
-  let elm;
   const items = Array.from(liveEdit.values());
+  let elm;
   while (node && node.parentNode && !elm) {
     const { classList, namespaceURI } = node;
     const isHtml = !namespaceURI || namespaceURI === nsURI.html;
@@ -1174,6 +1174,34 @@ const getTargetElementFromDataId = dataId => {
 };
 
 /**
+ * get queried items
+ *
+ * @param {object} elm - element
+ * @returns {Array} - items
+ */
+const getQueriedItems = elm => {
+  let items;
+  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+    const { localName, prefix } = elm;
+    const ancestorId = getAncestorId(elm);
+    if (prefix) {
+      const { localName: rootLocalName } = document.documentElement;
+      const query = ancestorId
+        ? `#${ancestorId} *|*`
+        : `${rootLocalName} *|*`;
+      items = Array.from(document.querySelectorAll(query)).filter(item => {
+        const { localName: itemLocalName } = item;
+        return itemLocalName === localName && item;
+      });
+    } else {
+      const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
+      items = Array.from(document.querySelectorAll(query));
+    }
+  }
+  return items || [];
+};
+
+/**
  * create ID data
  *
  * @param {object} elm - target element
@@ -1186,23 +1214,10 @@ const createIdData = elm => {
     if (id) {
       data = { dataId: id };
     } else {
-      const ancestorId = getAncestorId(elm);
-      const { localName: rootLocalName } = document.documentElement;
-      let items; let queryIndex; let i = 0; let l;
-      if (prefix) {
-        const query = ancestorId
-          ? `#${ancestorId} *|*`
-          : `${rootLocalName} *|*`;
-        items = Array.from(document.querySelectorAll(query)).filter(item => {
-          const { localName: itemLocalName } = item;
-          return itemLocalName === localName && item;
-        });
-        l = items.length;
-      } else {
-        const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
-        items = document.querySelectorAll(query);
-        l = items.length;
-      }
+      const items = getQueriedItems(elm);
+      const l = items.length;
+      let i = 0;
+      let queryIndex;
       while (i < l) {
         const item = items[i];
         if (item === elm) {
@@ -1212,6 +1227,8 @@ const createIdData = elm => {
         i++;
       }
       if (Number.isInteger(queryIndex)) {
+        const { localName: rootLocalName } = document.documentElement;
+        const ancestorId = getAncestorId(elm);
         const targetElm = prefix ? `${prefix}:${localName}` : localName;
         const dataId = ancestorId
           ? `${ancestorId}_${targetElm}_${queryIndex}`
@@ -1250,8 +1267,8 @@ const postEachDataId = async (bool = false) => {
  * @returns {?Function} - postMsg()
  */
 const postTmpFileData = async dataId => {
-  let func;
   const data = dataIds.get(dataId);
+  let func;
   if (data) {
     func = postMsg({ [TMP_FILE_GET]: data });
   }
@@ -1266,8 +1283,8 @@ const postTmpFileData = async dataId => {
  * @returns {?Function} - set data ID
  */
 const setTmpFileData = (data = {}) => {
-  let func;
   const tmpFileData = data[TMP_FILE_CREATE];
+  let func;
   if (tmpFileData) {
     const { dataId, mode } = tmpFileData;
     if (mode === MODE_EDIT && dataId) {
@@ -1284,8 +1301,8 @@ const setTmpFileData = (data = {}) => {
  * @returns {?Function} - set data ID
  */
 const updateTmpFileData = (obj = {}) => {
-  let func;
   const { data } = obj;
+  let func;
   if (data) {
     const { dataId, mode } = data;
     if (mode === MODE_EDIT && dataId) {
@@ -1302,8 +1319,8 @@ const updateTmpFileData = (obj = {}) => {
  * @returns {?Function} - remove data ID
  */
 const removeTmpFileData = (obj = {}) => {
-  let func;
   const { data } = obj;
+  let func;
   if (data) {
     const { dataId, tabId, timestamp } = data;
     if (dataId && tabId === vars[ID_TAB] &&
@@ -1370,8 +1387,12 @@ const createTmpFileData = async (data = {}) => {
   const {
     dir, host, incognito, liveEditKey, mode, syncAuto, tabId, value, windowId
   } = data;
-  let { dataId, namespaceURI } = data; let extType; let tmpFileData;
-  namespaceURI = namespaceURI || '';
+  let { dataId, namespaceURI } = data;
+  let extType;
+  let tmpFileData;
+  if (!namespaceURI) {
+    namespaceURI = '';
+  }
   switch (mode) {
     case MODE_EDIT:
       if (dataId) {
@@ -1892,12 +1913,12 @@ const replaceEditControlValue = (elm, opt = {}) => {
   if (elm && elm.nodeType === Node.ELEMENT_NODE &&
       /^(?:input|textarea)$/.test(elm.localName) &&
       dataIds.has(dataId) && isString(value)) {
+    const data = dataIds.get(dataId);
     let dataValue = value.replace(/\u200B/g, '');
     if (/^input$/.test(elm.localName)) {
       dataValue = dataValue.trim();
     }
     const changed = elm.value !== dataValue;
-    const data = dataIds.get(dataId);
     if (changed && !data.mutex) {
       data.mutex = true;
       setDataId(dataId, data);
@@ -2349,6 +2370,7 @@ if (typeof module !== 'undefined' &&
     getLiveEditElm,
     getLiveEditKey,
     getNodeNS,
+    getQueriedItems,
     getTargetElementFromDataId,
     getText,
     getType,
