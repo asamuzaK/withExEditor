@@ -2,8 +2,11 @@
  * file-ext.test.js
  */
 
+/* api */
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
+
+/* test */
 import fileExt from '../src/mjs/file-ext.js';
 
 describe('file-ext', () => {

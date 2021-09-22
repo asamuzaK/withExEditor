@@ -2,10 +2,9 @@
  * setup.js
  */
 
-'use strict';
-const { JSDOM } = require('jsdom');
-const { Schema } = require('webext-schema');
-const sinon = require('sinon');
+import { JSDOM } from 'jsdom';
+import { Schema } from 'webext-schema';
+import sinon from 'sinon';
 
 /**
  * create jsdom
@@ -13,7 +12,7 @@ const sinon = require('sinon');
  * @param {string} url - url
  * @returns {object} - jsdom instance
  */
-const createJsdom = url => {
+export const createJsdom = url => {
   const domstr = '<!DOCTYPE html><html><head></head><body></body></html>';
   const opt = {
     runScripts: 'dangerously',
@@ -49,9 +48,9 @@ const channel = getChannel();
 
 console.log(`Channel: ${channel}`);
 
-const browser = new Schema(channel).mock();
+export const browser = new Schema(channel).mock();
 
-const mockPort = ({ name, sender }) => {
+export const mockPort = ({ name, sender }) => {
   const port = Object.assign({}, browser.runtime.Port);
   port.name = name;
   port.sender = sender;
@@ -121,7 +120,3 @@ for (const key of globalKeys) {
     global[key] = window[key];
   }
 }
-
-module.exports = {
-  browser, createJsdom, mockPort
-};

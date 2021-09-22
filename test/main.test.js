@@ -2,11 +2,11 @@
  * main.test.js
  */
 
+/* api */
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { browser, mockPort } from './mocha/setup.js';
 import sinon from 'sinon';
-import * as mjs from '../src/mjs/main.js';
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
   EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
@@ -21,6 +21,9 @@ import {
   TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
   TMP_FILE_RES, WARN_COLOR, WARN_TEXT
 } from '../src/mjs/constant.js';
+
+/* test */
+import * as mjs from '../src/mjs/main.js';
 
 describe('main', () => {
   beforeEach(() => {

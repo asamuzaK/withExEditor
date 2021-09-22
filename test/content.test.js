@@ -2,41 +2,24 @@
  * content.test.js
  */
 
-const { assert } = require('chai');
-const { afterEach, beforeEach, describe, it } = require('mocha');
-const { browser, createJsdom, mockPort } = require('./mocha/setup.js');
-const sinon = require('sinon');
-const cjs = require('../src/js/content.js');
+/* api */
+import { assert } from 'chai';
+import { afterEach, beforeEach, describe, it } from 'mocha';
+import { browser, createJsdom, mockPort } from './mocha/setup.js';
+import sinon from 'sinon';
+
+/* test */
+import * as cjs from '../src/js/content.js';
 
 /* constants */
-const CONTENT_GET = 'getContent';
-const CONTEXT_MODE = 'contextMode';
-const CONTEXT_NODE = 'contextNode';
-const FILE_NOT_FOUND_TIMESTAMP = -1;
-const ID_TAB = 'tabId';
-const ID_WIN = 'windowId';
-const INCOGNITO = 'incognito';
-const IS_MAC = 'isMac';
-const KEY_CODE_A = 65;
-const LABEL = 'withExEditor';
-const LOCAL_FILE_VIEW = 'viewLocalFile';
-const MODE_EDIT = 'modeEditText';
-const MODE_MATHML = 'modeViewMathML';
-const MODE_SELECTION = 'modeViewSelection';
-const MODE_SOURCE = 'modeViewSource';
-const MODE_SVG = 'modeViewSVG';
-const ONLY_EDITABLE = 'enableOnlyEditable';
-const PORT_CONNECT = 'connectPort';
-const PORT_CONTENT = 'portContent';
-const SYNC_AUTO = 'enableSyncAuto';
-const SYNC_AUTO_URL = 'syncAutoUrls';
-const TMP_FILES_PB = 'tmpFilesPb';
-const TMP_FILE_CREATE = 'createTmpFile';
-const TMP_FILE_DATA_PORT = 'portTmpFileData';
-const TMP_FILE_DATA_REMOVE = 'removeTmpFileData';
-const TMP_FILE_REQ = 'requestTmpFile';
-const TMP_FILE_RES = 'resTmpFile';
-const VARS_SET = 'setVars';
+const {
+  CONTENT_GET, CONTEXT_MODE, CONTEXT_NODE, FILE_NOT_FOUND_TIMESTAMP,
+  ID_TAB, ID_WIN, INCOGNITO, IS_MAC, KEY_CODE_A, LABEL, LOCAL_FILE_VIEW,
+  MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
+  ONLY_EDITABLE, PORT_CONNECT, PORT_CONTENT, SYNC_AUTO, SYNC_AUTO_URL,
+  TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE,
+  TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
+} = cjs;
 
 describe('content', () => {
   let window, document;

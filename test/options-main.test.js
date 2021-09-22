@@ -2,16 +2,19 @@
  * options-main.test.js
  */
 
+/* api */
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { browser, createJsdom, mockPort } from './mocha/setup.js';
 import sinon from 'sinon';
-import * as mjs from '../src/mjs/options-main.js';
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION,
   HOST_VERSION_LATEST, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN
 } from '../src/mjs/constant.js';
+
+/* test */
+import * as mjs from '../src/mjs/options-main.js';
 
 describe('options-main', () => {
   let window, document;

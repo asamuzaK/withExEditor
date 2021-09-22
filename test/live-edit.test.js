@@ -2,8 +2,11 @@
  * live-edit.test.js
  */
 
+/* api */
 import { assert } from 'chai';
 import { describe, it } from 'mocha';
+
+/* test */
 import liveEdit from '../src/mjs/live-edit.js';
 
 describe('live-edit', () => {
