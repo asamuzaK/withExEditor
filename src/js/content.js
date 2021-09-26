@@ -2247,6 +2247,7 @@ const handleBeforeContextMenu = evt => {
     const isChildNodeText = isContentTextNode(target);
     const editableElm = getEditableElm(target);
     const liveEditElm = getLiveEditElm(target);
+    const isHtml = !namespaceURI || namespaceURI === nsURI.html;
     let enabled;
     if (localName === 'input') {
       enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
@@ -2257,12 +2258,10 @@ const handleBeforeContextMenu = evt => {
     vars[CONTEXT_MODE] = mode;
     if (liveEditElm) {
       vars[CONTEXT_NODE] =
-        ((!namespaceURI || namespaceURI === nsURI.html) && liveEditElm) ||
-        (isChildNodeText && target) || null;
+        (isHtml && liveEditElm) || (isChildNodeText && target) || null;
     } else if (editableElm) {
       vars[CONTEXT_NODE] =
-        ((!namespaceURI || namespaceURI === nsURI.html) && editableElm) ||
-        (isChildNodeText && target) || null;
+        (isHtml && editableElm) || (isChildNodeText && target) || null;
     } else {
       vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] ? target : null;
     }
@@ -2299,15 +2298,14 @@ const handleKeyDown = evt => {
     const isChildNodeText = isContentTextNode(target);
     const editableElm = getEditableElm(target);
     const liveEditElm = getLiveEditElm(target);
+    const isHtml = !namespaceURI || namespaceURI === nsURI.html;
     vars[CONTEXT_MODE] = mode;
     if (liveEditElm) {
       vars[CONTEXT_NODE] =
-        ((!namespaceURI || namespaceURI === nsURI.html) && liveEditElm) ||
-        (isChildNodeText && target) || null;
+        (isHtml && liveEditElm) || (isChildNodeText && target) || null;
     } else if (editableElm) {
       vars[CONTEXT_NODE] =
-        ((!namespaceURI || namespaceURI === nsURI.html) && editableElm) ||
-        (isChildNodeText && target) || null;
+        (isHtml && editableElm) || (isChildNodeText && target) || null;
     } else {
       vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] ? target : null;
     }
