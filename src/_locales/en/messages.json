@@ -66,6 +66,24 @@
       }
     }
   },
+  "modeEditTextFileExtension": {
+    "message": "Save as $FILEEXT$",
+    "placeholders": {
+      "fileext": {
+        "content": "$1",
+        "example": ".txt"
+      }
+    }
+  },
+  "modeEditTextFileExtension_key": {
+    "message": "Save as $FILEEXT$",
+    "placeholders": {
+      "fileext": {
+        "content": "$1",
+        "example": ".&txt"
+      }
+    }
+  },
   "modeViewMathML": {
     "message": "View MathML Source with $LABEL$",
     "placeholders": {

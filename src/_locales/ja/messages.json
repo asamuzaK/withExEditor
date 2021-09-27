@@ -66,6 +66,24 @@
       }
     }
   },
+  "modeEditTextFileExtension": {
+    "message": "$FILEEXT$ で保存",
+    "placeholders": {
+      "fileext": {
+        "content": "$1",
+        "example": ".txt"
+      }
+    }
+  },
+  "modeEditTextFileExtension_key": {
+    "message": "$FILEEXT$ で保存",
+    "placeholders": {
+      "fileext": {
+        "content": "$1",
+        "example": ".&txt"
+      }
+    }
+  },
   "modeViewMathML": {
     "message": "MathML のソースを $LABEL$ で表示",
     "placeholders": {
