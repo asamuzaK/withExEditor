@@ -1279,6 +1279,10 @@ const postTmpFileData = async dataId => {
 };
 
 /* temporary file data */
+const editTextMenuItems = new Set([
+  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT
+]);
+
 /**
  * set temporary file data
  *
@@ -1290,7 +1294,7 @@ const setTmpFileData = (data = {}) => {
   let func;
   if (tmpFileData) {
     const { dataId, mode } = tmpFileData;
-    if (mode === MODE_EDIT && dataId) {
+    if (editTextMenuItems.has(mode) && dataId) {
       func = setDataId(dataId, tmpFileData);
     }
   }
@@ -1308,7 +1312,7 @@ const updateTmpFileData = (obj = {}) => {
   let func;
   if (data) {
     const { dataId, mode } = data;
-    if (mode === MODE_EDIT && dataId) {
+    if (editTextMenuItems.has(mode) && dataId) {
       func = setDataId(dataId, data);
     }
   }
@@ -1605,7 +1609,10 @@ const createContentData = async (elm, mode) => {
   const { anchorNode, isCollapsed } = sel;
   if (elm && mode) {
     switch (mode) {
-      case MODE_EDIT: {
+      case MODE_EDIT:
+      case MODE_EDIT_HTML:
+      case MODE_EDIT_MD:
+      case MODE_EDIT_TXT: {
         const obj = createIdData(elm);
         if (obj) {
           const { dataId } = obj;

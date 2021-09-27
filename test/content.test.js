@@ -3322,6 +3322,42 @@ describe('content', () => {
       assert.instanceOf(res, Map, 'result');
     });
 
+    it('should set data', () => {
+      const res = func({
+        [TMP_FILE_CREATE]: {
+          dataId: 'foo',
+          mode: MODE_EDIT_HTML
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        [TMP_FILE_CREATE]: {
+          dataId: 'foo',
+          mode: MODE_EDIT_MD
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        [TMP_FILE_CREATE]: {
+          dataId: 'foo',
+          mode: MODE_EDIT_TXT
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
     it('should not set data', () => {
       const res = func({
         [TMP_FILE_CREATE]: {
@@ -3354,6 +3390,42 @@ describe('content', () => {
         data: {
           dataId: 'foo',
           mode: MODE_EDIT
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        data: {
+          dataId: 'foo',
+          mode: MODE_EDIT_HTML
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        data: {
+          dataId: 'foo',
+          mode: MODE_EDIT_MD
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        data: {
+          dataId: 'foo',
+          mode: MODE_EDIT_TXT
         }
       });
       assert.strictEqual(cjs.dataIds.size, 1, 'size');
@@ -4224,6 +4296,24 @@ describe('content', () => {
       assert.strictEqual(res.namespaceURI, 'http://www.w3.org/2000/svg', 'ns');
       assert.strictEqual(cjs.dataIds.size, 1, 'size');
       assert.isTrue(cjs.dataIds.has('html_text_0'), 'dataId');
+    });
+
+    it('should get default object', async () => {
+      const body = document.querySelector('body');
+      const res = await func(body, MODE_MATHML);
+      assert.strictEqual(res.mode, MODE_SOURCE, 'result');
+    });
+
+    it('should get object', async () => {
+      const math =
+        document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
+      const body = document.querySelector('body');
+      body.appendChild(math);
+      const res = await func(math, MODE_MATHML);
+      assert.strictEqual(res.mode, MODE_MATHML, 'mode');
+      assert.strictEqual(res.value,
+        '<math xmlns="http://www.w3.org/1998/Math/MathML"/>\n',
+        'value');
     });
 
     it('should get default object', async () => {
