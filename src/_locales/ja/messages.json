@@ -334,6 +334,12 @@
   "optionsSaveEditorSettings": {
     "message": "保存"
   },
+  "optionsSelectFileExtension": {
+    "message": "一時ファイルの保存時に拡張子を選択する"
+  },
+  "optionsSelectFileExtensionDetail": {
+    "message": "一時ファイルの拡張子を選択するためのコンテキストメニュー項目を追加します。"
+  },
   "optionsSyncAutoUrlLabel": {
     "message": "同期するサイト（1行ごとにURLを入力）"
   },

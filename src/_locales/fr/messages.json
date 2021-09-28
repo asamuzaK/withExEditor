@@ -322,6 +322,12 @@
   "optionsSaveEditorSettings": {
     "message": "Sauvegarder"
   },
+  "optionsSelectFileExtension": {
+    "message": "Select File Extension When Saving Temporary Files"
+  },
+  "optionsSelectFileExtensionDetail": {
+    "message": "Add context menu items for selecting a temporary file extension."
+  },
   "optionsSyncAutoUrlLabel": {
     "message": "Sites (Entrer une URL par ligne)"
   },

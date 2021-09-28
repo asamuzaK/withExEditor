@@ -322,6 +322,12 @@
   "optionsSaveEditorSettings": {
     "message": "保存"
   },
+  "optionsSelectFileExtension": {
+    "message": "Select File Extension When Saving Temporary Files"
+  },
+  "optionsSelectFileExtensionDetail": {
+    "message": "Add context menu items for selecting a temporary file extension."
+  },
   "optionsSyncAutoUrlLabel": {
     "message": "站点（每行输入一条网址）"
   },
