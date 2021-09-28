@@ -51,7 +51,7 @@ export const vars = {
 
 export const varsLocal = {
   [EDITOR_LABEL]: '',
-  [FILE_EXT_SELECT]: true,
+  [FILE_EXT_SELECT]: false,
   [FILE_EXT_SELECT_HTML]: false,
   [FILE_EXT_SELECT_MD]: false,
   [FILE_EXT_SELECT_TXT]: false,
