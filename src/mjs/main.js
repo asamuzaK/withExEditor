@@ -490,7 +490,7 @@ export const updateContextMenu = async (data = {}) => {
             case MODE_MATHML:
               func.push(
                 menus.update(mode, {
-                  visible: true
+                  visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_SOURCE, {
                   visible: false
@@ -503,7 +503,7 @@ export const updateContextMenu = async (data = {}) => {
             case MODE_SVG:
               func.push(
                 menus.update(mode, {
-                  visible: true
+                  visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_MATHML, {
                   visible: false
@@ -516,7 +516,7 @@ export const updateContextMenu = async (data = {}) => {
             default:
               func.push(
                 menus.update(MODE_SOURCE, {
-                  visible: true
+                  visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_MATHML, {
                   visible: false
