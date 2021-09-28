@@ -66,6 +66,24 @@
       }
     }
   },
+  "modeEditTextFileExtension": {
+    "message": "$FILEEXT$ で保存",
+    "placeholders": {
+      "fileext": {
+        "content": "$1",
+        "example": ".txt"
+      }
+    }
+  },
+  "modeEditTextFileExtension_key": {
+    "message": "$FILEEXT$ で保存",
+    "placeholders": {
+      "fileext": {
+        "content": "$1",
+        "example": ".&txt"
+      }
+    }
+  },
   "modeViewMathML": {
     "message": "MathML のソースを $LABEL$ で表示",
     "placeholders": {
@@ -315,6 +333,12 @@
   },
   "optionsSaveEditorSettings": {
     "message": "保存"
+  },
+  "optionsSelectFileExtension": {
+    "message": "一時ファイルの保存時に拡張子を選択する"
+  },
+  "optionsSelectFileExtensionDetail": {
+    "message": "一時ファイルの拡張子を選択するためのコンテキストメニュー項目を追加します。"
   },
   "optionsSyncAutoUrlLabel": {
     "message": "同期するサイト（1行ごとにURLを入力）"

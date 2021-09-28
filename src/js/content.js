@@ -32,6 +32,9 @@ const LOCAL_FILE_VIEW = 'viewLocalFile';
 const MIME_HTML = 'text/html';
 const MIME_PLAIN = 'text/plain';
 const MODE_EDIT = 'modeEditText';
+const MODE_EDIT_HTML = 'modeEditTextHtml';
+const MODE_EDIT_MD = 'modeEditTextMarkdown';
+const MODE_EDIT_TXT = 'modeEditTextPlaintext';
 const MODE_MATHML = 'modeViewMathML';
 const MODE_SELECTION = 'modeViewSelection';
 const MODE_SOURCE = 'modeViewSource';
@@ -1276,6 +1279,10 @@ const postTmpFileData = async dataId => {
 };
 
 /* temporary file data */
+const editTextMenuItems = new Set([
+  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT
+]);
+
 /**
  * set temporary file data
  *
@@ -1287,7 +1294,7 @@ const setTmpFileData = (data = {}) => {
   let func;
   if (tmpFileData) {
     const { dataId, mode } = tmpFileData;
-    if (mode === MODE_EDIT && dataId) {
+    if (editTextMenuItems.has(mode) && dataId) {
       func = setDataId(dataId, tmpFileData);
     }
   }
@@ -1305,7 +1312,7 @@ const updateTmpFileData = (obj = {}) => {
   let func;
   if (data) {
     const { dataId, mode } = data;
-    if (mode === MODE_EDIT && dataId) {
+    if (editTextMenuItems.has(mode) && dataId) {
       func = setDataId(dataId, data);
     }
   }
@@ -1388,20 +1395,59 @@ const createTmpFileData = async (data = {}) => {
     dir, host, incognito, liveEditKey, mode, syncAuto, tabId, value, windowId
   } = data;
   let { dataId, namespaceURI } = data;
-  let extType;
   let tmpFileData;
   if (!namespaceURI) {
     namespaceURI = '';
   }
   switch (mode) {
     case MODE_EDIT:
+    case MODE_EDIT_TXT:
       if (dataId) {
-        extType = '.txt';
         tmpFileData = {
           [TMP_FILE_CREATE]: {
+            extType: '.txt',
             dataId,
             dir,
-            extType,
+            host,
+            incognito,
+            liveEditKey,
+            mode,
+            namespaceURI,
+            syncAuto,
+            tabId,
+            windowId
+          },
+          value
+        };
+      }
+      break;
+    case MODE_EDIT_HTML:
+      if (dataId) {
+        tmpFileData = {
+          [TMP_FILE_CREATE]: {
+            extType: '.html',
+            dataId,
+            dir,
+            host,
+            incognito,
+            liveEditKey,
+            mode,
+            namespaceURI,
+            syncAuto,
+            tabId,
+            windowId
+          },
+          value
+        };
+      }
+      break;
+    case MODE_EDIT_MD:
+      if (dataId) {
+        tmpFileData = {
+          [TMP_FILE_CREATE]: {
+            extType: '.md',
+            dataId,
+            dir,
             host,
             incognito,
             liveEditKey,
@@ -1418,10 +1464,16 @@ const createTmpFileData = async (data = {}) => {
     case MODE_MATHML:
     case MODE_SVG:
       if (value && (dataId = getFileNameFromURI(uri, SUBST))) {
-        extType = mode === MODE_MATHML ? '.mml' : '.svg';
         tmpFileData = {
           [TMP_FILE_CREATE]: {
-            dataId, dir, extType, host, incognito, mode, tabId, windowId
+            extType: mode === MODE_MATHML ? '.mml' : '.svg',
+            dataId,
+            dir,
+            host,
+            incognito,
+            mode,
+            tabId,
+            windowId
           },
           value
         };
@@ -1431,10 +1483,16 @@ const createTmpFileData = async (data = {}) => {
       dataId = getFileNameFromURI(uri, SUBST);
       if (dataId && value &&
           /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
-        extType = '.xml';
         tmpFileData = {
           [TMP_FILE_CREATE]: {
-            dataId, dir, extType, host, incognito, mode, tabId, windowId
+            extType: '.xml',
+            dataId,
+            dir,
+            host,
+            incognito,
+            mode,
+            tabId,
+            windowId
           },
           value
         };
@@ -1535,23 +1593,26 @@ const setDataIdController = (elm, dataId) => {
 const createContentData = async (elm, mode) => {
   const { incognito, enableSyncAuto, syncAutoUrls, tabId, windowId } = vars;
   const data = {
-    incognito,
-    tabId,
-    windowId,
-    mode: MODE_SOURCE,
     dir: incognito ? TMP_FILES_PB : TMP_FILES,
     host: document.location.hostname || LABEL,
     dataId: null,
-    namespaceURI: null,
-    value: null,
     liveEditKey: null,
-    syncAuto: false
+    mode: MODE_SOURCE,
+    namespaceURI: null,
+    syncAuto: false,
+    value: null,
+    incognito,
+    tabId,
+    windowId
   };
   const sel = document.getSelection();
   const { anchorNode, isCollapsed } = sel;
   if (elm && mode) {
     switch (mode) {
-      case MODE_EDIT: {
+      case MODE_EDIT:
+      case MODE_EDIT_HTML:
+      case MODE_EDIT_MD:
+      case MODE_EDIT_TXT: {
         const obj = createIdData(elm);
         if (obj) {
           const { dataId } = obj;
@@ -2348,6 +2409,9 @@ if (typeof module !== 'undefined' &&
     LABEL,
     LOCAL_FILE_VIEW,
     MODE_EDIT,
+    MODE_EDIT_HTML,
+    MODE_EDIT_MD,
+    MODE_EDIT_TXT,
     MODE_MATHML,
     MODE_SELECTION,
     MODE_SOURCE,

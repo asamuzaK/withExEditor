@@ -15,13 +15,15 @@ import {
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET,
   EDITOR_CONFIG_RES, EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME,
-  EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
+  EDITOR_LABEL, EXT_NAME, EXT_RELOAD, FILE_EXT_SELECT,
+  FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD, FILE_EXT_SELECT_TXT,
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK, HOST_VERSION_LATEST,
   ICON, ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_CONTEXT_ID, ICON_DARK, ICON_ID,
   ICON_LIGHT, ICON_WHITE, INFO_COLOR, INFO_TEXT,
   IS_EXECUTABLE, IS_MAC, IS_WEBEXT, LOCAL_FILE_VIEW, MENU_ENABLED,
-  MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
+  MODE_EDIT, MODE_EDIT_EXT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
+  MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
   STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE, TMP_FILE_CREATE,
@@ -49,6 +51,10 @@ export const vars = {
 
 export const varsLocal = {
   [EDITOR_LABEL]: '',
+  [FILE_EXT_SELECT]: false,
+  [FILE_EXT_SELECT_HTML]: false,
+  [FILE_EXT_SELECT_MD]: false,
+  [FILE_EXT_SELECT_TXT]: false,
   [ICON_ID]: '',
   [IS_EXECUTABLE]: false,
   [MENU_ENABLED]: false,
@@ -349,136 +355,179 @@ export const toggleBadge = async () => {
 
 /* context menu items */
 export const menuItems = {
-  [MODE_SOURCE]: null,
-  [MODE_SELECTION]: null,
-  [MODE_EDIT]: null
+  [MODE_EDIT]: {
+    id: MODE_EDIT,
+    contexts: ['editable'],
+    placeholder: '(&E)'
+  },
+  [MODE_EDIT_TXT]: {
+    id: MODE_EDIT_TXT,
+    contexts: ['editable'],
+    parentId: MODE_EDIT,
+    placeholder: '.&txt'
+  },
+  [MODE_EDIT_HTML]: {
+    id: MODE_EDIT_HTML,
+    contexts: ['editable'],
+    parentId: MODE_EDIT,
+    placeholder: '.&html'
+  },
+  [MODE_EDIT_MD]: {
+    id: MODE_EDIT_MD,
+    contexts: ['editable'],
+    parentId: MODE_EDIT,
+    placeholder: '.&md'
+  },
+  [MODE_MATHML]: {
+    id: MODE_MATHML,
+    contexts: ['frame', 'page'],
+    placeholder: '(&V)'
+  },
+  [MODE_SELECTION]: {
+    id: MODE_SELECTION,
+    contexts: ['selection'],
+    placeholder: '(&V)'
+  },
+  [MODE_SOURCE]: {
+    id: MODE_SOURCE,
+    contexts: ['frame', 'page'],
+    placeholder: '(&V)'
+  },
+  [MODE_SVG]: {
+    id: MODE_SVG,
+    contexts: ['frame', 'page'],
+    placeholder: '(&V)'
+  }
 };
 
 /**
- * set context menu items
+ * create menu item data
  *
- * @param {string} key - key
- * @param {string} value - value
- * @returns {void}
+ * @param {string} key - item key
+ * @returns {object} - item data
  */
-export const setMenuItems = async (key, value) => {
-  if (!isString(key)) {
-    throw new TypeError(`Expected String but got ${getType(key)}.`);
-  }
-  if (Object.prototype.hasOwnProperty.call(menuItems, key)) {
-    menuItems[key] = value || null;
-  }
-};
-
-/**
- * init context menu items
- *
- * @returns {void}
- */
-export const initMenuItems = async () => {
-  const items = Object.keys(menuItems);
-  for (const item of items) {
-    menuItems[item] = null;
-  }
-};
-
-/**
- * get access key
- * NOTE: sync
- *
- * @param {string} id - menu item ID
- * @returns {string} - accesskey
- */
-export const getAccesskey = id => {
-  if (!isString(id)) {
-    throw new TypeError(`Expected String but got ${getType(id)}.`);
-  }
-  let key;
-  switch (id) {
-    case MODE_EDIT:
-      if (vars[IS_WEBEXT]) {
-        key = '(&E)';
-      } else {
-        key = ' (&E)';
+export const createMenuItemData = key => {
+  const data = {};
+  if (isString(key) && menuItems[key]) {
+    const { contexts, placeholder, parentId } = menuItems[key];
+    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
+    if (parentId) {
+      const keys = [MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT];
+      if (keys.includes(key) && varsLocal[FILE_EXT_SELECT]) {
+        let bool;
+        switch (key) {
+          case MODE_EDIT_HTML:
+            bool = !!varsLocal[FILE_EXT_SELECT_HTML];
+            break;
+          case MODE_EDIT_MD:
+            bool = !!varsLocal[FILE_EXT_SELECT_MD];
+            break;
+          default:
+            bool = !!varsLocal[FILE_EXT_SELECT_TXT];
+        }
+        if (bool) {
+          data.contexts = contexts;
+          data.enabled = enabled;
+          data.parentId = parentId;
+          data.title = i18n.getMessage(`${MODE_EDIT_EXT}_key`, [placeholder]);
+          data.visible = true;
+        }
       }
-      break;
-    case MODE_MATHML:
-    case MODE_SELECTION:
-    case MODE_SOURCE:
-    case MODE_SVG:
-      if (vars[IS_WEBEXT]) {
-        key = '(&V)';
+    } else {
+      const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
+      const accKey = (vars[IS_WEBEXT] && placeholder) || ` ${placeholder}`;
+      data.contexts = contexts;
+      data.enabled = enabled;
+      data.title = i18n.getMessage(`${key}_key`, [label, accKey]);
+      if (key === MODE_EDIT) {
+        data.visible = true;
       } else {
-        key = ' (&V)';
+        data.visible = !vars[ONLY_EDITABLE];
       }
-      break;
-    default:
-  }
-  return key || '';
-};
-
-/**
- * create context menu item
- *
- * @param {string} id - menu item ID
- * @param {Array} contexts - contexts
- * @returns {void}
- */
-export const createMenuItem = async (id, contexts) => {
-  if (!isString(id)) {
-    throw new TypeError(`Expected String but got ${getType(id)}.`);
-  }
-  if (!Array.isArray(contexts)) {
-    throw new TypeError(`Expected Array but got ${getType(contexts)}.`);
-  }
-  if (Object.prototype.hasOwnProperty.call(menuItems, id)) {
-    const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-    const accKey = getAccesskey(id);
-    const title = `${id}_key`;
-    const opt = {
-      contexts,
-      enabled: !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE],
-      title: i18n.getMessage(title, [label, accKey])
-    };
-    if (id === MODE_EDIT) {
-      opt.visible = true;
-    } else {
-      opt.visible = !vars[ONLY_EDITABLE];
-    }
-    if (menuItems[id]) {
-      await menus.update(id, opt);
-    } else {
-      const menuItemOpt = {
-        id,
-        contexts: opt.contexts,
-        enabled: opt.enabled,
-        title: opt.title
-      };
-      const menuItemId = await menus.create(menuItemOpt);
-      await setMenuItems(id, menuItemId);
     }
   }
+  return data;
 };
 
 /**
- * create context menu items
+ * create context menu
  *
  * @returns {Promise.<Array>} - results of each handler
  */
-export const createMenuItems = async () => {
-  const bool = !vars[ONLY_EDITABLE];
+export const createContextMenu = async () => {
   const items = Object.keys(menuItems);
   const func = [];
   for (const item of items) {
-    switch (item) {
-      case MODE_EDIT:
-        func.push(createMenuItem(item, ['editable']));
-        break;
-      case MODE_SELECTION:
-        bool && func.push(createMenuItem(item, ['selection']));
-        break;
-      default:
-        bool && func.push(createMenuItem(item, ['frame', 'page']));
+    const itemData = createMenuItemData(item);
+    if (isObjectNotEmpty(itemData)) {
+      itemData.id = item;
+      func.push(menus.create(itemData));
+    }
+  }
+  return Promise.all(func);
+};
+
+/**
+ * update context menu
+ *
+ * @param {object} data - context data
+ * @returns {Promise.<Array>} - results of each handler
+ */
+export const updateContextMenu = async (data = {}) => {
+  const func = [];
+  if (isObjectNotEmpty(data)) {
+    const items = Object.entries(data);
+    for (const [key, value] of items) {
+      const keys = [MODE_EDIT, MODE_SOURCE];
+      if (keys.includes(key) && isObjectNotEmpty(value)) {
+        const { enabled, mode } = value;
+        if (key === MODE_EDIT) {
+          func.push(menus.update(key, {
+            enabled: !!enabled
+          }));
+        } else {
+          switch (mode) {
+            case MODE_MATHML:
+              func.push(
+                menus.update(mode, {
+                  visible: true
+                }),
+                menus.update(MODE_SOURCE, {
+                  visible: false
+                }),
+                menus.update(MODE_SVG, {
+                  visible: false
+                })
+              );
+              break;
+            case MODE_SVG:
+              func.push(
+                menus.update(mode, {
+                  visible: true
+                }),
+                menus.update(MODE_MATHML, {
+                  visible: false
+                }),
+                menus.update(MODE_SOURCE, {
+                  visible: false
+                })
+              );
+              break;
+            default:
+              func.push(
+                menus.update(MODE_SOURCE, {
+                  visible: true
+                }),
+                menus.update(MODE_MATHML, {
+                  visible: false
+                }),
+                menus.update(MODE_SVG, {
+                  visible: false
+                })
+              );
+          }
+        }
+      }
     }
   }
   return Promise.all(func);
@@ -486,85 +535,11 @@ export const createMenuItems = async () => {
 
 /**
  * restore context menu
- * TODO: Remove in future release. Use updateContextMenu instead.
  *
  * @returns {Function} - promise chain
  */
 export const restoreContextMenu = async () =>
-  menus.removeAll().then(initMenuItems).then(createMenuItems);
-
-/**
- * update context menu
- *
- * @param {object} type - context type data
- * @returns {Promise.<Array>} - results of each handler
- */
-export const updateContextMenu = async type => {
-  const func = [];
-  if (isObjectNotEmpty(type)) {
-    const items = Object.entries(type);
-    for (const [key, value] of items) {
-      const { enabled, menuItemId, mode } = value;
-      if (menuItems[menuItemId]) {
-        if (key === MODE_SOURCE) {
-          const title = varsLocal[mode] || varsLocal[menuItemId];
-          title && func.push(menus.update(menuItemId, { title }));
-        } else {
-          key === MODE_EDIT &&
-            func.push(menus.update(menuItemId, { enabled }));
-        }
-      }
-    }
-  } else {
-    const items = Object.keys(menuItems);
-    const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
-    for (const item of items) {
-      if (menuItems[item]) {
-        const title = `${item}_key`;
-        const accKey = getAccesskey(item);
-        const opt = {
-          enabled,
-          title: i18n.getMessage(title, [label, accKey])
-        };
-        if (item === MODE_EDIT) {
-          opt.visible = true;
-        } else {
-          opt.visible = !vars[ONLY_EDITABLE];
-        }
-        func.push(menus.update(item, opt));
-      } else if (enabled) {
-        const bool = !vars[ONLY_EDITABLE];
-        switch (item) {
-          case MODE_EDIT:
-            func.push(createMenuItem(item, ['editable']));
-            break;
-          case MODE_SELECTION:
-            bool && func.push(createMenuItem(item, ['selection']));
-            break;
-          default:
-            bool && func.push(createMenuItem(item, ['frame', 'page']));
-        }
-      }
-    }
-  }
-  return Promise.all(func);
-};
-
-/**
- * cache localized context menu item title
- *
- * @returns {void}
- */
-export const cacheMenuItemTitle = async () => {
-  const items = [MODE_SOURCE, MODE_MATHML, MODE_SVG];
-  const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-  for (const item of items) {
-    const title = `${item}_key`;
-    const accKey = getAccesskey(item);
-    varsLocal[item] = i18n.getMessage(title, [label, accKey]);
-  }
-};
+  menus.removeAll().then(createContextMenu);
 
 /* editor config */
 /**
@@ -809,7 +784,7 @@ export const handlePortOnMsg = msg => handleMsg(msg).catch(throwErr);
  * handle connected port
  *
  * @param {object} port - runtime.Port
- * @returns {?Function} - updateContextMenu()
+ * @returns {?Function} - restoreContextMenu()
  */
 export const handlePort = async (port = {}) => {
   const { name: portName, sender } = port;
@@ -836,7 +811,7 @@ export const handlePort = async (port = {}) => {
       if (portName === PORT_CONTENT && frameId === 0 && active &&
           status === 'complete') {
         varsLocal[MENU_ENABLED] = true;
-        func = updateContextMenu();
+        func = restoreContextMenu();
       }
     }
   }
@@ -887,7 +862,7 @@ export const onTabActivated = async info => {
       windowId, tabId
     }));
   }
-  func.push(updateContextMenu());
+  func.push(restoreContextMenu());
   return Promise.all(func);
 };
 
@@ -920,7 +895,7 @@ export const onTabUpdated = async (id, info, tab) => {
       varsLocal[MENU_ENABLED] = false;
     }
     if (status === 'complete') {
-      func.push(updateContextMenu());
+      func.push(restoreContextMenu());
     }
   }
   return Promise.all(func);
@@ -980,7 +955,7 @@ export const onWindowFocusChanged = async () => {
     }, {
       windowId, tabId
     }));
-    func.push(updateContextMenu());
+    func.push(restoreContextMenu());
   }
   return Promise.all(func);
 };
@@ -1074,9 +1049,17 @@ export const setVar = async (item, obj, changed = false) => {
         break;
       case EDITOR_LABEL:
         varsLocal[item] = value;
-        func.push(cacheMenuItemTitle());
         if (changed) {
-          func.push(updateContextMenu());
+          func.push(restoreContextMenu());
+        }
+        break;
+      case FILE_EXT_SELECT:
+      case FILE_EXT_SELECT_HTML:
+      case FILE_EXT_SELECT_MD:
+      case FILE_EXT_SELECT_TXT:
+        varsLocal[item] = !!checked;
+        if (changed) {
+          func.push(restoreContextMenu());
         }
         break;
       case HOST_ERR_NOTIFY:

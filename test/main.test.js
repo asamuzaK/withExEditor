@@ -9,13 +9,15 @@ import { browser, mockPort } from './mocha/setup.js';
 import sinon from 'sinon';
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
-  EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME, EXT_RELOAD,
+  EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD, FILE_EXT_SELECT,
+  FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD, FILE_EXT_SELECT_TXT,
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST,
   ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_ID, ICON_LIGHT, ICON_WHITE,
   INFO_COLOR, INFO_TEXT, IS_EXECUTABLE, IS_MAC, IS_WEBEXT,
   LOCAL_FILE_VIEW, MENU_ENABLED,
-  MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
+  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
+  MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
   STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
@@ -846,617 +848,570 @@ describe('main', () => {
     });
   });
 
-  describe('set context menu items', () => {
-    const func = mjs.setMenuItems;
-    beforeEach(() => {
+  describe('context menu items', () => {
+    it('should have keys', () => {
+      const keys = [
+        MODE_EDIT,
+        MODE_EDIT_HTML,
+        MODE_EDIT_MD,
+        MODE_EDIT_TXT,
+        MODE_MATHML,
+        MODE_SELECTION,
+        MODE_SOURCE,
+        MODE_SVG
+      ];
       const { menuItems } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
-    });
-    afterEach(() => {
-      const { menuItems } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
-    });
-
-    it('should throw', async () => {
-      await func().catch(e => {
-        assert.instanceOf(e, TypeError, 'error');
-        assert.strictEqual(e.message, 'Expected String but got Undefined.');
-      });
-    });
-
-    it('should not set value', async () => {
-      const { menuItems } = mjs;
-      await func('foo', 'bar');
-      assert.isUndefined(menuItems.foo, 'result');
-    });
-
-    it('should set value', async () => {
-      const { menuItems } = mjs;
-      await func(MODE_SOURCE, 'foo');
-      assert.strictEqual(menuItems[MODE_SOURCE], 'foo', 'result');
-    });
-
-    it('should set null', async () => {
-      const { menuItems } = mjs;
-      menuItems[MODE_SOURCE] = 'foo';
-      await func(MODE_SOURCE);
-      assert.isNull(menuItems[MODE_SOURCE], 'result');
-    });
-
-    it('should set value', async () => {
-      const { menuItems } = mjs;
-      await func(MODE_SELECTION, 'foo');
-      assert.strictEqual(menuItems[MODE_SELECTION], 'foo', 'result');
-    });
-
-    it('should set null', async () => {
-      const { menuItems } = mjs;
-      menuItems[MODE_SELECTION] = 'foo';
-      await func(MODE_SELECTION);
-      assert.isNull(menuItems[MODE_SELECTION], 'result');
-    });
-
-    it('should set value', async () => {
-      const { menuItems } = mjs;
-      await func(MODE_EDIT, 'foo');
-      assert.strictEqual(menuItems[MODE_EDIT], 'foo', 'result');
-    });
-
-    it('should set null', async () => {
-      const { menuItems } = mjs;
-      menuItems[MODE_EDIT] = 'foo';
-      await func(MODE_EDIT);
-      assert.isNull(menuItems[MODE_EDIT], 'result');
+      const items = Object.entries(menuItems);
+      for (const [key, value] of items) {
+        assert.isTrue(keys.includes(key), `${key} key`);
+        assert.isObject(value, `${key} value`);
+        assert.strictEqual(value.id, key, `${key} id`);
+        assert.isTrue(Array.isArray(value.contexts), `${key} contexts`);
+        assert.isTrue(value.placeholder.includes('&'), `${key} placeholder`);
+      }
     });
   });
 
-  describe('init context menu items', () => {
-    const func = mjs.initMenuItems;
+  describe('create menu item data', () => {
+    const func = mjs.createMenuItemData;
     beforeEach(() => {
-      const { menuItems } = mjs;
-      menuItems[MODE_SOURCE] = 'foo';
-      menuItems[MODE_SELECTION] = 'bar';
-      menuItems[MODE_EDIT] = 'baz';
-    });
-    afterEach(() => {
-      const { menuItems } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
-    });
-
-    it('should init', async () => {
-      const { menuItems } = mjs;
-      await func();
-      assert.isNull(menuItems[MODE_SOURCE], 'value');
-      assert.isNull(menuItems[MODE_SELECTION], 'value');
-      assert.isNull(menuItems[MODE_EDIT], 'value');
-    });
-  });
-
-  describe('get access key', () => {
-    const func = mjs.getAccesskey;
-    beforeEach(() => {
-      const { vars } = mjs;
+      const { varsLocal, vars } = mjs;
       vars[IS_WEBEXT] = false;
+      vars[ONLY_EDITABLE] = false;
+      varsLocal[EDITOR_LABEL] = '';
+      varsLocal[FILE_EXT_SELECT] = false;
+      varsLocal[FILE_EXT_SELECT_HTML] = false;
+      varsLocal[FILE_EXT_SELECT_MD] = false;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      varsLocal[IS_EXECUTABLE] = false;
+      varsLocal[MENU_ENABLED] = false;
+      browser.i18n.getMessage.callsFake((...args) => args.toString());
     });
     afterEach(() => {
-      const { vars } = mjs;
+      const { varsLocal, vars } = mjs;
       vars[IS_WEBEXT] = false;
-    });
-
-    it('should throw', async () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.',
-        'throw');
-    });
-
-    it('should get empty string', async () => {
-      const res = await func('');
-      assert.strictEqual(res, '', 'result');
-    });
-
-    it('should get empty string', async () => {
-      const res = await func('foo');
-      assert.strictEqual(res, '', 'result');
-    });
-
-    it('should get value', async () => {
-      const res = await func(MODE_MATHML);
-      assert.strictEqual(res, ' (&V)', 'result');
-    });
-
-    it('should get value', async () => {
-      const { vars } = mjs;
-      vars[IS_WEBEXT] = true;
-      const res = await func(MODE_MATHML);
-      assert.strictEqual(res, '(&V)', 'result');
-    });
-
-    it('should get value', async () => {
-      const res = await func(MODE_SELECTION);
-      assert.strictEqual(res, ' (&V)', 'result');
-    });
-
-    it('should get value', async () => {
-      const { vars } = mjs;
-      vars[IS_WEBEXT] = true;
-      const res = await func(MODE_SELECTION);
-      assert.strictEqual(res, '(&V)', 'result');
-    });
-
-    it('should get value', async () => {
-      const res = await func(MODE_SOURCE);
-      assert.strictEqual(res, ' (&V)', 'result');
-    });
-
-    it('should get value', async () => {
-      const { vars } = mjs;
-      vars[IS_WEBEXT] = true;
-      const res = await func(MODE_SOURCE);
-      assert.strictEqual(res, '(&V)', 'result');
-    });
-
-    it('should get value', async () => {
-      const res = await func(MODE_SVG);
-      assert.strictEqual(res, ' (&V)', 'result');
-    });
-
-    it('should get value', async () => {
-      const { vars } = mjs;
-      vars[IS_WEBEXT] = true;
-      const res = await func(MODE_SVG);
-      assert.strictEqual(res, '(&V)', 'result');
-    });
-
-    it('should get value', async () => {
-      const res = await func(MODE_EDIT);
-      assert.strictEqual(res, ' (&E)', 'result');
-    });
-
-    it('should get value', async () => {
-      const { vars } = mjs;
-      vars[IS_WEBEXT] = true;
-      const res = await func(MODE_EDIT);
-      assert.strictEqual(res, '(&E)', 'result');
-    });
-  });
-
-  describe('create context menu item', () => {
-    const func = mjs.createMenuItem;
-    beforeEach(() => {
-      const { menuItems, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
-      varsLocal[MENU_ENABLED] = false;
+      vars[ONLY_EDITABLE] = false;
+      varsLocal[EDITOR_LABEL] = '';
+      varsLocal[FILE_EXT_SELECT] = false;
+      varsLocal[FILE_EXT_SELECT_HTML] = false;
+      varsLocal[FILE_EXT_SELECT_MD] = false;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
-    });
-    afterEach(() => {
-      const { menuItems, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
       varsLocal[MENU_ENABLED] = false;
-      varsLocal[IS_EXECUTABLE] = false;
     });
 
-    it('should throw', async () => {
-      await func().catch(e => {
-        assert.strictEqual(e.message, 'Expected String but got Undefined.',
-          'throw');
-      });
+    it('should get empty object', () => {
+      const res = func();
+      assert.deepEqual(res, {}, 'result');
     });
 
-    it('should throw', async () => {
-      await func('foo', 'bar').catch(e => {
-        assert.strictEqual(e.message, 'Expected Array but got String.',
-          'throw');
-      });
+    it('should get empty object', () => {
+      const res = func('foo');
+      assert.deepEqual(res, {}, 'result');
     });
 
-    it('should not call function', async () => {
-      const { menuItems } = mjs;
-      const i = browser.menus.update.callCount;
-      const j = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.menus.create.callsFake(opt => {
-        const { id } = opt;
-        return id;
-      });
-      await func('foo', []);
-      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.create.callCount, j, 'not called');
-      assert.isNull(menuItems[MODE_SOURCE], 'menu');
-      assert.isNull(menuItems[MODE_SELECTION], 'menu');
-      assert.isNull(menuItems[MODE_EDIT], 'menu');
+    it('should get object', () => {
+      const res = func(MODE_EDIT);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: false,
+        title: 'modeEditText_key,extensionName, (&E)',
+        visible: true
+      }, 'result');
     });
 
-    it('should call function', async () => {
-      const { menuItems } = mjs;
-      const i = browser.menus.update.callCount;
-      const j = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.menus.create.callsFake(opt => {
-        const { id } = opt;
-        return id;
-      });
-      await func(MODE_SOURCE, []);
-      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.create.callCount, j + 1, 'called');
-      assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, 'menu');
-      assert.isNull(menuItems[MODE_SELECTION], 'menu');
-      assert.isNull(menuItems[MODE_EDIT], 'menu');
-    });
-
-    it('should call function', async () => {
-      const { menuItems, varsLocal } = mjs;
-      const i = browser.menus.update.callCount;
-      const j = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.menus.create.callsFake(opt => {
-        const { id } = opt;
-        return id;
-      });
+    it('should get object', () => {
+      const { vars, varsLocal } = mjs;
+      vars[IS_WEBEXT] = true;
+      varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[MENU_ENABLED] = true;
+      const res = func(MODE_EDIT);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: false,
+        title: 'modeEditText_key,foo,(&E)',
+        visible: true
+      }, 'result');
+    });
+
+    it('should get object', () => {
+      const { vars, varsLocal } = mjs;
+      vars[IS_WEBEXT] = true;
+      varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
-      await func(MODE_SOURCE, []);
-      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.create.callCount, j + 1, 'called');
-      assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, 'menu');
-      assert.isNull(menuItems[MODE_SELECTION], 'menu');
-      assert.isNull(menuItems[MODE_EDIT], 'menu');
+      varsLocal[MENU_ENABLED] = true;
+      const res = func(MODE_EDIT);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: true,
+        title: 'modeEditText_key,foo,(&E)',
+        visible: true
+      }, 'result');
     });
 
-    it('should call function', async () => {
-      const { menuItems } = mjs;
-      const i = browser.menus.update.callCount;
-      const j = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.menus.create.callsFake(opt => {
-        const { id } = opt;
-        return id;
-      });
-      menuItems[MODE_SOURCE] = MODE_SOURCE;
-      await func(MODE_SOURCE, []);
-      assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
-      assert.strictEqual(browser.menus.create.callCount, j, 'not called');
-      assert.strictEqual(menuItems[MODE_SOURCE], MODE_SOURCE, 'menu');
-      assert.isNull(menuItems[MODE_SELECTION], 'menu');
-      assert.isNull(menuItems[MODE_EDIT], 'menu');
+    it('should get object', () => {
+      const res = func(MODE_SELECTION);
+      assert.deepEqual(res, {
+        contexts: [
+          'selection'
+        ],
+        enabled: false,
+        title: 'modeViewSelection_key,extensionName, (&V)',
+        visible: true
+      }, 'result');
     });
 
-    it('should call function', async () => {
-      const { menuItems } = mjs;
-      const i = browser.menus.update.callCount;
-      const j = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.menus.create.callsFake(opt => {
-        const { id } = opt;
-        return id;
-      });
-      await func(MODE_SELECTION, []);
-      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.create.callCount, j + 1, 'called');
-      assert.isNull(menuItems[MODE_SOURCE], 'menu');
-      assert.strictEqual(menuItems[MODE_SELECTION], MODE_SELECTION, 'menu');
-      assert.isNull(menuItems[MODE_EDIT], 'menu');
+    it('should get object', () => {
+      const { vars, varsLocal } = mjs;
+      vars[IS_WEBEXT] = true;
+      varsLocal[EDITOR_LABEL] = 'foo';
+      varsLocal[MENU_ENABLED] = true;
+      const res = func(MODE_SELECTION);
+      assert.deepEqual(res, {
+        contexts: [
+          'selection'
+        ],
+        enabled: false,
+        title: 'modeViewSelection_key,foo,(&V)',
+        visible: true
+      }, 'result');
     });
 
-    it('should call function', async () => {
-      const { menuItems } = mjs;
-      const i = browser.menus.update.callCount;
-      const j = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      browser.menus.create.callsFake(opt => {
-        const { id } = opt;
-        return id;
-      });
-      await func(MODE_EDIT, []);
-      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.create.callCount, j + 1, 'called');
-      assert.isNull(menuItems[MODE_SOURCE], 'menu');
-      assert.isNull(menuItems[MODE_SELECTION], 'menu');
-      assert.strictEqual(menuItems[MODE_EDIT], MODE_EDIT, 'menu');
-    });
-  });
-
-  describe('create context menu items', () => {
-    const func = mjs.createMenuItems;
-    beforeEach(() => {
-      const { menuItems, vars } = mjs;
-      const items = Object.keys(menuItems);
-      vars[ONLY_EDITABLE] = false;
-      for (const item of items) {
-        menuItems[item] = null;
-      }
-    });
-    afterEach(() => {
-      const { menuItems, vars } = mjs;
-      const items = Object.keys(menuItems);
-      vars[ONLY_EDITABLE] = false;
-      for (const item of items) {
-        menuItems[item] = null;
-      }
-    });
-
-    it('should call function', async () => {
-      const i = browser.menus.create.callCount;
-      const res = await func();
-      assert.strictEqual(browser.menus.create.callCount, i + 3, 'called');
-      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
-    });
-
-    it('should call function', async () => {
-      const { vars } = mjs;
-      const i = browser.menus.create.callCount;
+    it('should get object', () => {
+      const { vars, varsLocal } = mjs;
+      vars[IS_WEBEXT] = true;
+      varsLocal[EDITOR_LABEL] = 'foo';
+      varsLocal[IS_EXECUTABLE] = true;
+      varsLocal[MENU_ENABLED] = true;
       vars[ONLY_EDITABLE] = true;
-      const res = await func();
-      assert.strictEqual(browser.menus.create.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
+      const res = func(MODE_SELECTION);
+      assert.deepEqual(res, {
+        contexts: [
+          'selection'
+        ],
+        enabled: true,
+        title: 'modeViewSelection_key,foo,(&V)',
+        visible: false
+      }, 'result');
+    });
+
+    it('should get object', () => {
+      const res = func(MODE_SOURCE);
+      assert.deepEqual(res, {
+        contexts: [
+          'frame',
+          'page'
+        ],
+        enabled: false,
+        title: 'modeViewSource_key,extensionName, (&V)',
+        visible: true
+      }, 'result');
+    });
+
+    it('should get object', () => {
+      const { vars, varsLocal } = mjs;
+      vars[IS_WEBEXT] = true;
+      varsLocal[EDITOR_LABEL] = 'foo';
+      varsLocal[MENU_ENABLED] = true;
+      const res = func(MODE_SOURCE);
+      assert.deepEqual(res, {
+        contexts: [
+          'frame',
+          'page'
+        ],
+        enabled: false,
+        title: 'modeViewSource_key,foo,(&V)',
+        visible: true
+      }, 'result');
+    });
+
+    it('should get object', () => {
+      const { vars, varsLocal } = mjs;
+      vars[IS_WEBEXT] = true;
+      varsLocal[EDITOR_LABEL] = 'foo';
+      varsLocal[IS_EXECUTABLE] = true;
+      varsLocal[MENU_ENABLED] = true;
+      vars[ONLY_EDITABLE] = true;
+      const res = func(MODE_SOURCE);
+      assert.deepEqual(res, {
+        contexts: [
+          'frame',
+          'page'
+        ],
+        enabled: true,
+        title: 'modeViewSource_key,foo,(&V)',
+        visible: false
+      }, 'result');
+    });
+
+    it('should get empty object', () => {
+      const res = func(MODE_EDIT_HTML);
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should get empty object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      const res = func(MODE_EDIT_HTML);
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should get object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_HTML] = true;
+      const res = func(MODE_EDIT_HTML);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: false,
+        parentId: 'modeEditText',
+        title: 'modeEditTextFileExtension_key,.&html',
+        visible: true
+      }, 'result');
+    });
+
+    it('should get object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_HTML] = true;
+      varsLocal[IS_EXECUTABLE] = true;
+      varsLocal[MENU_ENABLED] = true;
+      const res = func(MODE_EDIT_HTML);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: true,
+        parentId: 'modeEditText',
+        title: 'modeEditTextFileExtension_key,.&html',
+        visible: true
+      }, 'result');
+    });
+
+    it('should get empty object', () => {
+      const res = func(MODE_EDIT_MD);
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should get empty object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      const res = func(MODE_EDIT_MD);
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should get object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_MD] = true;
+      const res = func(MODE_EDIT_MD);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: false,
+        parentId: 'modeEditText',
+        title: 'modeEditTextFileExtension_key,.&md',
+        visible: true
+      }, 'result');
+    });
+
+    it('should get object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_MD] = true;
+      varsLocal[IS_EXECUTABLE] = true;
+      varsLocal[MENU_ENABLED] = true;
+      const res = func(MODE_EDIT_MD);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: true,
+        parentId: 'modeEditText',
+        title: 'modeEditTextFileExtension_key,.&md',
+        visible: true
+      }, 'result');
+    });
+
+    it('should get empty object', () => {
+      const res = func(MODE_EDIT_TXT);
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should get empty object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      const res = func(MODE_EDIT_TXT);
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should get object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_TXT] = true;
+      const res = func(MODE_EDIT_TXT);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: false,
+        parentId: 'modeEditText',
+        title: 'modeEditTextFileExtension_key,.&txt',
+        visible: true
+      }, 'result');
+    });
+
+    it('should get object', () => {
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_TXT] = true;
+      varsLocal[IS_EXECUTABLE] = true;
+      varsLocal[MENU_ENABLED] = true;
+      const res = func(MODE_EDIT_TXT);
+      assert.deepEqual(res, {
+        contexts: [
+          'editable'
+        ],
+        enabled: true,
+        parentId: 'modeEditText',
+        title: 'modeEditTextFileExtension_key,.&txt',
+        visible: true
+      }, 'result');
     });
   });
 
-  describe('restore context menu', () => {
-    const func = mjs.restoreContextMenu;
+  describe('create context menu', () => {
+    const func = mjs.createContextMenu;
     beforeEach(() => {
-      const { menuItems, vars } = mjs;
-      const items = Object.keys(menuItems);
+      const { varsLocal, vars } = mjs;
+      vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
-      for (const item of items) {
-        menuItems[item] = null;
-      }
+      varsLocal[EDITOR_LABEL] = '';
+      varsLocal[FILE_EXT_SELECT] = false;
+      varsLocal[FILE_EXT_SELECT_HTML] = false;
+      varsLocal[FILE_EXT_SELECT_MD] = false;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      varsLocal[IS_EXECUTABLE] = false;
+      varsLocal[MENU_ENABLED] = false;
+      browser.i18n.getMessage.callsFake((...args) => args.toString());
     });
     afterEach(() => {
-      const { menuItems, vars } = mjs;
-      const items = Object.keys(menuItems);
+      const { varsLocal, vars } = mjs;
+      vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
-      for (const item of items) {
-        menuItems[item] = null;
-      }
+      varsLocal[EDITOR_LABEL] = '';
+      varsLocal[FILE_EXT_SELECT] = false;
+      varsLocal[FILE_EXT_SELECT_HTML] = false;
+      varsLocal[FILE_EXT_SELECT_MD] = false;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      varsLocal[IS_EXECUTABLE] = false;
+      varsLocal[MENU_ENABLED] = false;
     });
 
     it('should call function', async () => {
-      const i = browser.menus.removeAll.callCount;
-      const j = browser.menus.create.callCount;
-      browser.menus.removeAll.resolves(undefined);
+      const i = browser.menus.create.callCount;
       const res = await func();
-      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
-      assert.strictEqual(browser.menus.create.callCount, j + 3, 'called');
-      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
+      assert.strictEqual(browser.menus.create.callCount, i + 5, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+
+    it('should get result', async () => {
+      const i = browser.menus.create.callCount;
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_HTML] = false;
+      varsLocal[FILE_EXT_SELECT_MD] = false;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      const res = await func();
+      assert.strictEqual(browser.menus.create.callCount, i + 5, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+
+    it('should get result', async () => {
+      const i = browser.menus.create.callCount;
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_HTML] = true;
+      varsLocal[FILE_EXT_SELECT_MD] = false;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      const res = await func();
+      assert.strictEqual(browser.menus.create.callCount, i + 6, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+
+    it('should get result', async () => {
+      const i = browser.menus.create.callCount;
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_HTML] = true;
+      varsLocal[FILE_EXT_SELECT_MD] = true;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      const res = await func();
+      assert.strictEqual(browser.menus.create.callCount, i + 7, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+
+    it('should get result', async () => {
+      const i = browser.menus.create.callCount;
+      const { varsLocal } = mjs;
+      varsLocal[FILE_EXT_SELECT] = true;
+      varsLocal[FILE_EXT_SELECT_HTML] = true;
+      varsLocal[FILE_EXT_SELECT_MD] = true;
+      varsLocal[FILE_EXT_SELECT_TXT] = true;
+      const res = await func();
+      assert.strictEqual(browser.menus.create.callCount, i + 8, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
     });
   });
 
   describe('update context menu', () => {
     const func = mjs.updateContextMenu;
-    beforeEach(() => {
-      const { menuItems, vars, varsLocal } = mjs;
-      const items = Object.keys(menuItems);
-      vars[ONLY_EDITABLE] = false;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[MENU_ENABLED] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MODE_MATHML] = '';
-      varsLocal[MODE_SOURCE] = '';
-      varsLocal[MODE_SVG] = '';
-      for (const item of items) {
-        menuItems[item] = item;
-      }
-    });
-    afterEach(() => {
-      const { menuItems, vars, varsLocal } = mjs;
-      const items = Object.keys(menuItems);
-      vars[ONLY_EDITABLE] = false;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[MENU_ENABLED] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MODE_MATHML] = '';
-      varsLocal[MODE_SOURCE] = '';
-      varsLocal[MODE_SVG] = '';
-      for (const item of items) {
-        menuItems[item] = null;
-      }
-    });
 
-    it('should call function', async () => {
+    it('should not call function', async () => {
       const i = browser.menus.update.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
       const res = await func();
-      assert.strictEqual(browser.menus.update.callCount, i + 3, 'called');
-      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.menus.update.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      const res = await func();
-      assert.strictEqual(browser.menus.update.callCount, i + 3, 'called');
-      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
-    });
-
-    it('should call function', async () => {
-      const { menuItems, vars, varsLocal } = mjs;
-      const items = Object.keys(menuItems);
-      const i = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      varsLocal[MENU_ENABLED] = true;
-      varsLocal[IS_EXECUTABLE] = true;
-      vars[ONLY_EDITABLE] = false;
-      for (const item of items) {
-        menuItems[item] = null;
-      }
-      const res = await func();
-      assert.strictEqual(browser.menus.create.callCount, i + 3, 'called');
-      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
+      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
     });
 
     it('should not call function', async () => {
-      const { menuItems, vars, varsLocal } = mjs;
-      const items = Object.keys(menuItems);
-      const i = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      varsLocal[MENU_ENABLED] = false;
-      vars[ONLY_EDITABLE] = false;
-      for (const item of items) {
-        menuItems[item] = null;
-      }
-      const res = await func();
-      assert.strictEqual(browser.menus.create.callCount, i, 'not called');
+      const i = browser.menus.update.callCount;
+      const res = await func({
+        foo: 'bar'
+      });
+      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should not call function', async () => {
+      const i = browser.menus.update.callCount;
+      const res = await func({
+        foo: {
+          bar: 'baz'
+        }
+      });
+      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should call function', async () => {
-      const { menuItems, vars, varsLocal } = mjs;
-      const items = Object.keys(menuItems);
-      const i = browser.menus.create.callCount;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      varsLocal[MENU_ENABLED] = true;
-      varsLocal[IS_EXECUTABLE] = true;
-      vars[ONLY_EDITABLE] = true;
-      for (const item of items) {
-        menuItems[item] = null;
-      }
-      const res = await func();
-      assert.strictEqual(browser.menus.create.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
-    });
-
-    it('should call function', async () => {
       const i = browser.menus.update.callCount;
-      const opt = {
+      const res = await func({
         [MODE_EDIT]: {
-          enabled: true,
-          menuItemId: MODE_EDIT
+          enabled: true
         }
-      };
-      const res = await func(opt);
+      });
       assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.update.callCount;
-      const opt = {
+      const res = await func({
         [MODE_SOURCE]: {
-          enabled: true,
-          menuItemId: MODE_SOURCE,
           mode: MODE_SOURCE
         }
-      };
-      varsLocal[MODE_SOURCE] = 'foo';
-      const res = await func(opt);
-      assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
+      });
+      assert.strictEqual(browser.menus.update.callCount, i + 3, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.update.callCount;
-      const opt = {
+      const res = await func({
         [MODE_SOURCE]: {
-          enabled: true,
-          menuItemId: MODE_SOURCE,
-          mode: MODE_SVG
+          mode: MODE_MATHML
         }
-      };
-      varsLocal[MODE_SOURCE] = 'foo';
-      varsLocal[MODE_SVG] = 'bar';
-      const res = await func(opt);
-      assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
+      });
+      assert.strictEqual(browser.menus.update.callCount, i + 3, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.update.callCount;
-      const opt = {
+      const res = await func({
         [MODE_SOURCE]: {
-          enabled: true,
-          menuItemId: MODE_SOURCE,
           mode: MODE_SVG
         }
-      };
-      varsLocal[MODE_SOURCE] = 'foo';
-      const res = await func(opt);
-      assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
-    });
-
-    it('should not call function', async () => {
-      const i = browser.menus.update.callCount;
-      const opt = {
-        [MODE_SOURCE]: {
-          enabled: true,
-          menuItemId: MODE_SOURCE,
-          mode: MODE_SVG
-        }
-      };
-      const res = await func(opt);
-      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
-      assert.deepEqual(res, [], 'result');
-    });
-
-    it('should not call function', async () => {
-      const i = browser.menus.update.callCount;
-      const opt = {
-        [MODE_SOURCE]: {
-          enabled: true,
-          mode: MODE_SVG
-        }
-      };
-      const res = await func(opt);
-      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
-      assert.deepEqual(res, [], 'result');
+      });
+      assert.strictEqual(browser.menus.update.callCount, i + 3, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
     });
   });
 
-  describe('', () => {
-    const func = mjs.cacheMenuItemTitle;
-    beforeEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[MODE_SOURCE] = '';
-      varsLocal[MODE_MATHML] = '';
-      varsLocal[MODE_SVG] = '';
-    });
-    afterEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[MODE_SOURCE] = '';
-      varsLocal[MODE_MATHML] = '';
-      varsLocal[MODE_SVG] = '';
-    });
+  describe('restore context menu', () => {
+    const func = mjs.restoreContextMenu;
 
-    it('should set value', async () => {
-      const { varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      await func();
-      assert.strictEqual(varsLocal[MODE_SOURCE], `${MODE_SOURCE}_key,foo, (&V)`,
-        'source');
-      assert.strictEqual(varsLocal[MODE_MATHML], `${MODE_MATHML}_key,foo, (&V)`,
-        'math');
-      assert.strictEqual(varsLocal[MODE_SVG], `${MODE_SVG}_key,foo, (&V)`,
-        'svg');
-    });
-
-    it('should set value', async () => {
-      const { varsLocal } = mjs;
-      browser.i18n.getMessage.callsFake((...args) => args.toString());
-      await func();
-      assert.strictEqual(varsLocal[MODE_SOURCE],
-                         `${MODE_SOURCE}_key,${EXT_NAME}, (&V)`,
-                         'source');
-      assert.strictEqual(varsLocal[MODE_MATHML],
-                         `${MODE_MATHML}_key,${EXT_NAME}, (&V)`,
-                         'math');
-      assert.strictEqual(varsLocal[MODE_SVG],
-                         `${MODE_SVG}_key,${EXT_NAME}, (&V)`,
-                         'svg');
+    it('should call function', async () => {
+      const i = browser.menus.removeAll.callCount;
+      const j = browser.menus.create.callCount;
+      const res = await func();
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
+      assert.strictEqual(browser.menus.create.callCount, j + 5, 'called');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
     });
   });
 
@@ -1469,6 +1424,8 @@ describe('main', () => {
         undefined,
         [],
         [
+          undefined,
+          undefined,
           undefined,
           undefined,
           undefined
@@ -1494,8 +1451,17 @@ describe('main', () => {
         }
       });
       const res = await func(data);
-      assert.deepEqual(res, [undefined, [], [undefined, undefined, undefined]],
-        'result');
+      assert.deepEqual(res, [
+        undefined,
+        [],
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
     });
 
     it('should call function', async () => {
@@ -1509,8 +1475,17 @@ describe('main', () => {
         EDITOR_LABEL
       ]).resolves({});
       const res = await func(data);
-      assert.deepEqual(res, [undefined, [], [undefined, undefined, undefined]],
-        'result');
+      assert.deepEqual(res, [
+        undefined,
+        [],
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
     });
   });
 
@@ -1706,23 +1681,17 @@ describe('main', () => {
   describe('handle message', () => {
     const func = mjs.handleMsg;
     beforeEach(() => {
-      const { hostStatus, menuItems, ports } = mjs;
+      const { hostStatus, ports } = mjs;
       hostStatus[HOST_COMPAT] = false;
       hostStatus[HOST_CONNECTION] = false;
       hostStatus[HOST_VERSION_LATEST] = null;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
       ports.clear();
     });
     afterEach(() => {
-      const { hostStatus, menuItems, ports } = mjs;
+      const { hostStatus, ports } = mjs;
       hostStatus[HOST_COMPAT] = false;
       hostStatus[HOST_CONNECTION] = false;
       hostStatus[HOST_VERSION_LATEST] = null;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
       ports.clear();
     });
 
@@ -1954,7 +1923,13 @@ describe('main', () => {
       );
       assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
       assert.isNull(hostStatus[HOST_VERSION_LATEST], 'latest');
-      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
     });
 
     it('should call function', async () => {
@@ -1982,7 +1957,13 @@ describe('main', () => {
       );
       assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
       assert.isNull(hostStatus[HOST_VERSION_LATEST], 'latest');
-      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
     });
 
     it('should call function', async () => {
@@ -2010,7 +1991,13 @@ describe('main', () => {
       );
       assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
       assert.strictEqual(hostStatus[HOST_VERSION_LATEST], '1.2.3', 'latest');
-      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
     });
 
     it('should not call function', async () => {
@@ -2097,7 +2084,13 @@ describe('main', () => {
         [
           undefined,
           [[[]]],
-          [undefined, undefined, undefined]
+          [
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined
+          ]
         ]
       ], 'result');
     });
@@ -2147,14 +2140,12 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { menuItems } = mjs;
-      menuItems[MODE_EDIT] = MODE_EDIT;
       const i = browser.menus.update.callCount;
       const msg = {
         [CONTEXT_MENU]: {
           [MODE_EDIT]: {
             enabled: true,
-            menuItemId: [MODE_EDIT]
+            menuItemId: MODE_EDIT
           }
         }
       };
@@ -2209,19 +2200,13 @@ describe('main', () => {
   describe('handle connected port', () => {
     const func = mjs.handlePort;
     beforeEach(() => {
-      const { menuItems, ports, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, varsLocal } = mjs;
       ports.clear();
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = true;
     });
     afterEach(() => {
-      const { menuItems, ports, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, varsLocal } = mjs;
       ports.clear();
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
@@ -2258,20 +2243,23 @@ describe('main', () => {
         }
       });
       const i = port.postMessage.callCount;
-      const k = browser.menus.create.callCount;
-      const l = browser.menus.update.callCount;
+      const j = browser.menus.removeAll.callCount;
       const res = await func(port);
       assert.strictEqual(
         ports.get('1').get('2').get('https://example.com').name,
         PORT_CONTENT, 'port'
       );
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called port msg');
-      assert.strictEqual(browser.menus.create.callCount, k + 3,
-        'called menus create');
-      assert.strictEqual(browser.menus.update.callCount, l,
-        'not called menus update');
+      assert.strictEqual(browser.menus.removeAll.callCount, j + 1,
+        'called menus remove all');
       assert.isTrue(varsLocal[MENU_ENABLED], 'menu enabled');
-      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
     });
 
     it('should call function', async () => {
@@ -2291,19 +2279,16 @@ describe('main', () => {
         }
       });
       const i = port.postMessage.callCount;
-      const k = browser.menus.create.callCount;
-      const l = browser.menus.update.callCount;
+      const j = browser.menus.removeAll.callCount;
       const res = await func(port);
       assert.strictEqual(
         ports.get('1').get('2').get('https://example.com').name,
         PORT_CONTENT, 'port'
       );
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called port msg');
+      assert.strictEqual(browser.menus.removeAll.callCount, j,
+        'not called menus remove all');
       assert.isFalse(varsLocal[MENU_ENABLED], 'menu enabled');
-      assert.strictEqual(browser.menus.create.callCount, k,
-        'not called menus create');
-      assert.strictEqual(browser.menus.update.callCount, l,
-        'not called menus update');
       assert.isNull(res, 'result');
     });
 
@@ -2324,16 +2309,13 @@ describe('main', () => {
         }
       });
       const i = port.postMessage.callCount;
-      const k = browser.menus.create.callCount;
-      const l = browser.menus.update.callCount;
+      const j = browser.menus.removeAll.callCount;
       const res = await func(port);
       assert.isFalse(ports.has('1'), 'port');
       assert.strictEqual(port.postMessage.callCount, i, 'not called port msg');
       assert.isFalse(varsLocal[MENU_ENABLED], 'menu enabled');
-      assert.strictEqual(browser.menus.create.callCount, k,
-        'not called menus create');
-      assert.strictEqual(browser.menus.update.callCount, l,
-        'not called menus update');
+      assert.strictEqual(browser.menus.removeAll.callCount, j,
+        'not called menus remove all');
       assert.isNull(res, 'result');
     });
   });
@@ -2370,26 +2352,24 @@ describe('main', () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
       );
-      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
     });
   });
 
   describe('handle tab activated', () => {
     const func = mjs.onTabActivated;
     beforeEach(() => {
-      const { menuItems, ports, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, varsLocal } = mjs;
       ports.clear();
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = true;
     });
     afterEach(() => {
-      const { menuItems, ports, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, varsLocal } = mjs;
       ports.clear();
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
@@ -2403,39 +2383,18 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { varsLocal } = mjs;
-      const i = browser.menus.create.callCount;
+      const i = browser.menus.removeAll.callCount;
       const info = {
         tabId: -1,
         windowId: -1
       };
       const res = await func(info);
-      assert.strictEqual(browser.menus.create.callCount, i, 'not called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.isFalse(varsLocal[MENU_ENABLED], 'value');
       assert.deepEqual(res, [
-        []
-      ], 'result');
-    });
-
-    it('should call function', async () => {
-      const { ports, varsLocal } = mjs;
-      const stubPort = browser.runtime.connect({ name: PORT_CONTENT });
-      ports.set('1', new Map());
-      ports.get('1').set('2', new Map());
-      ports.get('1').get('2').set('https://example.com', stubPort);
-      const port = ports.get('1').get('2').get('https://example.com');
-      const i = browser.menus.create.callCount;
-      const j = port.postMessage.callCount;
-      const info = {
-        tabId: 2,
-        windowId: 1
-      };
-      const res = await func(info);
-      assert.strictEqual(browser.menus.create.callCount, i + 3, 'called');
-      assert.strictEqual(port.postMessage.callCount, j + 1, 'called');
-      assert.isTrue(varsLocal[MENU_ENABLED], 'value');
-      assert.deepEqual(res, [
-        [],
         [
+          undefined,
+          undefined,
           undefined,
           undefined,
           undefined
@@ -2450,18 +2409,53 @@ describe('main', () => {
       ports.get('1').set('2', new Map());
       ports.get('1').get('2').set('https://example.com', stubPort);
       const port = ports.get('1').get('2').get('https://example.com');
-      const i = browser.menus.create.callCount;
+      const i = browser.menus.removeAll.callCount;
+      const j = port.postMessage.callCount;
+      const info = {
+        tabId: 2,
+        windowId: 1
+      };
+      const res = await func(info);
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
+      assert.strictEqual(port.postMessage.callCount, j + 1, 'called');
+      assert.isTrue(varsLocal[MENU_ENABLED], 'value');
+      assert.deepEqual(res, [
+        [],
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should call function', async () => {
+      const { ports, varsLocal } = mjs;
+      const stubPort = browser.runtime.connect({ name: PORT_CONTENT });
+      ports.set('1', new Map());
+      ports.get('1').set('2', new Map());
+      ports.get('1').get('2').set('https://example.com', stubPort);
+      const port = ports.get('1').get('2').get('https://example.com');
+      const i = browser.menus.removeAll.callCount;
       const j = port.postMessage.callCount;
       const info = {
         tabId: 3,
         windowId: 1
       };
       const res = await func(info);
-      assert.strictEqual(browser.menus.create.callCount, i, 'not called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.strictEqual(port.postMessage.callCount, j, 'not called');
       assert.isFalse(varsLocal[MENU_ENABLED], 'value');
       assert.deepEqual(res, [
-        []
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
       ], 'result');
     });
 
@@ -2472,18 +2466,24 @@ describe('main', () => {
       ports.get('1').set('2', new Map());
       ports.get('1').get('2').set('https://example.com', stubPort);
       const port = ports.get('1').get('2').get('https://example.com');
-      const i = browser.menus.create.callCount;
+      const i = browser.menus.removeAll.callCount;
       const j = port.postMessage.callCount;
       const info = {
         tabId: 2,
         windowId: 1
       };
       const res = await func(info);
-      assert.strictEqual(browser.menus.create.callCount, i, 'not called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.strictEqual(port.postMessage.callCount, j, 'not called');
       assert.isFalse(varsLocal[MENU_ENABLED], 'value');
       assert.deepEqual(res, [
-        []
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
       ], 'result');
     });
   });
@@ -2491,19 +2491,13 @@ describe('main', () => {
   describe('handle tab updated', () => {
     const func = mjs.onTabUpdated;
     beforeEach(() => {
-      const { menuItems, ports, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, varsLocal } = mjs;
       ports.clear();
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = true;
     });
     afterEach(() => {
-      const { menuItems, ports, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, varsLocal } = mjs;
       ports.clear();
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
@@ -2540,21 +2534,24 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const i = browser.menus.create.callCount;
-      const j = browser.menus.update.callCount;
+      const i = browser.menus.removeAll.callCount;
       const res = await func(2, { status: 'complete' }, { active: true });
-      assert.strictEqual(browser.menus.create.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.update.callCount, j, 'not called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
-        []
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
       ], 'result');
     });
 
     it('should call function', async () => {
       const { ports, varsLocal } = mjs;
       const stubPort = browser.runtime.connect({ name: PORT_CONTENT });
-      const i = browser.menus.create.callCount;
-      const j = browser.menus.update.callCount;
+      const i = browser.menus.removeAll.callCount;
       ports.set('1', new Map());
       ports.get('1').set('2', new Map());
       ports.get('1').get('2').set('https://example.com', stubPort);
@@ -2566,10 +2563,11 @@ describe('main', () => {
         windowId: 1
       });
       assert.isTrue(varsLocal[MENU_ENABLED], 'value');
-      assert.strictEqual(browser.menus.create.callCount, i + 3, 'called');
-      assert.strictEqual(browser.menus.update.callCount, j, 'not called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
         [
+          undefined,
+          undefined,
           undefined,
           undefined,
           undefined
@@ -2705,55 +2703,44 @@ describe('main', () => {
   describe('handle window focus changed', () => {
     const func = mjs.onWindowFocusChanged;
     beforeEach(() => {
-      const { menuItems, ports, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, varsLocal } = mjs;
       ports.clear();
       varsLocal[MENU_ENABLED] = true;
       varsLocal[IS_EXECUTABLE] = true;
     });
     afterEach(() => {
-      const { menuItems, ports, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, varsLocal } = mjs;
       ports.clear();
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
     });
 
-    it('should call function', async () => {
-      const i = browser.menus.create.callCount;
-      const j = browser.menus.update.callCount;
+    it('should not call function', async () => {
+      const i = browser.menus.removeAll.callCount;
       browser.windows.getCurrent.resolves({
         focused: false,
         id: 1,
         type: 'normal'
       });
       const res = await func();
-      assert.strictEqual(browser.menus.create.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.update.callCount, j, 'not called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
-    it('should call function', async () => {
-      const i = browser.menus.create.callCount;
-      const j = browser.menus.update.callCount;
+    it('should not call function', async () => {
+      const i = browser.menus.removeAll.callCount;
       browser.windows.getCurrent.resolves({
         focused: true,
         id: browser.windows.WINDOW_ID_NONE,
         type: 'normal'
       });
       const res = await func();
-      assert.strictEqual(browser.menus.create.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.update.callCount, j, 'not called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
-    it('should call function', async () => {
-      const i = browser.menus.create.callCount;
-      const j = browser.menus.update.callCount;
+    it('should not call function', async () => {
+      const i = browser.menus.removeAll.callCount;
       browser.windows.getCurrent.resolves({
         focused: true,
         id: 1,
@@ -2761,7 +2748,6 @@ describe('main', () => {
       });
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i, 'not called');
-      assert.strictEqual(browser.menus.update.callCount, j, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -2772,9 +2758,8 @@ describe('main', () => {
       ports.get('1').set('2', new Map());
       ports.get('1').get('2').set('https://example.com', stubPort);
       const port = ports.get('1').get('2').get('https://example.com');
-      const i = browser.menus.create.callCount;
-      const j = browser.menus.update.callCount;
-      const k = port.postMessage.callCount;
+      const i = browser.menus.removeAll.callCount;
+      const j = port.postMessage.callCount;
       browser.windows.getCurrent.resolves({
         focused: true,
         id: 1,
@@ -2788,12 +2773,13 @@ describe('main', () => {
         id: 2
       }]);
       const res = await func(1);
-      assert.strictEqual(browser.menus.create.callCount, i + 3, 'called');
-      assert.strictEqual(browser.menus.update.callCount, j, 'not called');
-      assert.strictEqual(port.postMessage.callCount, k + 1, 'called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
+      assert.strictEqual(port.postMessage.callCount, j + 1, 'called');
       assert.deepEqual(res, [
         [],
         [
+          undefined,
+          undefined,
           undefined,
           undefined,
           undefined
@@ -2808,9 +2794,8 @@ describe('main', () => {
       ports.get('1').set('2', new Map());
       ports.get('1').get('2').set('https://example.com', stubPort);
       const port = ports.get('1').get('2').get('https://example.com');
-      const i = browser.menus.create.callCount;
-      const j = browser.menus.update.callCount;
-      const k = port.postMessage.callCount;
+      const i = browser.menus.removeAll.callCount;
+      const j = port.postMessage.callCount;
       browser.windows.getCurrent.resolves({
         focused: true,
         id: 1,
@@ -2824,12 +2809,13 @@ describe('main', () => {
         id: 2
       }]);
       const res = await func(1);
-      assert.strictEqual(browser.menus.create.callCount, i + 3, 'called');
-      assert.strictEqual(browser.menus.update.callCount, j, 'not called');
-      assert.strictEqual(port.postMessage.callCount, k + 1, 'called');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
+      assert.strictEqual(port.postMessage.callCount, j + 1, 'called');
       assert.deepEqual(res, [
         [],
         [
+          undefined,
+          undefined,
           undefined,
           undefined,
           undefined
@@ -2989,29 +2975,31 @@ describe('main', () => {
   describe('set variable', () => {
     const func = mjs.setVar;
     beforeEach(() => {
-      const { menuItems, ports, vars, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, vars, varsLocal } = mjs;
       ports.clear();
       vars[ONLY_EDITABLE] = false;
       vars[SYNC_AUTO] = false;
       vars[SYNC_AUTO_URL] = null;
       varsLocal[EDITOR_LABEL] = '';
+      varsLocal[FILE_EXT_SELECT] = false;
+      varsLocal[FILE_EXT_SELECT_HTML] = false;
+      varsLocal[FILE_EXT_SELECT_MD] = false;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[ICON_ID] = '';
       varsLocal[MENU_ENABLED] = true;
     });
     afterEach(() => {
-      const { menuItems, ports, vars, varsLocal } = mjs;
-      menuItems[MODE_SOURCE] = null;
-      menuItems[MODE_SELECTION] = null;
-      menuItems[MODE_EDIT] = null;
+      const { ports, vars, varsLocal } = mjs;
       ports.clear();
       vars[ONLY_EDITABLE] = false;
       vars[SYNC_AUTO] = false;
       vars[SYNC_AUTO_URL] = null;
       varsLocal[EDITOR_LABEL] = '';
+      varsLocal[FILE_EXT_SELECT] = false;
+      varsLocal[FILE_EXT_SELECT_HTML] = false;
+      varsLocal[FILE_EXT_SELECT_MD] = false;
+      varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[ICON_ID] = '';
       varsLocal[MENU_ENABLED] = false;
@@ -3132,7 +3120,13 @@ describe('main', () => {
       assert.strictEqual(browser.menus.removeAll.callCount, j + 1, 'called');
       assert.deepEqual(res, [
         [[[]]],
-        [undefined]
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
       ], 'result');
     });
 
@@ -3270,29 +3264,154 @@ describe('main', () => {
 
     it('should set value', async () => {
       const { varsLocal } = mjs;
-      const i = browser.menus.create.callCount;
-      varsLocal[IS_EXECUTABLE] = true;
-      const res = await func(EDITOR_LABEL, {
-        value: 'foo'
+      const i = browser.menus.removeAll.callCount;
+      const res = await func(FILE_EXT_SELECT, {
+        checked: true
+      });
+      assert.isTrue(varsLocal[FILE_EXT_SELECT], 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should call function', async () => {
+      const { varsLocal } = mjs;
+      const i = browser.menus.removeAll.callCount;
+      const res = await func(FILE_EXT_SELECT, {
+        checked: true
       }, true);
-      assert.strictEqual(varsLocal[EDITOR_LABEL], 'foo', 'value');
-      assert.strictEqual(browser.menus.create.callCount, i + 3, 'called');
+      assert.isTrue(varsLocal[FILE_EXT_SELECT], 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
-        undefined,
-        [undefined, undefined, undefined]
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
       ], 'result');
     });
 
     it('should set value', async () => {
       const { varsLocal } = mjs;
-      const i = browser.menus.create.callCount;
+      const i = browser.menus.removeAll.callCount;
+      const res = await func(FILE_EXT_SELECT_HTML, {
+        checked: true
+      });
+      assert.isTrue(varsLocal[FILE_EXT_SELECT_HTML], 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should call function', async () => {
+      const { varsLocal } = mjs;
+      const i = browser.menus.removeAll.callCount;
+      const res = await func(FILE_EXT_SELECT_HTML, {
+        checked: true
+      }, true);
+      assert.isTrue(varsLocal[FILE_EXT_SELECT_HTML], 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should set value', async () => {
+      const { varsLocal } = mjs;
+      const i = browser.menus.removeAll.callCount;
+      const res = await func(FILE_EXT_SELECT_MD, {
+        checked: true
+      });
+      assert.isTrue(varsLocal[FILE_EXT_SELECT_MD], 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should call function', async () => {
+      const { varsLocal } = mjs;
+      const i = browser.menus.removeAll.callCount;
+      const res = await func(FILE_EXT_SELECT_MD, {
+        checked: true
+      }, true);
+      assert.isTrue(varsLocal[FILE_EXT_SELECT_MD], 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should set value', async () => {
+      const { varsLocal } = mjs;
+      const i = browser.menus.removeAll.callCount;
+      const res = await func(FILE_EXT_SELECT_TXT, {
+        checked: true
+      });
+      assert.isTrue(varsLocal[FILE_EXT_SELECT_TXT], 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should call function', async () => {
+      const { varsLocal } = mjs;
+      const i = browser.menus.removeAll.callCount;
+      const res = await func(FILE_EXT_SELECT_TXT, {
+        checked: true
+      }, true);
+      assert.isTrue(varsLocal[FILE_EXT_SELECT_TXT], 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should set value', async () => {
+      const { varsLocal } = mjs;
+      const i = browser.menus.removeAll.callCount;
+      varsLocal[IS_EXECUTABLE] = true;
+      const res = await func(EDITOR_LABEL, {
+        value: 'foo'
+      }, true);
+      assert.strictEqual(varsLocal[EDITOR_LABEL], 'foo', 'value');
+      assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should set value', async () => {
+      const { varsLocal } = mjs;
+      const i = browser.menus.removeAll.callCount;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func(EDITOR_LABEL, {
         value: 'foo'
       });
       assert.strictEqual(varsLocal[EDITOR_LABEL], 'foo', 'value');
-      assert.strictEqual(browser.menus.create.callCount, i, 'not called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
     });
 
     it('should set value', async () => {
@@ -3316,7 +3435,13 @@ describe('main', () => {
       assert.strictEqual(
         browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
       );
-      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
     });
 
     it('should set value', async () => {

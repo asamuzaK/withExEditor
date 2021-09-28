@@ -207,6 +207,41 @@
           </div>
           <div>
             <p>
+              <input type="checkbox" id="selectFileExtension" />
+              <label for="selectFileExtension" class="checkboxLabel"
+                     data-i18n="optionsSelectFileExtension"
+                     aria-details="selectFileExtensionDetail">
+                Select File Extension When Saving Temporary Files
+              </label>
+              <span class="sub-item">
+                <input type="checkbox" id="selectTxtFileExtension" />
+                <label for="selectTxtFileExtension" class="checkboxLabel">
+                  .txt
+                </label>
+              </span>
+              <span class="sub-item">
+                <input type="checkbox" id="selectHtmlFileExtension" />
+                <label for="selectHtmlFileExtension" class="checkboxLabel">
+                  .html
+                </label>
+              </span>
+              <span class="sub-item">
+                <input type="checkbox" id="selectMarkdownFileExtension" />
+                <label for="selectMarkdownFileExtension" class="checkboxLabel">
+                  .md
+                </label>
+              </span>
+            </p>
+            <details id="selectFileExtensionDetail">
+              <div>
+                <p data-i18n="optionsSelectFileExtensionDetail">
+                  Add context menu items for selecting a temporary file extension.
+                </p>
+              </div>
+            </details>
+          </div>
+          <div>
+            <p>
               <input type="checkbox" id="enableSyncAuto" />
               <label for="enableSyncAuto" class="checkboxLabel"
                      data-i18n="optionsEnableSyncAutoLabel"

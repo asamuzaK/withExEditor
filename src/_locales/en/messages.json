@@ -66,6 +66,24 @@
       }
     }
   },
+  "modeEditTextFileExtension": {
+    "message": "Save as $FILEEXT$",
+    "placeholders": {
+      "fileext": {
+        "content": "$1",
+        "example": ".txt"
+      }
+    }
+  },
+  "modeEditTextFileExtension_key": {
+    "message": "Save as $FILEEXT$",
+    "placeholders": {
+      "fileext": {
+        "content": "$1",
+        "example": ".&txt"
+      }
+    }
+  },
   "modeViewMathML": {
     "message": "View MathML Source with $LABEL$",
     "placeholders": {
@@ -303,6 +321,12 @@
   },
   "optionsSaveEditorSettings": {
     "message": "Save"
+  },
+  "optionsSelectFileExtension": {
+    "message": "Select File Extension When Saving Temporary Files"
+  },
+  "optionsSelectFileExtensionDetail": {
+    "message": "Add context menu items for selecting a temporary file extension."
   },
   "optionsSyncAutoUrlLabel": {
     "message": "Sites (Enter URL Per Line)"

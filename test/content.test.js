@@ -15,7 +15,8 @@ import * as cjs from '../src/js/content.js';
 const {
   CONTENT_GET, CONTEXT_MODE, CONTEXT_NODE, FILE_NOT_FOUND_TIMESTAMP,
   ID_TAB, ID_WIN, INCOGNITO, IS_MAC, KEY_CODE_A, LABEL, LOCAL_FILE_VIEW,
-  MODE_EDIT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
+  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
+  MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, PORT_CONNECT, PORT_CONTENT, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE,
   TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
@@ -3321,6 +3322,42 @@ describe('content', () => {
       assert.instanceOf(res, Map, 'result');
     });
 
+    it('should set data', () => {
+      const res = func({
+        [TMP_FILE_CREATE]: {
+          dataId: 'foo',
+          mode: MODE_EDIT_HTML
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        [TMP_FILE_CREATE]: {
+          dataId: 'foo',
+          mode: MODE_EDIT_MD
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        [TMP_FILE_CREATE]: {
+          dataId: 'foo',
+          mode: MODE_EDIT_TXT
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
     it('should not set data', () => {
       const res = func({
         [TMP_FILE_CREATE]: {
@@ -3353,6 +3390,42 @@ describe('content', () => {
         data: {
           dataId: 'foo',
           mode: MODE_EDIT
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        data: {
+          dataId: 'foo',
+          mode: MODE_EDIT_HTML
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        data: {
+          dataId: 'foo',
+          mode: MODE_EDIT_MD
+        }
+      });
+      assert.strictEqual(cjs.dataIds.size, 1, 'size');
+      assert.isTrue(cjs.dataIds.has('foo'), 'set');
+      assert.instanceOf(res, Map, 'result');
+    });
+
+    it('should set data', () => {
+      const res = func({
+        data: {
+          dataId: 'foo',
+          mode: MODE_EDIT_TXT
         }
       });
       assert.strictEqual(cjs.dataIds.size, 1, 'size');
@@ -3522,6 +3595,99 @@ describe('content', () => {
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
+      assert.strictEqual(res.createTmpFile.namespaceURI,
+        'http://www.w3.org/1999/xhtml', 'value');
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(res.value, 'bar', 'value');
+    });
+
+    it('should get object', async () => {
+      const res = await func({
+        mode: MODE_EDIT_TXT,
+        dataId: 'foo',
+        value: 'bar'
+      });
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+        'prop');
+      assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
+      assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(res.value, 'bar', 'value');
+    });
+
+    it('should get object', async () => {
+      const res = await func({
+        mode: MODE_EDIT_TXT,
+        dataId: 'foo',
+        namespaceURI: 'http://www.w3.org/1999/xhtml',
+        value: 'bar'
+      });
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+        'prop');
+      assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
+      assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
+      assert.strictEqual(res.createTmpFile.namespaceURI,
+        'http://www.w3.org/1999/xhtml', 'value');
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(res.value, 'bar', 'value');
+    });
+
+    it('should get object', async () => {
+      const res = await func({
+        mode: MODE_EDIT_HTML,
+        dataId: 'foo',
+        value: 'bar'
+      });
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+        'prop');
+      assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
+      assert.strictEqual(res.createTmpFile.extType, '.html', 'value');
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(res.value, 'bar', 'value');
+    });
+
+    it('should get object', async () => {
+      const res = await func({
+        mode: MODE_EDIT_HTML,
+        dataId: 'foo',
+        namespaceURI: 'http://www.w3.org/1999/xhtml',
+        value: 'bar'
+      });
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+        'prop');
+      assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
+      assert.strictEqual(res.createTmpFile.extType, '.html', 'value');
+      assert.strictEqual(res.createTmpFile.namespaceURI,
+        'http://www.w3.org/1999/xhtml', 'value');
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(res.value, 'bar', 'value');
+    });
+
+    it('should get object', async () => {
+      const res = await func({
+        mode: MODE_EDIT_MD,
+        dataId: 'foo',
+        value: 'bar'
+      });
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+        'prop');
+      assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
+      assert.strictEqual(res.createTmpFile.extType, '.md', 'value');
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(res.value, 'bar', 'value');
+    });
+
+    it('should get object', async () => {
+      const res = await func({
+        mode: MODE_EDIT_MD,
+        dataId: 'foo',
+        namespaceURI: 'http://www.w3.org/1999/xhtml',
+        value: 'bar'
+      });
+      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+        'prop');
+      assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
+      assert.strictEqual(res.createTmpFile.extType, '.md', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
@@ -4130,6 +4296,24 @@ describe('content', () => {
       assert.strictEqual(res.namespaceURI, 'http://www.w3.org/2000/svg', 'ns');
       assert.strictEqual(cjs.dataIds.size, 1, 'size');
       assert.isTrue(cjs.dataIds.has('html_text_0'), 'dataId');
+    });
+
+    it('should get default object', async () => {
+      const body = document.querySelector('body');
+      const res = await func(body, MODE_MATHML);
+      assert.strictEqual(res.mode, MODE_SOURCE, 'result');
+    });
+
+    it('should get object', async () => {
+      const math =
+        document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
+      const body = document.querySelector('body');
+      body.appendChild(math);
+      const res = await func(math, MODE_MATHML);
+      assert.strictEqual(res.mode, MODE_MATHML, 'mode');
+      assert.strictEqual(res.value,
+        '<math xmlns="http://www.w3.org/1998/Math/MathML"/>\n',
+        'value');
     });
 
     it('should get default object', async () => {
