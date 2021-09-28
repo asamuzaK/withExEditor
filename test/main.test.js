@@ -9,7 +9,7 @@ import { browser, mockPort } from './mocha/setup.js';
 import sinon from 'sinon';
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
-  EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME, EXT_RELOAD, FILE_EXT_SELECT,
+  EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD, FILE_EXT_SELECT,
   FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD, FILE_EXT_SELECT_TXT,
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST,
@@ -1404,7 +1404,7 @@ describe('main', () => {
       const j = browser.menus.create.callCount;
       const res = await func();
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
-      assert.strictEqual(browser.menus.create.callCount, i + 5, 'called');
+      assert.strictEqual(browser.menus.create.callCount, j + 5, 'called');
       assert.deepEqual(res, [
         undefined,
         undefined,
