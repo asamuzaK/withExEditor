@@ -410,7 +410,8 @@ export const createMenuItemData = key => {
   const data = {};
   if (isString(key) && menuItems[key]) {
     const { contexts, placeholder, parentId } = menuItems[key];
-    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE];
+    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE] &&
+                    !!hostStatus[HOST_COMPAT];
     if (parentId) {
       const keys = [MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT];
       if (keys.includes(key) && varsLocal[FILE_EXT_SELECT]) {
@@ -471,9 +472,10 @@ export const createContextMenu = async () => {
  * update context menu
  *
  * @param {object} data - context data
+ * @param {boolean} all - update all items
  * @returns {Promise.<Array>} - results of each handler
  */
-export const updateContextMenu = async (data = {}) => {
+export const updateContextMenu = async (data, all = false) => {
   const func = [];
   if (isObjectNotEmpty(data)) {
     const items = Object.entries(data);
@@ -527,6 +529,14 @@ export const updateContextMenu = async (data = {}) => {
               );
           }
         }
+      }
+    }
+  } else if (all) {
+    const items = Object.keys(menuItems);
+    for (const item of items) {
+      const itemData = createMenuItemData(item);
+      if (isObjectNotEmpty(itemData)) {
+        func.push(menus.update(item, itemData));
       }
     }
   }
@@ -716,11 +726,10 @@ export const handleMsg = async (msg, sender) => {
             hostStatus[HOST_VERSION_LATEST] = !isLatest ? latest : null;
             if (isLatest) {
               hostStatus[HOST_COMPAT] = !!isLatest;
-              func.push(toggleBadge());
             } else if (Number.isInteger(result)) {
               hostStatus[HOST_COMPAT] = result >= 0;
-              func.push(toggleBadge());
             }
+            func.push(toggleBadge());
           }
           break;
         }
@@ -784,7 +793,7 @@ export const handlePortOnMsg = msg => handleMsg(msg).catch(throwErr);
  * handle connected port
  *
  * @param {object} port - runtime.Port
- * @returns {?Function} - restoreContextMenu()
+ * @returns {?Function} - updateContextMenu()
  */
 export const handlePort = async (port = {}) => {
   const { name: portName, sender } = port;
@@ -811,7 +820,7 @@ export const handlePort = async (port = {}) => {
       if (portName === PORT_CONTENT && frameId === 0 && active &&
           status === 'complete') {
         varsLocal[MENU_ENABLED] = true;
-        func = restoreContextMenu();
+        func = updateContextMenu(null, true);
       }
     }
   }
@@ -862,7 +871,7 @@ export const onTabActivated = async info => {
       windowId, tabId
     }));
   }
-  func.push(restoreContextMenu());
+  func.push(updateContextMenu(null, true));
   return Promise.all(func);
 };
 
@@ -895,7 +904,7 @@ export const onTabUpdated = async (id, info, tab) => {
       varsLocal[MENU_ENABLED] = false;
     }
     if (status === 'complete') {
-      func.push(restoreContextMenu());
+      func.push(updateContextMenu(null, true));
     }
   }
   return Promise.all(func);
@@ -955,7 +964,7 @@ export const onWindowFocusChanged = async () => {
     }, {
       windowId, tabId
     }));
-    func.push(restoreContextMenu());
+    func.push(updateContextMenu(null, true));
   }
   return Promise.all(func);
 };
@@ -1050,7 +1059,7 @@ export const setVar = async (item, obj, changed = false) => {
       case EDITOR_LABEL:
         varsLocal[item] = value;
         if (changed) {
-          func.push(restoreContextMenu());
+          func.push(updateContextMenu(null, true));
         }
         break;
       case FILE_EXT_SELECT:
