@@ -480,7 +480,7 @@ export const updateContextMenu = async (data, all = false) => {
   if (isObjectNotEmpty(data)) {
     const items = Object.entries(data);
     const itemEnabled = !!varsLocal[MENU_ENABLED] &&
-                        !!varsLocal[IS_EXECUTABLE] && !!hostStatus[HOST_COMPAT]l
+                        !!varsLocal[IS_EXECUTABLE] && !!hostStatus[HOST_COMPAT];
     for (const [key, value] of items) {
       const keys = [MODE_EDIT, MODE_SOURCE];
       if (keys.includes(key) && isObjectNotEmpty(value)) {
