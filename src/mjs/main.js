@@ -485,13 +485,14 @@ export const updateContextMenu = async (data, all = false) => {
         const { enabled, mode } = value;
         if (key === MODE_EDIT) {
           func.push(menus.update(key, {
-            enabled: !!enabled
+            enabled: !!enabled && !!hostStatus[HOST_COMPAT]
           }));
         } else {
           switch (mode) {
             case MODE_MATHML:
               func.push(
                 menus.update(mode, {
+                  enabled: !!hostStatus[HOST_COMPAT],
                   visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_SOURCE, {
@@ -505,6 +506,7 @@ export const updateContextMenu = async (data, all = false) => {
             case MODE_SVG:
               func.push(
                 menus.update(mode, {
+                  enabled: !!hostStatus[HOST_COMPAT],
                   visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_MATHML, {
@@ -518,6 +520,7 @@ export const updateContextMenu = async (data, all = false) => {
             default:
               func.push(
                 menus.update(MODE_SOURCE, {
+                  enabled: !!hostStatus[HOST_COMPAT],
                   visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_MATHML, {
