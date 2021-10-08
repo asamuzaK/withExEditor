@@ -4,7 +4,6 @@
 
 import { isObjectNotEmpty, isString } from './common.js';
 
-/* dispatch events */
 /**
  * dispatch event
  *
