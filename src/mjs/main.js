@@ -479,20 +479,22 @@ export const updateContextMenu = async (data, all = false) => {
   const func = [];
   if (isObjectNotEmpty(data)) {
     const items = Object.entries(data);
+    const itemEnabled = !!varsLocal[MENU_ENABLED] &&
+                        !!varsLocal[IS_EXECUTABLE] && !!hostStatus[HOST_COMPAT]l
     for (const [key, value] of items) {
       const keys = [MODE_EDIT, MODE_SOURCE];
       if (keys.includes(key) && isObjectNotEmpty(value)) {
         const { enabled, mode } = value;
         if (key === MODE_EDIT) {
           func.push(menus.update(key, {
-            enabled: !!enabled && !!hostStatus[HOST_COMPAT]
+            enabled: !!enabled && itemEnabled
           }));
         } else {
           switch (mode) {
             case MODE_MATHML:
               func.push(
                 menus.update(mode, {
-                  enabled: !!hostStatus[HOST_COMPAT],
+                  enabled: itemEnabled,
                   visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_SOURCE, {
@@ -506,7 +508,7 @@ export const updateContextMenu = async (data, all = false) => {
             case MODE_SVG:
               func.push(
                 menus.update(mode, {
-                  enabled: !!hostStatus[HOST_COMPAT],
+                  enabled: itemEnabled,
                   visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_MATHML, {
@@ -520,7 +522,7 @@ export const updateContextMenu = async (data, all = false) => {
             default:
               func.push(
                 menus.update(MODE_SOURCE, {
-                  enabled: !!hostStatus[HOST_COMPAT],
+                  enabled: itemEnabled,
                   visible: !vars[ONLY_EDITABLE]
                 }),
                 menus.update(MODE_MATHML, {
