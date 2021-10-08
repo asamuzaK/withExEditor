@@ -1,5 +1,5 @@
 /**
- * content.js
+ * content-main.js
  */
 
 import {
