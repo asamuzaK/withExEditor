@@ -38,7 +38,7 @@ const {
 const menus = browser.menus || browser.contextMenus;
 
 /* constant */
-const HOST_VERSION_MIN = 'v5.0.0-b.2.1';
+const HOST_VERSION_MIN = 'v6.1.3';
 
 /* variables */
 export const vars = {
