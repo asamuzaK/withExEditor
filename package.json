@@ -13,6 +13,9 @@
   "license": "MPL-2.0",
   "type": "module",
   "scripts": {
+    "bundle": "npm-run-all -s bundle:*",
+    "bundle:copy": "copyfiles --up=1 src/LICENSE src/manifest.json src/_locales/**/*.json src/css/*.css src/html/*.html src/img/*.* src/lib/*.* src/mjs/*.js bundle",
+    "bundle:esbuild": "esbuild src/mjs/content-loader.js --bundle --minify --outfile=bundle/js/content.js",
     "lint": "npm-run-all -s lint:*",
     "lint:addons-linter": "addons-linter src",
     "lint:eslint": "eslint --fix .",
@@ -24,9 +27,11 @@
     "test_all": "npm-run-all -s test:*"
   },
   "devDependencies": {
-    "addons-linter": "^3.18.0",
-    "c8": "^7.9.0",
+    "addons-linter": "^3.19.0",
+    "c8": "^7.10.0",
     "chai": "^4.3.4",
+    "copyfiles": "^2.4.1",
+    "esbuild": "^0.13.4",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.24.2",

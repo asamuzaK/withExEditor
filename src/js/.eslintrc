@@ -2,5 +2,8 @@
   "extends": "../../.eslintrc",
   "parserOptions": {
     "sourceType": "script"
+  },
+  "rules": {
+    "no-unsanitized/method": "off"
   }
 }

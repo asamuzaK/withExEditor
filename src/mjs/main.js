@@ -9,8 +9,8 @@ import {
 } from './common.js';
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
-  getActiveTab, getActiveTabId, getCurrentWindow, getOs, getStorage, getWindow,
-  sendMessage, setStorage
+  getActiveTab, getActiveTabId, getAllStorage, getCurrentWindow, getOs,
+  getStorage, getWindow, sendMessage, setStorage
 } from './browser.js';
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET,
@@ -1139,3 +1139,11 @@ export const setOs = async () => {
   const os = await getOs();
   vars[IS_MAC] = os === 'mac';
 };
+
+/**
+ * startup
+ *
+ * @returns {Function} - promise chain
+ */
+export const startup = () => setOs().then(getAllStorage).then(setVars)
+  .then(setDefaultIcon).then(toggleBadge).catch(throwErr);
