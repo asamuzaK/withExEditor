@@ -3734,4 +3734,53 @@ describe('main', () => {
       assert.isFalse(mjs.vars[IS_MAC], 'result');
     });
   });
+
+  describe('startup', () => {
+    const func = mjs.startup;
+    beforeEach(() => {
+      mjs.vars[IS_MAC] = false;
+    });
+    afterEach(() => {
+      mjs.vars[IS_MAC] = false;
+    });
+
+    it('should get array', async () => {
+      browser.runtime.getPlatformInfo.resolves({
+        os: 'mac'
+      });
+      browser.storage.local.get.resolves({});
+      const res = await func();
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+
+    it('should get array', async () => {
+      browser.runtime.getPlatformInfo.resolves({
+        os: 'win'
+      });
+      browser.storage.local.get.resolves({});
+      const res = await func();
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+
+    it('should get array', async () => {
+      browser.runtime.getPlatformInfo.resolves({
+        os: 'linux'
+      });
+      browser.storage.local.get.resolves({});
+      const res = await func();
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+  });
 });

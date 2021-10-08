@@ -4,19 +4,11 @@
 
 /* shared */
 import { throwErr } from './common.js';
-import { getAllStorage, setStorage } from './browser.js';
 import {
   handleCmd, handleDisconnectedHost, handleMsg, handlePort, host,
   onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
-  onWindowRemoved, openOptionsPage, postContextMenuData, setDefaultIcon, setOs,
-  setVars, toggleBadge
+  onWindowRemoved, openOptionsPage, postContextMenuData, setVars, startup
 } from './main.js';
-import fileExtData from './file-ext.js';
-import liveEditData from './live-edit.js';
-import nsUriData from './ns-uri.js';
-import {
-  FILE_EXT, LIVE_EDIT, NS_URI
-} from './constant.js';
 
 /* api */
 const {
@@ -56,10 +48,4 @@ windows.onRemoved.addListener(windowId =>
 );
 
 /* startup */
-document.addEventListener('DOMContentLoaded', () => Promise.all([
-  setOs().then(getAllStorage).then(setVars).then(setDefaultIcon)
-    .then(toggleBadge),
-  setStorage({ [NS_URI]: nsUriData }),
-  setStorage({ [FILE_EXT]: fileExtData }),
-  setStorage({ [LIVE_EDIT]: liveEditData })
-]).catch(throwErr));
+document.addEventListener('DOMContentLoaded', startup);

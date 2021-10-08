@@ -21,7 +21,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "jid1-WiAigu4HIo0Tag@jetpack",
-      "strict_min_version": "71.0"
+      "strict_min_version": "89.0"
     }
   },
   "commands": {
@@ -49,7 +49,7 @@
         "*://*/*",
         "file:///*"
       ],
-      "run_at": "document_start"
+      "run_at": "document_idle"
     }
   ],
   "default_locale": "en",
@@ -79,5 +79,5 @@
     "tabs"
   ],
   "short_name": "__MSG_extensionName__",
-  "version": "8.1.0a3"
+  "version": "9.0.0a1"
 }

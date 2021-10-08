@@ -38,6 +38,9 @@ export const ICON_LIGHT = 'buttonIconLight';
 export const ICON_LIGHT_ID = '#light';
 export const ICON_ID = 'iconId';
 export const ICON_WHITE = 'buttonIconWhite';
+export const ID_TAB = 'tabId';
+export const ID_WIN = 'windowId';
+export const INCOGNITO = 'incognito';
 export const INFO = 'info';
 export const INFO_COLOR = '#008EA4';
 export const INFO_TEXT = 'i';
@@ -68,10 +71,6 @@ export const PROCESS_CHILD = 'childProcess';
 export const STORAGE_SET = 'setStorage';
 export const SYNC_AUTO = 'enableSyncAuto';
 export const SYNC_AUTO_URL = 'syncAutoUrls';
-export const THEME_DARK =
-  'firefox-compact-dark@mozilla.org@personas.mozilla.org';
-export const THEME_LIGHT =
-  'firefox-compact-light@mozilla.org@personas.mozilla.org';
 export const TMP_FILES = 'tmpFiles';
 export const TMP_FILES_PB = 'tmpFilesPb';
 export const TMP_FILES_PB_REMOVE = 'removePrivateTmpFiles';
