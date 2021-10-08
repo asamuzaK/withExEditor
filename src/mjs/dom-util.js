@@ -5,12 +5,10 @@
 import { getType, isString, logErr } from './common.js';
 import fileExt from './file-ext.js';
 import nsURI from './ns-uri.js';
+import { MIME_HTML, MIME_PLAIN, SUBST } from './constant.js';
 
 /* constants */
 const FILE_LEN = 128;
-const MIME_HTML = 'text/html';
-const MIME_PLAIN = 'text/plain';
-const SUBST = 'index';
 const TAGS_ALT = ['area', 'img', 'input'];
 const TAGS_BLOCK = [
   'address', 'article', 'aside', 'blockquote', 'details', 'dialog', 'dd', 'div',
@@ -24,7 +22,6 @@ const TAGS_PHRASING = [
   'ruby', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'var'
 ];
 const TAGS_TABLE_CELL = ['td', 'th'];
-const XMLNS = 'xmlns';
 
 /**
  * strip HTML tags and decode HTML escaped characters
@@ -149,7 +146,8 @@ export const getNodeNS = node => {
     if (!ns.node) {
       ns.node = root;
       ns.localName = root.localName;
-      ns.namespaceURI = root.getAttribute(XMLNS) || nsURI[root.localName] || '';
+      ns.namespaceURI =
+        root.getAttribute('xmlns') || nsURI[root.localName] || '';
     }
   }
   return ns;

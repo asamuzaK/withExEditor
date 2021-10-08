@@ -8,20 +8,16 @@ import { afterEach, beforeEach, describe, it } from 'mocha';
 import { browser, createJsdom, mockPort } from './mocha/setup.js';
 import sinon from 'sinon';
 import {
-  CONTENT_GET, CONTEXT_MENU, IS_MAC, ID_TAB, ID_WIN, INCOGNITO, LABEL,
+  CONTENT_GET, IS_MAC, ID_TAB, ID_WIN, INCOGNITO, LABEL,
   LOCAL_FILE_VIEW, MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
   MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, PORT_CONNECT, PORT_CONTENT, SYNC_AUTO, SYNC_AUTO_URL,
-  TMP_FILES, TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
-  TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
+  TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
+  TMP_FILE_DATA_REMOVE, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
 } from '../src/mjs/constant.js';
 
 /* test */
 import * as mjs from '../src/mjs/content-main.js';
-
-/* constants */
-const CONTEXT_MODE = 'contextMode';
-const CONTEXT_NODE = 'contextNode';
 
 describe('content-main', () => {
   let window, document;
@@ -1807,11 +1803,11 @@ describe('content-main', () => {
   describe('determine content process', () => {
     const func = mjs.determineContentProcess;
     beforeEach(() => {
-      mjs.vars[CONTEXT_NODE] = null;
+      mjs.vars.contextNode = null;
       mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
-      mjs.vars[CONTEXT_NODE] = null;
+      mjs.vars.contextNode = null;
       mjs.vars.port = null;
     });
 
@@ -1842,7 +1838,7 @@ describe('content-main', () => {
       const p = document.createElement('p');
       const body = document.querySelector('body');
       body.appendChild(p);
-      mjs.vars[CONTEXT_NODE] = p;
+      mjs.vars.contextNode = p;
       const res = await func();
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [
@@ -1862,7 +1858,7 @@ describe('content-main', () => {
       const p = document.createElement('p');
       const body = document.querySelector('body');
       body.appendChild(p);
-      mjs.vars[CONTEXT_NODE] = p;
+      mjs.vars.contextNode = p;
       const res = await func({
         info: {
           menuItemId: MODE_SOURCE
@@ -1880,7 +1876,7 @@ describe('content-main', () => {
       const text = document.createElement('textarea');
       const body = document.querySelector('body');
       body.appendChild(text);
-      mjs.vars[CONTEXT_NODE] = text;
+      mjs.vars.contextNode = text;
       const res = await func({
         info: {
           menuItemId: MODE_EDIT
@@ -2047,11 +2043,11 @@ describe('content-main', () => {
     const func = mjs.replaceEditableContent;
     beforeEach(() => {
       mjs.dataIds.clear();
-      mjs.vars[CONTEXT_NODE] = null;
+      mjs.vars.contextNode = null;
     });
     afterEach(() => {
       mjs.dataIds.clear();
-      mjs.vars[CONTEXT_NODE] = null;
+      mjs.vars.contextNode = null;
     });
 
     it('should not call function', () => {
@@ -2090,7 +2086,7 @@ describe('content-main', () => {
       const spy = sinon.spy(div, 'dispatchEvent');
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       func(div, {
         value: 'foo\n'
       });
@@ -2105,7 +2101,7 @@ describe('content-main', () => {
       stubEvt.returns(true);
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       func(div, {
         dataId: 'foo',
@@ -2128,7 +2124,7 @@ describe('content-main', () => {
       stubEvt.onSecondCall().returns(false);
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       func(div, {
         dataId: 'foo',
@@ -2144,7 +2140,7 @@ describe('content-main', () => {
       const spy = sinon.spy(div, 'dispatchEvent');
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {
         mutex: true
       });
@@ -2162,7 +2158,7 @@ describe('content-main', () => {
       const spy = sinon.spy(div, 'dispatchEvent');
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       func(div, {
         value: 'foo\nbar\n'
       });
@@ -2176,7 +2172,7 @@ describe('content-main', () => {
       const spy = sinon.spy(div, 'dispatchEvent');
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       func(div, {
         dataId: 'foo',
@@ -2197,7 +2193,7 @@ describe('content-main', () => {
       const spy = sinon.spy(div, 'dispatchEvent');
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       func(div, {
         dataId: 'foo',
@@ -2218,7 +2214,7 @@ describe('content-main', () => {
       const spy = sinon.spy(div, 'dispatchEvent');
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {
         mutex: true
       });
@@ -2239,7 +2235,7 @@ describe('content-main', () => {
       span.textContent = 'bar';
       div.appendChild(span);
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       func(div, {
         value: 'foo\n'
       });
@@ -2259,7 +2255,7 @@ describe('content-main', () => {
       span.textContent = 'bar';
       div.appendChild(span);
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       func(div, {
         dataId: 'foo',
@@ -2283,7 +2279,7 @@ describe('content-main', () => {
       span.textContent = 'bar';
       div.appendChild(span);
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {
         mutex: true
       });
@@ -2307,7 +2303,7 @@ describe('content-main', () => {
       span.textContent = 'bar';
       div.appendChild(span);
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       func(div, {
         value: 'foo\n'
       });
@@ -2327,7 +2323,7 @@ describe('content-main', () => {
       div.id = 'div';
       span.textContent = 'bar';
       div.appendChild(span);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       body.appendChild(div);
       func(span, {
@@ -2351,7 +2347,7 @@ describe('content-main', () => {
       div.id = 'div';
       span.textContent = 'bar';
       div.appendChild(span);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {
         mutex: true
       });
@@ -2375,7 +2371,7 @@ describe('content-main', () => {
       stub.onCall(0).returns(false);
       const body = document.querySelector('body');
       body.appendChild(div);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       func(div, {
         dataId: 'foo',
@@ -2395,7 +2391,7 @@ describe('content-main', () => {
       div.id = 'div';
       span.textContent = 'bar';
       div.appendChild(span);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       body.appendChild(div);
       func(span, {
@@ -2421,7 +2417,7 @@ describe('content-main', () => {
       div.id = 'div';
       span.textContent = 'bar';
       div.appendChild(span);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       body.appendChild(div);
       func(span, {
@@ -2453,7 +2449,7 @@ describe('content-main', () => {
       div.id = 'div';
       span.textContent = 'bar';
       div.appendChild(span);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       body.appendChild(div);
       func(span, {
@@ -2483,7 +2479,7 @@ describe('content-main', () => {
       div.id = 'div';
       span.textContent = 'bar';
       div.appendChild(span);
-      mjs.vars[CONTEXT_NODE] = div;
+      mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       body.appendChild(div);
       func(span, {
@@ -2491,7 +2487,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\n'
       });
-      const {calledOnce: errorCalled} = stubError;
+      const { calledOnce: errorCalled } = stubError;
       stubError.restore();
       assert.isTrue(errorCalled, 'called');
       assert.strictEqual(spy.callCount, 3, 'called');
@@ -2912,12 +2908,12 @@ describe('content-main', () => {
     beforeEach(() => {
       mjs.dataIds.clear();
       mjs.vars[ID_TAB] = null;
-      mjs.vars[CONTEXT_NODE] = null;
+      mjs.vars.contextNode = null;
     });
     afterEach(() => {
       mjs.dataIds.clear();
       mjs.vars[ID_TAB] = null;
-      mjs.vars[CONTEXT_NODE] = null;
+      mjs.vars.contextNode = null;
     });
 
     it('should get empty array', async () => {
@@ -3147,7 +3143,7 @@ describe('content-main', () => {
       }
       body.appendChild(elm);
       mjs.vars[ID_TAB] = '1';
-      mjs.vars[CONTEXT_NODE] = elm;
+      mjs.vars.contextNode = elm;
       const res = await func({
         data: {
           dataId: 'bar',
@@ -3171,7 +3167,7 @@ describe('content-main', () => {
       }
       body.appendChild(elm);
       mjs.vars[ID_TAB] = '1';
-      mjs.vars[CONTEXT_NODE] = elm;
+      mjs.vars.contextNode = elm;
       mjs.dataIds.set('bar', {});
       const res = await func({
         data: {
@@ -3196,7 +3192,7 @@ describe('content-main', () => {
       }
       body.appendChild(elm);
       mjs.vars[ID_TAB] = '1';
-      mjs.vars[CONTEXT_NODE] = elm;
+      mjs.vars.contextNode = elm;
       mjs.dataIds.set('bar', {
         mutex: true
       });
@@ -3226,7 +3222,7 @@ describe('content-main', () => {
       div.appendChild(elm);
       body.appendChild(div);
       mjs.vars[ID_TAB] = '1';
-      mjs.vars[CONTEXT_NODE] = elm;
+      mjs.vars.contextNode = elm;
       const res = await func({
         data: {
           dataId: 'bar',
@@ -3254,7 +3250,7 @@ describe('content-main', () => {
       div.appendChild(elm);
       body.appendChild(div);
       mjs.vars[ID_TAB] = '1';
-      mjs.vars[CONTEXT_NODE] = elm;
+      mjs.vars.contextNode = elm;
       mjs.dataIds.set('bar', {});
       const res = await func({
         data: {
@@ -3283,7 +3279,7 @@ describe('content-main', () => {
       div.appendChild(elm);
       body.appendChild(div);
       mjs.vars[ID_TAB] = '1';
-      mjs.vars[CONTEXT_NODE] = elm;
+      mjs.vars.contextNode = elm;
       mjs.dataIds.set('bar', {
         mutex: true
       });
@@ -3382,8 +3378,6 @@ describe('content-main', () => {
     const func = mjs.handlePortMsg;
     beforeEach(() => {
       mjs.dataIds.clear();
-      mjs.vars[CONTEXT_MODE] = null;
-      mjs.vars[CONTEXT_NODE] = null;
       mjs.vars[ID_TAB] = '';
       mjs.vars[ID_WIN] = '';
       mjs.vars[INCOGNITO] = false;
@@ -3391,14 +3385,14 @@ describe('content-main', () => {
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars[SYNC_AUTO] = false;
       mjs.vars[SYNC_AUTO_URL] = null;
+      mjs.vars.contextMode = null;
+      mjs.vars.contextNode = null;
       mjs.vars.port = mockPort({ name: PORT_CONTENT });
       delete mjs.vars.keyCtrlA.ctrlKey;
       delete mjs.vars.keyCtrlA.metaKey;
     });
     afterEach(() => {
       mjs.dataIds.clear();
-      mjs.vars[CONTEXT_MODE] = null;
-      mjs.vars[CONTEXT_NODE] = null;
       mjs.vars[ID_TAB] = '';
       mjs.vars[ID_WIN] = '';
       mjs.vars[INCOGNITO] = false;
@@ -3406,6 +3400,8 @@ describe('content-main', () => {
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars[SYNC_AUTO] = false;
       mjs.vars[SYNC_AUTO_URL] = null;
+      mjs.vars.contextMode = null;
+      mjs.vars.contextNode = null;
       mjs.vars.port = null;
       delete mjs.vars.keyCtrlA.ctrlKey;
       delete mjs.vars.keyCtrlA.metaKey;
@@ -3816,15 +3812,15 @@ describe('content-main', () => {
   describe('handle before contextmenu event', () => {
     const func = mjs.handleBeforeContextMenu;
     beforeEach(() => {
-      mjs.vars[CONTEXT_MODE] = null;
-      mjs.vars[CONTEXT_NODE] = null;
       mjs.vars[ONLY_EDITABLE] = false;
+      mjs.vars.contextMode = null;
+      mjs.vars.contextNode = null;
       mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
-      mjs.vars[CONTEXT_MODE] = null;
-      mjs.vars[CONTEXT_NODE] = null;
       mjs.vars[ONLY_EDITABLE] = false;
+      mjs.vars.contextMode = null;
+      mjs.vars.contextNode = null;
       mjs.vars.port = null;
     });
 
@@ -3855,8 +3851,8 @@ describe('content-main', () => {
         button: 2
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -3869,8 +3865,8 @@ describe('content-main', () => {
         button: 2
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.isNull(mjs.vars[CONTEXT_NODE], 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -3882,8 +3878,8 @@ describe('content-main', () => {
         key: 'ContextMenu'
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -3896,8 +3892,8 @@ describe('content-main', () => {
         shiftKey: true
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -3912,8 +3908,8 @@ describe('content-main', () => {
         button: 2
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_MATHML, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_MATHML, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -3928,8 +3924,8 @@ describe('content-main', () => {
         button: 2
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SVG, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SVG, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -3943,8 +3939,8 @@ describe('content-main', () => {
         button: 2
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -3964,8 +3960,8 @@ describe('content-main', () => {
         button: 2
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -3981,8 +3977,8 @@ describe('content-main', () => {
         button: 2
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
   });
@@ -3990,22 +3986,22 @@ describe('content-main', () => {
   describe('handle keydown event', () => {
     const func = mjs.handleKeyDown;
     beforeEach(() => {
-      mjs.vars[CONTEXT_MODE] = null;
-      mjs.vars[CONTEXT_NODE] = null;
       mjs.vars[ONLY_EDITABLE] = false;
+      mjs.vars.contextMode = null;
+      mjs.vars.contextNode = null;
       mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
-      mjs.vars[CONTEXT_MODE] = null;
-      mjs.vars[CONTEXT_NODE] = null;
       mjs.vars[ONLY_EDITABLE] = false;
+      mjs.vars.contextMode = null;
+      mjs.vars.contextNode = null;
       mjs.vars.port = null;
     });
 
     it('should not set values', async () => {
       const res = await func({});
-      assert.isNull(mjs.vars[CONTEXT_NODE], 'node');
-      assert.isNull(mjs.vars[CONTEXT_MODE], 'mode');
+      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.isNull(mjs.vars.contextMode, 'mode');
       assert.isNull(res, 'result');
     });
 
@@ -4017,8 +4013,8 @@ describe('content-main', () => {
         key: 'ContextMenu'
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -4031,8 +4027,8 @@ describe('content-main', () => {
         key: 'ContextMenu'
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.isNull(mjs.vars[CONTEXT_NODE], 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -4045,8 +4041,8 @@ describe('content-main', () => {
         shiftKey: true
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -4060,8 +4056,8 @@ describe('content-main', () => {
         shiftKey: true
       });
       assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.isNull(mjs.vars[CONTEXT_NODE], 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isUndefined(res, 'result');
     });
 
@@ -4070,8 +4066,8 @@ describe('content-main', () => {
       const res = await func({
         target
       });
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isNull(res, 'result');
     });
 
@@ -4081,8 +4077,8 @@ describe('content-main', () => {
       const res = await func({
         target
       });
-      assert.isNull(mjs.vars[CONTEXT_NODE], 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isNull(res, 'result');
     });
 
@@ -4094,8 +4090,8 @@ describe('content-main', () => {
       const res = await func({
         target
       });
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_MATHML, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_MATHML, 'mode');
       assert.isNull(res, 'result');
     });
 
@@ -4107,8 +4103,8 @@ describe('content-main', () => {
       const res = await func({
         target
       });
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SVG, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SVG, 'mode');
       assert.isNull(res, 'result');
     });
 
@@ -4119,8 +4115,8 @@ describe('content-main', () => {
       const res = await func({
         target
       });
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_EDIT, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_EDIT, 'mode');
       assert.isNull(res, 'result');
     });
 
@@ -4133,8 +4129,8 @@ describe('content-main', () => {
       const res = await func({
         target
       });
-      assert.deepEqual(mjs.vars[CONTEXT_NODE], target, 'node');
-      assert.strictEqual(mjs.vars[CONTEXT_MODE], MODE_SOURCE, 'mode');
+      assert.deepEqual(mjs.vars.contextNode, target, 'node');
+      assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.isNull(res, 'result');
     });
   });

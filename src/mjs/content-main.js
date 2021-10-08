@@ -13,8 +13,8 @@ import {
 import {
   createParagraphedContent, createDomStringFromSelectionRange,
   createXmlBasedDomString, getAncestorId, getEditableElm, getFileExtension,
-  getFileNameFromURI, getNodeNS, getText,
-  isContentTextNode, isEditControl, matchDocUrl, serializeDomString
+  getFileNameFromURI, getNodeNS, getText, isContentTextNode, isEditControl,
+  matchDocUrl, serializeDomString
 } from './dom-util.js';
 import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
@@ -22,9 +22,10 @@ import liveEdit, {
 import nsURI from './ns-uri.js';
 import {
   CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_MAC, INCOGNITO, LABEL,
-  LOCAL_FILE_VIEW, MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
+  LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN,
+  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
   MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
-  ONLY_EDITABLE, PORT_CONNECT, PORT_CONTENT, SYNC_AUTO, SYNC_AUTO_URL,
+  ONLY_EDITABLE, PORT_CONNECT, PORT_CONTENT, SUBST, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILES, TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
   TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
 } from './constant.js';
@@ -32,20 +33,13 @@ import {
 const { runtime } = browser;
 
 /* constants */
-const CONTEXT_MODE = 'contextMode';
-const CONTEXT_NODE = 'contextNode';
 const FILE_NOT_FOUND_TIMESTAMP = -1;
 const KEY_CODE_A = 65;
 const KEY_CODE_BS = 8;
-const MIME_HTML = 'text/html';
-const MIME_PLAIN = 'text/plain';
 const MOUSE_BUTTON_RIGHT = 2;
-const SUBST = 'index';
 
 /* variables */
 export const vars = {
-  [CONTEXT_MODE]: null,
-  [CONTEXT_NODE]: null,
   [ID_TAB]: '',
   [ID_WIN]: '',
   [INCOGNITO]: false,
@@ -53,6 +47,8 @@ export const vars = {
   [ONLY_EDITABLE]: false,
   [SYNC_AUTO]: false,
   [SYNC_AUTO_URL]: null,
+  contextMode: null,
+  contextNode: null,
   keyBackSpace: {
     code: 'Backspace',
     key: 'Backspace',
@@ -744,11 +740,11 @@ export const getContextMode = elm => {
 export const determineContentProcess = (obj = {}) => {
   const { info } = obj;
   const isTop = window.top === window.self;
-  const elm = vars[CONTEXT_NODE] || (isTop && document.activeElement);
+  const elm = vars.contextNode || (isTop && document.activeElement);
   let mode;
   if (info) {
     const { menuItemId } = info;
-    mode = (menuItemId !== MODE_SOURCE && menuItemId) || vars[CONTEXT_MODE] ||
+    mode = (menuItemId !== MODE_SOURCE && menuItemId) || vars.contextMode ||
            (isTop && MODE_SOURCE);
   } else {
     mode = getContextMode(elm);
@@ -1230,15 +1226,15 @@ export const handleBeforeContextMenu = evt => {
       enabled = isCollapsed || !!liveEditElm || !!editableElm ||
                 anchorNode.parentNode === focusNode.parentNode;
     }
-    vars[CONTEXT_MODE] = mode;
+    vars.contextMode = mode;
     if (liveEditElm) {
-      vars[CONTEXT_NODE] =
+      vars.contextNode =
         (isHtml && liveEditElm) || (isChildNodeText && target) || null;
     } else if (editableElm) {
-      vars[CONTEXT_NODE] =
+      vars.contextNode =
         (isHtml && editableElm) || (isChildNodeText && target) || null;
     } else {
-      vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] ? target : null;
+      vars.contextNode = !vars[ONLY_EDITABLE] ? target : null;
     }
     func = postMsg({
       [CONTEXT_MENU]: {
@@ -1274,15 +1270,15 @@ export const handleKeyDown = evt => {
     const editableElm = getEditableElm(target);
     const liveEditElm = getLiveEditElement(target);
     const isHtml = !namespaceURI || namespaceURI === nsURI.html;
-    vars[CONTEXT_MODE] = mode;
+    vars.contextMode = mode;
     if (liveEditElm) {
-      vars[CONTEXT_NODE] =
+      vars.contextNode =
         (isHtml && liveEditElm) || (isChildNodeText && target) || null;
     } else if (editableElm) {
-      vars[CONTEXT_NODE] =
+      vars.contextNode =
         (isHtml && editableElm) || (isChildNodeText && target) || null;
     } else {
-      vars[CONTEXT_NODE] = !vars[ONLY_EDITABLE] ? target : null;
+      vars.contextNode = !vars[ONLY_EDITABLE] ? target : null;
     }
   }
   return func || null;
