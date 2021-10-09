@@ -101,7 +101,7 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 ### Automatically Synchronize Edited Content On Specific Sites
 
 * Enable this option if you want to automatically synchronize edited content.
-* Note that this option will not be enabled when private browsing. Also note that if you leave your browser running for a long time or register many URLs, it may affect the performance of the PC.
+* Note that this option is disabled during private browsing.
 
 ### Reload withExEditor
 
