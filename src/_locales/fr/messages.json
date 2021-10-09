@@ -206,7 +206,7 @@
     "message": "Synchroniser automatiquement le contenu édité sur des sites spécifiques."
   },
   "optionsHostConnectionDetail": {
-    "message": "Si le statut est \"Déconnecté\" ou \"Inconnu\" au lieu de \"Connecté\", rechargez avec ExEditor."
+    "message": "Si le statut est \"Déconnecté\" ou \"Inconnu\" au lieu de \"Connecté\", rechargez l'extension."
   },
   "optionsHostConnectionLabel": {
     "message": "Connection hôte"
@@ -305,7 +305,7 @@
     "message": "Statut de l'éditeur"
   },
   "optionsIsExecutableDetail": {
-    "message": "Si le statut est \"Non exécutable\" ou \"Inconnu\" au lieu de \"Exécutable\", exécutez le script d'installation sur l'hôte."
+    "message": "Si le statut est \"Non exécutable\" ou \"Inconnu\" au lieu de \"Exécutable\", exécutez le script d'installation de l'éditeur sur l'hôte."
   },
   "optionsNotifyHostError": {
     "message": "Notifier les érreures d'hôte"
