@@ -39,10 +39,10 @@
     "message": "Compatible"
   },
   "isExecutable_false": {
-    "message": "Not Executable"
+    "message": "Non exécutable"
   },
   "isExecutable_true": {
-    "message": "Executable"
+    "message": "Exécutable"
   },
   "modeEditText": {
     "message": "Editer Text avec $LABEL$",
@@ -67,7 +67,7 @@
     }
   },
   "modeEditTextFileExtension": {
-    "message": "Save as $FILEEXT$",
+    "message": "Enregistrer sous $FILEEXT$",
     "placeholders": {
       "fileext": {
         "content": "$1",
@@ -76,7 +76,7 @@
     }
   },
   "modeEditTextFileExtension_key": {
-    "message": "Save as $FILEEXT$",
+    "message": "Enregistrer sous $FILEEXT$",
     "placeholders": {
       "fileext": {
         "content": "$1",
@@ -173,7 +173,7 @@
     }
   },
   "optionsEditTextSettings": {
-    "message": "Edit Text"
+    "message": "Éditer Text"
   },
   "optionsEditorLabel": {
     "message": ""
@@ -191,40 +191,40 @@
     "message": "Editer Label"
   },
   "optionsEnableOnlyEditableDetail": {
-    "message": "Enable this option if you want to use this extension only when the content is editable."
+    "message": "Activez cette option si vous souhaitez utiliser cette extension uniquement lorsque le contenu est modifiable."
   },
   "optionsEnableOnlyEditableLabel": {
     "message": "Activer uniquement lors de l'édition de texte"
   },
   "optionsEnableSyncAutoDetail": {
-    "message": "Enable this option if you want to automatically synchronize edited content."
+    "message": "Activez cette option si vous souhaitez synchroniser automatiquement le contenu édité."
   },
   "optionsEnableSyncAutoDetail2": {
-    "message": "Note that this option is disabled during private browsing."
+    "message": "Notez que cette option est désactivée pendant la navigation privée."
   },
   "optionsEnableSyncAutoLabel": {
     "message": "Synchroniser automatiquement le contenu édité sur des sites spécifiques."
   },
   "optionsHostConnectionDetail": {
-    "message": "If the status is \"Disconnected\" or \"Unknown\" instead of \"Connected\", reload withExEditor."
+    "message": "Si le statut est \"Déconnecté\" ou \"Inconnu\" au lieu de \"Connecté\", rechargez avec ExEditor."
   },
   "optionsHostConnectionLabel": {
     "message": "Connection hôte"
   },
   "optionsHostInfoDetail": {
-    "message": "Notifies when the latest version of the host is available."
+    "message": "Avertit lorsque la dernière version de l'hôte est disponible."
   },
   "optionsHostInfoDetail2": {
-    "message": "If you are using a binary host, get the latest version from the link. If you are using the npm version, update with the command \"npm i -g withexeditorhost\"."
+    "message": "Si vous utilisez un hôte binaire, obtenez la dernière version à partir du lien. Si vous utilisez le package npm, mettez à jour avec la commande \"npm i -g withexeditorhost\"."
   },
   "optionsHostStatus": {
     "message": "Hôte"
   },
   "optionsHostVersionCompatDetail": {
-    "message": "If the status is \"Incompatible\" or \"Unknown\" instead of \"Compatible\", update the host."
+    "message": "Si le statut est \"Incompatible\" ou \"Inconnu\" au lieu de \"Compatible\", mettez à jour l'hôte."
   },
   "optionsHostVersionCompatLabel": {
-    "message": "Host Compatibility"
+    "message": "Compatibilité hôte"
   },
   "optionsIconAuto": {
     "message": "Auto"
@@ -302,16 +302,16 @@
     "message": "Icone blanche"
   },
   "optionsIsExecutable": {
-    "message": "Editor State"
+    "message": "Statut de l'éditeur"
   },
   "optionsIsExecutableDetail": {
-    "message": "If the status is \"Not Executable\" or \"Unknown\" instead of \"Executable\", run the setup script on the host."
+    "message": "Si le statut est \"Non exécutable\" ou \"Inconnu\" au lieu de \"Exécutable\", exécutez le script d'installation sur l'hôte."
   },
   "optionsNotifyHostError": {
     "message": "Notifier les érreures d'hôte"
   },
   "optionsNotifyHostErrorDetail": {
-    "message": "Enable this option if you want to be notified when a host fails."
+    "message": "Activez cette option si vous souhaitez être averti en cas de défaillance d'un hôte."
   },
   "optionsOtherSettings": {
     "message": "Autres réglages"
@@ -329,13 +329,13 @@
     "message": "Sauvegarder"
   },
   "optionsSelectFileExtension": {
-    "message": "Select File Extension When Saving Temporary Files"
+    "message": "Sélectionnez le type de fichier lors de l'enregistrement des fichiers temporaires"
   },
   "optionsSelectFileExtensionDetail": {
-    "message": "Add context menu items for selecting a temporary file extension."
+    "message": "Ajoute des éléments de menu contextuel pour sélectionner une extension de fichier temporaire."
   },
   "optionsSyncAutoUrlLabel": {
-    "message": "Sites (Entrer une URL par ligne)"
+    "message": "Sites (Entrer une URL par ligne):"
   },
   "optionsTitle": {
     "message": "Options withExEditor"

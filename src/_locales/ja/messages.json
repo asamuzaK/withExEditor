@@ -206,7 +206,7 @@
     "message": "特定のサイトでは編集したコンテンツを自動的に同期する"
   },
   "optionsHostConnectionDetail": {
-    "message": "状態が「接続」ではなく「未接続」や「不明」となっている場合は、withExEditor を再読み込みしてください。"
+    "message": "状態が「接続」ではなく「未接続」や「不明」となっている場合は、拡張機能を再読み込みしてください。"
   },
   "optionsHostConnectionLabel": {
     "message": "ホストの接続状態"
@@ -215,7 +215,7 @@
     "message": "ホストの最新版が出た場合に通知します。"
   },
   "optionsHostInfoDetail2": {
-    "message": "バイナリのホストを使用している場合はリンク先から最新版を入手してください。npm版を使っている場合はコマンド「npm i -g withexeditorhost」でアップデートしてください。"
+    "message": "バイナリのホストを使用している場合は、リンクから最新バージョンを入手してください。 npmパッケージを使用している場合は、コマンド「npm i -gwithexeditorhost」で更新してください。"
   },
   "optionsHostStatus": {
     "message": "ホスト"
@@ -305,7 +305,7 @@
     "message": "エディタの状態"
   },
   "optionsIsExecutableDetail": {
-    "message": "状態が「実行可能」ではなく「不明」や「実行不可」となっている場合は、ホストでセットアップスクリプトを実行してください。"
+    "message": "状態が「実行可能」ではなく「実行不可」や「不明」となっている場合は、ホストでセットアップスクリプトを実行してください。"
   },
   "optionsNotifyHostError": {
     "message": "ホストのエラーを通知"
@@ -329,13 +329,13 @@
     "message": "保存"
   },
   "optionsSelectFileExtension": {
-    "message": "一時ファイルの保存時に拡張子を選択する"
+    "message": "一時ファイルの保存時にファイルの種類を選択する"
   },
   "optionsSelectFileExtensionDetail": {
     "message": "一時ファイルの拡張子を選択するためのコンテキストメニュー項目を追加します。"
   },
   "optionsSyncAutoUrlLabel": {
-    "message": "同期するサイト（1行ごとにURLを入力）"
+    "message": "同期するサイト（1行ごとにURLを入力）："
   },
   "optionsTitle": {
     "message": "withExEditor 設定"

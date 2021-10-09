@@ -39,10 +39,10 @@
     "message": "兼容"
   },
   "isExecutable_false": {
-    "message": "Not Executable"
+    "message": "不可执行"
   },
   "isExecutable_true": {
-    "message": "Executable"
+    "message": "可执行"
   },
   "modeEditText": {
     "message": "使用 $LABEL$ 编辑文本",
@@ -67,7 +67,7 @@
     }
   },
   "modeEditTextFileExtension": {
-    "message": "Save as $FILEEXT$",
+    "message": "另存为 $FILEEXT$",
     "placeholders": {
       "fileext": {
         "content": "$1",
@@ -76,7 +76,7 @@
     }
   },
   "modeEditTextFileExtension_key": {
-    "message": "Save as $FILEEXT$",
+    "message": "另存为 $FILEEXT$",
     "placeholders": {
       "fileext": {
         "content": "$1",
@@ -173,7 +173,7 @@
     }
   },
   "optionsEditTextSettings": {
-    "message": "Edit Text"
+    "message": "编辑文本"
   },
   "optionsEditorLabel": {
     "message": ""
@@ -191,40 +191,40 @@
     "message": "编辑器名称"
   },
   "optionsEnableOnlyEditableDetail": {
-    "message": "Enable this option if you want to use this extension only when the content is editable."
+    "message": "如果您只想在内容可编辑时使用此扩展程序，请启用此选项。"
   },
   "optionsEnableOnlyEditableLabel": {
     "message": "只在编辑文本时启用"
   },
   "optionsEnableSyncAutoDetail": {
-    "message": "Enable this option if you want to automatically synchronize edited content."
+    "message": "如果要自动同步编辑的内容，请启用此选项。"
   },
   "optionsEnableSyncAutoDetail2": {
-    "message": "Note that this option is disabled during private browsing."
+    "message": "请注意，此选项在隐私浏览期间被禁用。"
   },
   "optionsEnableSyncAutoLabel": {
     "message": "在特定站点上自动同步已编辑的内容"
   },
   "optionsHostConnectionDetail": {
-    "message": "If the status is \"Disconnected\" or \"Unknown\" instead of \"Connected\", reload withExEditor."
+    "message": "如果状态是“断开连接”或“未知”而不是“连接”，请重新加载扩展。"
   },
   "optionsHostConnectionLabel": {
     "message": "主机连接"
   },
   "optionsHostInfoDetail": {
-    "message": "Notifies when the latest version of the host is available."
+    "message": "当最新版本的主机可用时通知。"
   },
   "optionsHostInfoDetail2": {
-    "message": "If you are using a binary host, get the latest version from the link. If you are using the npm version, update with the command \"npm i -g withexeditorhost\"."
+    "message": "如果您使用的是二进制主机，请从链接获取最新版本。如果您使用的是 npm 包，请使用命令 \"npm i -g withexeditorhost\" 进行更新。"
   },
   "optionsHostStatus": {
     "message": "主机"
   },
   "optionsHostVersionCompatDetail": {
-    "message": "If the status is \"Incompatible\" or \"Unknown\" instead of \"Compatible\", update the host."
+    "message": "如果状态为“不兼容”或“未知”而不是“兼容”，请更新主机。"
   },
   "optionsHostVersionCompatLabel": {
-    "message": "Host Compatibility"
+    "message": "主机兼容性"
   },
   "optionsIconAuto": {
     "message": "自动"
@@ -305,13 +305,13 @@
     "message": "Editor State"
   },
   "optionsIsExecutableDetail": {
-    "message": "If the status is \"Not Executable\" or \"Unknown\" instead of \"Executable\", run the setup script on the host."
+    "message": "如果状态为“不可执行”或“未知”而不是“可执行”，请在主机上运行安装脚本。"
   },
   "optionsNotifyHostError": {
     "message": "通知主机错误"
   },
   "optionsNotifyHostErrorDetail": {
-    "message": "Enable this option if you want to be notified when a host fails."
+    "message": "如果您希望在主机出现故障时收到通知，请启用此选项。"
   },
   "optionsOtherSettings": {
     "message": "其他设置"
@@ -329,13 +329,13 @@
     "message": "保存"
   },
   "optionsSelectFileExtension": {
-    "message": "Select File Extension When Saving Temporary Files"
+    "message": "保存临时文件时选择文件类型"
   },
   "optionsSelectFileExtensionDetail": {
-    "message": "Add context menu items for selecting a temporary file extension."
+    "message": "添加用于选择临时文件扩展名的上下文菜单项。"
   },
   "optionsSyncAutoUrlLabel": {
-    "message": "站点（每行输入一条网址）"
+    "message": "站点（每行输入一条网址）："
   },
   "optionsTitle": {
     "message": "withExEditor 选项"

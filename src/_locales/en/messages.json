@@ -206,7 +206,7 @@
     "message": "Automatically Synchronize Edited Content On Specific Sites"
   },
   "optionsHostConnectionDetail": {
-    "message": "If the status is \"Disconnected\" or \"Unknown\" instead of \"Connected\", reload withExEditor."
+    "message": "If the status is \"Disconnected\" or \"Unknown\" instead of \"Connected\", reload the extension."
   },
   "optionsHostConnectionLabel": {
     "message": "Host Connection"
@@ -215,7 +215,7 @@
     "message": "Notifies when the latest version of the host is available."
   },
   "optionsHostInfoDetail2": {
-    "message": "If you are using a binary host, get the latest version from the link. If you are using the npm version, update with the command \"npm i -g withexeditorhost\"."
+    "message": "If you are using a binary host, get the latest version from the link. If you are using the npm package, update with the command \"npm i -g withexeditorhost\"."
   },
   "optionsHostStatus": {
     "message": "Host"
@@ -329,13 +329,13 @@
     "message": "Save"
   },
   "optionsSelectFileExtension": {
-    "message": "Select File Extension When Saving Temporary Files"
+    "message": "Select File Type When Saving Temporary Files"
   },
   "optionsSelectFileExtensionDetail": {
     "message": "Add context menu items for selecting a temporary file extension."
   },
   "optionsSyncAutoUrlLabel": {
-    "message": "Sites (Enter URL Per Line)"
+    "message": "Sites (Enter URL Per Line):"
   },
   "optionsTitle": {
     "message": "withExEditor Options"
