@@ -82,7 +82,7 @@
           </legend>
           <div>
             <p>
-              <span class="label">
+              <span class="label" aria-details="hostInfoDetail">
                 <a href="https://github.com/asamuzaK/withExEditorHost">
                   withExEditorHost
                 </a>
@@ -90,6 +90,17 @@
               <span id="hostLatestVersion">
               </span>
             </p>
+            <details id="hostInfoDetail">
+              <div>
+                <p data-i18n="optionsHostInfoDetail">
+                  Notifies when the latest version of the host is available.
+                </p>
+                <p data-i18n="optionsHostInfoDetail2">
+                  If you are using a binary host, get the latest version from the link.
+                  If you are using the npm package, update with the command "npm i -g withexeditorhost".
+                </p>
+              </div>
+            </details>
             <p>
               <span class="label" data-i18n="optionsHostConnectionLabel"
                     aria-details="hostConnectionDetail">
@@ -102,25 +113,25 @@
             <details id="hostConnectionDetail">
               <div>
                 <p data-i18n="optionsHostConnectionDetail">
-                  If "Unknown" or "Disconnected", reload withExEditor.
+                  If the status is "Disconnected" or "Unknown" instead of "Connected", reload withExEditor.
                 </p>
               </div>
             </details>
           </div>
           <div>
             <p>
-              <span class="label" data-i18n="optionsHostVersionLabel"
-                    aria-details="hostVersionDetail">
-                Host Version
+              <span class="label" data-i18n="optionsHostVersionCompatLabel"
+                    aria-details="hostVersionCompatDetail">
+                Host Compatibility
               </span>
-              <span id="hostVersion" class="status warn">
+              <span id="hostVersionCompat" class="status warn">
                 Unknown
               </span>
             </p>
-            <details id="hostVersionDetail">
+            <details id="hostVersionCompatDetail">
               <div>
-                <p data-i18n="optionsHostVersionDetail">
-                  If "Unknown" or "Incompatible", update the host.
+                <p data-i18n="optionsHostVersionCompatDetail">
+                  If the status is "Incompatible" or "Unknown" instead of "Compatible", update the host.
                 </p>
               </div>
             </details>
@@ -138,7 +149,7 @@
             <details id="isExecutableDetail">
               <div>
                 <p data-i18n="optionsIsExecutableDetail">
-                  If "Unknown" or "Not Executable", run the setup script on the host.
+                  If the status is "Not Executable" or "Unknown" instead of "Executable", run the setup script on the host.
                 </p>
               </div>
             </details>
@@ -178,7 +189,7 @@
             <details id="notifyHostErrorDetail">
               <div>
                 <p data-i18n="optionsNotifyHostErrorDetail">
-                  Notify when an error occurs on the host.
+                  Enable this option if you want to be notified when a host fails.
                 </p>
               </div>
             </details>
@@ -200,7 +211,7 @@
             <details id="enableOnlyEditableDetail">
               <div>
                 <p data-i18n="optionsEnableOnlyEditableDetail">
-                  Enables only when the content is editable.
+                  Enable this option if you want to use this extension only when the content is editable.
                 </p>
               </div>
             </details>
@@ -211,7 +222,7 @@
               <label for="selectFileExtension" class="checkboxLabel"
                      data-i18n="optionsSelectFileExtension"
                      aria-details="selectFileExtensionDetail">
-                Select File Extension When Saving Temporary Files
+                Select File Format When Saving Temporary Files
               </label>
               <span class="sub-item">
                 <input type="checkbox" id="selectTxtFileExtension" />
@@ -235,7 +246,7 @@
             <details id="selectFileExtensionDetail">
               <div>
                 <p data-i18n="optionsSelectFileExtensionDetail">
-                  Add context menu items for selecting a temporary file extension.
+                  Adds a context menu item for selecting a temporary file extension.
                 </p>
               </div>
             </details>
@@ -252,7 +263,7 @@
                 <label for="syncAutoUrls" class="label"
                        data-i18n="optionsSyncAutoUrlLabel"
                        aria-details="enableSyncAutoDetail">
-                  Sites (Enter URL Per Line)
+                  Sites (Enter URL Per Line):
                 </label>
                 <textarea id="syncAutoUrls"></textarea>
               </span>
@@ -260,10 +271,10 @@
             <details id="enableSyncAutoDetail">
               <div>
                 <p data-i18n="optionsEnableSyncAutoDetail">
-                  Enable when you want to automatically synchronize edited content.
+                  Enable this option if you want to automatically synchronize edited content.
                 </p>
                 <p data-i18n="optionsEnableSyncAutoDetail2">
-                  Note that this option will not be enabled when private browsing.
+                  Note that this option is disabled during private browsing.
                   Also note that if you leave your browser running for a long time or register many URLs, it may affect the performance of the PC.
                 </p>
               </div>

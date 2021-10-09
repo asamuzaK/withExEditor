@@ -64,6 +64,23 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 * Choose the icon.
 
+### withExEditorHost
+
+* Notifies when the latest version of the host is available.
+* If you are using a binary host, get the latest version from [asamuzaK/withExEditorHost (GitHub)](https://github.com/asamuzaK/withExEditorHost "asamuzaK/withExEditorHost: Native messaging host for withExEditor"). If you are using the npm package, update with the command `npm i -g withexeditorhost`.
+
+### Host Connection
+
+* If the status is `Disconnected` or `Unknown` instead of `Connected`, reload withExEditor.
+
+### Host Compatibility
+
+* If the status is `Incompatible` or `Unknown` instead of `Compatible`, update the host.
+
+### Editor State
+
+* If the status is `Not Executable` or `Unknown` instead of `Executable`, run the setup script on the host.
+
 ### Editor Label
 
 * Enter the label of the editor.
@@ -71,15 +88,19 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 ### Notify Host Error
 
-* If enabled, notifies when an error occurs on the host.
+* Enable this option if you want to be notified when a host fails.
 
 ### Enable Only When Editing Text
 
-* Enables only when the content is editable.
+* Enable this option if you want to use this extension only when the content is editable.
+
+### Select File Format When Saving Temporary Files
+
+* Adds a context menu item for selecting a temporary file extension.
 
 ### Automatically Synchronize Edited Content On Specific Sites
 
-* Enable when you want to automatically synchronize edited content.
+* Enable this option if you want to automatically synchronize edited content.
 * Note that this option will not be enabled when private browsing. Also note that if you leave your browser running for a long time or register many URLs, it may affect the performance of the PC.
 
 ### Reload withExEditor

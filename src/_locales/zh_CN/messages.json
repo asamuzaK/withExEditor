@@ -24,7 +24,7 @@
     "message": "已连接"
   },
   "hostLatestVersion": {
-    "message": "New version $LATEST$ is available.",
+    "message": "新版本 $LATEST$ 可用。",
     "placeholders": {
       "latest": {
         "content": "$1",
@@ -191,34 +191,40 @@
     "message": "编辑器名称"
   },
   "optionsEnableOnlyEditableDetail": {
-    "message": "只在内容可编辑时启用。"
+    "message": "Enable this option if you want to use this extension only when the content is editable."
   },
   "optionsEnableOnlyEditableLabel": {
     "message": "只在编辑文本时启用"
   },
   "optionsEnableSyncAutoDetail": {
-    "message": "如果您想自动同步已编辑的内容，启用此项。"
+    "message": "Enable this option if you want to automatically synchronize edited content."
   },
   "optionsEnableSyncAutoDetail2": {
-    "message": "请注意，隐私浏览模式下此选项无效，并且如果您的浏览器长时间运行或者注册较多网址，可能会使电脑卡顿。"
+    "message": "Note that this option is disabled during private browsing."
   },
   "optionsEnableSyncAutoLabel": {
     "message": "在特定站点上自动同步已编辑的内容"
   },
   "optionsHostConnectionDetail": {
-    "message": "如果为“未知”或“已断开”，重新加载 withExEditor。"
+    "message": "If the status is \"Disconnected\" or \"Unknown\" instead of \"Connected\", reload withExEditor."
   },
   "optionsHostConnectionLabel": {
     "message": "主机连接"
   },
+  "optionsHostInfoDetail": {
+    "message": "Notifies when the latest version of the host is available."
+  },
+  "optionsHostInfoDetail2": {
+    "message": "If you are using a binary host, get the latest version from the link. If you are using the npm version, update with the command \"npm i -g withexeditorhost\"."
+  },
   "optionsHostStatus": {
     "message": "主机"
   },
-  "optionsHostVersionDetail": {
-    "message": "如果为“未知”或“不兼容”，请更新主机。"
+  "optionsHostVersionCompatDetail": {
+    "message": "If the status is \"Incompatible\" or \"Unknown\" instead of \"Compatible\", update the host."
   },
-  "optionsHostVersionLabel": {
-    "message": "主机版本"
+  "optionsHostVersionCompatLabel": {
+    "message": "Host Compatibility"
   },
   "optionsIconAuto": {
     "message": "自动"
@@ -299,13 +305,13 @@
     "message": "Editor State"
   },
   "optionsIsExecutableDetail": {
-    "message": "If \"Unknown\" or \"Not Executable\", run the setup script on the host."
+    "message": "If the status is \"Not Executable\" or \"Unknown\" instead of \"Executable\", run the setup script on the host."
   },
   "optionsNotifyHostError": {
     "message": "通知主机错误"
   },
   "optionsNotifyHostErrorDetail": {
-    "message": "主机上发生错误时通知我。"
+    "message": "Enable this option if you want to be notified when a host fails."
   },
   "optionsOtherSettings": {
     "message": "其他设置"

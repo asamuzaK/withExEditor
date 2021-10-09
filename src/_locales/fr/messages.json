@@ -168,7 +168,7 @@
       },
       "key": {
         "content": "$2",
-        "example": "(&v)"
+        "example": "(&V)"
       }
     }
   },
@@ -191,34 +191,40 @@
     "message": "Editer Label"
   },
   "optionsEnableOnlyEditableDetail": {
-    "message": "Active uniquement lorsque le contenu est modifiable."
+    "message": "Enable this option if you want to use this extension only when the content is editable."
   },
   "optionsEnableOnlyEditableLabel": {
     "message": "Activer uniquement lors de l'édition de texte"
   },
   "optionsEnableSyncAutoDetail": {
-    "message": "Activer lorsce que vous voulez automatiquement synchroniser les éléments édités."
+    "message": "Enable this option if you want to automatically synchronize edited content."
   },
   "optionsEnableSyncAutoDetail2": {
-    "message": "Notez que cette option ne sera pas activée lors de la navigation privée. Notez également que si vous laissez tourner votre navigateur pendant une longue période ou si vous enregistrez de nombreuses URL, cela peut affecter les performances du PC."
+    "message": "Note that this option is disabled during private browsing."
   },
   "optionsEnableSyncAutoLabel": {
     "message": "Synchroniser automatiquement le contenu édité sur des sites spécifiques."
   },
   "optionsHostConnectionDetail": {
-    "message": "Si \"Inconnu\" or \"Déconnecté\", relancez withExEditor."
+    "message": "If the status is \"Disconnected\" or \"Unknown\" instead of \"Connected\", reload withExEditor."
   },
   "optionsHostConnectionLabel": {
     "message": "Connection hôte"
   },
+  "optionsHostInfoDetail": {
+    "message": "Notifies when the latest version of the host is available."
+  },
+  "optionsHostInfoDetail2": {
+    "message": "If you are using a binary host, get the latest version from the link. If you are using the npm version, update with the command \"npm i -g withexeditorhost\"."
+  },
   "optionsHostStatus": {
     "message": "Hôte"
   },
-  "optionsHostVersionDetail": {
-    "message": "Si \"Inconnu\" or \"Incompatible\", mettre à jour l'hôte."
+  "optionsHostVersionCompatDetail": {
+    "message": "If the status is \"Incompatible\" or \"Unknown\" instead of \"Compatible\", update the host."
   },
-  "optionsHostVersionLabel": {
-    "message": "Version de l'hôte"
+  "optionsHostVersionCompatLabel": {
+    "message": "Host Compatibility"
   },
   "optionsIconAuto": {
     "message": "Auto"
@@ -299,13 +305,13 @@
     "message": "Editor State"
   },
   "optionsIsExecutableDetail": {
-    "message": "If \"Unknown\" or \"Not Executable\", run the setup script on the host."
+    "message": "If the status is \"Not Executable\" or \"Unknown\" instead of \"Executable\", run the setup script on the host."
   },
   "optionsNotifyHostError": {
     "message": "Notifier les érreures d'hôte"
   },
   "optionsNotifyHostErrorDetail": {
-    "message": "Notifier lorsce qu'une erreure survient dans l'hôte."
+    "message": "Enable this option if you want to be notified when a host fails."
   },
   "optionsOtherSettings": {
     "message": "Autres réglages"
