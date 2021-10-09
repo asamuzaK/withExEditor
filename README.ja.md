@@ -67,7 +67,7 @@ withExEditorを使うには、エディタを起動するホストも用意す�
 ### withExEditorHost
 
 * ホストの最新版が入手可能になった場合に通知されます。
-* バイナリのホストを使用している場合は[asamuzaK/withExEditorHost (GitHub)](https://github.com/asamuzaK/withExEditorHost "asamuzaK/withExEditorHost: Native messaging host for withExEditor")から最新版を入手してください。npm版を使っている場合はコマンド `npm i -g withexeditorhost` でアップデートしてください。
+* バイナリのホストを使用している場合は、[asamuzaK/withExEditorHost (GitHub)](https://github.com/asamuzaK/withExEditorHost "asamuzaK/withExEditorHost: Native messaging host for withExEditor")から最新バージョンを入手してください。npmパッケージを使っている場合は、コマンド `npm i -g withexeditorhost` で更新してください。
 
 ### ホストの接続状態
 
