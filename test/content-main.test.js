@@ -4148,46 +4148,50 @@ describe('content-main', () => {
       assert.throws(() => func());
     });
 
-    it('should get null', () => {
-      const spy = sinon.spy(document, 'removeEventListener');
-      const evt = {
-        target: {
-          readyState: 'loading'
-        }
-      };
-      const res = func(evt);
-      assert.isFalse(spy.called, 'not called');
-      assert.isNull(res, 'result');
-      spy.restore();
+    it('should throw', () => {
+      assert.throws(() => func({}));
     });
 
     it('should get null', () => {
-      const spy = sinon.spy(document, 'removeEventListener');
+      const stub = sinon.stub();
       const evt = {
         target: {
-          readyState: 'interactive'
+          readyState: 'loading',
+          removeEventListener: stub
         }
       };
       const res = func(evt);
-      assert.isFalse(spy.called, 'not called');
+      assert.isFalse(stub.called, 'not called');
       assert.isNull(res, 'result');
-      spy.restore();
+    });
+
+    it('should get null', () => {
+      const stub = sinon.stub();
+      const evt = {
+        target: {
+          readyState: 'interactive',
+          removeEventListener: stub
+        }
+      };
+      const res = func(evt);
+      assert.isFalse(stub.called, 'not called');
+      assert.isNull(res, 'result');
     });
 
     it('should call function', async () => {
       browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const spy = sinon.spy(document, 'removeEventListener');
+      const stub = sinon.stub();
       const evt = {
         target: {
-          readyState: 'complete'
+          readyState: 'complete',
+          removeEventListener: stub
         }
       };
       const res = await func(evt);
-      assert.isTrue(spy.called, 'called');
+      assert.isTrue(stub.called, 'called');
       assert.isObject(mjs.vars.port, 'port');
       assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
       assert.isUndefined(res, 'result');
-      spy.restore();
     });
   });
 });

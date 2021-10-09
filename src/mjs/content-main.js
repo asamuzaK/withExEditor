@@ -33,6 +33,7 @@ import {
 const { runtime } = browser;
 
 /* constants */
+const EDIT_MENU = [MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT];
 const FILE_NOT_FOUND_TIMESTAMP = -1;
 const KEY_CODE_A = 65;
 const KEY_CODE_BS = 8;
@@ -212,10 +213,6 @@ export const createIdData = elm => {
 };
 
 /* temporary file data */
-export const editTextMenuItems = new Set([
-  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT
-]);
-
 /**
  * set temporary file data
  *
@@ -227,7 +224,7 @@ export const setTmpFileData = (data = {}) => {
   let func;
   if (tmpFileData) {
     const { dataId, mode } = tmpFileData;
-    if (editTextMenuItems.has(mode) && dataId) {
+    if (EDIT_MENU.includes(mode) && dataId) {
       func = setDataId(dataId, tmpFileData);
     }
   }
@@ -245,7 +242,7 @@ export const updateTmpFileData = (obj = {}) => {
   let func;
   if (data) {
     const { dataId, mode } = data;
-    if (editTextMenuItems.has(mode) && dataId) {
+    if (EDIT_MENU.includes(mode) && dataId) {
       func = setDataId(dataId, data);
     }
   }
@@ -441,7 +438,7 @@ export const createTmpFileData = async (data = {}) => {
 
 /* post messages */
 /**
- * post message
+ * post message to port
  *
  * @param {*} msg - message
  * @returns {void}
@@ -529,6 +526,7 @@ export const requestTmpFile = evt => {
   return Promise.all(func).catch(throwErr);
 };
 
+/* content data */
 /**
  * set data ID controller
  *
@@ -564,7 +562,6 @@ export const setDataIdController = (elm, dataId) => {
   }
 };
 
-/* content data */
 /**
  * create content data
  *
@@ -1168,6 +1165,7 @@ export const checkPort = async () => {
 /* startup */
 export const startup = () => checkPort().catch(throwErr);
 
+/* runtime */
 /**
  * handle message
  *
@@ -1285,17 +1283,16 @@ export const handleKeyDown = evt => {
 };
 
 /**
- * handle ready state
+ * handle readystatechange event
  *
  * @param {!object} evt - Event
- * @returns {?Function} - Promise chain
+ * @returns {?Function} - startup()
  */
 export const handleReadyState = evt => {
   const { target } = evt;
-  const { readyState } = target;
   let func;
-  if (readyState === 'complete') {
-    document.removeEventListener('readystatechange', handleReadyState);
+  if (target.readyState === 'complete') {
+    target.removeEventListener('readystatechange', handleReadyState);
     func = startup();
   }
   return func || null;
