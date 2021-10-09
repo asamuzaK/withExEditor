@@ -185,7 +185,7 @@
     "message": "Enter the label of the editor."
   },
   "optionsEditorLabelDetail2": {
-    "message": "If the input field is disabled, run the setup script on the host."
+    "message": "If the input field is disabled, you need to run the setup script on the host."
   },
   "optionsEditorLabelLabel": {
     "message": "Editor Label"
@@ -206,7 +206,7 @@
     "message": "Automatically Synchronize Edited Content On Specific Sites"
   },
   "optionsHostConnectionDetail": {
-    "message": "If the status is \"Disconnected\" or \"Unknown\" instead of \"Connected\", reload the extension."
+    "message": "If the status is \"Disconnected\" or \"Unknown\" instead of \"Connected\", you need to reload the extension."
   },
   "optionsHostConnectionLabel": {
     "message": "Host Connection"
@@ -221,7 +221,7 @@
     "message": "Host"
   },
   "optionsHostVersionCompatDetail": {
-    "message": "If the status is \"Incompatible\" or \"Unknown\" instead of \"Compatible\", update the host."
+    "message": "If the status is \"Incompatible\" or \"Unknown\" instead of \"Compatible\", you need to update the host."
   },
   "optionsHostVersionCompatLabel": {
     "message": "Host Compatibility"
@@ -305,7 +305,7 @@
     "message": "Editor State"
   },
   "optionsIsExecutableDetail": {
-    "message": "If the status is \"Not Executable\" or \"Unknown\" instead of \"Executable\", run the setup script on the host."
+    "message": "If the status is \"Not Executable\" or \"Unknown\" instead of \"Executable\", you need to run the setup script on the host."
   },
   "optionsNotifyHostError": {
     "message": "Notify Host Error"

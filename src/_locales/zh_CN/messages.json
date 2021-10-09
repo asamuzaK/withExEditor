@@ -185,7 +185,7 @@
     "message": "输入编辑器的名称。"
   },
   "optionsEditorLabelDetail2": {
-    "message": "如果该文本框为禁用状态，请在主机上运行安装脚本。"
+    "message": "如果输入字段被禁用，则需要在主机上运行设置脚本。"
   },
   "optionsEditorLabelLabel": {
     "message": "编辑器名称"
@@ -206,7 +206,7 @@
     "message": "在特定站点上自动同步已编辑的内容"
   },
   "optionsHostConnectionDetail": {
-    "message": "如果状态是“断开连接”或“未知”而不是“连接”，请重新加载扩展。"
+    "message": "如果状态是“断开连接”或“未知”而不是“连接”，则需要重新加载扩展。"
   },
   "optionsHostConnectionLabel": {
     "message": "主机连接"
@@ -221,7 +221,7 @@
     "message": "主机"
   },
   "optionsHostVersionCompatDetail": {
-    "message": "如果状态为“不兼容”或“未知”而不是“兼容”，请更新主机。"
+    "message": "如果状态为“不兼容”或“未知”而不是“兼容”，则需要更新主机。"
   },
   "optionsHostVersionCompatLabel": {
     "message": "主机兼容性"
@@ -305,7 +305,7 @@
     "message": "Editor State"
   },
   "optionsIsExecutableDetail": {
-    "message": "如果状态为“不可执行”或“未知”而不是“可执行”，请在主机上运行安装脚本。"
+    "message": "如果状态为“不可执行”或“未知”而不是“可执行”，则需要在主机上运行安装脚本。"
   },
   "optionsNotifyHostError": {
     "message": "通知主机错误"

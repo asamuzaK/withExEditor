@@ -71,20 +71,20 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 ### Host Connection
 
-* If the status is `Disconnected` or `Unknown` instead of `Connected`, reload withExEditor.
+* If the status is `Disconnected` or `Unknown` instead of `Connected`, you need to reload withExEditor.
 
 ### Host Compatibility
 
-* If the status is `Incompatible` or `Unknown` instead of `Compatible`, update the host.
+* If the status is `Incompatible` or `Unknown` instead of `Compatible`, you need to update the host.
 
 ### Editor State
 
-* If the status is `Not Executable` or `Unknown` instead of `Executable`, run the setup script on the host.
+* If the status is `Not Executable` or `Unknown` instead of `Executable`, you need to run the setup script on the host.
 
 ### Editor Label
 
 * Enter the label of the editor.
-* If the input field is disabled, run the setup script on the host.
+* If the input field is disabled, you need to run the setup script on the host.
 
 ### Notify Host Error
 
