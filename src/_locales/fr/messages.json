@@ -323,7 +323,7 @@
     "message": "Recharger withExEditor"
   },
   "optionsReloadExtensionDetail": {
-    "message": "Essayez quand avecExEditor cesse de fonctionner, par exemple lors de la mise à jour de Node.js ou de la mise à jour avecExEditorHost."
+    "message": "Essayez quand withExEditor cesse de fonctionner, par exemple lors de la mise à jour de Node.js ou de la mise à jour withExEditorHost."
   },
   "optionsSaveEditorSettings": {
     "message": "Sauvegarder"
