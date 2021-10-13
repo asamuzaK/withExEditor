@@ -2,7 +2,10 @@
  * ns-uri.js
  */
 
+export const html = 'http://www.w3.org/1999/xhtml';
+
 export default {
+  html,
   ag: 'http://purl.org/rss/1.0/modules/aggregation/',
   annotate: 'http://purl.org/rss/1.0/modules/annotate/',
   app: 'http://www.w3.org/2007/app',
@@ -29,7 +32,6 @@ export default {
   gr: 'http://purl.org/goodrelations/v1#',
   grddl: 'http://www.w3.org/2003/g/data-view#',
   ht: 'http://www.w3.org/2006/http#',
-  html: 'http://www.w3.org/1999/xhtml',
   ical: 'http://www.w3.org/2002/12/cal/icaltzd#',
   image: 'http://purl.org/rss/1.0/modules/image/',
   itms: 'http://phobos.apple.com/rss/1.0/modules/itms/',

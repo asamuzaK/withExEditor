@@ -5,7 +5,7 @@
 /* api */
 import { isString } from './common.js';
 import { getText, isEditControl } from './dom-util.js';
-import nsURI from './ns-uri.js';
+import { html as nsHtml } from './ns-uri.js';
 
 /* live editors */
 const liveEdit = {
@@ -75,7 +75,7 @@ export const getLiveEditElement = node => {
   let elm;
   while (node && node.parentNode && !elm) {
     const { classList, namespaceURI } = node;
-    const isHtml = !namespaceURI || namespaceURI === nsURI.html;
+    const isHtml = !namespaceURI || namespaceURI === nsHtml;
     if (isHtml) {
       for (const item of items) {
         const { className, getContent, isIframe, setContent } = item;
