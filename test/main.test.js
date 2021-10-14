@@ -1428,7 +1428,8 @@ describe('main', () => {
   describe('update context menu', () => {
     const func = mjs.updateContextMenu;
     beforeEach(() => {
-      const { varsLocal, vars } = mjs;
+      const { hostStatus, varsLocal, vars } = mjs;
+      hostStatus[HOST_COMPAT] = false;
       vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
@@ -1441,7 +1442,8 @@ describe('main', () => {
       browser.i18n.getMessage.callsFake((...args) => args.toString());
     });
     afterEach(() => {
-      const { varsLocal, vars } = mjs;
+      const { hostStatus, varsLocal, vars } = mjs;
+      hostStatus[HOST_COMPAT] = false;
       vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
@@ -1481,10 +1483,84 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const i = browser.menus.update.callCount;
+      const i = browser.menus.update.withArgs(MODE_EDIT, {
+        enabled: false
+      }).callCount;
+      const { hostStatus, varsLocal } = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      varsLocal[IS_EXECUTABLE] = false;
+      varsLocal[MENU_ENABLED] = false;
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
+        }
+      });
+      assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.menus.update.withArgs(MODE_EDIT, {
+        enabled: false
+      }).callCount;
+      const { hostStatus, varsLocal } = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      varsLocal[IS_EXECUTABLE] = false;
+      varsLocal[MENU_ENABLED] = true;
+      const res = await func({
+        [MODE_EDIT]: {
+          enabled: true
+        }
+      });
+      assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.menus.update.withArgs(MODE_EDIT, {
+        enabled: false
+      }).callCount;
+      const { hostStatus, varsLocal } = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      varsLocal[IS_EXECUTABLE] = true;
+      varsLocal[MENU_ENABLED] = true;
+      const res = await func({
+        [MODE_EDIT]: {
+          enabled: true
+        }
+      });
+      assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.menus.update.withArgs(MODE_EDIT, {
+        enabled: true
+      }).callCount;
+      const { hostStatus, varsLocal } = mjs;
+      hostStatus[HOST_COMPAT] = true;
+      varsLocal[IS_EXECUTABLE] = true;
+      varsLocal[MENU_ENABLED] = true;
+      const res = await func({
+        [MODE_EDIT]: {
+          enabled: true
+        }
+      });
+      assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.menus.update.withArgs(MODE_EDIT, {
+        enabled: false
+      }).callCount;
+      const { hostStatus, varsLocal } = mjs;
+      hostStatus[HOST_COMPAT] = true;
+      varsLocal[IS_EXECUTABLE] = true;
+      varsLocal[MENU_ENABLED] = true;
+      const res = await func({
+        [MODE_EDIT]: {
+          enabled: false
         }
       });
       assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
