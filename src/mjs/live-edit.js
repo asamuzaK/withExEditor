@@ -2,7 +2,7 @@
  * live-edit.js
  */
 
-/* api */
+/* shared */
 import { isString } from './common.js';
 import { getText, isEditControl } from './dom-util.js';
 import { html as nsHtml } from './ns-uri.js';

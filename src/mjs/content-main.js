@@ -2,6 +2,7 @@
  * content-main.js
  */
 
+/* shared */
 import {
   getType, isObjectNotEmpty, isString, logErr, throwErr
 } from './common.js';
@@ -30,6 +31,7 @@ import {
   TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
 } from './constant.js';
 
+/* api */
 const { runtime } = browser;
 
 /* constants */

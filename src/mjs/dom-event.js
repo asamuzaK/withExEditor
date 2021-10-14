@@ -2,6 +2,7 @@
  * dom-event.js
  */
 
+/* shared */
 import { isObjectNotEmpty, isString } from './common.js';
 
 /**

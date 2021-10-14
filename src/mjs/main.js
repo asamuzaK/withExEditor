@@ -49,6 +49,7 @@ export const vars = {
   [SYNC_AUTO_URL]: null
 };
 
+/* local variables */
 export const varsLocal = {
   [EDITOR_LABEL]: '',
   [FILE_EXT_SELECT]: false,
@@ -574,7 +575,7 @@ export const extractEditorConfig = async (data = {}) => {
   const editorLabel = store && store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
   const editorNewLabel = (editorFileName === editorName && editorLabel) ||
                          (executable && editorName) || '';
-  return Promise.all([
+  const func = [
     setStorage({
       [EDITOR_CONFIG_TS]: {
         id: EDITOR_CONFIG_TS,
@@ -612,7 +613,8 @@ export const extractEditorConfig = async (data = {}) => {
       recurse: true
     }),
     restoreContextMenu()
-  ]);
+  ];
+  return Promise.all(func);
 };
 
 /* extension */

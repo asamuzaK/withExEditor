@@ -2,6 +2,7 @@
  * dom-util.js
  */
 
+/* shared */
 import { getType, isString, logErr } from './common.js';
 import fileExt from './file-ext.js';
 import nsURI from './ns-uri.js';
