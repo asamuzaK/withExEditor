@@ -191,7 +191,7 @@
     "message": "Editor Label"
   },
   "optionsEnableOnlyEditableDetail": {
-    "message": "Enable this option if you want to use this extension only when the content is editable."
+    "message": "Enable this option if you want to use extension only when the content is editable."
   },
   "optionsEnableOnlyEditableLabel": {
     "message": "Enable Only When Editing Text"

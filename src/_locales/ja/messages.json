@@ -191,7 +191,7 @@
     "message": "エディタの表示名"
   },
   "optionsEnableOnlyEditableDetail": {
-    "message": "コンテンツが編集可能な場合にのみこの拡張機能を使用する場合は、このオプションを有効にしてください。"
+    "message": "コンテンツが編集可能な場合にのみ拡張機能を使用する場合は、このオプションを有効にしてください。"
   },
   "optionsEnableOnlyEditableLabel": {
     "message": "テキスト編集のみ有効化"
@@ -215,7 +215,7 @@
     "message": "ホストの最新版が出た場合に通知します。"
   },
   "optionsHostInfoDetail2": {
-    "message": "バイナリのホストを使用している場合は、リンクから最新バージョンを入手してください。 npmパッケージを使用している場合は、コマンド「npm i -gwithexeditorhost」で更新してください。"
+    "message": "バイナリのホストを使用している場合は、リンクから最新バージョンを入手してください。 npmパッケージを使用している場合は、コマンド「npm i -g withexeditorhost」で更新してください。"
   },
   "optionsHostStatus": {
     "message": "ホスト"
