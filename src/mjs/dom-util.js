@@ -5,7 +5,7 @@
 /* shared */
 import { getType, isString, logErr } from './common.js';
 import fileExt from './file-ext.js';
-import nsURI from './ns-uri.js';
+import nsURI, { html as nsHtml } from './ns-uri.js';
 import { MIME_HTML, MIME_PLAIN, SUBST } from './constant.js';
 
 /* constants */
@@ -236,7 +236,7 @@ export const createElement = node => {
   if (node && node.nodeType === Node.ELEMENT_NODE) {
     const { attributes, localName, namespaceURI, prefix } = node;
     const ns = namespaceURI || (prefix && nsURI[prefix]) ||
-               getNodeNS(node).namespaceURI || nsURI.html;
+               getNodeNS(node).namespaceURI || nsHtml;
     const name = prefix ? `${prefix}:${localName}` : localName;
     if (localName === 'script') {
       elm = null;
@@ -547,7 +547,7 @@ export const getAncestorId = elm => {
 export const isEditable = node => {
   let editable;
   while (node && node.parentNode) {
-    if (!node.namespaceURI || node.namespaceURI === nsURI.html) {
+    if (!node.namespaceURI || node.namespaceURI === nsHtml) {
       editable = node.isContentEditable;
     }
     if (editable) {
@@ -567,7 +567,7 @@ export const isEditable = node => {
 export const isContentTextNode = node => {
   let isText = isEditable(node);
   if (isText && node && node.namespaceURI &&
-      node.namespaceURI !== nsURI.html && node.hasChildNodes()) {
+      node.namespaceURI !== nsHtml && node.hasChildNodes()) {
     const nodes = node.childNodes;
     for (const child of nodes) {
       isText = child.nodeType === Node.TEXT_NODE;
@@ -609,7 +609,7 @@ export const getEditableElm = node => {
   } else {
     while (node && node.parentNode) {
       if (node.hasAttribute('contenteditable') && node.isContentEditable &&
-          (!node.namespaceURI || node.namespaceURI === nsURI.html)) {
+          (!node.namespaceURI || node.namespaceURI === nsHtml)) {
         elm = node;
         break;
       }
@@ -626,7 +626,7 @@ export const getEditableElm = node => {
  * @param {string} ns - namespace URI
  * @returns {object} - document fragment
  */
-export const createParagraphedContent = (value, ns = nsURI.html) => {
+export const createParagraphedContent = (value, ns = nsHtml) => {
   const arr = isString(value) ? value.split(/\r?\n/) : [''];
   const l = arr.length;
   const frag = document.createDocumentFragment();
@@ -642,7 +642,7 @@ export const createParagraphedContent = (value, ns = nsURI.html) => {
     let i = 0;
     while (i < l) {
       const text = arr[i];
-      if (ns === nsURI.html) {
+      if (ns === nsHtml) {
         if (sep === 'div' || sep === 'p') {
           const elm = document.createElementNS(ns, sep);
           if (text) {

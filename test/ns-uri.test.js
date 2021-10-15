@@ -7,7 +7,9 @@ import { assert } from 'chai';
 import { describe, it } from 'mocha';
 
 /* test */
-import nsUri, { html as nsHtml } from '../src/mjs/ns-uri.js';
+import nsUri, {
+  html as nsHtml, math as nsMath, svg as nsSvg
+} from '../src/mjs/ns-uri.js';
 
 describe('ns-uri', () => {
   it('should get string', () => {
@@ -20,5 +22,13 @@ describe('ns-uri', () => {
 
   it('should get string', () => {
     assert.isString(nsHtml);
+  });
+
+  it('should get string', () => {
+    assert.isString(nsMath);
+  });
+
+  it('should get string', () => {
+    assert.isString(nsSvg);
   });
 });

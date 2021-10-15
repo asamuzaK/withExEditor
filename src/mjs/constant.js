@@ -62,7 +62,6 @@ export const MODE_MATHML = 'modeViewMathML';
 export const MODE_SELECTION = 'modeViewSelection';
 export const MODE_SOURCE = 'modeViewSource';
 export const MODE_SVG = 'modeViewSVG';
-export const NS_URI = 'nsUri';
 export const ONLY_EDITABLE = 'enableOnlyEditable';
 export const OPTIONS_OPEN = 'openOptionsPage';
 export const PATH_BROWSER_POLYFILL = '/lib/browser-polyfill.min.js';

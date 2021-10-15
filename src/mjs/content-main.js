@@ -20,7 +20,7 @@ import {
 import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
 } from './live-edit.js';
-import nsURI from './ns-uri.js';
+import { html as nsHtml, math as nsMath, svg as nsSvg } from './ns-uri.js';
 import {
   CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_MAC, INCOGNITO, LABEL,
   LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN,
@@ -599,7 +599,7 @@ export const createContentData = async (elm, mode) => {
           const { dataId } = obj;
           const { childNodes, isContentEditable, namespaceURI, value } = elm;
           const liveEditKey = getLiveEditKey(elm);
-          const isHtml = !namespaceURI || namespaceURI === nsURI.html;
+          const isHtml = !namespaceURI || namespaceURI === nsHtml;
           isHtml && elm.addEventListener('focus', requestTmpFile, true);
           !dataIds.has(dataId) && setDataId(dataId, obj);
           if (liveEditKey) {
@@ -718,9 +718,9 @@ export const getContextMode = elm => {
           elm !== document.documentElement))) {
       mode = MODE_EDIT;
     } else if (isCollapsed) {
-      if (elm.namespaceURI === nsURI.math) {
+      if (elm.namespaceURI === nsMath) {
         mode = MODE_MATHML;
-      } else if (elm.namespaceURI === nsURI.svg) {
+      } else if (elm.namespaceURI === nsSvg) {
         mode = MODE_SVG;
       }
     } else {
@@ -1213,12 +1213,12 @@ export const handleBeforeContextMenu = evt => {
       (shiftKey && key === 'F10')) {
     const { localName, namespaceURI, type } = target;
     const { anchorNode, focusNode, isCollapsed } = document.getSelection();
-    const mode = (namespaceURI === nsURI.math && MODE_MATHML) ||
-                 (namespaceURI === nsURI.svg && MODE_SVG) || MODE_SOURCE;
+    const mode = (namespaceURI === nsMath && MODE_MATHML) ||
+                 (namespaceURI === nsSvg && MODE_SVG) || MODE_SOURCE;
     const isChildNodeText = isContentTextNode(target);
     const editableElm = getEditableElm(target);
     const liveEditElm = getLiveEditElement(target);
-    const isHtml = !namespaceURI || namespaceURI === nsURI.html;
+    const isHtml = !namespaceURI || namespaceURI === nsHtml;
     let enabled;
     if (localName === 'input') {
       enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
@@ -1269,7 +1269,7 @@ export const handleKeyDown = evt => {
     const isChildNodeText = isContentTextNode(target);
     const editableElm = getEditableElm(target);
     const liveEditElm = getLiveEditElement(target);
-    const isHtml = !namespaceURI || namespaceURI === nsURI.html;
+    const isHtml = !namespaceURI || namespaceURI === nsHtml;
     vars.contextMode = mode;
     if (liveEditElm) {
       vars.contextNode =

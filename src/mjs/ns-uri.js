@@ -2,10 +2,16 @@
  * ns-uri.js
  */
 
+/* common namespace URI */
 export const html = 'http://www.w3.org/1999/xhtml';
+export const math = 'http://www.w3.org/1998/Math/MathML';
+export const svg = 'http://www.w3.org/2000/svg';
 
+/* namespace URI */
 export default {
   html,
+  math,
+  svg,
   ag: 'http://purl.org/rss/1.0/modules/aggregation/',
   annotate: 'http://purl.org/rss/1.0/modules/annotate/',
   app: 'http://www.w3.org/2007/app',
@@ -39,7 +45,6 @@ export default {
   itunes: 'http://www.itunes.com/dtds/podcast-1.0.dtd',
   l: 'http://purl.org/rss/1.0/modules/link/',
   ma: 'http://www.w3.org/ns/ma-ont#',
-  math: 'http://www.w3.org/1998/Math/MathML',
   oa: 'http://www.w3.org/ns/oa#',
   og: 'http://ogp.me/ns#',
   org: 'http://www.w3.org/ns/org#',
@@ -65,7 +70,6 @@ export default {
   sparql: 'http://www.w3.org/2005/sparql-results#',
   ss: 'http://purl.org/rss/1.0/modules/servicestatus/',
   sub: 'http://purl.org/rss/1.0/modules/subscription/',
-  svg: 'http://www.w3.org/2000/svg',
   sy: 'http://purl.org/rss/1.0/modules/syndication/',
   taxo: 'http://purl.org/rss/1.0/modules/taxonomy/',
   thr: 'http://purl.org/syndication/thread/1.0',
