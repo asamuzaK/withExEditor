@@ -1119,8 +1119,8 @@ export const handleDisconnectedPort = async port => {
  * @param {object} port - runtime.Port
  * @returns {Function} - handleDisconnectedPort()
  */
-export const portOnDisconnect =
-  port => handleDisconnectedPort(port).catch(throwErr);
+export const portOnDisconnect = port =>
+  handleDisconnectedPort(port).catch(throwErr);
 
 /**
  * port on message
