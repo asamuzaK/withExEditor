@@ -63,6 +63,7 @@
   },
   "manifest_version": 2,
   "minimum_chrome_version": "90",
+  "minimum_opera_version": "90",
   "name": "__MSG_extensionName__",
   "optional_permissions": [
     "notifications"
