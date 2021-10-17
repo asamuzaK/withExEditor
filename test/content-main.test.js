@@ -2469,12 +2469,10 @@ describe('content-main', () => {
       assert.strictEqual(div.textContent, 'foo <foo@example.dom> wrote:\nbar\n', 'content');
     });
 
-    it('should replace content', () => {
+    it('should throw if StaticRange is not supported', () => {
       delete global.StaticRange;
-      const stubError = sinon.stub(console, 'error');
       const div = document.createElement('div');
       const span = document.createElement('span');
-      const spy = sinon.spy(span, 'dispatchEvent');
       const body = document.querySelector('body');
       div.id = 'div';
       span.textContent = 'bar';
@@ -2482,20 +2480,11 @@ describe('content-main', () => {
       mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       body.appendChild(div);
-      func(span, {
+      assert.throws(() => func(span, {
         controlledBy: '#div',
         dataId: 'foo',
         value: 'foo\n'
-      });
-      const { calledOnce: errorCalled } = stubError;
-      stubError.restore();
-      assert.isTrue(errorCalled, 'called');
-      assert.strictEqual(spy.callCount, 3, 'called');
-      assert.strictEqual(div.childNodes.length, 1, 'length');
-      assert.strictEqual(div.firstChild.nodeType, 1, 'child');
-      assert.strictEqual(div.firstChild.localName, 'span', 'name');
-      assert.strictEqual(div.firstChild.textContent, 'foo\n', 'content');
-      assert.strictEqual(div.textContent, 'foo\n', 'content');
+      }));
     });
   });
 

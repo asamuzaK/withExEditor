@@ -823,20 +823,11 @@ export const replaceEditableContent = (node, opt = {}) => {
       });
       if (proceed) {
         const {
-          collapsed, endContainer, endOffset, startContainer, startOffset
+          endContainer, endOffset, startContainer, startOffset
         } = sel.getRangeAt(0);
-        // TODO: remove try-catch after Chrome 90 Stable is released
-        let insertTarget;
-        try {
-          insertTarget = new StaticRange({
-            endContainer, endOffset, startContainer, startOffset
-          });
-        } catch (e) {
-          logErr(e);
-          insertTarget = {
-            collapsed, endContainer, endOffset, startContainer, startOffset
-          };
-        }
+        const insertTarget = new StaticRange({
+          endContainer, endOffset, startContainer, startOffset
+        });
         proceed = dispatchInputEvent(node, 'beforeinput', {
           dataTransfer,
           bubbles: true,
