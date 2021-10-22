@@ -443,6 +443,8 @@ export const createMenuItemData = key => {
       data.title = i18n.getMessage(`${key}_key`, [label, accKey]);
       if (key === MODE_EDIT) {
         data.visible = true;
+      } else if (key === MODE_MATHML || key === MODE_SVG) {
+        data.visible = false;
       } else {
         data.visible = !vars[ONLY_EDITABLE];
       }

@@ -1041,6 +1041,32 @@ describe('main', () => {
     });
 
     it('should get object', () => {
+      const res = func(MODE_MATHML);
+      assert.deepEqual(res, {
+        contexts: [
+          'frame',
+          'page'
+        ],
+        enabled: false,
+        title: 'modeViewMathML_key,extensionName, (&V)',
+        visible: false
+      }, 'result');
+    });
+
+    it('should get object', () => {
+      const res = func(MODE_SVG);
+      assert.deepEqual(res, {
+        contexts: [
+          'frame',
+          'page'
+        ],
+        enabled: false,
+        title: 'modeViewSVG_key,extensionName, (&V)',
+        visible: false
+      }, 'result');
+    });
+
+    it('should get object', () => {
       const res = func(MODE_SOURCE);
       assert.deepEqual(res, {
         contexts: [
