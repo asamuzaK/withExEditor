@@ -2514,14 +2514,16 @@ describe('main', () => {
   describe('handle connected port', () => {
     const func = mjs.handlePort;
     beforeEach(() => {
-      const { ports, varsLocal } = mjs;
+      const { hostStatus, ports, varsLocal } = mjs;
       ports.clear();
+      hostStatus[HOST_COMPAT] = false;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = true;
     });
     afterEach(() => {
-      const { ports, varsLocal } = mjs;
+      const { hostStatus, ports, varsLocal } = mjs;
       ports.clear();
+      hostStatus[HOST_COMPAT] = false;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
     });
@@ -2541,11 +2543,11 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { ports, varsLocal } = mjs;
+      const { hostStatus, ports, varsLocal } = mjs;
+      hostStatus[HOST_COMPAT] = false;
       const port = browser.runtime.connect({
         name: PORT_CONTENT,
         sender: {
-          frameId: 0,
           tab: {
             active: true,
             id: 2,
@@ -2566,6 +2568,54 @@ describe('main', () => {
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called port msg');
       assert.strictEqual(browser.menus.update.callCount, j + 5,
         'called menus update');
+      assert.isTrue(browser.menus.update.withArgs(MODE_EDIT, {
+        contexts: ['editable'],
+        enabled: false,
+        title: 'modeEditText_key,extensionName, (&E)',
+        visible: true
+      }).calledOnce, 'edit menu');
+      assert.isTrue(varsLocal[MENU_ENABLED], 'menu enabled');
+      assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+
+    it('should call function', async () => {
+      const { hostStatus, ports, varsLocal } = mjs;
+      hostStatus[HOST_COMPAT] = true;
+      const port = browser.runtime.connect({
+        name: PORT_CONTENT,
+        sender: {
+          tab: {
+            active: true,
+            id: 2,
+            incognito: false,
+            status: 'complete',
+            windowId: 1
+          },
+          url: 'https://example.com'
+        }
+      });
+      const i = port.postMessage.callCount;
+      const j = browser.menus.update.callCount;
+      const res = await func(port);
+      assert.strictEqual(
+        ports.get('1').get('2').get('https://example.com').name,
+        PORT_CONTENT, 'port'
+      );
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called port msg');
+      assert.strictEqual(browser.menus.update.callCount, j + 5,
+        'called menus update');
+      assert.isTrue(browser.menus.update.withArgs(MODE_EDIT, {
+        contexts: ['editable'],
+        enabled: true,
+        title: 'modeEditText_key,extensionName, (&E)',
+        visible: true
+      }).calledOnce, 'edit menu');
       assert.isTrue(varsLocal[MENU_ENABLED], 'menu enabled');
       assert.deepEqual(res, [
         undefined,
@@ -2581,7 +2631,6 @@ describe('main', () => {
       const port = browser.runtime.connect({
         name: PORT_CONTENT,
         sender: {
-          frameId: 0,
           tab: {
             active: false,
             id: 2,
@@ -2611,7 +2660,6 @@ describe('main', () => {
       const port = browser.runtime.connect({
         name: PORT_CONTENT,
         sender: {
-          frameId: 0,
           tab: {
             active: false,
             id: browser.tabs.TAB_ID_NONE,

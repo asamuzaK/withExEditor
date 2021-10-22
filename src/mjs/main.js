@@ -806,7 +806,7 @@ export const handlePort = async (port = {}) => {
   const { name: portName, sender } = port;
   let func;
   if (sender) {
-    const { frameId, tab, url } = sender;
+    const { tab, url } = sender;
     if (tab) {
       const { active, id: tId, incognito, status, windowId: wId } = tab;
       const windowId = stringifyPositiveInt(wId, true);
@@ -824,8 +824,7 @@ export const handlePort = async (port = {}) => {
           [VARS_SET]: vars
         });
       }
-      if (portName === PORT_CONTENT && frameId === 0 && active &&
-          status === 'complete') {
+      if (portName === PORT_CONTENT && active && status === 'complete') {
         varsLocal[MENU_ENABLED] = true;
         func = updateContextMenu(null, true);
       }
