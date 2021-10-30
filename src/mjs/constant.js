@@ -27,6 +27,7 @@ export const HOST_STATUS_GET = 'getHostStatus';
 export const HOST_VERSION = 'hostVersion';
 export const HOST_VERSION_LATEST = 'hostLatestVersion';
 export const HOST_VERSION_CHECK = 'checkHostVersion';
+export const HOST_VERSION_MIN = 'v7.0.0';
 export const ICON = 'img/icon.svg';
 export const ICON_AUTO = 'buttonIconAuto';
 export const ICON_BLACK = 'buttonIconBlack';

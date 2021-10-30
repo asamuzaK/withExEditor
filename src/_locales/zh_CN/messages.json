@@ -33,10 +33,16 @@
     }
   },
   "hostVersion_false": {
-    "message": "不兼容"
+    "message": "不相容。需要主机 $MINVER$ 或更高版本。",
+    "placeholders": {
+      "minver": {
+        "content": "$1",
+        "example": "v1.2.3"
+      }
+    }
   },
   "hostVersion_true": {
-    "message": "兼容"
+    "message": "兼容的"
   },
   "isExecutable_false": {
     "message": "不可执行"
@@ -221,7 +227,7 @@
     "message": "主机"
   },
   "optionsHostVersionCompatDetail": {
-    "message": "如果状态为“不兼容”或“未知”而不是“兼容”，则需要更新主机。"
+    "message": "如果状态为“不相容”或“未知”而不是“兼容的”，则需要更新主机。"
   },
   "optionsHostVersionCompatLabel": {
     "message": "主机兼容性"

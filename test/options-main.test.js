@@ -10,7 +10,8 @@ import sinon from 'sinon';
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION,
-  HOST_VERSION_LATEST, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN
+  HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE, STORAGE_SET,
+  SYNC_AUTO_URL, WARN
 } from '../src/mjs/constant.js';
 
 /* test */
@@ -307,7 +308,8 @@ describe('options-main', () => {
     });
 
     it('should add warning', async () => {
-      browser.i18n.getMessage.withArgs('hostVersion_false').returns('foo');
+      browser.i18n.getMessage.withArgs('hostVersion_false', HOST_VERSION_MIN)
+        .returns('foo');
       const elm = document.createElement('p');
       const body = document.querySelector('body');
       const arg = { hostCompatibility: false };
@@ -319,7 +321,8 @@ describe('options-main', () => {
     });
 
     it('should remove warning', async () => {
-      browser.i18n.getMessage.withArgs('hostVersion_true').returns('foo');
+      browser.i18n.getMessage.withArgs('hostVersion_true', HOST_VERSION_MIN)
+        .returns('foo');
       const elm = document.createElement('p');
       const body = document.querySelector('body');
       const arg = { hostCompatibility: true };

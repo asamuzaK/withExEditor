@@ -33,10 +33,16 @@
     }
   },
   "hostVersion_false": {
-    "message": "非適合"
+    "message": "非互換。$MINVER$ 以降のホストが必要です。",
+    "placeholders": {
+      "minver": {
+        "content": "$1",
+        "example": "v1.2.3"
+      }
+    }
   },
   "hostVersion_true": {
-    "message": "適合"
+    "message": "互換"
   },
   "isExecutable_false": {
     "message": "実行不可"
@@ -221,7 +227,7 @@
     "message": "ホスト"
   },
   "optionsHostVersionCompatDetail": {
-    "message": "状態が「適合」ではなく「非適合」や「不明」となっている場合は、ホストをアップデートしてください。"
+    "message": "状態が「互換」ではなく「非互換」や「不明」となっている場合は、ホストをアップデートしてください。"
   },
   "optionsHostVersionCompatLabel": {
     "message": "ホストの互換性"
