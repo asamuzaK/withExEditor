@@ -33,7 +33,7 @@
     }
   },
   "hostVersion_false": {
-    "message": "不相容。需要主机 $MINVER$ 或更高版本。",
+    "message": "不相容。将主机升级到 $MINVER$ 或更高版本。",
     "placeholders": {
       "minver": {
         "content": "$1",

@@ -33,7 +33,7 @@
     }
   },
   "hostVersion_false": {
-    "message": "非互換。$MINVER$ 以降のホストが必要です。",
+    "message": "非互換。ホストを $MINVER$ 以上にアップグレードしてください。",
     "placeholders": {
       "minver": {
         "content": "$1",

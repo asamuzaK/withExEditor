@@ -33,7 +33,7 @@
     }
   },
   "hostVersion_false": {
-    "message": "Incompatible. Nécessite l'hôte MINVER ou une version ultérieure.",
+    "message": "Incompatible. Mettez à niveau l'hôte vers $MINVER$ ou supérieur.",
     "placeholders": {
       "minver": {
         "content": "$1",

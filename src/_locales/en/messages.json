@@ -33,7 +33,7 @@
     }
   },
   "hostVersion_false": {
-    "message": "Incompatible. Host $MINVER$ or later is required.",
+    "message": "Incompatible. Upgrade the host to $MINVER$ or higher.",
     "placeholders": {
       "minver": {
         "content": "$1",
