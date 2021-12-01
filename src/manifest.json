@@ -56,14 +56,10 @@
   "description": "__MSG_extensionDescription__",
   "homepage_url": "https://github.com/asamuzaK/withExEditor",
   "icons": {
-    "16": "img/icon-outline-16.png",
-    "32": "img/icon-outline-32.png",
-    "64": "img/icon-color.png",
-    "128": "img/icon-color-128.png"
+    "32": "img/icon.svg#current",
+    "64": "img/icon.svg"
   },
   "manifest_version": 2,
-  "minimum_chrome_version": "90",
-  "minimum_opera_version": "76",
   "name": "__MSG_extensionName__",
   "optional_permissions": [
     "notifications"
