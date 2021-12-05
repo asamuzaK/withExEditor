@@ -65,7 +65,7 @@
     "notifications"
   ],
   "options_ui": {
-    "browser_style": false,
+    "browser_style": true,
     "open_in_tab": true,
     "page": "html/options.html"
   },
