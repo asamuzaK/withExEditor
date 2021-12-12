@@ -18,7 +18,7 @@ export const createJsdom = url => {
     runScripts: 'dangerously',
     url: url || 'https://localhost',
     beforeParse(window) {
-      window.alert = sinon.stub().callsFake((...args) => args.toString());
+      window.alert = sinon.stub();
     }
   };
   return new JSDOM(domstr, opt);
