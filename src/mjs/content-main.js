@@ -14,8 +14,8 @@ import {
 import {
   createParagraphedContent, createDomStringFromSelectionRange,
   createXmlBasedDomString, getAncestorId, getEditableElm, getFileExtension,
-  getFileNameFromURI, getNodeNS, getText, isContentTextNode, isEditControl,
-  matchDocUrl, serializeDomString
+  getNodeNS, getText, isContentTextNode, isEditControl, matchDocUrl,
+  serializeDomString
 } from './dom-util.js';
 import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
@@ -36,6 +36,7 @@ const { runtime } = browser;
 
 /* constants */
 const EDIT_MENU = [MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT];
+const FILE_LEN = 128;
 const FILE_NOT_FOUND_TIMESTAMP = -1;
 const KEY_CODE_A = 65;
 const KEY_CODE_BS = 8;
@@ -143,6 +144,28 @@ export const getTargetElementFromDataId = dataId => {
     }
   }
   return elm || null;
+};
+
+/**
+ * get data ID from URI path
+ *
+ * @param {string} uri - URI
+ * @param {string} subst - substitute file name
+ * @returns {string} - data ID
+ */
+export const getDataIdFromURI = (uri, subst = SUBST) => {
+  if (!isString(uri)) {
+    throw new TypeError(`Expected String but got ${getType(uri)}.`);
+  }
+  const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/;
+  const { pathname, protocol } = new URL(uri);
+  let dataId;
+  if (pathname && reg.test(pathname) &&
+      protocol && !/^(?:blob|data):/.test(protocol)) {
+    const [, fileName] = reg.exec(pathname);
+    dataId = decodeURIComponent(fileName);
+  }
+  return dataId && dataId.length < FILE_LEN ? dataId : subst;
 };
 
 /**
@@ -301,7 +324,7 @@ export const fetchSource = async (data = {}) => {
     if (res) {
       const { dir, host, incognito, mode, tabId, windowId } = data;
       const [type] = res.headers.get('Content-Type').split(';');
-      const dataId = getFileNameFromURI(uri, SUBST);
+      const dataId = getDataIdFromURI(uri, SUBST);
       const extType = getFileExtension(type);
       const value = await res.text();
       obj = {
@@ -395,7 +418,7 @@ export const createTmpFileData = async (data = {}) => {
       break;
     case MODE_MATHML:
     case MODE_SVG:
-      if (value && (dataId = getFileNameFromURI(uri, SUBST))) {
+      if (value && (dataId = getDataIdFromURI(uri, SUBST))) {
         tmpFileData = {
           [TMP_FILE_CREATE]: {
             extType: mode === MODE_MATHML ? '.mml' : '.svg',
@@ -412,7 +435,7 @@ export const createTmpFileData = async (data = {}) => {
       }
       break;
     case MODE_SELECTION:
-      dataId = getFileNameFromURI(uri, SUBST);
+      dataId = getDataIdFromURI(uri, SUBST);
       if (dataId && value &&
           /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
         tmpFileData = {

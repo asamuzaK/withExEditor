@@ -133,44 +133,6 @@ describe('content', () => {
     });
   });
 
-  describe('get file name from URI path', () => {
-    const func = mjs.getFileNameFromURI;
-
-    it('should throw', async () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
-    });
-
-    it('should get value', () => {
-      const res = func('https://example.com/foo');
-      assert.strictEqual(res, 'foo', 'result');
-    });
-
-    it('should get value', () => {
-      const res = func('https://example.com/foo', 'bar');
-      assert.strictEqual(res, 'foo', 'result');
-    });
-
-    it('should get value', () => {
-      const res = func('https://example.com/', 'bar');
-      assert.strictEqual(res, 'bar', 'result');
-    });
-
-    it('should get value', () => {
-      const res = func('https://example.com/');
-      assert.strictEqual(res, 'index', 'result');
-    });
-
-    it('should get value', () => {
-      const res = func('https://example.com/foo%20bar');
-      assert.strictEqual(res, 'foo bar', 'result');
-    });
-
-    it('should get value', () => {
-      const res = func('data:image/svg+xml;utf8,<svg></svg>');
-      assert.strictEqual(res, 'index', 'result');
-    });
-  });
-
   describe('check whether given array of URLs matches document URL', () => {
     const func = mjs.matchDocUrl;
 

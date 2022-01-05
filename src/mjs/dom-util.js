@@ -6,10 +6,9 @@
 import { getType, isString, logErr } from './common.js';
 import fileExt from './file-ext.js';
 import nsURI, { html as nsHtml } from './ns-uri.js';
-import { MIME_HTML, MIME_PLAIN, SUBST } from './constant.js';
+import { MIME_HTML, MIME_PLAIN } from './constant.js';
 
 /* constants */
-const FILE_LEN = 128;
 const TAGS_ALT = ['area', 'img', 'input'];
 const TAGS_BLOCK = [
   'address', 'article', 'aside', 'blockquote', 'details', 'dialog', 'dd', 'div',
@@ -37,28 +36,6 @@ export const getDecodedContent = str => {
   const doc = new DOMParser().parseFromString(str, MIME_HTML);
   return doc.body.textContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
-};
-
-/**
- * get file name from URI path
- *
- * @param {string} uri - URI
- * @param {string} subst - substitute file name
- * @returns {string} - file name
- */
-export const getFileNameFromURI = (uri, subst = SUBST) => {
-  if (!isString(uri)) {
-    throw new TypeError(`Expected String but got ${getType(uri)}.`);
-  }
-  const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/;
-  const { pathname, protocol } = new URL(uri);
-  let file;
-  if (pathname && reg.test(pathname) &&
-      protocol && !/^(?:blob|data):/.test(protocol)) {
-    const [, fileName] = reg.exec(pathname);
-    file = decodeURIComponent(fileName);
-  }
-  return file && file.length < FILE_LEN ? file : subst;
 };
 
 /**
