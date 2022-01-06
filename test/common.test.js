@@ -244,146 +244,41 @@ describe('common', () => {
     });
   });
 
-  describe('parse stringified integer', () => {
-    const func = mjs.parseStringifiedInt;
+  describe('sleep', () => {
+    const func = mjs.sleep;
 
-    it('should throw', () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
+    it('should resolve even if no argument given', async () => {
+      const fake = sinon.fake();
+      const fake2 = sinon.fake();
+      await func().then(fake).catch(fake2);
+      assert.strictEqual(fake.callCount, 1);
+      assert.strictEqual(fake2.callCount, 0);
     });
 
-    it('should throw', () => {
-      assert.throws(() => func('foo'), 'foo is not a stringified integer.');
-    });
-
-    it('should throw', () => {
-      assert.throws(() => func('01'), '01 is not a stringified integer.');
-    });
-
-    it('should get integer', () => {
-      const i = '1';
-      const res = func(i);
-      assert.strictEqual(res, 1);
-    });
-
-    it('should get integer', () => {
-      const i = '-1';
-      const res = func(i);
-      assert.strictEqual(res, -1);
-    });
-
-    it('should get integer', () => {
-      const i = '01';
-      const res = func(i, true);
-      assert.strictEqual(res, 1);
-    });
-
-    it('should get integer', () => {
-      const i = '-01';
-      const res = func(i, true);
-      assert.strictEqual(res, -1);
-    });
-
-    it('should get integer', () => {
-      const i = '01a';
-      const res = func(i, true);
-      assert.strictEqual(res, 1);
-    });
-  });
-
-  describe('escape all matching chars', () => {
-    const func = mjs.escapeMatchingChars;
-
-    it('should throw', () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
-    });
-
-    it('should throw', () => {
-      assert.throws(() => func('foo', 'bar'),
-        'Expected RegExp but got String.');
-    });
-
-    it('should get null', () => {
-      const str = '[foo][bar][baz]';
-      const re = /([[\]])/;
-      const res = func(str, re);
+    it('should get null if 1st argument is not integer', async () => {
+      const res = await func('foo');
       assert.isNull(res);
     });
 
-    it('should get string', () => {
-      const str = '[foo][bar][baz]';
-      const re = /([[\]])/g;
-      const res = func(str, re);
-      assert.strictEqual(res, '\\[foo\\]\\[bar\\]\\[baz\\]');
-    });
-  });
-
-  describe('is valid Toolkit version string', () => {
-    const func = mjs.isValidToolkitVersion;
-
-    it('should throw', () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
+    it('should get null if 1st argument is not positive integer', async () => {
+      const res = await func(-1);
+      assert.isNull(res);
     });
 
-    it('should get true', () => {
-      const versions = [
-        '0', '1', '10', '0.1', '1.0', '1.0.0', '1.0.0.0', '1.0.0a', '1.0.0a1',
-        '1.0.0.0beta2', '3.1.2.65535', '4.1pre1', '4.1.1.2pre3',
-        '0.1.12dev-cb31c51'
-      ];
-      for (const version of versions) {
-        const res = func(version);
-        assert.isTrue(res, version);
-      }
+    it('should resolve', async () => {
+      const fake = sinon.fake();
+      const fake2 = sinon.fake();
+      await func(1).then(fake).catch(fake2);
+      assert.strictEqual(fake.callCount, 1);
+      assert.strictEqual(fake2.callCount, 0);
     });
 
-    it('should get false', () => {
-      const versions = [
-        '01', '1.0.01', '.', '.1', '1.', '65536', '1.0.0.65536',
-        '1.0.0.0.0', '1.0.0-a', '1.0.0-0', '1.0.0+20130313144700',
-        '123e5', '1.123e5', '1.a', 'a.b.c.d', '2.99999'
-      ];
-      for (const version of versions) {
-        const res = func(version);
-        assert.isFalse(res, version);
-      }
-    });
-  });
-
-  describe('parse version string', () => {
-    const func = mjs.parseVersion;
-
-    it('should throw', () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
-    });
-
-    it('should throw', () => {
-      assert.throws(() => func('.1'), '.1 does not match toolkit format.');
-    });
-
-    it('should get object', () => {
-      const version = '1.2.3';
-      const res = func(version);
-      assert.deepEqual(res, {
-        version,
-        major: 1,
-        minor: 2,
-        patch: 3,
-        build: undefined,
-        pre: undefined
-      });
-    });
-
-    it('should get object', () => {
-      const version = '1.2.3.4a1';
-      const res = func(version);
-      assert.deepEqual(res, {
-        version,
-        major: 1,
-        minor: 2,
-        patch: 3,
-        build: 4,
-        pre: ['a1']
-      });
+    it('should reject', async () => {
+      const fake = sinon.fake();
+      const fake2 = sinon.fake();
+      await func(1, true).then(fake).catch(fake2);
+      assert.strictEqual(fake.callCount, 0);
+      assert.strictEqual(fake2.callCount, 1);
     });
   });
 
@@ -429,44 +324,6 @@ describe('common', () => {
       const arg = 'https://example.com#foo?bar=baz%20qux';
       const res = func(arg);
       assert.strictEqual(res, 'https://example.com#foo');
-    });
-  });
-
-  describe('sleep', () => {
-    const func = mjs.sleep;
-
-    it('should resolve even if no argument given', async () => {
-      const fake = sinon.fake();
-      const fake2 = sinon.fake();
-      await func().then(fake).catch(fake2);
-      assert.strictEqual(fake.callCount, 1);
-      assert.strictEqual(fake2.callCount, 0);
-    });
-
-    it('should get null if 1st argument is not integer', async () => {
-      const res = await func('foo');
-      assert.isNull(res);
-    });
-
-    it('should get null if 1st argument is not positive integer', async () => {
-      const res = await func(-1);
-      assert.isNull(res);
-    });
-
-    it('should resolve', async () => {
-      const fake = sinon.fake();
-      const fake2 = sinon.fake();
-      await func(1).then(fake).catch(fake2);
-      assert.strictEqual(fake.callCount, 1);
-      assert.strictEqual(fake2.callCount, 0);
-    });
-
-    it('should reject', async () => {
-      const fake = sinon.fake();
-      const fake2 = sinon.fake();
-      await func(1, true).then(fake).catch(fake2);
-      assert.strictEqual(fake.callCount, 0);
-      assert.strictEqual(fake2.callCount, 1);
     });
   });
 });
