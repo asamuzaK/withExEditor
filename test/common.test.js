@@ -207,43 +207,6 @@ describe('common', () => {
     });
   });
 
-  describe('stringify positive integer', () => {
-    const func = mjs.stringifyPositiveInt;
-
-    it('should get null if no argument given', () => {
-      assert.isNull(func());
-    });
-
-    it('should get null if given argument exceeds max safe integer', () => {
-      const i = Number.MAX_SAFE_INTEGER + 1;
-      assert.isNull(func(i));
-    });
-
-    it('should get null if given argument is not positive integer', () => {
-      assert.isNull(func(''));
-    });
-
-    it('should get null if given argument is not positive integer', () => {
-      assert.isNull(func(-1));
-    });
-
-    it('should get null if 1st argument is 0 but 2nd argument is falsy', () => {
-      assert.isNull(func(0));
-    });
-
-    it('should get string', () => {
-      const i = 0;
-      const res = func(i, true);
-      assert.strictEqual(res, '0');
-    });
-
-    it('should get string', () => {
-      const i = 1;
-      const res = func(i);
-      assert.strictEqual(res, '1');
-    });
-  });
-
   describe('sleep', () => {
     const func = mjs.sleep;
 
@@ -279,6 +242,43 @@ describe('common', () => {
       await func(1, true).then(fake).catch(fake2);
       assert.strictEqual(fake.callCount, 0);
       assert.strictEqual(fake2.callCount, 1);
+    });
+  });
+
+  describe('stringify positive integer', () => {
+    const func = mjs.stringifyPositiveInt;
+
+    it('should get null if no argument given', () => {
+      assert.isNull(func());
+    });
+
+    it('should get null if given argument exceeds max safe integer', () => {
+      const i = Number.MAX_SAFE_INTEGER + 1;
+      assert.isNull(func(i));
+    });
+
+    it('should get null if given argument is not positive integer', () => {
+      assert.isNull(func(''));
+    });
+
+    it('should get null if given argument is not positive integer', () => {
+      assert.isNull(func(-1));
+    });
+
+    it('should get null if 1st argument is 0 but 2nd argument is falsy', () => {
+      assert.isNull(func(0));
+    });
+
+    it('should get string', () => {
+      const i = 0;
+      const res = func(i, true);
+      assert.strictEqual(res, '0');
+    });
+
+    it('should get string', () => {
+      const i = 1;
+      const res = func(i);
+      assert.strictEqual(res, '1');
     });
   });
 

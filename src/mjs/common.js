@@ -87,21 +87,6 @@ export const isObjectNotEmpty = o => {
 };
 
 /**
- * stringify positive integer
- *
- * @param {number} i - integer
- * @param {boolean} zero - treat 0 as a positive integer
- * @returns {?string} - stringified integer
- */
-export const stringifyPositiveInt = (i, zero = false) => {
-  let str;
-  if (Number.isSafeInteger(i) && (i > 0 || (zero && i === 0))) {
-    str = `${i}`;
-  }
-  return str || null;
-};
-
-/**
  * sleep
  *
  * @param {number} msec - milisec
@@ -120,6 +105,21 @@ export const sleep = (msec = 0, doReject = false) => {
     });
   }
   return func || null;
+};
+
+/**
+ * stringify positive integer
+ *
+ * @param {number} i - integer
+ * @param {boolean} zero - treat 0 as a positive integer
+ * @returns {?string} - stringified integer
+ */
+export const stringifyPositiveInt = (i, zero = false) => {
+  let str;
+  if (Number.isSafeInteger(i) && (i > 0 || (zero && i === 0))) {
+    str = `${i}`;
+  }
+  return str || null;
 };
 
 /**
