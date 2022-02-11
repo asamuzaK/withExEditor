@@ -2989,19 +2989,11 @@ describe('main', () => {
       });
     });
 
-    it('should get empty array', async () => {
-      const { host, ports } = mjs;
-      const stubPort = browser.runtime.connect({ name: PORT_CONTENT });
-      const i = host.postMessage.callCount;
-      ports.set('1', new Map());
-      ports.get('1').set('2', new Map());
-      ports.get('1').get('2').set('https://example.com', stubPort);
+    it('should throw', async () => {
       browser.windows.get.withArgs(1).rejects(new Error('error'));
-      const res = await func(3, { windowId: 1 });
-      assert.strictEqual(ports.get('1').size, 1, 'size');
-      assert.isTrue(ports.get('1').has('2'), 'has');
-      assert.strictEqual(host.postMessage.callCount, i, 'not called');
-      assert.deepEqual(res, [], 'result');
+      await func(3, { windowId: 1 }).catch(e => {
+        assert.instanceOf(e, Error, 'error');
+      });
     });
 
     it('should get empty array', async () => {
