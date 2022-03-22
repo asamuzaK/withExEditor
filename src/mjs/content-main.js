@@ -1194,10 +1194,7 @@ export const handleMsg = async msg => {
     const items = Object.entries(msg);
     for (const [key, value] of items) {
       if (key === PORT_CONNECT && value) {
-        const port = await makeConnection({
-          name: PORT_CONTENT
-        });
-        func.push(portOnConnect(port));
+        func.push(makeConnection({ name: PORT_CONTENT }).then(portOnConnect));
         break;
       }
     }
