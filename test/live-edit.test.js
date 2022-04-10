@@ -117,6 +117,7 @@ describe('live-edit', () => {
                       value.className === null);
         assert.isString(value.getContent);
         assert.isString(value.setContent);
+        assert.isString(value.url);
         // optional keys
         if (Object.prototype.hasOwnProperty.call(value, 'isIframe')) {
           assert.isBoolean(value.isIframe);
