@@ -15,7 +15,7 @@ const liveEdit = {
     setContent: '.ace_text-input',
     url: 'https://ace.c9.io/'
   },
-  // Up to CodeMirror 5. Not necessary for CodeMirror 6
+  // NOTE: Up to CodeMirror 5. Not necessary for CodeMirror 6.
   codeMirror: {
     className: 'CodeMirror',
     getContent: '.CodeMirror-line',
