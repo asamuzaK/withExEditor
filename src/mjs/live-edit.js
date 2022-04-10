@@ -12,24 +12,29 @@ const liveEdit = {
   aceEditor: {
     className: 'ace_editor',
     getContent: '.ace_line',
-    setContent: '.ace_text-input'
+    setContent: '.ace_text-input',
+    url: 'https://ace.c9.io/'
   },
+  // Up to CodeMirror 5. Not necessary for CodeMirror 6
   codeMirror: {
     className: 'CodeMirror',
     getContent: '.CodeMirror-line',
-    setContent: '.CodeMirror > div:nth-child(1) > textarea:nth-child(1), .CodeMirror .CodeMirror-code[contenteditable="true"]'
+    setContent: '.CodeMirror > div:nth-child(1) > textarea:nth-child(1), .CodeMirror .CodeMirror-code[contenteditable="true"]',
+    url: 'https://codemirror.net/'
   },
   tiddlyWiki: {
     isIframe: true,
     className: 'tc-edit-texteditor-body',
     getContent: 'body > textarea:nth-child(1)',
-    setContent: 'body > textarea:nth-child(1)'
+    setContent: 'body > textarea:nth-child(1)',
+    url: 'https://tiddlywiki.com/'
   },
   tinyMCE: {
     isIframe: true,
     className: null,
     getContent: '#tinymce',
-    setContent: '#tinymce'
+    setContent: '#tinymce',
+    url: 'https://www.tiny.cloud/'
   }
 };
 
