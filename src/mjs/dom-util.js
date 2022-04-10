@@ -212,12 +212,10 @@ export const createElement = node => {
   let elm;
   if (node && node.nodeType === Node.ELEMENT_NODE) {
     const { attributes, localName, namespaceURI, prefix } = node;
-    const ns = namespaceURI || (prefix && nsURI[prefix]) ||
-               getNodeNS(node).namespaceURI || nsHtml;
-    const name = prefix ? `${prefix}:${localName}` : localName;
-    if (localName === 'script') {
-      elm = null;
-    } else {
+    if (localName !== 'script') {
+      const ns = namespaceURI || (prefix && nsURI[prefix]) ||
+                 getNodeNS(node).namespaceURI || nsHtml;
+      const name = prefix ? `${prefix}:${localName}` : localName;
       elm = document.createElementNS(ns, name);
       attributes && !(node instanceof HTMLUnknownElement) &&
         setAttributeNS(elm, node);
