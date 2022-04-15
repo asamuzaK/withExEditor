@@ -84,6 +84,7 @@ export const saveLibraryPackage = async (lib, info) => {
   const {
     name: moduleName,
     origin: originUrl,
+    repository,
     type,
     files
   } = value;
@@ -119,6 +120,7 @@ export const saveLibraryPackage = async (lib, info) => {
     author,
     license,
     homepage,
+    repository,
     type,
     version,
     origins
@@ -143,6 +145,10 @@ export const extractLibraries = async (cmdOpts = {}) => {
     mozilla: {
       name: 'webextension-polyfill',
       origin: 'https://unpkg.com/webextension-polyfill',
+      repository: {
+        type: 'git',
+        url: 'git+https://github.com/mozilla/webextension-polyfill.git'
+      },
       type: 'commonjs',
       files: [
         {
