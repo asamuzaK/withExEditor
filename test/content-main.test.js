@@ -328,6 +328,34 @@ describe('content-main', () => {
         document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
       const p =
         document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const p2 =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const body = document.querySelector('body');
+      svg.id = 'foo';
+      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
+        'http://www.w3.org/1999/xhtml');
+      fo.appendChild(p);
+      fo.appendChild(p2);
+      svg.appendChild(fo);
+      body.appendChild(svg);
+      const dataId = 'foo_html:p_1';
+      mjs.dataIds.set(dataId, {
+        dataId,
+        ancestorId: 'foo',
+        localName: 'p',
+        prefix: 'html',
+        queryIndex: 1
+      });
+      const res = func(dataId);
+      assert.deepEqual(res, p2, 'result');
+    });
+
+    it('should get element', () => {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const fo =
+        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      const p =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
       const body = document.querySelector('body');
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
@@ -344,6 +372,33 @@ describe('content-main', () => {
       });
       const res = func(dataId);
       assert.deepEqual(res, p, 'result');
+    });
+
+    it('should get element', () => {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const fo =
+        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      const p =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const p2 =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const body = document.querySelector('body');
+      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
+        'http://www.w3.org/1999/xhtml');
+      fo.appendChild(p);
+      fo.appendChild(p2);
+      svg.appendChild(fo);
+      body.appendChild(svg);
+      const dataId = 'html_html:p_1';
+      mjs.dataIds.set(dataId, {
+        dataId,
+        ancestorId: null,
+        localName: 'p',
+        prefix: 'html',
+        queryIndex: 1
+      });
+      const res = func(dataId);
+      assert.deepEqual(res, p2, 'result');
     });
   });
 

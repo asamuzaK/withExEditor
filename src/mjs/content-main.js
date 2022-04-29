@@ -127,17 +127,18 @@ export const getTargetElementFromDataId = dataId => {
     if (isObjectNotEmpty(data)) {
       const { ancestorId, localName, prefix, queryIndex } = data;
       if (localName && Number.isInteger(queryIndex)) {
-        let items;
+        const items = [];
         if (prefix) {
           const query = (ancestorId && `#${ancestorId} *|*`) ||
                         `${document.documentElement.localName} *|*`;
-          items = [...document.querySelectorAll(query)].filter(item => {
+          const arr = [...document.querySelectorAll(query)].filter(item => {
             const { localName: itemLocalName } = item;
             return itemLocalName === localName && item;
           });
+          items.push(...arr);
         } else {
           const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
-          items = document.querySelectorAll(query);
+          items.push(...document.querySelectorAll(query));
         }
         elm = items[queryIndex];
       }
@@ -175,7 +176,7 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
  * @returns {Array} - items
  */
 export const getQueriedItems = elm => {
-  let items;
+  const items = [];
   if (elm && elm.nodeType === Node.ELEMENT_NODE) {
     const { localName, prefix } = elm;
     const ancestorId = getAncestorId(elm);
@@ -184,16 +185,17 @@ export const getQueriedItems = elm => {
       const query = ancestorId
         ? `#${ancestorId} *|*`
         : `${rootLocalName} *|*`;
-      items = [...document.querySelectorAll(query)].filter(item => {
+      const arr = [...document.querySelectorAll(query)].filter(item => {
         const { localName: itemLocalName } = item;
         return itemLocalName === localName && item;
       });
+      items.push(...arr);
     } else {
       const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
-      items = [...document.querySelectorAll(query)];
+      items.push(...document.querySelectorAll(query));
     }
   }
-  return items || [];
+  return items;
 };
 
 /**
