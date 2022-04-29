@@ -131,7 +131,7 @@ export const getTargetElementFromDataId = dataId => {
         if (prefix) {
           const query = (ancestorId && `#${ancestorId} *|*`) ||
                         `${document.documentElement.localName} *|*`;
-          items = Array.from(document.querySelectorAll(query)).filter(item => {
+          items = [...document.querySelectorAll(query)].filter(item => {
             const { localName: itemLocalName } = item;
             return itemLocalName === localName && item;
           });
@@ -184,13 +184,13 @@ export const getQueriedItems = elm => {
       const query = ancestorId
         ? `#${ancestorId} *|*`
         : `${rootLocalName} *|*`;
-      items = Array.from(document.querySelectorAll(query)).filter(item => {
+      items = [...document.querySelectorAll(query)].filter(item => {
         const { localName: itemLocalName } = item;
         return itemLocalName === localName && item;
       });
     } else {
       const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
-      items = Array.from(document.querySelectorAll(query));
+      items = [...document.querySelectorAll(query)];
     }
   }
   return items || [];
