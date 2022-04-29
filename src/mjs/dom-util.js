@@ -404,90 +404,86 @@ export const serializeDomString = (domstr, mime, reqElm = false) => {
 /**
  * get text
  *
- * @param {object} nodes - nodes
+ * @param {object} nodes - node list
  * @param {boolean} pre - preformatted
  * @returns {string} - text
  */
 export const getText = (nodes, pre = false) => {
   const arr = [];
-  const nodeArr = nodes && Array.from(nodes);
-  if (nodeArr) {
-    for (const node of nodeArr) {
-      const {
-        alt, lastChild, localName: nodeName, nextElementSibling: nextElm,
-        nextSibling, nodeType, nodeValue: value, parentNode
-      } = node;
-      const {
-        firstElementChild: parentFirstElmChild,
-        lastElementChild: parentLastElmChild,
-        lastChild: parentLastChild, localName: parentName
-      } = parentNode;
-      const isParentBlock = TAGS_BLOCK.includes(parentName) ||
-                            TAGS_BLOCK_SPACING.includes(parentName);
-      pre = pre || parentName === 'pre';
-      switch (nodeType) {
-        case Node.ELEMENT_NODE: {
-          if (node.hasChildNodes()) {
-            TAGS_BLOCK_SPACING.includes(nodeName) &&
-            node !== parentFirstElmChild &&
-              arr.push('\n');
-            arr.push(getText(node.childNodes, pre));
-            if (isParentBlock) {
-              if (node === parentLastChild) {
-                const isLastChild =
-                  (lastChild.nodeType === Node.TEXT_NODE &&
-                   lastChild.nodeValue) ||
-                  (lastChild.nodeType === Node.ELEMENT_NODE &&
-                   TAGS_PHRASING.includes(nodeName) &&
-                   TAGS_PHRASING.includes(lastChild.localName));
-                isLastChild && arr.push('\n');
-              } else {
-                const isPhrase = (!nextElm || nextElm.localName !== 'br') &&
-                                 !pre && TAGS_PHRASING.includes(nodeName);
-                isPhrase && arr.push(' ');
-              }
+  nodes instanceof NodeList && nodes.forEach(node => {
+    const {
+      alt, lastChild, localName: nodeName, nextElementSibling: nextElm,
+      nextSibling, nodeType, nodeValue: value, parentNode
+    } = node;
+    const {
+      firstElementChild: parentFirstElmChild,
+      lastElementChild: parentLastElmChild,
+      lastChild: parentLastChild, localName: parentName
+    } = parentNode;
+    const isParentBlock = TAGS_BLOCK.includes(parentName) ||
+                          TAGS_BLOCK_SPACING.includes(parentName);
+    pre = pre || parentName === 'pre';
+    switch (nodeType) {
+      case Node.ELEMENT_NODE: {
+        if (node.hasChildNodes()) {
+          TAGS_BLOCK_SPACING.includes(nodeName) &&
+          node !== parentFirstElmChild &&
+            arr.push('\n');
+          arr.push(getText(node.childNodes, pre));
+          if (isParentBlock) {
+            if (node === parentLastChild) {
+              const isLastChild =
+                (lastChild.nodeType === Node.TEXT_NODE &&
+                 lastChild.nodeValue) ||
+                (lastChild.nodeType === Node.ELEMENT_NODE &&
+                 TAGS_PHRASING.includes(nodeName) &&
+                 TAGS_PHRASING.includes(lastChild.localName));
+              isLastChild && arr.push('\n');
+            } else {
+              const isPhrase = (!nextElm || nextElm.localName !== 'br') &&
+                               !pre && TAGS_PHRASING.includes(nodeName);
+              isPhrase && arr.push(' ');
             }
-            if (TAGS_TABLE_CELL.includes(nodeName) &&
-                node !== parentLastElmChild) {
-              arr.push('\t');
-            } else if (nodeName === 'tr' ||
-                       (TAGS_BLOCK_SPACING.includes(nodeName) &&
-                        node !== parentLastElmChild &&
-                        !TAGS_BLOCK_SPACING.includes(nextElm.localName))) {
-              arr.push('\n');
-            }
-          } else if (TAGS_ALT.includes(nodeName)) {
-            if ((nodeName !== 'input' || node.type === 'image') && alt) {
-              const trail =
-                isParentBlock && (
-                  node === parentLastChild ||
-                  (node === parentLastElmChild &&
-                   nextSibling.nodeType === Node.TEXT_NODE &&
-                   /^\s*$/.test(nextSibling.nodeValue))
-                )
-                  ? '\n'
-                  : ' ';
-              arr.push(`${alt}${trail}`);
-            }
-          } else {
-            nodeName === 'br' && arr.push('\n');
           }
-          break;
-        }
-        case Node.TEXT_NODE: {
-          if (pre) {
-            arr.push(value);
-          } else if (isParentBlock && node === parentLastChild) {
-            arr.push(value.trim().replace(/([^\n])$/, (m, c) => `${c}\n`));
-          } else {
-            arr.push(value.trim());
+          if (TAGS_TABLE_CELL.includes(nodeName) &&
+              node !== parentLastElmChild) {
+            arr.push('\t');
+          } else if (nodeName === 'tr' ||
+                     (TAGS_BLOCK_SPACING.includes(nodeName) &&
+                      node !== parentLastElmChild &&
+                      !TAGS_BLOCK_SPACING.includes(nextElm.localName))) {
+            arr.push('\n');
           }
-          break;
+        } else if (TAGS_ALT.includes(nodeName)) {
+          if ((nodeName !== 'input' || node.type === 'image') && alt) {
+            const trail = isParentBlock && (
+              node === parentLastChild ||
+              (node === parentLastElmChild &&
+               nextSibling.nodeType === Node.TEXT_NODE &&
+               /^\s*$/.test(nextSibling.nodeValue))
+            )
+              ? '\n'
+              : ' ';
+            arr.push(`${alt}${trail}`);
+          }
+        } else {
+          nodeName === 'br' && arr.push('\n');
         }
-        default:
+        break;
       }
+      case Node.TEXT_NODE: {
+        if (pre) {
+          arr.push(value);
+        } else if (isParentBlock && node === parentLastChild) {
+          arr.push(value.trim().replace(/([^\n])$/, (m, c) => `${c}\n`));
+        } else {
+          arr.push(value.trim());
+        }
+        break;
+      }
+      default:
     }
-  }
+  });
   return arr.join('');
 };
 
