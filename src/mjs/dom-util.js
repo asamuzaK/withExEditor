@@ -341,9 +341,7 @@ export const createDomStringFromSelectionRange = sel => {
   if (sel && sel.rangeCount) {
     const rangeArr = createRangeArr(sel.getRangeAt(0));
     frag = document.createDocumentFragment();
-    for (const range of rangeArr) {
-      frag.appendChild(range);
-    }
+    frag.append(...rangeArr);
   }
   return frag ? new XMLSerializer().serializeToString(frag) : null;
 };
