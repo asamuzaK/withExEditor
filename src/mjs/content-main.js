@@ -166,7 +166,7 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
     const [, fileName] = reg.exec(pathname);
     dataId = decodeURIComponent(fileName);
   }
-  return dataId && dataId.length < FILE_LEN ? dataId : subst;
+  return dataId?.length < FILE_LEN ? dataId : subst;
 };
 
 /**
@@ -177,7 +177,7 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
  */
 export const getQueriedItems = elm => {
   const items = [];
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+  if (elm?.nodeType === Node.ELEMENT_NODE) {
     const { localName, prefix } = elm;
     const ancestorId = getAncestorId(elm);
     if (prefix) {
@@ -710,7 +710,7 @@ export const createContentDataMsg = async data => {
  */
 export const postContent = async (elm, mode) => {
   const func = [];
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+  if (elm?.nodeType === Node.ELEMENT_NODE) {
     const data = await createContentData(elm, mode).then(createTmpFileData);
     func.push(
       createContentDataMsg(data).then(postMsg),
@@ -786,7 +786,7 @@ export const determineContentProcess = (obj = {}) => {
  */
 export const createReplacingContent = (node, opt = {}) => {
   const frag = document.createDocumentFragment();
-  if (node && node.nodeType === Node.ELEMENT_NODE) {
+  if (node?.nodeType === Node.ELEMENT_NODE) {
     const { controlledBy, domstr, namespaceURI, value } = opt;
     const ctrl = controlledBy && isString(controlledBy) &&
                  getTargetElementFromDataId(controlledBy);
@@ -821,7 +821,7 @@ export const createReplacingContent = (node, opt = {}) => {
  */
 export const replaceEditableContent = (node, opt = {}) => {
   const { controlledBy, dataId, namespaceURI, value } = opt;
-  if (node && node.nodeType === Node.ELEMENT_NODE &&
+  if (node?.nodeType === Node.ELEMENT_NODE &&
       dataIds.has(dataId) && isString(value)) {
     const changed = value !== node.textContent.replace(/^\s*/, '')
       .replace(/\n +/g, '\n').replace(/([^\n])$/, (m, c) => `${c}\n`);
@@ -903,7 +903,7 @@ export const replaceEditableContent = (node, opt = {}) => {
  */
 export const replaceEditControlValue = (elm, opt = {}) => {
   const { dataId, value } = opt;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+  if (elm?.nodeType === Node.ELEMENT_NODE &&
       /^(?:input|textarea)$/.test(elm.localName) &&
       dataIds.has(dataId) && isString(value)) {
     const data = dataIds.get(dataId);
@@ -948,7 +948,7 @@ export const replaceEditControlValue = (elm, opt = {}) => {
  */
 export const replaceLiveEditContent = (elm, opt = {}) => {
   const { dataId, liveEditKey, value } = opt;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+  if (elm?.nodeType === Node.ELEMENT_NODE &&
       dataIds.has(dataId) && liveEdit[liveEditKey] && isString(value)) {
     const { isIframe, setContent } = liveEdit[liveEditKey];
     const data = dataIds.get(dataId);

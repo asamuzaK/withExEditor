@@ -34,7 +34,7 @@ import {
 const {
   browserAction, i18n, notifications, runtime, tabs, windows
 } = browser;
-const menus = browser.menus || browser.contextMenus;
+const menus = browser.menus ?? browser.contextMenus;
 
 /* variables */
 export const vars = {
@@ -568,9 +568,8 @@ export const extractEditorConfig = async (data = {}) => {
     EDITOR_FILE_NAME,
     EDITOR_LABEL
   ]);
-  const editorFileName = store && store[EDITOR_FILE_NAME] &&
-                         store[EDITOR_FILE_NAME].value;
-  const editorLabel = store && store[EDITOR_LABEL] && store[EDITOR_LABEL].value;
+  const editorFileName = store && store[EDITOR_FILE_NAME]?.value;
+  const editorLabel = store && store[EDITOR_LABEL]?.value;
   const editorNewLabel = (editorFileName === editorName && editorLabel) ||
                          (executable && editorName) || '';
   const func = [
@@ -624,7 +623,7 @@ export const extractEditorConfig = async (data = {}) => {
  */
 export const reloadExt = async (reload = false) => {
   if (reload) {
-    host && host.disconnect();
+    host?.disconnect();
     runtime.reload();
   }
 };
@@ -855,8 +854,8 @@ export const onTabActivated = async info => {
   let bool;
   if (windowId && tabId) {
     const portsWin = ports.get(windowId);
-    const portsTab = portsWin && portsWin.get(tabId);
-    const items = portsTab && portsTab.values();
+    const portsTab = portsWin?.get(tabId);
+    const items = portsTab?.values();
     if (items) {
       for (const item of items) {
         const { name } = item;
@@ -899,8 +898,8 @@ export const onTabUpdated = async (id, info, tab) => {
     const tabId = stringifyPositiveInt(id, true);
     const portUrl = removeQueryFromURI(url);
     const portsWin = ports.get(windowId);
-    const portsTab = portsWin && portsWin.get(tabId);
-    const port = portsTab && portsTab.get(portUrl);
+    const portsTab = portsWin?.get(tabId);
+    const port = portsTab?.get(portUrl);
     if (port) {
       const { name } = port;
       varsLocal[MENU_ENABLED] = name === PORT_CONTENT;
@@ -933,19 +932,17 @@ export const onTabRemoved = async (id, info) => {
     const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(id, true);
     const portsWin = ports.get(windowId);
-    const portsTab = portsWin && portsWin.get(tabId);
-    if (portsTab) {
-      func.push(
-        restorePorts({ windowId, tabId }),
-        hostPostMsg({
-          [TMP_FILE_DATA_REMOVE]: {
-            tabId,
-            windowId,
-            dir: incognito ? TMP_FILES_PB : TMP_FILES
-          }
-        })
-      );
-    }
+    const portsTab = portsWin?.get(tabId);
+    portsTab && func.push(
+      restorePorts({ windowId, tabId }),
+      hostPostMsg({
+        [TMP_FILE_DATA_REMOVE]: {
+          tabId,
+          windowId,
+          dir: incognito ? TMP_FILES_PB : TMP_FILES
+        }
+      })
+    );
   }
   return Promise.all(func);
 };
@@ -1055,7 +1052,7 @@ export const setVar = async (item, obj, changed = false) => {
     const hasPorts = ports.size > 0;
     switch (item) {
       case EDITOR_FILE_NAME:
-        varsLocal[IS_EXECUTABLE] = app && !!app.executable;
+        varsLocal[IS_EXECUTABLE] = !!(app?.executable);
         if (changed) {
           func.push(toggleBadge());
         }

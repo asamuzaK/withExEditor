@@ -48,7 +48,7 @@ export { liveEdit as default };
  */
 export const getLiveEditKey = elm => {
   let liveEditKey;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+  if (elm?.nodeType === Node.ELEMENT_NODE) {
     const items = Object.entries(liveEdit);
     for (const [key, value] of items) {
       const { className, getContent, isIframe, setContent } = value;
@@ -115,8 +115,7 @@ export const getLiveEditElement = node => {
  */
 export const getLiveEditContent = (elm, key) => {
   let content;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
-      isString(key) && liveEdit[key]) {
+  if (elm?.nodeType === Node.ELEMENT_NODE && isString(key) && liveEdit[key]) {
     const { getContent, isIframe } = liveEdit[key];
     let items;
     if (isIframe && elm.contentDocument) {

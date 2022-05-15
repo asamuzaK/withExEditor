@@ -54,7 +54,7 @@ export const getEditorConfig = async () => postMsg({
  * @returns {object} - pref data
  */
 export const createPref = async (elm, executable = false) => {
-  const id = elm && elm.id;
+  const id = elm?.id;
   const data = id && {
     [STORAGE_SET]: {
       [id]: {
@@ -154,7 +154,7 @@ export const extractSyncUrls = async evt => {
   const { value } = target;
   const items = isString(value) && value.split('\n');
   let func;
-  if (items && items.length) {
+  if (items?.length) {
     let bool = false;
     for (let item of items) {
       item = item.trim();
@@ -266,7 +266,7 @@ export const preventEvent = evt => {
  */
 export const addReloadExtensionListener = async () => {
   const elm = document.getElementById(EXT_RELOAD);
-  elm && elm.addEventListener('click', handleReloadExtensionClick);
+  elm?.addEventListener('click', handleReloadExtensionClick);
 };
 
 /**
@@ -276,7 +276,7 @@ export const addReloadExtensionListener = async () => {
  */
 export const addSyncUrlsInputListener = async () => {
   const elm = document.getElementById(SYNC_AUTO_URL);
-  elm && elm.addEventListener('input', handleSyncUrlsInputInput);
+  elm?.addEventListener('input', handleSyncUrlsInputInput);
 };
 
 /**
@@ -362,7 +362,7 @@ export const setValuesFromStorage = async () => {
 export const handleMsg = async msg => {
   const func = [];
   const items = msg && Object.entries(msg);
-  if (items && items.length) {
+  if (items?.length) {
     for (const item of items) {
       const [key, value] = item;
       switch (key) {

@@ -15,8 +15,8 @@ import { isObjectNotEmpty, isString } from './common.js';
  */
 export const dispatchEvent = (target, type, opt) => {
   let res;
-  if ((target.nodeType === Node.DOCUMENT_NODE ||
-       target.nodeType === Node.ELEMENT_NODE) &&
+  if ((target?.nodeType === Node.DOCUMENT_NODE ||
+       target?.nodeType === Node.ELEMENT_NODE) &&
       isString(type) && isObjectNotEmpty(opt)) {
     const evt = new Event(type, opt);
     res = target.dispatchEvent(evt);
@@ -32,7 +32,7 @@ export const dispatchEvent = (target, type, opt) => {
  */
 export const dispatchChangeEvent = elm => {
   let res;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+  if (elm?.nodeType === Node.ELEMENT_NODE) {
     const opt = {
       bubbles: true,
       cancelable: false
@@ -57,7 +57,7 @@ export const dispatchClipboardEvent = (elm, type, opt = {
   composed: true
 }) => {
   let res;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+  if (elm?.nodeType === Node.ELEMENT_NODE &&
       isString(type) && /^(?:c(?:opy|ut)|paste)$/.test(type)) {
     const evt = new ClipboardEvent(type, opt);
     const { clipboardData } = opt;
@@ -85,7 +85,7 @@ export const dispatchClipboardEvent = (elm, type, opt = {
  */
 export const dispatchFocusEvent = elm => {
   let res;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+  if (elm?.nodeType === Node.ELEMENT_NODE) {
     const opt = {
       bubbles: false,
       cancelable: false
@@ -106,7 +106,7 @@ export const dispatchFocusEvent = elm => {
  */
 export const dispatchInputEvent = (elm, type, opt) => {
   let res;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+  if (elm?.nodeType === Node.ELEMENT_NODE &&
       isString(type) && /^(?:before)?input$/.test(type)) {
     if (!isObjectNotEmpty(opt)) {
       opt = {
@@ -141,7 +141,7 @@ export const dispatchInputEvent = (elm, type, opt) => {
  */
 export const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
   let res;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE &&
+  if (elm?.nodeType === Node.ELEMENT_NODE &&
       isString(type) && /^key(?:down|press|up)$/.test(type) &&
       isObjectNotEmpty(keyOpt)) {
     const {

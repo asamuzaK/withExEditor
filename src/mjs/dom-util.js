@@ -140,7 +140,7 @@ export const getNodeNS = node => {
  */
 export const getXmlnsPrefixedNamespace = (elm, attr) => {
   let ns;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+  if (elm?.nodeType === Node.ELEMENT_NODE) {
     let node = elm;
     while (node && node.parentNode && !ns) {
       if (node.hasAttributeNS('', `xmlns:${attr}`)) {
@@ -161,7 +161,7 @@ export const getXmlnsPrefixedNamespace = (elm, attr) => {
  */
 export const setAttributeNS = (elm, node = {}) => {
   const { attributes } = node;
-  if (elm && attributes && attributes.length) {
+  if (elm && attributes?.length) {
     for (const attr of attributes) {
       const { localName, name, namespaceURI, prefix, value } = attr;
       if (typeof node[name] !== 'function' && !localName.startsWith('on')) {
@@ -210,7 +210,7 @@ export const setAttributeNS = (elm, node = {}) => {
  */
 export const createElement = node => {
   let elm;
-  if (node && node.nodeType === Node.ELEMENT_NODE) {
+  if (node?.nodeType === Node.ELEMENT_NODE) {
     const { attributes, localName, namespaceURI, prefix } = node;
     if (localName !== 'script') {
       const ns = namespaceURI || (prefix && nsURI[prefix]) ||
@@ -234,9 +234,8 @@ export const createFragment = nodes => {
   const frag = document.createDocumentFragment();
   if (Array.isArray(nodes)) {
     for (const node of nodes) {
-      if (node &&
-          (node.nodeType === Node.ELEMENT_NODE ||
-           node.nodeType === Node.TEXT_NODE)) {
+      if (node?.nodeType === Node.ELEMENT_NODE ||
+          node?.nodeType === Node.TEXT_NODE) {
         frag.appendChild(node);
       }
     }
@@ -253,8 +252,7 @@ export const createFragment = nodes => {
  */
 export const appendChildNodes = (elm, node) => {
   const parent = createElement(elm);
-  if (parent && parent.nodeType === Node.ELEMENT_NODE &&
-      node && node.hasChildNodes()) {
+  if (parent?.nodeType === Node.ELEMENT_NODE && node?.hasChildNodes()) {
     const arr = [];
     const nodes = node.childNodes;
     for (const child of nodes) {
@@ -338,7 +336,7 @@ export const createRangeArr = range => {
  */
 export const createDomStringFromSelectionRange = sel => {
   let frag;
-  if (sel && sel.rangeCount) {
+  if (sel?.rangeCount) {
     const rangeArr = createRangeArr(sel.getRangeAt(0));
     frag = document.createDocumentFragment();
     frag.append(...rangeArr);
@@ -379,7 +377,7 @@ export const serializeDomString = (domstr, mime, reqElm = false) => {
         for (const child of childNodes) {
           if (child.nodeType === Node.ELEMENT_NODE) {
             const elm = appendChildNodes(child, child.cloneNode(true));
-            elm && elm.nodeType === Node.ELEMENT_NODE &&
+            elm?.nodeType === Node.ELEMENT_NODE &&
               frag.appendChild(elm);
           } else {
             child.nodeType === Node.TEXT_NODE && child.nodeValue &&
@@ -408,80 +406,82 @@ export const serializeDomString = (domstr, mime, reqElm = false) => {
  */
 export const getText = (nodes, pre = false) => {
   const arr = [];
-  nodes instanceof NodeList && nodes.forEach(node => {
-    const {
-      alt, lastChild, localName: nodeName, nextElementSibling: nextElm,
-      nextSibling, nodeType, nodeValue: value, parentNode
-    } = node;
-    const {
-      firstElementChild: parentFirstElmChild,
-      lastElementChild: parentLastElmChild,
-      lastChild: parentLastChild, localName: parentName
-    } = parentNode;
-    const isParentBlock = TAGS_BLOCK.includes(parentName) ||
-                          TAGS_BLOCK_SPACING.includes(parentName);
-    pre = pre || parentName === 'pre';
-    switch (nodeType) {
-      case Node.ELEMENT_NODE: {
-        if (node.hasChildNodes()) {
-          TAGS_BLOCK_SPACING.includes(nodeName) &&
-          node !== parentFirstElmChild &&
-            arr.push('\n');
-          arr.push(getText(node.childNodes, pre));
-          if (isParentBlock) {
-            if (node === parentLastChild) {
-              const isLastChild =
-                (lastChild.nodeType === Node.TEXT_NODE &&
-                 lastChild.nodeValue) ||
-                (lastChild.nodeType === Node.ELEMENT_NODE &&
-                 TAGS_PHRASING.includes(nodeName) &&
-                 TAGS_PHRASING.includes(lastChild.localName));
-              isLastChild && arr.push('\n');
-            } else {
-              const isPhrase = (!nextElm || nextElm.localName !== 'br') &&
-                               !pre && TAGS_PHRASING.includes(nodeName);
-              isPhrase && arr.push(' ');
+  if (nodes instanceof NodeList) {
+    for (const node of nodes) {
+      const {
+        alt, lastChild, localName: nodeName, nextElementSibling: nextElm,
+        nextSibling, nodeType, nodeValue: value, parentNode
+      } = node;
+      const {
+        firstElementChild: parentFirstElmChild,
+        lastElementChild: parentLastElmChild,
+        lastChild: parentLastChild, localName: parentName
+      } = parentNode;
+      const isParentBlock = TAGS_BLOCK.includes(parentName) ||
+                            TAGS_BLOCK_SPACING.includes(parentName);
+      pre = pre || parentName === 'pre';
+      switch (nodeType) {
+        case Node.ELEMENT_NODE: {
+          if (node.hasChildNodes()) {
+            TAGS_BLOCK_SPACING.includes(nodeName) &&
+            node !== parentFirstElmChild &&
+              arr.push('\n');
+            arr.push(getText(node.childNodes, pre));
+            if (isParentBlock) {
+              if (node === parentLastChild) {
+                const isLastChild =
+                  (lastChild.nodeType === Node.TEXT_NODE &&
+                   lastChild.nodeValue) ||
+                  (lastChild.nodeType === Node.ELEMENT_NODE &&
+                   TAGS_PHRASING.includes(nodeName) &&
+                   TAGS_PHRASING.includes(lastChild.localName));
+                isLastChild && arr.push('\n');
+              } else {
+                const isPhrase = (!nextElm || nextElm.localName !== 'br') &&
+                                 !pre && TAGS_PHRASING.includes(nodeName);
+                isPhrase && arr.push(' ');
+              }
             }
+            if (TAGS_TABLE_CELL.includes(nodeName) &&
+                node !== parentLastElmChild) {
+              arr.push('\t');
+            } else if (nodeName === 'tr' ||
+                       (TAGS_BLOCK_SPACING.includes(nodeName) &&
+                        node !== parentLastElmChild &&
+                        !TAGS_BLOCK_SPACING.includes(nextElm.localName))) {
+              arr.push('\n');
+            }
+          } else if (TAGS_ALT.includes(nodeName)) {
+            if ((nodeName !== 'input' || node.type === 'image') && alt) {
+              const trail = isParentBlock && (
+                node === parentLastChild ||
+                (node === parentLastElmChild &&
+                 nextSibling.nodeType === Node.TEXT_NODE &&
+                 /^\s*$/.test(nextSibling.nodeValue))
+              )
+                ? '\n'
+                : ' ';
+              arr.push(`${alt}${trail}`);
+            }
+          } else {
+            nodeName === 'br' && arr.push('\n');
           }
-          if (TAGS_TABLE_CELL.includes(nodeName) &&
-              node !== parentLastElmChild) {
-            arr.push('\t');
-          } else if (nodeName === 'tr' ||
-                     (TAGS_BLOCK_SPACING.includes(nodeName) &&
-                      node !== parentLastElmChild &&
-                      !TAGS_BLOCK_SPACING.includes(nextElm.localName))) {
-            arr.push('\n');
-          }
-        } else if (TAGS_ALT.includes(nodeName)) {
-          if ((nodeName !== 'input' || node.type === 'image') && alt) {
-            const trail = isParentBlock && (
-              node === parentLastChild ||
-              (node === parentLastElmChild &&
-               nextSibling.nodeType === Node.TEXT_NODE &&
-               /^\s*$/.test(nextSibling.nodeValue))
-            )
-              ? '\n'
-              : ' ';
-            arr.push(`${alt}${trail}`);
-          }
-        } else {
-          nodeName === 'br' && arr.push('\n');
+          break;
         }
-        break;
-      }
-      case Node.TEXT_NODE: {
-        if (pre) {
-          arr.push(value);
-        } else if (isParentBlock && node === parentLastChild) {
-          arr.push(value.trim().replace(/([^\n])$/, (m, c) => `${c}\n`));
-        } else {
-          arr.push(value.trim());
+        case Node.TEXT_NODE: {
+          if (pre) {
+            arr.push(value);
+          } else if (isParentBlock && node === parentLastChild) {
+            arr.push(value.trim().replace(/([^\n])$/, (m, c) => `${c}\n`));
+          } else {
+            arr.push(value.trim());
+          }
+          break;
         }
-        break;
+        default:
       }
-      default:
     }
-  });
+  }
   return arr.join('');
 };
 
@@ -493,7 +493,7 @@ export const getText = (nodes, pre = false) => {
  */
 export const getAncestorId = elm => {
   let ancestorId;
-  if (elm && elm.nodeType === Node.ELEMENT_NODE) {
+  if (elm?.nodeType === Node.ELEMENT_NODE) {
     let node = elm;
     while (node && node.parentNode) {
       const { id: nodeId } = node;
