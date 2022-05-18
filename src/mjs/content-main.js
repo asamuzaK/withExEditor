@@ -353,9 +353,7 @@ export const createTmpFileData = async (data = {}) => {
   } = data;
   let { dataId, namespaceURI } = data;
   let tmpFileData;
-  if (!namespaceURI) {
-    namespaceURI = '';
-  }
+  namespaceURI ??= '';
   switch (mode) {
     case MODE_EDIT:
     case MODE_EDIT_TXT:
