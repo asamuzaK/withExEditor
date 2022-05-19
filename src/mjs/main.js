@@ -1147,4 +1147,4 @@ export const setOs = async () => {
  * @returns {Function} - promise chain
  */
 export const startup = () => setOs().then(getAllStorage).then(setVars)
-  .then(setDefaultIcon).then(toggleBadge).catch(throwErr);
+  .then(setDefaultIcon).then(toggleBadge);

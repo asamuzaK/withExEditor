@@ -27,12 +27,12 @@ menus.onClicked.addListener((info, tab) =>
   postContextMenuData(info, tab).catch(throwErr)
 );
 runtime.onConnect.addListener(port => handlePort(port).catch(throwErr));
+runtime.onInstalled.addListener(() => startup().catch(throwErr));
 runtime.onMessage.addListener((msg, sender) =>
   handleMsg(msg, sender).catch(throwErr)
 );
-storage.onChanged.addListener(data =>
-  setVars(data).catch(throwErr)
-);
+runtime.onStartup.addListener(() => startup().catch(throwErr));
+storage.onChanged.addListener(data => setVars(data).catch(throwErr));
 tabs.onActivated.addListener(info => onTabActivated(info).catch(throwErr));
 tabs.onUpdated.addListener((id, info, tab) =>
   onTabUpdated(id, info, tab).catch(throwErr)
@@ -46,6 +46,3 @@ windows.onFocusChanged.addListener(windowId =>
 windows.onRemoved.addListener(windowId =>
   onWindowRemoved(windowId).catch(throwErr)
 );
-
-/* startup */
-document.addEventListener('DOMContentLoaded', startup);
