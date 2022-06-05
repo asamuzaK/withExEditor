@@ -14,7 +14,7 @@ import {
 const {
   browserAction, commands, runtime, storage, tabs, windows
 } = browser;
-const menus = browser.menus || browser.contextMenus;
+const menus = browser.menus ?? browser.contextMenus;
 
 /* listeners */
 browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
