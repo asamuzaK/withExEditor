@@ -346,8 +346,9 @@ export const createNotification = async (id, opt) => {
   let func;
   if (isGranted) {
     const { notifications } = browser;
-    !notifications.onClosed.hasListener(clearNotification) &&
+    if (!notifications.onClosed.hasListener(clearNotification)) {
       notifications.onClosed.addListener(clearNotification);
+    }
     func = notifications.create(id, opt);
   }
   return func || null;
@@ -424,8 +425,8 @@ export const getOs = async () => {
 /**
  * make a connection
  *
- * @param {number|string} [id] - tab ID / extension ID
- * @param {object} [info] - info
+ * @param {number|string} [id] - tab ID / extension ID / host name
+ * @param {object|boolean} [info] - connection info / connect to native app
  * @returns {object} - runtime.Port
  */
 export const makeConnection = async (id, info) => {
@@ -437,7 +438,9 @@ export const makeConnection = async (id, info) => {
       port = await tabs.connect(id);
     }
   } else if (isString(id)) {
-    if (isObjectNotEmpty(info)) {
+    if (info && getType(info) === 'Boolean') {
+      port = await runtime.connectNative(id);
+    } else if (isObjectNotEmpty(info)) {
       port = await runtime.connect(id, info);
     } else {
       port = await runtime.connect(id);
@@ -455,7 +458,7 @@ export const makeConnection = async (id, info) => {
 /**
  * send message
  *
- * @param {number|string} id - tabId or extension ID
+ * @param {number|string} id - tab ID / extension ID
  * @param {*} msg - message
  * @param {object} opt - options
  * @returns {?Function} - tabs.sendMessage() | runtime.sendMessage()
@@ -979,7 +982,9 @@ export const warmupTab = async tabId => {
   if (!Number.isInteger(tabId)) {
     throw new TypeError(`Expected Number but got ${getType(tabId)}.`);
   }
-  typeof tabs.warmup === 'function' && await tabs.warmup(tabId);
+  if (typeof tabs.warmup === 'function') {
+    await tabs.warmup(tabId);
+  }
 };
 
 /**
@@ -1081,7 +1086,7 @@ export const getWindow = async (windowId, opt) => {
 export const checkIncognitoWindowExists = async () => {
   const arr = await getAllNormalWindows();
   let bool;
-  if (arr && arr.length) {
+  if (arr?.length) {
     for (const win of arr) {
       bool = win.incognito;
       if (bool) {
