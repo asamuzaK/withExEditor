@@ -1015,7 +1015,7 @@ export const syncText = (obj = {}) => {
           dataIds.delete(dataId);
         } else {
           const storedData = dataIds.get(dataId);
-          const mutex = storedData && storedData.mutex;
+          const mutex = storedData?.mutex;
           const isUpdated = !lastUpdate ||
                             (Number.isInteger(timestamp) &&
                              Number.isInteger(lastUpdate) &&
@@ -1058,7 +1058,7 @@ export const syncText = (obj = {}) => {
 export const handlePortMsg = async msg => {
   const func = [];
   const items = msg && Object.entries(msg);
-  if (items && items.length) {
+  if (items?.length) {
     for (const [key, value] of items) {
       switch (key) {
         case CONTENT_GET:

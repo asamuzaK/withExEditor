@@ -142,7 +142,7 @@ export const getXmlnsPrefixedNamespace = (elm, attr) => {
   let ns;
   if (elm?.nodeType === Node.ELEMENT_NODE) {
     let node = elm;
-    while (node && node.parentNode && !ns) {
+    while (node?.parentNode && !ns) {
       if (node.hasAttributeNS('', `xmlns:${attr}`)) {
         ns = node.getAttributeNS('', `xmlns:${attr}`);
       }
@@ -495,7 +495,7 @@ export const getAncestorId = elm => {
   let ancestorId;
   if (elm?.nodeType === Node.ELEMENT_NODE) {
     let node = elm;
-    while (node && node.parentNode) {
+    while (node?.parentNode) {
       const { id: nodeId } = node;
       if (nodeId) {
         ancestorId = nodeId;
@@ -515,7 +515,7 @@ export const getAncestorId = elm => {
  */
 export const isEditable = node => {
   let editable;
-  while (node && node.parentNode) {
+  while (node?.parentNode) {
     if (!node.namespaceURI || node.namespaceURI === nsHtml) {
       editable = node.isContentEditable;
     }
@@ -535,8 +535,8 @@ export const isEditable = node => {
  */
 export const isContentTextNode = node => {
   let isText = isEditable(node);
-  if (isText && node && node.namespaceURI &&
-      node.namespaceURI !== nsHtml && node.hasChildNodes()) {
+  if (isText && node?.namespaceURI && node?.namespaceURI !== nsHtml &&
+      node?.hasChildNodes()) {
     const nodes = node.childNodes;
     for (const child of nodes) {
       isText = child.nodeType === Node.TEXT_NODE;
@@ -576,7 +576,7 @@ export const getEditableElm = node => {
   if (isEditControl(node)) {
     elm = node;
   } else {
-    while (node && node.parentNode) {
+    while (node?.parentNode) {
       if (node.hasAttribute('contenteditable') && node.isContentEditable &&
           (!node.namespaceURI || node.namespaceURI === nsHtml)) {
         elm = node;

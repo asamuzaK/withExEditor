@@ -78,7 +78,7 @@ export const getLiveEditKey = elm => {
 export const getLiveEditElement = node => {
   const items = Object.values(liveEdit);
   let elm;
-  while (node && node.parentNode && !elm) {
+  while (node?.parentNode && !elm) {
     const { classList, namespaceURI } = node;
     const isHtml = !namespaceURI || namespaceURI === nsHtml;
     if (isHtml) {
@@ -123,7 +123,7 @@ export const getLiveEditContent = (elm, key) => {
     } else {
       items = elm.querySelectorAll(getContent);
     }
-    if (items && items.length) {
+    if (items?.length) {
       const arr = [];
       for (const item of items) {
         if (item.localName === 'br') {
