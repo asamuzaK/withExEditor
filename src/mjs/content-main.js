@@ -166,7 +166,7 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
     const [, fileName] = reg.exec(pathname);
     dataId = decodeURIComponent(fileName);
   }
-  return dataId?.length < FILE_LEN ? dataId : subst;
+  return dataId && dataId.length < FILE_LEN ? dataId : subst;
 };
 
 /**
