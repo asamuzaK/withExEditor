@@ -134,11 +134,13 @@ export const restorePorts = async (data = {}) => {
  * remove port from ports collection
  *
  * @param {object} port - removed port
- * @returns {?Function} - hostPostMsg()
+ * @returns {Promise.<Array>} - results of each handler
  */
 export const removePort = async (port = {}) => {
-  const { sender } = port;
-  let func;
+  const { error, sender } = port;
+  const e = error || (runtime.lastError?.message && runtime.lastError);
+  const func = [];
+  e && func.push(logErr(e));
   if (isObjectNotEmpty(sender)) {
     const { tab, url } = sender;
     const { incognito, windowId: wId, id: tId } = tab;
@@ -151,18 +153,18 @@ export const removePort = async (port = {}) => {
         const portUrl = removeQueryFromURI(url);
         const { hostname } = new URL(portUrl);
         portsTab.delete(portUrl);
-        func = hostPostMsg({
+        func.push(hostPostMsg({
           [TMP_FILE_DATA_REMOVE]: {
             tabId,
             windowId,
             dir: incognito ? TMP_FILES_PB : TMP_FILES,
             host: hostname
           }
-        });
+        }));
       }
     }
   }
-  return func || null;
+  return Promise.all(func);
 };
 
 /**
@@ -614,20 +616,6 @@ export const extractEditorConfig = async (data = {}) => {
   return Promise.all(func);
 };
 
-/* extension */
-/**
- * reload extension
- *
- * @param {boolean} reload - reload
- * @returns {void}
- */
-export const reloadExt = async (reload = false) => {
-  if (reload) {
-    host?.disconnect();
-    runtime.reload();
-  }
-};
-
 /* handlers */
 /**
  * open options page
@@ -828,16 +816,6 @@ export const handlePort = async (port = {}) => {
     }
   }
   return func || null;
-};
-
-/**
- * handle disconnected host
- *
- * @returns {Function} - toggleBadge()
- */
-export const handleDisconnectedHost = async () => {
-  hostStatus[HOST_CONNECTION] = false;
-  return toggleBadge();
 };
 
 /**
@@ -1141,10 +1119,60 @@ export const setOs = async () => {
   vars[IS_MAC] = os === 'mac';
 };
 
+/* extension */
+/**
+ * handle disconnected host
+ *
+ * @param {object} port - runtime.Port
+ * @returns {Promise.<Array>} - results of each handler
+ */
+export const handleDisconnectedHost = async (port = {}) => {
+  const { error } = port;
+  const e = error || (runtime.lastError.message && runtime.lastError);
+  const func = [toggleBadge()];
+  e && func.push(logErr(e));
+  hostStatus[HOST_CONNECTION] = false;
+  return Promise.all(func);
+};
+
+/**
+ * handle host on disconnect
+ *
+ * @param {object} port - removed host
+ * @returns {Function} - promise chain
+ */
+export const handleHostOnDisconnect = port =>
+  handleDisconnectedHost(port).catch(throwErr);
+
+/**
+ * set host
+ *
+ * @returns {void}
+ */
+export const setHost = async () => {
+  host.onDisconnect.addListener(handleHostOnDisconnect);
+  host.onMessage.addListener(handlePortOnMsg);
+};
+
+/**
+ * reload extension
+ *
+ * @param {boolean} reload - reload
+ * @returns {void}
+ */
+export const reloadExt = async (reload = false) => {
+  if (reload) {
+    host?.disconnect();
+    runtime.reload();
+  }
+};
+
 /**
  * startup
  *
  * @returns {Function} - promise chain
  */
-export const startup = () => setOs().then(getAllStorage).then(setVars)
-  .then(setDefaultIcon).then(toggleBadge);
+export const startup = () => Promise.all([
+  setHost(),
+  setOs()
+]).then(getAllStorage).then(setVars).then(setDefaultIcon).then(toggleBadge);

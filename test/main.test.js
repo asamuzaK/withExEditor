@@ -171,26 +171,73 @@ describe('main', () => {
     beforeEach(() => {
       const { ports } = mjs;
       ports.clear();
+      browser.runtime.lastError.message = null;
     });
     afterEach(() => {
       const { ports } = mjs;
       ports.clear();
+      browser.runtime.lastError.message = null;
     });
 
-    it('should get null', async () => {
+    it('should not call function', async () => {
+      const { host } = mjs;
+      const stubErr = sinon.stub(console, 'error');
+      const i = host.postMessage.callCount;
       const res = await func();
-      assert.isNull(res, 'result');
+      const { called: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(errCalled, 'not called');
+      assert.strictEqual(host.postMessage.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
     });
 
-    it('should get null', async () => {
+    it('should not call function', async () => {
+      const { host } = mjs;
+      const stubErr = sinon.stub(console, 'error');
+      const i = host.postMessage.callCount;
       const res = await func({
         sender: {}
       });
-      assert.isNull(res, 'result');
+      const { called: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(errCalled, 'not called');
+      assert.strictEqual(host.postMessage.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should log error', async () => {
+      const { host } = mjs;
+      const stubErr = sinon.stub(console, 'error');
+      const i = host.postMessage.callCount;
+      const res = await func({
+        error: new Error('error'),
+        sender: {}
+      });
+      const { calledOnce: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isTrue(errCalled, 'called');
+      assert.strictEqual(host.postMessage.callCount, i, 'not called');
+      assert.deepEqual(res, [false], 'result');
+    });
+
+    it('should log error', async () => {
+      const { host } = mjs;
+      const stubErr = sinon.stub(console, 'error');
+      const i = host.postMessage.callCount;
+      browser.runtime.lastError.message = 'error';
+      const res = await func({
+        sender: {}
+      });
+      const { calledOnce: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isTrue(errCalled, 'called');
+      assert.strictEqual(host.postMessage.callCount, i, 'not called');
+      assert.deepEqual(res, [false], 'result');
     });
 
     it('should call function', async () => {
       const { host, ports } = mjs;
+      const stubErr = sinon.stub(console, 'error');
       const i = host.postMessage.callCount;
       ports.set('1', new Map());
       ports.get('1').set('2', new Map());
@@ -204,12 +251,16 @@ describe('main', () => {
           url: 'https://example.com/?foo=bar'
         }
       });
+      const { called: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(errCalled, 'not called');
       assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
       const { host, ports } = mjs;
+      const stubErr = sinon.stub(console, 'error');
       const i = host.postMessage.callCount;
       ports.set('1', new Map());
       ports.get('1').set('2', new Map());
@@ -223,12 +274,16 @@ describe('main', () => {
           url: 'https://example.com/?foo=bar'
         }
       });
+      const { called: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(errCalled, 'not called');
       assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should not call function', async () => {
       const { host, ports } = mjs;
+      const stubErr = sinon.stub(console, 'error');
       const i = host.postMessage.callCount;
       ports.set('1', new Map());
       ports.get('1').set('2', new Map());
@@ -242,12 +297,16 @@ describe('main', () => {
           url: 'https://example.com/?foo=bar'
         }
       });
+      const { called: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(errCalled, 'not called');
       assert.strictEqual(host.postMessage.callCount, i, 'not called');
-      assert.isNull(res, 'result');
+      assert.deepEqual(res, [], 'result');
     });
 
     it('should not call function', async () => {
       const { host, ports } = mjs;
+      const stubErr = sinon.stub(console, 'error');
       const i = host.postMessage.callCount;
       ports.set('1', new Map());
       ports.get('1').set('2', new Map());
@@ -261,8 +320,11 @@ describe('main', () => {
           url: 'https://example.com/?foo=bar'
         }
       });
+      const { called: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(errCalled, 'not called');
       assert.strictEqual(host.postMessage.callCount, i, 'not called');
-      assert.isNull(res, 'result');
+      assert.deepEqual(res, [], 'result');
     });
   });
 
@@ -1823,28 +1885,6 @@ describe('main', () => {
     });
   });
 
-  describe('reload extension', () => {
-    const func = mjs.reloadExt;
-
-    it('should not call function', async () => {
-      const { host } = mjs;
-      const i = host.disconnect.callCount;
-      const j = browser.runtime.reload.callCount;
-      await func();
-      assert.strictEqual(host.disconnect.callCount, i, 'not called');
-      assert.strictEqual(browser.runtime.reload.callCount, j, 'not called');
-    });
-
-    it('should call function', async () => {
-      const { host } = mjs;
-      const i = host.disconnect.callCount;
-      const j = browser.runtime.reload.callCount;
-      await func(true);
-      assert.strictEqual(host.disconnect.callCount, i + 1, 'called');
-      assert.strictEqual(browser.runtime.reload.callCount, j + 1, 'called');
-    });
-  });
-
   describe('open options page', () => {
     const func = mjs.openOptionsPage;
 
@@ -2522,7 +2562,7 @@ describe('main', () => {
         }
       });
       assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
   });
 
@@ -2705,46 +2745,6 @@ describe('main', () => {
       assert.strictEqual(browser.menus.update.callCount, j,
         'not called menus update');
       assert.isNull(res, 'result');
-    });
-  });
-
-  describe('handle disconnected host', () => {
-    const func = mjs.handleDisconnectedHost;
-    beforeEach(() => {
-      const { hostStatus } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_VERSION_LATEST] = null;
-    });
-    afterEach(() => {
-      const { hostStatus } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
-    });
-
-    it('should call function', async () => {
-      const { hostStatus } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
-      const res = await func();
-      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
     });
   });
 
@@ -3874,6 +3874,195 @@ describe('main', () => {
       });
       await func();
       assert.isFalse(mjs.vars[IS_MAC], 'result');
+    });
+  });
+
+  describe('handle disconnected host', () => {
+    const func = mjs.handleDisconnectedHost;
+    beforeEach(() => {
+      const { hostStatus } = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      hostStatus[HOST_CONNECTION] = true;
+      hostStatus[HOST_VERSION_LATEST] = null;
+      browser.runtime.lastError.message = null;
+    });
+    afterEach(() => {
+      const { hostStatus } = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      hostStatus[HOST_CONNECTION] = false;
+      hostStatus[HOST_VERSION_LATEST] = null;
+      browser.runtime.lastError.message = null;
+    });
+
+    it('should call function', async () => {
+      const { hostStatus } = mjs;
+      const stubErr = sinon.stub(console, 'error');
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const res = await func();
+      const { called: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
+      assert.strictEqual(
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
+      );
+      assert.strictEqual(
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
+      );
+      assert.isFalse(errCalled, 'not called');
+      assert.deepEqual(res, [[
+        undefined,
+        undefined,
+        undefined
+      ]], 'result');
+    });
+
+    it('should call function and log error', async () => {
+      const { hostStatus } = mjs;
+      const stubErr = sinon.stub(console, 'error');
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const res = await func({
+        error: new Error('error')
+      });
+      const { calledOnce: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
+      assert.strictEqual(
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
+      );
+      assert.strictEqual(
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
+      );
+      assert.isTrue(errCalled, 'called');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ],
+        false
+      ], 'result');
+    });
+
+    it('should call function and log error', async () => {
+      const { hostStatus } = mjs;
+      const stubErr = sinon.stub(console, 'error');
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const k = browser.browserAction.setBadgeTextColor.callCount;
+      browser.runtime.lastError.message = 'error';
+      const res = await func();
+      const { calledOnce: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
+      assert.strictEqual(
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
+      );
+      assert.strictEqual(
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
+      );
+      assert.isTrue(errCalled, 'called');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ],
+        false
+      ], 'result');
+    });
+  });
+
+  describe('handle host on disconnect', () => {
+    const func = mjs.handleHostOnDisconnect;
+    beforeEach(() => {
+      const { hostStatus } = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      hostStatus[HOST_CONNECTION] = true;
+      hostStatus[HOST_VERSION_LATEST] = null;
+      browser.runtime.lastError.message = null;
+    });
+    afterEach(() => {
+      const { hostStatus } = mjs;
+      hostStatus[HOST_COMPAT] = false;
+      hostStatus[HOST_CONNECTION] = false;
+      hostStatus[HOST_VERSION_LATEST] = null;
+      browser.runtime.lastError.message = null;
+    });
+
+    it('should call function', async () => {
+      const { hostStatus } = mjs;
+      const stubErr = sinon.stub(console, 'error');
+      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
+      const j = browser.browserAction.setBadgeText.callCount;
+      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const res = await func();
+      const { called: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
+      assert.strictEqual(
+        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
+      );
+      assert.strictEqual(
+        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
+      );
+      assert.isFalse(errCalled, 'not called');
+      assert.deepEqual(res, [[
+        undefined,
+        undefined,
+        undefined
+      ]], 'result');
+    });
+  });
+
+  describe('set host', () => {
+    const func = mjs.setHost;
+
+    it('should add listeners', async () => {
+      await func();
+      assert.isTrue(mjs.host.onDisconnect.addListener.called, 'called');
+      assert.isTrue(mjs.host.onMessage.addListener.called, 'called');
+    });
+  });
+
+  describe('reload extension', () => {
+    const func = mjs.reloadExt;
+
+    it('should not call function', async () => {
+      const { host } = mjs;
+      const i = host.disconnect.callCount;
+      const j = browser.runtime.reload.callCount;
+      await func();
+      assert.strictEqual(host.disconnect.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.reload.callCount, j, 'not called');
+    });
+
+    it('should call function', async () => {
+      const { host } = mjs;
+      const i = host.disconnect.callCount;
+      const j = browser.runtime.reload.callCount;
+      await func(true);
+      assert.strictEqual(host.disconnect.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.reload.callCount, j + 1, 'called');
     });
   });
 
