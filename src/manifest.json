@@ -42,7 +42,6 @@
     {
       "all_frames": true,
       "js": [
-        "lib/mozilla/browser-polyfill.min.js",
         "js/content.js"
       ],
       "matches": [

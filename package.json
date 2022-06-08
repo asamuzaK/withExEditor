@@ -15,7 +15,7 @@
   "scripts": {
     "bundle": "npm-run-all -s bundle:*",
     "bundle:compat": "node index compat -ci",
-    "bundle:copy": "copyfiles --up=1 --verbose src/LICENSE src/_locales/**/*.json src/css/*.css src/html/*.html src/img/*.* src/lib/**/* src/mjs/*.js bundle",
+    "bundle:copy": "copyfiles --up=1 --verbose src/LICENSE src/_locales/**/*.json src/css/*.css src/html/*.html src/img/*.* src/lib/**/* src/mjs/*.js --exclude=src/mjs/background.js --exclude=src/mjs/options.js bundle",
     "bundle:esbuild": "esbuild --outfile=bundle/js/content.js --bundle --minify --sourcemap src/mjs/content-loader.js",
     "include": "npm-run-all -s include:*",
     "include:browser": "copyfiles --up=3 --verbose node_modules/webext-schema/modules/browser.js src/mjs",
@@ -35,14 +35,14 @@
   "dependencies": {
     "commander": "^9.3.0",
     "webext-schema": "^4.0.0",
-    "webextension-polyfill": "^0.7.0"
+    "webextension-polyfill": "^0.9.0"
   },
   "devDependencies": {
-    "addons-linter": "^5.6.0",
+    "addons-linter": "^5.7.0",
     "c8": "^7.11.3",
     "chai": "^4.3.6",
     "copyfiles": "^2.4.1",
-    "esbuild": "^0.14.42",
+    "esbuild": "^0.14.43",
     "eslint": "^8.17.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
