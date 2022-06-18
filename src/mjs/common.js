@@ -106,32 +106,3 @@ export const sleep = (msec = 0, doReject = false) => {
   }
   return func || null;
 };
-
-/**
- * stringify positive integer
- *
- * @param {number} i - integer
- * @param {boolean} zero - treat 0 as a positive integer
- * @returns {?string} - stringified integer
- */
-export const stringifyPositiveInt = (i, zero = false) => {
-  let str;
-  if (Number.isSafeInteger(i) && (i > 0 || (zero && i === 0))) {
-    str = `${i}`;
-  }
-  return str || null;
-};
-
-/**
- * remove query string from URI
- *
- * @param {string} uri - URI
- * @returns {string} - replaced URI
- */
-export const removeQueryFromURI = uri => {
-  if (isString(uri)) {
-    const query = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
-    uri = uri.replace(query, '');
-  }
-  return uri;
-};
