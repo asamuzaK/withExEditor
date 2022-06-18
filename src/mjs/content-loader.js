@@ -4,14 +4,15 @@
 
 /* shared */
 import {
-  handleBeforeContextMenu, handleKeyDown, handleReadyState, runtimeOnMsg,
-  startup
+  handleBeforeContextMenu, handleConnectedPort, handleKeyDown, handleReadyState,
+  runtimeOnMsg, startup
 } from './content-main.js';
 
 /* api */
 const { runtime } = browser;
 
 /* listeners */
+runtime.onConnect.addListener(handleConnectedPort);
 runtime.onMessage.addListener(runtimeOnMsg);
 window.addEventListener('mousedown', handleBeforeContextMenu, true);
 window.addEventListener('keydown', handleKeyDown, true);

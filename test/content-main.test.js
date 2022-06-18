@@ -1153,10 +1153,13 @@ describe('content-main', () => {
   describe('post message', () => {
     const func = mjs.postMsg;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should not call function', async () => {
@@ -1175,11 +1178,14 @@ describe('content-main', () => {
   describe('postEachDataId', () => {
     const func = mjs.postEachDataId;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.dataIds.clear();
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
       mjs.dataIds.clear();
     });
 
@@ -1214,11 +1220,14 @@ describe('content-main', () => {
   describe('post temporary file data', () => {
     const func = mjs.postTmpFileData;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.dataIds.clear();
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
       mjs.dataIds.clear();
     });
 
@@ -1241,11 +1250,14 @@ describe('content-main', () => {
   describe('request temporary file', () => {
     const func = mjs.requestTmpFile;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.dataIds.clear();
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
       mjs.dataIds.clear();
     });
 
@@ -1772,12 +1784,15 @@ describe('content-main', () => {
   describe('post content data', () => {
     const func = mjs.postContent;
     beforeEach(() => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.dataIds.clear();
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
-      mjs.dataIds.clear();
       mjs.vars.port = null;
+      mjs.vars.portId = null;
+      mjs.dataIds.clear();
     });
 
     it('should not call function', async () => {
@@ -1896,12 +1911,15 @@ describe('content-main', () => {
   describe('determine content process', () => {
     const func = mjs.determineContentProcess;
     beforeEach(() => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.vars.contextNode = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
-      mjs.vars.contextNode = null;
       mjs.vars.port = null;
+      mjs.vars.portId = null;
+      mjs.vars.contextNode = null;
     });
 
     it('should call function', async () => {
@@ -3459,6 +3477,9 @@ describe('content-main', () => {
   describe('handle port message', () => {
     const func = mjs.handlePortMsg;
     beforeEach(() => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.dataIds.clear();
       mjs.vars[ID_TAB] = '';
       mjs.vars[ID_WIN] = '';
@@ -3469,7 +3490,6 @@ describe('content-main', () => {
       mjs.vars[SYNC_AUTO_URL] = null;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       delete mjs.vars.keyCtrlA.ctrlKey;
       delete mjs.vars.keyCtrlA.metaKey;
     });
@@ -3485,6 +3505,7 @@ describe('content-main', () => {
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
       mjs.vars.port = null;
+      mjs.vars.portId = null;
       delete mjs.vars.keyCtrlA.ctrlKey;
       delete mjs.vars.keyCtrlA.metaKey;
     });
@@ -3611,58 +3632,49 @@ describe('content-main', () => {
     const func = mjs.handleDisconnectedPort;
     const lastErrorDefaultValue = browser.runtime.lastError;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should not log error', async () => {
       const stubConsole = sinon.stub(console, 'error');
-      const i = browser.runtime.sendMessage.callCount;
       browser.runtime.lastError = null;
       mjs.vars.port.error = null;
-      const res = await func(mjs.vars.port);
+      await func(mjs.vars.port);
       const { called: calledConsole } = stubConsole;
       stubConsole.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isFalse(calledConsole, 'not called console');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
       assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, {}, 'result');
     });
 
     it('should log error', async () => {
       const stubConsole = sinon.stub(console, 'error');
-      const i = browser.runtime.sendMessage.callCount;
       browser.runtime.lastError = null;
       mjs.vars.port.error = new Error('error');
-      const res = await func(mjs.vars.port);
+      await func(mjs.vars.port);
       const { called: calledConsole } = stubConsole;
       stubConsole.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isTrue(calledConsole, 'called console');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
       assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, {}, 'result');
     });
 
     it('should log error', async () => {
       const stubConsole = sinon.stub(console, 'error');
-      const i = browser.runtime.sendMessage.callCount;
       browser.runtime.lastError = new Error('error');
       mjs.vars.port.error = null;
-      const res = await func(mjs.vars.port);
+      await func(mjs.vars.port);
       const { called: calledConsole } = stubConsole;
       stubConsole.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isTrue(calledConsole, 'called console');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
       assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, {}, 'result');
     });
   });
 
@@ -3670,15 +3682,17 @@ describe('content-main', () => {
     const func = mjs.portOnDisconnect;
     const lastErrorDefaultValue = browser.runtime.lastError;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should not log error', async () => {
       const stubConsole = sinon.stub(console, 'error');
-      const i = browser.runtime.sendMessage.callCount;
       browser.runtime.lastError = null;
       mjs.vars.port.error = null;
       const res = await func(mjs.vars.port);
@@ -3686,22 +3700,22 @@ describe('content-main', () => {
       stubConsole.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isFalse(calledConsole, 'not called console');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
       assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, {}, 'result');
+      assert.isUndefined(res, 'result');
     });
   });
 
   describe('port on message', () => {
     const func = mjs.portOnMsg;
     beforeEach(() => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.dataIds.clear();
       mjs.vars[ID_TAB] = '';
       mjs.vars[ID_WIN] = '';
       mjs.vars[SYNC_AUTO] = false;
       mjs.vars[SYNC_AUTO_URL] = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
       mjs.dataIds.clear();
@@ -3710,6 +3724,7 @@ describe('content-main', () => {
       mjs.vars[SYNC_AUTO] = false;
       mjs.vars[SYNC_AUTO_URL] = null;
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should set values', async () => {
@@ -3727,9 +3742,11 @@ describe('content-main', () => {
     const func = mjs.portOnConnect;
     beforeEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should not set port', async () => {
@@ -3738,9 +3755,11 @@ describe('content-main', () => {
     });
 
     it('should set port', async () => {
-      const port = mockPort({ name: PORT_CONTENT });
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
       await func(port);
       assert.deepEqual(mjs.vars.port, port, 'port');
+      assert.strictEqual(mjs.vars.portId, portId, 'portId');
     });
 
     it('should not set port', async () => {
@@ -3750,26 +3769,106 @@ describe('content-main', () => {
     });
   });
 
+  describe('handle connected port', () => {
+    const func = mjs.handleConnectedPort;
+    beforeEach(() => {
+      mjs.vars.port = null;
+      mjs.vars.portId = null;
+    });
+    afterEach(() => {
+      mjs.vars.port = null;
+      mjs.vars.portId = null;
+    });
+
+    it('should throw', async () => {
+      const stubErr = sinon.stub(console, 'error');
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = { name: portId };
+      await func(port).catch(e => {
+        assert.instanceOf(e, Error, 'error');
+      });
+      stubErr.restore();
+    });
+
+    it('should set port', async () => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
+      const res = await func(port);
+      assert.deepEqual(mjs.vars.port, port, 'port');
+      assert.strictEqual(mjs.vars.portId, portId, 'portId');
+      assert.isUndefined(res, 'result');
+    });
+  });
+
+  describe('add port', () => {
+    const func = mjs.addPort;
+    beforeEach(() => {
+      mjs.vars.port = null;
+      mjs.vars.portId = null;
+    });
+    afterEach(() => {
+      mjs.vars.port = null;
+      mjs.vars.portId = null;
+    });
+
+    it('should throw', async () => {
+      await func().catch(e => {
+        assert.instanceOf(e, TypeError, 'error');
+        assert.strictEqual(e.message, 'Expected String but got Undefined.');
+      });
+    });
+
+    it('should not call function', async () => {
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
+      const i = browser.runtime.connect.callCount;
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
+      mjs.vars.port = port;
+      const res = await func(portId);
+      assert.strictEqual(browser.runtime.connect.callCount, i, 'not called');
+      assert.deepEqual(mjs.vars.port, port, 'port');
+      assert.isNull(mjs.vars.portId, 'portId');
+      assert.deepEqual(res, port, 'result');
+    });
+
+    it('should call function', async () => {
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
+      const i = browser.runtime.connect.callCount;
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
+      const res = await func(portId);
+      assert.strictEqual(browser.runtime.connect.callCount, i + 1, 'called');
+      assert.isObject(mjs.vars.port, 'port');
+      assert.strictEqual(mjs.vars.portId, portId, 'portId');
+      assert.deepEqual(res, port, 'result');
+    });
+  });
+
   describe('check port', () => {
     const func = mjs.checkPort;
     beforeEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
-    it('should set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
+    it('should not call function', async () => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
+      assert.isNull(res, 'result');
     });
 
     it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
@@ -3781,14 +3880,16 @@ describe('content-main', () => {
     const func = mjs.startup;
     beforeEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should throw', async () => {
       const stubError = sinon.stub(console, 'error');
-      browser.runtime.connect.rejects(new Error('error'));
+      browser.runtime.sendMessage.rejects(new Error('error'));
       await func().catch(e => {
         assert.instanceOf(e, Error, 'error');
         assert.strictEqual(e.message, 'error', 'message');
@@ -3796,17 +3897,9 @@ describe('content-main', () => {
       stubError.restore();
     });
 
-    it('should set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func();
-      assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.isUndefined(res, 'result');
-    });
-
     it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
@@ -3818,9 +3911,11 @@ describe('content-main', () => {
     const func = mjs.handleMsg;
     beforeEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should not set port', async () => {
@@ -3839,23 +3934,16 @@ describe('content-main', () => {
       assert.deepEqual(res, [], 'result');
     });
 
-    it('should not set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func({
-        [PORT_CONNECT]: false
-      });
-      assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, [], 'result');
-    });
-
     it('should set port', async () => {
       browser.runtime.connect.callsFake(arg => mockPort(arg));
+      const portId = `${PORT_CONTENT}_1_2`;
       const res = await func({
-        [PORT_CONNECT]: true
+        [PORT_CONNECT]: portId
       });
       assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.strictEqual(mjs.vars.portId, portId, 'name');
+      assert.isArray(res, 'result');
+      assert.deepEqual(res[0], mjs.vars.port, 'result');
     });
   });
 
@@ -3863,16 +3951,19 @@ describe('content-main', () => {
     const func = mjs.runtimeOnMsg;
     beforeEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should throw', async () => {
       const stubError = sinon.stub(console, 'error');
+      const portId = `${PORT_CONTENT}_1_2`;
       browser.runtime.connect.rejects(new Error('error'));
       await func({
-        [PORT_CONNECT]: true
+        [PORT_CONNECT]: portId
       }).catch(e => {
         assert.instanceOf(e, Error, 'error');
         assert.strictEqual(e.message, 'error', 'message');
@@ -3882,28 +3973,33 @@ describe('content-main', () => {
 
     it('should set port', async () => {
       browser.runtime.connect.callsFake(arg => mockPort(arg));
+      const portId = `${PORT_CONTENT}_1_2`;
       const res = await func({
-        [PORT_CONNECT]: true
+        [PORT_CONNECT]: portId
       });
       assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.strictEqual(mjs.vars.portId, portId, 'name');
+      assert.isArray(res, 'result');
+      assert.deepEqual(res[0], mjs.vars.port, 'result');
     });
   });
 
   describe('handle before contextmenu event', () => {
     const func = mjs.handleBeforeContextMenu;
     beforeEach(() => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should not call function', async () => {
@@ -4068,16 +4164,19 @@ describe('content-main', () => {
   describe('handle keydown event', () => {
     const func = mjs.handleKeyDown;
     beforeEach(() => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      mjs.vars.portId = portId;
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should not set values', async () => {
@@ -4221,9 +4320,11 @@ describe('content-main', () => {
     const func = mjs.handleReadyState;
     beforeEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
     afterEach(() => {
       mjs.vars.port = null;
+      mjs.vars.portId = null;
     });
 
     it('should throw', () => {
@@ -4261,7 +4362,8 @@ describe('content-main', () => {
     });
 
     it('should call function', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const stub = sinon.stub();
       const evt = {
         target: {
@@ -4271,9 +4373,9 @@ describe('content-main', () => {
       };
       const res = await func(evt);
       assert.isTrue(stub.called, 'called');
-      assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 });

@@ -63,7 +63,8 @@ export const vars = {
     key: 'a',
     keyCode: KEY_CODE_A
   },
-  port: null
+  port: null,
+  portId: null
 };
 
 /* keyboard shortcut */
@@ -1066,6 +1067,8 @@ export const handlePortMsg = async msg => {
           break;
         case ID_TAB:
         case ID_WIN:
+          vars[key] = `${value}`;
+          break;
         case SYNC_AUTO_URL:
           vars[key] = value;
           break;
@@ -1118,20 +1121,20 @@ export const requestPortConnection = async () => {
  * handle disconnected port
  *
  * @param {object} port - runtime.Port
- * @returns {Function} - requestPortConnection()
+ * @returns {void}
  */
-export const handleDisconnectedPort = async port => {
-  const e = port.error || runtime.lastError;
-  vars.port = null;
+export const handleDisconnectedPort = async (port = {}) => {
+  const { error } = port;
+  const e = error || (runtime.lastError?.message && runtime.lastError);
   e && logErr(e);
-  return requestPortConnection();
+  vars.port = null;
 };
 
 /**
  * port on disconnect
  *
  * @param {object} port - runtime.Port
- * @returns {Function} - handleDisconnectedPort()
+ * @returns {Function} - promise chain
  */
 export const portOnDisconnect = port =>
   handleDisconnectedPort(port).catch(throwErr);
@@ -1150,32 +1153,60 @@ export const portOnMsg = msg => handlePortMsg(msg).catch(throwErr);
  * @param {object} port - runtime.Port
  * @returns {void}
  */
-export const portOnConnect = async port => {
-  if (isObjectNotEmpty(port) && port.name === PORT_CONTENT) {
-    port.onMessage.addListener(portOnMsg);
+export const portOnConnect = async (port = {}) => {
+  const { name: portId } = port;
+  if (isString(portId) && portId.startsWith(PORT_CONTENT)) {
     port.onDisconnect.addListener(portOnDisconnect);
+    port.onMessage.addListener(portOnMsg);
+    vars.portId = portId;
     vars.port = port;
   } else {
+    vars.portId = null;
     vars.port = null;
   }
 };
 
 /**
+ * handle connected port
+ *
+ * @param {object} port - runtime.Port
+ * @returns {Function} - promise chain
+ */
+export const handleConnectedPort = port => portOnConnect(port).catch(throwErr);
+
+/**
+ * add port
+ *
+ * @param {string} portId - port ID
+ * @returns {object} - runtime.Port
+ */
+export const addPort = async portId => {
+  if (!isString(portId)) {
+    throw new TypeError(`Expected String but got ${getType(portId)}.`);
+  }
+  let port;
+  if (vars.port) {
+    port = vars.port;
+  } else {
+    port = await makeConnection({
+      name: portId
+    });
+    await portOnConnect(port);
+  }
+  return port;
+};
+
+/**
  * check port
  *
- * @returns {Function} - requestPortConnection() / portOnConnect()
+ * @returns {?Function} - requestPortConnection()
  */
 export const checkPort = async () => {
   let func;
-  if (vars.port) {
+  if (!vars.port) {
     func = requestPortConnection();
-  } else {
-    const port = await makeConnection({
-      name: PORT_CONTENT
-    });
-    func = portOnConnect(port);
   }
-  return func;
+  return func || null;
 };
 
 /* startup */
@@ -1194,7 +1225,8 @@ export const handleMsg = async msg => {
     const items = Object.entries(msg);
     for (const [key, value] of items) {
       if (key === PORT_CONNECT && value) {
-        func.push(makeConnection({ name: PORT_CONTENT }).then(portOnConnect));
+        vars.portId = value;
+        func.push(addPort(value));
         break;
       }
     }
