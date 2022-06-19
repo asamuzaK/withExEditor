@@ -13,9 +13,9 @@ import {
 } from './dom-event.js';
 import {
   createParagraphedContent, createDomStringFromSelectionRange,
-  createXmlBasedDomString, getAncestorId, getEditableElm, getFileExtension,
-  getNodeNS, getText, isContentTextNode, isEditControl, matchDocUrl,
-  serializeDomString
+  createXmlBasedDomString, filterEditableElements, getAncestorId,
+  getEditableElm, getFileExtension, getNodeNS, getText, isContentTextNode,
+  isEditControl, matchDocUrl, serializeDomString
 } from './dom-util.js';
 import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
@@ -126,21 +126,21 @@ export const getTargetElementFromDataId = dataId => {
   if (!elm) {
     const data = dataIds.get(dataId);
     if (isObjectNotEmpty(data)) {
-      const { ancestorId, localName, prefix, queryIndex } = data;
+      const {
+        ancestorId, liveEditKey, localName, namespaceURI, prefix, queryIndex
+      } = data;
       if (localName && Number.isInteger(queryIndex)) {
         const items = [];
-        if (prefix) {
-          const query = (ancestorId && `#${ancestorId} *|*`) ||
-                        `${document.documentElement.localName} *|*`;
-          const arr = [...document.querySelectorAll(query)].filter(item => {
-            const { localName: itemLocalName } = item;
-            return itemLocalName === localName && item;
-          });
-          items.push(...arr);
+        let query;
+        if (prefix || (namespaceURI && namespaceURI !== nsHtml)) {
+          query = ancestorId
+            ? `#${ancestorId} *|*`
+            : `${document.documentElement.localName} *|*`;
         } else {
-          const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
-          items.push(...document.querySelectorAll(query));
+          query = ancestorId ? `#${ancestorId} ${localName}` : localName;
         }
+        const arr = filterEditableElements(localName, query, !!liveEditKey);
+        items.push(...arr);
         elm = items[queryIndex];
       }
     }
@@ -179,22 +179,19 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
 export const getQueriedItems = elm => {
   const items = [];
   if (elm?.nodeType === Node.ELEMENT_NODE) {
-    const { localName, prefix } = elm;
+    const { localName, namespaceURI, prefix } = elm;
+    const isLiveEdit = getLiveEditKey(elm);
     const ancestorId = getAncestorId(elm);
-    if (prefix) {
-      const { localName: rootLocalName } = document.documentElement;
-      const query = ancestorId
+    let query;
+    if (prefix || (namespaceURI && namespaceURI !== nsHtml)) {
+      query = ancestorId
         ? `#${ancestorId} *|*`
-        : `${rootLocalName} *|*`;
-      const arr = [...document.querySelectorAll(query)].filter(item => {
-        const { localName: itemLocalName } = item;
-        return itemLocalName === localName && item;
-      });
-      items.push(...arr);
+        : `${document.documentElement.localName} *|*`;
     } else {
-      const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
-      items.push(...document.querySelectorAll(query));
+      query = ancestorId ? `#${ancestorId} ${localName}` : localName;
     }
+    const arr = filterEditableElements(localName, query, !!isLiveEdit);
+    items.push(...arr);
   }
   return items;
 };
@@ -488,7 +485,9 @@ export const postEachDataId = async (bool = false) => {
     dataIds.forEach((value, key) => {
       const { controls } = value;
       const elm = getTargetElementFromDataId(key);
-      elm && !controls && func.push(postMsg({ [TMP_FILE_GET]: value }));
+      if (elm && !controls) {
+        func.push(postMsg({ [TMP_FILE_GET]: value }));
+      }
     });
   }
   return Promise.all(func);
@@ -526,7 +525,9 @@ export const requestTmpFile = evt => {
         const { controls } = dataIds.get(dataId);
         if (controls) {
           controls.forEach(id => {
-            dataIds.has(id) && func.push(postTmpFileData(id));
+            if (dataIds.has(id)) {
+              func.push(postTmpFileData(id));
+            }
           });
         } else {
           func.push(postTmpFileData(dataId));
@@ -624,8 +625,12 @@ export const createContentData = async (elm, mode) => {
           const { childNodes, isContentEditable, namespaceURI, value } = elm;
           const liveEditKey = getLiveEditKey(elm);
           const isHtml = !namespaceURI || namespaceURI === nsHtml;
-          isHtml && elm.addEventListener('focus', requestTmpFile, true);
-          !dataIds.has(dataId) && setDataId(dataId, obj);
+          if (isHtml) {
+            elm.addEventListener('focus', requestTmpFile, true);
+          }
+          if (!dataIds.has(dataId)) {
+            setDataId(dataId, obj);
+          }
           if (liveEditKey) {
             data.mode = mode;
             data.dataId = dataId;
@@ -804,8 +809,8 @@ export const createReplacingContent = (node, opt = {}) => {
         const pContent = createParagraphedContent(value, namespaceURI);
         frag.appendChild(pContent);
       }
-    } else {
-      isString(value) && frag.appendChild(document.createTextNode(value));
+    } else if (isString(value)) {
+      frag.appendChild(document.createTextNode(value));
     }
   }
   return frag;
@@ -838,7 +843,9 @@ export const replaceEditableContent = (node, opt = {}) => {
         cancelable: false
       });
       dataTransfer.setData(MIME_PLAIN, dataValue);
-      domstr && dataTransfer.setData(MIME_HTML, domstr);
+      if (domstr) {
+        dataTransfer.setData(MIME_HTML, domstr);
+      }
       let proceed = dispatchClipboardEvent(node, 'paste', {
         bubbles: true,
         cancelable: true,
@@ -1126,7 +1133,9 @@ export const requestPortConnection = async () => {
 export const handleDisconnectedPort = async (port = {}) => {
   const { error } = port;
   const e = error || (runtime.lastError?.message && runtime.lastError);
-  e && logErr(e);
+  if (e) {
+    logErr(e);
+  }
   vars.port = null;
 };
 

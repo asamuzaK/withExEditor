@@ -240,7 +240,7 @@ describe('content-main', () => {
         ancestorId: null,
         localName: 'p',
         prefix: null,
-        queryIndex: null
+        queryIndex: 0
       });
       const res = func(dataId);
       assert.isNull(res, 'result');
@@ -249,6 +249,10 @@ describe('content-main', () => {
     it('should get element', () => {
       const p = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       body.appendChild(p);
       const dataId = 'html_p_0';
       mjs.dataIds.set(dataId, {
@@ -266,6 +270,14 @@ describe('content-main', () => {
       const p = document.createElement('p');
       const p2 = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p2.setAttribute('contenteditable', 'true');
+      if (typeof p2.isContentEditable !== 'boolean') {
+        p2.isContentEditable = isContentEditable(p2);
+      }
       body.appendChild(p);
       body.appendChild(p2);
       const dataId = 'html_p_1';
@@ -283,6 +295,10 @@ describe('content-main', () => {
     it('should get element', () => {
       const p = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       body.id = 'foo';
       body.appendChild(p);
       const dataId = 'foo_p_0';
@@ -307,6 +323,10 @@ describe('content-main', () => {
       svg.id = 'foo';
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       fo.appendChild(p);
       svg.appendChild(fo);
       body.appendChild(svg);
@@ -334,6 +354,14 @@ describe('content-main', () => {
       svg.id = 'foo';
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p2.setAttribute('contenteditable', 'true');
+      if (typeof p2.isContentEditable !== 'boolean') {
+        p2.isContentEditable = isContentEditable(p2);
+      }
       fo.appendChild(p);
       fo.appendChild(p2);
       svg.appendChild(fo);
@@ -359,6 +387,10 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       fo.appendChild(p);
       svg.appendChild(fo);
       body.appendChild(svg);
@@ -385,6 +417,14 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p2.setAttribute('contenteditable', 'true');
+      if (typeof p2.isContentEditable !== 'boolean') {
+        p2.isContentEditable = isContentEditable(p2);
+      }
       fo.appendChild(p);
       fo.appendChild(p2);
       svg.appendChild(fo);
@@ -399,6 +439,32 @@ describe('content-main', () => {
       });
       const res = func(dataId);
       assert.deepEqual(res, p2, 'result');
+    });
+
+    it('should get element', () => {
+      const div = document.createElement('div');
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const text =
+        document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const body = document.querySelector('body');
+      svg.appendChild(text);
+      div.setAttribute('contenteditable', 'true');
+      if (typeof div.isContentEditable !== 'boolean') {
+        div.isContentEditable = isContentEditable(div);
+      }
+      div.appendChild(svg);
+      body.appendChild(div);
+      const dataId = 'html_text_0';
+      mjs.dataIds.set(dataId, {
+        dataId,
+        ancestorId: null,
+        localName: 'text',
+        namespaceURI: 'http://www.w3.org/2000/svg',
+        prefix: null,
+        queryIndex: 0
+      });
+      const res = func(dataId);
+      assert.deepEqual(res, text, 'result');
     });
   });
 
@@ -457,6 +523,10 @@ describe('content-main', () => {
       const div = document.createElement('div');
       const p = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       div.id = 'foo';
       div.appendChild(p);
       body.appendChild(div);
@@ -469,6 +539,14 @@ describe('content-main', () => {
       const p = document.createElement('p');
       const p2 = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p2.setAttribute('contenteditable', 'true');
+      if (typeof p2.isContentEditable !== 'boolean') {
+        p2.isContentEditable = isContentEditable(p2);
+      }
       div.id = 'foo';
       div.appendChild(p);
       div.appendChild(p2);
@@ -483,6 +561,14 @@ describe('content-main', () => {
       const p = document.createElement('p');
       const p2 = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p2.setAttribute('contenteditable', 'true');
+      if (typeof p2.isContentEditable !== 'boolean') {
+        p2.isContentEditable = isContentEditable(p2);
+      }
       div.id = 'foo';
       div.appendChild(p);
       div2.id = 'bar';
@@ -499,6 +585,14 @@ describe('content-main', () => {
       const p = document.createElement('p');
       const p2 = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p2.setAttribute('contenteditable', 'true');
+      if (typeof p2.isContentEditable !== 'boolean') {
+        p2.isContentEditable = isContentEditable(p2);
+      }
       div.appendChild(p);
       div2.appendChild(p2);
       body.appendChild(div);
@@ -519,6 +613,10 @@ describe('content-main', () => {
       svg.id = 'foo';
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       fo.appendChild(p);
       fo.appendChild(div);
       svg.appendChild(fo);
@@ -538,6 +636,10 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       fo.appendChild(p);
       fo.appendChild(div);
       svg.appendChild(fo);
@@ -564,6 +666,10 @@ describe('content-main', () => {
     it('should get result', () => {
       const p = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       body.appendChild(p);
       const res = func(p);
       assert.deepEqual(res, {
@@ -578,6 +684,10 @@ describe('content-main', () => {
     it('should get result', () => {
       const p = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       body.id = 'foo';
       body.appendChild(p);
       const res = func(p);
@@ -594,6 +704,14 @@ describe('content-main', () => {
       const p = document.createElement('p');
       const p2 = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p2.setAttribute('contenteditable', 'true');
+      if (typeof p2.isContentEditable !== 'boolean') {
+        p2.isContentEditable = isContentEditable(p2);
+      }
       body.appendChild(p);
       body.appendChild(p2);
       const res = func(p2);
@@ -627,6 +745,10 @@ describe('content-main', () => {
       svg.id = 'foo';
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       fo.appendChild(p);
       svg.appendChild(fo);
       body.appendChild(svg);
@@ -649,6 +771,10 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
         'http://www.w3.org/1999/xhtml');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       fo.appendChild(p);
       svg.appendChild(fo);
       body.appendChild(svg);
@@ -1289,6 +1415,10 @@ describe('content-main', () => {
       const i = mjs.vars.port.postMessage.callCount;
       const p = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
       body.appendChild(p);
       mjs.dataIds.set('html_p_0', {});
       const res = await func({
@@ -1305,6 +1435,18 @@ describe('content-main', () => {
       const p2 = document.createElement('p');
       const p3 = document.createElement('p');
       const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p2.setAttribute('contenteditable', 'true');
+      if (typeof p2.isContentEditable !== 'boolean') {
+        p2.isContentEditable = isContentEditable(p2);
+      }
+      p3.setAttribute('contenteditable', 'true');
+      if (typeof p3.isContentEditable !== 'boolean') {
+        p3.isContentEditable = isContentEditable(p3);
+      }
       body.appendChild(p);
       body.appendChild(p2);
       body.appendChild(p3);
@@ -1606,6 +1748,65 @@ describe('content-main', () => {
       assert.strictEqual(res.dataId, 'foobar', 'dataId');
       assert.strictEqual(res.value, '', 'value');
       assert.strictEqual(res.liveEditKey, 'codeMirror', 'key');
+    });
+
+    it('should get object', async () => {
+      const p = document.createElement('p');
+      const span = document.createElement('span');
+      const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p.appendChild(span);
+      body.appendChild(p);
+      const res = await func(p, MODE_EDIT);
+      assert.strictEqual(res.mode, MODE_EDIT, 'mode');
+      assert.strictEqual(res.dataId, 'html_p_0', 'dataId');
+      assert.strictEqual(res.value, '', 'value');
+    });
+
+    it('should get object', async () => {
+      const p = document.createElement('p');
+      const span = document.createElement('span');
+      const body = document.querySelector('body');
+      p.setAttribute('contenteditable', 'true');
+      if (typeof p.isContentEditable !== 'boolean') {
+        p.isContentEditable = isContentEditable(p);
+      }
+      p.appendChild(span);
+      body.appendChild(p);
+      const res = await func(span, MODE_EDIT);
+      assert.strictEqual(res.mode, MODE_EDIT, 'mode');
+      assert.strictEqual(res.dataId, 'html_span_0', 'dataId');
+      assert.strictEqual(res.value, '', 'value');
+    });
+
+    it('should get object', async () => {
+      const sel = window.getSelection();
+      const range = document.createRange();
+      const div = document.createElement('div');
+      const p = document.createElement('p');
+      const span = document.createElement('span');
+      const span2 = document.createElement('span');
+      const body = document.querySelector('body');
+      span.textContent = 'foo';
+      span.textContent = 'bar';
+      p.appendChild(span);
+      p.appendChild(span2);
+      div.setAttribute('contenteditable', 'true');
+      if (typeof div.isContentEditable !== 'boolean') {
+        div.isContentEditable = isContentEditable(div);
+      }
+      div.appendChild(p);
+      body.appendChild(div);
+      range.setStart(span, 0);
+      range.setEnd(span2, 0);
+      sel.addRange(range);
+      const res = await func(span, MODE_EDIT);
+      assert.strictEqual(res.mode, MODE_EDIT, 'mode');
+      assert.strictEqual(res.dataId, 'html_span_0', 'dataId');
+      assert.strictEqual(res.value, 'bar', 'value');
     });
 
     it('should get object', async () => {

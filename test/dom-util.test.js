@@ -11,7 +11,7 @@ import sinon from 'sinon';
 /* test */
 import * as mjs from '../src/mjs/dom-util.js';
 
-describe('content', () => {
+describe('dom util', () => {
   let window, document;
   const globalKeys = [
     'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'Event',
@@ -1860,6 +1860,148 @@ describe('content', () => {
       body.appendChild(p);
       const res = func(span);
       assert.deepEqual(res, p, 'result');
+    });
+  });
+
+  describe('filter editable elements', () => {
+    const func = mjs.filterEditableElements;
+
+    it('should throw', async () => {
+      assert.throws(() => func(), 'Expected String but got Undefined.');
+    });
+
+    it('should throw', async () => {
+      assert.throws(() => func('p'), 'Expected String but got Undefined.');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('textarea');
+      const body = document.querySelector('body');
+      body.appendChild(elm);
+      const res = func('textarea', 'html textarea');
+      assert.deepEqual(res, [elm], 'result');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('input');
+      const body = document.querySelector('body');
+      body.appendChild(elm);
+      const res = func('input', 'html input');
+      assert.deepEqual(res, [elm], 'result');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('input');
+      const body = document.querySelector('body');
+      elm.type = 'email';
+      body.appendChild(elm);
+      const res = func('input', 'html input');
+      assert.deepEqual(res, [elm], 'result');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('input');
+      const body = document.querySelector('body');
+      elm.type = 'tel';
+      body.appendChild(elm);
+      const res = func('input', 'html input');
+      assert.deepEqual(res, [elm], 'result');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('input');
+      const body = document.querySelector('body');
+      elm.type = 'url';
+      body.appendChild(elm);
+      const res = func('input', 'html input');
+      assert.deepEqual(res, [elm], 'result');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('input');
+      const body = document.querySelector('body');
+      elm.type = 'search';
+      body.appendChild(elm);
+      const res = func('input', 'html input');
+      assert.deepEqual(res, [elm], 'result');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('input');
+      const body = document.querySelector('body');
+      elm.type = 'text';
+      body.appendChild(elm);
+      const res = func('input', 'html input');
+      assert.deepEqual(res, [elm], 'result');
+    });
+
+    it('should get empty array', () => {
+      const elm = document.createElement('input');
+      const body = document.querySelector('body');
+      elm.type = 'password';
+      body.appendChild(elm);
+      const res = func('input', 'html input');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get empty array', () => {
+      const elm = document.createElement('p');
+      const body = document.querySelector('body');
+      body.appendChild(elm);
+      const res = func('p', 'html p');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('p');
+      const elm2 = document.createElement('p');
+      const body = document.querySelector('body');
+      elm.setAttribute('contenteditable', 'true');
+      if (typeof elm.isContentEditable !== 'boolean') {
+        elm.isContentEditable = isContentEditable(elm);
+      }
+      body.appendChild(elm);
+      body.appendChild(elm2);
+      const res = func('p', 'html p', true);
+      assert.deepEqual(res, [elm, elm2], 'result');
+    });
+
+    it('should get array', () => {
+      const elm = document.createElement('p');
+      const elm2 = document.createElement('p');
+      const body = document.querySelector('body');
+      elm.setAttribute('contenteditable', 'true');
+      if (typeof elm.isContentEditable !== 'boolean') {
+        elm.isContentEditable = isContentEditable(elm);
+      }
+      body.appendChild(elm);
+      body.appendChild(elm2);
+      const res = func('p', 'html p');
+      assert.deepEqual(res, [elm], 'result');
+    });
+
+    it('should get array', () => {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const fo =
+        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+      const elm =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const elm2 =
+        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const body = document.querySelector('body');
+      svg.id = 'foo';
+      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
+        'http://www.w3.org/1999/xhtml');
+      elm.setAttribute('contenteditable', 'true');
+      if (typeof elm.isContentEditable !== 'boolean') {
+        elm.isContentEditable = isContentEditable(elm);
+      }
+      fo.appendChild(elm);
+      fo.appendChild(elm2);
+      svg.appendChild(fo);
+      body.appendChild(svg);
+      const res = func('p', '#foo *|*');
+      assert.deepEqual(res, [elm], 'result');
     });
   });
 

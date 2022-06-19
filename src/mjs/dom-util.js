@@ -174,7 +174,9 @@ export const setAttributeNS = (elm, node = {}) => {
           case 'poster':
           case 'src': {
             const { protocol } = new URL(value, origin);
-            /https?/.test(protocol) && elm.setAttributeNS(ns, attrName, value);
+            if (/https?/.test(protocol)) {
+              elm.setAttributeNS(ns, attrName, value);
+            }
             break;
           }
           case 'ping': {
@@ -187,7 +189,9 @@ export const setAttributeNS = (elm, node = {}) => {
                 break;
               }
             }
-            bool && elm.setAttributeNS(ns, attrName, value);
+            if (bool) {
+              elm.setAttributeNS(ns, attrName, value);
+            }
             break;
           }
           case 'value': {
@@ -217,8 +221,9 @@ export const createElement = node => {
                  getNodeNS(node).namespaceURI || nsHtml;
       const name = prefix ? `${prefix}:${localName}` : localName;
       elm = document.createElementNS(ns, name);
-      attributes && !(node instanceof HTMLUnknownElement) &&
+      if (attributes && !(node instanceof HTMLUnknownElement)) {
         setAttributeNS(elm, node);
+      }
     }
   }
   return elm || null;
@@ -258,14 +263,15 @@ export const appendChildNodes = (elm, node) => {
     for (const child of nodes) {
       const { nodeType, nodeValue, parentNode } = child;
       if (nodeType === Node.ELEMENT_NODE) {
-        child === parentNode.firstChild &&
+        if (child === parentNode.firstChild) {
           arr.push(document.createTextNode('\n'));
+        }
         arr.push(appendChildNodes(child, child.cloneNode(true)));
-        child === parentNode.lastChild &&
+        if (child === parentNode.lastChild) {
           arr.push(document.createTextNode('\n'));
-      } else {
-        nodeType === Node.TEXT_NODE &&
-          arr.push(document.createTextNode(nodeValue));
+        }
+      } else if (nodeType === Node.TEXT_NODE) {
+         arr.push(document.createTextNode(nodeValue));
       }
     }
     if (arr.length) {
@@ -377,11 +383,11 @@ export const serializeDomString = (domstr, mime, reqElm = false) => {
         for (const child of childNodes) {
           if (child.nodeType === Node.ELEMENT_NODE) {
             const elm = appendChildNodes(child, child.cloneNode(true));
-            elm?.nodeType === Node.ELEMENT_NODE &&
+            if (elm?.nodeType === Node.ELEMENT_NODE) {
               frag.appendChild(elm);
-          } else {
-            child.nodeType === Node.TEXT_NODE && child.nodeValue &&
-              frag.appendChild(document.createTextNode(child.nodeValue));
+            }
+          } else if (child.nodeType === Node.TEXT_NODE && child.nodeValue) {
+            frag.appendChild(document.createTextNode(child.nodeValue));
           }
         }
       }
@@ -423,9 +429,10 @@ export const getText = (nodes, pre = false) => {
       switch (nodeType) {
         case Node.ELEMENT_NODE: {
           if (node.hasChildNodes()) {
-            TAGS_BLOCK_SPACING.includes(nodeName) &&
-            node !== parentFirstElmChild &&
+            if (TAGS_BLOCK_SPACING.includes(nodeName) &&
+                node !== parentFirstElmChild) {
               arr.push('\n');
+            }
             arr.push(getText(node.childNodes, pre));
             if (isParentBlock) {
               if (node === parentLastChild) {
@@ -435,11 +442,15 @@ export const getText = (nodes, pre = false) => {
                   (lastChild.nodeType === Node.ELEMENT_NODE &&
                    TAGS_PHRASING.includes(nodeName) &&
                    TAGS_PHRASING.includes(lastChild.localName));
-                isLastChild && arr.push('\n');
+                if (isLastChild) {
+                  arr.push('\n');
+                }
               } else {
                 const isPhrase = (!nextElm || nextElm.localName !== 'br') &&
                                  !pre && TAGS_PHRASING.includes(nodeName);
-                isPhrase && arr.push(' ');
+                if (isPhrase) {
+                  arr.push(' ');
+                }
               }
             }
             if (TAGS_TABLE_CELL.includes(nodeName) &&
@@ -463,8 +474,8 @@ export const getText = (nodes, pre = false) => {
                 : ' ';
               arr.push(`${alt}${trail}`);
             }
-          } else {
-            nodeName === 'br' && arr.push('\n');
+          } else if (nodeName === 'br') {
+            arr.push('\n');
           }
           break;
         }
@@ -589,6 +600,32 @@ export const getEditableElm = node => {
 };
 
 /**
+ * filter editable elements
+ *
+ * @param {string} localName - element local name
+ * @param {string} query - query selector
+ * @param {boolean} force - force
+ * @returns {Array} - filtered editable elements
+ */
+export const filterEditableElements = (localName, query, force = false) => {
+  if (!isString(localName)) {
+    throw new TypeError(`Expected String but got ${getType(localName)}.`);
+  }
+  if (!isString(query)) {
+    throw new TypeError(`Expected String but got ${getType(query)}.`);
+  }
+  const arr = [...document.querySelectorAll(query)].filter(item => {
+    const { localName: itemLocalName, namespaceURI } = item;
+    let res;
+    if (itemLocalName === localName) {
+      res = namespaceURI !== nsHtml || getEditableElm(item) || force;
+    }
+    return res && item;
+  });
+  return arr;
+};
+
+/**
  * create paragraphed content
  *
  * @param {string} value - value
@@ -620,7 +657,9 @@ export const createParagraphedContent = (value, ns = nsHtml) => {
             const br = document.createElementNS(ns, 'br');
             elm.appendChild(br);
           }
-          elm.hasChildNodes() && frag.appendChild(elm);
+          if (elm.hasChildNodes()) {
+            frag.appendChild(elm);
+          }
         } else {
           if (text) {
             frag.appendChild(document.createTextNode(text));
