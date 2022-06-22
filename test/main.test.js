@@ -2194,7 +2194,8 @@ describe('main', () => {
       stubConsole.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isFalse(calledConsole, 'not called console');
-      assert.isFalse(mjs.ports.has(portId), 'port');
+      assert.isTrue(mjs.ports.has(portId), 'port');
+      assert.isNull(mjs.ports.get(portId), 'port');
       assert.isNull(res, 'result');
     });
 
@@ -2210,7 +2211,8 @@ describe('main', () => {
       stubConsole.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isTrue(calledConsole, 'not called console');
-      assert.isFalse(mjs.ports.has(portId), 'port');
+      assert.isTrue(mjs.ports.has(portId), 'port');
+      assert.isNull(mjs.ports.get(portId), 'port');
       assert.isNull(res, 'result');
     });
 
@@ -2225,7 +2227,8 @@ describe('main', () => {
       stubConsole.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isTrue(calledConsole, 'not called console');
-      assert.isFalse(mjs.ports.has(portId), 'port');
+      assert.isTrue(mjs.ports.has(portId), 'port');
+      assert.isNull(mjs.ports.get(portId), 'port');
       assert.isNull(res, 'result');
     });
   });
@@ -2425,6 +2428,7 @@ describe('main', () => {
       const port = mockPort({ name: portId });
       const i = browser.menus.update.callCount;
       const j = port.postMessage.callCount;
+      const k = browser.tabs.sendMessage.callCount;
       mjs.ports.set(portId, port);
       const info = {
         tabId: 2,
@@ -2433,9 +2437,39 @@ describe('main', () => {
       const res = await func(info);
       assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
       assert.strictEqual(port.postMessage.callCount, j + 1, 'called');
+      assert.strictEqual(browser.tabs.sendMessage.callCount, k, 'not called');
       assert.isTrue(varsLocal[MENU_ENABLED], 'value');
       assert.deepEqual(res, [
         [undefined],
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should call function', async () => {
+      const { varsLocal } = mjs;
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
+      const i = browser.menus.update.callCount;
+      const j = port.postMessage.callCount;
+      const k = browser.tabs.sendMessage.callCount;
+      mjs.ports.set(portId, null);
+      const info = {
+        tabId: 2,
+        windowId: 1
+      };
+      const res = await func(info);
+      assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
+      assert.strictEqual(port.postMessage.callCount, j, 'not called');
+      assert.strictEqual(browser.tabs.sendMessage.callCount, k + 1, 'called');
+      assert.isTrue(varsLocal[MENU_ENABLED], 'value');
+      assert.deepEqual(res, [
+        null,
         [
           undefined,
           undefined,
