@@ -35,7 +35,9 @@ export const postMsg = async msg => {
  *
  * @returns {Function} - postMsg()
  */
-export const getHostStatus = async () => postMsg({ [HOST_STATUS_GET]: true });
+export const getHostStatus = async () => postMsg({
+  [HOST_STATUS_GET]: true
+});
 
 /**
  * get editor config
@@ -147,7 +149,7 @@ export const extractHostStatus = async status => {
  * extract sync urls input
  *
  * @param {!object} evt - Event
- * @returns {?Function} - postMsg()
+ * @returns {?Function} - promise chain
  */
 export const extractSyncUrls = async evt => {
   const { target } = evt;
@@ -214,7 +216,7 @@ export const storePref = async evt => {
  * handle reloadExtension click
  *
  * @param {!object} evt - Event
- * @returns {?Function} - postMsg()
+ * @returns {?Function} - promise chain
  */
 export const handleReloadExtensionClick = evt => {
   const { currentTarget, target } = evt;

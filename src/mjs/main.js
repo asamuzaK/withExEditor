@@ -620,7 +620,9 @@ export const handleDisconnectedPort = (port = {}) => {
   if (e) {
     func = logErr(e);
   }
-  ports.delete(portId);
+  if (ports.has(portId)) {
+    ports.set(portId, null);
+  }
   return func || null;
 };
 
@@ -674,11 +676,17 @@ export const handleActivatedTab = async (info = {}) => {
     const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
     bool = ports.has(portId);
     if (bool) {
-      func.push(portPostMsg({
-        [TMP_FILE_REQ]: bool
-      }, {
-        portId
-      }));
+      if (ports.get(portId)) {
+        func.push(portPostMsg({
+          [TMP_FILE_REQ]: bool
+        }, {
+          portId
+        }));
+      } else {
+        func.push(sendMessage(tabId, {
+          [PORT_CONNECT]: portId
+        }));
+      }
     }
   }
   varsLocal[MENU_ENABLED] = !!bool;
@@ -722,6 +730,7 @@ export const handleRemovedTab = async (tabId, info = {}) => {
   let func;
   if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE &&
       Number.isInteger(windowId) && windowId !== WINDOW_ID_NONE) {
+    const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
     const win = await getWindow(windowId);
     if (win) {
       const { incognito } = win;
@@ -732,6 +741,9 @@ export const handleRemovedTab = async (tabId, info = {}) => {
           dir: incognito ? TMP_FILES_PB : TMP_FILES
         }
       });
+    }
+    if (ports.has(portId)) {
+      ports.delete(portId);
     }
   }
   return func || null;

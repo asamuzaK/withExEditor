@@ -271,7 +271,7 @@ export const appendChildNodes = (elm, node) => {
           arr.push(document.createTextNode('\n'));
         }
       } else if (nodeType === Node.TEXT_NODE) {
-         arr.push(document.createTextNode(nodeValue));
+        arr.push(document.createTextNode(nodeValue));
       }
     }
     if (arr.length) {
