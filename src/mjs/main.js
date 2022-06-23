@@ -371,7 +371,9 @@ export const portPostMsg = async (msg, opt = {}) => {
       const items = ports.keys();
       for (const itemKey of items) {
         const item = ports.get(itemKey);
-        func.push(item.postMessage(msg));
+        if (item) {
+          func.push(item.postMessage(msg));
+        }
       }
     } else {
       const port = isString(portId) && ports.get(portId);
@@ -580,13 +582,20 @@ export const handleMsg = async (msg, sender) => {
         case STORAGE_SET:
           func.push(setStorage(value));
           break;
-        case TMP_FILE_DATA_PORT:
-          func.push(portPostMsg({
-            [key]: value
-          }, {
-            allPorts: true
-          }));
+        case TMP_FILE_DATA_PORT: {
+          if (isObjectNotEmpty(value)) {
+            const { data } = value;
+            if (isObjectNotEmpty(data)) {
+              const { portId, tabId, windowId } = data;
+              func.push(portPostMsg({
+                [key]: value
+              }, {
+                portId: portId ?? `${PORT_CONTENT}_${windowId}_${tabId}`
+              }));
+            }
+          }
           break;
+        }
         case TMP_FILE_DATA_REMOVE:
         case TMP_FILE_RES:
           func.push(postTmpFileData(key, value));
@@ -633,18 +642,19 @@ export const handleDisconnectedPort = (port = {}) => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleConnectedPort = async (port = {}) => {
-  const { name: portId, sender } = port;
+  const { name: portName, sender } = port;
   const func = [];
-  if (isString(portId)) {
+  if (isString(portName)) {
     port.onDisconnect.addListener(handleDisconnectedPort);
     port.onMessage.addListener(handlePortOnMsg);
-    ports.set(portId, port);
     if (sender) {
       const { tab } = sender;
       if (tab) {
         const { active, id: tabId, incognito, status, windowId } = tab;
+        const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
         func.push(port.postMessage({
           incognito,
+          portId,
           tabId,
           windowId,
           [VARS_SET]: vars
@@ -654,7 +664,12 @@ export const handleConnectedPort = async (port = {}) => {
           varsLocal[MENU_ENABLED] = true;
           func.push(updateContextMenu(null, true));
         }
+        ports.set(portId, port);
+      } else {
+        ports.set(portName, port);
       }
+    } else {
+      ports.set(portName, port);
     }
   }
   return Promise.all(func);

@@ -1743,7 +1743,20 @@ describe('main', () => {
       assert.deepEqual(res, [[undefined]], 'result');
     });
 
-    it('should call function', async () => {
+    it('should not call function', async () => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
+      const i = port.postMessage.callCount;
+      mjs.ports.set(portId, port);
+      const msg = {
+        [TMP_FILE_DATA_PORT]: true
+      };
+      const res = await func(msg);
+      assert.strictEqual(port.postMessage.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should not call function', async () => {
       const portId = `${PORT_CONTENT}_1_2`;
       const port = mockPort({ name: portId });
       const i = port.postMessage.callCount;
@@ -1751,6 +1764,43 @@ describe('main', () => {
       const msg = {
         [TMP_FILE_DATA_PORT]: {
           foo: 'bar'
+        }
+      };
+      const res = await func(msg);
+      assert.strictEqual(port.postMessage.callCount, i, 'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should call function', async () => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
+      const i = port.postMessage.callCount;
+      mjs.ports.set(portId, port);
+      const msg = {
+        [TMP_FILE_DATA_PORT]: {
+          data: {
+            tabId: '2',
+            windowId: '1'
+          }
+        }
+      };
+      const res = await func(msg);
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.deepEqual(res, [[undefined]], 'result');
+    });
+
+    it('should call function', async () => {
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
+      const i = port.postMessage.callCount;
+      mjs.ports.set(portId, port);
+      const msg = {
+        [TMP_FILE_DATA_PORT]: {
+          data: {
+            portId,
+            tabId: '2',
+            windowId: '1'
+          }
         }
       };
       const res = await func(msg);

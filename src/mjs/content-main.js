@@ -322,14 +322,14 @@ export const fetchSource = async (data = {}) => {
     };
     const res = await fetch(uri, opt);
     if (res) {
-      const { dir, host, incognito, mode, tabId, windowId } = data;
+      const { dir, host, incognito, mode, portId, tabId, windowId } = data;
       const [type] = res.headers.get('Content-Type').split(';');
       const dataId = getDataIdFromURI(uri, SUBST);
       const extType = getFileExtension(type);
       const value = await res.text();
       obj = {
         [TMP_FILE_CREATE]: {
-          dataId, dir, extType, host, incognito, mode, tabId, windowId
+          dataId, dir, extType, host, incognito, mode, portId, tabId, windowId
         },
         value
       };
@@ -347,7 +347,8 @@ export const fetchSource = async (data = {}) => {
 export const createTmpFileData = async (data = {}) => {
   const { contentType, documentURI: uri } = document;
   const {
-    dir, host, incognito, liveEditKey, mode, syncAuto, tabId, value, windowId
+    dir, host, incognito, liveEditKey, mode, portId, syncAuto, tabId, value,
+    windowId
   } = data;
   let { dataId, namespaceURI } = data;
   let tmpFileData;
@@ -366,6 +367,7 @@ export const createTmpFileData = async (data = {}) => {
             liveEditKey,
             mode,
             namespaceURI,
+            portId,
             syncAuto,
             tabId,
             windowId
@@ -386,6 +388,7 @@ export const createTmpFileData = async (data = {}) => {
             liveEditKey,
             mode,
             namespaceURI,
+            portId,
             syncAuto,
             tabId,
             windowId
@@ -406,6 +409,7 @@ export const createTmpFileData = async (data = {}) => {
             liveEditKey,
             mode,
             namespaceURI,
+            portId,
             syncAuto,
             tabId,
             windowId
@@ -425,6 +429,7 @@ export const createTmpFileData = async (data = {}) => {
             host,
             incognito,
             mode,
+            portId,
             tabId,
             windowId
           },
@@ -444,6 +449,7 @@ export const createTmpFileData = async (data = {}) => {
             host,
             incognito,
             mode,
+            portId,
             tabId,
             windowId
           },
@@ -597,7 +603,9 @@ export const setDataIdController = (elm, dataId) => {
  * @returns {object} - content data
  */
 export const createContentData = async (elm, mode) => {
-  const { incognito, enableSyncAuto, syncAutoUrls, tabId, windowId } = vars;
+  const {
+    incognito, enableSyncAuto, portId, syncAutoUrls, tabId, windowId
+  } = vars;
   const data = {
     dir: incognito ? TMP_FILES_PB : TMP_FILES,
     host: document.location.hostname || LABEL,
@@ -608,6 +616,7 @@ export const createContentData = async (elm, mode) => {
     syncAuto: false,
     value: null,
     incognito,
+    portId,
     tabId,
     windowId
   };
@@ -1195,8 +1204,14 @@ export const addPort = async portId => {
   }
   let port;
   if (vars.port) {
-    port = vars.port;
-  } else {
+    const { name: portName } = vars.port;
+    if (portName === portId) {
+      port = vars.port;
+    } else {
+      vars.port.disconnect();
+    }
+  }
+  if (!port) {
     port = await makeConnection({
       name: portId
     });
@@ -1212,8 +1227,13 @@ export const addPort = async portId => {
  */
 export const checkPort = async () => {
   let func;
-  if (!vars.port) {
+  if (vars.port) {
     func = requestPortConnection();
+  } else {
+    const port = await makeConnection({
+      name: PORT_CONTENT
+    });
+    await portOnConnect(port);
   }
   return func || null;
 };

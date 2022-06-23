@@ -4037,6 +4037,19 @@ describe('content-main', () => {
       const i = browser.runtime.connect.callCount;
       const portId = `${PORT_CONTENT}_1_2`;
       const port = mockPort({ name: portId });
+      mjs.vars.port = mockPort({ name: PORT_CONTENT });
+      const res = await func(portId);
+      assert.strictEqual(browser.runtime.connect.callCount, i + 1, 'called');
+      assert.isObject(mjs.vars.port, 'port');
+      assert.strictEqual(mjs.vars.portId, portId, 'portId');
+      assert.deepEqual(res, port, 'result');
+    });
+
+    it('should call function', async () => {
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
+      const i = browser.runtime.connect.callCount;
+      const portId = `${PORT_CONTENT}_1_2`;
+      const port = mockPort({ name: portId });
       const res = await func(portId);
       assert.strictEqual(browser.runtime.connect.callCount, i + 1, 'called');
       assert.isObject(mjs.vars.port, 'port');
@@ -4056,23 +4069,45 @@ describe('content-main', () => {
       mjs.vars.portId = null;
     });
 
-    it('should not call function', async () => {
-      const portId = `${PORT_CONTENT}_1_2`;
-      mjs.vars.port = mockPort({ name: portId });
+    it('should call function', async () => {
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
+      const j = browser.runtime.connect.callCount;
+      const portId = `${PORT_CONTENT}_1_2`;
+      mjs.vars.port = mockPort({ name: portId });
+      const res = await func();
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.strictEqual(browser.runtime.connect.callCount, j,
+        'not called');
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should call function', async () => {
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
+      const j = browser.runtime.connect.callCount;
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i,
         'not called');
+      assert.strictEqual(browser.runtime.connect.callCount, j + 1,
+        'called');
       assert.isNull(res, 'result');
     });
 
     it('should call function', async () => {
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
+      const j = browser.runtime.connect.callCount;
+      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
+      assert.strictEqual(browser.runtime.connect.callCount, j,
+        'not called');
       assert.deepEqual(res, {}, 'result');
     });
   });
@@ -4099,12 +4134,16 @@ describe('content-main', () => {
     });
 
     it('should call function', async () => {
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
+      const j = browser.runtime.connect.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
+      assert.strictEqual(browser.runtime.connect.callCount, j + 1,
         'called');
-      assert.deepEqual(res, {}, 'result');
+      assert.isNull(res, 'result');
     });
   });
 
@@ -4563,8 +4602,8 @@ describe('content-main', () => {
     });
 
     it('should call function', async () => {
-      browser.runtime.sendMessage.resolves({});
-      const i = browser.runtime.sendMessage.callCount;
+      browser.runtime.connect.callsFake(arg => mockPort(arg));
+      const i = browser.runtime.connect.callCount;
       const stub = sinon.stub();
       const evt = {
         target: {
@@ -4574,9 +4613,9 @@ describe('content-main', () => {
       };
       const res = await func(evt);
       assert.isTrue(stub.called, 'called');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+      assert.strictEqual(browser.runtime.connect.callCount, i + 1,
         'called');
-      assert.deepEqual(res, {}, 'result');
+      assert.isNull(res, 'result');
     });
   });
 });
