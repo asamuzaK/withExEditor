@@ -4,7 +4,8 @@
 
 /* shared */
 import {
-  getType, isObjectNotEmpty, isString, logErr, logMsg, logWarn, throwErr
+  getType, isObjectNotEmpty, isString, logErr, logMsg, logWarn,
+  removeQueryFromURI, stringifyPositiveInt, throwErr
 } from './common.js';
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
@@ -114,8 +115,9 @@ export const toggleBadge = async () => {
     browserAction.setBadgeBackgroundColor({ color }),
     browserAction.setBadgeText({ text })
   );
-  text && typeof browserAction.setBadgeTextColor === 'function' &&
+  if (text && typeof browserAction.setBadgeTextColor === 'function') {
     func.push(browserAction.setBadgeTextColor({ color: 'white' }));
+  }
   return Promise.all(func);
 };
 
@@ -353,8 +355,92 @@ export const hostPostMsg = async msg => {
   }
 };
 
-/* ports */
+/* content ports collection */
 export const ports = new Map();
+
+/**
+ * create ports map
+ *
+ * @param {string} windowId - window ID
+ * @param {string} tabId - tabId
+ * @returns {object} - Map
+ */
+export const createPortsMap = async (windowId, tabId) => {
+  if (!isString(windowId)) {
+    throw new TypeError(`Expected String but got ${getType(windowId)}.`);
+  }
+  if (!isString(tabId)) {
+    throw new TypeError(`Expected String but got ${getType(tabId)}.`);
+  }
+  if (!ports.has(windowId)) {
+    ports.set(windowId, new Map());
+  }
+  const portsWin = ports.get(windowId);
+  if (!portsWin.has(tabId)) {
+    portsWin.set(tabId, new Map());
+  }
+  return portsWin.get(tabId);
+};
+
+/**
+ * restore ports collection
+ *
+ * @param {object} data - disconnected port data
+ * @returns {?Function} - restorePorts() (recursive)
+ */
+export const restorePorts = async (data = {}) => {
+  const { tabId, windowId } = data;
+  let func;
+  if (windowId && tabId && ports.has(windowId)) {
+    const portsWin = ports.get(windowId);
+    portsWin.delete(tabId);
+    if (portsWin.size === 0) {
+      func = restorePorts({ windowId });
+    }
+  } else if (windowId) {
+    ports.delete(windowId);
+  }
+  return func || null;
+};
+
+/**
+ * remove port from ports collection
+ *
+ * @param {object} port - removed port
+ * @returns {Promise.<Array>} - results of each handler
+ */
+export const removePort = async (port = {}) => {
+  const { error, sender } = port;
+  const e = error || (runtime.lastError?.message && runtime.lastError);
+  const func = [];
+  if (e) {
+    func.push(logErr(e));
+  }
+  if (isObjectNotEmpty(sender)) {
+    const { tab, url } = sender;
+    const { incognito, windowId: wId, id: tId } = tab;
+    const windowId = stringifyPositiveInt(wId, true);
+    const portsWin = ports.get(windowId);
+    if (portsWin) {
+      const tabId = stringifyPositiveInt(tId, true);
+      const portsTab = portsWin.get(tabId);
+      if (portsTab) {
+        const portUrl = removeQueryFromURI(url);
+        const { hostname } = new URL(portUrl);
+        portsTab.delete(portUrl);
+        func.push(hostPostMsg({
+          [TMP_FILE_DATA_REMOVE]: {
+            tabId,
+            windowId,
+            dir: incognito ? TMP_FILES_PB : TMP_FILES,
+            host: hostname
+          }
+        }));
+      }
+    }
+  }
+  return Promise.all(func);
+};
 
 /**
  * post message to port
@@ -366,19 +452,39 @@ export const ports = new Map();
 export const portPostMsg = async (msg, opt = {}) => {
   const func = [];
   if (msg) {
-    const { allPorts, portId } = opt;
-    if (allPorts) {
-      const items = ports.keys();
-      for (const itemKey of items) {
-        const item = ports.get(itemKey);
-        if (item) {
-          func.push(item.postMessage(msg));
+    const { windowId, tabId, portKey, recurse } = opt;
+    const portsWin = isString(windowId) && ports.get(windowId);
+    const portsTab = portsWin && isString(tabId) && portsWin.get(tabId);
+    const port = portsTab && isString(portKey) && portsTab.get(portKey);
+    if (port) {
+      port.postMessage(msg);
+    } else if (portsTab) {
+      const items = portsTab.entries();
+      for (const [itemKey, itemPort] of items) {
+        try {
+          itemPort.postMessage(msg);
+        } catch (e) {
+          logErr(e);
+          portsTab.delete(itemKey);
         }
       }
-    } else {
-      const port = isString(portId) && ports.get(portId);
-      if (port) {
-        func.push(port.postMessage(msg));
+    } else if (recurse) {
+      if (portsWin) {
+        const items = portsWin.keys();
+        for (const itemKey of items) {
+          func.push(portPostMsg(msg, {
+            windowId,
+            tabId: itemKey
+          }));
+        }
+      } else {
+        const items = ports.keys();
+        for (const itemKey of items) {
+          func.push(portPostMsg(msg, {
+            recurse,
+            windowId: itemKey
+          }));
+        }
       }
     }
   }
@@ -392,20 +498,21 @@ export const portPostMsg = async (msg, opt = {}) => {
  * @param {object} tab - tabs.Tab
  * @returns {?Function} - portPostMsg()
  */
-export const postContextMenuData = async (info, tab = {}) => {
-  const { id: tabId, windowId } = tab;
+export const postContextMenuData = async (info, tab) => {
   let func;
-  if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE &&
-      Number.isInteger(windowId) && windowId !== WINDOW_ID_NONE) {
-    const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
-    func = portPostMsg({
-      [CONTENT_GET]: {
-        info,
-        tab
-      }
-    }, {
-      portId
-    });
+  if (info && tab) {
+    const { frameUrl, pageUrl } = info;
+    const { windowId: wId, id: tId } = tab;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(tId, true);
+    const portKey = removeQueryFromURI(frameUrl || pageUrl);
+    if (windowId && tabId && portKey) {
+      func = portPostMsg({
+        [CONTENT_GET]: { info, tab }
+      }, {
+        windowId, tabId, portKey
+      });
+    }
   }
   return func || null;
 };
@@ -425,14 +532,16 @@ export const postTmpFileData = async (key, msg = {}) => {
   let func;
   if (isObjectNotEmpty(data)) {
     const { tabId, windowId } = data;
-    const activeTabId = await getActiveTabId(windowId);
-    if (`${activeTabId}` === `${tabId}`) {
-      const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
-      func = portPostMsg({
-        [key]: msg
-      }, {
-        portId
-      });
+    if (isString(tabId) && /^\d+$/.test(tabId) &&
+        isString(windowId) && /^\d+$/.test(windowId)) {
+      const activeTabId = await getActiveTabId(windowId * 1);
+      if (activeTabId === tabId * 1) {
+        func = portPostMsg({
+          [key]: msg
+        }, {
+          windowId, tabId
+        });
+      }
     }
   }
   return func || null;
@@ -447,14 +556,14 @@ export const postGetContent = async () => {
   const tab = await getActiveTab();
   let func;
   if (tab) {
-    const { id: tabId, windowId } = tab;
-    const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
-    func = portPostMsg({
-      [CONTENT_GET]: {
-        tab
-      }
-    }, {
-      portId
+    const { id: tId, windowId: wId } = tab;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(tId, true);
+    const msg = {
+      [CONTENT_GET]: { tab }
+    };
+    func = portPostMsg(msg, {
+      windowId, tabId
     });
   }
   return func || null;
@@ -544,7 +653,7 @@ export const handleMsg = async (msg, sender) => {
           func.push(portPostMsg({
             [HOST_STATUS]: hostStatus
           }, {
-            allPorts: true
+            recurse: true
           }));
           break;
         case HOST_VERSION: {
@@ -569,10 +678,10 @@ export const handleMsg = async (msg, sender) => {
             if (tab) {
               const { id: tabId, windowId } = tab;
               if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE &&
-                  Number.isInteger(windowId) && windowId !== WINDOW_ID_NONE) {
-                const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
+                  Number.isInteger(windowId) &&
+                  windowId !== WINDOW_ID_NONE) {
                 func.push(sendMessage(tabId, {
-                  [PORT_CONNECT]: portId
+                  [PORT_CONNECT]: true
                 }));
               }
             }
@@ -582,20 +691,13 @@ export const handleMsg = async (msg, sender) => {
         case STORAGE_SET:
           func.push(setStorage(value));
           break;
-        case TMP_FILE_DATA_PORT: {
-          if (isObjectNotEmpty(value)) {
-            const { data } = value;
-            if (isObjectNotEmpty(data)) {
-              const { portId, tabId, windowId } = data;
-              func.push(portPostMsg({
-                [key]: value
-              }, {
-                portId: portId ?? `${PORT_CONTENT}_${windowId}_${tabId}`
-              }));
-            }
-          }
+        case TMP_FILE_DATA_PORT:
+          func.push(portPostMsg({
+            [key]: value
+          }, {
+            recurse: true
+          }));
           break;
-        }
         case TMP_FILE_DATA_REMOVE:
         case TMP_FILE_RES:
           func.push(postTmpFileData(key, value));
@@ -607,7 +709,14 @@ export const handleMsg = async (msg, sender) => {
   return Promise.all(func);
 };
 
-/* port handlers */
+/**
+ * handle port on disconnect
+ *
+ * @param {object} port - runtime.Port
+ * @returns {Function} - promise chain
+ */
+export const handlePortOnDisconnect = port => removePort(port).catch(throwErr);
+
 /**
  * handle port on message
  *
@@ -617,94 +726,77 @@ export const handleMsg = async (msg, sender) => {
 export const handlePortOnMsg = msg => handleMsg(msg).catch(throwErr);
 
 /**
- * handle disconnected port
- *
- * @param {object} port - runtime.Port
- * @returns {?Function} - logErr()
- */
-export const handleDisconnectedPort = (port = {}) => {
-  const { error, name: portId } = port;
-  const e = error || (runtime.lastError?.message && runtime.lastError);
-  let func;
-  if (e) {
-    func = logErr(e);
-  }
-  if (ports.has(portId)) {
-    ports.set(portId, null);
-  }
-  return func || null;
-};
-
-/**
  * handle connected port
  *
  * @param {object} port - runtime.Port
- * @returns {Promise.<Array>} - results of each handler
+ * @returns {?Function} - updateContextMenu()
  */
-export const handleConnectedPort = async (port = {}) => {
+export const handlePort = async (port = {}) => {
   const { name: portName, sender } = port;
-  const func = [];
-  if (isString(portName)) {
-    port.onDisconnect.addListener(handleDisconnectedPort);
-    port.onMessage.addListener(handlePortOnMsg);
-    if (sender) {
-      const { tab } = sender;
-      if (tab) {
-        const { active, id: tabId, incognito, status, windowId } = tab;
-        const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
-        func.push(port.postMessage({
+  let func;
+  if (sender) {
+    const { tab, url } = sender;
+    if (tab) {
+      const { active, id: tId, incognito, status, windowId: wId } = tab;
+      const windowId = stringifyPositiveInt(wId, true);
+      const tabId = stringifyPositiveInt(tId, true);
+      if (windowId && tabId && url) {
+        const portsTab = await createPortsMap(windowId, tabId);
+        const portUrl = removeQueryFromURI(url);
+        port.onDisconnect.addListener(handlePortOnDisconnect);
+        port.onMessage.addListener(handlePortOnMsg);
+        portsTab.set(portUrl, port);
+        port.postMessage({
           incognito,
-          portId,
           tabId,
           windowId,
           [VARS_SET]: vars
-        }));
-        if (portId.startsWith(PORT_CONTENT) && active &&
-            status === 'complete') {
-          varsLocal[MENU_ENABLED] = true;
-          func.push(updateContextMenu(null, true));
-        }
-        ports.set(portId, port);
-      } else {
-        ports.set(portName, port);
+        });
       }
-    } else {
-      ports.set(portName, port);
+      if (portName === PORT_CONTENT && active && status === 'complete') {
+        varsLocal[MENU_ENABLED] = true;
+        func = updateContextMenu(null, true);
+      }
     }
   }
-  return Promise.all(func);
+  return func || null;
 };
 
 /* tab / window handlers */
 /**
  * handle activated tab
  *
- * @param {object} info - activated tab info
+ * @param {!object} info - activated tab info
  * @returns {Promise.<Array>} - results of each handler
  */
-export const handleActivatedTab = async (info = {}) => {
-  const { tabId, windowId } = info;
+export const onTabActivated = async info => {
+  const { tabId: tId, windowId: wId } = info;
+  const windowId = stringifyPositiveInt(wId, true);
+  const tabId = stringifyPositiveInt(tId, true);
   const func = [];
   let bool;
-  if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE &&
-      Number.isInteger(windowId) && windowId !== WINDOW_ID_NONE) {
-    const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
-    bool = ports.has(portId);
-    if (bool) {
-      if (ports.get(portId)) {
-        func.push(portPostMsg({
-          [TMP_FILE_REQ]: bool
-        }, {
-          portId
-        }));
-      } else {
-        func.push(sendMessage(tabId, {
-          [PORT_CONNECT]: portId
-        }));
+  if (windowId && tabId) {
+    const portsWin = ports.get(windowId);
+    const portsTab = portsWin?.get(tabId);
+    const items = portsTab?.values();
+    if (items) {
+      for (const item of items) {
+        const { name } = item;
+        bool = name === PORT_CONTENT;
+        if (bool) {
+          break;
+        }
       }
     }
   }
-  varsLocal[MENU_ENABLED] = !!bool;
+  varsLocal[MENU_ENABLED] = bool || false;
+  if (bool) {
+    func.push(portPostMsg({
+      [TMP_FILE_REQ]: bool
+    }, {
+      windowId, tabId
+    }));
+  }
   func.push(updateContextMenu(null, true));
   return Promise.all(func);
 };
@@ -712,82 +804,94 @@ export const handleActivatedTab = async (info = {}) => {
 /**
  * handle updated tab
  *
- * @param {number} tabId - tabId
- * @param {object} info - changed tab info
- * @param {object} tab - tabs.Tab
- * @returns {?Function} - results of each handler
+ * @param {!number} id - tabId
+ * @param {!object} info - changed tab info
+ * @param {!object} tab - tabs.Tab
+ * @returns {Promise.<Array>} - results of each handler
  */
-export const handleUpdatedTab = async (tabId, info, tab = {}) => {
-  const { active, windowId } = tab;
-  let func;
-  if (active && isObjectNotEmpty(info) &&
-      Number.isInteger(tabId) && tabId !== TAB_ID_NONE &&
-      Number.isInteger(windowId) && windowId !== WINDOW_ID_NONE) {
+export const onTabUpdated = async (id, info, tab) => {
+  if (!Number.isInteger(id)) {
+    throw new TypeError(`Expected Number but got ${getType(id)}.`);
+  }
+  const { active, url, windowId: wId } = tab;
+  const func = [];
+  if (active) {
     const { status } = info;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(id, true);
+    const portUrl = removeQueryFromURI(url);
+    const portsWin = ports.get(windowId);
+    const portsTab = portsWin?.get(tabId);
+    const port = portsTab?.get(portUrl);
+    if (port) {
+      const { name } = port;
+      varsLocal[MENU_ENABLED] = name === PORT_CONTENT;
+    } else {
+      varsLocal[MENU_ENABLED] = false;
+    }
     if (status === 'complete') {
-      const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
-      varsLocal[MENU_ENABLED] = ports.has(portId);
-      func = updateContextMenu(null, true);
+      func.push(updateContextMenu(null, true));
     }
   }
-  return func || null;
+  return Promise.all(func);
 };
 
 /**
  * handle removed tab
  *
- * @param {number} tabId - tabId
- * @param {object} info - removed tab info
+ * @param {!number} id - tabId
+ * @param {!object} info - removed tab info
  * @returns {Promise.<Array>} - results of each handler
  */
-export const handleRemovedTab = async (tabId, info = {}) => {
-  const { windowId } = info;
-  let func;
-  if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE &&
-      Number.isInteger(windowId) && windowId !== WINDOW_ID_NONE) {
-    const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
-    const win = await getWindow(windowId);
-    if (win) {
-      const { incognito } = win;
-      func = hostPostMsg({
-        [TMP_FILE_DATA_REMOVE]: {
-          tabId,
-          windowId,
-          dir: incognito ? TMP_FILES_PB : TMP_FILES
-        }
-      });
-    }
-    if (ports.has(portId)) {
-      ports.delete(portId);
+export const onTabRemoved = async (id, info) => {
+  if (!Number.isInteger(id)) {
+    throw new TypeError(`Expected Number but got ${getType(id)}.`);
+  }
+  const { windowId: wId } = info;
+  const func = [];
+  const win = await getWindow(wId);
+  if (win) {
+    const { incognito } = win;
+    const windowId = stringifyPositiveInt(wId, true);
+    const tabId = stringifyPositiveInt(id, true);
+    const portsWin = ports.get(windowId);
+    const portsTab = portsWin?.get(tabId);
+    if (portsTab) {
+      func.push(
+        restorePorts({ windowId, tabId }),
+        hostPostMsg({
+          [TMP_FILE_DATA_REMOVE]: {
+            tabId,
+            windowId,
+            dir: incognito ? TMP_FILES_PB : TMP_FILES
+          }
+        })
+      );
     }
   }
-  return func || null;
+  return Promise.all(func);
 };
 
 /**
- * handle focused window
+ * handle focus changed window
  *
  * @returns {Promise.<Array>} - results of each handler
  */
-export const handleFocusedWindow = async () => {
+export const onWindowFocusChanged = async () => {
   const win = await getCurrentWindow();
-  const { focused, id: windowId, type } = win;
+  const { focused, id, type } = win;
   const func = [];
-  if (focused && windowId !== WINDOW_ID_NONE && type === 'normal') {
-    const tabId = await getActiveTabId(windowId);
-    let bool;
-    if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE) {
-      const portId = `${PORT_CONTENT}_${windowId}_${tabId}`;
-      bool = ports.has(portId);
-      if (bool) {
-        func.push(portPostMsg({
-          [TMP_FILE_REQ]: true
-        }, {
-          portId
-        }));
-      }
+  if (focused && id !== WINDOW_ID_NONE && type === 'normal') {
+    const tId = await getActiveTabId(id);
+    const windowId = stringifyPositiveInt(id, true);
+    const tabId = stringifyPositiveInt(tId, true);
+    if (windowId && tabId) {
+      func.push(portPostMsg({
+        [TMP_FILE_REQ]: true
+      }, {
+        windowId, tabId
+      }));
     }
-    varsLocal[MENU_ENABLED] = !!bool;
     func.push(updateContextMenu(null, true));
   }
   return Promise.all(func);
@@ -796,15 +900,23 @@ export const handleFocusedWindow = async () => {
 /**
  * handle removed window
  *
- * @returns {?Function} - hostPostMsg()
+ * @param {!number} id - windowId
+ * @returns {Promise.<Array>} - results of each handler
  */
-export const handleRemovedWindow = async () => {
-  const bool = await checkIncognitoWindowExists();
-  let func;
-  if (!bool) {
-    func = hostPostMsg({ [TMP_FILES_PB_REMOVE]: !bool });
+export const onWindowRemoved = async id => {
+  if (!Number.isInteger(id)) {
+    throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
-  return func || null;
+  const windowId = stringifyPositiveInt(id, true);
+  const bool = await checkIncognitoWindowExists();
+  const func = [];
+  if (windowId) {
+    func.push(restorePorts({ windowId }));
+  }
+  if (!bool) {
+    func.push(hostPostMsg({ [TMP_FILES_PB_REMOVE]: !bool }));
+  }
+  return Promise.all(func);
 };
 
 /**
@@ -843,7 +955,7 @@ export const portPostVar = async obj => {
     func = portPostMsg({
       [VARS_SET]: obj
     }, {
-      allPorts: true
+      recurse: true
     });
   }
   return func || null;
@@ -1008,7 +1120,7 @@ export const extractEditorConfig = async (data = {}) => {
         editorLabel: editorNewLabel
       }
     }, {
-      allPorts: true
+      recurse: true
     }),
     restoreContextMenu()
   ];
@@ -1025,12 +1137,11 @@ export const extractEditorConfig = async (data = {}) => {
 export const handleDisconnectedHost = async (port = {}) => {
   const { error } = port;
   const e = error || (runtime.lastError?.message && runtime.lastError);
-  const func = [];
+  const func = [toggleBadge()];
   if (e) {
     func.push(logErr(e));
   }
   hostStatus[HOST_CONNECTION] = false;
-  func.push(toggleBadge());
   return Promise.all(func);
 };
 

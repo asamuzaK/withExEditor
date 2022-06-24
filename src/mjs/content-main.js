@@ -13,9 +13,9 @@ import {
 } from './dom-event.js';
 import {
   createParagraphedContent, createDomStringFromSelectionRange,
-  createXmlBasedDomString, filterEditableElements, getAncestorId,
-  getEditableElm, getFileExtension, getNodeNS, getText, isContentTextNode,
-  isEditControl, matchDocUrl, serializeDomString
+  createXmlBasedDomString, getAncestorId, getEditableElm, getFileExtension,
+  getNodeNS, getText, isContentTextNode, isEditControl, matchDocUrl,
+  serializeDomString
 } from './dom-util.js';
 import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
@@ -63,8 +63,7 @@ export const vars = {
     key: 'a',
     keyCode: KEY_CODE_A
   },
-  port: null,
-  portId: null
+  port: null
 };
 
 /* keyboard shortcut */
@@ -126,21 +125,22 @@ export const getTargetElementFromDataId = dataId => {
   if (!elm) {
     const data = dataIds.get(dataId);
     if (isObjectNotEmpty(data)) {
-      const {
-        ancestorId, liveEditKey, localName, namespaceURI, prefix, queryIndex
-      } = data;
+      const { ancestorId, localName, namespaceURI, prefix, queryIndex } = data;
       if (localName && Number.isInteger(queryIndex)) {
         const items = [];
-        let query;
         if (prefix || (namespaceURI && namespaceURI !== nsHtml)) {
-          query = ancestorId
+          const query = ancestorId
             ? `#${ancestorId} *|*`
             : `${document.documentElement.localName} *|*`;
+          const arr = [...document.querySelectorAll(query)].filter(item => {
+            const { localName: itemLocalName } = item;
+            return itemLocalName === localName && item;
+          });
+          items.push(...arr);
         } else {
-          query = ancestorId ? `#${ancestorId} ${localName}` : localName;
+          const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
+          items.push(...document.querySelectorAll(query));
         }
-        const arr = filterEditableElements(localName, query, !!liveEditKey);
-        items.push(...arr);
         elm = items[queryIndex];
       }
     }
@@ -180,18 +180,20 @@ export const getQueriedItems = elm => {
   const items = [];
   if (elm?.nodeType === Node.ELEMENT_NODE) {
     const { localName, namespaceURI, prefix } = elm;
-    const isLiveEdit = getLiveEditKey(elm);
     const ancestorId = getAncestorId(elm);
-    let query;
     if (prefix || (namespaceURI && namespaceURI !== nsHtml)) {
-      query = ancestorId
+      const query = ancestorId
         ? `#${ancestorId} *|*`
         : `${document.documentElement.localName} *|*`;
+      const arr = [...document.querySelectorAll(query)].filter(item => {
+        const { localName: itemLocalName } = item;
+        return itemLocalName === localName && item;
+      });
+      items.push(...arr);
     } else {
-      query = ancestorId ? `#${ancestorId} ${localName}` : localName;
+      const query = ancestorId ? `#${ancestorId} ${localName}` : localName;
+      items.push(...document.querySelectorAll(query));
     }
-    const arr = filterEditableElements(localName, query, !!isLiveEdit);
-    items.push(...arr);
   }
   return items;
 };
@@ -322,14 +324,14 @@ export const fetchSource = async (data = {}) => {
     };
     const res = await fetch(uri, opt);
     if (res) {
-      const { dir, host, incognito, mode, portId, tabId, windowId } = data;
+      const { dir, host, incognito, mode, tabId, windowId } = data;
       const [type] = res.headers.get('Content-Type').split(';');
       const dataId = getDataIdFromURI(uri, SUBST);
       const extType = getFileExtension(type);
       const value = await res.text();
       obj = {
         [TMP_FILE_CREATE]: {
-          dataId, dir, extType, host, incognito, mode, portId, tabId, windowId
+          dataId, dir, extType, host, incognito, mode, tabId, windowId
         },
         value
       };
@@ -347,8 +349,7 @@ export const fetchSource = async (data = {}) => {
 export const createTmpFileData = async (data = {}) => {
   const { contentType, documentURI: uri } = document;
   const {
-    dir, host, incognito, liveEditKey, mode, portId, syncAuto, tabId, value,
-    windowId
+    dir, host, incognito, liveEditKey, mode, syncAuto, tabId, value, windowId
   } = data;
   let { dataId, namespaceURI } = data;
   let tmpFileData;
@@ -367,7 +368,6 @@ export const createTmpFileData = async (data = {}) => {
             liveEditKey,
             mode,
             namespaceURI,
-            portId,
             syncAuto,
             tabId,
             windowId
@@ -388,7 +388,6 @@ export const createTmpFileData = async (data = {}) => {
             liveEditKey,
             mode,
             namespaceURI,
-            portId,
             syncAuto,
             tabId,
             windowId
@@ -409,7 +408,6 @@ export const createTmpFileData = async (data = {}) => {
             liveEditKey,
             mode,
             namespaceURI,
-            portId,
             syncAuto,
             tabId,
             windowId
@@ -429,7 +427,6 @@ export const createTmpFileData = async (data = {}) => {
             host,
             incognito,
             mode,
-            portId,
             tabId,
             windowId
           },
@@ -449,7 +446,6 @@ export const createTmpFileData = async (data = {}) => {
             host,
             incognito,
             mode,
-            portId,
             tabId,
             windowId
           },
@@ -603,9 +599,7 @@ export const setDataIdController = (elm, dataId) => {
  * @returns {object} - content data
  */
 export const createContentData = async (elm, mode) => {
-  const {
-    incognito, enableSyncAuto, portId, syncAutoUrls, tabId, windowId
-  } = vars;
+  const { incognito, enableSyncAuto, syncAutoUrls, tabId, windowId } = vars;
   const data = {
     dir: incognito ? TMP_FILES_PB : TMP_FILES,
     host: document.location.hostname || LABEL,
@@ -616,7 +610,6 @@ export const createContentData = async (elm, mode) => {
     syncAuto: false,
     value: null,
     incognito,
-    portId,
     tabId,
     windowId
   };
@@ -1083,8 +1076,6 @@ export const handlePortMsg = async msg => {
           break;
         case ID_TAB:
         case ID_WIN:
-          vars[key] = `${value}`;
-          break;
         case SYNC_AUTO_URL:
           vars[key] = value;
           break;
@@ -1137,15 +1128,15 @@ export const requestPortConnection = async () => {
  * handle disconnected port
  *
  * @param {object} port - runtime.Port
- * @returns {void}
+ * @returns {Function} - requestPortConnection()
  */
-export const handleDisconnectedPort = async (port = {}) => {
-  const { error } = port;
-  const e = error || (runtime.lastError?.message && runtime.lastError);
+export const handleDisconnectedPort = async port => {
+  const e = port.error || runtime.lastError;
   if (e) {
     logErr(e);
   }
   vars.port = null;
+  return requestPortConnection();
 };
 
 /**
@@ -1172,58 +1163,19 @@ export const portOnMsg = msg => handlePortMsg(msg).catch(throwErr);
  * @returns {void}
  */
 export const portOnConnect = async (port = {}) => {
-  const { name: portId } = port;
-  if (isString(portId) && portId.startsWith(PORT_CONTENT)) {
+  if (port?.name === PORT_CONTENT) {
     port.onDisconnect.addListener(portOnDisconnect);
     port.onMessage.addListener(portOnMsg);
-    vars.portId = portId;
     vars.port = port;
   } else {
-    vars.portId = null;
     vars.port = null;
   }
 };
 
 /**
- * handle connected port
- *
- * @param {object} port - runtime.Port
- * @returns {Function} - promise chain
- */
-export const handleConnectedPort = port => portOnConnect(port).catch(throwErr);
-
-/**
- * add port
- *
- * @param {string} portId - port ID
- * @returns {object} - runtime.Port
- */
-export const addPort = async portId => {
-  if (!isString(portId)) {
-    throw new TypeError(`Expected String but got ${getType(portId)}.`);
-  }
-  let port;
-  if (vars.port) {
-    const { name: portName } = vars.port;
-    if (portName === portId) {
-      port = vars.port;
-    } else {
-      vars.port.disconnect();
-    }
-  }
-  if (!port) {
-    port = await makeConnection({
-      name: portId
-    });
-    await portOnConnect(port);
-  }
-  return port;
-};
-
-/**
  * check port
  *
- * @returns {?Function} - requestPortConnection()
+ * @returns {Function} - requestPortConnection() / portOnConnect()
  */
 export const checkPort = async () => {
   let func;
@@ -1233,9 +1185,9 @@ export const checkPort = async () => {
     const port = await makeConnection({
       name: PORT_CONTENT
     });
-    await portOnConnect(port);
+    func = portOnConnect(port);
   }
-  return func || null;
+  return func;
 };
 
 /* startup */
@@ -1254,8 +1206,7 @@ export const handleMsg = async msg => {
     const items = Object.entries(msg);
     for (const [key, value] of items) {
       if (key === PORT_CONNECT && value) {
-        vars.portId = value;
-        func.push(addPort(value));
+        func.push(makeConnection({ name: PORT_CONTENT }).then(portOnConnect));
         break;
       }
     }
