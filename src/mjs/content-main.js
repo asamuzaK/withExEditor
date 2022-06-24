@@ -835,8 +835,10 @@ export const replaceEditableContent = (node, opt = {}) => {
     if (changed && !data.mutex) {
       const sel = node.ownerDocument.getSelection();
       const dataTransfer = new DataTransfer();
+      const doctype = new XMLSerializer().serializeToString(document.doctype);
       const dataValue = value.replace(/\u200B/g, '');
-      const domstr = serializeDomString(dataValue, MIME_HTML, true);
+      const domstr =
+        serializeDomString(`${doctype}${dataValue}`, MIME_HTML, true);
       data.mutex = true;
       setDataId(dataId, data);
       sel.selectAllChildren(node);
