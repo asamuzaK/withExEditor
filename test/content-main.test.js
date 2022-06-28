@@ -3680,12 +3680,11 @@ describe('content-main', () => {
           name: PORT_CONTENT
         }
       };
-      const { id } = browser.runtime;
-      const i = browser.runtime.sendMessage.withArgs(id, msg).callCount;
-      browser.runtime.sendMessage.withArgs(id, msg).resolves({});
+      const i = browser.runtime.sendMessage.withArgs(msg).callCount;
+      browser.runtime.sendMessage.withArgs(msg).resolves({});
       const res = await func();
       assert.strictEqual(
-        browser.runtime.sendMessage.withArgs(id, msg).callCount,
+        browser.runtime.sendMessage.withArgs(msg).callCount,
         i + 1, 'called'
       );
       assert.deepEqual(res, {}, 'result');
