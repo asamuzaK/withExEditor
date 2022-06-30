@@ -47,9 +47,7 @@ export const createManifest = async info => {
       32: 'img/icon-outline-32.png',
       64: 'img/icon-color.png',
       128: 'img/icon-color-128.png'
-    },
-    minimum_chrome_version: '90',
-    minimum_opera_version: '76'
+    }
   };
   const items = Object.entries(replaceItems);
   for (const [key, value] of items) {
