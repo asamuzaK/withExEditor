@@ -12,7 +12,6 @@ export const EDITOR_FILE_NAME = 'editorFileName';
 export const EDITOR_LABEL = 'editorLabel';
 export const EXT_LOCALE = 'extensionLocale';
 export const EXT_NAME = 'extensionName';
-export const EXT_RELOAD = 'reloadExtension';
 export const FILE_EXT = 'fileExt';
 export const FILE_EXT_SELECT = 'selectFileExtension';
 export const FILE_EXT_SELECT_HTML = 'selectHtmlFileExtension';
