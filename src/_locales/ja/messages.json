@@ -322,6 +322,15 @@
   "optionsOtherSettings": {
     "message": "その他"
   },
+  "optionsReload": {
+    "message": "再読み込み"
+  },
+  "optionsReloadExtension": {
+    "message": "withExEditorを再読み込み"
+  },
+  "optionsReloadExtensionDetail": {
+    "message": "Node.js をアップデートしたときやホストをアップデートしたとき、または、 withExEditor が動かなくなった場合に試してください。"
+  },
   "optionsSaveEditorSettings": {
     "message": "保存"
   },

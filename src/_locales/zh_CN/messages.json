@@ -322,6 +322,15 @@
   "optionsOtherSettings": {
     "message": "其他设置"
   },
+  "optionsReload": {
+    "message": "重新加载"
+  },
+  "optionsReloadExtension": {
+    "message": "重新加载 withExEditor"
+  },
+  "optionsReloadExtensionDetail": {
+    "message": "withExEditor 失效时尝试，例如在更新 Node.js 或 withExEditorHost 之后。"
+  },
   "optionsSaveEditorSettings": {
     "message": "保存"
   },

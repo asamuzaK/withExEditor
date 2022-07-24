@@ -8,9 +8,10 @@ import { afterEach, beforeEach, describe, it } from 'mocha';
 import { browser, createJsdom, mockPort } from './mocha/setup.js';
 import sinon from 'sinon';
 import {
-  EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, HOST_CONNECTION,
-  HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION, HOST_VERSION_LATEST,
-  HOST_VERSION_MIN, INFO, IS_EXECUTABLE, STORAGE_SET, SYNC_AUTO_URL, WARN
+  EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
+  HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION,
+  HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE, STORAGE_SET,
+  SYNC_AUTO_URL, WARN
 } from '../src/mjs/constant.js';
 
 /* test */
@@ -469,6 +470,38 @@ describe('options-main', () => {
     });
   });
 
+  describe('handle reloadExtension click', () => {
+    const func = mjs.handleReloadExtensionClick;
+
+    it('should call function', async () => {
+      const elm = document.createElement('button');
+      const body = document.querySelector('body');
+      body.appendChild(elm);
+      const evt = {
+        currentTarget: elm,
+        target: elm,
+        stopPropagation: () => sinon.fake(),
+        preventDefault: () => sinon.fake()
+      };
+      const res = await func(evt);
+      assert.isUndefined(res, 'result');
+    });
+
+    it('should get null', async () => {
+      const elm = document.createElement('button');
+      const body = document.querySelector('body');
+      body.appendChild(elm);
+      const evt = {
+        currentTarget: body,
+        target: elm,
+        stopPropagation: () => sinon.fake(),
+        preventDefault: () => sinon.fake()
+      };
+      const res = await func(evt);
+      assert.isNull(res, 'result');
+    });
+  });
+
   describe('handle sync urls input', () => {
     const func = mjs.handleSyncUrlsInputInput;
 
@@ -511,6 +544,21 @@ describe('options-main', () => {
       await func(evt);
       assert.isTrue(fake.calledOnce, 'called stopPropagation');
       assert.isTrue(fake2.calledOnce, 'called preventDefault');
+    });
+  });
+
+  describe('add event listener to reload extension button', () => {
+    const func = mjs.addReloadExtensionListener;
+
+    it('should set listener', async () => {
+      const elm = document.createElement('button');
+      const body = document.querySelector('body');
+      const spy = sinon.spy(elm, 'addEventListener');
+      elm.id = EXT_RELOAD;
+      body.appendChild(elm);
+      await func();
+      assert.isTrue(spy.calledOnce, 'called');
+      elm.addEventListener.restore();
     });
   });
 

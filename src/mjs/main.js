@@ -15,7 +15,7 @@ import {
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES,
   EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME,
-  FILE_EXT_SELECT, FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD,
+  EXT_RELOAD, FILE_EXT_SELECT, FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD,
   FILE_EXT_SELECT_TXT, HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
   HOST_STATUS, HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK,
   HOST_VERSION_LATEST, HOST_VERSION_MIN, ICON, ICON_AUTO, ICON_BLACK,
@@ -643,6 +643,9 @@ export const handleMsg = async (msg, sender) => {
         case EDITOR_CONFIG_RES:
           func.push(extractEditorConfig(value));
           break;
+        case EXT_RELOAD:
+          func.push(reloadExt(!!value));
+          break;
         case HOST:
           func.push(handleHostMsg(value));
           break;
@@ -1159,6 +1162,19 @@ export const handleHostOnDisconnect = port =>
 export const setHost = async () => {
   host.onDisconnect.addListener(handleHostOnDisconnect);
   host.onMessage.addListener(handlePortOnMsg);
+};
+
+/**
+ * reload extension
+ *
+ * @param {boolean} reload - reload
+ * @returns {void}
+ */
+export const reloadExt = async (reload = false) => {
+  if (reload) {
+    host?.disconnect();
+    runtime.reload();
+  }
 };
 
 /**

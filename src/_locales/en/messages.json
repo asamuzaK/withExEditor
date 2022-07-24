@@ -322,6 +322,15 @@
   "optionsOtherSettings": {
     "message": "Other Settings"
   },
+  "optionsReload": {
+    "message": "Reload"
+  },
+  "optionsReloadExtension": {
+    "message": "Reload withExEditor"
+  },
+  "optionsReloadExtensionDetail": {
+    "message": "Try when withExEditor stops working, for example when updating Node.js or updating withExEditorHost."
+  },
   "optionsSaveEditorSettings": {
     "message": "Save"
   },
