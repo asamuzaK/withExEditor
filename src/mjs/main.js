@@ -569,6 +569,19 @@ export const postGetContent = async () => {
   return func || null;
 };
 
+/**
+ * reload extension
+ *
+ * @param {boolean} reload - reload
+ * @returns {void}
+ */
+export const reloadExt = async (reload = false) => {
+  if (reload) {
+    host?.disconnect();
+    runtime.reload();
+  }
+};
+
 /* message handlers */
 /**
  * handle host message
@@ -1162,19 +1175,6 @@ export const handleHostOnDisconnect = port =>
 export const setHost = async () => {
   host.onDisconnect.addListener(handleHostOnDisconnect);
   host.onMessage.addListener(handlePortOnMsg);
-};
-
-/**
- * reload extension
- *
- * @param {boolean} reload - reload
- * @returns {void}
- */
-export const reloadExt = async (reload = false) => {
-  if (reload) {
-    host?.disconnect();
-    runtime.reload();
-  }
 };
 
 /**
