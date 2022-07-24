@@ -64,6 +64,13 @@ export const varsLocal = {
   [MODE_SVG]: ''
 };
 
+/* host status */
+export const hostStatus = {
+  [HOST_COMPAT]: false,
+  [HOST_CONNECTION]: false,
+  [HOST_VERSION_LATEST]: null
+};
+
 /* UI */
 /**
  * set icon
@@ -336,13 +343,6 @@ export const restoreContextMenu = async () =>
 /* native application host */
 export const host = runtime.connectNative(HOST);
 
-/* host status */
-export const hostStatus = {
-  [HOST_COMPAT]: false,
-  [HOST_CONNECTION]: false,
-  [HOST_VERSION_LATEST]: null
-};
-
 /**
  * post message to host
  *
@@ -569,6 +569,66 @@ export const postGetContent = async () => {
   return func || null;
 };
 
+/* editor config */
+/**
+ * extract editor config data
+ *
+ * @param {object} data - editor config data
+ * @returns {Promise.<Array>} - results of each handler
+ */
+export const extractEditorConfig = async (data = {}) => {
+  const { editorConfigTimestamp, editorName, executable } = data;
+  const store = await getStorage([
+    EDITOR_FILE_NAME,
+    EDITOR_LABEL
+  ]);
+  const editorFileName = store && store[EDITOR_FILE_NAME]?.value;
+  const editorLabel = store && store[EDITOR_LABEL]?.value;
+  const editorNewLabel = (editorFileName === editorName && editorLabel) ||
+                         (executable && editorName) || '';
+  const func = [
+    setStorage({
+      [EDITOR_CONFIG_TS]: {
+        id: EDITOR_CONFIG_TS,
+        app: {
+          executable: !!executable
+        },
+        checked: false,
+        value: editorConfigTimestamp || 0
+      },
+      [EDITOR_FILE_NAME]: {
+        id: EDITOR_FILE_NAME,
+        app: {
+          executable: !!executable
+        },
+        checked: false,
+        value: executable ? editorName : ''
+      },
+      [EDITOR_LABEL]: {
+        id: EDITOR_LABEL,
+        app: {
+          executable: false
+        },
+        checked: false,
+        value: editorNewLabel
+      }
+    }),
+    portPostMsg({
+      [EDITOR_CONFIG_RES]: {
+        editorConfigTimestamp,
+        editorName,
+        executable,
+        editorLabel: editorNewLabel
+      }
+    }, {
+      recurse: true
+    }),
+    restoreContextMenu()
+  ];
+  return Promise.all(func);
+};
+
+/* reload extension */
 /**
  * reload extension
  *
@@ -1079,65 +1139,6 @@ export const setVars = async (data = {}) => {
 export const setOs = async () => {
   const os = await getOs();
   vars[IS_MAC] = os === 'mac';
-};
-
-/* editor config */
-/**
- * extract editor config data
- *
- * @param {object} data - editor config data
- * @returns {Promise.<Array>} - results of each handler
- */
-export const extractEditorConfig = async (data = {}) => {
-  const { editorConfigTimestamp, editorName, executable } = data;
-  const store = await getStorage([
-    EDITOR_FILE_NAME,
-    EDITOR_LABEL
-  ]);
-  const editorFileName = store && store[EDITOR_FILE_NAME]?.value;
-  const editorLabel = store && store[EDITOR_LABEL]?.value;
-  const editorNewLabel = (editorFileName === editorName && editorLabel) ||
-                         (executable && editorName) || '';
-  const func = [
-    setStorage({
-      [EDITOR_CONFIG_TS]: {
-        id: EDITOR_CONFIG_TS,
-        app: {
-          executable: !!executable
-        },
-        checked: false,
-        value: editorConfigTimestamp || 0
-      },
-      [EDITOR_FILE_NAME]: {
-        id: EDITOR_FILE_NAME,
-        app: {
-          executable: !!executable
-        },
-        checked: false,
-        value: executable ? editorName : ''
-      },
-      [EDITOR_LABEL]: {
-        id: EDITOR_LABEL,
-        app: {
-          executable: false
-        },
-        checked: false,
-        value: editorNewLabel
-      }
-    }),
-    portPostMsg({
-      [EDITOR_CONFIG_RES]: {
-        editorConfigTimestamp,
-        editorName,
-        executable,
-        editorLabel: editorNewLabel
-      }
-    }, {
-      recurse: true
-    }),
-    restoreContextMenu()
-  ];
-  return Promise.all(func);
 };
 
 /* extension */
