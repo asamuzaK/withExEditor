@@ -2081,19 +2081,14 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { ports } = mjs;
-      ports.set('1', new Map());
-      ports.get('1').set('2', new Map());
-      ports.get('1').get('2').set('https://example.com',
-        browser.runtime.connect({ name: 'foo' }));
-      const port = ports.get('1').get('2').get('https://example.com');
-      const i = port.postMessage.callCount;
+      const i = browser.runtime.sendMessage.callCount;
       const msg = {
         [HOST_STATUS_GET]: true
       };
       const res = await func(msg);
-      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [[[[]]]], 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, [null], 'result');
     });
 
     it('should call function', async () => {
@@ -2371,13 +2366,7 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { ports } = mjs;
-      ports.set('1', new Map());
-      ports.get('1').set('2', new Map());
-      ports.get('1').get('2').set('https://example.com',
-        browser.runtime.connect({ name: 'foo' }));
-      const port = ports.get('1').get('2').get('https://example.com');
-      const i = port.postMessage.callCount;
+      const i = browser.runtime.sendMessage.callCount;
       const j = browser.storage.local.set.callCount;
       const k = browser.menus.removeAll.callCount;
       const msg = {
@@ -2385,13 +2374,14 @@ describe('main', () => {
       };
       browser.storage.local.get.resolves({});
       const res = await func(msg);
-      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.strictEqual(browser.storage.local.set.callCount, j + 1, 'called');
       assert.strictEqual(browser.menus.removeAll.callCount, k + 1, 'called');
       assert.deepEqual(res, [
         [
           undefined,
-          [[[]]],
+          null,
           [
             undefined,
             undefined,
@@ -3812,7 +3802,7 @@ describe('main', () => {
       const res = await func();
       assert.deepEqual(res, [
         undefined,
-        [],
+        null,
         [
           undefined,
           undefined,
@@ -3843,7 +3833,7 @@ describe('main', () => {
       const res = await func(data);
       assert.deepEqual(res, [
         undefined,
-        [],
+        null,
         [
           undefined,
           undefined,
@@ -3867,7 +3857,7 @@ describe('main', () => {
       const res = await func(data);
       assert.deepEqual(res, [
         undefined,
-        [],
+        null,
         [
           undefined,
           undefined,
