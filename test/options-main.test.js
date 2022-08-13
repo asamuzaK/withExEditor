@@ -10,8 +10,8 @@ import sinon from 'sinon';
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION,
-  HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE, STORAGE_SET,
-  SYNC_AUTO_URL, WARN
+  HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE, SYNC_AUTO_URL,
+  WARN
 } from '../src/mjs/constant.js';
 
 /* test */
@@ -107,15 +107,13 @@ describe('options-main', () => {
         id: 'foo'
       });
       assert.deepEqual(res, {
-        [STORAGE_SET]: {
-          foo: {
-            app: {
-              executable: false
-            },
-            id: 'foo',
-            checked: false,
-            value: ''
-          }
+        foo: {
+          app: {
+            executable: false
+          },
+          id: 'foo',
+          checked: false,
+          value: ''
         }
       }, 'result');
     });
@@ -398,36 +396,37 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.deepEqual(res, {}, 'result');
+      assert.isUndefined(res, 'result');
     });
   });
 
   describe('store pref', () => {
     const func = mjs.storePref;
 
-    it('should get empty array', async () => {
-      browser.runtime.sendMessage.resolves({});
+    it('should not call function', async () => {
+      const i = browser.storage.local.set.callCount;
       const evt = {
         target: {}
       };
       const res = await func(evt);
+      assert.strictEqual(browser.storage.local.set.callCount, i, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should get array', async () => {
-      browser.runtime.sendMessage.resolves({});
+      const i = browser.storage.local.set.callCount;
       const evt = {
         target: {
           id: 'foo'
         }
       };
       const res = await func(evt);
-      assert.strictEqual(res.length, 1, 'length');
-      assert.deepEqual(res, [{}], 'result');
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should get array', async () => {
-      browser.runtime.sendMessage.resolves({});
+      const i = browser.storage.local.set.callCount;
       const elm = document.createElement('input');
       const elm2 = document.createElement('input');
       const body = document.querySelector('body');
@@ -450,13 +449,13 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.strictEqual(res.length, 2, 'length');
-      assert.deepEqual(res, [{}, {}], 'result');
+      assert.strictEqual(browser.storage.local.set.callCount, i + 2, 'called');
+      assert.deepEqual(res, [undefined, undefined], 'result');
     });
 
     it('should get array', async () => {
-      browser.runtime.sendMessage.resolves({});
-      const i = browser.permissions.request.callCount;
+      const i = browser.storage.local.set.callCount;
+      const j = browser.permissions.request.callCount;
       const evt = {
         target: {
           id: HOST_ERR_NOTIFY,
@@ -464,15 +463,15 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.strictEqual(browser.permissions.request.callCount, i + 1,
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1, 'called');
+      assert.strictEqual(browser.permissions.request.callCount, j + 1,
         'called');
-      assert.strictEqual(res.length, 1, 'length');
-      assert.deepEqual(res, [{}], 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should get array', async () => {
-      browser.runtime.sendMessage.resolves({});
-      const i = browser.permissions.remove.callCount;
+      const i = browser.storage.local.set.callCount;
+      const j = browser.permissions.remove.callCount;
       const evt = {
         target: {
           id: HOST_ERR_NOTIFY,
@@ -480,9 +479,9 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.strictEqual(browser.permissions.remove.callCount, i + 1, 'called');
-      assert.strictEqual(res.length, 1, 'length');
-      assert.deepEqual(res, [{}], 'result');
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1, 'called');
+      assert.strictEqual(browser.permissions.remove.callCount, j + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
     });
   });
 
@@ -524,7 +523,6 @@ describe('options-main', () => {
     const func = mjs.handleSyncUrlsInputInput;
 
     it('should call function', async () => {
-      browser.runtime.sendMessage.resolves({});
       const evt = {
         target: {
           id: 'foo',
@@ -532,7 +530,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.deepEqual(res, {}, 'result');
+      assert.isUndefined(res, 'result');
     });
   });
 
@@ -540,14 +538,13 @@ describe('options-main', () => {
     const func = mjs.handleInputChange;
 
     it('should get array', async () => {
-      browser.runtime.sendMessage.resolves({});
       const evt = {
         target: {
           id: 'foo'
         }
       };
       const res = await func(evt);
-      assert.deepEqual(res, [{}], 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
   });
 
@@ -803,7 +800,6 @@ describe('options-main', () => {
       browser.storage.local.get.resolves({});
       const res = await func();
       assert.strictEqual(browser.storage.local.get.callCount, i + 1, 'called');
-      assert.strictEqual(res.length, 0, 'array length');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -815,7 +811,6 @@ describe('options-main', () => {
       });
       const res = await func();
       assert.strictEqual(browser.storage.local.get.callCount, i + 1, 'called');
-      assert.strictEqual(res.length, 0, 'array length');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -831,7 +826,6 @@ describe('options-main', () => {
       });
       const res = await func();
       assert.strictEqual(browser.storage.local.get.callCount, i + 1, 'called');
-      assert.strictEqual(res.length, 2, 'array length');
       assert.deepEqual(res, [undefined, undefined], 'result');
     });
   });
@@ -853,7 +847,6 @@ describe('options-main', () => {
       const res = await func({
         [EDITOR_CONFIG_RES]: {}
       });
-      assert.strictEqual(res.length, 1, 'length');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -861,7 +854,6 @@ describe('options-main', () => {
       const res = await func({
         [HOST_STATUS]: {}
       });
-      assert.strictEqual(res.length, 1, 'length');
       assert.deepEqual(res, [undefined], 'result');
     });
   });

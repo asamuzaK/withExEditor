@@ -19,7 +19,7 @@ import {
   MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
   MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
-  STORAGE_SET, SYNC_AUTO, SYNC_AUTO_URL,
+  SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
   TMP_FILE_RES, WARN_COLOR, WARN_TEXT
 } from '../src/mjs/constant.js';
@@ -2089,18 +2089,6 @@ describe('main', () => {
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
       assert.deepEqual(res, [null], 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.storage.local.set.callCount;
-      const msg = {
-        [STORAGE_SET]: {
-          foo: 'bar'
-        }
-      };
-      const res = await func(msg);
-      assert.strictEqual(browser.storage.local.set.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {

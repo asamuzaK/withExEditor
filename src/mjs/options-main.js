@@ -5,13 +5,13 @@
 /* shared */
 import { isObjectNotEmpty, isString, logErr, throwErr } from './common.js';
 import {
-  getStorage, removePermission, requestPermission, sendMessage
+  getStorage, removePermission, requestPermission, sendMessage, setStorage
 } from './browser.js';
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
   EXT_RELOAD, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
   HOST_VERSION, HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE,
-  STORAGE_SET, SYNC_AUTO_URL, WARN
+  SYNC_AUTO_URL, WARN
 } from './constant.js';
 
 /* api */
@@ -59,15 +59,13 @@ export const getEditorConfig = async () => sendMsg({
 export const createPref = async (elm, executable = false) => {
   const id = elm?.id;
   const data = id && {
-    [STORAGE_SET]: {
-      [id]: {
-        id,
-        app: {
-          executable: !!executable
-        },
-        checked: !!elm.checked,
-        value: elm.value || ''
-      }
+    [id]: {
+      id,
+      app: {
+        executable: !!executable
+      },
+      checked: !!elm.checked,
+      value: elm.value || ''
     }
   };
   return data || null;
@@ -172,7 +170,7 @@ export const extractSyncUrls = async evt => {
       }
     }
     if (bool) {
-      func = createPref(target).then(sendMsg);
+      func = createPref(target).then(setStorage);
     }
   }
   return func || null;
@@ -192,7 +190,7 @@ export const storePref = async evt => {
     if (type === 'radio') {
       const nodes = document.querySelectorAll(`[name=${name}]`);
       for (const node of nodes) {
-        func.push(createPref(node).then(sendMsg));
+        func.push(createPref(node).then(setStorage));
       }
     } else {
       switch (id) {
@@ -202,10 +200,10 @@ export const storePref = async evt => {
           } else {
             await removePermission(['notifications']);
           }
-          func.push(createPref(target).then(sendMsg));
+          func.push(createPref(target).then(setStorage));
           break;
         default:
-          func.push(createPref(target).then(sendMsg));
+          func.push(createPref(target).then(setStorage));
       }
     }
   }
