@@ -70,7 +70,6 @@ export const PATH_CONTENT_SCRIPT = '/js/content.js';
 export const PORT_CONNECT = 'connectPort';
 export const PORT_CONTENT = 'portContent';
 export const PROCESS_CHILD = 'childProcess';
-export const STORAGE_SET = 'setStorage';
 export const SUBST = 'index';
 export const SYNC_AUTO = 'enableSyncAuto';
 export const SYNC_AUTO_URL = 'syncAutoUrls';
