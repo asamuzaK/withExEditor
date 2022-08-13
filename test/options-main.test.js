@@ -46,21 +46,25 @@ describe('options-main', () => {
     assert.isObject(browser, 'browser');
   });
 
-  describe('post message', () => {
-    const func = mjs.postMsg;
+  describe('send message', () => {
+    const func = mjs.sendMsg;
 
-    it('should call function', async () => {
-      const i = mjs.port.postMessage.callCount;
-      await func();
-      assert.isNumber(i, 'call count');
-      assert.strictEqual(mjs.port.postMessage.callCount, i, 'not called');
+    it('should not call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
+      const res = await func();
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
+      assert.isNull(res, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.port.postMessage.callCount;
-      await func({});
-      assert.isNumber(i, 'call count');
-      assert.strictEqual(mjs.port.postMessage.callCount, i + 1, 'called');
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
+      const res = await func({});
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 
@@ -68,9 +72,12 @@ describe('options-main', () => {
     const func = mjs.getHostStatus;
 
     it('should call function', async () => {
-      const i = mjs.port.postMessage.callCount;
-      await func();
-      assert.strictEqual(mjs.port.postMessage.callCount, i + 1, 'called');
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
+      const res = await func();
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 
@@ -78,9 +85,12 @@ describe('options-main', () => {
     const func = mjs.getEditorConfig;
 
     it('should call function', async () => {
-      const i = mjs.port.postMessage.callCount;
-      await func();
-      assert.strictEqual(mjs.port.postMessage.callCount, i + 1, 'called');
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
+      const res = await func();
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 
@@ -380,6 +390,7 @@ describe('options-main', () => {
     });
 
     it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
       const evt = {
         target: {
           id: 'foo',
@@ -387,7 +398,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 
@@ -395,6 +406,7 @@ describe('options-main', () => {
     const func = mjs.storePref;
 
     it('should get empty array', async () => {
+      browser.runtime.sendMessage.resolves({});
       const evt = {
         target: {}
       };
@@ -403,6 +415,7 @@ describe('options-main', () => {
     });
 
     it('should get array', async () => {
+      browser.runtime.sendMessage.resolves({});
       const evt = {
         target: {
           id: 'foo'
@@ -410,10 +423,11 @@ describe('options-main', () => {
       };
       const res = await func(evt);
       assert.strictEqual(res.length, 1, 'length');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [{}], 'result');
     });
 
     it('should get array', async () => {
+      browser.runtime.sendMessage.resolves({});
       const elm = document.createElement('input');
       const elm2 = document.createElement('input');
       const body = document.querySelector('body');
@@ -437,10 +451,11 @@ describe('options-main', () => {
       };
       const res = await func(evt);
       assert.strictEqual(res.length, 2, 'length');
-      assert.deepEqual(res, [undefined, undefined], 'result');
+      assert.deepEqual(res, [{}, {}], 'result');
     });
 
     it('should get array', async () => {
+      browser.runtime.sendMessage.resolves({});
       const i = browser.permissions.request.callCount;
       const evt = {
         target: {
@@ -452,10 +467,11 @@ describe('options-main', () => {
       assert.strictEqual(browser.permissions.request.callCount, i + 1,
         'called');
       assert.strictEqual(res.length, 1, 'length');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [{}], 'result');
     });
 
     it('should get array', async () => {
+      browser.runtime.sendMessage.resolves({});
       const i = browser.permissions.remove.callCount;
       const evt = {
         target: {
@@ -466,7 +482,7 @@ describe('options-main', () => {
       const res = await func(evt);
       assert.strictEqual(browser.permissions.remove.callCount, i + 1, 'called');
       assert.strictEqual(res.length, 1, 'length');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [{}], 'result');
     });
   });
 
@@ -474,6 +490,7 @@ describe('options-main', () => {
     const func = mjs.handleReloadExtensionClick;
 
     it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
       const elm = document.createElement('button');
       const body = document.querySelector('body');
       body.appendChild(elm);
@@ -484,10 +501,11 @@ describe('options-main', () => {
         preventDefault: () => sinon.fake()
       };
       const res = await func(evt);
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should get null', async () => {
+      browser.runtime.sendMessage.resolves({});
       const elm = document.createElement('button');
       const body = document.querySelector('body');
       body.appendChild(elm);
@@ -506,6 +524,7 @@ describe('options-main', () => {
     const func = mjs.handleSyncUrlsInputInput;
 
     it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
       const evt = {
         target: {
           id: 'foo',
@@ -513,7 +532,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 
@@ -521,13 +540,14 @@ describe('options-main', () => {
     const func = mjs.handleInputChange;
 
     it('should get array', async () => {
+      browser.runtime.sendMessage.resolves({});
       const evt = {
         target: {
           id: 'foo'
         }
       };
       const res = await func(evt);
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [{}], 'result');
     });
   });
 

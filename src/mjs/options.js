@@ -8,12 +8,16 @@ import { localizeHtml } from './localize.js';
 import { disableIncompatibleInputs } from './compat.js';
 import {
   addFormSubmitListener, addInputChangeListener, addReloadExtensionListener,
-  addSyncUrlsInputListener, getEditorConfig, getHostStatus, handleMsg, port,
+  addSyncUrlsInputListener, getEditorConfig, getHostStatus, handleMsg,
   setValuesFromStorage
 } from './options-main.js';
 
+const { runtime } = browser;
+
 /* listener */
-port.onMessage.addListener(msg => handleMsg(msg).catch(throwErr));
+runtime.onMessage.addListener((msg, sender) =>
+  handleMsg(msg, sender).catch(throwErr)
+);
 
 /* startup */
 document.addEventListener('DOMContentLoaded', () => Promise.all([

@@ -613,15 +613,13 @@ export const extractEditorConfig = async (data = {}) => {
         value: editorNewLabel
       }
     }),
-    portPostMsg({
+    sendMessage(null, {
       [EDITOR_CONFIG_RES]: {
         editorConfigTimestamp,
         editorName,
         executable,
         editorLabel: editorNewLabel
       }
-    }, {
-      recurse: true
     }),
     restoreContextMenu()
   ];
@@ -723,10 +721,8 @@ export const handleMsg = async (msg, sender) => {
           func.push(handleHostMsg(value));
           break;
         case HOST_STATUS_GET:
-          func.push(portPostMsg({
+          func.push(sendMessage(null, {
             [HOST_STATUS]: hostStatus
-          }, {
-            recurse: true
           }));
           break;
         case HOST_VERSION: {

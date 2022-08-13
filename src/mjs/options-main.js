@@ -4,47 +4,48 @@
 
 /* shared */
 import { isObjectNotEmpty, isString, logErr, throwErr } from './common.js';
-import { getStorage, removePermission, requestPermission } from './browser.js';
+import {
+  getStorage, removePermission, requestPermission, sendMessage
+} from './browser.js';
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
   EXT_RELOAD, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
   HOST_VERSION, HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE,
-  PORT_OPTIONS, STORAGE_SET, SYNC_AUTO_URL, WARN
+  STORAGE_SET, SYNC_AUTO_URL, WARN
 } from './constant.js';
 
 /* api */
-const { i18n, runtime } = browser;
-
-/* port */
-export const port = runtime.connect({ name: PORT_OPTIONS });
+const { i18n } = browser;
 
 /**
- * post message
+ * send message
  *
  * @param {*} msg - message
- * @returns {void}
+ * @returns {?Function} - sendMessage()
  */
-export const postMsg = async msg => {
+export const sendMsg = async msg => {
+  let func;
   if (msg) {
-    port.postMessage(msg);
+    func = sendMessage(null, msg);
   }
+  return func || null;
 };
 
 /**
  * get host status
  *
- * @returns {Function} - postMsg()
+ * @returns {Function} - sendMsg()
  */
-export const getHostStatus = async () => postMsg({
+export const getHostStatus = async () => sendMsg({
   [HOST_STATUS_GET]: true
 });
 
 /**
  * get editor config
  *
- * @returns {Function} - postMsg()
+ * @returns {Function} - sendMsg()
  */
-export const getEditorConfig = async () => postMsg({
+export const getEditorConfig = async () => sendMsg({
   [EDITOR_CONFIG_GET]: true
 });
 
@@ -171,7 +172,7 @@ export const extractSyncUrls = async evt => {
       }
     }
     if (bool) {
-      func = createPref(target).then(postMsg);
+      func = createPref(target).then(sendMsg);
     }
   }
   return func || null;
@@ -191,7 +192,7 @@ export const storePref = async evt => {
     if (type === 'radio') {
       const nodes = document.querySelectorAll(`[name=${name}]`);
       for (const node of nodes) {
-        func.push(createPref(node).then(postMsg));
+        func.push(createPref(node).then(sendMsg));
       }
     } else {
       switch (id) {
@@ -201,10 +202,10 @@ export const storePref = async evt => {
           } else {
             await removePermission(['notifications']);
           }
-          func.push(createPref(target).then(postMsg));
+          func.push(createPref(target).then(sendMsg));
           break;
         default:
-          func.push(createPref(target).then(postMsg));
+          func.push(createPref(target).then(sendMsg));
       }
     }
   }
@@ -223,7 +224,7 @@ export const handleReloadExtensionClick = evt => {
   let func;
   const reload = currentTarget === target;
   if (reload) {
-    func = postMsg({
+    func = sendMsg({
       [EXT_RELOAD]: reload
     }).catch(throwErr);
   }
