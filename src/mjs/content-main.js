@@ -599,9 +599,8 @@ export const setDataIdController = (elm, dataId) => {
  * @returns {object} - content data
  */
 export const createContentData = async (elm, mode) => {
-  const { incognito, enableSyncAuto, syncAutoUrls, tabId, windowId } = vars;
   const data = {
-    dir: incognito ? TMP_FILES_PB : TMP_FILES,
+    dir: vars[INCOGNITO] ? TMP_FILES_PB : TMP_FILES,
     host: document.location.hostname || LABEL,
     dataId: null,
     liveEditKey: null,
@@ -609,9 +608,9 @@ export const createContentData = async (elm, mode) => {
     namespaceURI: null,
     syncAuto: false,
     value: null,
-    incognito,
-    tabId,
-    windowId
+    incognito: vars[INCOGNITO],
+    tabId: vars[ID_TAB],
+    windowId: vars[ID_WIN]
   };
   const sel = document.getSelection();
   const { anchorNode, isCollapsed } = sel;
@@ -652,8 +651,9 @@ export const createContentData = async (elm, mode) => {
             data.namespaceURI = namespaceURI || getNodeNS(elm).namespaceURI;
             setDataIdController(elm, dataId);
           }
-          if (!incognito && enableSyncAuto && isString(syncAutoUrls)) {
-            data.syncAuto = matchDocUrl(syncAutoUrls.split(/\r?\n/));
+          if (!vars[INCOGNITO] && vars[SYNC_AUTO] &&
+              isString(vars[SYNC_AUTO_URL])) {
+            data.syncAuto = matchDocUrl(vars[SYNC_AUTO_URL].split(/\r?\n/));
           }
         }
         break;
