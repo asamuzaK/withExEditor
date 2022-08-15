@@ -5,8 +5,8 @@
 /* shared */
 import { throwErr } from './common.js';
 import {
-  handleCmd, handleMsg, handlePort, onTabActivated, onTabRemoved, onTabUpdated,
-  onWindowFocusChanged, onWindowRemoved, openOptionsPage, postContextMenuData,
+  handleCmd, handleMsg, onTabActivated, onTabRemoved, onTabUpdated,
+  onWindowFocusChanged, onWindowRemoved, openOptionsPage, sendContextMenuData,
   setVars, startup
 } from './main.js';
 
@@ -18,9 +18,8 @@ const menus = browser.menus ?? browser.contextMenus;
 browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
 commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
 menus.onClicked.addListener((info, tab) =>
-  postContextMenuData(info, tab).catch(throwErr)
+  sendContextMenuData(info, tab).catch(throwErr)
 );
-runtime.onConnect.addListener(port => handlePort(port).catch(throwErr));
 runtime.onInstalled.addListener(() => startup().catch(throwErr));
 runtime.onMessage.addListener((msg, sender) =>
   handleMsg(msg, sender).catch(throwErr)

@@ -3,10 +3,8 @@
  */
 
 /* shared */
-import {
-  getType, isObjectNotEmpty, isString, logErr, throwErr
-} from './common.js';
-import { makeConnection, sendMessage } from './browser.js';
+import { getType, isObjectNotEmpty, isString, throwErr } from './common.js';
+import { sendMessage } from './browser.js';
 import {
   dispatchClipboardEvent, dispatchEvent, dispatchFocusEvent, dispatchInputEvent,
   dispatchKeyboardEvent
@@ -22,17 +20,14 @@ import liveEdit, {
 } from './live-edit.js';
 import { html as nsHtml, math as nsMath, svg as nsSvg } from './ns-uri.js';
 import {
-  CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_MAC, INCOGNITO, LABEL,
-  LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN,
+  CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_CONNECTABLE, IS_MAC, INCOGNITO,
+  LABEL, LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN,
   MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
   MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
-  ONLY_EDITABLE, PORT_CONNECT, PORT_CONTENT, SUBST, SYNC_AUTO, SYNC_AUTO_URL,
+  ONLY_EDITABLE, SUBST, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILES, TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
   TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
 } from './constant.js';
-
-/* api */
-const { runtime } = browser;
 
 /* constants */
 const EDIT_MENU = [MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT];
@@ -62,8 +57,7 @@ export const vars = {
     code: 'KeyA',
     key: 'a',
     keyCode: KEY_CODE_A
-  },
-  port: null
+  }
 };
 
 /* keyboard shortcut */
@@ -461,34 +455,36 @@ export const createTmpFileData = async (data = {}) => {
   return tmpFileData || null;
 };
 
-/* post messages */
 /**
- * post message to port
+ * send message
  *
  * @param {*} msg - message
- * @returns {void}
+ * @returns {?Function} - sendMessage()
  */
-export const postMsg = async msg => {
-  const { port } = vars;
-  if (port && msg) {
-    port.postMessage(msg);
+export const sendMsg = async msg => {
+  let func;
+  if (msg) {
+    func = sendMessage(null, msg);
   }
+  return func || null;
 };
 
 /**
- * post each data ID
+ * send each data ID
  *
  * @param {boolean} bool - post data ID
  * @returns {Promise.<Array>} - results of each handler
  */
-export const postEachDataId = async (bool = false) => {
+export const sendEachDataId = async (bool = false) => {
   const func = [];
   if (bool) {
     dataIds.forEach((value, key) => {
       const { controls } = value;
       const elm = getTargetElementFromDataId(key);
       if (elm && !controls) {
-        func.push(postMsg({ [TMP_FILE_GET]: value }));
+        func.push(sendMsg({
+          [TMP_FILE_GET]: value
+        }));
       }
     });
   }
@@ -496,16 +492,18 @@ export const postEachDataId = async (bool = false) => {
 };
 
 /**
- * post temporary file data
+ * send temporary file data
  *
  * @param {string} dataId - data ID
- * @returns {?Function} - postMsg()
+ * @returns {?Function} - sendMsg()
  */
-export const postTmpFileData = async dataId => {
+export const sendTmpFileData = async dataId => {
   const data = dataIds.get(dataId);
   let func;
   if (data) {
-    func = postMsg({ [TMP_FILE_GET]: data });
+    func = sendMsg({
+      [TMP_FILE_GET]: data
+    });
   }
   return func || null;
 };
@@ -528,11 +526,11 @@ export const requestTmpFile = evt => {
         if (controls) {
           controls.forEach(id => {
             if (dataIds.has(id)) {
-              func.push(postTmpFileData(id));
+              func.push(sendTmpFileData(id));
             }
           });
         } else {
-          func.push(postTmpFileData(dataId));
+          func.push(sendTmpFileData(dataId));
         }
       } else {
         const liveEditKey = getLiveEditKey(currentTarget);
@@ -543,7 +541,7 @@ export const requestTmpFile = evt => {
             const items = document.querySelectorAll(setContent);
             for (const item of items) {
               if (item === target) {
-                func.push(postTmpFileData(dataId));
+                func.push(sendTmpFileData(dataId));
                 break;
               }
             }
@@ -708,18 +706,18 @@ export const createContentDataMsg = async data => {
 };
 
 /**
- * post content data
+ * send content data
  *
  * @param {object} elm - element
  * @param {string} mode - context mode
  * @returns {Promise.<Array>} - results of each handler
  */
-export const postContent = async (elm, mode) => {
+export const sendContent = async (elm, mode) => {
   const func = [];
   if (elm?.nodeType === Node.ELEMENT_NODE) {
     const data = await createContentData(elm, mode).then(createTmpFileData);
     func.push(
-      createContentDataMsg(data).then(postMsg),
+      createContentDataMsg(data).then(sendMsg),
       setTmpFileData(data)
     );
   }
@@ -765,7 +763,7 @@ export const getContextMode = elm => {
  * determine content process
  *
  * @param {object} obj - context menu obj
- * @returns {Function} - postContent()
+ * @returns {Function} - sendContent()
  */
 export const determineContentProcess = (obj = {}) => {
   const { info } = obj;
@@ -779,7 +777,7 @@ export const determineContentProcess = (obj = {}) => {
   } else {
     mode = getContextMode(elm);
   }
-  return postContent(elm, mode);
+  return sendContent(elm, mode);
 };
 
 /* synchronize text */
@@ -1060,14 +1058,13 @@ export const syncText = (obj = {}) => {
   return Promise.all(func);
 };
 
-/* port */
 /**
- * handle port message
+ * handle message
  *
  * @param {*} msg - message
  * @returns {Promise.<Array>} - results of each handler
  */
-export const handlePortMsg = async msg => {
+export const handleMsg = async msg => {
   const func = [];
   const items = msg && Object.entries(msg);
   if (items?.length) {
@@ -1100,10 +1097,10 @@ export const handlePortMsg = async msg => {
           func.push(removeTmpFileData(value));
           break;
         case TMP_FILE_REQ:
-          func.push(postEachDataId(value));
+          func.push(sendEachDataId(value));
           break;
         case VARS_SET:
-          func.push(handlePortMsg(value));
+          func.push(handleMsg(value));
           break;
         default:
       }
@@ -1112,110 +1109,7 @@ export const handlePortMsg = async msg => {
   return Promise.all(func);
 };
 
-/**
- * request port connection
- *
- * @returns {Function} - sendMessage()
- */
-export const requestPortConnection = async () => {
-  const msg = {
-    [PORT_CONNECT]: {
-      name: PORT_CONTENT
-    }
-  };
-  return sendMessage(null, msg);
-};
-
-/**
- * handle disconnected port
- *
- * @param {object} port - runtime.Port
- * @returns {Function} - requestPortConnection()
- */
-export const handleDisconnectedPort = async port => {
-  const e = port.error || runtime.lastError;
-  if (e) {
-    logErr(e);
-  }
-  vars.port = null;
-  return requestPortConnection();
-};
-
-/**
- * port on disconnect
- *
- * @param {object} port - runtime.Port
- * @returns {Function} - promise chain
- */
-export const portOnDisconnect = port =>
-  handleDisconnectedPort(port).catch(throwErr);
-
-/**
- * port on message
- *
- * @param {*} msg - message
- * @returns {Function} - handlePortMsg()
- */
-export const portOnMsg = msg => handlePortMsg(msg).catch(throwErr);
-
-/**
- * handle connected port
- *
- * @param {object} port - runtime.Port
- * @returns {void}
- */
-export const portOnConnect = async (port = {}) => {
-  if (port?.name === PORT_CONTENT) {
-    port.onDisconnect.addListener(portOnDisconnect);
-    port.onMessage.addListener(portOnMsg);
-    vars.port = port;
-  } else {
-    vars.port = null;
-  }
-};
-
-/**
- * check port
- *
- * @returns {Function} - requestPortConnection() / portOnConnect()
- */
-export const checkPort = async () => {
-  let func;
-  if (vars.port) {
-    func = requestPortConnection();
-  } else {
-    const port = await makeConnection({
-      name: PORT_CONTENT
-    });
-    func = portOnConnect(port);
-  }
-  return func;
-};
-
-/* startup */
-export const startup = () => checkPort().catch(throwErr);
-
 /* runtime */
-/**
- * handle message
- *
- * @param {*} msg - message
- * @returns {Promise.<Array>} - results of each handler
- */
-export const handleMsg = async msg => {
-  const func = [];
-  if (isObjectNotEmpty(msg)) {
-    const items = Object.entries(msg);
-    for (const [key, value] of items) {
-      if (key === PORT_CONNECT && value) {
-        func.push(makeConnection({ name: PORT_CONTENT }).then(portOnConnect));
-        break;
-      }
-    }
-  }
-  return Promise.all(func);
-};
-
 /**
  * runtime on message
  *
@@ -1224,12 +1118,27 @@ export const handleMsg = async msg => {
  */
 export const runtimeOnMsg = msg => handleMsg(msg).catch(throwErr);
 
+/**
+ * send tab status
+ *
+ * @returns {Function} - sendMsg()
+ */
+export const sendTabStatus = async () => {
+  const msg = {
+    [IS_CONNECTABLE]: true
+  };
+  return sendMsg(msg);
+};
+
+/* startup */
+export const startup = () => sendTabStatus().catch(throwErr);
+
 /* handle events */
 /**
  * handle before contextmenu event
  *
  * @param {!object} evt - Event
- * @returns {?Function} - postMsg()
+ * @returns {?Function} - sendMsg()
  */
 export const handleBeforeContextMenu = evt => {
   const { button, key, shiftKey, target } = evt;
@@ -1261,7 +1170,7 @@ export const handleBeforeContextMenu = evt => {
     } else {
       vars.contextNode = !vars[ONLY_EDITABLE] ? target : null;
     }
-    func = postMsg({
+    func = sendMsg({
       [CONTEXT_MENU]: {
         [MODE_EDIT]: {
           enabled,

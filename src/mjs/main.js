@@ -5,12 +5,12 @@
 /* shared */
 import {
   getType, isObjectNotEmpty, isString, logErr, logMsg, logWarn,
-  removeQueryFromURI, stringifyPositiveInt, throwErr
+  stringifyPositiveInt, throwErr
 } from './common.js';
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   getActiveTab, getActiveTabId, getAllStorage, getCurrentWindow, getOs,
-  getStorage, getWindow, sendMessage, setStorage
+  getStorage, getWindow, isTab, sendMessage, setStorage
 } from './browser.js';
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES,
@@ -20,19 +20,17 @@ import {
   HOST_STATUS, HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK,
   HOST_VERSION_LATEST, HOST_VERSION_MIN, ICON, ICON_AUTO, ICON_BLACK,
   ICON_COLOR, ICON_CONTEXT_ID, ICON_DARK, ICON_ID, ICON_LIGHT, ICON_WHITE,
-  INFO_COLOR, INFO_TEXT, IS_EXECUTABLE, IS_MAC, IS_WEBEXT, LOCAL_FILE_VIEW,
-  MENU_ENABLED, MODE_EDIT, MODE_EDIT_EXT, MODE_EDIT_HTML, MODE_EDIT_MD,
-  MODE_EDIT_TXT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
-  ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONNECT, PORT_CONTENT, PROCESS_CHILD,
-  SYNC_AUTO, SYNC_AUTO_URL, TMP_FILES, TMP_FILES_PB, TMP_FILES_PB_REMOVE,
-  TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
-  TMP_FILE_REQ, TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID
+  INFO_COLOR, INFO_TEXT, IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC, IS_WEBEXT,
+  LOCAL_FILE_VIEW, MENU_ENABLED, MODE_EDIT, MODE_EDIT_EXT, MODE_EDIT_HTML,
+  MODE_EDIT_MD, MODE_EDIT_TXT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE,
+  MODE_SVG, ONLY_EDITABLE, OPTIONS_OPEN, PROCESS_CHILD, SYNC_AUTO,
+  SYNC_AUTO_URL, TMP_FILES_PB, TMP_FILES_PB_REMOVE, TMP_FILE_CREATE,
+  TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ,
+  TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID
 } from './constant.js';
 
 /* api */
-const {
-  browserAction, i18n, notifications, runtime, tabs, windows
-} = browser;
+const { browserAction, i18n, notifications, runtime, tabs, windows } = browser;
 const menus = browser.menus ?? browser.contextMenus;
 
 /* constants */
@@ -126,13 +124,6 @@ export const toggleBadge = async () => {
   }
   return Promise.all(func);
 };
-
-/**
- * open options page
- *
- * @returns {?Function} - runtime.openOptionsPage()
- */
-export const openOptionsPage = async () => runtime.openOptionsPage();
 
 /* context menu items */
 export const menuItems = {
@@ -354,162 +345,99 @@ export const hostPostMsg = async msg => {
   }
 };
 
-/* content ports collection */
-export const ports = new Map();
+/* tab list */
+// TODO: save tab list in storage.session
+export const tabList = new Set();
 
 /**
- * create ports map
+ * add id to tab list
  *
- * @param {string} windowId - window ID
- * @param {string} tabId - tabId
- * @returns {object} - Map
+ * @param {number} id - tabId
+ * @returns {object} - tab list
  */
-export const createPortsMap = async (windowId, tabId) => {
-  if (!isString(windowId)) {
-    throw new TypeError(`Expected String but got ${getType(windowId)}.`);
+export const addIdToTabList = async id => {
+  if (!Number.isInteger(id)) {
+    throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
-  if (!isString(tabId)) {
-    throw new TypeError(`Expected String but got ${getType(tabId)}.`);
-  }
-  if (!ports.has(windowId)) {
-    ports.set(windowId, new Map());
-  }
-  const portsWin = ports.get(windowId);
-  if (!portsWin.has(tabId)) {
-    portsWin.set(tabId, new Map());
-  }
-  return portsWin.get(tabId);
+  tabList.add(id);
+  return tabList;
 };
 
 /**
- * restore ports collection
+ * remove id from tab list
  *
- * @param {object} data - disconnected port data
- * @returns {?Function} - restorePorts() (recursive)
+ * @param {number} id - tabId
+ * @returns {object} - tab list
  */
-export const restorePorts = async (data = {}) => {
-  const { tabId, windowId } = data;
-  let func;
-  if (windowId && tabId && ports.has(windowId)) {
-    const portsWin = ports.get(windowId);
-    portsWin.delete(tabId);
-    if (portsWin.size === 0) {
-      func = restorePorts({ windowId });
+export const removeIdFromTabList = async id => {
+  if (!Number.isInteger(id)) {
+    throw new TypeError(`Expected Number but got ${getType(id)}.`);
+  }
+  tabList.delete(id);
+  return tabList;
+};
+
+/**
+ * restore tab list
+ *
+ * @returns {void}
+ */
+export const restoreTabList = async () => {
+  const func = [];
+  tabList.forEach(async tabId => {
+    const bool = await isTab(tabId);
+    if (!bool) {
+      func.push(removeIdFromTabList(tabId));
     }
-  } else if (windowId) {
-    ports.delete(windowId);
-  }
-  return func || null;
+  });
+  await Promise.all(func);
 };
 
 /**
- * remove port from ports collection
+ * handle connectable tab
  *
- * @param {object} port - removed port
+ * @param {object} tab - tabs.Tab
  * @returns {Promise.<Array>} - results of each handler
  */
-export const removePort = async (port = {}) => {
-  const { error, sender } = port;
-  const e = error || (runtime.lastError?.message && runtime.lastError);
+export const handleConnectableTab = async (tab = {}) => {
   const func = [];
-  if (e) {
-    func.push(logErr(e));
-  }
-  if (isObjectNotEmpty(sender)) {
-    const { tab, url } = sender;
-    const { incognito, windowId: wId, id: tId } = tab;
+  if (tab) {
+    const { active, id: tId, incognito, status, windowId: wId } = tab;
     const windowId = stringifyPositiveInt(wId, true);
-    const portsWin = ports.get(windowId);
-    if (portsWin) {
-      const tabId = stringifyPositiveInt(tId, true);
-      const portsTab = portsWin.get(tabId);
-      if (portsTab) {
-        const portUrl = removeQueryFromURI(url);
-        const { hostname } = new URL(portUrl);
-        portsTab.delete(portUrl);
-        func.push(hostPostMsg({
-          [TMP_FILE_DATA_REMOVE]: {
-            tabId,
-            windowId,
-            dir: incognito ? TMP_FILES_PB : TMP_FILES,
-            host: hostname
-          }
-        }));
-      }
+    const tabId = stringifyPositiveInt(tId, true);
+    if (windowId && tabId) {
+      func.push(
+        addIdToTabList(tId),
+        sendMessage(tId, {
+          incognito,
+          tabId,
+          windowId,
+          [VARS_SET]: vars
+        })
+      );
+    }
+    if (active && status === 'complete') {
+      varsLocal[MENU_ENABLED] = true;
+      func.push(updateContextMenu(null, true));
     }
   }
   return Promise.all(func);
 };
 
 /**
- * post message to port
- *
- * @param {*} msg - message
- * @param {object} opt - option
- * @returns {Promise.<Array>} - results of each handler
- */
-export const portPostMsg = async (msg, opt = {}) => {
-  const func = [];
-  if (msg) {
-    const { windowId, tabId, portKey, recurse } = opt;
-    const portsWin = isString(windowId) && ports.get(windowId);
-    const portsTab = portsWin && isString(tabId) && portsWin.get(tabId);
-    const port = portsTab && isString(portKey) && portsTab.get(portKey);
-    if (port) {
-      port.postMessage(msg);
-    } else if (portsTab) {
-      const items = portsTab.entries();
-      for (const [itemKey, itemPort] of items) {
-        try {
-          itemPort.postMessage(msg);
-        } catch (e) {
-          logErr(e);
-          portsTab.delete(itemKey);
-        }
-      }
-    } else if (recurse) {
-      if (portsWin) {
-        const items = portsWin.keys();
-        for (const itemKey of items) {
-          func.push(portPostMsg(msg, {
-            windowId,
-            tabId: itemKey
-          }));
-        }
-      } else {
-        const items = ports.keys();
-        for (const itemKey of items) {
-          func.push(portPostMsg(msg, {
-            recurse,
-            windowId: itemKey
-          }));
-        }
-      }
-    }
-  }
-  return Promise.all(func);
-};
-
-/**
- * post context menu data
+ * send context menu data
  *
  * @param {object} info - menus.OnClickData
  * @param {object} tab - tabs.Tab
- * @returns {?Function} - portPostMsg()
+ * @returns {?Function} - sendMessage()
  */
-export const postContextMenuData = async (info, tab) => {
+export const sendContextMenuData = async (info, tab) => {
   let func;
   if (info && tab) {
-    const { frameUrl, pageUrl } = info;
-    const { windowId: wId, id: tId } = tab;
-    const windowId = stringifyPositiveInt(wId, true);
-    const tabId = stringifyPositiveInt(tId, true);
-    const portKey = removeQueryFromURI(frameUrl || pageUrl);
-    if (windowId && tabId && portKey) {
-      func = portPostMsg({
+    const { id: tabId } = tab;
+    if (tabList.has(tabId)) {
+      func = sendMessage(tabId, {
         [CONTENT_GET]: { info, tab }
-      }, {
-        windowId, tabId, portKey
       });
     }
   }
@@ -517,28 +445,25 @@ export const postContextMenuData = async (info, tab) => {
 };
 
 /**
- * post tmp file data
+ * send tmp file data
  *
  * @param {string} key - message key
  * @param {object} msg - message
- * @returns {?Function} - portPostMsg()
+ * @returns {?Function} - sendMessage()
  */
-export const postTmpFileData = async (key, msg = {}) => {
+export const sendTmpFileData = async (key, msg = {}) => {
   if (!isString(key)) {
     throw new TypeError(`Expected String but got ${getType(key)}.`);
   }
   const { data } = msg;
   let func;
   if (isObjectNotEmpty(data)) {
-    const { tabId, windowId } = data;
-    if (isString(tabId) && /^\d+$/.test(tabId) &&
-        isString(windowId) && /^\d+$/.test(windowId)) {
-      const activeTabId = await getActiveTabId(windowId * 1);
+    const { tabId } = data;
+    if (isString(tabId) && /^\d+$/.test(tabId)) {
+      const activeTabId = await getActiveTabId();
       if (activeTabId === tabId * 1) {
-        func = portPostMsg({
+        func = sendMessage(activeTabId, {
           [key]: msg
-        }, {
-          windowId, tabId
         });
       }
     }
@@ -547,23 +472,20 @@ export const postTmpFileData = async (key, msg = {}) => {
 };
 
 /**
- * post get content message to active tab
+ * send get content message to active tab
  *
- * @returns {?Function} - portPostMsg()
+ * @returns {?Function} - sendMessage()
  */
-export const postGetContent = async () => {
+export const sendGetContent = async () => {
   const tab = await getActiveTab();
   let func;
   if (tab) {
-    const { id: tId, windowId: wId } = tab;
-    const windowId = stringifyPositiveInt(wId, true);
-    const tabId = stringifyPositiveInt(tId, true);
-    const msg = {
-      [CONTENT_GET]: { tab }
-    };
-    func = portPostMsg(msg, {
-      windowId, tabId
-    });
+    const { id } = tab;
+    if (tabList.has(id)) {
+      func = sendMessage(id, {
+        [CONTENT_GET]: { tab }
+      });
+    }
   }
   return func || null;
 };
@@ -625,7 +547,14 @@ export const extractEditorConfig = async (data = {}) => {
   return Promise.all(func);
 };
 
-/* reload extension */
+/* extension */
+/**
+ * open options page
+ *
+ * @returns {?Function} - runtime.openOptionsPage()
+ */
+export const openOptionsPage = async () => runtime.openOptionsPage();
+
 /**
  * reload extension
  *
@@ -737,94 +666,34 @@ export const handleMsg = async (msg, sender) => {
           }
           break;
         }
-        case OPTIONS_OPEN:
-          func.push(openOptionsPage());
-          break;
-        case PORT_CONNECT: {
+        case IS_CONNECTABLE: {
           if (sender) {
             const { tab } = sender;
             if (tab) {
-              const { id: tabId, windowId } = tab;
-              if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE &&
-                  Number.isInteger(windowId) &&
-                  windowId !== WINDOW_ID_NONE) {
-                func.push(sendMessage(tabId, {
-                  [PORT_CONNECT]: true
-                }));
-              }
+              func.push(handleConnectableTab(tab));
             }
           }
           break;
         }
+        case OPTIONS_OPEN:
+          func.push(openOptionsPage());
+          break;
         case TMP_FILE_DATA_PORT:
-          func.push(portPostMsg({
-            [key]: value
-          }, {
-            recurse: true
-          }));
+          tabList.forEach(id => {
+            func.push(sendMessage(id, {
+              [key]: value
+            }));
+          });
           break;
         case TMP_FILE_DATA_REMOVE:
         case TMP_FILE_RES:
-          func.push(postTmpFileData(key, value));
+          func.push(sendTmpFileData(key, value));
           break;
         default:
       }
     }
   }
   return Promise.all(func);
-};
-
-/**
- * handle port on disconnect
- *
- * @param {object} port - runtime.Port
- * @returns {Function} - promise chain
- */
-export const handlePortOnDisconnect = port => removePort(port).catch(throwErr);
-
-/**
- * handle port on message
- *
- * @param {*} msg - message
- * @returns {Function} - promise chain
- */
-export const handlePortOnMsg = msg => handleMsg(msg).catch(throwErr);
-
-/**
- * handle connected port
- *
- * @param {object} port - runtime.Port
- * @returns {?Function} - updateContextMenu()
- */
-export const handlePort = async (port = {}) => {
-  const { name: portName, sender } = port;
-  let func;
-  if (sender) {
-    const { tab, url } = sender;
-    if (tab) {
-      const { active, id: tId, incognito, status, windowId: wId } = tab;
-      const windowId = stringifyPositiveInt(wId, true);
-      const tabId = stringifyPositiveInt(tId, true);
-      if (windowId && tabId && url) {
-        const portsTab = await createPortsMap(windowId, tabId);
-        const portUrl = removeQueryFromURI(url);
-        port.onDisconnect.addListener(handlePortOnDisconnect);
-        port.onMessage.addListener(handlePortOnMsg);
-        portsTab.set(portUrl, port);
-        port.postMessage({
-          incognito,
-          tabId,
-          windowId,
-          [VARS_SET]: vars
-        });
-      }
-      if (portName === PORT_CONTENT && active && status === 'complete') {
-        varsLocal[MENU_ENABLED] = true;
-        func = updateContextMenu(null, true);
-      }
-    }
-  }
-  return func || null;
 };
 
 /* tab / window handlers */
@@ -835,33 +704,15 @@ export const handlePort = async (port = {}) => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onTabActivated = async info => {
-  const { tabId: tId, windowId: wId } = info;
-  const windowId = stringifyPositiveInt(wId, true);
-  const tabId = stringifyPositiveInt(tId, true);
+  const { tabId } = info;
+  const isListed = tabList.has(tabId);
   const func = [];
-  let bool;
-  if (windowId && tabId) {
-    const portsWin = ports.get(windowId);
-    const portsTab = portsWin?.get(tabId);
-    const items = portsTab?.values();
-    if (items) {
-      for (const item of items) {
-        const { name } = item;
-        bool = name === PORT_CONTENT;
-        if (bool) {
-          break;
-        }
-      }
-    }
-  }
-  varsLocal[MENU_ENABLED] = bool || false;
-  if (bool) {
-    func.push(portPostMsg({
-      [TMP_FILE_REQ]: bool
-    }, {
-      windowId, tabId
+  if (isListed) {
+    func.push(sendMessage(tabId, {
+      [TMP_FILE_REQ]: isListed
     }));
   }
+  varsLocal[MENU_ENABLED] = isListed;
   func.push(updateContextMenu(null, true));
   return Promise.all(func);
 };
@@ -878,22 +729,11 @@ export const onTabUpdated = async (id, info, tab) => {
   if (!Number.isInteger(id)) {
     throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
-  const { active, url, windowId: wId } = tab;
+  const { active } = tab;
   const func = [];
   if (active) {
     const { status } = info;
-    const windowId = stringifyPositiveInt(wId, true);
-    const tabId = stringifyPositiveInt(id, true);
-    const portUrl = removeQueryFromURI(url);
-    const portsWin = ports.get(windowId);
-    const portsTab = portsWin?.get(tabId);
-    const port = portsTab?.get(portUrl);
-    if (port) {
-      const { name } = port;
-      varsLocal[MENU_ENABLED] = name === PORT_CONTENT;
-    } else {
-      varsLocal[MENU_ENABLED] = false;
-    }
+    varsLocal[MENU_ENABLED] = tabList.has(id);
     if (status === 'complete') {
       func.push(updateContextMenu(null, true));
     }
@@ -912,27 +752,25 @@ export const onTabRemoved = async (id, info) => {
   if (!Number.isInteger(id)) {
     throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
-  const { windowId: wId } = info;
   const func = [];
-  const win = await getWindow(wId);
-  if (win) {
-    const { incognito } = win;
-    const windowId = stringifyPositiveInt(wId, true);
-    const tabId = stringifyPositiveInt(id, true);
-    const portsWin = ports.get(windowId);
-    const portsTab = portsWin?.get(tabId);
-    if (portsTab) {
-      func.push(
-        restorePorts({ windowId, tabId }),
-        hostPostMsg({
+  if (tabList.has(id)) {
+    const { windowId: wId } = info;
+    const win = await getWindow(wId);
+    if (win) {
+      const { incognito } = win;
+      if (incognito) {
+        const windowId = stringifyPositiveInt(wId, true);
+        const tabId = stringifyPositiveInt(id, true);
+        func.push(hostPostMsg({
           [TMP_FILE_DATA_REMOVE]: {
             tabId,
             windowId,
-            dir: incognito ? TMP_FILES_PB : TMP_FILES
+            dir: TMP_FILES_PB
           }
-        })
-      );
+        }));
+      }
     }
+    func.push(removeIdFromTabList(id));
   }
   return Promise.all(func);
 };
@@ -947,17 +785,15 @@ export const onWindowFocusChanged = async () => {
   const { focused, id, type } = win;
   const func = [];
   if (focused && id !== WINDOW_ID_NONE && type === 'normal') {
-    const tId = await getActiveTabId(id);
-    const windowId = stringifyPositiveInt(id, true);
-    const tabId = stringifyPositiveInt(tId, true);
-    if (windowId && tabId) {
-      func.push(portPostMsg({
-        [TMP_FILE_REQ]: true
-      }, {
-        windowId, tabId
-      }));
+    const tabId = await getActiveTabId(id);
+    if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE) {
+      func.push(
+        sendMessage(tabId, {
+          [TMP_FILE_REQ]: true
+        }),
+        updateContextMenu(null, true)
+      );
     }
-    func.push(updateContextMenu(null, true));
   }
   return Promise.all(func);
 };
@@ -965,22 +801,17 @@ export const onWindowFocusChanged = async () => {
 /**
  * handle removed window
  *
- * @param {!number} id - windowId
  * @returns {Promise.<Array>} - results of each handler
  */
-export const onWindowRemoved = async id => {
-  if (!Number.isInteger(id)) {
-    throw new TypeError(`Expected Number but got ${getType(id)}.`);
-  }
-  const windowId = stringifyPositiveInt(id, true);
-  const bool = await checkIncognitoWindowExists();
+export const onWindowRemoved = async () => {
+  const hasIncognito = await checkIncognitoWindowExists(); ;
   const func = [];
-  if (windowId) {
-    func.push(restorePorts({ windowId }));
+  if (!hasIncognito) {
+    func.push(hostPostMsg({
+      [TMP_FILES_PB_REMOVE]: !hasIncognito
+    }));
   }
-  if (!bool) {
-    func.push(hostPostMsg({ [TMP_FILES_PB_REMOVE]: !bool }));
-  }
+  func.push(restoreTabList());
   return Promise.all(func);
 };
 
@@ -988,7 +819,7 @@ export const onWindowRemoved = async id => {
  * handle command
  *
  * @param {!string} cmd - command
- * @returns {?Function} - postGetContent() / openOptionsPage()
+ * @returns {?Function} - sendGetContent() / openOptionsPage()
  */
 export const handleCmd = async cmd => {
   if (!isString(cmd)) {
@@ -997,7 +828,7 @@ export const handleCmd = async cmd => {
   let func;
   switch (cmd) {
     case EDITOR_EXEC:
-      func = postGetContent();
+      func = sendGetContent();
       break;
     case OPTIONS_OPEN:
       func = openOptionsPage();
@@ -1009,21 +840,22 @@ export const handleCmd = async cmd => {
 
 /* handle variables */
 /**
- * post variable
+ * send variables
  *
  * @param {object} obj - variable object
- * @returns {?Function} - portPostMsg()
+ * @returns {Promise.<Array>} - results of each handler
  */
-export const portPostVar = async obj => {
-  let func;
+export const sendVariables = async obj => {
+  const func = [];
   if (obj) {
-    func = portPostMsg({
-      [VARS_SET]: obj
-    }, {
-      recurse: true
-    });
+    const items = tabList.keys();
+    for (const item of items) {
+      func.push(sendMessage(item, {
+        [VARS_SET]: obj
+      }));
+    }
   }
-  return func || null;
+  return Promise.all(func);
 };
 
 /**
@@ -1041,7 +873,7 @@ export const setVar = async (item, obj, changed = false) => {
   const func = [];
   if (isObjectNotEmpty(obj)) {
     const { app, checked, value } = obj;
-    const hasPorts = ports.size > 0;
+    const hasTabList = tabList.size > 0;
     switch (item) {
       case EDITOR_FILE_NAME:
         varsLocal[IS_EXECUTABLE] = !!(app?.executable);
@@ -1082,8 +914,8 @@ export const setVar = async (item, obj, changed = false) => {
         break;
       case ONLY_EDITABLE:
         vars[item] = !!checked;
-        if (hasPorts) {
-          func.push(portPostVar({ [item]: !!checked }));
+        if (hasTabList) {
+          func.push(sendVariables({ [item]: !!checked }));
         }
         if (changed) {
           func.push(restoreContextMenu());
@@ -1091,14 +923,14 @@ export const setVar = async (item, obj, changed = false) => {
         break;
       case SYNC_AUTO:
         vars[item] = !!checked;
-        if (hasPorts) {
-          func.push(portPostVar({ [item]: !!checked }));
+        if (hasTabList) {
+          func.push(sendVariables({ [item]: !!checked }));
         }
         break;
       case SYNC_AUTO_URL:
         vars[item] = value;
-        if (hasPorts) {
-          func.push(portPostVar({ [item]: value }));
+        if (hasTabList) {
+          func.push(sendVariables({ [item]: value }));
         }
         break;
       default:
@@ -1161,13 +993,21 @@ export const handleHostOnDisconnect = port =>
   handleDisconnectedHost(port).catch(throwErr);
 
 /**
+ * handle host on message
+ *
+ * @param {*} msg - message
+ * @returns {Function} - promise chain
+ */
+export const handleHostOnMsg = msg => handleMsg(msg).catch(throwErr);
+
+/**
  * set host
  *
  * @returns {void}
  */
 export const setHost = async () => {
   host.onDisconnect.addListener(handleHostOnDisconnect);
-  host.onMessage.addListener(handlePortOnMsg);
+  host.onMessage.addListener(handleHostOnMsg);
 };
 
 /**

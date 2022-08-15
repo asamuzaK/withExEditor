@@ -121,17 +121,3 @@ export const stringifyPositiveInt = (i, zero = false) => {
   }
   return str || null;
 };
-
-/**
- * remove query string from URI
- *
- * @param {string} uri - URI
- * @returns {string} - replaced URI
- */
-export const removeQueryFromURI = uri => {
-  if (isString(uri)) {
-    const query = /\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9A-F]{2})*/;
-    uri = uri.replace(query, '');
-  }
-  return uri;
-};
