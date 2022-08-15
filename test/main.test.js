@@ -18,8 +18,7 @@ import {
   LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
   MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
-  ONLY_EDITABLE, OPTIONS_OPEN, PORT_CONTENT, PROCESS_CHILD, SYNC_AUTO,
-  SYNC_AUTO_URL,
+  ONLY_EDITABLE, OPTIONS_OPEN, PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
   TMP_FILE_RES, WARN_COLOR, WARN_TEXT
 } from '../src/mjs/constant.js';
@@ -2525,7 +2524,7 @@ describe('main', () => {
       ], 'result');
     });
 
-    it('should call function', async () => {
+    it('should not call function', async () => {
       const { tabList } = mjs;
       const i = browser.menus.update.callCount;
       const j = browser.tabs.sendMessage.callCount;
@@ -2543,18 +2542,9 @@ describe('main', () => {
         id: browser.tabs.TAB_ID_NONE
       }]);
       const res = await func(1);
-      assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
-      assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
-      assert.deepEqual(res, [
-        null,
-        [
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.strictEqual(browser.menus.update.callCount, i, 'not called');
+      assert.strictEqual(browser.tabs.sendMessage.callCount, j, 'not called');
+      assert.deepEqual(res, [], 'result');
     });
   });
 

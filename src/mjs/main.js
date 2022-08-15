@@ -458,7 +458,7 @@ export const sendTmpFileData = async (key, msg = {}) => {
   const { data } = msg;
   let func;
   if (isObjectNotEmpty(data)) {
-    const { tabId, windowId } = data;
+    const { tabId } = data;
     if (isString(tabId) && /^\d+$/.test(tabId)) {
       const activeTabId = await getActiveTabId();
       if (activeTabId === tabId * 1) {
