@@ -5,13 +5,13 @@
 /* api */
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import { browser, createJsdom, mockPort } from './mocha/setup.js';
+import { browser, createJsdom } from './mocha/setup.js';
 import sinon from 'sinon';
 import {
   CONTENT_GET, IS_MAC, ID_TAB, ID_WIN, INCOGNITO, LABEL,
   LOCAL_FILE_VIEW, MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
-  MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
-  ONLY_EDITABLE, PORT_CONNECT, PORT_CONTENT, SYNC_AUTO, SYNC_AUTO_URL,
+  MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG, ONLY_EDITABLE,
+  SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
   TMP_FILE_DATA_REMOVE, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
 } from '../src/mjs/constant.js';
@@ -1176,48 +1176,49 @@ describe('content-main', () => {
     });
   });
 
-  describe('post message', () => {
-    const func = mjs.postMsg;
-    beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
+  describe('send message', () => {
+    const func = mjs.sendMsg;
 
     it('should not call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
-      await func();
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
+      const res = await func();
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
+      assert.isNull(res, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
-      await func('foo');
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
+      const res = await func('foo');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 
-  describe('postEachDataId', () => {
-    const func = mjs.postEachDataId;
+  describe('sendEachDataId', () => {
+    const func = mjs.sendEachDataId;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       mjs.dataIds.clear();
     });
     afterEach(() => {
-      mjs.vars.port = null;
       mjs.dataIds.clear();
     });
 
     it('should not call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const p2 = document.createElement('p');
       const body = document.querySelector('body');
@@ -1232,62 +1233,66 @@ describe('content-main', () => {
         dataId: 'bar'
       });
       const res = await func(true);
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 2, 'called');
-      assert.deepEqual(res, [undefined, undefined], 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 2,
+        'called');
+      assert.deepEqual(res, [{}, {}], 'result');
     });
   });
 
-  describe('post temporary file data', () => {
-    const func = mjs.postTmpFileData;
+  describe('send temporary file data', () => {
+    const func = mjs.sendTmpFileData;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       mjs.dataIds.clear();
     });
     afterEach(() => {
-      mjs.vars.port = null;
       mjs.dataIds.clear();
     });
 
     it('should not call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.isNull(res, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
       mjs.dataIds.set('foo', 'bar');
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const res = await func('foo');
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 
   describe('request temporary file', () => {
     const func = mjs.requestTmpFile;
     beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       mjs.dataIds.clear();
     });
     afterEach(() => {
-      mjs.vars.port = null;
       mjs.dataIds.clear();
     });
 
-    it('should not post message', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+    it('should not call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const res = await func({
         currentTarget: p,
         target: p
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.deepEqual(res, [], 'result');
     });
 
-    it('should not post message', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+    it('should not call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const body = document.querySelector('body');
       body.appendChild(p);
@@ -1295,12 +1300,14 @@ describe('content-main', () => {
         currentTarget: p,
         target: p
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.deepEqual(res, [], 'result');
     });
 
-    it('should post message', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+    it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const body = document.querySelector('body');
       body.appendChild(p);
@@ -1309,12 +1316,14 @@ describe('content-main', () => {
         currentTarget: p,
         target: p
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, [{}], 'result');
     });
 
-    it('should post message', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+    it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const p2 = document.createElement('p');
       const p3 = document.createElement('p');
@@ -1330,12 +1339,14 @@ describe('content-main', () => {
         currentTarget: p,
         target: p
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, [{}], 'result');
     });
 
-    it('should not post message', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+    it('should not call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const textarea = document.createElement('textarea');
       const body = document.querySelector('body');
@@ -1345,12 +1356,14 @@ describe('content-main', () => {
         currentTarget: p,
         target: textarea
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.deepEqual(res, [], 'result');
     });
 
-    it('should not post message', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+    it('should not call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const textarea = document.createElement('textarea');
       const body = document.querySelector('body');
@@ -1362,12 +1375,14 @@ describe('content-main', () => {
         currentTarget: p,
         target: textarea
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.deepEqual(res, [], 'result');
     });
 
-    it('should post message', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+    it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const textarea = document.createElement('textarea');
       const body = document.querySelector('body');
@@ -1380,12 +1395,14 @@ describe('content-main', () => {
         currentTarget: p,
         target: textarea
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, [{}], 'result');
     });
 
-    it('should post message', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+    it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const textarea0 = document.createElement('textarea');
       const textarea = document.createElement('textarea');
@@ -1400,8 +1417,9 @@ describe('content-main', () => {
         currentTarget: p,
         target: textarea
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, [{}], 'result');
     });
   });
 
@@ -1854,34 +1872,36 @@ describe('content-main', () => {
     });
   });
 
-  describe('post content data', () => {
-    const func = mjs.postContent;
+  describe('send content data', () => {
+    const func = mjs.sendContent;
     beforeEach(() => {
       mjs.dataIds.clear();
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
       mjs.dataIds.clear();
-      mjs.vars.port = null;
     });
 
     it('should not call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.strictEqual(mjs.dataIds.size, 0, 'data');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const text = document.createElement('textarea');
       const body = document.querySelector('body');
       body.appendChild(text);
       const res = await func(text, MODE_EDIT);
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.strictEqual(mjs.dataIds.size, 1, 'data');
-      assert.isUndefined(res[0], 'result');
+      assert.deepEqual(res[0], {}, 'result');
       assert.instanceOf(res[1], Map, 'map');
     });
   });
@@ -1982,11 +2002,9 @@ describe('content-main', () => {
     const func = mjs.determineContentProcess;
     beforeEach(() => {
       mjs.vars.contextNode = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
       mjs.vars.contextNode = null;
-      mjs.vars.port = null;
     });
 
     it('should call function', async () => {
@@ -1996,11 +2014,13 @@ describe('content-main', () => {
         },
         text: sinon.stub().returns('foo bar')
       });
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(res, [
-        undefined,
+        {},
         null
       ], 'result');
     });
@@ -2012,15 +2032,17 @@ describe('content-main', () => {
         },
         text: sinon.stub().returns('foo bar')
       });
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const body = document.querySelector('body');
       body.appendChild(p);
       mjs.vars.contextNode = p;
       const res = await func();
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(res, [
-        undefined,
+        {},
         null
       ], 'result');
     });
@@ -2032,7 +2054,8 @@ describe('content-main', () => {
         },
         text: sinon.stub().returns('foo bar')
       });
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
       const body = document.querySelector('body');
       body.appendChild(p);
@@ -2042,15 +2065,17 @@ describe('content-main', () => {
           menuItemId: MODE_SOURCE
         }
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(res, [
-        undefined,
+        {},
         null
       ], 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const text = document.createElement('textarea');
       const body = document.querySelector('body');
       body.appendChild(text);
@@ -2060,8 +2085,9 @@ describe('content-main', () => {
           menuItemId: MODE_EDIT
         }
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.isUndefined(res[0], 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res[0], {}, 'result');
       assert.instanceOf(res[1], Map, 'map');
     });
   });
@@ -3541,8 +3567,8 @@ describe('content-main', () => {
     });
   });
 
-  describe('handle port message', () => {
-    const func = mjs.handlePortMsg;
+  describe('handle message', () => {
+    const func = mjs.handleMsg;
     beforeEach(() => {
       mjs.dataIds.clear();
       mjs.vars[ID_TAB] = '';
@@ -3554,7 +3580,6 @@ describe('content-main', () => {
       mjs.vars[SYNC_AUTO_URL] = null;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       delete mjs.vars.keyCtrlA.ctrlKey;
       delete mjs.vars.keyCtrlA.metaKey;
     });
@@ -3569,7 +3594,6 @@ describe('content-main', () => {
       mjs.vars[SYNC_AUTO_URL] = null;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = null;
       delete mjs.vars.keyCtrlA.ctrlKey;
       delete mjs.vars.keyCtrlA.metaKey;
     });
@@ -3627,12 +3651,14 @@ describe('content-main', () => {
         },
         text: sinon.stub().returns('<html></html>')
       });
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const res = await func({
         [CONTENT_GET]: {}
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [[undefined, null]], 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, [[{}, null]], 'result');
     });
 
     it('should get result', async () => {
@@ -3671,189 +3697,31 @@ describe('content-main', () => {
     });
   });
 
-  describe('request port connection', () => {
-    const func = mjs.requestPortConnection;
+  describe('runtime on message', () => {
+    const func = mjs.runtimeOnMsg;
 
-    it('should call function', async () => {
-      const msg = {
-        [PORT_CONNECT]: {
-          name: PORT_CONTENT
-        }
-      };
-      const i = browser.runtime.sendMessage.withArgs(msg).callCount;
-      browser.runtime.sendMessage.withArgs(msg).resolves({});
-      const res = await func();
-      assert.strictEqual(
-        browser.runtime.sendMessage.withArgs(msg).callCount,
-        i + 1, 'called'
-      );
-      assert.deepEqual(res, {}, 'result');
-    });
-  });
-
-  describe('handle disconnected port', () => {
-    const func = mjs.handleDisconnectedPort;
-    const lastErrorDefaultValue = browser.runtime.lastError;
-    beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
-
-    it('should not log error', async () => {
-      const stubConsole = sinon.stub(console, 'error');
-      const i = browser.runtime.sendMessage.callCount;
-      browser.runtime.lastError = null;
-      mjs.vars.port.error = null;
-      const res = await func(mjs.vars.port);
-      const { called: calledConsole } = stubConsole;
-      stubConsole.restore();
-      browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isFalse(calledConsole, 'not called console');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, {}, 'result');
-    });
-
-    it('should log error', async () => {
-      const stubConsole = sinon.stub(console, 'error');
-      const i = browser.runtime.sendMessage.callCount;
-      browser.runtime.lastError = null;
-      mjs.vars.port.error = new Error('error');
-      const res = await func(mjs.vars.port);
-      const { called: calledConsole } = stubConsole;
-      stubConsole.restore();
-      browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isTrue(calledConsole, 'called console');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, {}, 'result');
-    });
-
-    it('should log error', async () => {
-      const stubConsole = sinon.stub(console, 'error');
-      const i = browser.runtime.sendMessage.callCount;
-      browser.runtime.lastError = new Error('error');
-      mjs.vars.port.error = null;
-      const res = await func(mjs.vars.port);
-      const { called: calledConsole } = stubConsole;
-      stubConsole.restore();
-      browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isTrue(calledConsole, 'called console');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, {}, 'result');
-    });
-  });
-
-  describe('port on disconnect', () => {
-    const func = mjs.portOnDisconnect;
-    const lastErrorDefaultValue = browser.runtime.lastError;
-    beforeEach(() => {
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
-
-    it('should not log error', async () => {
-      const stubConsole = sinon.stub(console, 'error');
-      const i = browser.runtime.sendMessage.callCount;
-      browser.runtime.lastError = null;
-      mjs.vars.port.error = null;
-      const res = await func(mjs.vars.port);
-      const { called: calledConsole } = stubConsole;
-      stubConsole.restore();
-      browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isFalse(calledConsole, 'not called console');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, {}, 'result');
-    });
-  });
-
-  describe('port on message', () => {
-    const func = mjs.portOnMsg;
-    beforeEach(() => {
-      mjs.dataIds.clear();
-      mjs.vars[ID_TAB] = '';
-      mjs.vars[ID_WIN] = '';
-      mjs.vars[SYNC_AUTO] = false;
-      mjs.vars[SYNC_AUTO_URL] = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
-    });
-    afterEach(() => {
-      mjs.dataIds.clear();
-      mjs.vars[ID_TAB] = '';
-      mjs.vars[ID_WIN] = '';
-      mjs.vars[SYNC_AUTO] = false;
-      mjs.vars[SYNC_AUTO_URL] = null;
-      mjs.vars.port = null;
-    });
-
-    it('should set values', async () => {
-      const res = await func({
-        [ID_TAB]: '1',
-        [ID_WIN]: '2'
+    it('should throw', async () => {
+      browser.runtime.sendMessage.rejects(new Error('error'));
+      await func().catch(e => {
+        assert.instanceOf(e, Error, 'error');
+        assert.strictEqual(e.message, 'error', 'message');
       });
-      assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
-      assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
+    });
+
+    it('should get empty array', async () => {
+      const res = await func({
+        foo: 'bar'
+      });
       assert.deepEqual(res, [], 'result');
     });
   });
 
-  describe('handle connected port', () => {
-    const func = mjs.portOnConnect;
-    beforeEach(() => {
-      mjs.vars.port = null;
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
-
-    it('should not set port', async () => {
-      await func();
-      assert.isNull(mjs.vars.port, 'port');
-    });
-
-    it('should set port', async () => {
-      const port = mockPort({ name: PORT_CONTENT });
-      await func(port);
-      assert.deepEqual(mjs.vars.port, port, 'port');
-    });
-
-    it('should not set port', async () => {
-      const port = mockPort({ name: 'foo' });
-      await func(port);
-      assert.isNull(mjs.vars.port, 'port');
-    });
-  });
-
-  describe('check port', () => {
-    const func = mjs.checkPort;
-    beforeEach(() => {
-      mjs.vars.port = null;
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
-
-    it('should set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func();
-      assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.isUndefined(res, 'result');
-    });
+  describe('send tab status', () => {
+    const func = mjs.sendTabStatus;
 
     it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
@@ -3863,16 +3731,10 @@ describe('content-main', () => {
 
   describe('startup', () => {
     const func = mjs.startup;
-    beforeEach(() => {
-      mjs.vars.port = null;
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
 
     it('should throw', async () => {
       const stubError = sinon.stub(console, 'error');
-      browser.runtime.connect.rejects(new Error('error'));
+      browser.runtime.sendMessage.rejects(new Error('error'));
       await func().catch(e => {
         assert.instanceOf(e, Error, 'error');
         assert.strictEqual(e.message, 'error', 'message');
@@ -3880,98 +3742,13 @@ describe('content-main', () => {
       stubError.restore();
     });
 
-    it('should set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func();
-      assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.isUndefined(res, 'result');
-    });
-
     it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
       assert.deepEqual(res, {}, 'result');
-    });
-  });
-
-  describe('handle message', () => {
-    const func = mjs.handleMsg;
-    beforeEach(() => {
-      mjs.vars.port = null;
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
-
-    it('should not set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func();
-      assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, [], 'result');
-    });
-
-    it('should not set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func({
-        foo: true
-      });
-      assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, [], 'result');
-    });
-
-    it('should not set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func({
-        [PORT_CONNECT]: false
-      });
-      assert.isNull(mjs.vars.port, 'port');
-      assert.deepEqual(res, [], 'result');
-    });
-
-    it('should set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func({
-        [PORT_CONNECT]: true
-      });
-      assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.deepEqual(res, [undefined], 'result');
-    });
-  });
-
-  describe('runtime on message', () => {
-    const func = mjs.runtimeOnMsg;
-    beforeEach(() => {
-      mjs.vars.port = null;
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
-
-    it('should throw', async () => {
-      const stubError = sinon.stub(console, 'error');
-      browser.runtime.connect.rejects(new Error('error'));
-      await func({
-        [PORT_CONNECT]: true
-      }).catch(e => {
-        assert.instanceOf(e, Error, 'error');
-        assert.strictEqual(e.message, 'error', 'message');
-      });
-      stubError.restore();
-    });
-
-    it('should set port', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
-      const res = await func({
-        [PORT_CONNECT]: true
-      });
-      assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.deepEqual(res, [undefined], 'result');
     });
   });
 
@@ -3981,90 +3758,101 @@ describe('content-main', () => {
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = null;
     });
 
     it('should not call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const res = await func({});
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.isNull(res, 'result');
     });
 
     it('should not call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       const res = await func({
         target,
         key: 'a',
         shiftKey: true
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.isNull(res, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       const res = await func({
         target,
         button: 2
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       mjs.vars[ONLY_EDITABLE] = true;
       const res = await func({
         target,
         button: 2
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.isNull(mjs.vars.contextNode, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       const res = await func({
         target,
         key: 'ContextMenu'
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       const res = await func({
         target,
         key: 'F10',
         shiftKey: true
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target =
         document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
       const body = document.querySelector('body');
@@ -4073,14 +3861,16 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_MATHML, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target =
         document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       const body = document.querySelector('body');
@@ -4089,14 +3879,16 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SVG, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.createElement('input');
       const body = document.querySelector('body');
       body.appendChild(target);
@@ -4104,14 +3896,16 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const range = document.createRange();
       const sel = window.getSelection();
       const target = document.createElement('textarea');
@@ -4125,14 +3919,16 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.createElement('div');
       const body = document.querySelector('body');
       target.id = 'foo';
@@ -4142,10 +3938,11 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 
@@ -4155,13 +3952,11 @@ describe('content-main', () => {
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = mockPort({ name: PORT_CONTENT });
     });
     afterEach(() => {
       mjs.vars[ONLY_EDITABLE] = false;
       mjs.vars.contextMode = null;
       mjs.vars.contextNode = null;
-      mjs.vars.port = null;
     });
 
     it('should not set values', async () => {
@@ -4172,48 +3967,55 @@ describe('content-main', () => {
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       const res = await func({
         target,
         key: 'ContextMenu'
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       mjs.vars[ONLY_EDITABLE] = true;
       const res = await func({
         target,
         key: 'ContextMenu'
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.isNull(mjs.vars.contextNode, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       const res = await func({
         target,
         key: 'F10',
         shiftKey: true
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should call function', async () => {
-      const i = mjs.vars.port.postMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const target = document.querySelector('body');
       mjs.vars[ONLY_EDITABLE] = true;
       const res = await func({
@@ -4221,10 +4023,11 @@ describe('content-main', () => {
         key: 'F10',
         shiftKey: true
       });
-      assert.strictEqual(mjs.vars.port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.isNull(mjs.vars.contextNode, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isUndefined(res, 'result');
+      assert.deepEqual(res, {}, 'result');
     });
 
     it('should set values', async () => {
@@ -4303,12 +4106,6 @@ describe('content-main', () => {
 
   describe('handle ready state', () => {
     const func = mjs.handleReadyState;
-    beforeEach(() => {
-      mjs.vars.port = null;
-    });
-    afterEach(() => {
-      mjs.vars.port = null;
-    });
 
     it('should throw', () => {
       assert.throws(() => func());
@@ -4318,7 +4115,9 @@ describe('content-main', () => {
       assert.throws(() => func({}));
     });
 
-    it('should get null', () => {
+    it('should not call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const stub = sinon.stub();
       const evt = {
         target: {
@@ -4326,12 +4125,16 @@ describe('content-main', () => {
           removeEventListener: stub
         }
       };
-      const res = func(evt);
+      const res = await func(evt);
       assert.isFalse(stub.called, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.isNull(res, 'result');
     });
 
-    it('should get null', () => {
+    it('should not call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const stub = sinon.stub();
       const evt = {
         target: {
@@ -4339,13 +4142,16 @@ describe('content-main', () => {
           removeEventListener: stub
         }
       };
-      const res = func(evt);
+      const res = await func(evt);
       assert.isFalse(stub.called, 'not called');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.isNull(res, 'result');
     });
 
     it('should call function', async () => {
-      browser.runtime.connect.callsFake(arg => mockPort(arg));
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.runtime.sendMessage.callCount;
       const stub = sinon.stub();
       const evt = {
         target: {
@@ -4355,9 +4161,9 @@ describe('content-main', () => {
       };
       const res = await func(evt);
       assert.isTrue(stub.called, 'called');
-      assert.isObject(mjs.vars.port, 'port');
-      assert.strictEqual(mjs.vars.port.name, PORT_CONTENT, 'name');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, {}, 'result');
     });
   });
 });

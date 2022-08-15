@@ -45,6 +45,7 @@ export const INCOGNITO = 'incognito';
 export const INFO = 'info';
 export const INFO_COLOR = '#008EA4';
 export const INFO_TEXT = 'i';
+export const IS_CONNECTABLE = 'isConnectable';
 export const IS_EXECUTABLE = 'isExecutable';
 export const IS_MAC = 'isMac';
 export const IS_WEBEXT = 'isWebExtension';
