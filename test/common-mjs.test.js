@@ -281,49 +281,4 @@ describe('common', () => {
       assert.strictEqual(res, '1');
     });
   });
-
-  describe('remove query string from URI', () => {
-    const func = mjs.removeQueryFromURI;
-
-    it('should get same value', () => {
-      const res = func();
-      assert.isUndefined(res);
-    });
-
-    it('should get same value', () => {
-      const arg = [];
-      const res = func(arg);
-      assert.deepEqual(res, arg);
-    });
-
-    it('should get same value', () => {
-      const arg = '';
-      const res = func(arg);
-      assert.strictEqual(res, arg);
-    });
-
-    it('should get same value', () => {
-      const arg = 'foo/bar';
-      const res = func(arg);
-      assert.strictEqual(res, arg);
-    });
-
-    it('should get same value', () => {
-      const arg = 'https://example.com';
-      const res = func(arg);
-      assert.strictEqual(res, arg);
-    });
-
-    it('should get query stripped', () => {
-      const arg = 'https://example.com#foo?bar=baz';
-      const res = func(arg);
-      assert.strictEqual(res, 'https://example.com#foo');
-    });
-
-    it('should get query stripped', () => {
-      const arg = 'https://example.com#foo?bar=baz%20qux';
-      const res = func(arg);
-      assert.strictEqual(res, 'https://example.com#foo');
-    });
-  });
 });
