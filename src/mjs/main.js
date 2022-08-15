@@ -1015,7 +1015,10 @@ export const setHost = async () => {
  *
  * @returns {Function} - promise chain
  */
-export const startup = () => Promise.all([
-  setHost(),
-  setOs()
-]).then(getAllStorage).then(setVars).then(setDefaultIcon).then(toggleBadge);
+export const startup = async () => {
+  await Promise.all([
+    setHost(),
+    setOs()
+  ]);
+  return getAllStorage().then(setVars).then(setDefaultIcon).then(toggleBadge);
+};
