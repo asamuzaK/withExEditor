@@ -105,7 +105,3 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 
 * Enable this option if you want to automatically synchronize edited content.
 * Note that this option is disabled during private browsing.
-
-### Reload withExEditor
-
-* Try when withExEditor stops working, for example when updating Node.js or updating withExEditorHost.
