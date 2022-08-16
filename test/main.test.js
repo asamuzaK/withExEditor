@@ -9,8 +9,8 @@ import { browser, mockPort } from './mocha/setup.js';
 import sinon from 'sinon';
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
-  EDITOR_FILE_NAME, EDITOR_LABEL, EXT_RELOAD, FILE_EXT_SELECT,
-  FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD, FILE_EXT_SELECT_TXT,
+  EDITOR_FILE_NAME, EDITOR_LABEL, FILE_EXT_SELECT, FILE_EXT_SELECT_HTML,
+  FILE_EXT_SELECT_MD, FILE_EXT_SELECT_TXT,
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST,
   ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_ID, ICON_LIGHT, ICON_WHITE,
@@ -2092,16 +2092,6 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const i = browser.runtime.reload.callCount;
-      const msg = {
-        [EXT_RELOAD]: true
-      };
-      const res = await func(msg);
-      assert.strictEqual(browser.runtime.reload.callCount, i + 1, 'called');
-      assert.deepEqual(res, [undefined], 'result');
-    });
-
-    it('should call function', async () => {
       const i = browser.runtime.sendMessage.callCount;
       const j = browser.storage.local.set.callCount;
       const k = browser.menus.removeAll.callCount;
@@ -3506,28 +3496,6 @@ describe('main', () => {
       assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
         'called');
       assert.isUndefined(res, 'result');
-    });
-  });
-
-  describe('reload extension', () => {
-    const func = mjs.reloadExt;
-
-    it('should not call function', async () => {
-      const { host } = mjs;
-      const i = host.disconnect.callCount;
-      const j = browser.runtime.reload.callCount;
-      await func();
-      assert.strictEqual(host.disconnect.callCount, i, 'not called');
-      assert.strictEqual(browser.runtime.reload.callCount, j, 'not called');
-    });
-
-    it('should call function', async () => {
-      const { host } = mjs;
-      const i = host.disconnect.callCount;
-      const j = browser.runtime.reload.callCount;
-      await func(true);
-      assert.strictEqual(host.disconnect.callCount, i + 1, 'called');
-      assert.strictEqual(browser.runtime.reload.callCount, j + 1, 'called');
     });
   });
 

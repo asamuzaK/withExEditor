@@ -7,9 +7,8 @@ import { throwErr } from './common.js';
 import { localizeHtml } from './localize.js';
 import { disableIncompatibleInputs } from './compat.js';
 import {
-  addFormSubmitListener, addInputChangeListener, addReloadExtensionListener,
-  addSyncUrlsInputListener, getEditorConfig, getHostStatus, handleMsg,
-  setValuesFromStorage
+  addFormSubmitListener, addInputChangeListener, addSyncUrlsInputListener,
+  getEditorConfig, getHostStatus, handleMsg, setValuesFromStorage
 } from './options-main.js';
 
 const { runtime } = browser;
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => Promise.all([
   setValuesFromStorage(),
   addInputChangeListener(),
   addSyncUrlsInputListener(),
-  addReloadExtensionListener(),
   addFormSubmitListener(),
   getHostStatus(),
   getEditorConfig(),

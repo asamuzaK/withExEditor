@@ -9,9 +9,9 @@ import {
 } from './browser.js';
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
-  EXT_RELOAD, HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET,
-  HOST_VERSION, HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE,
-  SYNC_AUTO_URL, WARN
+  HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
+  HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE, SYNC_AUTO_URL,
+  WARN
 } from './constant.js';
 
 /* api */
@@ -212,26 +212,6 @@ export const storePref = async evt => {
 
 /* event handlers */
 /**
- * handle reloadExtension click
- *
- * @param {!object} evt - Event
- * @returns {?Function} - promise chain
- */
-export const handleReloadExtensionClick = evt => {
-  const { currentTarget, target } = evt;
-  let func;
-  const reload = currentTarget === target;
-  if (reload) {
-    func = sendMsg({
-      [EXT_RELOAD]: reload
-    }).catch(throwErr);
-  }
-  evt.stopPropagation();
-  evt.preventDefault();
-  return func || null;
-};
-
-/**
  * handle sync urls input
  *
  * @param {!object} evt - Event
@@ -260,16 +240,6 @@ export const preventEvent = evt => {
 };
 
 /* html */
-/**
- * add event listener to reload extension button
- *
- * @returns {void}
- */
-export const addReloadExtensionListener = async () => {
-  const elm = document.getElementById(EXT_RELOAD);
-  elm?.addEventListener('click', handleReloadExtensionClick);
-};
-
 /**
  * add event listener to sync urls textarea
  *
