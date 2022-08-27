@@ -13,14 +13,14 @@ import {
   FILE_EXT_SELECT_MD, FILE_EXT_SELECT_TXT,
   HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
   HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST,
-  ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_ID, ICON_LIGHT, ICON_WHITE,
-  INFO_COLOR, INFO_TEXT, IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC, IS_WEBEXT,
+  ICON_AUTO, ICON_BLACK, ICON_COLOR, ICON_DARK, ICON_LIGHT, ICON_WHITE,
+  INFO_COLOR, INFO_TEXT, IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC,
   LOCAL_FILE_VIEW, MENU_ENABLED,
-  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
-  MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
+  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT, MODE_MATHML,
+  MODE_SELECTION, MODE_SOURCE, MODE_SVG,
   ONLY_EDITABLE, OPTIONS_OPEN, PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
-  TMP_FILE_RES, WARN_COLOR, WARN_TEXT
+  TMP_FILE_RES, WARN_COLOR, WARN_TEXT, WEBEXT_ID
 } from '../src/mjs/constant.js';
 
 /* test */
@@ -43,111 +43,6 @@ describe('main', () => {
 
   it('should get browser object', () => {
     assert.isObject(browser, 'browser');
-  });
-
-  describe('set icon', () => {
-    const func = mjs.setIcon;
-
-    it('should call function', async () => {
-      const i = browser.runtime.getURL.callCount;
-      const j = browser.browserAction.setIcon.callCount;
-      browser.runtime.getURL.callsFake(arg => arg);
-      browser.browserAction.setIcon.callsFake(arg => arg);
-      const res = await func();
-      assert.strictEqual(browser.runtime.getURL.callCount, i + 1, 'called');
-      assert.strictEqual(browser.browserAction.setIcon.callCount, j + 1,
-        'called');
-      assert.deepEqual(res, {
-        path: 'img/icon.svg'
-      }, 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.runtime.getURL.callCount;
-      const j = browser.browserAction.setIcon.callCount;
-      browser.runtime.getURL.callsFake(arg => arg);
-      browser.browserAction.setIcon.callsFake(arg => arg);
-      const res = await func('#foo');
-      assert.strictEqual(browser.runtime.getURL.callCount, i + 1, 'called');
-      assert.strictEqual(browser.browserAction.setIcon.callCount, j + 1,
-        'called');
-      assert.deepEqual(res, {
-        path: 'img/icon.svg#foo'
-      }, 'result');
-    });
-  });
-
-  describe('set default icon', () => {
-    const func = mjs.setDefaultIcon;
-    beforeEach(() => {
-      const { vars, varsLocal } = mjs;
-      vars[IS_WEBEXT] = false;
-      varsLocal[ICON_ID] = '';
-    });
-    afterEach(() => {
-      const { vars, varsLocal } = mjs;
-      vars[IS_WEBEXT] = false;
-      varsLocal[ICON_ID] = '';
-    });
-
-    it('should get null', async () => {
-      const i = browser.runtime.getURL.callCount;
-      const j = browser.browserAction.setIcon.callCount;
-      browser.runtime.getURL.callsFake(arg => arg);
-      browser.browserAction.setIcon.callsFake(arg => arg);
-      const res = await func();
-      assert.strictEqual(browser.runtime.getURL.callCount, i, 'not called');
-      assert.strictEqual(browser.browserAction.setIcon.callCount, j,
-        'not called');
-      assert.isNull(res, 'result');
-    });
-
-    it('should get null', async () => {
-      const { vars, varsLocal } = mjs;
-      const i = browser.runtime.getURL.callCount;
-      const j = browser.browserAction.setIcon.callCount;
-      browser.runtime.getURL.callsFake(arg => arg);
-      browser.browserAction.setIcon.callsFake(arg => arg);
-      vars[IS_WEBEXT] = true;
-      varsLocal[ICON_ID] = '#foo';
-      const res = await func();
-      assert.strictEqual(browser.runtime.getURL.callCount, i, 'not called');
-      assert.strictEqual(browser.browserAction.setIcon.callCount, j,
-        'not called');
-      assert.isNull(res, 'result');
-    });
-
-    it('should get null', async () => {
-      const { vars, varsLocal } = mjs;
-      const i = browser.runtime.getURL.callCount;
-      const j = browser.browserAction.setIcon.callCount;
-      browser.runtime.getURL.callsFake(arg => arg);
-      browser.browserAction.setIcon.callsFake(arg => arg);
-      vars[IS_WEBEXT] = false;
-      varsLocal[ICON_ID] = '';
-      const res = await func();
-      assert.strictEqual(browser.runtime.getURL.callCount, i, 'not called');
-      assert.strictEqual(browser.browserAction.setIcon.callCount, j,
-        'not called');
-      assert.isNull(res, 'result');
-    });
-
-    it('should call function', async () => {
-      const { vars, varsLocal } = mjs;
-      const i = browser.runtime.getURL.callCount;
-      const j = browser.browserAction.setIcon.callCount;
-      browser.runtime.getURL.callsFake(arg => arg);
-      browser.browserAction.setIcon.callsFake(arg => arg);
-      vars[IS_WEBEXT] = true;
-      varsLocal[ICON_ID] = '';
-      const res = await func();
-      assert.strictEqual(browser.runtime.getURL.callCount, i + 1, 'called');
-      assert.strictEqual(browser.browserAction.setIcon.callCount, j + 1,
-        'called');
-      assert.deepEqual(res, {
-        path: 'img/icon.svg#context'
-      }, 'result');
-    });
   });
 
   describe('toggle badge', () => {
@@ -401,7 +296,6 @@ describe('main', () => {
     beforeEach(() => {
       const { hostStatus, varsLocal, vars } = mjs;
       hostStatus[HOST_COMPAT] = false;
-      vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -411,11 +305,11 @@ describe('main', () => {
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
+      browser.runtime.id = null;
     });
     afterEach(() => {
       const { hostStatus, varsLocal, vars } = mjs;
       hostStatus[HOST_COMPAT] = false;
-      vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -424,6 +318,7 @@ describe('main', () => {
       varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
+      browser.runtime.id = null;
     });
 
     it('should get empty object', () => {
@@ -449,10 +344,10 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { vars, varsLocal } = mjs;
-      vars[IS_WEBEXT] = true;
+      const { varsLocal } = mjs;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[MENU_ENABLED] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_EDIT);
       assert.deepEqual(res, {
         contexts: [
@@ -465,11 +360,11 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { vars, varsLocal } = mjs;
-      vars[IS_WEBEXT] = true;
+      const { varsLocal } = mjs;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_EDIT);
       assert.deepEqual(res, {
         contexts: [
@@ -482,12 +377,12 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { hostStatus, vars, varsLocal } = mjs;
+      const { hostStatus, varsLocal } = mjs;
       hostStatus[HOST_COMPAT] = true;
-      vars[IS_WEBEXT] = true;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_EDIT);
       assert.deepEqual(res, {
         contexts: [
@@ -512,10 +407,10 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { vars, varsLocal } = mjs;
-      vars[IS_WEBEXT] = true;
+      const { varsLocal } = mjs;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[MENU_ENABLED] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_SELECTION);
       assert.deepEqual(res, {
         contexts: [
@@ -529,11 +424,11 @@ describe('main', () => {
 
     it('should get object', () => {
       const { vars, varsLocal } = mjs;
-      vars[IS_WEBEXT] = true;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
       vars[ONLY_EDITABLE] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_SELECTION);
       assert.deepEqual(res, {
         contexts: [
@@ -548,11 +443,11 @@ describe('main', () => {
     it('should get object', () => {
       const { hostStatus, vars, varsLocal } = mjs;
       hostStatus[HOST_COMPAT] = true;
-      vars[IS_WEBEXT] = true;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
       vars[ONLY_EDITABLE] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_SELECTION);
       assert.deepEqual(res, {
         contexts: [
@@ -604,10 +499,10 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { vars, varsLocal } = mjs;
-      vars[IS_WEBEXT] = true;
+      const { varsLocal } = mjs;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[MENU_ENABLED] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_SOURCE);
       assert.deepEqual(res, {
         contexts: [
@@ -622,11 +517,11 @@ describe('main', () => {
 
     it('should get object', () => {
       const { vars, varsLocal } = mjs;
-      vars[IS_WEBEXT] = true;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
       vars[ONLY_EDITABLE] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_SOURCE);
       assert.deepEqual(res, {
         contexts: [
@@ -642,11 +537,11 @@ describe('main', () => {
     it('should get object', () => {
       const { hostStatus, vars, varsLocal } = mjs;
       hostStatus[HOST_COMPAT] = true;
-      vars[IS_WEBEXT] = true;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
       vars[ONLY_EDITABLE] = true;
+      browser.runtime.id = WEBEXT_ID;
       const res = func(MODE_SOURCE);
       assert.deepEqual(res, {
         contexts: [
@@ -859,7 +754,6 @@ describe('main', () => {
     const func = mjs.createContextMenu;
     beforeEach(() => {
       const { varsLocal, vars } = mjs;
-      vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -869,10 +763,10 @@ describe('main', () => {
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
+      browser.runtime.id = null;
     });
     afterEach(() => {
       const { varsLocal, vars } = mjs;
-      vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -881,6 +775,7 @@ describe('main', () => {
       varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
+      browser.runtime.id = null;
     });
 
     it('should call function', async () => {
@@ -980,7 +875,6 @@ describe('main', () => {
     beforeEach(() => {
       const { hostStatus, varsLocal, vars } = mjs;
       hostStatus[HOST_COMPAT] = false;
-      vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -994,7 +888,6 @@ describe('main', () => {
     afterEach(() => {
       const { hostStatus, varsLocal, vars } = mjs;
       hostStatus[HOST_COMPAT] = false;
-      vars[IS_WEBEXT] = false;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -2713,7 +2606,6 @@ describe('main', () => {
       varsLocal[FILE_EXT_SELECT_MD] = false;
       varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[ICON_ID] = '';
       varsLocal[MENU_ENABLED] = true;
     });
     afterEach(() => {
@@ -2728,7 +2620,6 @@ describe('main', () => {
       varsLocal[FILE_EXT_SELECT_MD] = false;
       varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[ICON_ID] = '';
       varsLocal[MENU_ENABLED] = false;
     });
 
@@ -2977,101 +2868,87 @@ describe('main', () => {
     });
 
     it('should not set value', async () => {
-      const { varsLocal } = mjs;
       const i = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_AUTO, {
         checked: false,
         value: '#auto'
       });
-      assert.strictEqual(varsLocal[ICON_ID], '', 'value');
       assert.strictEqual(browser.browserAction.setIcon.callCount, i,
         'not called');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_AUTO, {
         checked: true,
         value: '#auto'
       });
-      assert.strictEqual(varsLocal[ICON_ID], '#auto', 'value');
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
         'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call functin', async () => {
-      const { varsLocal } = mjs;
       const i = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_BLACK, {
         checked: true,
         value: '#black'
       }, true);
-      assert.strictEqual(varsLocal[ICON_ID], '#black', 'value');
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
         'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_COLOR, {
         checked: true,
         value: '#color'
       }, true);
-      assert.strictEqual(varsLocal[ICON_ID], '#color', 'value');
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
         'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_DARK, {
         checked: true,
         value: '#dark'
       }, true);
-      assert.strictEqual(varsLocal[ICON_ID], '#dark', 'value');
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
         'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_LIGHT, {
         checked: true,
         value: '#light'
       }, true);
-      assert.strictEqual(varsLocal[ICON_ID], '#light', 'value');
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
         'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.browserAction.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_WHITE, {
         checked: true,
         value: '#white'
       }, true);
-      assert.strictEqual(varsLocal[ICON_ID], '#white', 'value');
       assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
         'called');
-      assert.deepEqual(res, [undefined], 'result');
+      assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should set value', async () => {

@@ -12,6 +12,7 @@ import {
   getActiveTab, getActiveTabId, getAllStorage, getCurrentWindow, getOs,
   getStorage, getWindow, isTab, sendMessage, setStorage
 } from './browser.js';
+import { setDefaultIcon, setIcon } from './icon.js';
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES,
   EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME,
@@ -19,14 +20,14 @@ import {
   FILE_EXT_SELECT_TXT, HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
   HOST_STATUS, HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK,
   HOST_VERSION_LATEST, HOST_VERSION_MIN, ICON, ICON_AUTO, ICON_BLACK,
-  ICON_COLOR, ICON_CONTEXT_ID, ICON_DARK, ICON_ID, ICON_LIGHT, ICON_WHITE,
-  INFO_COLOR, INFO_TEXT, IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC, IS_WEBEXT,
-  LOCAL_FILE_VIEW, MENU_ENABLED, MODE_EDIT, MODE_EDIT_EXT, MODE_EDIT_HTML,
-  MODE_EDIT_MD, MODE_EDIT_TXT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE,
-  MODE_SVG, ONLY_EDITABLE, OPTIONS_OPEN, PROCESS_CHILD, SYNC_AUTO,
-  SYNC_AUTO_URL, TMP_FILES_PB, TMP_FILES_PB_REMOVE, TMP_FILE_CREATE,
-  TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ,
-  TMP_FILE_RES, VARS_SET, WARN_COLOR, WARN_TEXT, WEBEXT_ID
+  ICON_COLOR, ICON_DARK, ICON_LIGHT, ICON_WHITE, INFO_COLOR, INFO_TEXT,
+  IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC, LOCAL_FILE_VIEW, MENU_ENABLED,
+  MODE_EDIT, MODE_EDIT_EXT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
+  MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG, ONLY_EDITABLE,
+  OPTIONS_OPEN, PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL, TMP_FILES_PB,
+  TMP_FILES_PB_REMOVE, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
+  TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET,
+  WARN_COLOR, WARN_TEXT, WEBEXT_ID
 } from './constant.js';
 
 /* api */
@@ -40,7 +41,6 @@ const { WINDOW_ID_NONE } = windows;
 /* variables */
 export const vars = {
   [IS_MAC]: false,
-  [IS_WEBEXT]: runtime.id === WEBEXT_ID,
   [ONLY_EDITABLE]: false,
   [SYNC_AUTO]: false,
   [SYNC_AUTO_URL]: null
@@ -53,7 +53,6 @@ export const varsLocal = {
   [FILE_EXT_SELECT_HTML]: false,
   [FILE_EXT_SELECT_MD]: false,
   [FILE_EXT_SELECT_TXT]: false,
-  [ICON_ID]: '',
   [IS_EXECUTABLE]: false,
   [MENU_ENABLED]: false,
   [MODE_MATHML]: '',
@@ -69,31 +68,6 @@ export const hostStatus = {
 };
 
 /* UI */
-/**
- * set icon
- *
- * @param {string} id - icon fragment ID
- * @returns {Function} - browserAction.setIcon()
- */
-export const setIcon = async (id = varsLocal[ICON_ID]) => {
-  const icon = runtime.getURL(ICON);
-  const path = `${icon}${id}`;
-  return browserAction.setIcon({ path });
-};
-
-/**
- * set default icon
- *
- * @returns {?Function} - setIcon()
- */
-export const setDefaultIcon = async () => {
-  let func;
-  if (vars[IS_WEBEXT] && !varsLocal[ICON_ID]) {
-    func = setIcon(ICON_CONTEXT_ID);
-  }
-  return func || null;
-};
-
 /**
  * toggle badge
  *
@@ -208,7 +182,8 @@ export const createMenuItemData = key => {
       }
     } else {
       const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
-      const accKey = (vars[IS_WEBEXT] && placeholder) || ` ${placeholder}`;
+      const accKey = (runtime.id === WEBEXT_ID && placeholder) ||
+                     ` ${placeholder}`;
       data.contexts = contexts;
       data.enabled = enabled;
       data.title = i18n.getMessage(`${key}_key`, [label, accKey]);
@@ -892,7 +867,6 @@ export const setVar = async (item, obj, changed = false) => {
       case ICON_LIGHT:
       case ICON_WHITE:
         if (checked) {
-          varsLocal[ICON_ID] = value;
           func.push(setIcon(value));
         }
         break;
