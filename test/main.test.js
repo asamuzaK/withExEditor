@@ -3047,10 +3047,39 @@ describe('main', () => {
       assert.deepEqual(res, [], 'result');
     });
 
+    it('should not set variables', async () => {
+      const res = await func({
+        foo: {
+          checked: true
+        }
+      }, 'bar');
+      assert.deepEqual(res, [], 'result');
+    });
+
     it('should set variables', async () => {
       const res = await func({
         foo: {
           checked: true
+        }
+      });
+      assert.deepEqual(res, [[]], 'result');
+    });
+
+    it('should set variables', async () => {
+      const res = await func({
+        foo: {
+          checked: true
+        }
+      }, 'local');
+      assert.deepEqual(res, [[]], 'result');
+    });
+
+    it('should set variables', async () => {
+      const res = await func({
+        foo: {
+          newValue: {
+            checked: true
+          }
         }
       });
       assert.deepEqual(res, [[]], 'result');

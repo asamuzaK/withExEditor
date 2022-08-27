@@ -901,14 +901,17 @@ export const setVar = async (item, obj, changed = false) => {
  * set variables
  *
  * @param {object} data - data
+ * @param {string} area - storage area
  * @returns {Promise.<Array>} - results of each handler
  */
-export const setVars = async (data = {}) => {
+export const setVars = async (data = {}, area = 'local') => {
   const items = Object.entries(data);
   const func = [];
-  for (const [key, value] of items) {
-    const { newValue } = value;
-    func.push(setVar(key, newValue || value, !!newValue));
+  if (items.length && area === 'local') {
+    for (const [key, value] of items) {
+      const { newValue } = value;
+      func.push(setVar(key, newValue || value, !!newValue));
+    }
   }
   return Promise.all(func);
 };
