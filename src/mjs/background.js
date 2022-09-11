@@ -11,11 +11,12 @@ import {
 } from './main.js';
 
 /* api */
-const { browserAction, commands, runtime, storage, tabs, windows } = browser;
+const { commands, runtime, storage, tabs, windows } = browser;
+const action = browser.action ?? browser.browserAction;
 const menus = browser.menus ?? browser.contextMenus;
 
 /* listeners */
-browserAction.onClicked.addListener(() => openOptionsPage().catch(throwErr));
+action.onClicked.addListener(() => openOptionsPage().catch(throwErr));
 commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
 menus.onClicked.addListener((info, tab) =>
   sendContextMenuData(info, tab).catch(throwErr)

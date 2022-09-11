@@ -31,7 +31,8 @@ import {
 } from './constant.js';
 
 /* api */
-const { browserAction, i18n, notifications, runtime, tabs, windows } = browser;
+const { i18n, notifications, runtime, tabs, windows } = browser;
+const action = browser.action ?? browser.browserAction;
 const menus = browser.menus ?? browser.contextMenus;
 
 /* constants */
@@ -90,11 +91,11 @@ export const toggleBadge = async () => {
     text = WARN_TEXT;
   }
   func.push(
-    browserAction.setBadgeBackgroundColor({ color }),
-    browserAction.setBadgeText({ text })
+    action.setBadgeBackgroundColor({ color }),
+    action.setBadgeText({ text })
   );
-  if (text && typeof browserAction.setBadgeTextColor === 'function') {
-    func.push(browserAction.setBadgeTextColor({ color: 'white' }));
+  if (text && typeof action.setBadgeTextColor === 'function') {
+    func.push(action.setBadgeTextColor({ color: 'white' }));
   }
   return Promise.all(func);
 };

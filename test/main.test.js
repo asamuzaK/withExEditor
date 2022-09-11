@@ -63,23 +63,19 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
-      browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
-      browser.browserAction.setBadgeText.callsFake(arg => arg);
-      browser.browserAction.setBadgeTextColor.callsFake(arg => arg);
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
+      browser.action.setBadgeText.callsFake(arg => arg);
+      browser.action.setBadgeTextColor.callsFake(arg => arg);
       const res = await func();
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1,
-        'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.deepEqual(res, [
         {
           color: WARN_COLOR
@@ -95,26 +91,22 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { hostStatus, varsLocal } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
-      browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
-      browser.browserAction.setBadgeText.callsFake(arg => arg);
-      browser.browserAction.setBadgeTextColor.callsFake(arg => arg);
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
+      browser.action.setBadgeText.callsFake(arg => arg);
+      browser.action.setBadgeTextColor.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = true;
       hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func();
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k, 'not called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
+        'not called');
       assert.deepEqual(res, [
         {
           color: [0, 0, 0, 0]
@@ -127,26 +119,22 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { hostStatus, varsLocal } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
-      browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
-      browser.browserAction.setBadgeText.callsFake(arg => arg);
-      browser.browserAction.setBadgeTextColor.callsFake(arg => arg);
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
+      browser.action.setBadgeText.callsFake(arg => arg);
+      browser.action.setBadgeTextColor.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = false;
       hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func();
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.deepEqual(res, [
         {
           color: WARN_COLOR
@@ -162,26 +150,22 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { hostStatus, varsLocal } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
-      browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
-      browser.browserAction.setBadgeText.callsFake(arg => arg);
-      browser.browserAction.setBadgeTextColor.callsFake(arg => arg);
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
+      browser.action.setBadgeText.callsFake(arg => arg);
+      browser.action.setBadgeTextColor.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = true;
       hostStatus[HOST_COMPAT] = false;
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func();
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.deepEqual(res, [
         {
           color: WARN_COLOR
@@ -197,26 +181,22 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { hostStatus, varsLocal } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
-      browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
-      browser.browserAction.setBadgeText.callsFake(arg => arg);
-      browser.browserAction.setBadgeTextColor.callsFake(arg => arg);
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
+      browser.action.setBadgeText.callsFake(arg => arg);
+      browser.action.setBadgeTextColor.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = true;
       hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = false;
       const res = await func();
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.deepEqual(res, [
         {
           color: WARN_COLOR
@@ -232,27 +212,23 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { hostStatus, varsLocal } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
-      browser.browserAction.setBadgeBackgroundColor.callsFake(arg => arg);
-      browser.browserAction.setBadgeText.callsFake(arg => arg);
-      browser.browserAction.setBadgeTextColor.callsFake(arg => arg);
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
+      browser.action.setBadgeText.callsFake(arg => arg);
+      browser.action.setBadgeTextColor.callsFake(arg => arg);
       hostStatus[HOST_CONNECTION] = true;
       hostStatus[HOST_COMPAT] = true;
       hostStatus[HOST_VERSION_LATEST] = '1.2.3';
       varsLocal[IS_EXECUTABLE] = true;
       const res = await func();
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.deepEqual(res, [
         {
           color: INFO_COLOR
@@ -1827,9 +1803,9 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { hostStatus } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       const msg = {
         [HOST_VERSION]: {
           isLatest: true,
@@ -1837,16 +1813,12 @@ describe('main', () => {
         }
       };
       const res = await func(msg);
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
       assert.isNull(hostStatus[HOST_VERSION_LATEST], 'latest');
       assert.deepEqual(res, [
@@ -1860,9 +1832,9 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { hostStatus } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       const msg = {
         [HOST_VERSION]: {
           isLatest: true,
@@ -1871,16 +1843,12 @@ describe('main', () => {
         }
       };
       const res = await func(msg);
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
       assert.isNull(hostStatus[HOST_VERSION_LATEST], 'latest');
       assert.deepEqual(res, [
@@ -1894,9 +1862,9 @@ describe('main', () => {
 
     it('should call function', async () => {
       const { hostStatus } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       const msg = {
         [HOST_VERSION]: {
           isLatest: false,
@@ -1905,16 +1873,13 @@ describe('main', () => {
         }
       };
       const res = await func(msg);
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called'
       );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
       assert.strictEqual(hostStatus[HOST_VERSION_LATEST], '1.2.3', 'latest');
       assert.deepEqual(res, [
@@ -1927,25 +1892,21 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       const msg = {
         [HOST_VERSION]: {
           result: true
         }
       };
       const res = await func(msg);
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.deepEqual(res, [
         [
           undefined,
@@ -1956,23 +1917,19 @@ describe('main', () => {
     });
 
     it('should not call function', async () => {
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       const msg = {
         [HOST_VERSION]: {}
       };
       const res = await func(msg);
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i,
-        'not called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j, 'not called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k, 'not called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount, i,
+        'not called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j,
+        'not called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
+        'not called');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -2645,49 +2602,41 @@ describe('main', () => {
 
     it('should set value', async () => {
       const { varsLocal } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       const res = await func(EDITOR_FILE_NAME, {
         app: {
           executable: true
         }
       });
       assert.isTrue(varsLocal[IS_EXECUTABLE], 'value');
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i,
-        'not called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j, 'not called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k, 'not called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount, i,
+        'not called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j,
+        'not called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
+        'not called');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should call function', async () => {
       const { varsLocal } = mjs;
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       const res = await func(EDITOR_FILE_NAME, {
         app: {
           executable: true
         }
       }, true);
       assert.isTrue(varsLocal[IS_EXECUTABLE], 'value');
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.deepEqual(res, [
         [
           undefined,
@@ -2868,86 +2817,79 @@ describe('main', () => {
     });
 
     it('should not set value', async () => {
-      const i = browser.browserAction.setIcon.callCount;
+      const i = browser.action.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_AUTO, {
         checked: false,
         value: '#auto'
       });
-      assert.strictEqual(browser.browserAction.setIcon.callCount, i,
-        'not called');
+      assert.strictEqual(browser.action.setIcon.callCount, i, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should call function', async () => {
-      const i = browser.browserAction.setIcon.callCount;
+      const i = browser.action.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_AUTO, {
         checked: true,
         value: '#auto'
       });
-      assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.action.setIcon.callCount, i + 1, 'called');
       assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call functin', async () => {
-      const i = browser.browserAction.setIcon.callCount;
+      const i = browser.action.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_BLACK, {
         checked: true,
         value: '#black'
       }, true);
-      assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.action.setIcon.callCount, i + 1, 'called');
       assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
-      const i = browser.browserAction.setIcon.callCount;
+      const i = browser.action.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_COLOR, {
         checked: true,
         value: '#color'
       }, true);
-      assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.action.setIcon.callCount, i + 1, 'called');
       assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
-      const i = browser.browserAction.setIcon.callCount;
+      const i = browser.action.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_DARK, {
         checked: true,
         value: '#dark'
       }, true);
-      assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.action.setIcon.callCount, i + 1, 'called');
       assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
-      const i = browser.browserAction.setIcon.callCount;
+      const i = browser.action.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_LIGHT, {
         checked: true,
         value: '#light'
       }, true);
-      assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.action.setIcon.callCount, i + 1, 'called');
       assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
-      const i = browser.browserAction.setIcon.callCount;
+      const i = browser.action.setIcon.callCount;
       browser.runtime.getURL.callsFake(arg => arg);
       const res = await func(ICON_WHITE, {
         checked: true,
         value: '#white'
       }, true);
-      assert.strictEqual(browser.browserAction.setIcon.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.action.setIcon.callCount, i + 1, 'called');
       assert.deepEqual(res, [[undefined, undefined]], 'result');
     });
 
@@ -3205,25 +3147,21 @@ describe('main', () => {
     it('should call function', async () => {
       const { hostStatus } = mjs;
       const stubErr = sinon.stub(console, 'error');
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = null;
       const res = await func();
       const { called: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.isFalse(errCalled, 'not called');
       assert.deepEqual(res, [[
         undefined,
@@ -3235,25 +3173,21 @@ describe('main', () => {
     it('should call function and log error', async () => {
       const { hostStatus } = mjs;
       const stubErr = sinon.stub(console, 'error');
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       const res = await func({
         error: new Error('error')
       });
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
       assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.isTrue(errCalled, 'called');
       assert.deepEqual(res, [
         [
@@ -3268,25 +3202,22 @@ describe('main', () => {
     it('should call function and log error', async () => {
       const { hostStatus } = mjs;
       const stubErr = sinon.stub(console, 'error');
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = new Error('error');
       const res = await func();
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called'
       );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.isTrue(errCalled, 'called');
       assert.deepEqual(res, [
         [
@@ -3331,25 +3262,21 @@ describe('main', () => {
     it('should call function', async () => {
       const { hostStatus } = mjs;
       const stubErr = sinon.stub(console, 'error');
-      const i = browser.browserAction.setBadgeBackgroundColor.callCount;
-      const j = browser.browserAction.setBadgeText.callCount;
-      const k = browser.browserAction.setBadgeTextColor.callCount;
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = null;
       const res = await func();
       const { called: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
-      assert.strictEqual(
-        browser.browserAction.setBadgeBackgroundColor.callCount, i + 1,
-        'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeText.callCount, j + 1, 'called'
-      );
-      assert.strictEqual(
-        browser.browserAction.setBadgeTextColor.callCount, k + 1, 'called'
-      );
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
       assert.isFalse(errCalled, 'not called');
       assert.deepEqual(res, [[
         undefined,
