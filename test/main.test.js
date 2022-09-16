@@ -48,18 +48,14 @@ describe('main', () => {
   describe('toggle badge', () => {
     const func = mjs.toggleBadge;
     beforeEach(() => {
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
+      const { varsLocal } = mjs;
       varsLocal[IS_EXECUTABLE] = false;
+      mjs.appHost.clear();
     });
     afterEach(() => {
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
+      const { varsLocal } = mjs;
       varsLocal[IS_EXECUTABLE] = false;
+      mjs.appHost.clear();
     });
 
     it('should call function', async () => {
@@ -90,16 +86,18 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus, varsLocal } = mjs;
+      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = true;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true,
+        [HOST_COMPAT]: true
+      });
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -118,16 +116,18 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus, varsLocal } = mjs;
+      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = true;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: false,
+        [HOST_COMPAT]: true
+      });
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -149,16 +149,18 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus, varsLocal } = mjs;
+      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_COMPAT] = false;
       varsLocal[IS_EXECUTABLE] = true;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true,
+        [HOST_COMPAT]: false
+      });
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -180,16 +182,18 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus, varsLocal } = mjs;
+      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_COMPAT] = true;
       varsLocal[IS_EXECUTABLE] = false;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true,
+        [HOST_COMPAT]: true
+      });
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -211,17 +215,19 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus, varsLocal } = mjs;
+      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_COMPAT] = true;
-      hostStatus[HOST_VERSION_LATEST] = '1.2.3';
       varsLocal[IS_EXECUTABLE] = true;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true,
+        [HOST_COMPAT]: true,
+        [HOST_VERSION_LATEST]: '1.2.3'
+      });
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -270,8 +276,7 @@ describe('main', () => {
   describe('create menu item data', () => {
     const func = mjs.createMenuItemData;
     beforeEach(() => {
-      const { hostStatus, varsLocal, vars } = mjs;
-      hostStatus[HOST_COMPAT] = false;
+      const { varsLocal, vars } = mjs;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -282,10 +287,10 @@ describe('main', () => {
       varsLocal[MENU_ENABLED] = false;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.runtime.id = null;
+      mjs.appHost.clear();
     });
     afterEach(() => {
-      const { hostStatus, varsLocal, vars } = mjs;
-      hostStatus[HOST_COMPAT] = false;
+      const { varsLocal, vars } = mjs;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -295,6 +300,7 @@ describe('main', () => {
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
       browser.runtime.id = null;
+      mjs.appHost.clear();
     });
 
     it('should get empty object', () => {
@@ -353,12 +359,14 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = true;
+      const { varsLocal } = mjs;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: true
+      });
       const res = func(MODE_EDIT);
       assert.deepEqual(res, {
         contexts: [
@@ -417,13 +425,15 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { hostStatus, vars, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = true;
+      const { vars, varsLocal } = mjs;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
       vars[ONLY_EDITABLE] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: true
+      });
       const res = func(MODE_SELECTION);
       assert.deepEqual(res, {
         contexts: [
@@ -511,13 +521,15 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { hostStatus, vars, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = true;
+      const { vars, varsLocal } = mjs;
       varsLocal[EDITOR_LABEL] = 'foo';
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
       vars[ONLY_EDITABLE] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: true
+      });
       const res = func(MODE_SOURCE);
       assert.deepEqual(res, {
         contexts: [
@@ -577,12 +589,14 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = true;
+      const { varsLocal } = mjs;
       varsLocal[FILE_EXT_SELECT] = true;
       varsLocal[FILE_EXT_SELECT_HTML] = true;
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: true
+      });
       const res = func(MODE_EDIT_HTML);
       assert.deepEqual(res, {
         contexts: [
@@ -642,12 +656,14 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = true;
+      const { varsLocal } = mjs;
       varsLocal[FILE_EXT_SELECT] = true;
       varsLocal[FILE_EXT_SELECT_MD] = true;
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: true
+      });
       const res = func(MODE_EDIT_MD);
       assert.deepEqual(res, {
         contexts: [
@@ -707,12 +723,14 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = true;
+      const { varsLocal } = mjs;
       varsLocal[FILE_EXT_SELECT] = true;
       varsLocal[FILE_EXT_SELECT_TXT] = true;
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: true
+      });
       const res = func(MODE_EDIT_TXT);
       assert.deepEqual(res, {
         contexts: [
@@ -849,8 +867,7 @@ describe('main', () => {
   describe('update context menu', () => {
     const func = mjs.updateContextMenu;
     beforeEach(() => {
-      const { hostStatus, varsLocal, vars } = mjs;
-      hostStatus[HOST_COMPAT] = false;
+      const { varsLocal, vars } = mjs;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -860,10 +877,10 @@ describe('main', () => {
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
+      mjs.appHost.clear();
     });
     afterEach(() => {
-      const { hostStatus, varsLocal, vars } = mjs;
-      hostStatus[HOST_COMPAT] = false;
+      const { varsLocal, vars } = mjs;
       vars[ONLY_EDITABLE] = false;
       varsLocal[EDITOR_LABEL] = '';
       varsLocal[FILE_EXT_SELECT] = false;
@@ -872,6 +889,7 @@ describe('main', () => {
       varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
+      mjs.appHost.clear();
     });
 
     it('should not call function', async () => {
@@ -905,10 +923,12 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: false
       }).callCount;
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = false;
+      const { varsLocal } = mjs;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: false
+      });
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
@@ -922,10 +942,12 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: false
       }).callCount;
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = false;
+      const { varsLocal } = mjs;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = true;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: false
+      });
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
@@ -939,10 +961,12 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: false
       }).callCount;
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = false;
+      const { varsLocal } = mjs;
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: false
+      });
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
@@ -956,10 +980,12 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: true
       }).callCount;
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = true;
+      const { varsLocal } = mjs;
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: true
+      });
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
@@ -973,10 +999,12 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: false
       }).callCount;
-      const { hostStatus, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = true;
+      const { varsLocal } = mjs;
       varsLocal[IS_EXECUTABLE] = true;
       varsLocal[MENU_ENABLED] = true;
+      mjs.appHost.set('status', {
+        [HOST_COMPAT]: true
+      });
       const res = await func({
         [MODE_EDIT]: {
           enabled: false
@@ -1142,40 +1170,13 @@ describe('main', () => {
     });
   });
 
-  describe('native application host', () => {
-    it('should get host object', () => {
-      const { host } = mjs;
-      assert.isObject(host, 'host');
-    });
-  });
-
-  describe('post message to host', () => {
-    const func = mjs.hostPostMsg;
-
-    it('should not call function', async () => {
-      const { host } = mjs;
-      const i = host.postMessage.callCount;
-      await func();
-      assert.strictEqual(host.postMessage.callCount, i, 'not called');
-    });
-
-    it('should call function', async () => {
-      const { host } = mjs;
-      const i = host.postMessage.callCount;
-      await func('foo');
-      assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
-    });
-  });
-
   describe('add id to tab list', () => {
     const func = mjs.addIdToTabList;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
 
     it('should throw', async () => {
@@ -1187,24 +1188,21 @@ describe('main', () => {
     });
 
     it('should add', async () => {
-      const { tabList } = mjs;
       const res = await func(1);
       assert.instanceOf(res, Set, 'instance');
       assert.strictEqual(res.size, 1, 'size');
       assert.isTrue(res.has(1), 'has');
-      assert.deepEqual(res, tabList, 'result');
+      assert.deepEqual(res, mjs.tabList, 'result');
     });
   });
 
   describe('remove id from tab list', () => {
     const func = mjs.removeIdFromTabList;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
 
     it('should throw', async () => {
@@ -1216,52 +1214,48 @@ describe('main', () => {
     });
 
     it('should remove', async () => {
-      const { tabList } = mjs;
-      tabList.add(1);
+      mjs.tabList.add(1);
       const res = await func(1);
       assert.instanceOf(res, Set, 'instance');
       assert.strictEqual(res.size, 0, 'size');
-      assert.deepEqual(res, tabList, 'result');
+      assert.deepEqual(res, mjs.tabList, 'result');
     });
   });
 
   describe('restore tab list', () => {
     const func = mjs.restoreTabList;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
 
     it('should restore', async () => {
-      const { tabList } = mjs;
-      tabList.add(1);
-      tabList.add(2);
-      tabList.add(3);
+      mjs.tabList.add(1);
+      mjs.tabList.add(2);
+      mjs.tabList.add(3);
       browser.tabs.get.withArgs(1).resolves({});
       browser.tabs.get.withArgs(2).rejects(new Error('error'));
       browser.tabs.get.withArgs(3).resolves({});
       await func();
-      assert.strictEqual(tabList.size, 2, 'size');
-      assert.isTrue(tabList.has(1), 'has');
-      assert.isFalse(tabList.has(2), 'has');
-      assert.isTrue(tabList.has(3), 'has');
+      assert.strictEqual(mjs.tabList.size, 2, 'size');
+      assert.isTrue(mjs.tabList.has(1), 'has');
+      assert.isFalse(mjs.tabList.has(2), 'has');
+      assert.isTrue(mjs.tabList.has(3), 'has');
     });
   });
 
   describe('handle connectable tab', () => {
     const func = mjs.handleConnectableTab;
     beforeEach(() => {
-      const { tabList, varsLocal } = mjs;
-      tabList.clear();
+      const { varsLocal } = mjs;
+      mjs.tabList.clear();
       varsLocal[MENU_ENABLED] = false;
     });
     afterEach(() => {
-      const { tabList, varsLocal } = mjs;
-      tabList.clear();
+      const { varsLocal } = mjs;
+      mjs.tabList.clear();
       varsLocal[MENU_ENABLED] = false;
     });
 
@@ -1271,27 +1265,26 @@ describe('main', () => {
     });
 
     it('should not call function', async () => {
-      const { tabList } = mjs;
       const i = browser.tabs.sendMessage.callCount;
       const res = await func({
         id: -1,
         windowId: -1
       });
-      assert.strictEqual(tabList.size, 0, 'size');
+      assert.strictEqual(mjs.tabList.size, 0, 'size');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should call function', async () => {
-      const { tabList, varsLocal } = mjs;
+      const { varsLocal } = mjs;
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.menus.update.callCount;
       const res = await func({
         id: 2,
         windowId: 1
       });
-      assert.strictEqual(tabList.size, 1, 'size');
-      assert.isTrue(tabList.has(2), 'has');
+      assert.strictEqual(mjs.tabList.size, 1, 'size');
+      assert.isTrue(mjs.tabList.has(2), 'has');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.update.callCount, j, 'not called');
       assert.isFalse(varsLocal[MENU_ENABLED], 'menu');
@@ -1301,7 +1294,7 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList, varsLocal } = mjs;
+      const { varsLocal } = mjs;
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.menus.update.callCount;
       const res = await func({
@@ -1310,8 +1303,8 @@ describe('main', () => {
         status: 'complete',
         windowId: 1
       });
-      assert.strictEqual(tabList.size, 1, 'size');
-      assert.isTrue(tabList.has(2), 'has');
+      assert.strictEqual(mjs.tabList.size, 1, 'size');
+      assert.isTrue(mjs.tabList.has(2), 'has');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.update.callCount, j + 5, 'called');
       assert.isTrue(varsLocal[MENU_ENABLED], 'menu');
@@ -1331,12 +1324,10 @@ describe('main', () => {
   describe('send context menu data', () => {
     const func = mjs.sendContextMenuData;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
 
     it('should get null', async () => {
@@ -1359,10 +1350,9 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList } = mjs;
-      tabList.add(2);
       const i = browser.tabs.sendMessage.callCount;
       browser.tabs.sendMessage.resolves({});
+      mjs.tabList.add(2);
       const res = await func({}, {
         id: 2
       });
@@ -1441,12 +1431,10 @@ describe('main', () => {
   describe('send get content message to active tab', () => {
     const func = mjs.sendGetContent;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
 
     it('should not call function', async () => {
@@ -1468,32 +1456,51 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList } = mjs;
-      tabList.add(2);
       const i = browser.tabs.sendMessage.callCount;
       browser.tabs.sendMessage.resolves({});
       browser.tabs.query.resolves([{
         id: 2
       }]);
+      mjs.tabList.add(2);
       const res = await func();
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, {}, 'result');
     });
   });
 
+  describe('post message to host', () => {
+    const func = mjs.hostPostMsg;
+    beforeEach(() => {
+      mjs.appHost.clear();
+    });
+    afterEach(() => {
+      mjs.appHost.clear();
+    });
+
+    it('should not call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
+      await func();
+      assert.strictEqual(port.postMessage.callCount, i, 'not called');
+    });
+
+    it('should call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
+      await func('foo');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+    });
+  });
+
   describe('handle host message', () => {
     const func = mjs.handleHostMsg;
     beforeEach(() => {
-      const { hostStatus } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
+      mjs.appHost.clear();
     });
     afterEach(() => {
-      const { hostStatus } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
+      mjs.appHost.clear();
     });
 
     it('should get empty array', async () => {
@@ -1623,14 +1630,33 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { host, hostStatus } = mjs;
-      const i = host.postMessage.callCount;
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
       const msg = {
         status: 'ready'
       };
       const res = await func(msg);
-      assert.isTrue(hostStatus[HOST_CONNECTION], 'value');
-      assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
+      const status = mjs.appHost.get('status');
+      assert.isTrue(status[HOST_CONNECTION], 'value');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: false
+      });
+      const msg = {
+        status: 'ready'
+      };
+      const res = await func(msg);
+      const status = mjs.appHost.get('status');
+      assert.isTrue(status[HOST_CONNECTION], 'value');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined], 'result');
     });
   });
@@ -1638,20 +1664,16 @@ describe('main', () => {
   describe('handle message', () => {
     const func = mjs.handleMsg;
     beforeEach(() => {
-      const { hostStatus, tabList, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
-      tabList.clear();
+      const { varsLocal } = mjs;
       varsLocal[MENU_ENABLED] = false;
+      mjs.appHost.clear();
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { hostStatus, tabList, varsLocal } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
-      tabList.clear();
+      const { varsLocal } = mjs;
       varsLocal[MENU_ENABLED] = false;
+      mjs.appHost.clear();
+      mjs.tabList.clear();
     });
 
     it('should get empty array', async () => {
@@ -1668,13 +1690,12 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList } = mjs;
-      tabList.add(2);
       const i = browser.tabs.query.callCount;
       const j = browser.tabs.sendMessage.callCount;
       browser.tabs.query.resolves([{
         id: 2
       }]);
+      mjs.tabList.add(2);
       const msg = {
         [TMP_FILE_DATA_REMOVE]: {
           data: {
@@ -1690,13 +1711,12 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList } = mjs;
-      tabList.add(2);
       const i = browser.tabs.query.callCount;
       const j = browser.tabs.sendMessage.callCount;
       browser.tabs.query.resolves([{
         id: 2
       }]);
+      mjs.tabList.add(2);
       const msg = {
         [TMP_FILE_RES]: {
           data: {
@@ -1712,9 +1732,8 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList } = mjs;
-      tabList.add(2);
       const i = browser.tabs.sendMessage.callCount;
+      mjs.tabList.add(2);
       const msg = {
         [TMP_FILE_DATA_PORT]: {
           foo: 'bar'
@@ -1802,7 +1821,6 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
@@ -1813,14 +1831,15 @@ describe('main', () => {
         }
       };
       const res = await func(msg);
+      const status = mjs.appHost.get('status');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
-      assert.isNull(hostStatus[HOST_VERSION_LATEST], 'latest');
+      assert.isTrue(status[HOST_COMPAT], 'compat');
+      assert.isNull(status[HOST_VERSION_LATEST], 'latest');
       assert.deepEqual(res, [
         [
           undefined,
@@ -1831,7 +1850,6 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
@@ -1843,14 +1861,15 @@ describe('main', () => {
         }
       };
       const res = await func(msg);
+      const status = mjs.appHost.get('status');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
-      assert.isNull(hostStatus[HOST_VERSION_LATEST], 'latest');
+      assert.isTrue(status[HOST_COMPAT], 'compat');
+      assert.isNull(status[HOST_VERSION_LATEST], 'latest');
       assert.deepEqual(res, [
         [
           undefined,
@@ -1861,7 +1880,6 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
@@ -1873,6 +1891,7 @@ describe('main', () => {
         }
       };
       const res = await func(msg);
+      const status = mjs.appHost.get('status');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called'
       );
@@ -1880,8 +1899,8 @@ describe('main', () => {
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isTrue(hostStatus[HOST_COMPAT], 'compat');
-      assert.strictEqual(hostStatus[HOST_VERSION_LATEST], '1.2.3', 'latest');
+      assert.isTrue(status[HOST_COMPAT], 'compat');
+      assert.strictEqual(status[HOST_VERSION_LATEST], '1.2.3', 'latest');
       assert.deepEqual(res, [
         [
           undefined,
@@ -1970,46 +1989,50 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { host } = mjs;
-      const i = host.postMessage.callCount;
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
       const msg = {
         [EDITOR_CONFIG_GET]: true
       };
       const res = await func(msg);
-      assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { host } = mjs;
-      const i = host.postMessage.callCount;
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
       const msg = {
         [LOCAL_FILE_VIEW]: true
       };
       const res = await func(msg);
-      assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { host } = mjs;
-      const i = host.postMessage.callCount;
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
       const msg = {
         [TMP_FILE_CREATE]: true
       };
       const res = await func(msg);
-      assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { host } = mjs;
-      const i = host.postMessage.callCount;
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
       const msg = {
         [TMP_FILE_GET]: true
       };
       const res = await func(msg);
-      assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2032,16 +2055,16 @@ describe('main', () => {
   describe('handle activated tab', () => {
     const func = mjs.onTabActivated;
     beforeEach(() => {
-      const { tabList, varsLocal } = mjs;
-      tabList.clear();
+      const { varsLocal } = mjs;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = true;
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList, varsLocal } = mjs;
-      tabList.clear();
+      const { varsLocal } = mjs;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
+      mjs.tabList.clear();
     });
 
     it('should throw', async () => {
@@ -2072,8 +2095,8 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList, varsLocal } = mjs;
-      tabList.add(2);
+      const { varsLocal } = mjs;
+      mjs.tabList.add(2);
       const i = browser.menus.update.callCount;
       const j = browser.tabs.sendMessage.callCount;
       const info = {
@@ -2097,8 +2120,8 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList, varsLocal } = mjs;
-      tabList.add(2);
+      const { varsLocal } = mjs;
+      mjs.tabList.add(2);
       const i = browser.menus.update.callCount;
       const j = browser.tabs.sendMessage.callCount;
       const info = {
@@ -2124,16 +2147,16 @@ describe('main', () => {
   describe('handle updated tab', () => {
     const func = mjs.onTabUpdated;
     beforeEach(() => {
-      const { tabList, varsLocal } = mjs;
-      tabList.clear();
+      const { varsLocal } = mjs;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = true;
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList, varsLocal } = mjs;
-      tabList.clear();
+      const { varsLocal } = mjs;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
+      mjs.tabList.clear();
     });
 
     it('should throw', async () => {
@@ -2182,8 +2205,8 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList, varsLocal } = mjs;
-      tabList.add(2);
+      const { varsLocal } = mjs;
+      mjs.tabList.add(2);
       const i = browser.menus.update.callCount;
       const res = await func(2, {
         status: 'complete'
@@ -2209,12 +2232,12 @@ describe('main', () => {
   describe('handle removed tab', () => {
     const func = mjs.onTabRemoved;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.appHost.clear();
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.appHost.clear();
+      mjs.tabList.clear();
     });
 
     it('should throw', async () => {
@@ -2226,34 +2249,36 @@ describe('main', () => {
     });
 
     it('should not call function', async () => {
-      const { host, tabList } = mjs;
-      const i = host.postMessage.callCount;
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
       const j = browser.windows.get.callCount;
-      tabList.add(2);
+      mjs.appHost.set('port', port);
+      mjs.tabList.add(2);
       browser.windows.get.resolves({
         incognito: false
       });
       const res = await func(3, { windowId: 1 });
-      assert.strictEqual(tabList.size, 1, 'size');
-      assert.isTrue(tabList.has(2), 'has');
-      assert.strictEqual(host.postMessage.callCount, i, 'not called');
+      assert.strictEqual(mjs.tabList.size, 1, 'size');
+      assert.isTrue(mjs.tabList.has(2), 'has');
+      assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.strictEqual(browser.windows.get.callCount, j, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
     it('should not call function', async () => {
-      const { host, tabList } = mjs;
-      tabList.add(2);
-      tabList.add(3);
-      const i = host.postMessage.callCount;
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
       const j = browser.windows.get.withArgs(1, null).callCount;
+      mjs.appHost.set('port', port);
+      mjs.tabList.add(2);
+      mjs.tabList.add(3);
       browser.windows.get.withArgs(1, null).resolves({
         incognito: false
       });
       const res = await func(2, { windowId: 1 });
-      assert.strictEqual(tabList.size, 1, 'size');
-      assert.isFalse(tabList.has(2), 'has');
-      assert.strictEqual(host.postMessage.callCount, i, 'not called');
+      assert.strictEqual(mjs.tabList.size, 1, 'size');
+      assert.isFalse(mjs.tabList.has(2), 'has');
+      assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
         'called');
       assert.strictEqual(res.length, 1, 'length');
@@ -2261,18 +2286,19 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { host, tabList } = mjs;
-      const i = host.postMessage.callCount;
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
       const j = browser.windows.get.withArgs(1, null).callCount;
-      tabList.add(2);
-      tabList.add(3);
+      mjs.appHost.set('port', port);
+      mjs.tabList.add(2);
+      mjs.tabList.add(3);
       browser.windows.get.withArgs(1, null).resolves({
         incognito: true
       });
       const res = await func(2, { windowId: 1 });
-      assert.strictEqual(tabList.size, 1, 'size');
-      assert.isFalse(tabList.has(2), 'has');
-      assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(mjs.tabList.size, 1, 'size');
+      assert.isFalse(mjs.tabList.has(2), 'has');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
         'called');
       assert.strictEqual(res.length, 2, 'length');
@@ -2284,16 +2310,16 @@ describe('main', () => {
   describe('handle focused window', () => {
     const func = mjs.onWindowFocusChanged;
     beforeEach(() => {
-      const { tabList, varsLocal } = mjs;
-      tabList.clear();
+      const { varsLocal } = mjs;
       varsLocal[MENU_ENABLED] = true;
       varsLocal[IS_EXECUTABLE] = true;
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList, varsLocal } = mjs;
-      tabList.clear();
+      const { varsLocal } = mjs;
       varsLocal[MENU_ENABLED] = false;
       varsLocal[IS_EXECUTABLE] = false;
+      mjs.tabList.clear();
     });
 
     it('should not call function', async () => {
@@ -2333,10 +2359,8 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList } = mjs;
       const i = browser.menus.update.callCount;
       const j = browser.tabs.sendMessage.callCount;
-      tabList.add(2);
       browser.windows.getCurrent.resolves({
         focused: true,
         id: 1,
@@ -2349,6 +2373,7 @@ describe('main', () => {
       }).resolves([{
         id: 2
       }]);
+      mjs.tabList.add(2);
       const res = await func(1);
       assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
@@ -2365,10 +2390,8 @@ describe('main', () => {
     });
 
     it('should not call function', async () => {
-      const { tabList } = mjs;
       const i = browser.menus.update.callCount;
       const j = browser.tabs.sendMessage.callCount;
-      tabList.add(2);
       browser.windows.getCurrent.resolves({
         focused: true,
         id: 1,
@@ -2381,6 +2404,7 @@ describe('main', () => {
       }).resolves([{
         id: browser.tabs.TAB_ID_NONE
       }]);
+      mjs.tabList.add(2);
       const res = await func(1);
       assert.strictEqual(browser.menus.update.callCount, i, 'not called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j, 'not called');
@@ -2391,20 +2415,21 @@ describe('main', () => {
   describe('handle removed window', () => {
     const func = mjs.onWindowRemoved;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.appHost.clear();
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.appHost.clear();
+      mjs.tabList.clear();
     });
 
     it('should call function', async () => {
-      const { host, tabList } = mjs;
-      const i = host.postMessage.callCount;
-      tabList.add(1);
-      tabList.add(2);
-      tabList.add(3);
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
+      mjs.tabList.add(1);
+      mjs.tabList.add(2);
+      mjs.tabList.add(3);
       browser.tabs.get.withArgs(1).rejects(new Error('error'));
       browser.tabs.get.withArgs(2).resolves({});
       browser.tabs.get.withArgs(3).rejects(new Error('error'));
@@ -2420,20 +2445,21 @@ describe('main', () => {
         }
       ]);
       const res = await func();
-      assert.strictEqual(tabList.size, 1, 'size');
-      assert.isFalse(tabList.has(1), 'removed');
-      assert.isTrue(tabList.has(2), 'not removed');
-      assert.isFalse(tabList.has(3), 'removed');
-      assert.strictEqual(host.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(mjs.tabList.size, 1, 'size');
+      assert.isFalse(mjs.tabList.has(1), 'removed');
+      assert.isTrue(mjs.tabList.has(2), 'not removed');
+      assert.isFalse(mjs.tabList.has(3), 'removed');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined, undefined], 'result');
     });
 
     it('should not call function', async () => {
-      const { host, tabList } = mjs;
-      const i = host.postMessage.callCount;
-      tabList.add(1);
-      tabList.add(2);
-      tabList.add(3);
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      mjs.appHost.set('port', port);
+      mjs.tabList.add(1);
+      mjs.tabList.add(2);
+      mjs.tabList.add(3);
       browser.tabs.get.withArgs(1).rejects(new Error('error'));
       browser.tabs.get.withArgs(2).resolves({});
       browser.tabs.get.withArgs(3).rejects(new Error('error'));
@@ -2449,11 +2475,11 @@ describe('main', () => {
         }
       ]);
       const res = await func();
-      assert.strictEqual(tabList.size, 1, 'size');
-      assert.isFalse(tabList.has(1), 'removed');
-      assert.isTrue(tabList.has(2), 'not removed');
-      assert.isFalse(tabList.has(3), 'removed');
-      assert.strictEqual(host.postMessage.callCount, i, 'not called');
+      assert.strictEqual(mjs.tabList.size, 1, 'size');
+      assert.isFalse(mjs.tabList.has(1), 'removed');
+      assert.isTrue(mjs.tabList.has(2), 'not removed');
+      assert.isFalse(mjs.tabList.has(3), 'removed');
+      assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.deepEqual(res, [undefined], 'result');
     });
   });
@@ -2461,12 +2487,10 @@ describe('main', () => {
   describe('handle command', () => {
     const func = mjs.handleCmd;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.add(2);
+      mjs.tabList.add(2);
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.add(2);
+      mjs.tabList.clear();
     });
 
     it('should throw', async () => {
@@ -2492,8 +2516,6 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList } = mjs;
-      tabList.add(2);
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.tabs.query.callCount;
       browser.tabs.sendMessage.resolves({});
@@ -2515,12 +2537,10 @@ describe('main', () => {
   describe('send variable', () => {
     const func = mjs.sendVariables;
     beforeEach(() => {
-      const { tabList } = mjs;
-      tabList.add(1);
+      mjs.tabList.add(1);
     });
     afterEach(() => {
-      const { tabList } = mjs;
-      tabList.clear();
+      mjs.tabList.clear();
     });
 
     it('should get empty array', async () => {
@@ -2538,8 +2558,7 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList } = mjs;
-      tabList.add(2);
+      mjs.tabList.add(2);
       const i = browser.tabs.sendMessage.callCount;
       const res = await func({
         foo: 'bar'
@@ -2552,8 +2571,7 @@ describe('main', () => {
   describe('set variable', () => {
     const func = mjs.setVar;
     beforeEach(() => {
-      const { tabList, vars, varsLocal } = mjs;
-      tabList.clear();
+      const { vars, varsLocal } = mjs;
       vars[ONLY_EDITABLE] = false;
       vars[SYNC_AUTO] = false;
       vars[SYNC_AUTO_URL] = null;
@@ -2564,10 +2582,15 @@ describe('main', () => {
       varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = true;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: false,
+        [HOST_COMPAT]: false,
+        [HOST_VERSION_LATEST]: null
+      });
+      mjs.tabList.clear();
     });
     afterEach(() => {
-      const { tabList, vars, varsLocal } = mjs;
-      tabList.clear();
+      const { vars, varsLocal } = mjs;
       vars[ONLY_EDITABLE] = false;
       vars[SYNC_AUTO] = false;
       vars[SYNC_AUTO_URL] = null;
@@ -2578,6 +2601,8 @@ describe('main', () => {
       varsLocal[FILE_EXT_SELECT_TXT] = false;
       varsLocal[IS_EXECUTABLE] = false;
       varsLocal[MENU_ENABLED] = false;
+      mjs.appHost.clear();
+      mjs.tabList.clear();
     });
 
     it('should throw', async () => {
@@ -2903,8 +2928,8 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList, vars } = mjs;
-      tabList.add(1);
+      const { vars } = mjs;
+      mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const res = await func(ONLY_EDITABLE, {
         checked: true
@@ -2915,8 +2940,8 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { tabList, vars } = mjs;
-      tabList.add(1);
+      const { vars } = mjs;
+      mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.menus.removeAll.callCount;
       const res = await func(ONLY_EDITABLE, {
@@ -2947,8 +2972,8 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { tabList, vars } = mjs;
-      tabList.add(1);
+      const { vars } = mjs;
+      mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const res = await func(SYNC_AUTO, {
         checked: true
@@ -2968,8 +2993,8 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { tabList, vars } = mjs;
-      tabList.add(1);
+      const { vars } = mjs;
+      mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const res = await func(SYNC_AUTO_URL, {
         value: 'https://example.com'
@@ -3132,30 +3157,27 @@ describe('main', () => {
     const func = mjs.handleDisconnectedHost;
     const lastErrorDefaultValue = browser.runtime.lastError;
     beforeEach(() => {
-      const { hostStatus } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_VERSION_LATEST] = null;
+      mjs.appHost.clear();
     });
     afterEach(() => {
-      const { hostStatus } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
+      mjs.appHost.clear();
     });
 
     it('should call function', async () => {
-      const { hostStatus } = mjs;
       const stubErr = sinon.stub(console, 'error');
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = null;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true
+      });
       const res = await func();
+      const status = mjs.appHost.get('status');
       const { called: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
+      assert.isFalse(status[HOST_CONNECTION], 'value');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
@@ -3171,17 +3193,20 @@ describe('main', () => {
     });
 
     it('should call function and log error', async () => {
-      const { hostStatus } = mjs;
       const stubErr = sinon.stub(console, 'error');
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true
+      });
       const res = await func({
         error: new Error('error')
       });
+      const status = mjs.appHost.get('status');
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
-      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
+      assert.isFalse(status[HOST_CONNECTION], 'value');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
@@ -3190,27 +3215,30 @@ describe('main', () => {
         'called');
       assert.isTrue(errCalled, 'called');
       assert.deepEqual(res, [
+        false,
         [
           undefined,
           undefined,
           undefined
-        ],
-        false
+        ]
       ], 'result');
     });
 
     it('should call function and log error', async () => {
-      const { hostStatus } = mjs;
       const stubErr = sinon.stub(console, 'error');
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = new Error('error');
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true
+      });
       const res = await func();
+      const status = mjs.appHost.get('status');
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
+      assert.isFalse(status[HOST_CONNECTION], 'value');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called'
       );
@@ -3220,12 +3248,12 @@ describe('main', () => {
         'called');
       assert.isTrue(errCalled, 'called');
       assert.deepEqual(res, [
+        false,
         [
           undefined,
           undefined,
           undefined
-        ],
-        false
+        ]
       ], 'result');
     });
   });
@@ -3234,16 +3262,10 @@ describe('main', () => {
     const func = mjs.handleHostOnDisconnect;
     const lastErrorDefaultValue = browser.runtime.lastError;
     beforeEach(() => {
-      const { hostStatus } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = true;
-      hostStatus[HOST_VERSION_LATEST] = null;
+      mjs.appHost.clear();
     });
     afterEach(() => {
-      const { hostStatus } = mjs;
-      hostStatus[HOST_COMPAT] = false;
-      hostStatus[HOST_CONNECTION] = false;
-      hostStatus[HOST_VERSION_LATEST] = null;
+      mjs.appHost.clear();
     });
 
     it('should throw', async () => {
@@ -3260,17 +3282,20 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { hostStatus } = mjs;
       const stubErr = sinon.stub(console, 'error');
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = null;
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true
+      });
       const res = await func();
+      const status = mjs.appHost.get('status');
       const { called: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isFalse(hostStatus[HOST_CONNECTION], 'value');
+      assert.isFalse(status[HOST_CONNECTION], 'value');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
@@ -3311,11 +3336,27 @@ describe('main', () => {
 
   describe('set host', () => {
     const func = mjs.setHost;
+    beforeEach(() => {
+      mjs.appHost.clear();
+    });
+    afterEach(() => {
+      mjs.appHost.clear();
+    });
 
-    it('should add listeners', async () => {
+    it('should not set map', async () => {
+      browser.runtime.connectNative.returns(null);
       await func();
-      assert.isTrue(mjs.host.onDisconnect.addListener.called, 'called');
-      assert.isTrue(mjs.host.onMessage.addListener.called, 'called');
+      assert.strictEqual(mjs.appHost.size, 0, 'size');
+    });
+
+    it('should set map', async () => {
+      await func();
+      assert.strictEqual(mjs.appHost.size, 2, 'size');
+      assert.isTrue(mjs.appHost.has('port'), 'port');
+      assert.isTrue(mjs.appHost.get('port').onDisconnect.addListener.called,
+        'called');
+      assert.isTrue(mjs.appHost.get('port').onMessage.addListener.called,
+        'called');
     });
   });
 

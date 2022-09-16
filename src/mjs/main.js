@@ -10,9 +10,9 @@ import {
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   getActiveTab, getActiveTabId, getAllStorage, getCurrentWindow, getOs,
-  getStorage, getWindow, isTab, sendMessage, setStorage
+  getStorage, getWindow, isTab, makeConnection, sendMessage, setStorage
 } from './browser.js';
-import { setDefaultIcon, setIcon } from './icon.js';
+import { setDefaultIcon, setIcon, setIconBadge } from './icon.js';
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES,
   EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME,
@@ -32,7 +32,6 @@ import {
 
 /* api */
 const { i18n, notifications, runtime, tabs, windows } = browser;
-const action = browser.action ?? browser.browserAction;
 const menus = browser.menus ?? browser.contextMenus;
 
 /* constants */
@@ -61,21 +60,17 @@ export const varsLocal = {
   [MODE_SVG]: ''
 };
 
-/* host status */
-export const hostStatus = {
-  [HOST_COMPAT]: false,
-  [HOST_CONNECTION]: false,
-  [HOST_VERSION_LATEST]: null
-};
+/* native application host */
+export const appHost = new Map();
 
 /* UI */
 /**
  * toggle badge
  *
- * @returns {Promise.<Array>} - results of each handler
+ * @returns {Function} - setIconBadge()
  */
 export const toggleBadge = async () => {
-  const func = [];
+  const hostStatus = appHost.get('status') ?? {};
   let color, text;
   if (hostStatus[HOST_CONNECTION] && hostStatus[HOST_COMPAT] &&
       varsLocal[IS_EXECUTABLE]) {
@@ -90,14 +85,7 @@ export const toggleBadge = async () => {
     color = WARN_COLOR;
     text = WARN_TEXT;
   }
-  func.push(
-    action.setBadgeBackgroundColor({ color }),
-    action.setBadgeText({ text })
-  );
-  if (text && typeof action.setBadgeTextColor === 'function') {
-    func.push(action.setBadgeTextColor({ color: 'white' }));
-  }
-  return Promise.all(func);
+  return setIconBadge({ color, text });
 };
 
 /* context menu items */
@@ -157,6 +145,7 @@ export const createMenuItemData = key => {
   const data = {};
   if (isString(key) && menuItems[key]) {
     const { contexts, placeholder, parentId } = menuItems[key];
+    const hostStatus = appHost.get('status') ?? {};
     const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE] &&
                     !!hostStatus[HOST_COMPAT];
     if (parentId) {
@@ -228,6 +217,7 @@ export const createContextMenu = async () => {
 export const updateContextMenu = async (data, all = false) => {
   const func = [];
   if (isObjectNotEmpty(data)) {
+    const hostStatus = appHost.get('status') ?? {};
     const items = Object.entries(data);
     const itemEnabled = !!varsLocal[MENU_ENABLED] &&
                         !!varsLocal[IS_EXECUTABLE] && !!hostStatus[HOST_COMPAT];
@@ -305,21 +295,6 @@ export const updateContextMenu = async (data, all = false) => {
  */
 export const restoreContextMenu = async () =>
   menus.removeAll().then(createContextMenu);
-
-/* native application host */
-export const host = runtime.connectNative(HOST);
-
-/**
- * post message to host
- *
- * @param {*} msg - message
- * @returns {void}
- */
-export const hostPostMsg = async msg => {
-  if (msg && host) {
-    host.postMessage(msg);
-  }
-};
 
 /* tab list */
 // TODO: save tab list in storage.session
@@ -533,6 +508,19 @@ export const openOptionsPage = async () => runtime.openOptionsPage();
 
 /* message handlers */
 /**
+ * post message to host
+ *
+ * @param {*} msg - message
+ * @returns {void}
+ */
+export const hostPostMsg = async msg => {
+  const port = appHost.get('port');
+  if (msg && port) {
+    port.postMessage(msg);
+  }
+};
+
+/**
  * handle host message
  *
  * @param {object} msg - message
@@ -558,13 +546,16 @@ export const handleHostMsg = async msg => {
         }
         func.push(createNotification(status, notifyMsg));
         break;
-      case 'ready':
+      case 'ready': {
+        const hostStatus = appHost.get('status') ?? {};
         hostStatus[HOST_CONNECTION] = true;
+        appHost.set('status', hostStatus);
         func.push(hostPostMsg({
           [EDITOR_CONFIG_GET]: true,
           [HOST_VERSION_CHECK]: HOST_VERSION_MIN
         }));
         break;
+      }
       case 'warn':
         if (log) {
           func.push(logWarn(log));
@@ -608,20 +599,24 @@ export const handleMsg = async (msg, sender) => {
         case HOST:
           func.push(handleHostMsg(value));
           break;
-        case HOST_STATUS_GET:
+        case HOST_STATUS_GET: {
+          const hostStatus = appHost.get('status') ?? {};
           func.push(sendMessage(null, {
             [HOST_STATUS]: hostStatus
           }));
           break;
+        }
         case HOST_VERSION: {
           if (isObjectNotEmpty(value)) {
             const { isLatest, latest, result } = value;
+            const hostStatus = appHost.get('status') ?? {};
             hostStatus[HOST_VERSION_LATEST] = !isLatest ? latest : null;
             if (isLatest) {
               hostStatus[HOST_COMPAT] = !!isLatest;
             } else if (Number.isInteger(result)) {
               hostStatus[HOST_COMPAT] = result >= 0;
             }
+            appHost.set('status', hostStatus);
             func.push(toggleBadge());
           }
           break;
@@ -937,11 +932,14 @@ export const setOs = async () => {
 export const handleDisconnectedHost = async (port = {}) => {
   const { error } = port;
   const e = error || (runtime.lastError?.message && runtime.lastError);
-  const func = [toggleBadge()];
+  const hostStatus = appHost.get('status') ?? {};
+  const func = [];
   if (e) {
     func.push(logErr(e));
   }
   hostStatus[HOST_CONNECTION] = false;
+  appHost.set('status', hostStatus);
+  func.push(toggleBadge());
   return Promise.all(func);
 };
 
@@ -968,8 +966,17 @@ export const handleHostOnMsg = msg => handleMsg(msg).catch(throwErr);
  * @returns {void}
  */
 export const setHost = async () => {
-  host.onDisconnect.addListener(handleHostOnDisconnect);
-  host.onMessage.addListener(handleHostOnMsg);
+  const port = await makeConnection(HOST, true);
+  if (port) {
+    port.onDisconnect.addListener(handleHostOnDisconnect);
+    port.onMessage.addListener(handleHostOnMsg);
+    appHost.set('port', port);
+    appHost.set('status', {
+      [HOST_COMPAT]: false,
+      [HOST_CONNECTION]: false,
+      [HOST_VERSION_LATEST]: null
+    });
+  }
 };
 
 /**
