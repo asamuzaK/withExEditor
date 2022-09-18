@@ -5,9 +5,9 @@
 /* shared */
 import { throwErr } from './common.js';
 import {
-  handleCmd, handleMsg, onTabActivated, onTabRemoved, onTabUpdated,
-  onWindowFocusChanged, onWindowRemoved, openOptionsPage, sendContextMenuData,
-  setVars, startup
+  handleCmd, handleMsg, handleStorage, onTabActivated, onTabRemoved,
+  onTabUpdated, onWindowFocusChanged, onWindowRemoved, openOptionsPage,
+  sendContextMenuData, startup
 } from './main.js';
 
 /* api */
@@ -27,7 +27,7 @@ runtime.onMessage.addListener((msg, sender) =>
 );
 runtime.onStartup.addListener(() => startup().catch(throwErr));
 storage.onChanged.addListener((data, area) =>
-  setVars(data, area).catch(throwErr)
+  handleStorage(data, area, true).catch(throwErr)
 );
 tabs.onActivated.addListener(info => onTabActivated(info).catch(throwErr));
 tabs.onUpdated.addListener((id, info, tab) =>

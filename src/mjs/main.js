@@ -815,14 +815,14 @@ export const sendVariables = async obj => {
 };
 
 /**
- * set variable
+ * set storage value
  *
  * @param {string} item - item
  * @param {object} obj - value object
  * @param {boolean} changed - changed
  * @returns {Promise.<Array>} - results of each handler
  */
-export const setVar = async (item, obj, changed = false) => {
+export const setStorageValue = async (item, obj, changed = false) => {
   if (!isString(item)) {
     throw new TypeError(`Expected String but got ${getType(item)}.`);
   }
@@ -895,19 +895,21 @@ export const setVar = async (item, obj, changed = false) => {
 };
 
 /**
- * set variables
+ * handle storage
  *
  * @param {object} data - data
  * @param {string} area - storage area
  * @returns {Promise.<Array>} - results of each handler
  */
-export const setVars = async (data = {}, area = 'local') => {
-  const items = Object.entries(data);
+export const handleStorage = async (data, area = 'local') => {
   const func = [];
-  if (items.length && area === 'local') {
-    for (const [key, value] of items) {
-      const { newValue } = value;
-      func.push(setVar(key, newValue || value, !!newValue));
+  if (isObjectNotEmpty(data) && area === 'local') {
+    const items = Object.entries(data);
+    if (items.length) {
+      for (const [key, value] of items) {
+        const { newValue } = value;
+        func.push(setStorageValue(key, newValue || value, !!newValue));
+      }
     }
   }
   return Promise.all(func);
@@ -990,5 +992,6 @@ export const startup = async () => {
     setHost(),
     setOs()
   ]);
-  return getAllStorage().then(setVars).then(setDefaultIcon).then(toggleBadge);
+  return getAllStorage().then(handleStorage).then(setDefaultIcon)
+    .then(toggleBadge);
 };

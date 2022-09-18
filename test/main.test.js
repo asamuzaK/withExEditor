@@ -2594,8 +2594,8 @@ describe('main', () => {
     });
   });
 
-  describe('set variable', () => {
-    const func = mjs.setVar;
+  describe('set storage value', () => {
+    const func = mjs.setStorageValue;
     beforeEach(() => {
       const { vars, varsLocal } = mjs;
       vars[ONLY_EDITABLE] = false;
@@ -3032,8 +3032,8 @@ describe('main', () => {
     });
   });
 
-  describe('set variables', () => {
-    const func = mjs.setVars;
+  describe('handle storage', () => {
+    const func = mjs.handleStorage;
 
     it('should not set variables', async () => {
       const res = await func();
