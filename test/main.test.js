@@ -1359,6 +1359,19 @@ describe('main', () => {
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, {}, 'result');
     });
+
+    it('should call function', async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      browser.tabs.sendMessage.resolves({});
+      mjs.tabList.add(2);
+      const res = await func({
+        frameId: 0
+      }, {
+        id: 2
+      });
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
+      assert.deepEqual(res, {}, 'result');
+    });
   });
 
   describe('send tmp file data', () => {
@@ -1465,6 +1478,19 @@ describe('main', () => {
       const res = await func();
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, {}, 'result');
+    });
+  });
+
+  describe('open options page', () => {
+    const func = mjs.openOptionsPage;
+
+    it('should call function', async () => {
+      const i = browser.runtime.openOptionsPage.callCount;
+      browser.runtime.openOptionsPage.resolves(undefined);
+      const res = await func();
+      assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
+        'called');
+      assert.isUndefined(res, 'result');
     });
   });
 
@@ -3357,19 +3383,6 @@ describe('main', () => {
         'called');
       assert.isTrue(mjs.appHost.get('port').onMessage.addListener.called,
         'called');
-    });
-  });
-
-  describe('open options page', () => {
-    const func = mjs.openOptionsPage;
-
-    it('should call function', async () => {
-      const i = browser.runtime.openOptionsPage.callCount;
-      browser.runtime.openOptionsPage.resolves(undefined);
-      const res = await func();
-      assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
-        'called');
-      assert.isUndefined(res, 'result');
     });
   });
 

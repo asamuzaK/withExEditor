@@ -54,10 +54,7 @@ export const varsLocal = {
   [FILE_EXT_SELECT_MD]: false,
   [FILE_EXT_SELECT_TXT]: false,
   [IS_EXECUTABLE]: false,
-  [MENU_ENABLED]: false,
-  [MODE_MATHML]: '',
-  [MODE_SOURCE]: '',
-  [MODE_SVG]: ''
+  [MENU_ENABLED]: false
 };
 
 /* native application host */
@@ -387,9 +384,13 @@ export const sendContextMenuData = async (info, tab) => {
   if (info && tab) {
     const { id: tabId } = tab;
     if (tabList.has(tabId)) {
+      const { frameId } = info;
+      const opt = {
+        frameId
+      };
       func = sendMessage(tabId, {
         [CONTENT_GET]: { info, tab }
-      });
+      }, opt);
     }
   }
   return func || null;
