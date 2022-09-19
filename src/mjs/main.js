@@ -38,27 +38,73 @@ const menus = browser.menus ?? browser.contextMenus;
 const { TAB_ID_NONE } = tabs;
 const { WINDOW_ID_NONE } = windows;
 
-/* variables */
-export const vars = {
-  [IS_MAC]: false,
-  [ONLY_EDITABLE]: false,
-  [SYNC_AUTO]: false,
-  [SYNC_AUTO_URL]: null
-};
-
-/* local variables */
-export const varsLocal = {
-  [EDITOR_LABEL]: '',
-  [FILE_EXT_SELECT]: false,
-  [FILE_EXT_SELECT_HTML]: false,
-  [FILE_EXT_SELECT_MD]: false,
-  [FILE_EXT_SELECT_TXT]: false,
-  [IS_EXECUTABLE]: false,
-  [MENU_ENABLED]: false
-};
-
 /* native application host */
 export const appHost = new Map();
+
+/* global options */
+export const globalOpts = new Map();
+
+/* global options keys */
+export const globalOptsKeys = new Set([
+  ONLY_EDITABLE,
+  SYNC_AUTO,
+  SYNC_AUTO_URL
+]);
+
+/* local options */
+export const localOpts = new Map();
+
+/* local options keys */
+export const localOptsKeys = new Set([
+  EDITOR_FILE_NAME,
+  EDITOR_LABEL,
+  FILE_EXT_SELECT,
+  FILE_EXT_SELECT_HTML,
+  FILE_EXT_SELECT_MD,
+  FILE_EXT_SELECT_TXT
+]);
+
+/**
+ * set options
+ *
+ * @param {object} opt - user option
+ * @param {boolean} store - get storage
+ * @returns {void}
+ */
+export const setOpts = async (opt, store = false) => {
+  let opts;
+  if (isObjectNotEmpty(opt)) {
+    opts = opt;
+  } else {
+    const os = await getOs();
+    globalOpts.set(IS_MAC, os === 'mac');
+    localOpts.set(MENU_ENABLED, false);
+    if (store) {
+      opts = await getStorage([...globalOptsKeys, ...localOptsKeys]);
+    }
+  }
+  if (opts) {
+    const items = Object.entries(opts);
+    for (const [itemKey, itemValue] of items) {
+      const { app, checked, value } = itemValue;
+      if (globalOptsKeys.has(itemKey)) {
+        if (itemKey === SYNC_AUTO_URL) {
+          globalOpts.set(itemKey, value ?? null);
+        } else {
+          globalOpts.set(itemKey, !!checked);
+        }
+      } else if (localOptsKeys.has(itemKey)) {
+        if (itemKey === EDITOR_FILE_NAME) {
+          localOpts.set(IS_EXECUTABLE, !!app?.executable);
+        } else if (itemKey === EDITOR_LABEL) {
+          localOpts.set(itemKey, value ?? '');
+        } else {
+          localOpts.set(itemKey, !!checked);
+        }
+      }
+    }
+  }
+};
 
 /* UI */
 /**
@@ -70,7 +116,7 @@ export const toggleBadge = async () => {
   const hostStatus = appHost.get('status') ?? {};
   let color, text;
   if (hostStatus[HOST_CONNECTION] && hostStatus[HOST_COMPAT] &&
-      varsLocal[IS_EXECUTABLE]) {
+      localOpts.get(IS_EXECUTABLE)) {
     if (hostStatus[HOST_VERSION_LATEST]) {
       color = INFO_COLOR;
       text = INFO_TEXT;
@@ -143,21 +189,22 @@ export const createMenuItemData = key => {
   if (isString(key) && menuItems[key]) {
     const { contexts, placeholder, parentId } = menuItems[key];
     const hostStatus = appHost.get('status') ?? {};
-    const enabled = !!varsLocal[MENU_ENABLED] && !!varsLocal[IS_EXECUTABLE] &&
+    const enabled = !!localOpts.get(MENU_ENABLED) &&
+                    !!localOpts.get(IS_EXECUTABLE) &&
                     !!hostStatus[HOST_COMPAT];
     if (parentId) {
       const keys = [MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT];
-      if (keys.includes(key) && varsLocal[FILE_EXT_SELECT]) {
+      if (keys.includes(key) && localOpts.get(FILE_EXT_SELECT)) {
         let bool;
         switch (key) {
           case MODE_EDIT_HTML:
-            bool = !!varsLocal[FILE_EXT_SELECT_HTML];
+            bool = !!localOpts.get(FILE_EXT_SELECT_HTML);
             break;
           case MODE_EDIT_MD:
-            bool = !!varsLocal[FILE_EXT_SELECT_MD];
+            bool = !!localOpts.get(FILE_EXT_SELECT_MD);
             break;
           default:
-            bool = !!varsLocal[FILE_EXT_SELECT_TXT];
+            bool = !!localOpts.get(FILE_EXT_SELECT_TXT);
         }
         if (bool) {
           data.contexts = contexts;
@@ -168,7 +215,7 @@ export const createMenuItemData = key => {
         }
       }
     } else {
-      const label = varsLocal[EDITOR_LABEL] || i18n.getMessage(EXT_NAME);
+      const label = localOpts.get(EDITOR_LABEL) || i18n.getMessage(EXT_NAME);
       const accKey = (runtime.id === WEBEXT_ID && placeholder) ||
                      ` ${placeholder}`;
       data.contexts = contexts;
@@ -179,7 +226,7 @@ export const createMenuItemData = key => {
       } else if (key === MODE_MATHML || key === MODE_SVG) {
         data.visible = false;
       } else {
-        data.visible = !vars[ONLY_EDITABLE];
+        data.visible = !globalOpts.get(ONLY_EDITABLE);
       }
     }
   }
@@ -216,8 +263,9 @@ export const updateContextMenu = async (data, all = false) => {
   if (isObjectNotEmpty(data)) {
     const hostStatus = appHost.get('status') ?? {};
     const items = Object.entries(data);
-    const itemEnabled = !!varsLocal[MENU_ENABLED] &&
-                        !!varsLocal[IS_EXECUTABLE] && !!hostStatus[HOST_COMPAT];
+    const itemEnabled = !!localOpts.get(MENU_ENABLED) &&
+                        !!localOpts.get(IS_EXECUTABLE) &&
+                        !!hostStatus[HOST_COMPAT];
     for (const [key, value] of items) {
       const keys = [MODE_EDIT, MODE_SOURCE];
       if (keys.includes(key) && isObjectNotEmpty(value)) {
@@ -227,12 +275,13 @@ export const updateContextMenu = async (data, all = false) => {
             enabled: !!enabled && itemEnabled
           }));
         } else {
+          const onlyEditable = globalOpts.get(ONLY_EDITABLE);
           switch (mode) {
             case MODE_MATHML:
               func.push(
                 menus.update(mode, {
                   enabled: itemEnabled,
-                  visible: !vars[ONLY_EDITABLE]
+                  visible: !onlyEditable
                 }),
                 menus.update(MODE_SOURCE, {
                   visible: false
@@ -246,7 +295,7 @@ export const updateContextMenu = async (data, all = false) => {
               func.push(
                 menus.update(mode, {
                   enabled: itemEnabled,
-                  visible: !vars[ONLY_EDITABLE]
+                  visible: !onlyEditable
                 }),
                 menus.update(MODE_MATHML, {
                   visible: false
@@ -260,7 +309,7 @@ export const updateContextMenu = async (data, all = false) => {
               func.push(
                 menus.update(MODE_SOURCE, {
                   enabled: itemEnabled,
-                  visible: !vars[ONLY_EDITABLE]
+                  visible: !onlyEditable
                 }),
                 menus.update(MODE_MATHML, {
                   visible: false
@@ -354,18 +403,19 @@ export const handleConnectableTab = async (tab = {}) => {
     const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(tId, true);
     if (windowId && tabId) {
+      const obj = Object.fromEntries(globalOpts);
       func.push(
         addIdToTabList(tId),
         sendMessage(tId, {
           incognito,
           tabId,
           windowId,
-          [VARS_SET]: vars
+          [VARS_SET]: obj
         })
       );
     }
     if (active && status === 'complete') {
-      varsLocal[MENU_ENABLED] = true;
+      localOpts.set(MENU_ENABLED, true);
       func.push(updateContextMenu(null, true));
     }
   }
@@ -668,7 +718,7 @@ export const onTabActivated = async info => {
       [TMP_FILE_REQ]: isListed
     }));
   }
-  varsLocal[MENU_ENABLED] = isListed;
+  localOpts.set(MENU_ENABLED, isListed);
   func.push(updateContextMenu(null, true));
   return Promise.all(func);
 };
@@ -689,7 +739,7 @@ export const onTabUpdated = async (id, info, tab) => {
   const func = [];
   if (active) {
     const { status } = info;
-    varsLocal[MENU_ENABLED] = tabList.has(id);
+    localOpts.set(MENU_ENABLED, tabList.has(id));
     if (status === 'complete') {
       func.push(updateContextMenu(null, true));
     }
@@ -828,17 +878,21 @@ export const setStorageValue = async (item, obj, changed = false) => {
   }
   const func = [];
   if (isObjectNotEmpty(obj)) {
-    const { app, checked, value } = obj;
+    const { checked, value } = obj;
     const hasTabList = tabList.size > 0;
     switch (item) {
       case EDITOR_FILE_NAME:
-        varsLocal[IS_EXECUTABLE] = !!(app?.executable);
+        func.push(setOpts({
+          [item]: obj
+        }));
         if (changed) {
           func.push(toggleBadge());
         }
         break;
       case EDITOR_LABEL:
-        varsLocal[item] = value;
+        func.push(setOpts({
+          [item]: obj
+        }));
         if (changed) {
           func.push(updateContextMenu(null, true));
         }
@@ -847,7 +901,9 @@ export const setStorageValue = async (item, obj, changed = false) => {
       case FILE_EXT_SELECT_HTML:
       case FILE_EXT_SELECT_MD:
       case FILE_EXT_SELECT_TXT:
-        varsLocal[item] = !!checked;
+        func.push(setOpts({
+          [item]: obj
+        }));
         if (changed) {
           func.push(restoreContextMenu());
         }
@@ -868,7 +924,11 @@ export const setStorageValue = async (item, obj, changed = false) => {
         }
         break;
       case ONLY_EDITABLE:
-        vars[item] = !!checked;
+        func.push(setOpts({
+          [item]: {
+            checked
+          }
+        }));
         if (hasTabList) {
           func.push(sendVariables({ [item]: !!checked }));
         }
@@ -877,13 +937,21 @@ export const setStorageValue = async (item, obj, changed = false) => {
         }
         break;
       case SYNC_AUTO:
-        vars[item] = !!checked;
+        func.push(setOpts({
+          [item]: {
+            checked
+          }
+        }));
         if (hasTabList) {
           func.push(sendVariables({ [item]: !!checked }));
         }
         break;
       case SYNC_AUTO_URL:
-        vars[item] = value;
+        func.push(setOpts({
+          [item]: {
+            value
+          }
+        }));
         if (hasTabList) {
           func.push(sendVariables({ [item]: value }));
         }
@@ -913,16 +981,6 @@ export const handleStorage = async (data, area = 'local') => {
     }
   }
   return Promise.all(func);
-};
-
-/**
- * set OS
- *
- * @returns {void}
- */
-export const setOs = async () => {
-  const os = await getOs();
-  vars[IS_MAC] = os === 'mac';
 };
 
 /* extension */
@@ -990,7 +1048,7 @@ export const setHost = async () => {
 export const startup = async () => {
   await Promise.all([
     setHost(),
-    setOs()
+    setOpts()
   ]);
   return getAllStorage().then(handleStorage).then(setDefaultIcon)
     .then(toggleBadge);

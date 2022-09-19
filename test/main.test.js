@@ -45,17 +45,264 @@ describe('main', () => {
     assert.isObject(browser, 'browser');
   });
 
+  describe('set options', () => {
+    const func = mjs.setOpts;
+    beforeEach(() => {
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
+    });
+    afterEach(() => {
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
+    });
+
+    it('should not set option', async () => {
+      await func({
+        foo: {
+          checked: true
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 0, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [SYNC_AUTO_URL]: {}
+      });
+      assert.strictEqual(mjs.localOpts.size, 0, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 1, 'global');
+      assert.isTrue(mjs.globalOpts.has(SYNC_AUTO_URL), 'key');
+      assert.isNull(mjs.globalOpts.get(SYNC_AUTO_URL), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [SYNC_AUTO_URL]: {
+          value: ''
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 0, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 1, 'global');
+      assert.isTrue(mjs.globalOpts.has(SYNC_AUTO_URL), 'key');
+      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL), '', 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [SYNC_AUTO_URL]: {
+          value: 'https://example.com'
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 0, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 1, 'global');
+      assert.isTrue(mjs.globalOpts.has(SYNC_AUTO_URL), 'key');
+      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL),
+        'https://example.com', 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [ONLY_EDITABLE]: {
+          checked: true
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 0, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 1, 'global');
+      assert.isTrue(mjs.globalOpts.has(ONLY_EDITABLE), 'key');
+      assert.isTrue(mjs.globalOpts.get(ONLY_EDITABLE), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [SYNC_AUTO]: {
+          checked: true
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 0, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 1, 'global');
+      assert.isTrue(mjs.globalOpts.has(SYNC_AUTO), 'key');
+      assert.isTrue(mjs.globalOpts.get(SYNC_AUTO), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [EDITOR_FILE_NAME]: {
+          app: {}
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(IS_EXECUTABLE), 'key');
+      assert.isFalse(mjs.localOpts.get(IS_EXECUTABLE), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [EDITOR_FILE_NAME]: {
+          app: {
+            executable: false
+          }
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(IS_EXECUTABLE), 'key');
+      assert.isFalse(mjs.localOpts.get(IS_EXECUTABLE), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [EDITOR_FILE_NAME]: {
+          app: {
+            executable: true
+          }
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(IS_EXECUTABLE), 'key');
+      assert.isTrue(mjs.localOpts.get(IS_EXECUTABLE), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [EDITOR_LABEL]: {}
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(EDITOR_LABEL), 'key');
+      assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), '', 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [EDITOR_LABEL]: {
+          value: ''
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(EDITOR_LABEL), 'key');
+      assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), '', 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [EDITOR_LABEL]: {
+          value: 'foo'
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(EDITOR_LABEL), 'key');
+      assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), 'foo', 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [FILE_EXT_SELECT]: {
+          checked: true
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(FILE_EXT_SELECT), 'key');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [FILE_EXT_SELECT_HTML]: {
+          checked: true
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(FILE_EXT_SELECT_HTML), 'key');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_HTML), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [FILE_EXT_SELECT_MD]: {
+          checked: true
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(FILE_EXT_SELECT_MD), 'key');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_MD), 'value');
+    });
+
+    it('should set option', async () => {
+      await func({
+        [FILE_EXT_SELECT_TXT]: {
+          checked: true
+        }
+      });
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.strictEqual(mjs.globalOpts.size, 0, 'global');
+      assert.isTrue(mjs.localOpts.has(FILE_EXT_SELECT_TXT), 'key');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_TXT), 'value');
+    });
+
+    it('should set default options', async () => {
+      browser.runtime.getPlatformInfo.resolves({
+        os: 'win'
+      });
+      const i = browser.storage.local.get.callCount;
+      await func();
+      assert.strictEqual(browser.storage.local.get.callCount, i, 'not called');
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.isTrue(mjs.localOpts.has(MENU_ENABLED), 'key');
+      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.globalOpts.size, 1, 'global');
+      assert.isTrue(mjs.globalOpts.has(IS_MAC), 'key');
+      assert.isFalse(mjs.globalOpts.get(IS_MAC), 'value');
+    });
+
+    it('should set default options', async () => {
+      browser.runtime.getPlatformInfo.resolves({
+        os: 'mac'
+      });
+      const i = browser.storage.local.get.callCount;
+      await func();
+      assert.strictEqual(browser.storage.local.get.callCount, i, 'not called');
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.isTrue(mjs.localOpts.has(MENU_ENABLED), 'key');
+      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.globalOpts.size, 1, 'global');
+      assert.isTrue(mjs.globalOpts.has(IS_MAC), 'key');
+      assert.isTrue(mjs.globalOpts.get(IS_MAC), 'value');
+    });
+
+    it('should call function', async () => {
+      browser.runtime.getPlatformInfo.resolves({
+        os: 'win'
+      });
+      browser.storage.local.get.resolves({});
+      const i = browser.storage.local.get.callCount;
+      await func(null, true);
+      assert.strictEqual(browser.storage.local.get.callCount, i + 1, 'called');
+      assert.strictEqual(mjs.localOpts.size, 1, 'local');
+      assert.isTrue(mjs.localOpts.has(MENU_ENABLED), 'key');
+      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.globalOpts.size, 1, 'global');
+      assert.isTrue(mjs.globalOpts.has(IS_MAC), 'key');
+      assert.isFalse(mjs.globalOpts.get(IS_MAC), 'value');
+    });
+  });
+
   describe('toggle badge', () => {
     const func = mjs.toggleBadge;
     beforeEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[IS_EXECUTABLE] = false;
       mjs.appHost.clear();
+      mjs.localOpts.clear();
     });
     afterEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[IS_EXECUTABLE] = false;
       mjs.appHost.clear();
+      mjs.localOpts.clear();
     });
 
     it('should call function', async () => {
@@ -86,18 +333,17 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      varsLocal[IS_EXECUTABLE] = true;
       mjs.appHost.set('status', {
         [HOST_CONNECTION]: true,
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(IS_EXECUTABLE, true);
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -116,18 +362,17 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      varsLocal[IS_EXECUTABLE] = true;
       mjs.appHost.set('status', {
         [HOST_CONNECTION]: false,
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(IS_EXECUTABLE, true);
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -149,18 +394,17 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      varsLocal[IS_EXECUTABLE] = true;
       mjs.appHost.set('status', {
         [HOST_CONNECTION]: true,
         [HOST_COMPAT]: false
       });
+      mjs.localOpts.set(IS_EXECUTABLE, true);
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -182,18 +426,17 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      varsLocal[IS_EXECUTABLE] = false;
       mjs.appHost.set('status', {
         [HOST_CONNECTION]: true,
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(IS_EXECUTABLE, false);
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -215,19 +458,18 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.action.setBadgeBackgroundColor.callsFake(arg => arg);
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
-      varsLocal[IS_EXECUTABLE] = true;
       mjs.appHost.set('status', {
         [HOST_CONNECTION]: true,
         [HOST_COMPAT]: true,
         [HOST_VERSION_LATEST]: '1.2.3'
       });
+      mjs.localOpts.set(IS_EXECUTABLE, true);
       const res = await func();
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
@@ -276,31 +518,17 @@ describe('main', () => {
   describe('create menu item data', () => {
     const func = mjs.createMenuItemData;
     beforeEach(() => {
-      const { varsLocal, vars } = mjs;
-      vars[ONLY_EDITABLE] = false;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[FILE_EXT_SELECT] = false;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = false;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.runtime.id = null;
       mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
     afterEach(() => {
-      const { varsLocal, vars } = mjs;
-      vars[ONLY_EDITABLE] = false;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[FILE_EXT_SELECT] = false;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = false;
       browser.runtime.id = null;
       mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
 
     it('should get empty object', () => {
@@ -326,10 +554,9 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[MENU_ENABLED] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT);
       assert.deepEqual(res, {
         contexts: [
@@ -342,11 +569,10 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT);
       assert.deepEqual(res, {
         contexts: [
@@ -359,14 +585,13 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
       browser.runtime.id = WEBEXT_ID;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT);
       assert.deepEqual(res, {
         contexts: [
@@ -391,10 +616,9 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[MENU_ENABLED] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_SELECTION);
       assert.deepEqual(res, {
         contexts: [
@@ -407,12 +631,11 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { vars, varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
-      vars[ONLY_EDITABLE] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
+      mjs.globalOpts.set(ONLY_EDITABLE, true);
       const res = func(MODE_SELECTION);
       assert.deepEqual(res, {
         contexts: [
@@ -425,15 +648,14 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { vars, varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
-      vars[ONLY_EDITABLE] = true;
       browser.runtime.id = WEBEXT_ID;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
+      mjs.globalOpts.set(ONLY_EDITABLE, true);
       const res = func(MODE_SELECTION);
       assert.deepEqual(res, {
         contexts: [
@@ -485,10 +707,9 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[MENU_ENABLED] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_SOURCE);
       assert.deepEqual(res, {
         contexts: [
@@ -502,12 +723,11 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { vars, varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
-      vars[ONLY_EDITABLE] = true;
       browser.runtime.id = WEBEXT_ID;
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
+      mjs.globalOpts.set(ONLY_EDITABLE, true);
       const res = func(MODE_SOURCE);
       assert.deepEqual(res, {
         contexts: [
@@ -521,15 +741,14 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { vars, varsLocal } = mjs;
-      varsLocal[EDITOR_LABEL] = 'foo';
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
-      vars[ONLY_EDITABLE] = true;
       browser.runtime.id = WEBEXT_ID;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(EDITOR_LABEL, 'foo');
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
+      mjs.globalOpts.set(ONLY_EDITABLE, true);
       const res = func(MODE_SOURCE);
       assert.deepEqual(res, {
         contexts: [
@@ -548,16 +767,14 @@ describe('main', () => {
     });
 
     it('should get empty object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
       const res = func(MODE_EDIT_HTML);
       assert.deepEqual(res, {}, 'result');
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
       const res = func(MODE_EDIT_HTML);
       assert.deepEqual(res, {
         contexts: [
@@ -571,11 +788,10 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_HTML);
       assert.deepEqual(res, {
         contexts: [
@@ -589,14 +805,13 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_HTML);
       assert.deepEqual(res, {
         contexts: [
@@ -615,16 +830,14 @@ describe('main', () => {
     });
 
     it('should get empty object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
       const res = func(MODE_EDIT_MD);
       assert.deepEqual(res, {}, 'result');
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, true);
       const res = func(MODE_EDIT_MD);
       assert.deepEqual(res, {
         contexts: [
@@ -638,11 +851,10 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = true;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, true);
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_MD);
       assert.deepEqual(res, {
         contexts: [
@@ -656,14 +868,13 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = true;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, true);
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_MD);
       assert.deepEqual(res, {
         contexts: [
@@ -682,16 +893,14 @@ describe('main', () => {
     });
 
     it('should get empty object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
       const res = func(MODE_EDIT_TXT);
       assert.deepEqual(res, {}, 'result');
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_TXT] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, true);
       const res = func(MODE_EDIT_TXT);
       assert.deepEqual(res, {
         contexts: [
@@ -705,11 +914,10 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_TXT] = true;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, true);
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_TXT);
       assert.deepEqual(res, {
         contexts: [
@@ -723,14 +931,13 @@ describe('main', () => {
     });
 
     it('should get object', () => {
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_TXT] = true;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, true);
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_TXT);
       assert.deepEqual(res, {
         contexts: [
@@ -747,29 +954,15 @@ describe('main', () => {
   describe('create context menu', () => {
     const func = mjs.createContextMenu;
     beforeEach(() => {
-      const { varsLocal, vars } = mjs;
-      vars[ONLY_EDITABLE] = false;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[FILE_EXT_SELECT] = false;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = false;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       browser.runtime.id = null;
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
     afterEach(() => {
-      const { varsLocal, vars } = mjs;
-      vars[ONLY_EDITABLE] = false;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[FILE_EXT_SELECT] = false;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = false;
       browser.runtime.id = null;
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
 
     it('should call function', async () => {
@@ -787,11 +980,10 @@ describe('main', () => {
 
     it('should get result', async () => {
       const i = browser.menus.create.callCount;
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, false);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, false);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 5, 'called');
       assert.deepEqual(res, [
@@ -805,11 +997,10 @@ describe('main', () => {
 
     it('should get result', async () => {
       const i = browser.menus.create.callCount;
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, false);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 6, 'called');
       assert.deepEqual(res, [
@@ -824,11 +1015,10 @@ describe('main', () => {
 
     it('should get result', async () => {
       const i = browser.menus.create.callCount;
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = true;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 7, 'called');
       assert.deepEqual(res, [
@@ -844,11 +1034,10 @@ describe('main', () => {
 
     it('should get result', async () => {
       const i = browser.menus.create.callCount;
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = true;
-      varsLocal[FILE_EXT_SELECT_TXT] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, true);
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 8, 'called');
       assert.deepEqual(res, [
@@ -867,29 +1056,15 @@ describe('main', () => {
   describe('update context menu', () => {
     const func = mjs.updateContextMenu;
     beforeEach(() => {
-      const { varsLocal, vars } = mjs;
-      vars[ONLY_EDITABLE] = false;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[FILE_EXT_SELECT] = false;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = false;
       browser.i18n.getMessage.callsFake((...args) => args.toString());
       mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
     afterEach(() => {
-      const { varsLocal, vars } = mjs;
-      vars[ONLY_EDITABLE] = false;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[FILE_EXT_SELECT] = false;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = false;
       mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
 
     it('should not call function', async () => {
@@ -923,12 +1098,11 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: false
       }).callCount;
-      const { varsLocal } = mjs;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = false;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: false
       });
+      mjs.localOpts.set(IS_EXECUTABLE, false);
+      mjs.localOpts.set(MENU_ENABLED, false);
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
@@ -942,12 +1116,11 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: false
       }).callCount;
-      const { varsLocal } = mjs;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = true;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: false
       });
+      mjs.localOpts.set(IS_EXECUTABLE, false);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
@@ -961,12 +1134,11 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: false
       }).callCount;
-      const { varsLocal } = mjs;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: false
       });
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
@@ -980,12 +1152,11 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: true
       }).callCount;
-      const { varsLocal } = mjs;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = await func({
         [MODE_EDIT]: {
           enabled: true
@@ -999,12 +1170,11 @@ describe('main', () => {
       const i = browser.menus.update.withArgs(MODE_EDIT, {
         enabled: false
       }).callCount;
-      const { varsLocal } = mjs;
-      varsLocal[IS_EXECUTABLE] = true;
-      varsLocal[MENU_ENABLED] = true;
       mjs.appHost.set('status', {
         [HOST_COMPAT]: true
       });
+      mjs.localOpts.set(IS_EXECUTABLE, true);
+      mjs.localOpts.set(MENU_ENABLED, true);
       const res = await func({
         [MODE_EDIT]: {
           enabled: false
@@ -1074,11 +1244,10 @@ describe('main', () => {
 
     it('should call function', async () => {
       const i = browser.menus.update.callCount;
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, false);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, false);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
       assert.deepEqual(res, [
@@ -1092,11 +1261,10 @@ describe('main', () => {
 
     it('should call function', async () => {
       const i = browser.menus.update.callCount;
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, false);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
       assert.deepEqual(res, [
@@ -1111,11 +1279,10 @@ describe('main', () => {
 
     it('should call function', async () => {
       const i = browser.menus.update.callCount;
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = true;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 7, 'called');
       assert.deepEqual(res, [
@@ -1131,11 +1298,10 @@ describe('main', () => {
 
     it('should call function', async () => {
       const i = browser.menus.update.callCount;
-      const { varsLocal } = mjs;
-      varsLocal[FILE_EXT_SELECT] = true;
-      varsLocal[FILE_EXT_SELECT_HTML] = true;
-      varsLocal[FILE_EXT_SELECT_MD] = true;
-      varsLocal[FILE_EXT_SELECT_TXT] = true;
+      mjs.localOpts.set(FILE_EXT_SELECT, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_MD, true);
+      mjs.localOpts.set(FILE_EXT_SELECT_TXT, true);
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 8, 'called');
       assert.deepEqual(res, [
@@ -1249,14 +1415,14 @@ describe('main', () => {
   describe('handle connectable tab', () => {
     const func = mjs.handleConnectableTab;
     beforeEach(() => {
-      const { varsLocal } = mjs;
       mjs.tabList.clear();
-      varsLocal[MENU_ENABLED] = false;
+      mjs.localOpts.clear();
+      mjs.globalOpts.set(IS_MAC, false);
     });
     afterEach(() => {
-      const { varsLocal } = mjs;
       mjs.tabList.clear();
-      varsLocal[MENU_ENABLED] = false;
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
 
     it('should get empty array', async () => {
@@ -1276,9 +1442,9 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.menus.update.callCount;
+      mjs.localOpts.set(MENU_ENABLED, false);
       const res = await func({
         id: 2,
         windowId: 1
@@ -1287,16 +1453,16 @@ describe('main', () => {
       assert.isTrue(mjs.tabList.has(2), 'has');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.update.callCount, j, 'not called');
-      assert.isFalse(varsLocal[MENU_ENABLED], 'menu');
+      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'menu');
       assert.strictEqual(res.length, 2, 'length');
       assert.instanceOf(res[0], Set, 'result');
       assert.isNull(res[1], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.menus.update.callCount;
+      mjs.localOpts.set(MENU_ENABLED, false);
       const res = await func({
         active: true,
         id: 2,
@@ -1307,7 +1473,7 @@ describe('main', () => {
       assert.isTrue(mjs.tabList.has(2), 'has');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.update.callCount, j + 5, 'called');
-      assert.isTrue(varsLocal[MENU_ENABLED], 'menu');
+      assert.isTrue(mjs.localOpts.get(MENU_ENABLED), 'menu');
       assert.strictEqual(res.length, 3, 'length');
       assert.instanceOf(res[0], Set, 'result');
       assert.isNull(res[1], 'result');
@@ -1690,15 +1856,15 @@ describe('main', () => {
   describe('handle message', () => {
     const func = mjs.handleMsg;
     beforeEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[MENU_ENABLED] = false;
       mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.set(IS_MAC, false);
       mjs.tabList.clear();
     });
     afterEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[MENU_ENABLED] = false;
       mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
       mjs.tabList.clear();
     });
 
@@ -2081,15 +2247,11 @@ describe('main', () => {
   describe('handle activated tab', () => {
     const func = mjs.onTabActivated;
     beforeEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[MENU_ENABLED] = false;
-      varsLocal[IS_EXECUTABLE] = true;
+      mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.tabList.clear();
     });
     afterEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[MENU_ENABLED] = false;
-      varsLocal[IS_EXECUTABLE] = false;
+      mjs.localOpts.clear();
       mjs.tabList.clear();
     });
 
@@ -2100,15 +2262,15 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.update.callCount;
       const info = {
         tabId: -1,
         windowId: -1
       };
+      mjs.localOpts.set(MENU_ENABLED, false);
       const res = await func(info);
       assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
-      assert.isFalse(varsLocal[MENU_ENABLED], 'value');
+      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
       assert.deepEqual(res, [
         [
           undefined,
@@ -2121,18 +2283,18 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
-      mjs.tabList.add(2);
       const i = browser.menus.update.callCount;
       const j = browser.tabs.sendMessage.callCount;
       const info = {
         tabId: 2,
         windowId: 1
       };
+      mjs.localOpts.set(MENU_ENABLED, false);
+      mjs.tabList.add(2);
       const res = await func(info);
       assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
-      assert.isTrue(varsLocal[MENU_ENABLED], 'value');
+      assert.isTrue(mjs.localOpts.get(MENU_ENABLED), 'value');
       assert.deepEqual(res, [
         null,
         [
@@ -2146,18 +2308,18 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
-      mjs.tabList.add(2);
       const i = browser.menus.update.callCount;
       const j = browser.tabs.sendMessage.callCount;
       const info = {
         tabId: 3,
         windowId: 1
       };
+      mjs.localOpts.set(MENU_ENABLED, false);
+      mjs.tabList.add(2);
       const res = await func(info);
       assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j, 'not called');
-      assert.isFalse(varsLocal[MENU_ENABLED], 'value');
+      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
       assert.deepEqual(res, [
         [
           undefined,
@@ -2173,15 +2335,11 @@ describe('main', () => {
   describe('handle updated tab', () => {
     const func = mjs.onTabUpdated;
     beforeEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[MENU_ENABLED] = false;
-      varsLocal[IS_EXECUTABLE] = true;
+      mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.tabList.clear();
     });
     afterEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[MENU_ENABLED] = false;
-      varsLocal[IS_EXECUTABLE] = false;
+      mjs.localOpts.clear();
       mjs.tabList.clear();
     });
 
@@ -2231,9 +2389,9 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
-      mjs.tabList.add(2);
       const i = browser.menus.update.callCount;
+      mjs.localOpts.set(MENU_ENABLED, false);
+      mjs.tabList.add(2);
       const res = await func(2, {
         status: 'complete'
       }, {
@@ -2241,7 +2399,7 @@ describe('main', () => {
         url: 'https://example.com',
         windowId: 1
       });
-      assert.isTrue(varsLocal[MENU_ENABLED], 'value');
+      assert.isTrue(mjs.localOpts.get(MENU_ENABLED), 'value');
       assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
       assert.deepEqual(res, [
         [
@@ -2336,15 +2494,12 @@ describe('main', () => {
   describe('handle focused window', () => {
     const func = mjs.onWindowFocusChanged;
     beforeEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[MENU_ENABLED] = true;
-      varsLocal[IS_EXECUTABLE] = true;
+      mjs.localOpts.set(MENU_ENABLED, true);
+      mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.tabList.clear();
     });
     afterEach(() => {
-      const { varsLocal } = mjs;
-      varsLocal[MENU_ENABLED] = false;
-      varsLocal[IS_EXECUTABLE] = false;
+      mjs.localOpts.clear();
       mjs.tabList.clear();
     });
 
@@ -2597,37 +2752,19 @@ describe('main', () => {
   describe('set storage value', () => {
     const func = mjs.setStorageValue;
     beforeEach(() => {
-      const { vars, varsLocal } = mjs;
-      vars[ONLY_EDITABLE] = false;
-      vars[SYNC_AUTO] = false;
-      vars[SYNC_AUTO_URL] = null;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[FILE_EXT_SELECT] = false;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = true;
       mjs.appHost.set('status', {
         [HOST_CONNECTION]: false,
         [HOST_COMPAT]: false,
         [HOST_VERSION_LATEST]: null
       });
+      mjs.localOpts.set(MENU_ENABLED, true);
+      mjs.globalOpts.clear();
       mjs.tabList.clear();
     });
     afterEach(() => {
-      const { vars, varsLocal } = mjs;
-      vars[ONLY_EDITABLE] = false;
-      vars[SYNC_AUTO] = false;
-      vars[SYNC_AUTO_URL] = null;
-      varsLocal[EDITOR_LABEL] = '';
-      varsLocal[FILE_EXT_SELECT] = false;
-      varsLocal[FILE_EXT_SELECT_HTML] = false;
-      varsLocal[FILE_EXT_SELECT_MD] = false;
-      varsLocal[FILE_EXT_SELECT_TXT] = false;
-      varsLocal[IS_EXECUTABLE] = false;
-      varsLocal[MENU_ENABLED] = false;
       mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
       mjs.tabList.clear();
     });
 
@@ -2652,7 +2789,6 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
@@ -2661,18 +2797,17 @@ describe('main', () => {
           executable: true
         }
       });
-      assert.isTrue(varsLocal[IS_EXECUTABLE], 'value');
+      assert.isTrue(mjs.localOpts.get(IS_EXECUTABLE), 'value');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount, i,
         'not called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j,
         'not called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
         'not called');
-      assert.deepEqual(res, [], 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
@@ -2681,7 +2816,7 @@ describe('main', () => {
           executable: true
         }
       }, true);
-      assert.isTrue(varsLocal[IS_EXECUTABLE], 'value');
+      assert.isTrue(mjs.localOpts.get(IS_EXECUTABLE), 'value');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
@@ -2689,6 +2824,7 @@ describe('main', () => {
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
       assert.deepEqual(res, [
+        undefined,
         [
           undefined,
           undefined,
@@ -2698,25 +2834,24 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.update.callCount;
       const res = await func(EDITOR_LABEL, {
         value: 'foo'
       });
-      assert.strictEqual(varsLocal[EDITOR_LABEL], 'foo', 'value');
+      assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), 'foo', 'value');
       assert.strictEqual(browser.menus.update.callCount, i, 'not called');
-      assert.deepEqual(res, [], 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.update.callCount;
       const res = await func(EDITOR_LABEL, {
         value: 'foo'
       }, true);
-      assert.strictEqual(varsLocal[EDITOR_LABEL], 'foo', 'value');
+      assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), 'foo', 'value');
       assert.strictEqual(browser.menus.update.callCount, i + 5, 'called');
       assert.deepEqual(res, [
+        undefined,
         [
           undefined,
           undefined,
@@ -2728,25 +2863,24 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.removeAll.callCount;
       const res = await func(FILE_EXT_SELECT, {
         checked: true
       });
-      assert.isTrue(varsLocal[FILE_EXT_SELECT], 'value');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT), 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
-      assert.deepEqual(res, [], 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.removeAll.callCount;
       const res = await func(FILE_EXT_SELECT, {
         checked: true
       }, true);
-      assert.isTrue(varsLocal[FILE_EXT_SELECT], 'value');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT), 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
+        undefined,
         [
           undefined,
           undefined,
@@ -2758,25 +2892,24 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.removeAll.callCount;
       const res = await func(FILE_EXT_SELECT_HTML, {
         checked: true
       });
-      assert.isTrue(varsLocal[FILE_EXT_SELECT_HTML], 'value');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_HTML), 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
-      assert.deepEqual(res, [], 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.removeAll.callCount;
       const res = await func(FILE_EXT_SELECT_HTML, {
         checked: true
       }, true);
-      assert.isTrue(varsLocal[FILE_EXT_SELECT_HTML], 'value');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_HTML), 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
+        undefined,
         [
           undefined,
           undefined,
@@ -2788,25 +2921,24 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.removeAll.callCount;
       const res = await func(FILE_EXT_SELECT_MD, {
         checked: true
       });
-      assert.isTrue(varsLocal[FILE_EXT_SELECT_MD], 'value');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_MD), 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
-      assert.deepEqual(res, [], 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.removeAll.callCount;
       const res = await func(FILE_EXT_SELECT_MD, {
         checked: true
       }, true);
-      assert.isTrue(varsLocal[FILE_EXT_SELECT_MD], 'value');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_MD), 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
+        undefined,
         [
           undefined,
           undefined,
@@ -2818,25 +2950,24 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.removeAll.callCount;
       const res = await func(FILE_EXT_SELECT_TXT, {
         checked: true
       });
-      assert.isTrue(varsLocal[FILE_EXT_SELECT_TXT], 'value');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_TXT), 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
-      assert.deepEqual(res, [], 'result');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { varsLocal } = mjs;
       const i = browser.menus.removeAll.callCount;
       const res = await func(FILE_EXT_SELECT_TXT, {
         checked: true
       }, true);
-      assert.isTrue(varsLocal[FILE_EXT_SELECT_TXT], 'value');
+      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_TXT), 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
+        undefined,
         [
           undefined,
           undefined,
@@ -2945,38 +3076,36 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { vars } = mjs;
       const res = await func(ONLY_EDITABLE, {
         checked: true
       });
-      assert.isTrue(vars[ONLY_EDITABLE], 'value');
-      assert.deepEqual(res, [], 'result');
+      assert.isTrue(mjs.globalOpts.get(ONLY_EDITABLE), 'value');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
-      const { vars } = mjs;
       mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const res = await func(ONLY_EDITABLE, {
         checked: true
       });
-      assert.isTrue(vars[ONLY_EDITABLE], 'value');
+      assert.isTrue(mjs.globalOpts.get(ONLY_EDITABLE), 'value');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [[null]], 'result');
+      assert.deepEqual(res, [undefined, [null]], 'result');
     });
 
     it('should call function', async () => {
-      const { vars } = mjs;
       mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.menus.removeAll.callCount;
       const res = await func(ONLY_EDITABLE, {
         checked: true
       }, true);
-      assert.isTrue(vars[ONLY_EDITABLE], 'value');
+      assert.isTrue(mjs.globalOpts.get(ONLY_EDITABLE), 'value');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.removeAll.callCount, j + 1, 'called');
       assert.deepEqual(res, [
+        undefined,
         [null],
         [
           undefined,
@@ -2989,46 +3118,44 @@ describe('main', () => {
     });
 
     it('should set value', async () => {
-      const { vars } = mjs;
       const res = await func(SYNC_AUTO, {
         checked: true
       });
-      assert.isTrue(vars[SYNC_AUTO], 'value');
-      assert.deepEqual(res, [], 'result');
+      assert.isTrue(mjs.globalOpts.get(SYNC_AUTO), 'value');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should set value', async () => {
-      const { vars } = mjs;
       mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const res = await func(SYNC_AUTO, {
         checked: true
       });
-      assert.isTrue(vars[SYNC_AUTO], 'value');
+      assert.isTrue(mjs.globalOpts.get(SYNC_AUTO), 'value');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [[null]], 'result');
+      assert.deepEqual(res, [undefined, [null]], 'result');
     });
 
     it('should set value', async () => {
-      const { vars } = mjs;
       const res = await func(SYNC_AUTO_URL, {
         value: 'https://example.com'
       });
-      assert.strictEqual(vars[SYNC_AUTO_URL], 'https://example.com', 'value');
-      assert.deepEqual(res, [], 'result');
+      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL),
+        'https://example.com', 'value');
+      assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should set value', async () => {
-      const { vars } = mjs;
       mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const res = await func(SYNC_AUTO_URL, {
         value: 'https://example.com'
       });
-      assert.strictEqual(vars[SYNC_AUTO_URL], 'https://example.com', 'value');
+      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL),
+        'https://example.com', 'value');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1,
         'called');
-      assert.deepEqual(res, [[null]], 'result');
+      assert.deepEqual(res, [undefined, [null]], 'result');
     });
   });
 
@@ -3076,32 +3203,6 @@ describe('main', () => {
         }
       });
       assert.deepEqual(res, [[]], 'result');
-    });
-  });
-
-  describe('set OS', () => {
-    const func = mjs.setOs;
-    beforeEach(() => {
-      mjs.vars[IS_MAC] = false;
-    });
-    afterEach(() => {
-      mjs.vars[IS_MAC] = false;
-    });
-
-    it('should set variables', async () => {
-      browser.runtime.getPlatformInfo.resolves({
-        os: 'mac'
-      });
-      await func();
-      assert.isTrue(mjs.vars[IS_MAC], 'result');
-    });
-
-    it('should set variables', async () => {
-      browser.runtime.getPlatformInfo.resolves({
-        os: 'foo'
-      });
-      await func();
-      assert.isFalse(mjs.vars[IS_MAC], 'result');
     });
   });
 
@@ -3389,10 +3490,12 @@ describe('main', () => {
   describe('startup', () => {
     const func = mjs.startup;
     beforeEach(() => {
-      mjs.vars[IS_MAC] = false;
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
     afterEach(() => {
-      mjs.vars[IS_MAC] = false;
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
     });
 
     it('should get array', async () => {
