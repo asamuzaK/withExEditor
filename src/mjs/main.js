@@ -41,10 +41,10 @@ const { WINDOW_ID_NONE } = windows;
 /* native application host */
 export const appHost = new Map();
 
-/* global options */
+/* shared options */
 export const globalOpts = new Map();
 
-/* global options keys */
+/* shared options keys */
 export const globalOptsKeys = new Set([
   ONLY_EDITABLE,
   SYNC_AUTO,
