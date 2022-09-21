@@ -106,7 +106,6 @@ export const setOpts = async (opt, store = false) => {
   }
 };
 
-/* UI */
 /**
  * toggle badge
  *
