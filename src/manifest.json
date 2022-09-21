@@ -1,7 +1,6 @@
 {
   "background": {
-    "page": "html/background.html",
-    "persistent": false
+    "page": "html/background.html"
   },
   "browser_action": {
     "browser_style": false,
@@ -77,5 +76,5 @@
     "tabs"
   ],
   "short_name": "__MSG_extensionName__",
-  "version": "10.2.0"
+  "version": "10.2.1"
 }
