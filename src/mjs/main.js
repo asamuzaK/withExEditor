@@ -992,13 +992,11 @@ export const handleStorage = async (data, area = 'local') => {
 export const handleDisconnectedHost = async (port = {}) => {
   const { error } = port;
   const e = error || (runtime.lastError?.message && runtime.lastError);
-  const hostStatus = appHost.get('status') ?? {};
   const func = [];
   if (e) {
     func.push(logErr(e));
   }
-  hostStatus[HOST_CONNECTION] = false;
-  appHost.set('status', hostStatus);
+  appHost.clear();
   func.push(toggleBadge());
   return Promise.all(func);
 };

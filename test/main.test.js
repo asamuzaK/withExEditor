@@ -3284,7 +3284,9 @@ describe('main', () => {
     const func = mjs.handleDisconnectedHost;
     const lastErrorDefaultValue = browser.runtime.lastError;
     beforeEach(() => {
-      mjs.appHost.clear();
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true
+      });
     });
     afterEach(() => {
       mjs.appHost.clear();
@@ -3296,15 +3298,11 @@ describe('main', () => {
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = null;
-      mjs.appHost.set('status', {
-        [HOST_CONNECTION]: true
-      });
       const res = await func();
-      const status = mjs.appHost.get('status');
       const { called: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isFalse(status[HOST_CONNECTION], 'value');
+      assert.strictEqual(mjs.appHost.size, 0, 'size');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
@@ -3324,16 +3322,12 @@ describe('main', () => {
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
-      mjs.appHost.set('status', {
-        [HOST_CONNECTION]: true
-      });
       const res = await func({
         error: new Error('error')
       });
-      const status = mjs.appHost.get('status');
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
-      assert.isFalse(status[HOST_CONNECTION], 'value');
+      assert.strictEqual(mjs.appHost.size, 0, 'size');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
@@ -3357,15 +3351,11 @@ describe('main', () => {
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = new Error('error');
-      mjs.appHost.set('status', {
-        [HOST_CONNECTION]: true
-      });
       const res = await func();
-      const status = mjs.appHost.get('status');
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isFalse(status[HOST_CONNECTION], 'value');
+      assert.strictEqual(mjs.appHost.size, 0, 'size');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called'
       );
@@ -3389,7 +3379,9 @@ describe('main', () => {
     const func = mjs.handleHostOnDisconnect;
     const lastErrorDefaultValue = browser.runtime.lastError;
     beforeEach(() => {
-      mjs.appHost.clear();
+      mjs.appHost.set('status', {
+        [HOST_CONNECTION]: true
+      });
     });
     afterEach(() => {
       mjs.appHost.clear();
@@ -3414,15 +3406,11 @@ describe('main', () => {
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
       browser.runtime.lastError = null;
-      mjs.appHost.set('status', {
-        [HOST_CONNECTION]: true
-      });
       const res = await func();
-      const status = mjs.appHost.get('status');
       const { called: errCalled } = stubErr;
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
-      assert.isFalse(status[HOST_CONNECTION], 'value');
+      assert.strictEqual(mjs.appHost.size, 0, 'size');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
