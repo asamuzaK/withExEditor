@@ -993,10 +993,10 @@ export const handleDisconnectedHost = async (port = {}) => {
   const { error } = port;
   const e = error || (runtime.lastError?.message && runtime.lastError);
   const func = [];
+  appHost.clear();
   if (e) {
     func.push(logErr(e));
   }
-  appHost.clear();
   func.push(toggleBadge());
   return Promise.all(func);
 };
