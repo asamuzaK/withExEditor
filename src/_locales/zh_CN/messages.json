@@ -178,6 +178,15 @@
       }
     }
   },
+  "openOptions_key": {
+    "message": "选项 $KEY$",
+    "placeholders": {
+      "key": {
+        "content": "$1",
+        "example": "(&T)"
+      }
+    }
+  },
   "optionsEditTextSettings": {
     "message": "编辑文本"
   },

@@ -132,6 +132,11 @@ export const toggleBadge = async () => {
 
 /* context menu items */
 export const menuItems = {
+  [OPTIONS_OPEN]: {
+    id: OPTIONS_OPEN,
+    contexts: ['browser_action'],
+    placeholder: '(&T)'
+  },
   [MODE_EDIT]: {
     id: MODE_EDIT,
     contexts: ['editable'],
@@ -184,52 +189,63 @@ export const menuItems = {
  * @returns {object} - item data
  */
 export const createMenuItemData = key => {
-  const data = {};
+  const data = new Map();
   if (isString(key) && menuItems[key]) {
     const { contexts, placeholder, parentId } = menuItems[key];
-    const hostStatus = appHost.get('status') ?? {};
-    const enabled = !!localOpts.get(MENU_ENABLED) &&
-                    !!localOpts.get(IS_EXECUTABLE) &&
-                    !!hostStatus[HOST_COMPAT];
-    if (parentId) {
-      const keys = [MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT];
-      if (keys.includes(key) && localOpts.get(FILE_EXT_SELECT)) {
-        let bool;
-        switch (key) {
-          case MODE_EDIT_HTML:
-            bool = !!localOpts.get(FILE_EXT_SELECT_HTML);
-            break;
-          case MODE_EDIT_MD:
-            bool = !!localOpts.get(FILE_EXT_SELECT_MD);
-            break;
-          default:
-            bool = !!localOpts.get(FILE_EXT_SELECT_TXT);
-        }
-        if (bool) {
-          data.contexts = contexts;
-          data.enabled = enabled;
-          data.parentId = parentId;
-          data.title = i18n.getMessage(`${MODE_EDIT_EXT}_key`, [placeholder]);
-          data.visible = true;
-        }
+    if (key === OPTIONS_OPEN) {
+      if (runtime.id === WEBEXT_ID) {
+        data.set('contexts', contexts);
+        data.set('enabled', true);
+        data.set('title',
+          i18n.getMessage(`${OPTIONS_OPEN}_key`, [placeholder]));
+        data.set('visible', true);
       }
     } else {
-      const label = localOpts.get(EDITOR_LABEL) || i18n.getMessage(EXT_NAME);
-      const accKey = (runtime.id === WEBEXT_ID && placeholder) ||
-                     ` ${placeholder}`;
-      data.contexts = contexts;
-      data.enabled = enabled;
-      data.title = i18n.getMessage(`${key}_key`, [label, accKey]);
-      if (key === MODE_EDIT) {
-        data.visible = true;
-      } else if (key === MODE_MATHML || key === MODE_SVG) {
-        data.visible = false;
+      const hostStatus = appHost.get('status') ?? {};
+      const enabled = !!localOpts.get(MENU_ENABLED) &&
+                      !!localOpts.get(IS_EXECUTABLE) &&
+                      !!hostStatus[HOST_COMPAT];
+      if (parentId) {
+        const keys = [MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT];
+        if (keys.includes(key) && localOpts.get(FILE_EXT_SELECT)) {
+          let bool;
+          switch (key) {
+            case MODE_EDIT_HTML:
+              bool = !!localOpts.get(FILE_EXT_SELECT_HTML);
+              break;
+            case MODE_EDIT_MD:
+              bool = !!localOpts.get(FILE_EXT_SELECT_MD);
+              break;
+            default:
+              bool = !!localOpts.get(FILE_EXT_SELECT_TXT);
+          }
+          if (bool) {
+            data.set('contexts', contexts);
+            data.set('enabled', enabled);
+            data.set('parentId', parentId);
+            data.set('title',
+              i18n.getMessage(`${MODE_EDIT_EXT}_key`, [placeholder]));
+            data.set('visible', true);
+          }
+        }
       } else {
-        data.visible = !globalOpts.get(ONLY_EDITABLE);
+        const label = localOpts.get(EDITOR_LABEL) || i18n.getMessage(EXT_NAME);
+        const accKey = (runtime.id === WEBEXT_ID && placeholder) ||
+                       ` ${placeholder}`;
+        data.set('contexts', contexts);
+        data.set('enabled', enabled);
+        data.set('title', i18n.getMessage(`${key}_key`, [label, accKey]));
+        if (key === MODE_EDIT) {
+          data.set('visible', true);
+        } else if (key === MODE_MATHML || key === MODE_SVG) {
+          data.set('visible', false);
+        } else {
+          data.set('visible', !globalOpts.get(ONLY_EDITABLE));
+        }
       }
     }
   }
-  return data;
+  return Object.fromEntries(data);
 };
 
 /**
@@ -341,6 +357,14 @@ export const updateContextMenu = async (data, all = false) => {
 export const restoreContextMenu = async () =>
   menus.removeAll().then(createContextMenu);
 
+/* extension */
+/**
+ * open options page
+ *
+ * @returns {?Function} - runtime.openOptionsPage()
+ */
+export const openOptionsPage = async () => runtime.openOptionsPage();
+
 /* tab list */
 // TODO: save tab list in storage.session
 export const tabList = new Set();
@@ -422,24 +446,29 @@ export const handleConnectableTab = async (tab = {}) => {
 };
 
 /**
- * send context menu data
+ * handle clicked context menu
  *
  * @param {object} info - menus.OnClickData
  * @param {object} tab - tabs.Tab
  * @returns {?Function} - sendMessage()
  */
-export const sendContextMenuData = async (info, tab) => {
+export const handleClickedMenu = async (info, tab) => {
   let func;
-  if (info && tab) {
-    const { id: tabId } = tab;
-    if (tabList.has(tabId)) {
-      const { frameId } = info;
-      const opt = {
-        frameId
-      };
-      func = sendMessage(tabId, {
-        [CONTENT_GET]: { info, tab }
-      }, opt);
+  if (isObjectNotEmpty(info) && isObjectNotEmpty(tab)) {
+    const { menuItemId } = info;
+    if (menuItemId === OPTIONS_OPEN) {
+      func = openOptionsPage();
+    } else {
+      const { id: tabId } = tab;
+      if (tabList.has(tabId)) {
+        const { frameId } = info;
+        const opt = {
+          frameId
+        };
+        func = sendMessage(tabId, {
+          [CONTENT_GET]: { info, tab }
+        }, opt);
+      }
     }
   }
   return func || null;
@@ -547,14 +576,6 @@ export const extractEditorConfig = async (data = {}) => {
   ];
   return Promise.all(func);
 };
-
-/* extension */
-/**
- * open options page
- *
- * @returns {?Function} - runtime.openOptionsPage()
- */
-export const openOptionsPage = async () => runtime.openOptionsPage();
 
 /* message handlers */
 /**

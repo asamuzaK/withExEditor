@@ -178,6 +178,15 @@
       }
     }
   },
+  "openOptions_key": {
+    "message": "Op&tions",
+    "placeholders": {
+      "key": {
+        "content": "$1",
+        "example": "(&T)"
+      }
+    }
+  },
   "optionsEditTextSettings": {
     "message": "Éditer Text"
   },

@@ -501,7 +501,8 @@ describe('main', () => {
         MODE_MATHML,
         MODE_SELECTION,
         MODE_SOURCE,
-        MODE_SVG
+        MODE_SVG,
+        OPTIONS_OPEN
       ];
       const { menuItems } = mjs;
       const items = Object.entries(menuItems);
@@ -539,6 +540,24 @@ describe('main', () => {
     it('should get empty object', () => {
       const res = func('foo');
       assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should get empty object', () => {
+      const res = func(OPTIONS_OPEN);
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should get object', () => {
+      browser.runtime.id = WEBEXT_ID;
+      const res = func(OPTIONS_OPEN);
+      assert.deepEqual(res, {
+        contexts: [
+          'browser_action'
+        ],
+        enabled: true,
+        title: 'openOptionsPage_key,(&T)',
+        visible: true
+      }, 'result');
     });
 
     it('should get object', () => {
@@ -970,6 +989,21 @@ describe('main', () => {
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 5, 'called');
       assert.deepEqual(res, [
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        undefined
+      ], 'result');
+    });
+
+    it('should call function', async () => {
+      browser.runtime.id = WEBEXT_ID;
+      const i = browser.menus.create.callCount;
+      const res = await func();
+      assert.strictEqual(browser.menus.create.callCount, i + 6, 'called');
+      assert.deepEqual(res, [
+        undefined,
         undefined,
         undefined,
         undefined,
@@ -1487,8 +1521,8 @@ describe('main', () => {
     });
   });
 
-  describe('send context menu data', () => {
-    const func = mjs.sendContextMenuData;
+  describe('handle clicked context menu', () => {
+    const func = mjs.handleClickedMenu;
     beforeEach(() => {
       mjs.tabList.clear();
     });
@@ -1506,9 +1540,24 @@ describe('main', () => {
       assert.isNull(res, 'result');
     });
 
+    it('should call function', async () => {
+      const i = browser.runtime.openOptionsPage.callCount;
+      browser.runtime.openOptionsPage.resolves({});
+      const res = await func({
+        menuItemId: OPTIONS_OPEN
+      }, {
+        id: 1
+      });
+      assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, {}, 'result');
+    });
+
     it('should not call function', async () => {
       const i = browser.tabs.sendMessage.callCount;
-      const res = await func({}, {
+      const res = await func({
+        menuItemId: 'foo'
+      }, {
         id: 2
       });
       assert.strictEqual(browser.tabs.sendMessage.callCount, i, 'not called');
@@ -1519,7 +1568,9 @@ describe('main', () => {
       const i = browser.tabs.sendMessage.callCount;
       browser.tabs.sendMessage.resolves({});
       mjs.tabList.add(2);
-      const res = await func({}, {
+      const res = await func({
+        menuItemId: 'foo'
+      }, {
         id: 2
       });
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
