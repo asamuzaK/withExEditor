@@ -31,7 +31,7 @@ import {
 } from './constant.js';
 
 /* api */
-const { i18n, notifications, runtime, tabs, windows } = browser;
+const { i18n, notifications, runtime, windows } = browser;
 const menus = browser.menus ?? browser.contextMenus;
 
 /* constants */
