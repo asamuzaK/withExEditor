@@ -66,6 +66,7 @@ export const ONLY_EDITABLE = 'enableOnlyEditable';
 export const OPTIONS_OPEN = 'openOptionsPage';
 export const PATH_BROWSER_POLYFILL = '/lib/mozilla/browser-polyfill.min.js';
 export const PATH_CONTENT_SCRIPT = '/js/content.js';
+export const PATH_OPTIONS_PAGE = '/html/options.html';
 export const PORT_CONNECT = 'connectPort';
 export const PORT_CONTENT = 'portContent';
 export const PROCESS_CHILD = 'childProcess';
