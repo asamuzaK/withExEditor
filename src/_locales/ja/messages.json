@@ -178,7 +178,7 @@
       }
     }
   },
-  "openOptions_key": {
+  "openOptionsPage_key": {
     "message": "設定 $KEY$",
     "placeholders": {
       "key": {

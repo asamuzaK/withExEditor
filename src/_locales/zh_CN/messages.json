@@ -178,7 +178,7 @@
       }
     }
   },
-  "openOptions_key": {
+  "openOptionsPage_key": {
     "message": "选项 $KEY$",
     "placeholders": {
       "key": {
