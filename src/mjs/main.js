@@ -35,7 +35,6 @@ const { i18n, notifications, runtime, tabs, windows } = browser;
 const menus = browser.menus ?? browser.contextMenus;
 
 /* constants */
-const { TAB_ID_NONE } = tabs;
 const { WINDOW_ID_NONE } = windows;
 
 /* native application host */
