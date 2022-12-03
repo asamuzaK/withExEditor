@@ -24,8 +24,8 @@ import {
   IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_EDIT_EXT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
   MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG, ONLY_EDITABLE,
-  OPTIONS_OPEN, PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL, TMP_FILES_PB,
-  TMP_FILES_PB_REMOVE, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
+  OPTIONS_OPEN, PATH_OPTIONS_PAGE, PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL,
+  TMP_FILES_PB, TMP_FILES_PB_REMOVE, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
   TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET,
   WARN_COLOR, WARN_TEXT, WEBEXT_ID
 } from './constant.js';
@@ -564,16 +564,21 @@ export const extractEditorConfig = async (data = {}) => {
         value: editorNewLabel
       }
     }),
-    sendMessage(null, {
+    restoreContextMenu()
+  ];
+  const tab = await getActiveTab();
+  const { url: tabUrl } = tab;
+  const optionsUrl = runtime.getURL(PATH_OPTIONS_PAGE);
+  if (tabUrl === optionsUrl) {
+    func.push(sendMessage(null, {
       [EDITOR_CONFIG_RES]: {
         editorConfigTimestamp,
         editorName,
         executable,
         editorLabel: editorNewLabel
       }
-    }),
-    restoreContextMenu()
-  ];
+    }));
+  }
   return Promise.all(func);
 };
 
@@ -812,7 +817,7 @@ export const onWindowFocusChanged = async () => {
   const func = [];
   if (focused && id !== WINDOW_ID_NONE && type === 'normal') {
     const tabId = await getActiveTabId(id);
-    if (Number.isInteger(tabId) && tabId !== TAB_ID_NONE) {
+    if (tabList.has(tabId)) {
       func.push(
         sendMessage(tabId, {
           [TMP_FILE_REQ]: true

@@ -2210,6 +2210,10 @@ describe('main', () => {
       const msg = {
         [EDITOR_CONFIG_RES]: {}
       };
+      browser.runtime.getURL.returns('moz-extension://foo/bar.html');
+      browser.tabs.query.resolves([{
+        url: 'moz-extension://foo/bar.html'
+      }]);
       browser.storage.local.get.resolves({});
       const res = await func(msg);
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
@@ -2219,14 +2223,14 @@ describe('main', () => {
       assert.deepEqual(res, [
         [
           undefined,
-          null,
           [
             undefined,
             undefined,
             undefined,
             undefined,
             undefined
-          ]
+          ],
+          null
         ]
       ], 'result');
     });
@@ -3260,11 +3264,18 @@ describe('main', () => {
   describe('extract editor config data', () => {
     const func = mjs.extractEditorConfig;
 
-    it('should call function', async () => {
+    it('should not send message', async () => {
+      const i = browser.runtime.sendMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      browser.runtime.getURL.returns('moz-extension://foo/bar.html');
+      browser.tabs.query.resolves([{
+        url: 'https://example.com'
+      }]);
       const res = await func();
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.deepEqual(res, [
         undefined,
-        null,
         [
           undefined,
           undefined,
@@ -3275,12 +3286,41 @@ describe('main', () => {
       ], 'result');
     });
 
-    it('should call function', async () => {
+    it('should send message', async () => {
+      const i = browser.runtime.sendMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      browser.runtime.getURL.returns('moz-extension://foo/bar.html');
+      browser.tabs.query.resolves([{
+        url: 'moz-extension://foo/bar.html'
+      }]);
+      const res = await func();
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.deepEqual(res, [
+        undefined,
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ],
+        {}
+      ], 'result');
+    });
+
+    it('should not send message', async () => {
       const data = {
         editorConfigTimestamp: 1,
         editorName: 'foo',
         executable: true
       };
+      const i = browser.runtime.sendMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      browser.runtime.getURL.returns('moz-extension://foo/bar.html');
+      browser.tabs.query.resolves([{
+        url: 'https://example.com'
+      }]);
       browser.storage.local.get.withArgs([
         EDITOR_FILE_NAME,
         EDITOR_LABEL
@@ -3293,9 +3333,10 @@ describe('main', () => {
         }
       });
       const res = await func(data);
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
+        'not called');
       assert.deepEqual(res, [
         undefined,
-        null,
         [
           undefined,
           undefined,
@@ -3306,27 +3347,35 @@ describe('main', () => {
       ], 'result');
     });
 
-    it('should call function', async () => {
+    it('should send message', async () => {
       const data = {
         editorConfigTimestamp: 1,
         editorName: 'foo',
         executable: true
       };
+      const i = browser.runtime.sendMessage.callCount;
+      browser.runtime.sendMessage.resolves({});
+      browser.runtime.getURL.returns('moz-extension://foo/bar.html');
+      browser.tabs.query.resolves([{
+        url: 'moz-extension://foo/bar.html'
+      }]);
       browser.storage.local.get.withArgs([
         EDITOR_FILE_NAME,
         EDITOR_LABEL
       ]).resolves({});
       const res = await func(data);
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
       assert.deepEqual(res, [
         undefined,
-        null,
         [
           undefined,
           undefined,
           undefined,
           undefined,
           undefined
-        ]
+        ],
+        {}
       ], 'result');
     });
   });
