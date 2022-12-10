@@ -1,6 +1,7 @@
 {
   "background": {
-    "page": "html/background.html"
+    "page": "html/background.html",
+    "persistent": false
   },
   "browser_action": {
     "browser_style": false,
