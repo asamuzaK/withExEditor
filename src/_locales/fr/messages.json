@@ -14,9 +14,6 @@
   "commandOpenOptions": {
     "message": "Ouvrir la page des options"
   },
-  "compatNoteIconAuto": {
-    "message": "NOTE: \"Auto\" applique uniquement aux navigateurs Gecko, et vous devez définir \"svg.context-properties.content.enabled\" à \"true\" depuis \"about:config\"."
-  },
   "hostConnection_false": {
     "message": "Déconnecté"
   },
@@ -240,18 +237,6 @@
   },
   "optionsHostVersionCompatLabel": {
     "message": "Compatibilité hôte"
-  },
-  "optionsIconAuto": {
-    "message": "Auto"
-  },
-  "optionsIconAuto_alt": {
-    "message": ""
-  },
-  "optionsIconAutoLabel": {
-    "message": "Auto"
-  },
-  "optionsIconAutoLabel_ariaLabel": {
-    "message": "Auto"
   },
   "optionsIconBlack": {
     "message": ""

@@ -10,9 +10,10 @@ import {
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   getActiveTab, getActiveTabId, getAllStorage, getCurrentWindow, getOs,
-  getStorage, getWindow, isTab, makeConnection, sendMessage, setStorage
+  getStorage, getWindow, isTab, makeConnection, removeStorage, sendMessage,
+  setStorage
 } from './browser.js';
-import { setDefaultIcon, setIcon, setIconBadge } from './icon.js';
+import { setIcon, setIconBadge } from './icon.js';
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES,
   EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME,
@@ -943,7 +944,9 @@ export const setStorageValue = async (item, obj, changed = false) => {
       case ICON_DARK:
       case ICON_LIGHT:
       case ICON_WHITE:
-        if (checked) {
+        if (runtime.id === WEBEXT_ID) {
+          func.push(removeStorage(item));
+        } else if (checked) {
           func.push(setIcon(value));
         }
         break;
@@ -1072,6 +1075,5 @@ export const startup = async () => {
     setHost(),
     setOpts()
   ]);
-  return getAllStorage().then(handleStorage).then(setDefaultIcon)
-    .then(toggleBadge);
+  return getAllStorage().then(handleStorage).then(toggleBadge);
 };

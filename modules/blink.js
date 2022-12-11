@@ -28,6 +28,14 @@ export const createManifest = async info => {
   });
   const manifest = JSON.parse(srcContent);
   const replaceItems = {
+    browser_action: {
+      browser_style: false,
+      default_icon: {
+        16: 'img/icon-outline-16.png',
+        32: 'img/icon-outline-32.png'
+      },
+      default_title: '__MSG_extensionName__'
+    },
     content_scripts: [
       {
         all_frames: true,
