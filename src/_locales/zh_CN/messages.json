@@ -14,9 +14,6 @@
   "commandOpenOptions": {
     "message": "打开选项页面"
   },
-  "compatNoteIconAuto": {
-    "message": "注意：“自动”仅适用于 Gecko 内核的浏览器，并且你需要在 \"about:config\" 中将 \"svg.context-properties.content.enabled\" 设定为 \"true\" 。"
-  },
   "hostConnection_false": {
     "message": "已断开"
   },
@@ -240,18 +237,6 @@
   },
   "optionsHostVersionCompatLabel": {
     "message": "主机兼容性"
-  },
-  "optionsIconAuto": {
-    "message": "自动"
-  },
-  "optionsIconAuto_alt": {
-    "message": ""
-  },
-  "optionsIconAutoLabel": {
-    "message": "自动"
-  },
-  "optionsIconAutoLabel_ariaLabel": {
-    "message": "自动"
   },
   "optionsIconBlack": {
     "message": ""

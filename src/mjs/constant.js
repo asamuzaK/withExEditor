@@ -64,6 +64,7 @@ export const MODE_SOURCE = 'modeViewSource';
 export const MODE_SVG = 'modeViewSVG';
 export const ONLY_EDITABLE = 'enableOnlyEditable';
 export const OPTIONS_OPEN = 'openOptionsPage';
+export const OPTIONS_ICON_TOOLBAR = 'toolbarIcon';
 export const PATH_BROWSER_POLYFILL = '/lib/mozilla/browser-polyfill.min.js';
 export const PATH_CONTENT_SCRIPT = '/js/content.js';
 export const PATH_OPTIONS_PAGE = '/html/options.html';

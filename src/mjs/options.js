@@ -5,7 +5,7 @@
 /* shared */
 import { throwErr } from './common.js';
 import { localizeHtml } from './localize.js';
-import { disableIncompatibleInputs } from './compat.js';
+import { showToolbarIconOptions } from './compat.js';
 import {
   addFormSubmitListener, addInputChangeListener, addSyncUrlsInputListener,
   getEditorConfig, getHostStatus, handleMsg, setValuesFromStorage
@@ -27,5 +27,5 @@ document.addEventListener('DOMContentLoaded', () => Promise.all([
   addFormSubmitListener(),
   getHostStatus(),
   getEditorConfig(),
-  disableIncompatibleInputs()
+  showToolbarIconOptions()
 ]).catch(throwErr));

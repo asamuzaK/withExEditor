@@ -14,9 +14,6 @@
   "commandOpenOptions": {
     "message": "設定ページを開く"
   },
-  "compatNoteIconAuto": {
-    "message": "備考： 「自動」はGecko系ブラウザしか適用されません。また「about:config」から「svg.context-properties.content.enabled」の値を「true」に変更する必要があります。"
-  },
   "hostConnection_false": {
     "message": "未接続"
   },
@@ -240,18 +237,6 @@
   },
   "optionsHostVersionCompatLabel": {
     "message": "ホストの互換性"
-  },
-  "optionsIconAuto": {
-    "message": "自動"
-  },
-  "optionsIconAuto_alt": {
-    "message": ""
-  },
-  "optionsIconAutoLabel": {
-    "message": "自動"
-  },
-  "optionsIconAutoLabel_ariaLabel": {
-    "message": "自動"
   },
   "optionsIconBlack": {
     "message": ""

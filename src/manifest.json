@@ -5,19 +5,8 @@
   },
   "browser_action": {
     "browser_style": false,
-    "default_title": "__MSG_extensionName__",
-    "theme_icons": [
-      {
-        "dark": "img/icon.svg#context",
-        "light": "img/icon.svg#context-light",
-        "size": 16
-      },
-      {
-        "dark": "img/icon.svg#context",
-        "light": "img/icon.svg#context-light",
-        "size": 32
-      }
-    ]
+    "default_icon": "img/icon.svg#current",
+    "default_title": "__MSG_extensionName__"
   },
   "browser_specific_settings": {
     "gecko": {
@@ -56,6 +45,7 @@
   "description": "__MSG_extensionDescription__",
   "homepage_url": "https://github.com/asamuzaK/withExEditor",
   "icons": {
+    "16": "img/icon.svg#current",
     "32": "img/icon.svg#current",
     "64": "img/icon.svg"
   },
