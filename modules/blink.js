@@ -29,7 +29,7 @@ export const createManifest = async info => {
   const manifest = JSON.parse(srcContent);
   const replaceItems = {
     browser_action: {
-      browser_style: false,
+      browser_style: true,
       default_icon: {
         16: 'img/icon-outline-16.png',
         32: 'img/icon-outline-32.png'
