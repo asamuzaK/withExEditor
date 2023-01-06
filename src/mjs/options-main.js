@@ -163,8 +163,8 @@ export const extractSyncUrls = async evt => {
         try {
           bool = !!new URL(item);
         } catch (e) {
-          logErr(e);
           bool = false;
+          logErr(e);
           break;
         }
       }
