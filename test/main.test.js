@@ -1933,61 +1933,6 @@ describe('main', () => {
     });
 
     it('should call function', async () => {
-      const i = browser.tabs.query.callCount;
-      const j = browser.tabs.sendMessage.callCount;
-      browser.tabs.query.resolves([{
-        id: 2
-      }]);
-      mjs.tabList.add(2);
-      const msg = {
-        [TMP_FILE_DATA_REMOVE]: {
-          data: {
-            tabId: '2',
-            windowId: '1'
-          }
-        }
-      };
-      const res = await func(msg);
-      assert.strictEqual(browser.tabs.query.callCount, i + 1, 'called');
-      assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
-      assert.deepEqual(res, [null], 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.tabs.query.callCount;
-      const j = browser.tabs.sendMessage.callCount;
-      browser.tabs.query.resolves([{
-        id: 2
-      }]);
-      mjs.tabList.add(2);
-      const msg = {
-        [TMP_FILE_RES]: {
-          data: {
-            tabId: '2',
-            windowId: '1'
-          }
-        }
-      };
-      const res = await func(msg);
-      assert.strictEqual(browser.tabs.query.callCount, i + 1, 'called');
-      assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
-      assert.deepEqual(res, [null], 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.tabs.sendMessage.callCount;
-      mjs.tabList.add(2);
-      const msg = {
-        [TMP_FILE_DATA_PORT]: {
-          foo: 'bar'
-        }
-      };
-      const res = await func(msg);
-      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, [null], 'result');
-    });
-
-    it('should call function', async () => {
       const i = browser.runtime.sendMessage.callCount;
       const msg = {
         [HOST_STATUS_GET]: true
@@ -2061,178 +2006,6 @@ describe('main', () => {
       assert.strictEqual(res.length, 1, 'length');
       assert.instanceOf(res[0][0], Set, 'set');
       assert.deepEqual(res[0][1], {}, 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.action.setBadgeBackgroundColor.callCount;
-      const j = browser.action.setBadgeText.callCount;
-      const k = browser.action.setBadgeTextColor.callCount;
-      const msg = {
-        [HOST_VERSION]: {
-          isLatest: true,
-          latest: '1.2.3'
-        }
-      };
-      const res = await func(msg);
-      const status = mjs.appHost.get('status');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.isTrue(status[HOST_COMPAT], 'compat');
-      assert.isNull(status[HOST_VERSION_LATEST], 'latest');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.action.setBadgeBackgroundColor.callCount;
-      const j = browser.action.setBadgeText.callCount;
-      const k = browser.action.setBadgeTextColor.callCount;
-      const msg = {
-        [HOST_VERSION]: {
-          isLatest: true,
-          result: 1,
-          latest: '1.2.3'
-        }
-      };
-      const res = await func(msg);
-      const status = mjs.appHost.get('status');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.isTrue(status[HOST_COMPAT], 'compat');
-      assert.isNull(status[HOST_VERSION_LATEST], 'latest');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.action.setBadgeBackgroundColor.callCount;
-      const j = browser.action.setBadgeText.callCount;
-      const k = browser.action.setBadgeTextColor.callCount;
-      const msg = {
-        [HOST_VERSION]: {
-          isLatest: false,
-          result: 1,
-          latest: '1.2.3'
-        }
-      };
-      const res = await func(msg);
-      const status = mjs.appHost.get('status');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called'
-      );
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.isTrue(status[HOST_COMPAT], 'compat');
-      assert.strictEqual(status[HOST_VERSION_LATEST], '1.2.3', 'latest');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.action.setBadgeBackgroundColor.callCount;
-      const j = browser.action.setBadgeText.callCount;
-      const k = browser.action.setBadgeTextColor.callCount;
-      const msg = {
-        [HOST_VERSION]: {
-          result: true
-        }
-      };
-      const res = await func(msg);
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
-    });
-
-    it('should not call function', async () => {
-      const i = browser.action.setBadgeBackgroundColor.callCount;
-      const j = browser.action.setBadgeText.callCount;
-      const k = browser.action.setBadgeTextColor.callCount;
-      const msg = {
-        [HOST_VERSION]: {}
-      };
-      const res = await func(msg);
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount, i,
-        'not called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j,
-        'not called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
-        'not called');
-      assert.deepEqual(res, [], 'result');
-    });
-
-    it('should call function', async () => {
-      const msg = {
-        [HOST]: {}
-      };
-      const res = await func(msg);
-      assert.deepEqual(res, [[]], 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.runtime.sendMessage.callCount;
-      const j = browser.storage.local.set.callCount;
-      const k = browser.menus.removeAll.callCount;
-      const msg = {
-        [EDITOR_CONFIG_RES]: {}
-      };
-      browser.runtime.getURL.returns('moz-extension://foo/bar.html');
-      browser.tabs.query.resolves([{
-        url: 'moz-extension://foo/bar.html'
-      }]);
-      browser.storage.local.get.resolves({});
-      const res = await func(msg);
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.strictEqual(browser.storage.local.set.callCount, j + 1, 'called');
-      assert.strictEqual(browser.menus.removeAll.callCount, k + 1, 'called');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          [
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined
-          ],
-          null
-        ]
-      ], 'result');
     });
 
     it('should call function', async () => {
@@ -2409,6 +2182,66 @@ describe('main', () => {
       const res = await func(msg);
       assert.strictEqual(browser.menus.update.callCount, i + 1, 'called');
       assert.deepEqual(res, [[undefined]], 'result');
+    });
+
+    it('should get empty array', async () => {
+      const msg = {
+        [EDITOR_CONFIG_RES]: {}
+      };
+      const res = await func(msg);
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get empty array', async () => {
+      const msg = {
+        [HOST]: {}
+      };
+      const res = await func(msg);
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get empty array', async () => {
+      const msg = {
+        [HOST_VERSION]: {}
+      };
+      const res = await func(msg);
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get empty array', async () => {
+      const msg = {
+        [TMP_FILE_DATA_PORT]: {
+          foo: 'bar'
+        }
+      };
+      const res = await func(msg);
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get empty array', async () => {
+      const msg = {
+        [TMP_FILE_DATA_REMOVE]: {
+          data: {
+            tabId: '2',
+            windowId: '1'
+          }
+        }
+      };
+      const res = await func(msg);
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get empty array', async () => {
+      const msg = {
+        [TMP_FILE_RES]: {
+          data: {
+            tabId: '2',
+            windowId: '1'
+          }
+        }
+      };
+      const res = await func(msg);
+      assert.deepEqual(res, [], 'result');
     });
   });
 
@@ -3772,17 +3605,27 @@ describe('main', () => {
 
   describe('handle host on message', () => {
     const func = mjs.handleHostOnMsg;
+    beforeEach(() => {
+      mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.set(IS_MAC, false);
+      mjs.tabList.clear();
+    });
+    afterEach(() => {
+      mjs.appHost.clear();
+      mjs.localOpts.clear();
+      mjs.globalOpts.clear();
+      mjs.tabList.clear();
+    });
 
-    it('should throw', async () => {
-      browser.tabs.sendMessage.rejects(new Error('error'));
-      await func({
-        [ONLY_EDITABLE]: {
-          checked: true
-        }
-      }).catch(e => {
-        assert.instanceOf(e, Error, 'error');
-        assert.strictEqual(e.message, 'error', 'message');
-      });
+    it('should get empty array', async () => {
+      const res = await func();
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should get empty array', async () => {
+      const res = await func({});
+      assert.deepEqual(res, [], 'result');
     });
 
     it('should get empty array', async () => {
@@ -3790,6 +3633,247 @@ describe('main', () => {
         foo: 'bar'
       });
       assert.deepEqual(res, [], 'result');
+    });
+
+    it('should throw', async () => {
+      browser.runtime.getURL.throws(new Error('error'));
+      const res = await func({
+        [HOST]: {
+          foo: 'bar'
+        }
+      }).catch(e => {
+        assert.instanceOf(e, Error, 'error');
+        assert.strictEqual(e.message, 'error', 'message');
+        return false;
+      });
+      assert.isFalse(res, 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.runtime.sendMessage.callCount;
+      const j = browser.storage.local.set.callCount;
+      const k = browser.menus.removeAll.callCount;
+      const msg = {
+        [EDITOR_CONFIG_RES]: {}
+      };
+      browser.runtime.getURL.returns('moz-extension://foo/bar.html');
+      browser.tabs.query.resolves([{
+        url: 'moz-extension://foo/bar.html'
+      }]);
+      browser.storage.local.get.resolves({});
+      const res = await func(msg);
+      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
+        'called');
+      assert.strictEqual(browser.storage.local.set.callCount, j + 1, 'called');
+      assert.strictEqual(browser.menus.removeAll.callCount, k + 1, 'called');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          [
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined
+          ],
+          null
+        ]
+      ], 'result');
+    });
+
+    it('should call function', async () => {
+      const msg = {
+        [HOST]: {}
+      };
+      const res = await func(msg);
+      assert.deepEqual(res, [[]], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      const msg = {
+        [HOST_VERSION]: {
+          isLatest: true,
+          latest: '1.2.3'
+        }
+      };
+      const res = await func(msg);
+      const status = mjs.appHost.get('status');
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
+      assert.isTrue(status[HOST_COMPAT], 'compat');
+      assert.isNull(status[HOST_VERSION_LATEST], 'latest');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      const msg = {
+        [HOST_VERSION]: {
+          isLatest: true,
+          result: 1,
+          latest: '1.2.3'
+        }
+      };
+      const res = await func(msg);
+      const status = mjs.appHost.get('status');
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
+      assert.isTrue(status[HOST_COMPAT], 'compat');
+      assert.isNull(status[HOST_VERSION_LATEST], 'latest');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      const msg = {
+        [HOST_VERSION]: {
+          isLatest: false,
+          result: 1,
+          latest: '1.2.3'
+        }
+      };
+      const res = await func(msg);
+      const status = mjs.appHost.get('status');
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called'
+      );
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
+      assert.isTrue(status[HOST_COMPAT], 'compat');
+      assert.strictEqual(status[HOST_VERSION_LATEST], '1.2.3', 'latest');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      const msg = {
+        [HOST_VERSION]: {
+          result: true
+        }
+      };
+      const res = await func(msg);
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
+        i + 1, 'called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
+        'called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
+        'called');
+      assert.deepEqual(res, [
+        [
+          undefined,
+          undefined,
+          undefined
+        ]
+      ], 'result');
+    });
+
+    it('should not call function', async () => {
+      const i = browser.action.setBadgeBackgroundColor.callCount;
+      const j = browser.action.setBadgeText.callCount;
+      const k = browser.action.setBadgeTextColor.callCount;
+      const msg = {
+        [HOST_VERSION]: {}
+      };
+      const res = await func(msg);
+      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount, i,
+        'not called');
+      assert.strictEqual(browser.action.setBadgeText.callCount, j,
+        'not called');
+      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
+        'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      mjs.tabList.add(2);
+      const msg = {
+        [TMP_FILE_DATA_PORT]: {
+          foo: 'bar'
+        }
+      };
+      const res = await func(msg);
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
+      assert.deepEqual(res, [null], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.tabs.query.callCount;
+      const j = browser.tabs.sendMessage.callCount;
+      browser.tabs.query.resolves([{
+        id: 2
+      }]);
+      mjs.tabList.add(2);
+      const msg = {
+        [TMP_FILE_DATA_REMOVE]: {
+          data: {
+            tabId: '2',
+            windowId: '1'
+          }
+        }
+      };
+      const res = await func(msg);
+      assert.strictEqual(browser.tabs.query.callCount, i + 1, 'called');
+      assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
+      assert.deepEqual(res, [null], 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.tabs.query.callCount;
+      const j = browser.tabs.sendMessage.callCount;
+      browser.tabs.query.resolves([{
+        id: 2
+      }]);
+      mjs.tabList.add(2);
+      const msg = {
+        [TMP_FILE_RES]: {
+          data: {
+            tabId: '2',
+            windowId: '1'
+          }
+        }
+      };
+      const res = await func(msg);
+      assert.strictEqual(browser.tabs.query.callCount, i + 1, 'called');
+      assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
+      assert.deepEqual(res, [null], 'result');
     });
   });
 
