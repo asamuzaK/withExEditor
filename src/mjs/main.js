@@ -32,11 +32,12 @@ import {
 } from './constant.js';
 
 /* api */
-const { i18n, notifications, runtime, windows } = browser;
+const { i18n, notifications, runtime, tabs, windows } = browser;
 const menus = browser.menus ?? browser.contextMenus;
 
 /* constants */
 const { WINDOW_ID_NONE } = windows;
+const { TAB_ID_NONE } = tabs;
 
 /* native application host */
 export const appHost = new Map();
@@ -666,9 +667,25 @@ export const handleMsg = async (msg, sender) => {
         case EDITOR_CONFIG_GET:
         case LOCAL_FILE_VIEW:
         case TMP_FILE_CREATE:
-        case TMP_FILE_GET:
+        case TMP_FILE_GET: {
+          if (sender) {
+            const { tab } = sender;
+            if (tab) {
+              const { id } = tab;
+              if (Number.isInteger(id) && id !== TAB_ID_NONE) {
+                let connectedTabs = appHost.get('tabs');
+                if (connectedTabs instanceof Set) {
+                  connectedTabs.add(id);
+                } else {
+                  connectedTabs = new Set([id]);
+                }
+                appHost.set('tabs', connectedTabs);
+              }
+            }
+          }
           func.push(hostPostMsg({ [key]: value }));
           break;
+        }
         case EDITOR_CONFIG_RES:
           func.push(extractEditorConfig(value));
           break;
@@ -784,7 +801,8 @@ export const onTabRemoved = async (id, info) => {
     throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
   const func = [];
-  if (tabList.has(id)) {
+  const connectedTabs = appHost.get('tabs');
+  if (connectedTabs instanceof Set && connectedTabs.has(id)) {
     const { windowId: wId } = info;
     const win = await getWindow(wId);
     if (win) {
@@ -801,6 +819,15 @@ export const onTabRemoved = async (id, info) => {
         }));
       }
     }
+    connectedTabs.delete(id);
+    // FIXME: later
+    /*
+    if (!connectedTabs.size) {
+      // disconnect host and clear appHost
+    }
+    */
+  }
+  if (tabList.has(id)) {
     func.push(removeIdFromTabList(id));
   }
   return Promise.all(func);
@@ -835,7 +862,7 @@ export const onWindowFocusChanged = async () => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onWindowRemoved = async () => {
-  const hasIncognito = await checkIncognitoWindowExists(); ;
+  const hasIncognito = await checkIncognitoWindowExists();
   const func = [];
   if (!hasIncognito) {
     func.push(hostPostMsg({
@@ -1062,6 +1089,7 @@ export const setHost = async () => {
       [HOST_CONNECTION]: false,
       [HOST_VERSION_LATEST]: null
     });
+    appHost.set('tabs', new Set());
   }
 };
 
