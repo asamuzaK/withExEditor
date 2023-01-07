@@ -686,32 +686,11 @@ export const handleMsg = async (msg, sender) => {
           func.push(hostPostMsg({ [key]: value }));
           break;
         }
-        case EDITOR_CONFIG_RES:
-          func.push(extractEditorConfig(value));
-          break;
-        case HOST:
-          func.push(handleHostMsg(value));
-          break;
         case HOST_STATUS_GET: {
           const hostStatus = appHost.get('status') ?? {};
           func.push(sendMessage(null, {
             [HOST_STATUS]: hostStatus
           }));
-          break;
-        }
-        case HOST_VERSION: {
-          if (isObjectNotEmpty(value)) {
-            const { isLatest, latest, result } = value;
-            const hostStatus = appHost.get('status') ?? {};
-            hostStatus[HOST_VERSION_LATEST] = !isLatest ? latest : null;
-            if (isLatest) {
-              hostStatus[HOST_COMPAT] = !!isLatest;
-            } else if (Number.isInteger(result)) {
-              hostStatus[HOST_COMPAT] = result >= 0;
-            }
-            appHost.set('status', hostStatus);
-            func.push(toggleBadge());
-          }
           break;
         }
         case IS_CONNECTABLE: {
@@ -725,17 +704,6 @@ export const handleMsg = async (msg, sender) => {
         }
         case OPTIONS_OPEN:
           func.push(openOptionsPage());
-          break;
-        case TMP_FILE_DATA_PORT:
-          tabList.forEach(id => {
-            func.push(sendMessage(id, {
-              [key]: value
-            }));
-          });
-          break;
-        case TMP_FILE_DATA_REMOVE:
-        case TMP_FILE_RES:
-          func.push(sendTmpFileData(key, value));
           break;
         default:
       }
@@ -1071,7 +1039,50 @@ export const handleHostOnDisconnect = port =>
  * @param {*} msg - message
  * @returns {Function} - promise chain
  */
-export const handleHostOnMsg = msg => handleMsg(msg).catch(throwErr);
+export const handleHostOnMsg = msg => {
+  const func = [];
+  if (msg) {
+    const items = Object.entries(msg);
+    for (const [key, value] of items) {
+      switch (key) {
+        case EDITOR_CONFIG_RES:
+          func.push(extractEditorConfig(value));
+          break;
+        case HOST:
+          func.push(handleHostMsg(value));
+          break;
+        case HOST_VERSION: {
+          if (isObjectNotEmpty(value)) {
+            const { isLatest, latest, result } = value;
+            const hostStatus = appHost.get('status') ?? {};
+            hostStatus[HOST_VERSION_LATEST] = !isLatest ? latest : null;
+            if (isLatest) {
+              hostStatus[HOST_COMPAT] = !!isLatest;
+            } else if (Number.isInteger(result)) {
+              hostStatus[HOST_COMPAT] = result >= 0;
+            }
+            appHost.set('status', hostStatus);
+            func.push(toggleBadge());
+          }
+          break;
+        }
+        case TMP_FILE_DATA_PORT:
+          tabList.forEach(id => {
+            func.push(sendMessage(id, {
+              [key]: value
+            }));
+          });
+          break;
+        case TMP_FILE_DATA_REMOVE:
+        case TMP_FILE_RES:
+          func.push(sendTmpFileData(key, value));
+          break;
+        default:
+      }
+    }
+  }
+  return Promise.all(func).catch(throwErr);
+};
 
 /**
  * set host
