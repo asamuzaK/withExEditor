@@ -800,34 +800,34 @@ export const onTabRemoved = async (id, info) => {
   if (!Number.isInteger(id)) {
     throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
+  const connectedTabs = appHost.get('tabs');
   const func = [];
-  if (tabList.has(id)) {
-    const connectedTabs = appHost.get('tabs');
-    if (connectedTabs.has(id)) {
-      const { windowId: wId } = info;
-      const win = await getWindow(wId);
-      if (win) {
-        const { incognito } = win;
-        if (incognito) {
-          const windowId = stringifyPositiveInt(wId, true);
-          const tabId = stringifyPositiveInt(id, true);
-          func.push(hostPostMsg({
-            [TMP_FILE_DATA_REMOVE]: {
-              tabId,
-              windowId,
-              dir: TMP_FILES_PB
-            }
-          }));
-        }
+  if (connectedTabs instanceof Set && connectedTabs.has(id)) {
+    const { windowId: wId } = info;
+    const win = await getWindow(wId);
+    if (win) {
+      const { incognito } = win;
+      if (incognito) {
+        const windowId = stringifyPositiveInt(wId, true);
+        const tabId = stringifyPositiveInt(id, true);
+        func.push(hostPostMsg({
+          [TMP_FILE_DATA_REMOVE]: {
+            tabId,
+            windowId,
+            dir: TMP_FILES_PB
+          }
+        }));
       }
-      connectedTabs.delete(id);
-      // FIXME: later
-      /*
-      if (!connectedTabs.size) {
-        // disconnect host and clear appHost
-      }
-      */
     }
+    connectedTabs.delete(id);
+    // FIXME: later
+    /*
+    if (!connectedTabs.size) {
+      // disconnect host and clear appHost
+    }
+    */
+  }
+  if (tabList.has(id)) {
     func.push(removeIdFromTabList(id));
   }
   return Promise.all(func);
