@@ -32,11 +32,12 @@ import {
 } from './constant.js';
 
 /* api */
-const { i18n, notifications, runtime, windows } = browser;
+const { i18n, notifications, runtime, tabs, windows } = browser;
 const menus = browser.menus ?? browser.contextMenus;
 
 /* constants */
 const { WINDOW_ID_NONE } = windows;
+const { TAB_ID_NONE } = tabs;
 
 /* native application host */
 export const appHost = new Map();
@@ -666,9 +667,25 @@ export const handleMsg = async (msg, sender) => {
         case EDITOR_CONFIG_GET:
         case LOCAL_FILE_VIEW:
         case TMP_FILE_CREATE:
-        case TMP_FILE_GET:
+        case TMP_FILE_GET: {
+          if (sender) {
+            const { tab } = sender;
+            if (tab) {
+              const { id } = tab;
+              if (Number.isInteger(id) && id !== TAB_ID_NONE) {
+                let connectedTabs = appHost.get('tabs');
+                if (connectedTabs instanceof Set) {
+                  connectedTabs.add(id);
+                } else {
+                  connectedTabs = new Set([id]);
+                }
+                appHost.set('tabs', connectedTabs);
+              }
+            }
+          }
           func.push(hostPostMsg({ [key]: value }));
           break;
+        }
         case EDITOR_CONFIG_RES:
           func.push(extractEditorConfig(value));
           break;
@@ -785,21 +802,31 @@ export const onTabRemoved = async (id, info) => {
   }
   const func = [];
   if (tabList.has(id)) {
-    const { windowId: wId } = info;
-    const win = await getWindow(wId);
-    if (win) {
-      const { incognito } = win;
-      if (incognito) {
-        const windowId = stringifyPositiveInt(wId, true);
-        const tabId = stringifyPositiveInt(id, true);
-        func.push(hostPostMsg({
-          [TMP_FILE_DATA_REMOVE]: {
-            tabId,
-            windowId,
-            dir: TMP_FILES_PB
-          }
-        }));
+    const connectedTabs = appHost.get('tabs');
+    if (connectedTabs.has(id)) {
+      const { windowId: wId } = info;
+      const win = await getWindow(wId);
+      if (win) {
+        const { incognito } = win;
+        if (incognito) {
+          const windowId = stringifyPositiveInt(wId, true);
+          const tabId = stringifyPositiveInt(id, true);
+          func.push(hostPostMsg({
+            [TMP_FILE_DATA_REMOVE]: {
+              tabId,
+              windowId,
+              dir: TMP_FILES_PB
+            }
+          }));
+        }
       }
+      connectedTabs.delete(id);
+      // FIXME: later
+      /*
+      if (!connectedTabs.size) {
+        // disconnect host and clear appHost
+      }
+      */
     }
     func.push(removeIdFromTabList(id));
   }
@@ -1062,6 +1089,7 @@ export const setHost = async () => {
       [HOST_CONNECTION]: false,
       [HOST_VERSION_LATEST]: null
     });
+    appHost.set('tabs', new Set());
   }
 };
 

@@ -2250,36 +2250,149 @@ describe('main', () => {
     it('should call function', async () => {
       const port = mockPort({ name: HOST });
       const i = port.postMessage.callCount;
+      const sender = {};
       mjs.appHost.set('port', port);
+      const msg = {
+        [EDITOR_CONFIG_GET]: true
+      };
+      const res = await func(msg, sender);
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      const sender = {
+        tab: {}
+      };
+      mjs.appHost.set('port', port);
+      const msg = {
+        [EDITOR_CONFIG_GET]: true
+      };
+      const res = await func(msg, sender);
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      const sender = {
+        tab: {
+          id: browser.tabs.TAB_ID_NONE
+        }
+      };
+      mjs.appHost.set('port', port);
+      const msg = {
+        [EDITOR_CONFIG_GET]: true
+      };
+      const res = await func(msg, sender);
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      const sender = {
+        tab: {
+          id: 1
+        }
+      };
+      mjs.appHost.set('port', port);
+      const msg = {
+        [EDITOR_CONFIG_GET]: true
+      };
+      const res = await func(msg, sender);
+      const connectedTabs = mjs.appHost.get('tabs');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(connectedTabs.size, 1, 'size');
+      assert.isTrue(connectedTabs.has(1), 'tabs');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      const sender = {
+        tab: {
+          id: 1
+        }
+      };
+      mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set([2]));
+      const msg = {
+        [EDITOR_CONFIG_GET]: true
+      };
+      const res = await func(msg, sender);
+      const connectedTabs = mjs.appHost.get('tabs');
+      assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(connectedTabs.size, 2, 'size');
+      assert.isTrue(connectedTabs.has(1), 'tabs');
+      assert.deepEqual(res, [undefined], 'result');
+    });
+
+    it('should call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      const sender = {
+        tab: {
+          id: 1
+        }
+      };
+      mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set([2]));
       const msg = {
         [LOCAL_FILE_VIEW]: true
       };
-      const res = await func(msg);
+      const res = await func(msg, sender);
+      const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(connectedTabs.size, 2, 'size');
+      assert.isTrue(connectedTabs.has(1), 'tabs');
       assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
       const port = mockPort({ name: HOST });
       const i = port.postMessage.callCount;
+      const sender = {
+        tab: {
+          id: 1
+        }
+      };
       mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set([2]));
       const msg = {
         [TMP_FILE_CREATE]: true
       };
-      const res = await func(msg);
+      const res = await func(msg, sender);
+      const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(connectedTabs.size, 2, 'size');
+      assert.isTrue(connectedTabs.has(1), 'tabs');
       assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
       const port = mockPort({ name: HOST });
       const i = port.postMessage.callCount;
+      const sender = {
+        tab: {
+          id: 1
+        }
+      };
       mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set([2]));
       const msg = {
         [TMP_FILE_GET]: true
       };
-      const res = await func(msg);
+      const res = await func(msg, sender);
+      const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
+      assert.strictEqual(connectedTabs.size, 2, 'size');
+      assert.isTrue(connectedTabs.has(1), 'tabs');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2492,6 +2605,7 @@ describe('main', () => {
       const i = port.postMessage.callCount;
       const j = browser.windows.get.callCount;
       mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set());
       mjs.tabList.add(2);
       browser.windows.get.resolves({
         incognito: false
@@ -2509,14 +2623,65 @@ describe('main', () => {
       const i = port.postMessage.callCount;
       const j = browser.windows.get.withArgs(1, null).callCount;
       mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set([2]));
+      mjs.tabList.add(2);
+      mjs.tabList.add(3);
+      browser.windows.get.withArgs(1, null).resolves({
+        incognito: false
+      });
+      const res = await func(1, { windowId: 1 });
+      const connectedTabs = mjs.appHost.get('tabs');
+      assert.strictEqual(mjs.tabList.size, 2, 'tabList size');
+      assert.isTrue(mjs.tabList.has(2), 'tabList has id');
+      assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
+      assert.isTrue(connectedTabs.has(2), 'connected tabs has id');
+      assert.strictEqual(port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j,
+        'not called');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should not call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      const j = browser.windows.get.withArgs(1, null).callCount;
+      mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set([2]));
       mjs.tabList.add(2);
       mjs.tabList.add(3);
       browser.windows.get.withArgs(1, null).resolves({
         incognito: false
       });
       const res = await func(2, { windowId: 1 });
-      assert.strictEqual(mjs.tabList.size, 1, 'size');
-      assert.isFalse(mjs.tabList.has(2), 'has');
+      const connectedTabs = mjs.appHost.get('tabs');
+      assert.strictEqual(mjs.tabList.size, 1, 'tabList size');
+      assert.isFalse(mjs.tabList.has(2), 'tabList has id');
+      assert.strictEqual(connectedTabs.size, 0, 'connected tabs size');
+      assert.strictEqual(port.postMessage.callCount, i, 'not called');
+      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
+        'called');
+      assert.strictEqual(res.length, 1, 'length');
+      assert.instanceOf(res[0], Set, 'result');
+    });
+
+    it('should not call function', async () => {
+      const port = mockPort({ name: HOST });
+      const i = port.postMessage.callCount;
+      const j = browser.windows.get.withArgs(1, null).callCount;
+      mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set([2, 3]));
+      mjs.tabList.add(2);
+      mjs.tabList.add(3);
+      mjs.tabList.add(4);
+      browser.windows.get.withArgs(1, null).resolves({
+        incognito: false
+      });
+      const res = await func(2, { windowId: 1 });
+      const connectedTabs = mjs.appHost.get('tabs');
+      assert.strictEqual(mjs.tabList.size, 2, 'tabList size');
+      assert.isFalse(mjs.tabList.has(2), 'tabList has id');
+      assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
+      assert.isFalse(connectedTabs.has(2), 'connected tabs has id');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
         'called');
@@ -2529,14 +2694,19 @@ describe('main', () => {
       const i = port.postMessage.callCount;
       const j = browser.windows.get.withArgs(1, null).callCount;
       mjs.appHost.set('port', port);
+      mjs.appHost.set('tabs', new Set([2, 3]));
       mjs.tabList.add(2);
       mjs.tabList.add(3);
+      mjs.tabList.add(4);
       browser.windows.get.withArgs(1, null).resolves({
         incognito: true
       });
       const res = await func(2, { windowId: 1 });
-      assert.strictEqual(mjs.tabList.size, 1, 'size');
-      assert.isFalse(mjs.tabList.has(2), 'has');
+      const connectedTabs = mjs.appHost.get('tabs');
+      assert.strictEqual(mjs.tabList.size, 2, 'tabList size');
+      assert.isFalse(mjs.tabList.has(2), 'tabList has id');
+      assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
+      assert.isFalse(connectedTabs.has(2), 'connected tabs has id');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
         'called');
@@ -3640,12 +3810,14 @@ describe('main', () => {
 
     it('should set map', async () => {
       await func();
-      assert.strictEqual(mjs.appHost.size, 2, 'size');
+      assert.strictEqual(mjs.appHost.size, 3, 'size');
       assert.isTrue(mjs.appHost.has('port'), 'port');
       assert.isTrue(mjs.appHost.get('port').onDisconnect.addListener.called,
         'called');
       assert.isTrue(mjs.appHost.get('port').onMessage.addListener.called,
         'called');
+      assert.isTrue(mjs.appHost.has('status'), 'status');
+      assert.isTrue(mjs.appHost.has('tabs'), 'tabs');
     });
   });
 
