@@ -3644,7 +3644,7 @@ describe('main', () => {
       }).catch(e => {
         assert.instanceOf(e, Error, 'error');
         assert.strictEqual(e.message, 'error', 'message');
-        return false
+        return false;
       });
       assert.isFalse(res, 'result');
     });
