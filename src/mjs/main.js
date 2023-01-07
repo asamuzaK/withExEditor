@@ -800,8 +800,8 @@ export const onTabRemoved = async (id, info) => {
   if (!Number.isInteger(id)) {
     throw new TypeError(`Expected Number but got ${getType(id)}.`);
   }
-  const connectedTabs = appHost.get('tabs');
   const func = [];
+  const connectedTabs = appHost.get('tabs');
   if (connectedTabs instanceof Set && connectedTabs.has(id)) {
     const { windowId: wId } = info;
     const win = await getWindow(wId);
@@ -862,7 +862,7 @@ export const onWindowFocusChanged = async () => {
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onWindowRemoved = async () => {
-  const hasIncognito = await checkIncognitoWindowExists(); ;
+  const hasIncognito = await checkIncognitoWindowExists();
   const func = [];
   if (!hasIncognito) {
     func.push(hostPostMsg({
