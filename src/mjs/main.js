@@ -583,7 +583,7 @@ export const extractEditorConfig = async (data = {}) => {
   return Promise.all(func);
 };
 
-/* message handlers */
+/* application host */
 /**
  * post message to host
  *
@@ -648,6 +648,105 @@ export const handleHostMsg = async msg => {
   return Promise.all(func);
 };
 
+/**
+ * handle disconnected host
+ *
+ * @param {object} port - runtime.Port
+ * @returns {Promise.<Array>} - results of each handler
+ */
+export const handleDisconnectedHost = async (port = {}) => {
+  const { error } = port;
+  const e = error || (runtime.lastError?.message && runtime.lastError);
+  const func = [];
+  appHost.clear();
+  if (e) {
+    func.push(logErr(e));
+  }
+  func.push(toggleBadge());
+  return Promise.all(func);
+};
+
+/**
+ * handle host on disconnect
+ *
+ * @param {object} port - removed host
+ * @returns {Function} - promise chain
+ */
+export const handleHostOnDisconnect = port =>
+  handleDisconnectedHost(port).catch(throwErr);
+
+/**
+ * handle host on message
+ *
+ * @param {*} msg - message
+ * @returns {Function} - promise chain
+ */
+export const handleHostOnMsg = msg => {
+  const func = [];
+  if (msg) {
+    const items = Object.entries(msg);
+    for (const [key, value] of items) {
+      switch (key) {
+        case EDITOR_CONFIG_RES:
+          func.push(extractEditorConfig(value));
+          break;
+        case HOST:
+          func.push(handleHostMsg(value));
+          break;
+        case HOST_VERSION: {
+          if (isObjectNotEmpty(value)) {
+            const { isLatest, latest, result } = value;
+            const hostStatus = appHost.get('status') ?? {};
+            hostStatus[HOST_VERSION_LATEST] = !isLatest ? latest : null;
+            if (isLatest) {
+              hostStatus[HOST_COMPAT] = !!isLatest;
+            } else if (Number.isInteger(result)) {
+              hostStatus[HOST_COMPAT] = result >= 0;
+            }
+            appHost.set('status', hostStatus);
+            func.push(toggleBadge());
+          }
+          break;
+        }
+        case TMP_FILE_DATA_PORT:
+          tabList.forEach(id => {
+            func.push(sendMessage(id, {
+              [key]: value
+            }));
+          });
+          break;
+        case TMP_FILE_DATA_REMOVE:
+        case TMP_FILE_RES:
+          func.push(sendTmpFileData(key, value));
+          break;
+        default:
+      }
+    }
+  }
+  return Promise.all(func).catch(throwErr);
+};
+
+/**
+ * set host
+ *
+ * @returns {void}
+ */
+export const setHost = async () => {
+  const port = await makeConnection(HOST, true);
+  if (port) {
+    port.onDisconnect.addListener(handleHostOnDisconnect);
+    port.onMessage.addListener(handleHostOnMsg);
+    appHost.set('port', port);
+    appHost.set('status', {
+      [HOST_COMPAT]: false,
+      [HOST_CONNECTION]: false,
+      [HOST_VERSION_LATEST]: null
+    });
+    appHost.set('tabs', new Set());
+  }
+};
+
+/* message */
 /**
  * handle message
  *
@@ -1003,105 +1102,6 @@ export const handleStorage = async (data, area = 'local') => {
     }
   }
   return Promise.all(func);
-};
-
-/* extension */
-/**
- * handle disconnected host
- *
- * @param {object} port - runtime.Port
- * @returns {Promise.<Array>} - results of each handler
- */
-export const handleDisconnectedHost = async (port = {}) => {
-  const { error } = port;
-  const e = error || (runtime.lastError?.message && runtime.lastError);
-  const func = [];
-  appHost.clear();
-  if (e) {
-    func.push(logErr(e));
-  }
-  func.push(toggleBadge());
-  return Promise.all(func);
-};
-
-/**
- * handle host on disconnect
- *
- * @param {object} port - removed host
- * @returns {Function} - promise chain
- */
-export const handleHostOnDisconnect = port =>
-  handleDisconnectedHost(port).catch(throwErr);
-
-/**
- * handle host on message
- *
- * @param {*} msg - message
- * @returns {Function} - promise chain
- */
-export const handleHostOnMsg = msg => {
-  const func = [];
-  if (msg) {
-    const items = Object.entries(msg);
-    for (const [key, value] of items) {
-      switch (key) {
-        case EDITOR_CONFIG_RES:
-          func.push(extractEditorConfig(value));
-          break;
-        case HOST:
-          func.push(handleHostMsg(value));
-          break;
-        case HOST_VERSION: {
-          if (isObjectNotEmpty(value)) {
-            const { isLatest, latest, result } = value;
-            const hostStatus = appHost.get('status') ?? {};
-            hostStatus[HOST_VERSION_LATEST] = !isLatest ? latest : null;
-            if (isLatest) {
-              hostStatus[HOST_COMPAT] = !!isLatest;
-            } else if (Number.isInteger(result)) {
-              hostStatus[HOST_COMPAT] = result >= 0;
-            }
-            appHost.set('status', hostStatus);
-            func.push(toggleBadge());
-          }
-          break;
-        }
-        case TMP_FILE_DATA_PORT:
-          tabList.forEach(id => {
-            func.push(sendMessage(id, {
-              [key]: value
-            }));
-          });
-          break;
-        case TMP_FILE_DATA_REMOVE:
-        case TMP_FILE_RES:
-          func.push(sendTmpFileData(key, value));
-          break;
-        default:
-      }
-    }
-  }
-  return Promise.all(func).catch(throwErr);
-};
-
-/**
- * set host
- *
- * @returns {void}
- */
-export const setHost = async () => {
-  const port = await makeConnection(HOST, true);
-  if (port) {
-    port.onDisconnect.addListener(handleHostOnDisconnect);
-    port.onMessage.addListener(handleHostOnMsg);
-    appHost.set('port', port);
-    appHost.set('status', {
-      [HOST_COMPAT]: false,
-      [HOST_CONNECTION]: false,
-      [HOST_VERSION_LATEST]: null
-    });
-    appHost.set('tabs', new Set());
-  }
 };
 
 /**
