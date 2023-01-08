@@ -887,13 +887,13 @@ export const onTabRemoved = async (id, info) => {
       }
     }
     connectedTabs.delete(id);
-    // FIXME: later
-    /*
-    if (!connectedTabs.size) {
-      // disconnect host and clear appHost
-    }
-    */
   }
+  // FIXME: later
+  /*
+  if (!connectedTabs.size) {
+    // disconnect host and clear appHost
+  }
+  */
   if (tabList.has(id)) {
     func.push(removeIdFromTabList(id));
   }
