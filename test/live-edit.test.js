@@ -46,7 +46,6 @@ describe('live-edit', () => {
     }
     global.window = window;
     global.document = document;
-    global.fetch = sinon.stub();
     for (const key of globalKeys) {
       // Not implemented in jsdom
       if (key === 'InputEvent' &&
@@ -100,7 +99,6 @@ describe('live-edit', () => {
     document = null;
     delete global.window;
     delete global.document;
-    delete global.fetch;
     for (const key of globalKeys) {
       delete global[key];
     }

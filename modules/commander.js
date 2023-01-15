@@ -3,17 +3,20 @@
  */
 
 /* api */
-import { getType, throwErr } from './common.js';
-import { createFile, isFile, readFile } from './file-util.js';
+import { getType, isString, throwErr } from './common.js';
+import { createFile, fetchText, isFile, readFile } from './file-util.js';
 import { createBlinkFiles } from './blink.js';
 import { program as commander } from 'commander';
+import csvToJson from 'csvtojson';
 import path from 'node:path';
 import process from 'node:process';
 
 /* constants */
+const BASE_URL_IANA = 'https://www.iana.org/assignments/uri-schemes/';
 const CHAR = 'utf8';
 const DIR_CWD = process.cwd();
 const INDENT = 2;
+const PATH_LIB = './src/lib';
 
 /**
  * create blink compatible files
@@ -23,6 +26,41 @@ const INDENT = 2;
  */
 export const createBlinkCompatFiles = cmdOpts =>
   createBlinkFiles(cmdOpts).catch(throwErr);
+
+/**
+ * save URI schemes file
+ *
+ * @see {@link https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml}
+ *      - Historical schemes omitted
+ *      - Added 'moz-extension' scheme
+ * @param {string} dir - directory name
+ * @param {boolean} info - console info
+ * @returns {string} - file path
+ */
+export const saveUriSchemes = async (dir, info) => {
+  if (!isString(dir)) {
+    throw new TypeError(`Expected String but got ${getType(dir)}.`);
+  }
+  const libPath = path.resolve(DIR_CWD, PATH_LIB, dir);
+  const csvFile = 'uri-schemes-1.csv';
+  const csvText = await fetchText(`${BASE_URL_IANA}${csvFile}`);
+  const items = await csvToJson().fromString(csvText);
+  const schemes = new Set(['moz-extension']);
+  for (const item of items) {
+    const { 'URI Scheme': scheme, Status: status } = item;
+    if (!/obsolete|\+/i.test(scheme) &&
+        /^p(?:ermanent|rovisional)$/i.test(status)) {
+      schemes.add(scheme);
+    }
+  }
+  const content = JSON.stringify([...schemes].sort(), null, INDENT);
+  const filePath =
+    await createFile(path.resolve(libPath, 'uri-schemes.json'), `${content}\n`);
+  if (filePath && info) {
+    console.info(`Created: ${filePath}`);
+  }
+  return filePath;
+};
 
 /**
  * save library package info
@@ -121,13 +159,16 @@ export const extractLibraries = async (cmdOpts = {}) => {
     }
   };
   const func = [];
-  if (dir) {
+  if (dir === 'iana') {
+    func.push(saveUriSchemes(dir, info));
+  } else if (dir) {
     func.push(saveLibraryPackage([dir, libraries[dir]], info));
   } else {
     const items = Object.entries(libraries);
     for (const [key, value] of items) {
       func.push(saveLibraryPackage([key, value], info));
     }
+    func.push(saveUriSchemes('iana', info));
   }
   const arr = await Promise.allSettled(func);
   for (const i of arr) {

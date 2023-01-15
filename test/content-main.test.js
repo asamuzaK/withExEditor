@@ -3,6 +3,7 @@
  */
 
 /* api */
+import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { browser, createJsdom } from './mocha/setup.js';
@@ -54,7 +55,6 @@ describe('content-main', () => {
     }
     global.window = window;
     global.document = document;
-    global.fetch = sinon.stub();
     for (const key of globalKeys) {
       // Not implemented in jsdom
       if (key === 'InputEvent' &&
@@ -108,7 +108,6 @@ describe('content-main', () => {
     document = null;
     delete global.window;
     delete global.document;
-    delete global.fetch;
     for (const key of globalKeys) {
       delete global[key];
     }
@@ -888,19 +887,25 @@ describe('content-main', () => {
 
   describe('fetch file source and create temporary file data', () => {
     const func = mjs.fetchSource;
-
-    it('should get null', async () => {
-      const res = await func();
-      assert.isNull(res, 'result');
+    const globalDispatcher = getGlobalDispatcher();
+    const mockAgent = new MockAgent();
+    beforeEach(() => {
+      setGlobalDispatcher(mockAgent);
+      mockAgent.disableNetConnect();
+    });
+    afterEach(() => {
+      mockAgent.enableNetConnect();
+      setGlobalDispatcher(globalDispatcher);
     });
 
     it('should get object', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       const res = await func({});
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
         'prop');
@@ -909,6 +914,7 @@ describe('content-main', () => {
     });
 
     it('should get object', async () => {
+      const url = new URL('file:///foo/bar');
       const dom = createJsdom('file:///foo/bar');
       window = dom.window;
       document = window.document;
@@ -917,7 +923,7 @@ describe('content-main', () => {
       const res = await func({});
       assert.deepEqual(res, {
         [LOCAL_FILE_VIEW]: {
-          uri: 'file:///foo/bar'
+          uri: url.href
         }
       }, 'result');
     });
@@ -925,23 +931,26 @@ describe('content-main', () => {
 
   describe('create temporary file data', () => {
     const func = mjs.createTmpFileData;
+    const globalDispatcher = getGlobalDispatcher();
+    const mockAgent = new MockAgent();
+    beforeEach(() => {
+      setGlobalDispatcher(mockAgent);
+      mockAgent.disableNetConnect();
+    });
+    afterEach(() => {
+      mockAgent.enableNetConnect();
+      setGlobalDispatcher(globalDispatcher);
+    });
 
-    it('should get null', async () => {
-      global.fetch.resolves(undefined);
+    it('should get object', async () => {
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       const res = await func();
-      assert.isNull(res, 'result');
-    });
-
-    it('should get object', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo')
-      });
-      const res = await func({
-        mode: MODE_SOURCE
-      });
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
         'prop');
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
@@ -949,12 +958,13 @@ describe('content-main', () => {
     });
 
     it('should get object', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       const res = await func({
         mode: MODE_SOURCE
       });
@@ -1089,19 +1099,20 @@ describe('content-main', () => {
     });
 
     it('should get object', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo bar')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       const res = await func({
         mode: MODE_EDIT
       });
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
         'prop');
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
-      assert.strictEqual(res.value, 'foo bar', 'value');
+      assert.strictEqual(res.value, 'foo', 'value');
     });
 
     it('should get object', async () => {
@@ -1131,19 +1142,20 @@ describe('content-main', () => {
     });
 
     it('should get object', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo bar')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       const res = await func({
         mode: MODE_SVG
       });
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
         'prop');
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
-      assert.strictEqual(res.value, 'foo bar', 'value');
+      assert.strictEqual(res.value, 'foo', 'value');
     });
 
     it('should get object', async () => {
@@ -1160,19 +1172,20 @@ describe('content-main', () => {
     });
 
     it('should get object', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo bar')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       const res = await func({
         mode: MODE_SELECTION
       });
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
         'prop');
       assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
-      assert.strictEqual(res.value, 'foo bar', 'value');
+      assert.strictEqual(res.value, 'foo', 'value');
     });
   });
 
@@ -2000,20 +2013,27 @@ describe('content-main', () => {
 
   describe('determine content process', () => {
     const func = mjs.determineContentProcess;
+    const globalDispatcher = getGlobalDispatcher();
+    const mockAgent = new MockAgent();
     beforeEach(() => {
+      setGlobalDispatcher(mockAgent);
+      mockAgent.disableNetConnect();
       mjs.vars.contextNode = null;
     });
     afterEach(() => {
+      mockAgent.enableNetConnect();
+      setGlobalDispatcher(globalDispatcher);
       mjs.vars.contextNode = null;
     });
 
     it('should call function', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo bar')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
@@ -2026,12 +2046,13 @@ describe('content-main', () => {
     });
 
     it('should call function', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo bar')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
@@ -2048,12 +2069,13 @@ describe('content-main', () => {
     });
 
     it('should call function', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('foo bar')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const p = document.createElement('p');
@@ -3569,7 +3591,11 @@ describe('content-main', () => {
 
   describe('handle message', () => {
     const func = mjs.handleMsg;
+    const globalDispatcher = getGlobalDispatcher();
+    const mockAgent = new MockAgent();
     beforeEach(() => {
+      setGlobalDispatcher(mockAgent);
+      mockAgent.disableNetConnect();
       mjs.dataIds.clear();
       mjs.vars[ID_TAB] = '';
       mjs.vars[ID_WIN] = '';
@@ -3584,6 +3610,8 @@ describe('content-main', () => {
       delete mjs.vars.keyCtrlA.metaKey;
     });
     afterEach(() => {
+      mockAgent.enableNetConnect();
+      setGlobalDispatcher(globalDispatcher);
       mjs.dataIds.clear();
       mjs.vars[ID_TAB] = '';
       mjs.vars[ID_WIN] = '';
@@ -3614,11 +3642,48 @@ describe('content-main', () => {
       const res = await func({
         [ID_TAB]: '1',
         [ID_WIN]: '2',
-        [SYNC_AUTO_URL]: ['https://example.com']
+        [SYNC_AUTO_URL]: 'https://example.com\nfoo:bar\nhttps://example.com/baz'
       });
       assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
       assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
-      assert.deepEqual(mjs.vars[SYNC_AUTO_URL], ['https://example.com'], 'url');
+      assert.strictEqual(mjs.vars[SYNC_AUTO_URL],
+        'https://example.com/\nhttps://example.com/baz', 'url');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should set values', async () => {
+      const res = await func({
+        [ID_TAB]: '1',
+        [ID_WIN]: '2',
+        [SYNC_AUTO_URL]: 'foo:bar\n'
+      });
+      assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
+      assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
+      assert.isNull(mjs.vars[SYNC_AUTO_URL], 'url');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should set values', async () => {
+      const res = await func({
+        [ID_TAB]: '1',
+        [ID_WIN]: '2',
+        [SYNC_AUTO_URL]: ''
+      });
+      assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
+      assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
+      assert.isNull(mjs.vars[SYNC_AUTO_URL], 'url');
+      assert.deepEqual(res, [], 'result');
+    });
+
+    it('should set values', async () => {
+      const res = await func({
+        [ID_TAB]: '1',
+        [ID_WIN]: '2',
+        [SYNC_AUTO_URL]: null
+      });
+      assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
+      assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
+      assert.isNull(mjs.vars[SYNC_AUTO_URL], 'url');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3645,12 +3710,13 @@ describe('content-main', () => {
     });
 
     it('should call function', async () => {
-      global.fetch.resolves({
-        headers: {
-          get: sinon.stub().returns('')
-        },
-        text: sinon.stub().returns('<html></html>')
-      });
+      const url = new URL('https://localhost/');
+      mockAgent.get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+          headers: {
+            'content-type': 'text/plain'
+          }
+        });
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func({

@@ -373,16 +373,13 @@ describe('options-main', () => {
       assert.isNull(res, 'result');
     });
 
-    it('should log error', async () => {
-      const stub = sinon.stub(console, 'error');
+    it('should get null', async () => {
       const evt = {
         target: {
           value: 'foo/bar'
         }
       };
       const res = await func(evt);
-      stub.restore();
-      assert.isTrue(stub.calledOnce, 'error logged');
       assert.isNull(res, 'result');
     });
 
@@ -396,6 +393,18 @@ describe('options-main', () => {
       };
       const res = await func(evt);
       assert.isUndefined(res, 'result');
+    });
+
+    it('should not call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const evt = {
+        target: {
+          id: 'foo',
+          value: 'https://example.com\nfoo:bar'
+        }
+      };
+      const res = await func(evt);
+      assert.isNull(res, 'result');
     });
   });
 
@@ -711,9 +720,23 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func({
         id: SYNC_AUTO_URL,
-        value: 'https://example.com'
+        value: 'https://example.com/foo\nbaz:qux\n\nhttps://example.com/bar\n'
       });
-      assert.strictEqual(elm.value, 'https://example.com', 'value');
+      assert.strictEqual(elm.value,
+        'https://example.com/foo\nhttps://example.com/bar', 'value');
+    });
+
+    it('should set text value', async () => {
+      const elm = document.createElement('textarea');
+      const body = document.querySelector('body');
+      elm.id = SYNC_AUTO_URL;
+      elm.value = 'foo';
+      body.appendChild(elm);
+      await func({
+        id: SYNC_AUTO_URL,
+        value: 'foo:bar'
+      });
+      assert.strictEqual(elm.value, '', 'value');
     });
 
     it('should set text value', async () => {
