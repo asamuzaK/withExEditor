@@ -108,7 +108,6 @@ export const fetchText = async url => {
   if (!isString(url)) {
     throw new TypeError(`Expected String but got ${getType(url)}.`);
   }
-  console.log(typeof fetch);
   const res = await fetch(url);
   const { ok, status } = res;
   if (!ok) {
