@@ -1,4 +1,5 @@
 /* api */
+import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import fs, { promises as fsPromise } from 'node:fs';
@@ -8,7 +9,7 @@ import sinon from 'sinon';
 
 /* test */
 import {
-  createFile, getStat, isFile, mkdir, readFile, rm
+  createFile, fetchText, getStat, isFile, mkdir, readFile, rm
 } from '../modules/file-util.js';
 
 /* constants */
@@ -130,5 +131,43 @@ describe('createFile', () => {
       assert.instanceOf(e, TypeError, 'error');
       assert.strictEqual(e.message, 'Expected String but got Undefined.');
     });
+  });
+});
+
+describe('fetch text', () => {
+  const globalDispatcher = getGlobalDispatcher();
+  const mockAgent = new MockAgent();
+  beforeEach(() => {
+    setGlobalDispatcher(mockAgent);
+    mockAgent.disableNetConnect();
+  });
+  afterEach(() => {
+    mockAgent.enableNetConnect();
+    setGlobalDispatcher(globalDispatcher);
+  });
+
+  it('should throw', async () => {
+    await fetchText().catch(e => {
+      assert.instanceOf(e, TypeError, 'error');
+      assert.strictEqual(e.message, 'Expected String but got Undefined.');
+    });
+  });
+
+  it('should throw', async () => {
+    const base = 'https://example.com';
+    mockAgent.get(base).intercept({ path: '/', method: 'GET' }).reply(404);
+    await fetchText(base).catch(e => {
+      assert.instanceOf(e, Error, 'error');
+      assert.strictEqual(e.message,
+        `Network response was not ok. status: 404 url: ${base}`);
+    });
+  });
+
+  it('should get result', async () => {
+    const base = 'https://example.com';
+    mockAgent.get(base).intercept({ path: '/', method: 'GET' })
+      .reply(200, 'foo');
+    const res = await fetchText('https://example.com');
+    assert.strictEqual(res, 'foo', 'result');
   });
 });

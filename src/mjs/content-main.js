@@ -19,6 +19,7 @@ import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
 } from './live-edit.js';
 import { html as nsHtml, math as nsMath, svg as nsSvg } from './ns-uri.js';
+import { sanitizeUrl } from './uri-scheme.js';
 import {
   CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_CONNECTABLE, IS_MAC, INCOGNITO,
   LABEL, LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN,
@@ -305,6 +306,7 @@ export const fetchSource = async (data = {}) => {
       [LOCAL_FILE_VIEW]: { uri }
     };
   } else {
+    const { dir, host, incognito, mode, tabId, windowId } = data;
     const headers = new Headers({
       Charset: characterSet,
       'Content-Type': contentType
@@ -317,21 +319,18 @@ export const fetchSource = async (data = {}) => {
       mode: 'cors'
     };
     const res = await fetch(uri, opt);
-    if (res) {
-      const { dir, host, incognito, mode, tabId, windowId } = data;
-      const [type] = res.headers.get('Content-Type').split(';');
-      const dataId = getDataIdFromURI(uri, SUBST);
-      const extType = getFileExtension(type);
-      const value = await res.text();
-      obj = {
-        [TMP_FILE_CREATE]: {
-          dataId, dir, extType, host, incognito, mode, tabId, windowId
-        },
-        value
-      };
-    }
+    const [type] = res.headers.get('Content-Type').split(';');
+    const extType = getFileExtension(type);
+    const value = await res.text();
+    const dataId = getDataIdFromURI(uri, SUBST);
+    obj = {
+      [TMP_FILE_CREATE]: {
+        dataId, dir, extType, host, incognito, mode, tabId, windowId
+      },
+      value
+    };
   }
-  return obj || null;
+  return obj;
 };
 
 /**
@@ -452,7 +451,7 @@ export const createTmpFileData = async (data = {}) => {
   if (!tmpFileData) {
     tmpFileData = await fetchSource(data);
   }
-  return tmpFileData || null;
+  return tmpFileData;
 };
 
 /**
@@ -1075,7 +1074,6 @@ export const handleMsg = async msg => {
           break;
         case ID_TAB:
         case ID_WIN:
-        case SYNC_AUTO_URL:
           vars[key] = value;
           break;
         case INCOGNITO:
@@ -1087,6 +1085,26 @@ export const handleMsg = async msg => {
           vars[key] = !!value;
           func.push(setModifierKey(value));
           break;
+        case SYNC_AUTO_URL: {
+          const urlItems = isString(value) && value.split('\n');
+          if (urlItems?.length) {
+            const arr = [];
+            for (const item of urlItems) {
+              const url = sanitizeUrl(item);
+              if (url) {
+                arr.push(url);
+              }
+            }
+            if (arr.length) {
+              vars[key] = arr.join('\n');
+            } else {
+              vars[key] = null;
+            }
+          } else {
+            vars[key] = null;
+          }
+          break;
+        }
         case TMP_FILE_RES:
           func.push(syncText(value));
           break;

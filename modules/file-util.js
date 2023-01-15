@@ -97,3 +97,23 @@ export const createFile = async (file, value) => {
   });
   return filePath;
 };
+
+/**
+ * fetch text
+ *
+ * @param {string} url - URL
+ * @returns {string} - content text
+ */
+export const fetchText = async url => {
+  if (!isString(url)) {
+    throw new TypeError(`Expected String but got ${getType(url)}.`);
+  }
+  console.log(typeof fetch);
+  const res = await fetch(url);
+  const { ok, status } = res;
+  if (!ok) {
+    const msg = `Network response was not ok. status: ${status} url: ${url}`;
+    throw new Error(msg);
+  }
+  return res.text();
+};

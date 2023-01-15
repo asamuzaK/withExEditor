@@ -3,10 +3,11 @@
  */
 
 /* shared */
-import { isObjectNotEmpty, isString, logErr, throwErr } from './common.js';
+import { isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
   getStorage, removePermission, requestPermission, sendMessage, setStorage
 } from './browser.js';
+import { sanitizeUrl } from './uri-scheme.js';
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
@@ -160,11 +161,8 @@ export const extractSyncUrls = async evt => {
     for (let item of items) {
       item = item.trim();
       if (item.length) {
-        try {
-          bool = !!new URL(item);
-        } catch (e) {
-          bool = false;
-          logErr(e);
+        bool = !!sanitizeUrl(item);
+        if (!bool) {
           break;
         }
       }
@@ -296,10 +294,27 @@ export const setHtmlInputValue = async (data = {}) => {
           elm.disabled = false;
         }
         break;
-      default:
+      default: {
         if (id === SYNC_AUTO_URL) {
-          elm.value = isString(value) ? value : '';
+          const items = isString(value) && value.split('\n');
+          if (items?.length) {
+            const arr = [];
+            for (const item of items) {
+              const url = sanitizeUrl(item);
+              if (url) {
+                arr.push(url);
+              }
+            }
+            if (arr.length) {
+              elm.value = arr.join('\n');
+            } else {
+              elm.value = '';
+            }
+          } else {
+            elm.value = '';
+          }
         }
+      }
     }
   }
 };
