@@ -3,7 +3,7 @@
  */
 
 /* shared */
-import { getType, isString } from './common.js';
+import { getType, isObjectNotEmpty, isString } from './common.js';
 
 /* constants */
 const HEX = 16;
@@ -408,7 +408,7 @@ export const getUrlEncodedString = str => {
  * escape URL encoded HTML special chars
  *
  * @param {string} ch - URL encoded char
- * @returns {string} - escaped URL encoded HTML special char
+ * @returns {string} - escaped URL encoded HTML special char / URL encoded char
  */
 export const escapeUrlEncodedHtmlChars = ch => {
   if (isString(ch)) {
@@ -446,16 +446,31 @@ export const escapeUrlEncodedHtmlChars = ch => {
  * @param {object} opt - options to accept / deny schemes
  * @returns {?string} - sanitized URL
  */
-export const sanitizeUrl = (url, opt = { data: false, file: false }) => {
+export const sanitizeUrl = (url, opt = {}) => {
   let sanitizedUrl;
   if (isUri(url)) {
     const { data, file } = opt;
     const { href, protocol } = new URL(url);
     const scheme = protocol.replace(/:$/, '');
     const schemeParts = scheme.split('+');
-    // TODO: accept / deny keys in opt
-    if ((data || schemeParts.every(s => s !== 'data')) &&
-        (file || schemeParts.every(s => s !== 'file'))) {
+    const schemeMap = new Map([
+      ['data', false],
+      ['file', false]
+    ]);
+    if (isObjectNotEmpty(opt)) {
+      const items = Object.entries(opt);
+      for (const [key, value] of items) {
+        schemeMap.set(key, value);
+      }
+    }
+    let bool;
+    for (const [key, value] of schemeMap.entries()) {
+      bool = value || schemeParts.every(s => s !== key);
+      if (!bool) {
+        break;
+      }
+    }
+    if (bool) {
       // TODO: add check if data scheme is accepted and data are base64
       const [amp, lt, gt, quot, apos] =
         ['&', '<', '>', '"', "'"].map(getUrlEncodedString);
