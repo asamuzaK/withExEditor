@@ -1,9 +1,10 @@
 /**
  * uri-scheme.js
+ * TODO: rename file
  */
 
 /* shared */
-import { isString } from './common.js';
+import { getType, isString } from './common.js';
 
 /* constants */
 const HEX = 16;
@@ -388,10 +389,62 @@ export const isUri = uri => {
 };
 
 /**
+ * get URL encoded string
+ *
+ * @param {string} str - string
+ * @returns {string} - URL encoded string
+ */
+export const getUrlEncodedString = str => {
+  if (!isString(str)) {
+    throw new TypeError(`Expected String but got ${getType(str)}.`);
+  }
+  const chars = [];
+  for (const ch of str) {
+    chars.push(`%${ch.charCodeAt(0).toString(HEX).toUpperCase()}`);
+  }
+  return chars.join('');
+};
+
+/**
+ * escape URL encoded HTML special chars
+ *
+ * @param {string} ch - URL encoded char
+ * @returns {string} - escaped URL encoded HTML special char
+ */
+export const escapeUrlEncodedHtmlChars = ch => {
+  if (isString(ch)) {
+    if (/^%[\da-z]{2}$/i.test(ch)) {
+      ch = ch.toUpperCase();
+    } else {
+      throw new Error(`${ch} is not a URL encoded character.`);
+    }
+  } else {
+    throw new TypeError(`Expected String but got ${getType(ch)}.`);
+  }
+  const [amp, num, lt, gt, quot, apos] =
+    ['&', '#', '<', '>', '"', "'"].map(getUrlEncodedString);
+  let escapedChar;
+  if (ch === amp) {
+    escapedChar = `${amp}amp;`;
+  } else if (ch === lt) {
+    escapedChar = `${amp}lt;`;
+  } else if (ch === gt) {
+    escapedChar = `${amp}gt;`;
+  } else if (ch === quot) {
+    escapedChar = `${amp}quot;`;
+  } else if (ch === apos) {
+    escapedChar = `${amp}${num}39;`;
+  } else {
+    escapedChar = ch;
+  }
+  return escapedChar;
+};
+
+/**
  * sanitize URL
  *
  * @param {string} url - URL input
- * @param {object} opt - accept 'data' and/or 'file' schemes
+ * @param {object} opt - options to accept / deny schemes
  * @returns {?string} - sanitized URL
  */
 export const sanitizeUrl = (url, opt = { data: false, file: false }) => {
@@ -399,16 +452,20 @@ export const sanitizeUrl = (url, opt = { data: false, file: false }) => {
   if (isUri(url)) {
     const { data, file } = opt;
     const { href, protocol } = new URL(url);
-    const schemeParts = protocol.replace(/:$/, '').split('+');
+    const scheme = protocol.replace(/:$/, '');
+    const schemeParts = scheme.split('+');
+    // TODO: accept / deny keys in opt
     if ((data || schemeParts.every(s => s !== 'data')) &&
         (file || schemeParts.every(s => s !== 'file'))) {
-      const [amp, num, lt, gt, quot, apos] = ['&', '#', '<', '>', '"', "'"]
-        .map(c => `%${c.charCodeAt(0).toString(HEX).toUpperCase()}`);
-      sanitizedUrl = href.replace(new RegExp(amp, 'g'), `${amp}amp;`)
-        .replace(new RegExp(lt, 'g'), `${amp}lt;`)
-        .replace(new RegExp(gt, 'g'), `${amp}gt;`)
-        .replace(new RegExp(quot, 'g'), `${amp}quot;`)
-        .replace(new RegExp(apos, 'g'), `${amp}${num}39;`);
+      // TODO: add check if data scheme is accepted and data are base64
+      const [amp, lt, gt, quot, apos] =
+        ['&', '<', '>', '"', "'"].map(getUrlEncodedString);
+      const escapeCharsReg = /[<>"']/g;
+      const ampersandReg = new RegExp(amp, 'g');
+      const htmlCharsReg = new RegExp(`(${lt}|${gt}|${quot}|${apos})`, 'g');
+      sanitizedUrl = href.replace(escapeCharsReg, getUrlEncodedString)
+        .replace(ampersandReg, escapeUrlEncodedHtmlChars)
+        .replace(htmlCharsReg, escapeUrlEncodedHtmlChars);
     }
   }
   return sanitizedUrl || null;

@@ -127,6 +127,76 @@ describe('uri-scheme', () => {
     });
   });
 
+  describe('get URL encoded string', () => {
+    const func = mjs.getUrlEncodedString;
+
+    it('should throw', () => {
+      assert.throws(() => func());
+    });
+
+    it('should get empty string', () => {
+      const res = func('');
+      assert.strictEqual(res, '', 'result');
+    });
+
+    it('should get encoded string', () => {
+      const res = func('foo bar');
+      assert.strictEqual(res, '%66%6F%6F%20%62%61%72', 'result');
+    });
+
+    it('should get encoded string', () => {
+      const res = func('&#<>"\'');
+      assert.strictEqual(res, '%26%23%3C%3E%22%27', 'result');
+    });
+  });
+
+  describe('escape URL encoded HTML special chars', () => {
+    const func = mjs.escapeUrlEncodedHtmlChars;
+
+    it('should throw', () => {
+      assert.throws(() => func());
+    });
+
+    it('should throw', () => {
+      assert.throws(() => func('foo'));
+    });
+
+    it('should get unescaped char', () => {
+      const res = func('%20');
+      assert.strictEqual(res, '%20', 'result');
+    });
+
+    it('should get escaped char', () => {
+      const res = func('%26');
+      assert.strictEqual(res, '%26amp;', 'result');
+    });
+
+    it('should get escaped char', () => {
+      const res = func('%3c');
+      assert.strictEqual(res, '%26lt;', 'result');
+    });
+
+    it('should get escaped char', () => {
+      const res = func('%3C');
+      assert.strictEqual(res, '%26lt;', 'result');
+    });
+
+    it('should get escaped char', () => {
+      const res = func('%3E');
+      assert.strictEqual(res, '%26gt;', 'result');
+    });
+
+    it('should get escaped char', () => {
+      const res = func('%22');
+      assert.strictEqual(res, '%26quot;', 'result');
+    });
+
+    it('should get escaped char', () => {
+      const res = func('%27');
+      assert.strictEqual(res, '%26%2339;', 'result');
+    });
+  });
+
   describe('sanitize URL', () => {
     const func = mjs.sanitizeUrl;
 
@@ -190,6 +260,26 @@ describe('uri-scheme', () => {
       });
       assert.strictEqual(res, 'data:,Hello%2C%20World!', 'result');
       assert.strictEqual(decodeURIComponent(res), 'data:,Hello, World!',
+        'decode');
+    });
+
+    it('should get sanitized value', () => {
+      const res = func("data:text/html,<script>alert('XSS');</script>?<script>alert(1);</script>", {
+        data: true
+      });
+      assert.strictEqual(res, 'data:text/html,%26lt;script%26gt;alert(%26%2339;XSS%26%2339;);%26lt;/script%26gt;?%26lt;script%26gt;alert(1);%26lt;/script%26gt;',
+        'result');
+      assert.strictEqual(decodeURIComponent(res), 'data:text/html,&lt;script&gt;alert(&#39;XSS&#39;);&lt;/script&gt;?&lt;script&gt;alert(1);&lt;/script&gt;',
+        'decode');
+    });
+
+    it('should get sanitized value', () => {
+      const res = func("data:text/html,%3Cscript%3Ealert('XSS');%3C/script%3E?%3Cscript%3Ealert(1);%3C/script%3E", {
+        data: true
+      });
+      assert.strictEqual(res, 'data:text/html,%26lt;script%26gt;alert(%26%2339;XSS%26%2339;);%26lt;/script%26gt;?%26lt;script%26gt;alert(1);%26lt;/script%26gt;',
+        'result');
+      assert.strictEqual(decodeURIComponent(res), 'data:text/html,&lt;script&gt;alert(&#39;XSS&#39;);&lt;/script&gt;?&lt;script&gt;alert(1);&lt;/script&gt;',
         'decode');
     });
 
