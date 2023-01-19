@@ -7,7 +7,7 @@ import { isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
   getStorage, removePermission, requestPermission, sendMessage, setStorage
 } from './browser.js';
-import { sanitizeUrl } from './uri-scheme.js';
+import { sanitizeUrl } from './uri-util.js';
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,

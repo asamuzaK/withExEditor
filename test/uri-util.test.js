@@ -7,7 +7,7 @@ import { assert } from 'chai';
 import { describe, it } from 'mocha';
 
 /* test */
-import uriSchemes, * as mjs from '../src/mjs/uri-scheme.js';
+import uriSchemes, * as mjs from '../src/mjs/uri-util.js';
 
 describe('uri-scheme', () => {
   it('should get string', () => {

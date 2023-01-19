@@ -1,6 +1,5 @@
 /**
- * uri-scheme.js
- * TODO: rename file
+ * uri-util.js
  */
 
 /* shared */
