@@ -522,11 +522,6 @@ export const sanitizeUrl = (url, opt = {
       }
     }
     if (bool) {
-      const [amp, lt, gt, quot, apos] =
-        ['&', '<', '>', '"', "'"].map(getUrlEncodedString);
-      const charsReg = /[<>"']/g;
-      const ampReg = new RegExp(amp, 'g');
-      const encodedCharsReg = new RegExp(`(${lt}|${gt}|${quot}|${apos})`, 'g');
       let toBeSanitizedUrl = href;
       if (schemeParts.includes('data') && (parseData ?? true)) {
         const [header, data] = pathname.split(',');
@@ -539,9 +534,14 @@ export const sanitizeUrl = (url, opt = {
           }
         }
       }
-      sanitizedUrl = toBeSanitizedUrl.replace(charsReg, getUrlEncodedString)
-        .replace(ampReg, escapeUrlEncodedHtmlChars)
-        .replace(encodedCharsReg, escapeUrlEncodedHtmlChars);
+      const [amp, lt, gt, quot, apos] =
+        ['&', '<', '>', '"', "'"].map(getUrlEncodedString);
+      const regChars = /[<>"']/g;
+      const regAmp = new RegExp(amp, 'g');
+      const regEncodedChars = new RegExp(`(${lt}|${gt}|${quot}|${apos})`, 'g');
+      sanitizedUrl = toBeSanitizedUrl.replace(regChars, getUrlEncodedString)
+        .replace(regAmp, escapeUrlEncodedHtmlChars)
+        .replace(regEncodedChars, escapeUrlEncodedHtmlChars);
     }
   }
   return sanitizedUrl || null;
