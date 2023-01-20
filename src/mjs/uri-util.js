@@ -394,7 +394,7 @@ export class URISchemes {
 
   /**
    * add scheme
-   * NOTE: `javascript` and/or `vbscript` schemes are not allowed to register
+   * NOTE: `javascript` and/or `vbscript` schemes cannot be registered.
    *
    * @param {string} scheme - scheme
    * @returns {Array.<string>} - array of schemes
