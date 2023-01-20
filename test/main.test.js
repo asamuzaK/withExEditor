@@ -3636,6 +3636,7 @@ describe('main', () => {
     });
 
     it('should throw', async () => {
+      const stubErr = sinon.stub(console, 'error');
       browser.runtime.getURL.throws(new Error('error'));
       const res = await func({
         [HOST]: {
@@ -3646,6 +3647,9 @@ describe('main', () => {
         assert.strictEqual(e.message, 'error', 'message');
         return false;
       });
+      const { calledOnce: errCalled } = stubErr;
+      stubErr.restore();
+      assert.isTrue(errCalled, 'called');
       assert.isFalse(res, 'result');
     });
 
