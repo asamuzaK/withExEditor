@@ -451,4 +451,11 @@ describe('uri-scheme', () => {
         'decode');
     });
   });
+
+  describe('alias exports', () => {
+    it('should get alias', () => {
+      assert.isTrue(typeof mjs.isURI === 'function');
+      assert.isTrue(typeof mjs.sanitizeURL === 'function');
+    });
+  });
 });

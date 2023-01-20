@@ -363,8 +363,6 @@ const uriSchemes = [
   'z39.50s'
 ];
 
-export { uriSchemes as default };
-
 /**
  * is URI
  *
@@ -547,4 +545,11 @@ export const sanitizeUrl = (url, opt = {
     }
   }
   return sanitizedUrl || null;
+};
+
+/* alias exports */
+export {
+  uriSchemes as default,
+  isUri as isURI,
+  sanitizeUrl as sanitizeURL
 };
