@@ -442,7 +442,7 @@ export const escapeUrlEncodedHtmlChars = ch => {
  *
  * @see {@link https://github.com/file/file/blob/master/src/encoding.c}
  * @param {string} data - base64 data
- * @returns {string} - URL
+ * @returns {string} - parsed data / base64 data
  */
 export const parseBase64 = data => {
   if (!isString(data)) {
