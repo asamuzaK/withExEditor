@@ -3,7 +3,7 @@
  */
 
 /* shared */
-import { getType, isObjectNotEmpty, isString } from './common.js';
+import { getType, isString } from './common.js';
 
 /* constants */
 const HEX = 16;
@@ -440,46 +440,110 @@ export const escapeUrlEncodedHtmlChars = ch => {
 };
 
 /**
+ * parse base64
+ *
+ * @see {@link https://github.com/file/file/blob/master/src/encoding.c}
+ * @param {string} data - base64 data
+ * @returns {string} - URL
+ */
+export const parseBase64 = data => {
+  if (!isString(data)) {
+    throw new TypeError(`Expected String but got ${getType(data)}.`);
+  }
+  const bin = atob(data);
+  const uint8arr = Uint8Array.from([...bin].map(c => c.charCodeAt(0)));
+  const textChars = new Set([0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x1b]);
+  for (let i = 0x20; i < 0x7f; i++) {
+    textChars.add(i);
+  }
+  for (let i = 0x80; i <= 0xff; i++) {
+    textChars.add(i);
+  }
+  let parsedData;
+  if (uint8arr.every(c => textChars.has(c))) {
+    parsedData = bin;
+  } else {
+    parsedData = data;
+  }
+  return parsedData;
+};
+
+/**
  * sanitize URL
+ * NOTE: `data` and/or `file` schemes must be explicitly allowed
  *
  * @param {string} url - URL input
- * @param {object} opt - options to accept / deny schemes
+ * @param {object} opt - options
+ * @param {Array.<string>} [opt.allow] - array of allowed schemes
+ * @param {Array.<string>} [opt.deny] - array of denied schemes
+ * @param {boolean} [opt.parseDataUrl] - parse data URL, `true` if omitted
  * @returns {?string} - sanitized URL
  */
-export const sanitizeUrl = (url, opt = {}) => {
+export const sanitizeUrl = (url, opt = {
+  allow: [],
+  deny: [],
+  parseDataUrl: true
+}) => {
   let sanitizedUrl;
   if (isUri(url)) {
-    const { data, file } = opt;
-    const { href, protocol } = new URL(url);
+    const { allow, deny, parseDataUrl } = opt;
+    const { href, pathname, protocol } = new URL(url);
     const scheme = protocol.replace(/:$/, '');
     const schemeParts = scheme.split('+');
     const schemeMap = new Map([
       ['data', false],
       ['file', false]
     ]);
-    if (isObjectNotEmpty(opt)) {
-      const items = Object.entries(opt);
-      for (const [key, value] of items) {
-        schemeMap.set(key, value);
+    if (Array.isArray(allow) && allow.length) {
+      const items = Object.values(allow);
+      for (let item of items) {
+        if (isString(item)) {
+          item = item.trim();
+          if (item) {
+            schemeMap.set(item, true);
+          }
+        }
+      }
+    }
+    if (Array.isArray(deny) && deny.length) {
+      const items = Object.values(deny);
+      for (let item of items) {
+        if (isString(item)) {
+          item = item.trim();
+          if (item) {
+            schemeMap.set(item, false);
+          }
+        }
       }
     }
     let bool;
     for (const [key, value] of schemeMap.entries()) {
-      bool = value || schemeParts.every(s => s !== key);
+      bool = value || (scheme !== key && schemeParts.every(s => s !== key));
       if (!bool) {
         break;
       }
     }
     if (bool) {
-      // TODO: add check if data scheme is accepted and data are base64
       const [amp, lt, gt, quot, apos] =
         ['&', '<', '>', '"', "'"].map(getUrlEncodedString);
-      const escapeCharsReg = /[<>"']/g;
-      const ampersandReg = new RegExp(amp, 'g');
-      const htmlCharsReg = new RegExp(`(${lt}|${gt}|${quot}|${apos})`, 'g');
-      sanitizedUrl = href.replace(escapeCharsReg, getUrlEncodedString)
-        .replace(ampersandReg, escapeUrlEncodedHtmlChars)
-        .replace(htmlCharsReg, escapeUrlEncodedHtmlChars);
+      const charsReg = /[<>"']/g;
+      const ampReg = new RegExp(amp, 'g');
+      const encodedCharsReg = new RegExp(`(${lt}|${gt}|${quot}|${apos})`, 'g');
+      let toBeSanitizedUrl = href;
+      if (schemeParts.includes('data') && (parseDataUrl ?? true)) {
+        const [header, data] = pathname.split(',');
+        const mediaType = header.split(';');
+        const isBase64 = mediaType.pop() === 'base64';
+        if (isBase64) {
+          const parsedData = parseBase64(data);
+          if (parsedData !== data) {
+            toBeSanitizedUrl = `${scheme}:${mediaType.join(';')},${parsedData}`;
+          }
+        }
+      }
+      sanitizedUrl = toBeSanitizedUrl.replace(charsReg, getUrlEncodedString)
+        .replace(ampReg, escapeUrlEncodedHtmlChars)
+        .replace(encodedCharsReg, escapeUrlEncodedHtmlChars);
     }
   }
   return sanitizedUrl || null;

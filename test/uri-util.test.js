@@ -197,6 +197,27 @@ describe('uri-scheme', () => {
     });
   });
 
+  describe('parse base64', () => {
+    const func = mjs.parseBase64;
+
+    it('should throw', () => {
+      assert.throws(() => func());
+    });
+
+    it('should get data', () => {
+      const data = 'iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==';
+      const res = func(data);
+      assert.strictEqual(res, data, 'result');
+    });
+
+    it('should get parsed data', () => {
+      const data = 'Hello%2C%20World!';
+      const base64data = btoa(data);
+      const res = func(base64data);
+      assert.strictEqual(res, data, 'result');
+    });
+  });
+
   describe('sanitize URL', () => {
     const func = mjs.sanitizeUrl;
 
@@ -242,30 +263,68 @@ describe('uri-scheme', () => {
       assert.isNull(res, 'result');
     });
 
-    it('should get null', () => {
+    it('should get null if data scheme is not explicitly allowed', () => {
       const res = func('data:,Hello%2C%20World!');
       assert.isNull(res, 'result');
     });
 
-    it('should get null', () => {
+    it('should override allow and get null', () => {
       const res = func('data:,Hello%2C%20World!', {
-        file: true
+        allow: ['data'],
+        deny: ['data']
       });
       assert.isNull(res, 'result');
     });
 
     it('should get value', () => {
       const res = func('data:,Hello%2C%20World!', {
-        data: true
+        allow: ['data']
       });
       assert.strictEqual(res, 'data:,Hello%2C%20World!', 'result');
       assert.strictEqual(decodeURIComponent(res), 'data:,Hello, World!',
         'decode');
     });
 
+    it('should get value', () => {
+      const data = 'Hello%2C%20World!';
+      const base64data = btoa(data);
+      const res = func(`data:text/plain;charset=UTF-8;base64,${base64data}`, {
+        allow: ['data'],
+        parseDataUrl: false
+      });
+      assert.strictEqual(res,
+        `data:text/plain;charset=UTF-8;base64,${base64data}`, 'result');
+      assert.strictEqual(decodeURIComponent(res),
+        `data:text/plain;charset=UTF-8;base64,${base64data}`, 'decode');
+    });
+
+    it('should get sanitized value', () => {
+      const data = 'Hello%2C%20World!';
+      const base64data = btoa(data);
+      const res = func(`data:text/plain;charset=UTF-8;base64,${base64data}`, {
+        allow: ['data']
+      });
+      assert.strictEqual(res,
+        'data:text/plain;charset=UTF-8,Hello%2C%20World!', 'result');
+      assert.strictEqual(decodeURIComponent(res),
+        'data:text/plain;charset=UTF-8,Hello, World!', 'decode');
+    });
+
     it('should get sanitized value', () => {
       const res = func("data:text/html,<script>alert('XSS');</script>?<script>alert(1);</script>", {
-        data: true
+        allow: ['data']
+      });
+      assert.strictEqual(res, 'data:text/html,%26lt;script%26gt;alert(%26%2339;XSS%26%2339;);%26lt;/script%26gt;?%26lt;script%26gt;alert(1);%26lt;/script%26gt;',
+        'result');
+      assert.strictEqual(decodeURIComponent(res), 'data:text/html,&lt;script&gt;alert(&#39;XSS&#39;);&lt;/script&gt;?&lt;script&gt;alert(1);&lt;/script&gt;',
+        'decode');
+    });
+
+    it('should get sanitized value', () => {
+      const data = "<script>alert('XSS');</script>?<script>alert(1);</script>";
+      const base64data = btoa(data);
+      const res = func(`data:text/html;base64,${base64data}`, {
+        allow: ['data']
       });
       assert.strictEqual(res, 'data:text/html,%26lt;script%26gt;alert(%26%2339;XSS%26%2339;);%26lt;/script%26gt;?%26lt;script%26gt;alert(1);%26lt;/script%26gt;',
         'result');
@@ -275,7 +334,7 @@ describe('uri-scheme', () => {
 
     it('should get sanitized value', () => {
       const res = func("data:text/html,%3Cscript%3Ealert('XSS');%3C/script%3E?%3Cscript%3Ealert(1);%3C/script%3E", {
-        data: true
+        allow: ['data']
       });
       assert.strictEqual(res, 'data:text/html,%26lt;script%26gt;alert(%26%2339;XSS%26%2339;);%26lt;/script%26gt;?%26lt;script%26gt;alert(1);%26lt;/script%26gt;',
         'result');
@@ -283,23 +342,50 @@ describe('uri-scheme', () => {
         'decode');
     });
 
-    it('should get null', () => {
+    it('should get sanitized value', () => {
+      const data = "%3Cscript%3Ealert('XSS');%3C/script%3E?%3Cscript%3Ealert(1);%3C/script%3E";
+      const base64data = btoa(data);
+      const res = func(`data:text/html;base64,${base64data}`, {
+        allow: ['data']
+      });
+      assert.strictEqual(res, 'data:text/html,%26lt;script%26gt;alert(%26%2339;XSS%26%2339;);%26lt;/script%26gt;?%26lt;script%26gt;alert(1);%26lt;/script%26gt;',
+        'result');
+      assert.strictEqual(decodeURIComponent(res), 'data:text/html,&lt;script&gt;alert(&#39;XSS&#39;);&lt;/script&gt;?&lt;script&gt;alert(1);&lt;/script&gt;',
+        'decode');
+    });
+
+    it('should get null if file scheme is not explicitly allowed', () => {
       const res = func('file:///foo/bar');
       assert.isNull(res, 'result');
     });
 
-    it('should get null', () => {
+    it('should override allow and get null', () => {
       const res = func('file:///foo/bar', {
-        data: true
+        deny: ['file'],
+        allow: ['file']
       });
       assert.isNull(res, 'result');
     });
 
     it('should get value', () => {
       const res = func('file:///foo/bar', {
-        file: true
+        allow: ['file']
       });
       assert.strictEqual(res, 'file:///foo/bar', 'result');
+    });
+
+    it('should get value', () => {
+      const res = func('web+foo:bar', {
+        allow: ['web+foo']
+      });
+      assert.strictEqual(res, 'web+foo:bar', 'result');
+    });
+
+    it('should get null', () => {
+      const res = func('web+foo:bar', {
+        deny: ['web+foo']
+      });
+      assert.isNull(res, 'result');
     });
 
     it('should get value', () => {
