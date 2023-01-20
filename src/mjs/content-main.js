@@ -19,7 +19,7 @@ import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
 } from './live-edit.js';
 import { html as nsHtml, math as nsMath, svg as nsSvg } from './ns-uri.js';
-import { sanitizeUrl } from './uri-scheme.js';
+import { sanitizeUrl } from './uri-util.js';
 import {
   CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_CONNECTABLE, IS_MAC, INCOGNITO,
   LABEL, LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN,
