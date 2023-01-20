@@ -405,12 +405,12 @@ export const getUrlEncodedString = str => {
 /**
  * escape URL encoded HTML special chars
  *
- * @param {string} ch - URL encoded char
+ * @param {string} ch - URL encoded (percent encoded) char
  * @returns {string} - escaped URL encoded HTML special char / URL encoded char
  */
 export const escapeUrlEncodedHtmlChars = ch => {
   if (isString(ch)) {
-    if (/^%[\da-z]{2}$/i.test(ch)) {
+    if (/^%[\dA-F]{2}$/i.test(ch)) {
       ch = ch.toUpperCase();
     } else {
       throw new Error(`${ch} is not a URL encoded character.`);
