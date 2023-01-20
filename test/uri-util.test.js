@@ -10,12 +10,100 @@ import { describe, it } from 'mocha';
 import uriSchemes, * as mjs from '../src/mjs/uri-util.js';
 
 describe('uri-scheme', () => {
-  it('should get string', () => {
-    assert.isArray(uriSchemes);
-    for (const scheme of uriSchemes) {
-      assert.isString(scheme);
-      assert.isTrue(/^[a-z][a-z0-9+\-.]*$/.test(scheme));
-    }
+  describe('default', () => {
+    it('should be instance of URISchemes', () => {
+      assert.instanceOf(uriSchemes, mjs.URISchemes, 'instance');
+    });
+  });
+
+  describe('URI schemes', () => {
+    const { URISchemes } = mjs;
+
+    it('should create instance', () => {
+      const schemes = new URISchemes();
+      assert.instanceOf(schemes, URISchemes, 'instance');
+    });
+
+    it('should get array', () => {
+      const schemes = new URISchemes();
+      const res = schemes.get();
+      assert.isArray(res, 'result');
+    });
+
+    it('should get true', () => {
+      const schemes = new URISchemes();
+      const res = schemes.has('https');
+      assert.isTrue(res, 'result');
+    });
+
+    it('should get true', () => {
+      const schemes = new URISchemes();
+      const res = schemes.has('moz-extension');
+      assert.isTrue(res, 'result');
+    });
+
+    it('should get false', () => {
+      const schemes = new URISchemes();
+      const res = schemes.has('foo');
+      assert.isFalse(res, 'result');
+    });
+
+    it('should throw', () => {
+      const schemes = new URISchemes();
+      assert.throws(() => schemes.add(),
+        'Expected String but got Undefined.');
+    });
+
+    it('should throw', () => {
+      const schemes = new URISchemes();
+      assert.throws(() => schemes.add('javascript'),
+        'Invalid scheme: javascript');
+    });
+
+    it('should throw', () => {
+      const schemes = new URISchemes();
+      assert.throws(() => schemes.add('vbscript'),
+        'Invalid scheme: vbscript');
+    });
+
+    it('should throw', () => {
+      const schemes = new URISchemes();
+      assert.throws(() => schemes.add('web+javascript'),
+        'Invalid scheme: web+javascript');
+    });
+
+    it('should throw', () => {
+      const schemes = new URISchemes();
+      assert.throws(() => schemes.add('foo=bar'),
+        'Invalid scheme: foo=bar');
+    });
+
+    it('should add scheme', () => {
+      const schemes = new URISchemes();
+      const res = schemes.add('foo');
+      assert.isArray(res, 'result');
+      assert.isTrue(res.includes('foo'), 'added');
+    });
+
+    it('should add scheme', () => {
+      const schemes = new URISchemes();
+      const res = schemes.add('web+foo');
+      assert.isArray(res, 'result');
+      assert.isTrue(res.includes('web+foo'), 'added');
+    });
+
+    it('should get false', () => {
+      const schemes = new URISchemes();
+      const res = schemes.remove('foo');
+      assert.isFalse(res, 'result');
+    });
+
+    it('should get true', () => {
+      const schemes = new URISchemes();
+      schemes.add('foo');
+      const res = schemes.remove('foo');
+      assert.isTrue(res, 'result');
+    });
   });
 
   describe('is URI', () => {
