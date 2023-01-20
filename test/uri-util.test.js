@@ -237,6 +237,16 @@ describe('uri-scheme', () => {
     });
 
     it('should get value', () => {
+      const res = func('https://example.com', 'foo');
+      assert.strictEqual(res, 'https://example.com/', 'result');
+    });
+
+    it('should get value', () => {
+      const res = func('https://example.com', null);
+      assert.strictEqual(res, 'https://example.com/', 'result');
+    });
+
+    it('should get value', () => {
       const res = func('https://example.com:8000/#foo?bar=baz qux');
       assert.strictEqual(res, 'https://example.com:8000/#foo?bar=baz%20qux',
         'result');

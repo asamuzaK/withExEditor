@@ -484,7 +484,7 @@ export const sanitizeUrl = (url, opt = {
 }) => {
   let sanitizedUrl;
   if (isUri(url)) {
-    const { allow, deny, parseData } = opt;
+    const { allow, deny, parseData } = opt ?? {};
     const { href, pathname, protocol } = new URL(url);
     const scheme = protocol.replace(/:$/, '');
     const schemeParts = scheme.split('+');
