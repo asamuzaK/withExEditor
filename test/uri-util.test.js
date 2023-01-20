@@ -161,6 +161,10 @@ describe('uri-scheme', () => {
       assert.throws(() => func('foo'));
     });
 
+    it('should throw', () => {
+      assert.throws(() => func('%3G'));
+    });
+
     it('should get unescaped char', () => {
       const res = func('%20');
       assert.strictEqual(res, '%20', 'result');
