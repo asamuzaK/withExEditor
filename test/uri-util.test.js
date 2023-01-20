@@ -290,7 +290,7 @@ describe('uri-scheme', () => {
       const base64data = btoa(data);
       const res = func(`data:text/plain;charset=UTF-8;base64,${base64data}`, {
         allow: ['data'],
-        parseDataUrl: false
+        parseData: false
       });
       assert.strictEqual(res,
         `data:text/plain;charset=UTF-8;base64,${base64data}`, 'result');
