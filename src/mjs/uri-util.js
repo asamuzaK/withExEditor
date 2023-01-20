@@ -474,17 +474,17 @@ export const parseBase64 = data => {
  * @param {object} opt - options
  * @param {Array.<string>} [opt.allow] - array of allowed schemes
  * @param {Array.<string>} [opt.deny] - array of denied schemes
- * @param {boolean} [opt.parseDataUrl] - parse data URL, `true` if omitted
+ * @param {boolean} [opt.parseData] - parse data URL, `true` if omitted
  * @returns {?string} - sanitized URL
  */
 export const sanitizeUrl = (url, opt = {
   allow: [],
   deny: [],
-  parseDataUrl: true
+  parseData: true
 }) => {
   let sanitizedUrl;
   if (isUri(url)) {
-    const { allow, deny, parseDataUrl } = opt;
+    const { allow, deny, parseData } = opt;
     const { href, pathname, protocol } = new URL(url);
     const scheme = protocol.replace(/:$/, '');
     const schemeParts = scheme.split('+');
@@ -528,7 +528,7 @@ export const sanitizeUrl = (url, opt = {
       const ampReg = new RegExp(amp, 'g');
       const encodedCharsReg = new RegExp(`(${lt}|${gt}|${quot}|${apos})`, 'g');
       let toBeSanitizedUrl = href;
-      if (schemeParts.includes('data') && (parseDataUrl ?? true)) {
+      if (schemeParts.includes('data') && (parseData ?? true)) {
         const [header, data] = pathname.split(',');
         const mediaType = header.split(';');
         const isBase64 = mediaType.pop() === 'base64';
