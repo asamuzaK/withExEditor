@@ -3,20 +3,19 @@
  */
 
 /* api */
-import { getType, isString, throwErr } from './common.js';
-import { createFile, fetchText, isFile, readFile } from './file-util.js';
+import { getType, throwErr } from './common.js';
+import { createFile, isFile, readFile } from './file-util.js';
 import { createBlinkFiles } from './blink.js';
 import { program as commander } from 'commander';
-import csvToJson from 'csvtojson';
 import path from 'node:path';
 import process from 'node:process';
 
 /* constants */
-const BASE_URL_IANA = 'https://www.iana.org/assignments/uri-schemes/';
 const CHAR = 'utf8';
 const DIR_CWD = process.cwd();
 const INDENT = 2;
 const PATH_LIB = './src/lib';
+const PATH_MODULE = './node_modules';
 
 /**
  * create blink compatible files
@@ -26,41 +25,6 @@ const PATH_LIB = './src/lib';
  */
 export const createBlinkCompatFiles = cmdOpts =>
   createBlinkFiles(cmdOpts).catch(throwErr);
-
-/**
- * save URI schemes file
- *
- * @see {@link https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml}
- *      - Historical schemes omitted
- *      - Added 'moz-extension' scheme
- * @param {string} dir - directory name
- * @param {boolean} info - console info
- * @returns {string} - file path
- */
-export const saveUriSchemes = async (dir, info) => {
-  if (!isString(dir)) {
-    throw new TypeError(`Expected String but got ${getType(dir)}.`);
-  }
-  const libPath = path.resolve(DIR_CWD, PATH_LIB, dir);
-  const csvFile = 'uri-schemes-1.csv';
-  const csvText = await fetchText(`${BASE_URL_IANA}${csvFile}`);
-  const items = await csvToJson().fromString(csvText);
-  const schemes = new Set(['moz-extension']);
-  for (const item of items) {
-    const { 'URI Scheme': scheme, Status: status } = item;
-    if (!/obsolete|\+/i.test(scheme) &&
-        /^p(?:ermanent|rovisional)$/i.test(status)) {
-      schemes.add(scheme);
-    }
-  }
-  const content = JSON.stringify([...schemes].sort(), null, INDENT);
-  const filePath =
-    await createFile(path.resolve(libPath, 'uri-schemes.json'), `${content}\n`);
-  if (filePath && info) {
-    console.info(`Created: ${filePath}`);
-  }
-  return filePath;
-};
 
 /**
  * save library package info
@@ -81,8 +45,8 @@ export const saveLibraryPackage = async (lib, info) => {
     type,
     files
   } = value;
-  const libDir = path.resolve(DIR_CWD, 'src', 'lib', key);
-  const moduleDir = path.resolve(DIR_CWD, 'node_modules', moduleName);
+  const libDir = path.resolve(DIR_CWD, PATH_LIB, key);
+  const moduleDir = path.resolve(DIR_CWD, PATH_MODULE, moduleName);
   const pkgJsonPath = path.join(moduleDir, 'package.json');
   const pkgJson = await readFile(pkgJsonPath, { encoding: CHAR, flag: 'r' });
   const {
@@ -134,6 +98,29 @@ export const saveLibraryPackage = async (lib, info) => {
 export const extractLibraries = async (cmdOpts = {}) => {
   const { dir, info } = cmdOpts;
   const libraries = {
+    url: {
+      name: 'url-sanitizer',
+      origin: 'https://unpkg.com/url-sanitizer',
+      repository: {
+        type: 'git',
+        url: 'https://github.com/asamuzaK/urlSanitizer.git'
+      },
+      type: 'module',
+      files: [
+        {
+          file: 'LICENSE',
+          path: 'LICENSE'
+        },
+        {
+          file: 'url-sanitizer.min.js',
+          path: 'dist/url-sanitizer.min.js'
+        },
+        {
+          file: 'url-sanitizer.min.js.map',
+          path: 'dist/url-sanitizer.min.js.map'
+        }
+      ]
+    },
     mozilla: {
       name: 'webextension-polyfill',
       origin: 'https://unpkg.com/webextension-polyfill',
@@ -159,16 +146,13 @@ export const extractLibraries = async (cmdOpts = {}) => {
     }
   };
   const func = [];
-  if (dir === 'iana') {
-    func.push(saveUriSchemes(dir, info));
-  } else if (dir) {
+  if (dir) {
     func.push(saveLibraryPackage([dir, libraries[dir]], info));
   } else {
     const items = Object.entries(libraries);
     for (const [key, value] of items) {
       func.push(saveLibraryPackage([key, value], info));
     }
-    func.push(saveUriSchemes('iana', info));
   }
   const arr = await Promise.allSettled(func);
   for (const i of arr) {
