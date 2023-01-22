@@ -19,7 +19,7 @@ import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
 } from './live-edit.js';
 import { html as nsHtml, math as nsMath, svg as nsSvg } from './ns-uri.js';
-import { sanitizeUrl } from './uri-util.js';
+import { sanitizeURLSync } from '../lib/url/url-sanitizer.min.js';
 import {
   CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_CONNECTABLE, IS_MAC, INCOGNITO,
   LABEL, LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN,
@@ -1090,7 +1090,7 @@ export const handleMsg = async msg => {
           if (urlItems?.length) {
             const arr = [];
             for (const item of urlItems) {
-              const url = sanitizeUrl(item);
+              const url = sanitizeURLSync(item);
               if (url) {
                 arr.push(url);
               }

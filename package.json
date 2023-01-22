@@ -19,7 +19,7 @@
     "bundle-esbuild": "esbuild --outfile=bundle/js/content.js --bundle --minify --sourcemap src/mjs/content-loader.js",
     "include": "npm-run-all -s include-*",
     "include-browser": "copyfiles --up=3 --verbose node_modules/webext-schema/modules/browser.js src/mjs",
-    "include-iana": "node index include --dir=iana -i",
+    "include-url": "copyfiles -f --verbose node_modules/url-sanitizer/LICENSE node_modules/url-sanitizer/dist/url-sanitizer.min.js node_modules/url-sanitizer/dist/url-sanitizer.min.js.map src/lib/url && node index include --dir=url -i",
     "include-polyfill": "copyfiles -f --verbose node_modules/webextension-polyfill/LICENSE node_modules/webextension-polyfill/dist/browser-polyfill.min.js node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map src/lib/mozilla && node index include --dir=mozilla -i",
     "lint": "npm-run-all -s lint-*",
     "lint-addons-linter": "addons-linter src",
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "commander": "^10.0.0",
-    "csvtojson": "^2.0.10",
+    "url-sanitizer": "^0.2.2",
     "webext-schema": "^5.1.0",
     "webextension-polyfill": "^0.10.0"
   },
