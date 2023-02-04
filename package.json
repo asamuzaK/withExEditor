@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "commander": "^10.0.0",
-    "url-sanitizer": "^0.5.3",
+    "url-sanitizer": "^0.7.4",
     "webext-schema": "^5.1.0",
     "webextension-polyfill": "^0.10.0"
   },
@@ -45,10 +45,10 @@
     "chai": "^4.3.7",
     "copyfiles": "^2.4.1",
     "esbuild": "^0.17.5",
-    "eslint": "^8.32.0",
+    "eslint": "^8.33.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-jsdoc": "^39.6.10",
+    "eslint-plugin-jsdoc": "^39.8.0",
     "eslint-plugin-no-unsanitized": "^4.0.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
