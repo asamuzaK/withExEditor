@@ -4,6 +4,7 @@
 
 /* shared */
 import { getType, isString, logErr } from './common.js';
+import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import fileExt from './file-ext.js';
 import nsURI, { html as nsHtml } from './ns-uri.js';
 import { MIME_HTML, MIME_PLAIN } from './constant.js';
@@ -173,24 +174,35 @@ export const setAttributeNS = (elm, node = {}) => {
           case 'href':
           case 'poster':
           case 'src': {
-            const { protocol } = new URL(value, origin);
-            if (/https?/.test(protocol)) {
-              elm.setAttributeNS(ns, attrName, value);
+            const { href } = new URL(value, origin);
+            const url = sanitizeURLSync(href, {
+              only: ['http', 'https'],
+              remove: true
+            });
+            if (url) {
+              elm.setAttributeNS(ns, attrName, url);
             }
             break;
           }
           case 'ping': {
-            const urls = value.split(/\s+/);
+            const items = value.split(/\s+/);
+            const arr = [];
             let bool = true;
-            for (const url of urls) {
-              const { protocol } = new URL(url, origin);
-              if (!/https?/.test(protocol)) {
+            for (const item of items) {
+              const { href } = new URL(item, origin);
+              const url = sanitizeURLSync(href, {
+                only: ['http', 'https'],
+                remove: true
+              });
+              if (url) {
+                arr.push(url);
+              } else {
                 bool = false;
                 break;
               }
             }
-            if (bool) {
-              elm.setAttributeNS(ns, attrName, value);
+            if (bool && arr.length) {
+              elm.setAttributeNS(ns, attrName, arr.join(' '));
             }
             break;
           }

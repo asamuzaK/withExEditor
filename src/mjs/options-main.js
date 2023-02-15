@@ -7,7 +7,7 @@ import { isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
   getStorage, removePermission, requestPermission, sendMessage, setStorage
 } from './browser.js';
-import { sanitizeURLSync } from '../lib/url/url-sanitizer.min.js';
+import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
@@ -157,17 +157,25 @@ export const extractSyncUrls = async evt => {
   const items = isString(value) && value.split('\n');
   let func;
   if (items?.length) {
+    const arr = [];
     let bool = false;
     for (let item of items) {
       item = item.trim();
       if (item.length) {
-        bool = !!sanitizeURLSync(item);
-        if (!bool) {
+        const url = sanitizeURLSync(item, {
+          remove: true
+        });
+        if (url) {
+          bool = true;
+          arr.push(url);
+        } else {
+          bool = false;
           break;
         }
       }
     }
-    if (bool) {
+    if (bool && arr.length) {
+      target.value = arr.join('\n');
       func = createPref(target).then(setStorage);
     }
   }
@@ -300,7 +308,9 @@ export const setHtmlInputValue = async (data = {}) => {
           if (items?.length) {
             const arr = [];
             for (const item of items) {
-              const url = sanitizeURLSync(item);
+              const url = sanitizeURLSync(item, {
+                remove: true
+              });
               if (url) {
                 arr.push(url);
               }

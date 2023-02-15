@@ -385,6 +385,7 @@ describe('options-main', () => {
 
     it('should call function', async () => {
       browser.runtime.sendMessage.resolves({});
+      const i = browser.storage.local.set.callCount;
       const evt = {
         target: {
           id: 'foo',
@@ -392,11 +393,29 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1,
+        'called');
+      assert.isUndefined(res, 'result');
+    });
+
+    it('should call function', async () => {
+      browser.runtime.sendMessage.resolves({});
+      const i = browser.storage.local.set.callCount;
+      const evt = {
+        target: {
+          id: 'foo',
+          value: 'https://example.com\nhttps://www.example.com/foo'
+        }
+      };
+      const res = await func(evt);
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1,
+        'called');
       assert.isUndefined(res, 'result');
     });
 
     it('should not call function', async () => {
       browser.runtime.sendMessage.resolves({});
+      const i = browser.storage.local.set.callCount;
       const evt = {
         target: {
           id: 'foo',
@@ -404,6 +423,8 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
+      assert.strictEqual(browser.storage.local.set.callCount, i,
+        'not called');
       assert.isNull(res, 'result');
     });
   });
@@ -497,6 +518,7 @@ describe('options-main', () => {
     const func = mjs.handleSyncUrlsInputInput;
 
     it('should call function', async () => {
+      const i = browser.storage.local.set.callCount;
       const evt = {
         target: {
           id: 'foo',
@@ -504,6 +526,8 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1,
+        'called');
       assert.isUndefined(res, 'result');
     });
   });
