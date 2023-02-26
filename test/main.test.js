@@ -1,12 +1,15 @@
 /**
  * main.test.js
  */
+/* eslint-disable import/order */
 
 /* api */
+import sinon from 'sinon';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { browser, mockPort } from './mocha/setup.js';
-import sinon from 'sinon';
+
+/* test */
 import {
   CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
   EDITOR_FILE_NAME, EDITOR_LABEL, FILE_EXT_SELECT, FILE_EXT_SELECT_HTML,
@@ -22,8 +25,6 @@ import {
   TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
   TMP_FILE_RES, WARN_COLOR, WARN_TEXT, WEBEXT_ID
 } from '../src/mjs/constant.js';
-
-/* test */
 import * as mjs from '../src/mjs/main.js';
 
 describe('main', () => {

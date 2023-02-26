@@ -1,19 +1,20 @@
 /**
  * options-main.test.js
  */
+/* eslint-disable import/order */
 
 /* api */
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import { browser, createJsdom, mockPort } from './mocha/setup.js';
 import sinon from 'sinon';
+import { browser, createJsdom, mockPort } from './mocha/setup.js';
+
+/* test */
 import {
   EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, HOST_CONNECTION,
   HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION, HOST_VERSION_LATEST,
   HOST_VERSION_MIN, INFO, IS_EXECUTABLE, SYNC_AUTO_URL, WARN
 } from '../src/mjs/constant.js';
-
-/* test */
 import * as mjs from '../src/mjs/options-main.js';
 
 describe('options-main', () => {

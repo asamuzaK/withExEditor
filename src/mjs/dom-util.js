@@ -3,8 +3,8 @@
  */
 
 /* shared */
-import { getType, isString, logErr } from './common.js';
 import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
+import { getType, isString, logErr } from './common.js';
 import fileExt from './file-ext.js';
 import nsURI, { html as nsHtml } from './ns-uri.js';
 import { MIME_HTML, MIME_PLAIN } from './constant.js';

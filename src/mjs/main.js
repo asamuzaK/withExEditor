@@ -4,15 +4,15 @@
 
 /* shared */
 import {
-  getType, isObjectNotEmpty, isString, logErr, logMsg, logWarn,
-  stringifyPositiveInt, throwErr
-} from './common.js';
-import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   getActiveTab, getActiveTabId, getAllStorage, getCurrentWindow, getOs,
   getStorage, getWindow, isTab, makeConnection, removeStorage, sendMessage,
   setStorage
 } from './browser.js';
+import {
+  getType, isObjectNotEmpty, isString, logErr, logMsg, logWarn,
+  stringifyPositiveInt, throwErr
+} from './common.js';
 import { setIcon, setIconBadge } from './icon.js';
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES,

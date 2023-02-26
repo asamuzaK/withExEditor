@@ -1,13 +1,16 @@
 /**
  * content-main.test.js
  */
+/* eslint-disable import/order */
 
 /* api */
-import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
+import sinon from 'sinon';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
+import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import { browser, createJsdom } from './mocha/setup.js';
-import sinon from 'sinon';
+
+/* test */
 import {
   CONTENT_GET, IS_MAC, ID_TAB, ID_WIN, INCOGNITO, LABEL,
   LOCAL_FILE_VIEW, MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
@@ -16,8 +19,6 @@ import {
   TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
   TMP_FILE_DATA_REMOVE, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
 } from '../src/mjs/constant.js';
-
-/* test */
 import * as mjs from '../src/mjs/content-main.js';
 
 describe('content-main', () => {

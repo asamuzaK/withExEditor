@@ -4,13 +4,14 @@
 
 /* shared */
 import { throwErr } from './common.js';
-import { localizeHtml } from './localize.js';
 import { showToolbarIconOptions } from './compat.js';
+import { localizeHtml } from './localize.js';
 import {
   addFormSubmitListener, addInputChangeListener, addSyncUrlsInputListener,
   getEditorConfig, getHostStatus, handleMsg, setValuesFromStorage
 } from './options-main.js';
 
+/* api */
 const { runtime } = browser;
 
 /* listener */

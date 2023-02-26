@@ -3,8 +3,9 @@
  */
 
 /* shared */
-import { getType, isObjectNotEmpty, isString, throwErr } from './common.js';
+import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import { sendMessage } from './browser.js';
+import { getType, isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
   dispatchClipboardEvent, dispatchEvent, dispatchFocusEvent, dispatchInputEvent,
   dispatchKeyboardEvent
@@ -19,7 +20,6 @@ import liveEdit, {
   getLiveEditContent, getLiveEditElement, getLiveEditKey
 } from './live-edit.js';
 import { html as nsHtml, math as nsMath, svg as nsSvg } from './ns-uri.js';
-import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import {
   CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_CONNECTABLE, IS_MAC, INCOGNITO,
   LABEL, LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN,

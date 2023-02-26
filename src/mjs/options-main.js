@@ -3,11 +3,11 @@
  */
 
 /* shared */
-import { isObjectNotEmpty, isString, throwErr } from './common.js';
+import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import {
   getStorage, removePermission, requestPermission, sendMessage, setStorage
 } from './browser.js';
-import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
+import { isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
   EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
   HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
