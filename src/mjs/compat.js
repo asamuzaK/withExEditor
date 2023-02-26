@@ -11,7 +11,7 @@ const { runtime } = browser;
 /**
  * show toolbar icon options
  *
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const showToolbarIconOptions = async () => {
   if (runtime.id !== WEBEXT_ID) {

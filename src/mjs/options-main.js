@@ -22,7 +22,7 @@ const { i18n } = browser;
  * send message
  *
  * @param {*} msg - message
- * @returns {?Function} - sendMessage()
+ * @returns {?Promise} - sendMessage()
  */
 export const sendMsg = async msg => {
   let func;
@@ -35,7 +35,7 @@ export const sendMsg = async msg => {
 /**
  * get host status
  *
- * @returns {Function} - sendMsg()
+ * @returns {Promise} - sendMsg()
  */
 export const getHostStatus = async () => sendMsg({
   [HOST_STATUS_GET]: true
@@ -44,7 +44,7 @@ export const getHostStatus = async () => sendMsg({
 /**
  * get editor config
  *
- * @returns {Function} - sendMsg()
+ * @returns {Promise} - sendMsg()
  */
 export const getEditorConfig = async () => sendMsg({
   [EDITOR_CONFIG_GET]: true
@@ -55,7 +55,7 @@ export const getEditorConfig = async () => sendMsg({
  *
  * @param {object} elm - element
  * @param {boolean} executable - executable
- * @returns {object} - pref data
+ * @returns {Promise.<object>} - pref data
  */
 export const createPref = async (elm, executable = false) => {
   const id = elm?.id;
@@ -75,8 +75,8 @@ export const createPref = async (elm, executable = false) => {
 /**
  * extract editor config
  *
- * @param {string} obj - editor config object
- * @returns {void}
+ * @param {object} obj - editor config object
+ * @returns {Promise.<void>} - void
  */
 export const extractEditorConfig = async (obj = {}) => {
   const { editorLabel, editorName, executable } = obj;
@@ -109,7 +109,7 @@ export const extractEditorConfig = async (obj = {}) => {
  * extract host status
  *
  * @param {object} status - host status
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const extractHostStatus = async status => {
   const { hostCompatibility, hostConnection, hostLatestVersion } = status;
@@ -149,7 +149,7 @@ export const extractHostStatus = async status => {
  * extract sync urls input
  *
  * @param {!object} evt - Event
- * @returns {?Function} - promise chain
+ * @returns {?Promise} - promise chain
  */
 export const extractSyncUrls = async evt => {
   const { target } = evt;
@@ -221,7 +221,7 @@ export const storePref = async evt => {
  * handle sync urls input
  *
  * @param {!object} evt - Event
- * @returns {Function} - extractSyncUrls()
+ * @returns {Promise} - extractSyncUrls()
  */
 export const handleSyncUrlsInputInput = evt =>
   extractSyncUrls(evt).catch(throwErr);
@@ -230,7 +230,7 @@ export const handleSyncUrlsInputInput = evt =>
  * handle input change
  *
  * @param {!object} evt - Event
- * @returns {Function} - storePref()
+ * @returns {Promise} - storePref()
  */
 export const handleInputChange = evt => storePref(evt).catch(throwErr);
 
@@ -249,7 +249,7 @@ export const preventEvent = evt => {
 /**
  * add event listener to sync urls textarea
  *
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const addSyncUrlsInputListener = async () => {
   const elm = document.getElementById(SYNC_AUTO_URL);
@@ -259,7 +259,7 @@ export const addSyncUrlsInputListener = async () => {
 /**
  * add event listener to input elements
  *
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const addInputChangeListener = async () => {
   const nodes = document.querySelectorAll('input');
@@ -271,7 +271,7 @@ export const addInputChangeListener = async () => {
 /**
  * add event listener to form elements
  *
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const addFormSubmitListener = async () => {
   const nodes = document.querySelectorAll('form');
@@ -284,7 +284,7 @@ export const addFormSubmitListener = async () => {
  * set html input value
  *
  * @param {object} data - data
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const setHtmlInputValue = async (data = {}) => {
   const { checked, id: dataId, value } = data;

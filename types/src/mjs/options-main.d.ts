@@ -1,0 +1,17 @@
+export function sendMsg(msg: any): Promise<any> | null;
+export function getHostStatus(): Promise<any>;
+export function getEditorConfig(): Promise<any>;
+export function createPref(elm: object, executable?: boolean): Promise<object>;
+export function extractEditorConfig(obj?: object): Promise<void>;
+export function extractHostStatus(status: object): Promise<void>;
+export function extractSyncUrls(evt: object): Promise<any> | null;
+export function storePref(evt: object): Promise<any[]>;
+export function handleSyncUrlsInputInput(evt: object): Promise<any>;
+export function handleInputChange(evt: object): Promise<any>;
+export function preventEvent(evt: object): void;
+export function addSyncUrlsInputListener(): Promise<void>;
+export function addInputChangeListener(): Promise<void>;
+export function addFormSubmitListener(): Promise<void>;
+export function setHtmlInputValue(data?: object): Promise<void>;
+export function setValuesFromStorage(): Promise<any[]>;
+export function handleMsg(msg: any): Promise<any[]>;

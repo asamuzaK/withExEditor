@@ -70,7 +70,7 @@ export const localOptsKeys = new Set([
  *
  * @param {object} opt - user option
  * @param {boolean} store - get storage
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const setOpts = async (opt, store = false) => {
   let opts;
@@ -110,7 +110,7 @@ export const setOpts = async (opt, store = false) => {
 /**
  * toggle badge
  *
- * @returns {Function} - setIconBadge()
+ * @returns {Promise} - setIconBadge()
  */
 export const toggleBadge = async () => {
   const hostStatus = appHost.get('status') ?? {};
@@ -353,7 +353,7 @@ export const updateContextMenu = async (data, all = false) => {
 /**
  * restore context menu
  *
- * @returns {Function} - promise chain
+ * @returns {Promise} - promise chain
  */
 export const restoreContextMenu = async () =>
   menus.removeAll().then(createContextMenu);
@@ -362,7 +362,7 @@ export const restoreContextMenu = async () =>
 /**
  * open options page
  *
- * @returns {?Function} - runtime.openOptionsPage()
+ * @returns {Promise} - runtime.openOptionsPage()
  */
 export const openOptionsPage = async () => runtime.openOptionsPage();
 
@@ -374,7 +374,7 @@ export const tabList = new Set();
  * add id to tab list
  *
  * @param {number} id - tabId
- * @returns {object} - tab list
+ * @returns {Promise.<object>} - tab list
  */
 export const addIdToTabList = async id => {
   if (!Number.isInteger(id)) {
@@ -388,7 +388,7 @@ export const addIdToTabList = async id => {
  * remove id from tab list
  *
  * @param {number} id - tabId
- * @returns {object} - tab list
+ * @returns {Promise.<object>} - tab list
  */
 export const removeIdFromTabList = async id => {
   if (!Number.isInteger(id)) {
@@ -401,7 +401,7 @@ export const removeIdFromTabList = async id => {
 /**
  * restore tab list
  *
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const restoreTabList = async () => {
   const func = [];
@@ -451,7 +451,7 @@ export const handleConnectableTab = async (tab = {}) => {
  *
  * @param {object} info - menus.OnClickData
  * @param {object} tab - tabs.Tab
- * @returns {?Function} - sendMessage()
+ * @returns {?Promise} - sendMessage()
  */
 export const handleClickedMenu = async (info, tab) => {
   let func;
@@ -480,7 +480,7 @@ export const handleClickedMenu = async (info, tab) => {
  *
  * @param {string} key - message key
  * @param {object} msg - message
- * @returns {?Function} - sendMessage()
+ * @returns {?Promise} - sendMessage()
  */
 export const sendTmpFileData = async (key, msg = {}) => {
   if (!isString(key)) {
@@ -505,7 +505,7 @@ export const sendTmpFileData = async (key, msg = {}) => {
 /**
  * send get content message to active tab
  *
- * @returns {?Function} - sendMessage()
+ * @returns {?Promise} - sendMessage()
  */
 export const sendGetContent = async () => {
   const tab = await getActiveTab();
@@ -588,7 +588,7 @@ export const extractEditorConfig = async (data = {}) => {
  * post message to host
  *
  * @param {*} msg - message
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const hostPostMsg = async msg => {
   const port = appHost.get('port');
@@ -670,7 +670,7 @@ export const handleDisconnectedHost = async (port = {}) => {
  * handle host on disconnect
  *
  * @param {object} port - removed host
- * @returns {Function} - promise chain
+ * @returns {Promise} - promise chain
  */
 export const handleHostOnDisconnect = port =>
   handleDisconnectedHost(port).catch(throwErr);
@@ -679,7 +679,7 @@ export const handleHostOnDisconnect = port =>
  * handle host on message
  *
  * @param {*} msg - message
- * @returns {Function} - promise chain
+ * @returns {Promise} - promise chain
  */
 export const handleHostOnMsg = msg => {
   const func = [];
@@ -729,7 +729,7 @@ export const handleHostOnMsg = msg => {
 /**
  * set host
  *
- * @returns {void}
+ * @returns {Promise.<void>} - void
  */
 export const setHost = async () => {
   const port = await makeConnection(HOST, true);
@@ -944,7 +944,7 @@ export const onWindowRemoved = async () => {
  * handle command
  *
  * @param {!string} cmd - command
- * @returns {?Function} - sendGetContent() / openOptionsPage()
+ * @returns {?Promise} - sendGetContent() / openOptionsPage()
  */
 export const handleCmd = async cmd => {
   if (!isString(cmd)) {
@@ -1107,7 +1107,7 @@ export const handleStorage = async (data, area = 'local') => {
 /**
  * startup
  *
- * @returns {Function} - promise chain
+ * @returns {Promise} - promise chain
  */
 export const startup = async () => {
   await Promise.all([

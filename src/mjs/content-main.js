@@ -294,7 +294,7 @@ export const removeTmpFileData = (obj = {}) => {
  * fetch file source and create temporary file data
  *
  * @param {object} data - content data
- * @returns {object} - temporary file data
+ * @returns {Promise.<object>} - temporary file data
  */
 export const fetchSource = async (data = {}) => {
   const {
@@ -337,7 +337,7 @@ export const fetchSource = async (data = {}) => {
  * create temporary file data
  *
  * @param {object} data - content data
- * @returns {object} - temporary file data
+ * @returns {Promise.<object>} - temporary file data
  */
 export const createTmpFileData = async (data = {}) => {
   const { contentType, documentURI: uri } = document;
@@ -458,7 +458,7 @@ export const createTmpFileData = async (data = {}) => {
  * send message
  *
  * @param {*} msg - message
- * @returns {?Function} - sendMessage()
+ * @returns {?Promise} - sendMessage()
  */
 export const sendMsg = async msg => {
   let func;
@@ -494,7 +494,7 @@ export const sendEachDataId = async (bool = false) => {
  * send temporary file data
  *
  * @param {string} dataId - data ID
- * @returns {?Function} - sendMsg()
+ * @returns {?Promise} - sendMsg()
  */
 export const sendTmpFileData = async dataId => {
   const data = dataIds.get(dataId);
@@ -593,7 +593,7 @@ export const setDataIdController = (elm, dataId) => {
  *
  * @param {object} elm - element
  * @param {string} mode - context mode
- * @returns {object} - content data
+ * @returns {Promise.<object>} - content data
  */
 export const createContentData = async (elm, mode) => {
   const data = {
@@ -682,7 +682,7 @@ export const createContentData = async (elm, mode) => {
  * create content data message
  *
  * @param {object} data - temporary file data
- * @returns {object} - message
+ * @returns {Promise.<object>} - message
  */
 export const createContentDataMsg = async data => {
   let msg;
@@ -762,7 +762,7 @@ export const getContextMode = elm => {
  * determine content process
  *
  * @param {object} obj - context menu obj
- * @returns {Function} - sendContent()
+ * @returns {Promise} - sendContent()
  */
 export const determineContentProcess = (obj = {}) => {
   const { info } = obj;
@@ -1134,14 +1134,14 @@ export const handleMsg = async msg => {
  * runtime on message
  *
  * @param {*} msg - message
- * @returns {Function} - handleMsg();
+ * @returns {Promise} - handleMsg();
  */
 export const runtimeOnMsg = msg => handleMsg(msg).catch(throwErr);
 
 /**
  * send tab status
  *
- * @returns {Function} - sendMsg()
+ * @returns {Promise} - sendMsg()
  */
 export const sendTabStatus = async () => {
   const msg = {
@@ -1158,7 +1158,7 @@ export const startup = () => sendTabStatus().catch(throwErr);
  * handle before contextmenu event
  *
  * @param {!object} evt - Event
- * @returns {?Function} - sendMsg()
+ * @returns {?Promise} - sendMsg()
  */
 export const handleBeforeContextMenu = evt => {
   const { button, key, shiftKey, target } = evt;
@@ -1210,7 +1210,7 @@ export const handleBeforeContextMenu = evt => {
  * handle keydown event
  *
  * @param {!object} evt - Event
- * @returns {?Function} - handleBeforeContextMenu()
+ * @returns {?Promise} - handleBeforeContextMenu()
  */
 export const handleKeyDown = evt => {
   const { key, shiftKey, target } = evt;
@@ -1242,7 +1242,7 @@ export const handleKeyDown = evt => {
  * handle readystatechange event
  *
  * @param {!object} evt - Event
- * @returns {?Function} - startup()
+ * @returns {?Promise} - startup()
  */
 export const handleReadyState = evt => {
   const { target } = evt;

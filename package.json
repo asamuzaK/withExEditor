@@ -16,7 +16,7 @@
     "commander": "^10.0.0",
     "dompurify": "^3.0.0",
     "url-sanitizer": "^0.9.5",
-    "webext-schema": "^5.1.5",
+    "webext-schema": "^5.1.6",
     "webextension-polyfill": "^0.10.0"
   },
   "devDependencies": {
@@ -40,6 +40,7 @@
     "sinon": "^15.0.1",
     "stylelint": "^15.2.0",
     "stylelint-config-standard": "^30.0.1",
+    "typescript": "^4.9.5",
     "undici": "^5.20.0"
   },
   "scripts": {
@@ -62,7 +63,8 @@
     "test-central": "c8 mocha --require=test/mocha/setup.js --channel=central --exit test/*.test.js",
     "test-esr": "c8 mocha --require=test/mocha/setup.js --channel=esr --exit test/*.test.js",
     "test-release": "c8 mocha --require=test/mocha/setup.js --channel=release --exit test/*.test.js",
-    "test_all": "npm-run-all -s test-*"
+    "test_all": "npm-run-all -s test-*",
+    "tsc": "node index clean --dir=types -i && npx tsc"
   },
   "version": "10.5.1"
 }
