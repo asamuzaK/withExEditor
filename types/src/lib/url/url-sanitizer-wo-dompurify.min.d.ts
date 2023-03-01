@@ -3,11 +3,7 @@ declare var y: {
     "__#2@#t": Set<any>;
     replace(e: any): any;
     purify(e: any): string;
-    sanitize(e: any, s?: {
-        allow: any[];
-        deny: any[];
-        only: any[];
-    }): string;
+    sanitize(e: any, s: any): string;
     parse(e: any, s: any): {
         [k: string]: any;
     };
@@ -19,7 +15,7 @@ declare var y: {
     verify(e: any): boolean;
 };
 declare function xe(t: any): Promise<boolean>;
-declare function ve(t: any): boolean;
+declare function Ue(t: any): boolean;
 declare function Ee(t: any): Promise<{
     [k: string]: any;
 }>;
@@ -32,4 +28,4 @@ declare function be(t: any, e?: {
     only: any[];
 }): Promise<string>;
 declare function we(t: any, e: any): string;
-export { y as default, xe as isURI, ve as isURISync, Ee as parseURL, Re as parseURLSync, be as sanitizeURL, we as sanitizeURLSync };
+export { y as default, xe as isURI, Ue as isURISync, Ee as parseURL, Re as parseURLSync, be as sanitizeURL, we as sanitizeURLSync };
