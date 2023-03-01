@@ -154,13 +154,15 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
-  const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[0-9A-F]{2})+)*$/;
-  const { pathname, protocol } = new URL(uri);
+  const url = sanitizeURLSync(uri);
   let dataId;
-  if (pathname && reg.test(pathname) &&
-      protocol && !/^(?:blob|data):/.test(protocol)) {
-    const [, fileName] = reg.exec(pathname);
-    dataId = decodeURIComponent(fileName);
+  if (url) {
+    const { pathname } = new URL(url);
+    const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[\dA-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[\dA-F]{2})+)*$/;
+    if (pathname && reg.test(pathname)) {
+      const [, fileName] = reg.exec(pathname);
+      dataId = decodeURIComponent(fileName);
+    }
   }
   return dataId && dataId.length < FILE_LEN ? dataId : subst;
 };
