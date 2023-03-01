@@ -8,7 +8,7 @@ import sinon from 'sinon';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
-import { browser, createJsdom } from './mocha/setup.js';
+import { browser, createJsdom, DOMPurify } from './mocha/setup.js';
 
 /* test */
 import {
@@ -54,8 +54,12 @@ describe('content-main', () => {
       document.queryCommandValue =
         sinon.stub().withArgs('defaultParagraphSeparator').returns('div');
     }
+    window.DOMPurify = DOMPurify(window);
+
     global.window = window;
     global.document = document;
+    global.DOMPurify = window.DOMPurify;
+
     for (const key of globalKeys) {
       // Not implemented in jsdom
       if (key === 'InputEvent' &&
@@ -109,6 +113,7 @@ describe('content-main', () => {
     document = null;
     delete global.window;
     delete global.document;
+    delete global.DOMPurify;
     for (const key of globalKeys) {
       delete global[key];
     }

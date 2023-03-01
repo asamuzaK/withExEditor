@@ -3,7 +3,9 @@
  */
 
 /* shared */
-import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
+import {
+  parseURLSync, sanitizeURLSync
+} from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import { sendMessage } from './browser.js';
 import { getType, isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
@@ -154,15 +156,14 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
-  const url = sanitizeURLSync(uri);
+  const { pathname, protocol } = parseURLSync(uri);
+  const schemeParts = protocol && protocol.replace(/:$/, '').split('+');
+  const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[\dA-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[\dA-F]{2})+)*$/;
   let dataId;
-  if (url) {
-    const { pathname } = new URL(url);
-    const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[\dA-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[\dA-F]{2})+)*$/;
-    if (pathname && reg.test(pathname)) {
-      const [, fileName] = reg.exec(pathname);
-      dataId = decodeURIComponent(fileName);
-    }
+  if (schemeParts && schemeParts.every(s => !/^(?:blob|data)$/.test(s)) &&
+      pathname && reg.test(pathname)) {
+    const [, fileName] = reg.exec(pathname);
+    dataId = decodeURIComponent(fileName);
   }
   return dataId && dataId.length < FILE_LEN ? dataId : subst;
 };
