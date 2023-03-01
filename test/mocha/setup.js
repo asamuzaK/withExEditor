@@ -2,10 +2,10 @@
  * setup.js
  */
 
+import DOMPurify from 'dompurify';
+import sinon from 'sinon';
 import { JSDOM } from 'jsdom';
 import { Schema } from 'webext-schema';
-import domPurify from 'dompurify';
-import sinon from 'sinon';
 
 /**
  * create jsdom
@@ -20,7 +20,6 @@ export const createJsdom = url => {
     url: url || 'https://localhost',
     beforeParse(window) {
       window.alert = sinon.stub();
-      window.DOMPurify = domPurify;
     }
   };
   return new JSDOM(domstr, opt);
@@ -28,6 +27,7 @@ export const createJsdom = url => {
 
 const { window } = createJsdom();
 const { document } = window;
+window.DOMPurify = DOMPurify;
 
 /**
  * get channel
@@ -68,6 +68,7 @@ browser.runtime.connectNative.callsFake(mockPort);
 global.window = window;
 global.document = document;
 global.browser = browser;
+global.DOMPurify = DOMPurify(window);
 
 const globalKeys = [
   'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'Event',
@@ -122,3 +123,7 @@ for (const key of globalKeys) {
     global[key] = window[key];
   }
 }
+
+export {
+  DOMPurify
+};
