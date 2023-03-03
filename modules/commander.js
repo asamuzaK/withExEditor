@@ -226,7 +226,7 @@ export const cleanDirectory = (cmdOpts = {}) => {
  */
 export const parseCommand = args => {
   const reg =
-    /^(?:(?:--)?help|-[h|v]|--version|c(?:lean|ompat)?|i(?:nclude)?)$/;
+    /^(?:(?:--)?help|-[h|v]|--version|c(?:lean|ompat)|include)$/;
   if (Array.isArray(args) && args.some(arg => reg.test(arg))) {
     commander.exitOverride();
     commander.version(process.env.npm_package_version, '-v, --version');
@@ -235,12 +235,12 @@ export const parseCommand = args => {
       .option('-d, --dir <name>', 'specify directory')
       .option('-i, --info', 'console info')
       .action(cleanDirectory);
-    commander.command('compat').alias('c')
+    commander.command('compat')
       .description('create blink compatible files')
       .option('-c, --clean', 'clean directory')
       .option('-i, --info', 'console info')
       .action(createBlinkCompatFiles);
-    commander.command('include').alias('i')
+    commander.command('include')
       .description('include library packages')
       .option('-d, --dir <name>', 'specify library directory')
       .option('-i, --info', 'console info')
