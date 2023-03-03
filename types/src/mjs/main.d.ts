@@ -3,7 +3,7 @@ export const globalOpts: Map<any, any>;
 export const globalOptsKeys: Set<string>;
 export const localOpts: Map<any, any>;
 export const localOptsKeys: Set<string>;
-export function setOpts(opt: object, store?: boolean): Promise<void>;
+export function setOpts(opt?: object, store?: boolean): Promise<void>;
 export function toggleBadge(): Promise<any>;
 export namespace menuItems {
     namespace openOptionsPage {
@@ -71,9 +71,9 @@ export namespace menuItems {
         export { placeholder_8 as placeholder };
     }
 }
-export function createMenuItemData(key: string): object;
+export function createMenuItemData(key?: string): object;
 export function createContextMenu(): Promise<any[]>;
-export function updateContextMenu(data: object, all?: boolean): Promise<any[]>;
+export function updateContextMenu(data?: object, all?: boolean): Promise<any[]>;
 export function restoreContextMenu(): Promise<any>;
 export function openOptionsPage(): Promise<any>;
 export const tabList: Set<any>;
@@ -81,17 +81,17 @@ export function addIdToTabList(id: number): Promise<object>;
 export function removeIdFromTabList(id: number): Promise<object>;
 export function restoreTabList(): Promise<void>;
 export function handleConnectableTab(tab?: object): Promise<any[]>;
-export function handleClickedMenu(info: object, tab: object): Promise<any> | null;
+export function handleClickedMenu(info?: object, tab?: object): Promise<any> | null;
 export function sendTmpFileData(key: string, msg?: object): Promise<any> | null;
 export function sendGetContent(): Promise<any> | null;
 export function extractEditorConfig(data?: object): Promise<any[]>;
 export function hostPostMsg(msg: any): Promise<void>;
-export function handleHostMsg(msg: object): Promise<any[]>;
+export function handleHostMsg(msg?: object): Promise<any[]>;
 export function handleDisconnectedHost(port?: object): Promise<any[]>;
 export function handleHostOnDisconnect(port: object): Promise<any>;
-export function handleHostOnMsg(msg: any): Promise<any>;
+export function handleHostOnMsg(msg?: object): Promise<any>;
 export function setHost(): Promise<void>;
-export function handleMsg(msg: any, sender: object): Promise<any[]>;
+export function handleMsg(msg?: object, sender?: object): Promise<any[]>;
 export function onTabActivated(info: object): Promise<any[]>;
 export function onTabUpdated(id: number, info: object, tab: object): Promise<any[]>;
 export function onTabRemoved(id: number, info: object): Promise<any[]>;
@@ -99,8 +99,8 @@ export function onWindowFocusChanged(): Promise<any[]>;
 export function onWindowRemoved(): Promise<any[]>;
 export function handleCmd(cmd: string): Promise<any> | null;
 export function sendVariables(obj: object): Promise<any[]>;
-export function setStorageValue(item: string, obj: object, changed?: boolean): Promise<any[]>;
-export function handleStorage(data: object, area?: string): Promise<any[]>;
+export function setStorageValue(item: string, obj?: object, changed?: boolean): Promise<any[]>;
+export function handleStorage(data?: object, area?: string): Promise<any[]>;
 export function startup(): Promise<any>;
 import { OPTIONS_OPEN } from "./constant.js";
 import { MODE_EDIT } from "./constant.js";

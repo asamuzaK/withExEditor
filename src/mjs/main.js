@@ -68,8 +68,8 @@ export const localOptsKeys = new Set([
 /**
  * set options
  *
- * @param {object} opt - user option
- * @param {boolean} store - get storage
+ * @param {object} [opt] - user option
+ * @param {boolean} [store] - get storage
  * @returns {Promise.<void>} - void
  */
 export const setOpts = async (opt, store = false) => {
@@ -186,7 +186,7 @@ export const menuItems = {
 /**
  * create menu item data
  *
- * @param {string} key - item key
+ * @param {string} [key] - item key
  * @returns {object} - item data
  */
 export const createMenuItemData = key => {
@@ -270,8 +270,8 @@ export const createContextMenu = async () => {
 /**
  * update context menu
  *
- * @param {object} data - context data
- * @param {boolean} all - update all items
+ * @param {object} [data] - context data
+ * @param {boolean} [all] - update all items
  * @returns {Promise.<Array>} - results of each handler
  */
 export const updateContextMenu = async (data, all = false) => {
@@ -417,7 +417,7 @@ export const restoreTabList = async () => {
 /**
  * handle connectable tab
  *
- * @param {object} tab - tabs.Tab
+ * @param {object} [tab] - tabs.Tab
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleConnectableTab = async (tab = {}) => {
@@ -449,8 +449,8 @@ export const handleConnectableTab = async (tab = {}) => {
 /**
  * handle clicked context menu
  *
- * @param {object} info - menus.OnClickData
- * @param {object} tab - tabs.Tab
+ * @param {object} [info] - menus.OnClickData
+ * @param {object} [tab] - tabs.Tab
  * @returns {?Promise} - sendMessage()
  */
 export const handleClickedMenu = async (info, tab) => {
@@ -479,7 +479,7 @@ export const handleClickedMenu = async (info, tab) => {
  * send tmp file data
  *
  * @param {string} key - message key
- * @param {object} msg - message
+ * @param {object} [msg] - message
  * @returns {?Promise} - sendMessage()
  */
 export const sendTmpFileData = async (key, msg = {}) => {
@@ -525,7 +525,7 @@ export const sendGetContent = async () => {
 /**
  * extract editor config data
  *
- * @param {object} data - editor config data
+ * @param {object} [data] - editor config data
  * @returns {Promise.<Array>} - results of each handler
  */
 export const extractEditorConfig = async (data = {}) => {
@@ -600,7 +600,7 @@ export const hostPostMsg = async msg => {
 /**
  * handle host message
  *
- * @param {object} msg - message
+ * @param {object} [msg] - message
  * @returns {Promise.<Array>} - result of each handler
  */
 export const handleHostMsg = async msg => {
@@ -678,7 +678,7 @@ export const handleHostOnDisconnect = port =>
 /**
  * handle host on message
  *
- * @param {*} msg - message
+ * @param {object} [msg] - message
  * @returns {Promise} - promise chain
  */
 export const handleHostOnMsg = msg => {
@@ -750,8 +750,8 @@ export const setHost = async () => {
 /**
  * handle message
  *
- * @param {*} msg - message
- * @param {object} sender - sender
+ * @param {object} [msg] - message
+ * @param {object} [sender] - sender
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleMsg = async (msg, sender) => {
@@ -987,8 +987,8 @@ export const sendVariables = async obj => {
  * set storage value
  *
  * @param {string} item - item
- * @param {object} obj - value object
- * @param {boolean} changed - changed
+ * @param {object} [obj] - value object
+ * @param {boolean} [changed] - changed
  * @returns {Promise.<Array>} - results of each handler
  */
 export const setStorageValue = async (item, obj, changed = false) => {
@@ -1086,8 +1086,8 @@ export const setStorageValue = async (item, obj, changed = false) => {
 /**
  * handle storage
  *
- * @param {object} data - data
- * @param {string} area - storage area
+ * @param {object} [data] - data
+ * @param {string} [area] - storage area
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleStorage = async (data, area = 'local') => {

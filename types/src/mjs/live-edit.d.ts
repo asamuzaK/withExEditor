@@ -1,7 +1,7 @@
 export { liveEdit as default };
-export function getLiveEditKey(elm: object): string | null;
-export function getLiveEditElement(node: object): object;
-export function getLiveEditContent(elm: object, key: string): string | null;
+export function getLiveEditKey(elm?: object): string | null;
+export function getLiveEditElement(node?: object): object;
+export function getLiveEditContent(elm?: object, key?: string): string | null;
 declare namespace liveEdit {
     namespace aceEditor {
         const className: string;

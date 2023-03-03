@@ -42,7 +42,7 @@ export const getDecodedContent = str => {
 /**
  * check whether given array of URLs matches document URL
  *
- * @param {Array} arr - array of URLs
+ * @param {Array} [arr] - array of URLs
  * @returns {boolean} - result
  */
 export const matchDocUrl = arr => {
@@ -74,8 +74,8 @@ export const matchDocUrl = arr => {
 /**
  * get file extension from media type
  *
- * @param {string} media - media type
- * @param {string} subst - substitute file extension
+ * @param {string} [media] - media type
+ * @param {string} [subst] - substitute file extension
  * @returns {string} - file extension
  */
 export const getFileExtension = (media = MIME_PLAIN, subst = 'txt') => {
@@ -101,7 +101,7 @@ export const getFileExtension = (media = MIME_PLAIN, subst = 'txt') => {
 /**
  * get namespace of node from ancestor
  *
- * @param {object} node - element node
+ * @param {object} [node] - element node
  * @returns {object} - namespace data
  */
 export const getNodeNS = node => {
@@ -135,8 +135,8 @@ export const getNodeNS = node => {
 /**
  * get xmlns prefixed namespace
  *
- * @param {object} elm - element
- * @param {string} attr - attribute
+ * @param {object} [elm] - element
+ * @param {string} [attr] - attribute
  * @returns {string} - namespace
  */
 export const getXmlnsPrefixedNamespace = (elm, attr) => {
@@ -156,8 +156,8 @@ export const getXmlnsPrefixedNamespace = (elm, attr) => {
 /**
  * set namespaced attribute
  *
- * @param {object} elm - element to append attributes
- * @param {object} node - element node to get attributes from
+ * @param {object} [elm] - element to append attributes
+ * @param {object} [node] - element node to get attributes from
  * @returns {void}
  */
 export const setAttributeNS = (elm, node = {}) => {
@@ -221,7 +221,7 @@ export const setAttributeNS = (elm, node = {}) => {
 /**
  * create namespaced element
  *
- * @param {object} node - element node to create element from
+ * @param {object} [node] - element node to create element from
  * @returns {object} - namespaced element
  */
 export const createElement = node => {
@@ -244,7 +244,7 @@ export const createElement = node => {
 /**
  * create document fragment from nodes array
  *
- * @param {Array} nodes - nodes array
+ * @param {Array} [nodes] - nodes array
  * @returns {object} - document fragment
  */
 export const createFragment = nodes => {
@@ -264,7 +264,7 @@ export const createFragment = nodes => {
  * append child nodes
  *
  * @param {object} elm - container element
- * @param {object} node - node containing child nodes to append
+ * @param {object} [node] - node containing child nodes to append
  * @returns {object} - element
  */
 export const appendChildNodes = (elm, node) => {
@@ -297,7 +297,7 @@ export const appendChildNodes = (elm, node) => {
 /**
  * create DOM string of MathML / SVG
  *
- * @param {object} node - element node
+ * @param {object} [node] - element node
  * @returns {?string} - serialized node string
  */
 export const createXmlBasedDomString = node => {
@@ -322,7 +322,7 @@ export const createXmlBasedDomString = node => {
 /**
  * create range array
  *
- * @param {object} range - range
+ * @param {object} [range] - range
  * @returns {Array} - range array
  */
 export const createRangeArr = range => {
@@ -349,7 +349,7 @@ export const createRangeArr = range => {
 /**
  * create DOM string from selection range
  *
- * @param {object} sel - selection
+ * @param {object} [sel] - selection
  * @returns {?string} - serialized node string
  */
 export const createDomStringFromSelectionRange = sel => {
@@ -368,18 +368,19 @@ export const createDomStringFromSelectionRange = sel => {
  *
  * @param {string} domstr - DOM string
  * @param {string} mime - mime type
- * @param {boolean} reqElm - require first element child
+ * @param {boolean} [reqElm] - require first element child
  * @returns {?string} - serialized DOM string
  */
 export const serializeDomString = (domstr, mime, reqElm = false) => {
   if (!isString(domstr)) {
     throw new TypeError(`Expected String but got ${getType(domstr)}.`);
   }
-  if (!isString(mime)) {
+  if (isString(mime)) {
+    if (!/text\/(?:ht|x)ml|application\/(?:xhtml\+)?xml|image\/svg\+xml/.test(mime)) {
+      throw new TypeError(`Unsupported MIME type ${mime}.`);
+    }
+  } else {
     throw new TypeError(`Expected String but got ${getType(mime)}.`);
-  }
-  if (!/text\/(?:ht|x)ml|application\/(?:xhtml\+)?xml|image\/svg\+xml/.test(mime)) {
-    throw new TypeError(`Unsupported MIME type ${mime}.`);
   }
   const dom = new DOMParser().parseFromString(domstr, mime);
   if (dom.querySelector('parsererror')) {
@@ -418,8 +419,8 @@ export const serializeDomString = (domstr, mime, reqElm = false) => {
 /**
  * get text
  *
- * @param {object} nodes - node list
- * @param {boolean} pre - preformatted
+ * @param {object} [nodes] - node list
+ * @param {boolean} [pre] - preformatted
  * @returns {string} - text
  */
 export const getText = (nodes, pre = false) => {
@@ -511,7 +512,7 @@ export const getText = (nodes, pre = false) => {
 /**
  * get ancestor element ID
  *
- * @param {object} elm - element node
+ * @param {object} [elm] - element node
  * @returns {?string} - ID
  */
 export const getAncestorId = elm => {
@@ -533,7 +534,7 @@ export const getAncestorId = elm => {
 /**
  * node or ancestor is editable
  *
- * @param {object} node - element node
+ * @param {object} [node] - element node
  * @returns {boolean} - result
  */
 export const isEditable = node => {
@@ -574,7 +575,7 @@ export const isContentTextNode = node => {
 /**
  * is text edit control element
  *
- * @param {object} elm - element
+ * @param {object} [elm] - element
  * @returns {boolean} - result
  */
 export const isEditControl = elm => {
@@ -616,7 +617,7 @@ export const getEditableElm = node => {
  *
  * @param {string} localName - element local name
  * @param {string} query - query selector
- * @param {boolean} force - force
+ * @param {boolean} [force] - force
  * @returns {Array} - filtered editable elements
  */
 export const filterEditableElements = (localName, query, force = false) => {
@@ -640,8 +641,8 @@ export const filterEditableElements = (localName, query, force = false) => {
 /**
  * create paragraphed content
  *
- * @param {string} value - value
- * @param {string} ns - namespace URI
+ * @param {string} [value] - value
+ * @param {string} [ns] - namespace URI
  * @returns {object} - document fragment
  */
 export const createParagraphedContent = (value, ns = nsHtml) => {
