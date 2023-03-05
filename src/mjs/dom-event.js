@@ -117,10 +117,6 @@ export const dispatchInputEvent = (elm, type, opt) => {
     const evt = new InputEvent(type, opt);
     const { dataTransfer } = opt;
     if (dataTransfer) {
-      // FIXME: evt.dataTransfer is read-only
-      if (!evt.dataTransfer) {
-        evt.dataTransfer = new DataTransfer();
-      }
       const { types } = dataTransfer;
       for (const mime of types) {
         const value = dataTransfer.getData(mime);

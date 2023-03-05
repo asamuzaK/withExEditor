@@ -6,7 +6,7 @@
 import sinon from 'sinon';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import { browser, createJsdom } from './mocha/setup.js';
+import { browser, createJsdom, DataTransfer } from './mocha/setup.js';
 
 /* test */
 // eslint-disable-next-line import/order
@@ -49,11 +49,16 @@ describe('dom util', () => {
     global.document = document;
     for (const key of globalKeys) {
       // Not implemented in jsdom
-      if (key === 'InputEvent' &&
-          typeof window.InputEvent.prototype.getTargetRanges !== 'function') {
-        Object.defineProperty(window.InputEvent.prototype, 'getTargetRanges', {
-          value: sinon.stub()
-        });
+      if (key === 'InputEvent') {
+        if (typeof window.InputEvent.prototype.getTargetRanges !== 'function') {
+          Object.defineProperty(window.InputEvent.prototype,
+            'getTargetRanges', {
+              value: sinon.stub()
+            });
+        }
+        if (typeof window.InputEvent.prototype.dataTransfer === 'undefined') {
+          window.InputEvent.prototype.dataTransfer = new DataTransfer();
+        }
       } else if (!window[key]) {
         if (key === 'ClipboardEvent') {
           window[key] = class ClipboardEvent extends window.Event {
@@ -63,31 +68,7 @@ describe('dom util', () => {
             }
           };
         } else if (key === 'DataTransfer') {
-          window[key] = class DataTransfer {
-            constructor() {
-              this._items = new Map();
-            }
-
-            get types() {
-              return Array.from(this._items.keys());
-            }
-
-            clearData(format) {
-              if (format) {
-                this._items.remove(format);
-              } else {
-                this._items.clear();
-              }
-            }
-
-            getData(type) {
-              return this._items.get(type) || '';
-            }
-
-            setData(type, value) {
-              this._items.set(type, value);
-            }
-          };
+          window[key] = DataTransfer;
         }
       }
       if (window[key] && !global[key]) {
