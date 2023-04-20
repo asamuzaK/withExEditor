@@ -67,7 +67,6 @@ export const localOptsKeys = new Set([
 
 /**
  * set options
- *
  * @param {object} [opt] - user option
  * @param {boolean} [store] - get storage
  * @returns {Promise.<void>} - void
@@ -109,7 +108,6 @@ export const setOpts = async (opt, store = false) => {
 
 /**
  * toggle badge
- *
  * @returns {Promise} - setIconBadge()
  */
 export const toggleBadge = async () => {
@@ -185,7 +183,6 @@ export const menuItems = {
 
 /**
  * create menu item data
- *
  * @param {string} [key] - item key
  * @returns {object} - item data
  */
@@ -251,7 +248,6 @@ export const createMenuItemData = key => {
 
 /**
  * create context menu
- *
  * @returns {Promise.<Array>} - results of each handler
  */
 export const createContextMenu = async () => {
@@ -269,7 +265,6 @@ export const createContextMenu = async () => {
 
 /**
  * update context menu
- *
  * @param {object} [data] - context data
  * @param {boolean} [all] - update all items
  * @returns {Promise.<Array>} - results of each handler
@@ -352,7 +347,6 @@ export const updateContextMenu = async (data, all = false) => {
 
 /**
  * restore context menu
- *
  * @returns {Promise} - promise chain
  */
 export const restoreContextMenu = async () =>
@@ -361,7 +355,6 @@ export const restoreContextMenu = async () =>
 /* extension */
 /**
  * open options page
- *
  * @returns {Promise} - runtime.openOptionsPage()
  */
 export const openOptionsPage = async () => runtime.openOptionsPage();
@@ -372,7 +365,6 @@ export const tabList = new Set();
 
 /**
  * add id to tab list
- *
  * @param {number} id - tabId
  * @returns {Promise.<object>} - tab list
  */
@@ -386,7 +378,6 @@ export const addIdToTabList = async id => {
 
 /**
  * remove id from tab list
- *
  * @param {number} id - tabId
  * @returns {Promise.<object>} - tab list
  */
@@ -400,7 +391,6 @@ export const removeIdFromTabList = async id => {
 
 /**
  * restore tab list
- *
  * @returns {Promise.<void>} - void
  */
 export const restoreTabList = async () => {
@@ -416,7 +406,6 @@ export const restoreTabList = async () => {
 
 /**
  * handle connectable tab
- *
  * @param {object} [tab] - tabs.Tab
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -448,7 +437,6 @@ export const handleConnectableTab = async (tab = {}) => {
 
 /**
  * handle clicked context menu
- *
  * @param {object} [info] - menus.OnClickData
  * @param {object} [tab] - tabs.Tab
  * @returns {?Promise} - sendMessage()
@@ -477,7 +465,6 @@ export const handleClickedMenu = async (info, tab) => {
 
 /**
  * send tmp file data
- *
  * @param {string} key - message key
  * @param {object} [msg] - message
  * @returns {?Promise} - sendMessage()
@@ -504,7 +491,6 @@ export const sendTmpFileData = async (key, msg = {}) => {
 
 /**
  * send get content message to active tab
- *
  * @returns {?Promise} - sendMessage()
  */
 export const sendGetContent = async () => {
@@ -524,7 +510,6 @@ export const sendGetContent = async () => {
 /* editor config */
 /**
  * extract editor config data
- *
  * @param {object} [data] - editor config data
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -586,7 +571,6 @@ export const extractEditorConfig = async (data = {}) => {
 /* application host */
 /**
  * post message to host
- *
  * @param {*} msg - message
  * @returns {Promise.<void>} - void
  */
@@ -599,7 +583,6 @@ export const hostPostMsg = async msg => {
 
 /**
  * handle host message
- *
  * @param {object} [msg] - message
  * @returns {Promise.<Array>} - result of each handler
  */
@@ -650,7 +633,6 @@ export const handleHostMsg = async msg => {
 
 /**
  * handle disconnected host
- *
  * @param {object} port - runtime.Port
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -668,7 +650,6 @@ export const handleDisconnectedHost = async (port = {}) => {
 
 /**
  * handle host on disconnect
- *
  * @param {object} port - removed host
  * @returns {Promise} - promise chain
  */
@@ -677,7 +658,6 @@ export const handleHostOnDisconnect = port =>
 
 /**
  * handle host on message
- *
  * @param {object} [msg] - message
  * @returns {Promise} - promise chain
  */
@@ -728,7 +708,6 @@ export const handleHostOnMsg = msg => {
 
 /**
  * set host
- *
  * @returns {Promise.<void>} - void
  */
 export const setHost = async () => {
@@ -749,7 +728,6 @@ export const setHost = async () => {
 /* message */
 /**
  * handle message
- *
  * @param {object} [msg] - message
  * @param {object} [sender] - sender
  * @returns {Promise.<Array>} - results of each handler
@@ -814,7 +792,6 @@ export const handleMsg = async (msg, sender) => {
 /* tab / window handlers */
 /**
  * handle activated tab
- *
  * @param {!object} info - activated tab info
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -834,7 +811,6 @@ export const onTabActivated = async info => {
 
 /**
  * handle updated tab
- *
  * @param {!number} id - tabId
  * @param {!object} info - changed tab info
  * @param {!object} tab - tabs.Tab
@@ -858,7 +834,6 @@ export const onTabUpdated = async (id, info, tab) => {
 
 /**
  * handle removed tab
- *
  * @param {!number} id - tabId
  * @param {!object} info - removed tab info
  * @returns {Promise.<Array>} - results of each handler
@@ -902,7 +877,6 @@ export const onTabRemoved = async (id, info) => {
 
 /**
  * handle focus changed window
- *
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onWindowFocusChanged = async () => {
@@ -925,7 +899,6 @@ export const onWindowFocusChanged = async () => {
 
 /**
  * handle removed window
- *
  * @returns {Promise.<Array>} - results of each handler
  */
 export const onWindowRemoved = async () => {
@@ -942,7 +915,6 @@ export const onWindowRemoved = async () => {
 
 /**
  * handle command
- *
  * @param {!string} cmd - command
  * @returns {?Promise} - sendGetContent() / openOptionsPage()
  */
@@ -966,7 +938,6 @@ export const handleCmd = async cmd => {
 /* handle variables */
 /**
  * send variables
- *
  * @param {object} obj - variable object
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -985,7 +956,6 @@ export const sendVariables = async obj => {
 
 /**
  * set storage value
- *
  * @param {string} item - item
  * @param {object} [obj] - value object
  * @param {boolean} [changed] - changed
@@ -1085,7 +1055,6 @@ export const setStorageValue = async (item, obj, changed = false) => {
 
 /**
  * handle storage
- *
  * @param {object} [data] - data
  * @param {string} [area] - storage area
  * @returns {Promise.<Array>} - results of each handler
@@ -1106,7 +1075,6 @@ export const handleStorage = async (data, area = 'local') => {
 
 /**
  * startup
- *
  * @returns {Promise} - promise chain
  */
 export const startup = async () => {

@@ -19,7 +19,6 @@ const PATH_MODULE = './node_modules';
 
 /**
  * create blink compatible files
- *
  * @param {object} cmdOpts - command options
  * @returns {Promise} - promise chain
  */
@@ -28,7 +27,6 @@ export const createBlinkCompatFiles = cmdOpts =>
 
 /**
  * save library package info
- *
  * @param {Array} lib - library
  * @param {boolean} info - console info
  * @returns {Promise.<string>} - package.json file path
@@ -96,7 +94,6 @@ export const saveLibraryPackage = async (lib, info) => {
 
 /**
  * extract libraries
- *
  * @param {object} cmdOpts - command options
  * @returns {Promise.<void>} - void
  */
@@ -195,7 +192,6 @@ export const extractLibraries = async (cmdOpts = {}) => {
 
 /**
  * include libraries
- *
  * @param {object} cmdOpts - command options
  * @returns {Promise} - promise chain
  */
@@ -204,7 +200,6 @@ export const includeLibraries = cmdOpts =>
 
 /**
  * clean directory
- *
  * @param {object} cmdOpts - command options
  * @returns {void}
  */
@@ -220,7 +215,6 @@ export const cleanDirectory = (cmdOpts = {}) => {
 
 /**
  * parse command
- *
  * @param {Array} args - process.argv
  * @returns {void}
  */

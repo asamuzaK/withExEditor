@@ -10,7 +10,6 @@ const { runtime } = browser;
 
 /**
  * show toolbar icon options
- *
  * @returns {Promise.<void>} - void
  */
 export const showToolbarIconOptions = async () => {

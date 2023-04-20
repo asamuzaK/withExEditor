@@ -37,7 +37,6 @@ export class DataTransfer {
 
 /**
  * create jsdom
- *
  * @param {string} url - url
  * @returns {object} - jsdom instance
  */
@@ -59,7 +58,6 @@ window.DOMPurify = DOMPurify;
 
 /**
  * get channel
- *
  * @returns {string} - channel
  */
 const getChannel = () => {

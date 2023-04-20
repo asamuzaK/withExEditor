@@ -8,7 +8,6 @@ const TYPE_TO = -1;
 
 /**
  * log error
- *
  * @param {!object} e - Error
  * @returns {boolean} - false
  */
@@ -23,7 +22,6 @@ export const logErr = e => {
 
 /**
  * throw error
- *
  * @param {!object} e - Error
  * @throws
  */
@@ -34,7 +32,6 @@ export const throwErr = e => {
 
 /**
  * log warn
- *
  * @param {*} msg - message
  * @returns {boolean} - false
  */
@@ -47,7 +44,6 @@ export const logWarn = msg => {
 
 /**
  * log message
- *
  * @param {*} msg - message
  * @returns {object} - message
  */
@@ -60,7 +56,6 @@ export const logMsg = msg => {
 
 /**
  * get type
- *
  * @param {*} o - object to check
  * @returns {string} - type of object
  */
@@ -69,7 +64,6 @@ export const getType = o =>
 
 /**
  * is string
- *
  * @param {*} o - object to check
  * @returns {boolean} - result
  */
@@ -77,7 +71,6 @@ export const isString = o => typeof o === 'string' || o instanceof String;
 
 /**
  * is object, and not an empty object
- *
  * @param {*} o - object to check;
  * @returns {boolean} - result
  */
@@ -88,7 +81,6 @@ export const isObjectNotEmpty = o => {
 
 /**
  * sleep
- *
  * @param {number} msec - milisec
  * @param {boolean} doReject - reject instead of resolve
  * @returns {?Promise} - resolve / reject
@@ -109,7 +101,6 @@ export const sleep = (msec = 0, doReject = false) => {
 
 /**
  * stringify positive integer
- *
  * @param {number} i - integer
  * @param {boolean} zero - treat 0 as a positive integer
  * @returns {?string} - stringified integer
