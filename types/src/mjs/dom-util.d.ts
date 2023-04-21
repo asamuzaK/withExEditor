@@ -12,7 +12,7 @@ export function createRangeArr(range?: object): any[];
 export function createDomStringFromSelectionRange(sel?: object): string | null;
 export function serializeDomString(domstr: string, mime: string, reqElm?: boolean): string | null;
 export function getText(nodes?: object, pre?: boolean): string;
-export function getAncestorId(elm?: object): string | null;
+export function getAncestorId(node?: object): string | null;
 export function isEditable(node?: object): boolean;
 export function isContentTextNode(node: object): boolean;
 export function isEditControl(elm?: object): boolean;
