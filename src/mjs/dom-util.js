@@ -292,7 +292,11 @@ export const appendChildNodes = (elm, node) => {
  */
 export const createXmlBasedDomString = node => {
   let elm;
-  if (node) {
+  if (node?.nodeType === Node.ELEMENT_NODE) {
+    // FIXME:
+    /*
+    elm = node.closest('*|math, *|svg');
+    */
     const root = document.documentElement;
     while (node && node !== root && !elm) {
       if (/^(?:math|svg)$/.test(node.localName)) {
@@ -503,6 +507,10 @@ export const getText = (nodes, pre = false) => {
 export const getAncestorId = elm => {
   let ancestorId;
   if (elm?.nodeType === Node.ELEMENT_NODE) {
+    // FIXME:
+    /*
+    ancestorId = elm.closest('[id]');
+    */
     let node = elm;
     while (node?.parentNode) {
       const { id: nodeId } = node;
