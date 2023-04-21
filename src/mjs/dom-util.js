@@ -293,17 +293,7 @@ export const appendChildNodes = (elm, node) => {
 export const createXmlBasedDomString = node => {
   let elm;
   if (node?.nodeType === Node.ELEMENT_NODE) {
-    // FIXME:
-    /*
     elm = node.closest('*|math, *|svg');
-    */
-    const root = document.documentElement;
-    while (node && node !== root && !elm) {
-      if (/^(?:math|svg)$/.test(node.localName)) {
-        elm = node;
-      }
-      node = node.parentNode;
-    }
     if (elm) {
       const range = document.createRange();
       range.selectNodeContents(elm);
@@ -501,24 +491,15 @@ export const getText = (nodes, pre = false) => {
 
 /**
  * get ancestor element ID
- * @param {object} [elm] - element node
+ * @param {object} [node] - element node
  * @returns {?string} - ID
  */
-export const getAncestorId = elm => {
+export const getAncestorId = node => {
   let ancestorId;
-  if (elm?.nodeType === Node.ELEMENT_NODE) {
-    // FIXME:
-    /*
-    ancestorId = elm.closest('[id]');
-    */
-    let node = elm;
-    while (node?.parentNode) {
-      const { id: nodeId } = node;
-      if (nodeId) {
-        ancestorId = nodeId;
-        break;
-      }
-      node = node.parentNode;
+  if (node?.nodeType === Node.ELEMENT_NODE) {
+    const elm = node.closest('[id]');
+    if (elm) {
+      ancestorId = elm.id;
     }
   }
   return ancestorId || null;
