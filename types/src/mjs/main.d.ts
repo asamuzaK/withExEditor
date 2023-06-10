@@ -8,66 +8,66 @@ export function toggleBadge(): Promise<any>;
 export namespace menuItems {
     namespace openOptionsPage {
         export { OPTIONS_OPEN as id };
-        export const contexts: string[];
-        export const placeholder: string;
+        export let contexts: string[];
+        export let placeholder: string;
     }
     namespace modeEditText {
         export { MODE_EDIT as id };
-        const contexts_1: string[];
+        let contexts_1: string[];
         export { contexts_1 as contexts };
-        const placeholder_1: string;
+        let placeholder_1: string;
         export { placeholder_1 as placeholder };
     }
     namespace modeEditTextPlaintext {
         export { MODE_EDIT_TXT as id };
-        const contexts_2: string[];
+        let contexts_2: string[];
         export { contexts_2 as contexts };
         export { MODE_EDIT as parentId };
-        const placeholder_2: string;
+        let placeholder_2: string;
         export { placeholder_2 as placeholder };
     }
     namespace modeEditTextHtml {
         export { MODE_EDIT_HTML as id };
-        const contexts_3: string[];
+        let contexts_3: string[];
         export { contexts_3 as contexts };
         export { MODE_EDIT as parentId };
-        const placeholder_3: string;
+        let placeholder_3: string;
         export { placeholder_3 as placeholder };
     }
     namespace modeEditTextMarkdown {
         export { MODE_EDIT_MD as id };
-        const contexts_4: string[];
+        let contexts_4: string[];
         export { contexts_4 as contexts };
         export { MODE_EDIT as parentId };
-        const placeholder_4: string;
+        let placeholder_4: string;
         export { placeholder_4 as placeholder };
     }
     namespace modeViewMathML {
         export { MODE_MATHML as id };
-        const contexts_5: string[];
+        let contexts_5: string[];
         export { contexts_5 as contexts };
-        const placeholder_5: string;
+        let placeholder_5: string;
         export { placeholder_5 as placeholder };
     }
     namespace modeViewSelection {
         export { MODE_SELECTION as id };
-        const contexts_6: string[];
+        let contexts_6: string[];
         export { contexts_6 as contexts };
-        const placeholder_6: string;
+        let placeholder_6: string;
         export { placeholder_6 as placeholder };
     }
     namespace modeViewSource {
         export { MODE_SOURCE as id };
-        const contexts_7: string[];
+        let contexts_7: string[];
         export { contexts_7 as contexts };
-        const placeholder_7: string;
+        let placeholder_7: string;
         export { placeholder_7 as placeholder };
     }
     namespace modeViewSVG {
         export { MODE_SVG as id };
-        const contexts_8: string[];
+        let contexts_8: string[];
         export { contexts_8 as contexts };
-        const placeholder_8: string;
+        let placeholder_8: string;
         export { placeholder_8 as placeholder };
     }
 }

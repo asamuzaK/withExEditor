@@ -1,2 +1,2 @@
-declare const runtime: typeof browser.runtime;
-declare const baseUrl: string;
+declare const runtime: any;
+declare const baseUrl: any;

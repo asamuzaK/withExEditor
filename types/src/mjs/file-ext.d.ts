@@ -1,5 +1,5 @@
 declare namespace _default {
-    const application: {
+    let application: {
         ecmascript: string;
         javascript: string;
         'x-ecmascript': string;
@@ -44,10 +44,10 @@ declare namespace _default {
     };
     namespace image {
         namespace xml {
-            const svg: string;
+            let svg: string;
         }
     }
-    const text: {
+    let text: {
         'cache-manifest': string;
         css: string;
         csv: string;

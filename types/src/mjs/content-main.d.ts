@@ -1,22 +1,22 @@
 export namespace vars {
-    const tabId: string;
-    const windowId: string;
-    const incognito: boolean;
-    const isMac: boolean;
-    const enableOnlyEditable: boolean;
-    const enableSyncAuto: boolean;
-    const syncAutoUrls: any;
-    const contextMode: any;
-    const contextNode: any;
+    let tabId: string;
+    let windowId: string;
+    let incognito: boolean;
+    let isMac: boolean;
+    let enableOnlyEditable: boolean;
+    let enableSyncAuto: boolean;
+    let syncAutoUrls: any;
+    let contextMode: any;
+    let contextNode: any;
     namespace keyBackSpace {
-        export const code: string;
-        export const key: string;
+        export let code: string;
+        export let key: string;
         export { KEY_CODE_BS as keyCode };
     }
     namespace keyCtrlA {
-        const code_1: string;
+        let code_1: string;
         export { code_1 as code };
-        const key_1: string;
+        let key_1: string;
         export { key_1 as key };
         export { KEY_CODE_A as keyCode };
     }
