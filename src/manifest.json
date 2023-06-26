@@ -4,7 +4,6 @@
     "persistent": false
   },
   "browser_action": {
-    "browser_style": true,
     "default_icon": "img/icon.svg#current",
     "default_title": "__MSG_extensionName__"
   },
@@ -55,7 +54,6 @@
     "notifications"
   ],
   "options_ui": {
-    "browser_style": true,
     "open_in_tab": true,
     "page": "html/options.html"
   },
