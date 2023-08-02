@@ -28,7 +28,6 @@ export const createManifest = async info => {
   const manifest = JSON.parse(srcContent);
   const replaceItems = {
     browser_action: {
-      browser_style: true,
       default_icon: {
         16: 'img/icon-outline-16.png',
         32: 'img/icon-outline-32.png'
@@ -59,6 +58,12 @@ export const createManifest = async info => {
   const items = Object.entries(replaceItems);
   for (const [key, value] of items) {
     manifest[key] = value;
+  }
+  const unsupportedKeys = [
+    'browser_specific_settings'
+  ];
+  for (const key of unsupportedKeys) {
+    delete manifest[key];
   }
   const content = `${JSON.stringify(manifest, null, INDENT)}\n`;
   const filePath =
