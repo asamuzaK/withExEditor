@@ -9,7 +9,7 @@ import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import {
-  browser, createJsdom, DataTransfer, DOMPurify
+  browser, createJsdom, DataTransfer
 } from './mocha/setup.js';
 
 /* test */
@@ -26,8 +26,8 @@ import * as mjs from '../src/mjs/content-main.js';
 describe('content-main', () => {
   let window, document;
   const globalKeys = [
-    'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'Event',
-    'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
+    'ClipboardEvent', 'DataTransfer', 'DOMPurify', 'DOMTokenList', 'DOMParser',
+    'Event', 'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
     'KeyboardEvent', 'Node', 'NodeList', 'Selection', 'StaticRange',
     'XMLSerializer'
   ];
@@ -56,11 +56,9 @@ describe('content-main', () => {
       document.queryCommandValue =
         sinon.stub().withArgs('defaultParagraphSeparator').returns('div');
     }
-    window.DOMPurify = DOMPurify(window);
 
     global.window = window;
     global.document = document;
-    global.DOMPurify = window.DOMPurify;
 
     for (const key of globalKeys) {
       // Not implemented in jsdom
@@ -450,6 +448,11 @@ describe('content-main', () => {
 
     it('should get value', () => {
       const res = func('data:image/svg+xml;utf8,<svg></svg>');
+      assert.strictEqual(res, 'index', 'result');
+    });
+
+    it('should get value', () => {
+      const res = func('data:,https://example.com/#<script>alert(1);</script>');
       assert.strictEqual(res, 'index', 'result');
     });
   });

@@ -3,6 +3,7 @@
  */
 
 /* shared */
+import '../lib/purify/purify.min.js';
 import {
   parseURLSync, sanitizeURLSync
 } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
