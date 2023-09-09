@@ -94,11 +94,10 @@ browser.runtime.connectNative.callsFake(mockPort);
 global.window = window;
 global.document = document;
 global.browser = browser;
-global.DOMPurify = window.DOMPurify;
 
 const globalKeys = [
-  'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'Event',
-  'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
+  'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'DOMPurify',
+  'Event', 'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
   'KeyboardEvent', 'Node', 'NodeList', 'Selection', 'StaticRange',
   'XMLSerializer'
 ];

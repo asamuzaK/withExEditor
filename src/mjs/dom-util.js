@@ -3,6 +3,7 @@
  */
 
 /* shared */
+import '../lib/purify/purify.min.js';
 import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import { getType, isString, logErr } from './common.js';
 import fileExt from './file-ext.js';
