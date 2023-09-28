@@ -66,5 +66,5 @@
     "test_all": "npm-run-all -s test-*",
     "tsc": "node index clean --dir=types -i && npx tsc"
   },
-  "version": "10.5.5"
+  "version": "10.5.6"
 }
