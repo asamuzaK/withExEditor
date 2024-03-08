@@ -7,6 +7,8 @@
 
 # withExEditor
 
+[お知らせ](https://github.com/asamuzaK/withExEditor/issues/166#issuecomment-1962765650)
+
 GeckoベースのブラウザとBlinkベースのブラウザ用の拡張機能。
 
 コンテキストメニュー（右クリック）から、お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。

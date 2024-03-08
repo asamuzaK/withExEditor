@@ -7,6 +7,8 @@ EN | [JA](./README.ja.md)
 
 # withExEditor
 
+[Announcement](https://github.com/asamuzaK/withExEditor/issues/166#issuecomment-1962765650)
+
 Extension for Gecko based browsers and Blink based browsers.
 
 From the context menu (right click), you can "View source" "View selection" or "Edit text" with your favorite editor.
