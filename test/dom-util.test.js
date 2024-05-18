@@ -43,8 +43,12 @@ describe('dom util', () => {
     const dom = createJsdom();
     window = dom && dom.window;
     const domSelector = new DOMSelector(window);
+    // Overwrite Element.matches(), Element.closest()
+    const matches = domSelector.matches.bind(domSelector);
+    window.Element.prototype.matches = function (sel) {
+      return matches(sel, this);
+    };
     const closest = domSelector.closest.bind(domSelector);
-    // Overwrite Element.closest()
     window.Element.prototype.closest = function (sel) {
       return closest(sel, this);
     };
