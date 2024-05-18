@@ -3,7 +3,8 @@
  */
 
 /* api */
-import selery from 'selery';
+import { DOMSelector } from '@asamuzakjp/dom-selector';
+//import selery from 'selery';
 import sinon from 'sinon';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
@@ -41,9 +42,11 @@ describe('dom util', () => {
   beforeEach(() => {
     const dom = createJsdom();
     window = dom && dom.window;
+    const domSelector = new DOMSelector(window);
+    const closest = domSelector.closest.bind(domSelector);
     // Overwrite Element.closest()
     window.Element.prototype.closest = function (sel) {
-      return selery.closest(this, sel);
+      return closest(sel, this);
     };
     document = window && window.document;
     if (typeof document.queryCommandValue !== 'function') {
