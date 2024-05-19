@@ -4,7 +4,6 @@
 
 /* api */
 import { DOMSelector } from '@asamuzakjp/dom-selector';
-//import selery from 'selery';
 import sinon from 'sinon';
 import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
