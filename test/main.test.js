@@ -1659,46 +1659,6 @@ describe('main', () => {
     });
   });
 
-  describe('send get content message to active tab', () => {
-    const func = mjs.sendGetContent;
-    beforeEach(() => {
-      mjs.tabList.clear();
-    });
-    afterEach(() => {
-      mjs.tabList.clear();
-    });
-
-    it('should not call function', async () => {
-      const i = browser.tabs.sendMessage.callCount;
-      browser.tabs.query.resolves([]);
-      const res = await func();
-      assert.strictEqual(browser.tabs.sendMessage.callCount, i, 'not called');
-      assert.isNull(res, 'result');
-    });
-
-    it('should not call function', async () => {
-      const i = browser.tabs.sendMessage.callCount;
-      browser.tabs.query.resolves([{
-        id: 2
-      }]);
-      const res = await func();
-      assert.strictEqual(browser.tabs.sendMessage.callCount, i, 'not called');
-      assert.isNull(res, 'result');
-    });
-
-    it('should call function', async () => {
-      const i = browser.tabs.sendMessage.callCount;
-      browser.tabs.sendMessage.resolves({});
-      browser.tabs.query.resolves([{
-        id: 2
-      }]);
-      mjs.tabList.add(2);
-      const res = await func();
-      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
-      assert.deepEqual(res, {}, 'result');
-    });
-  });
-
   describe('open options page', () => {
     const func = mjs.openOptionsPage;
 
@@ -2767,9 +2727,11 @@ describe('main', () => {
         id: 2,
         windowId: 1
       }]);
-      const res = await func(EDITOR_EXEC);
+      const res = await func(EDITOR_EXEC, {
+        id: 2
+      });
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
-      assert.strictEqual(browser.tabs.query.callCount, j + 1, 'called');
+      assert.strictEqual(browser.tabs.query.callCount, j, 'not called');
       assert.deepEqual(res, {}, 'result');
     });
   });
