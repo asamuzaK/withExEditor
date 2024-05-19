@@ -489,24 +489,6 @@ export const sendTmpFileData = async (key, msg = {}) => {
   return func || null;
 };
 
-/**
- * send get content message to active tab
- * @returns {?Promise} - sendMessage()
- */
-export const sendGetContent = async () => {
-  const tab = await getActiveTab();
-  let func;
-  if (tab) {
-    const { id } = tab;
-    if (tabList.has(id)) {
-      func = sendMessage(id, {
-        [CONTENT_GET]: { tab }
-      });
-    }
-  }
-  return func || null;
-};
-
 /* editor config */
 /**
  * extract editor config data
@@ -916,17 +898,24 @@ export const onWindowRemoved = async () => {
 /**
  * handle command
  * @param {!string} cmd - command
- * @returns {?Promise} - sendGetContent() / openOptionsPage()
+ * @param {object} tab - tabs.Tab
+ * @returns {?Promise} - sendMessage() / openOptionsPage()
  */
-export const handleCmd = async cmd => {
+export const handleCmd = async (cmd, tab = {}) => {
   if (!isString(cmd)) {
     throw new TypeError(`Expected String but got ${getType(cmd)}.`);
   }
   let func;
   switch (cmd) {
-    case EDITOR_EXEC:
-      func = sendGetContent();
+    case EDITOR_EXEC: {
+      const { id } = tab;
+      if (tabList.has(id)) {
+        func = sendMessage(id, {
+          [CONTENT_GET]: { tab }
+        });
+      }
       break;
+    }
     case OPTIONS_OPEN:
       func = openOptionsPage();
       break;

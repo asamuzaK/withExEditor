@@ -17,7 +17,8 @@ const menus = browser.menus ?? browser.contextMenus;
 
 /* listeners */
 action.onClicked.addListener(() => openOptionsPage().catch(throwErr));
-commands.onCommand.addListener(cmd => handleCmd(cmd).catch(throwErr));
+commands.onCommand.addListener((cmd, tab) =>
+  handleCmd(cmd, tab).catch(throwErr));
 menus.onClicked.addListener((info, tab) =>
   handleClickedMenu(info, tab).catch(throwErr)
 );
