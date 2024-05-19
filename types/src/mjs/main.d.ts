@@ -83,7 +83,6 @@ export function restoreTabList(): Promise<void>;
 export function handleConnectableTab(tab?: object): Promise<any[]>;
 export function handleClickedMenu(info?: object, tab?: object): Promise<any> | null;
 export function sendTmpFileData(key: string, msg?: object): Promise<any> | null;
-export function sendGetContent(): Promise<any> | null;
 export function extractEditorConfig(data?: object): Promise<any[]>;
 export function hostPostMsg(msg: any): Promise<void>;
 export function handleHostMsg(msg?: object): Promise<any[]>;
@@ -97,7 +96,7 @@ export function onTabUpdated(id: number, info: object, tab: object): Promise<any
 export function onTabRemoved(id: number, info: object): Promise<any[]>;
 export function onWindowFocusChanged(): Promise<any[]>;
 export function onWindowRemoved(): Promise<any[]>;
-export function handleCmd(cmd: string): Promise<any> | null;
+export function handleCmd(cmd: string, tab?: object): Promise<any> | null;
 export function sendVariables(obj: object): Promise<any[]>;
 export function setStorageValue(item: string, obj?: object, changed?: boolean): Promise<any[]>;
 export function handleStorage(data?: object, area?: string): Promise<any[]>;
