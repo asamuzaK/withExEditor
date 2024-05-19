@@ -10,7 +10,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "jid1-WiAigu4HIo0Tag@jetpack",
-      "strict_min_version": "89.0"
+      "strict_min_version": "126.0"
     }
   },
   "commands": {
