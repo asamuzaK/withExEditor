@@ -4,6 +4,6 @@ module.exports = {
     './lib/mozilla',
     './mjs/package.json',
     'package.json',
-    'web-ext-config.js'
+    'web-ext-config.cjs'
   ]
 };
