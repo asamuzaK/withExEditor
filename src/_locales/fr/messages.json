@@ -184,6 +184,9 @@
       }
     }
   },
+  "optionsContribute": {
+    "message": "Participer:"
+  },
   "optionsEditTextSettings": {
     "message": "Éditer Text"
   },
@@ -333,5 +336,8 @@
   },
   "optionsToolbarIconLabel": {
     "message": "Icônes du boutton de la barre d'outils"
+  },
+  "optionsWebsite": {
+    "message": "Site d’assistance:"
   }
 }

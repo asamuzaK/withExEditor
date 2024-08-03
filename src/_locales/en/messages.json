@@ -184,6 +184,9 @@
       }
     }
   },
+  "optionsContribute": {
+    "message": "Contribute:"
+  },
   "optionsEditTextSettings": {
     "message": "Edit Text"
   },
@@ -333,5 +336,8 @@
   },
   "optionsToolbarIconLabel": {
     "message": "Toolbar Button Icon"
+  },
+  "optionsWebsite": {
+    "message": "Support site:"
   }
 }

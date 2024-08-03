@@ -184,6 +184,9 @@
       }
     }
   },
+  "optionsContribute": {
+    "message": "捐助:"
+  },
   "optionsEditTextSettings": {
     "message": "编辑文本"
   },
@@ -333,5 +336,8 @@
   },
   "optionsToolbarIconLabel": {
     "message": "工具栏按钮的图标"
+  },
+  "optionsWebsite": {
+    "message": "用户支持网站:"
   }
 }
