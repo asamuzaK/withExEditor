@@ -184,6 +184,9 @@
       }
     }
   },
+  "optionsContribute": {
+    "message": "寄付する:"
+  },
   "optionsEditTextSettings": {
     "message": "テキスト編集"
   },
@@ -333,5 +336,8 @@
   },
   "optionsToolbarIconLabel": {
     "message": "ツールバーボタンアイコン"
+  },
+  "optionsWebsite": {
+    "message": "サポートサイト:"
   }
 }
