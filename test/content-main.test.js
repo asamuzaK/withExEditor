@@ -1,7 +1,7 @@
 /**
  * content-main.test.js
  */
-/* eslint-disable import/order */
+/* eslint-disable import-x/order */
 
 /* api */
 import sinon from 'sinon';

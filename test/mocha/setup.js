@@ -33,7 +33,7 @@ export class DataTransfer {
   setData(type, value) {
     this.#items.set(type, value);
   }
-};
+}
 
 /**
  * create jsdom
