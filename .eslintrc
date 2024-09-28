@@ -16,13 +16,13 @@
     "sourceType": "module"
   },
   "plugins": [
-    "eslint-plugin-import",
+    "eslint-plugin-import-x",
     "eslint-plugin-regexp",
     "eslint-plugin-unicorn"
   ],
   "reportUnusedDisableDirectives": true,
   "rules": {
-    "import/order": ["error", {
+    "import-x/order": ["error", {
       "alphabetize": {
         "order": "ignore",
         "caseInsensitive": false
