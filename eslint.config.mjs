@@ -1,7 +1,3 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { FlatCompat } from '@eslint/eslintrc';
-import js from '@eslint/js';
 import importX from 'eslint-plugin-import-x';
 import jsdoc from 'eslint-plugin-jsdoc';
 import nounsanitized from 'eslint-plugin-no-unsanitized';
@@ -10,14 +6,6 @@ import unicorn from 'eslint-plugin-unicorn';
 import neostandard, { plugins as neostdplugins } from 'neostandard';
 import globals from 'globals';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all
-});
-
 export default [
   {
     ignores: ['src/js', 'src/lib', 'src/web-ext-config.cjs', '**/bundle/']
@@ -25,12 +13,6 @@ export default [
   jsdoc.configs['flat/recommended'],
   nounsanitized.configs.recommended,
   regexp.configs['flat/recommended'],
-  ...compat.env({
-    browser: true,
-    es6: true,
-    node: true,
-    webextensions: true
-  }),
   ...neostandard({
     semi: true
   }),
@@ -55,16 +37,16 @@ export default [
       sourceType: 'module'
     },
     rules: {
+      '@stylistic/space-before-function-paren': ['error', {
+        anonymous: 'always',
+        asyncArrow: 'always',
+        named: 'never'
+      }],
       'import-x/order': ['error', {
         alphabetize: {
           order: 'ignore',
           caseInsensitive: false
         }
-      }],
-      '@stylistic/space-before-function-paren': ['error', {
-        anonymous: 'always',
-        asyncArrow: 'always',
-        named: 'never'
       }],
       'no-await-in-loop': 'error',
       'no-use-before-define': ['error', {
@@ -72,12 +54,6 @@ export default [
         classes: true,
         functions: true,
         variables: true
-      }],
-      // semi: ['error', 'always'],
-      'space-before-function-paren': ['error', {
-        anonymous: 'always',
-        asyncArrow: 'always',
-        named: 'never'
       }],
       'unicorn/prefer-node-protocol': 'error'
     }
