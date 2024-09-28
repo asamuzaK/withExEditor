@@ -7,6 +7,7 @@ import jsdoc from 'eslint-plugin-jsdoc';
 import nounsanitized from 'eslint-plugin-no-unsanitized';
 import regexp from 'eslint-plugin-regexp';
 import unicorn from 'eslint-plugin-unicorn';
+import neostandard, { plugins as neostdplugins } from 'neostandard';
 import globals from 'globals';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -19,16 +20,23 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ['src/lib', 'src/web-ext-config.js', '**/bundle/', 'src/js/']
+    ignores: ['src/js', 'src/lib', 'src/web-ext-config.cjs', '**/bundle/']
   },
   jsdoc.configs['flat/recommended'],
   nounsanitized.configs.recommended,
   regexp.configs['flat/recommended'],
-  ...compat.extends(
-    'standard'
-  ),
+  ...compat.env({
+    browser: true,
+    es6: true,
+    node: true,
+    webextensions: true
+  }),
+  ...neostandard({
+    semi: true
+  }),
   {
     plugins: {
+      '@stylistic': neostdplugins['@stylistic'],
       'import-x': importX,
       nounsanitized,
       regexp,
@@ -53,6 +61,11 @@ export default [
           caseInsensitive: false
         }
       }],
+      '@stylistic/space-before-function-paren': ['error', {
+        anonymous: 'always',
+        asyncArrow: 'always',
+        named: 'never'
+      }],
       'no-await-in-loop': 'error',
       'no-use-before-define': ['error', {
         allowNamedExports: false,
@@ -60,7 +73,7 @@ export default [
         functions: true,
         variables: true
       }],
-      semi: ['error', 'always'],
+      // semi: ['error', 'always'],
       'space-before-function-paren': ['error', {
         anonymous: 'always',
         asyncArrow: 'always',
