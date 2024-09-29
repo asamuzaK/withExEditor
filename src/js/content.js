@@ -1,6 +1,7 @@
 /**
  * content.js
  */
+/* eslint-disable no-unsanitized/method */
 
 'use strict';
 /* api */
