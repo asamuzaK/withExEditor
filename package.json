@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@asamuzakjp/dom-selector": "^6.1.1",
+    "@types/node": "^22.7.4",
     "addons-linter": "^7.1.0",
     "c8": "^10.1.2",
     "chai": "^5.1.1",
@@ -70,5 +71,5 @@
     "test_all": "npm-run-all -s test-*",
     "tsc": "node index clean --dir=types -i && npx tsc"
   },
-  "version": "11.0.0"
+  "version": "11.0.1"
 }
