@@ -131,6 +131,7 @@ export const extractLibraries = async (cmdOpts = {}) => {
         type: 'git',
         url: 'git://github.com/cure53/DOMPurify.git'
       },
+      type: 'commonjs',
       files: [
         {
           file: 'LICENSE',
