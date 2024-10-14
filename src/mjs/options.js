@@ -4,7 +4,6 @@
 
 /* shared */
 import { throwErr } from './common.js';
-import { showToolbarIconOptions } from './compat.js';
 import { localizeHtml } from './localize.js';
 import {
   addFormSubmitListener, addInputChangeListener, addSyncUrlsInputListener,
@@ -27,6 +26,5 @@ Promise.all([
   addSyncUrlsInputListener(),
   addFormSubmitListener(),
   getHostStatus(),
-  getEditorConfig(),
-  showToolbarIconOptions()
+  getEditorConfig()
 ]).catch(throwErr);
