@@ -6,7 +6,6 @@
 import path from 'node:path';
 import process from 'node:process';
 import { program as commander } from 'commander';
-import { createBlinkFiles } from './blink.js';
 import { getType, throwErr } from './common.js';
 import { createFile, isDir, isFile, readFile, removeDir } from './file-util.js';
 
@@ -16,14 +15,6 @@ const DIR_CWD = process.cwd();
 const INDENT = 2;
 const PATH_LIB = './src/lib';
 const PATH_MODULE = './node_modules';
-
-/**
- * create blink compatible files
- * @param {object} cmdOpts - command options
- * @returns {Promise} - promise chain
- */
-export const createBlinkCompatFiles = cmdOpts =>
-  createBlinkFiles(cmdOpts).catch(throwErr);
 
 /**
  * save library package info
@@ -100,29 +91,6 @@ export const saveLibraryPackage = async (lib, info) => {
 export const extractLibraries = async (cmdOpts = {}) => {
   const { dir, info } = cmdOpts;
   const libraries = {
-    mozilla: {
-      name: 'webextension-polyfill',
-      cdn: 'https://unpkg.com/webextension-polyfill',
-      repository: {
-        type: 'git',
-        url: 'git+https://github.com/mozilla/webextension-polyfill.git'
-      },
-      type: 'commonjs',
-      files: [
-        {
-          file: 'LICENSE',
-          path: 'LICENSE'
-        },
-        {
-          file: 'browser-polyfill.min.js',
-          path: 'dist/browser-polyfill.min.js'
-        },
-        {
-          file: 'browser-polyfill.min.js.map',
-          path: 'dist/browser-polyfill.min.js.map'
-        }
-      ]
-    },
     purify: {
       name: 'dompurify',
       raw: 'https://raw.githubusercontent.com/cure53/DOMPurify/',
@@ -221,7 +189,7 @@ export const cleanDirectory = (cmdOpts = {}) => {
  */
 export const parseCommand = args => {
   const reg =
-    /^(?:(?:--)?help|-[h|v]|--version|c(?:lean|ompat)|include)$/;
+    /^(?:(?:--)?help|-[h|v]|--version|clean|include)$/;
   if (Array.isArray(args) && args.some(arg => reg.test(arg))) {
     commander.exitOverride();
     commander.version(process.env.npm_package_version, '-v, --version');
@@ -231,12 +199,6 @@ export const parseCommand = args => {
         .option('-d, --dir <name>', 'specify directory')
         .option('-i, --info', 'console info')
         .action(cleanDirectory);
-    } else if (args.includes('compat')) {
-      commander.command('compat')
-        .description('create blink compatible files')
-        .option('-c, --clean', 'clean directory')
-        .option('-i, --info', 'console info')
-        .action(createBlinkCompatFiles);
     } else if (args.includes('include')) {
       commander.command('include')
         .description('include library packages')
