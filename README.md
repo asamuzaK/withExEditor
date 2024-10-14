@@ -3,7 +3,6 @@ EN | [JA](./README.ja.md)
 [![build](https://github.com/asamuzaK/withExEditor/workflows/build/badge.svg)](https://github.com/asamuzaK/withExEditor/actions?query=workflow%3Abuild)
 [![CodeQL](https://github.com/asamuzaK/withExEditor/workflows/CodeQL/badge.svg)](https://github.com/asamuzaK/withExEditor/actions?query=workflow%3ACodeQL)
 [![Mozilla Add-on](https://img.shields.io/amo/v/jid1-WiAigu4HIo0Tag@jetpack.svg)](https://addons.mozilla.org/addon/withexeditor/)
-[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/koghhpkkcndhhclklnnnhcpkkplfkgoi.svg)](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi)
 
 # withExEditor
 
