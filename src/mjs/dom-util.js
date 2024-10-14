@@ -171,8 +171,7 @@ export const setAttributeNS = (elm, node = {}) => {
           case 'src': {
             const { href } = new URL(value, origin);
             const url = sanitizeURLSync(href, {
-              only: ['http', 'https'],
-              remove: true
+              only: ['http', 'https']
             });
             if (url) {
               elm.setAttributeNS(ns, attrName, url);
@@ -186,8 +185,7 @@ export const setAttributeNS = (elm, node = {}) => {
             for (const item of items) {
               const { href } = new URL(item, origin);
               const url = sanitizeURLSync(href, {
-                only: ['http', 'https'],
-                remove: true
+                only: ['http', 'https']
               });
               if (url) {
                 arr.push(url);
@@ -556,7 +554,7 @@ export const isEditControl = elm => {
     const { localName, type } = elm;
     bool = localName === 'textarea' ||
            (localName === 'input' &&
-            (!type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type)));
+            (!type || /^(?:email|search|tel|text|url)$/.test(type)));
   }
   return !!bool;
 };
