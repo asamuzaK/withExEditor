@@ -155,7 +155,7 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
   }
   const { pathname, protocol } = parseURLSync(uri);
   const schemeParts = protocol && protocol.replace(/:$/, '').split('+');
-  const reg = /^.*\/((?:[\w\-~!$&'()*+,;=:@]|%[\dA-F]{2})+)(?:\.(?:[\w\-~!$&'()*+,;=:@]|%[\dA-F]{2})+)*$/;
+  const reg = /^.*\/((?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)(?:\.(?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)*$/;
   let dataId;
   if (schemeParts && schemeParts.every(s => !/^(?:blob|data)$/.test(s)) &&
       pathname && reg.test(pathname)) {
@@ -1067,9 +1067,7 @@ export const handleMsg = async msg => {
           if (urlItems?.length) {
             const arr = [];
             for (const item of urlItems) {
-              const url = sanitizeURLSync(item, {
-                remove: true
-              });
+              const url = sanitizeURLSync(item);
               if (url) {
                 arr.push(url);
               }
