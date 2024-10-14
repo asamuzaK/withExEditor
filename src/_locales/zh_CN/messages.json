@@ -241,69 +241,6 @@
   "optionsHostVersionCompatLabel": {
     "message": "主机兼容性"
   },
-  "optionsIconBlack": {
-    "message": ""
-  },
-  "optionsIconBlack_alt": {
-    "message": "黑"
-  },
-  "optionsIconBlackLabel": {
-    "message": ""
-  },
-  "optionsIconBlackLabel_ariaLabel": {
-    "message": "黑图标"
-  },
-  "optionsIconColor": {
-    "message": ""
-  },
-  "optionsIconColor_alt": {
-    "message": "彩色"
-  },
-  "optionsIconColorLabel": {
-    "message": ""
-  },
-  "optionsIconColorLabel_ariaLabel": {
-    "message": "彩色图标"
-  },
-  "optionsIconDark": {
-    "message": ""
-  },
-  "optionsIconDark_alt": {
-    "message": "暗"
-  },
-  "optionsIconDarkLabel": {
-    "message": ""
-  },
-  "optionsIconDarkLabel_ariaLabel": {
-    "message": "暗图标"
-  },
-  "optionsIconDetail": {
-    "message": "选择在工具栏上显示的图标。"
-  },
-  "optionsIconLight": {
-    "message": ""
-  },
-  "optionsIconLight_alt": {
-    "message": "亮"
-  },
-  "optionsIconLightLabel": {
-    "message": ""
-  },
-  "optionsIconLightLabel_ariaLabel": {
-    "message": "亮图标"
-  },
-  "optionsIconWhite": {
-    "message": ""
-  },
-  "optionsIconWhite_alt": {
-    "message": "白"
-  },
-  "optionsIconWhiteLabel": {
-    "message": ""
-  },
-  "optionsIconWhiteLabel_ariaLabel": {
-    "message": "白图标"
-  },
   "optionsIsExecutable": {
     "message": "Editor State"
   },
@@ -333,9 +270,6 @@
   },
   "optionsTitle": {
     "message": "withExEditor 选项"
-  },
-  "optionsToolbarIconLabel": {
-    "message": "工具栏按钮的图标"
   },
   "optionsWebsite": {
     "message": "用户支持网站:"

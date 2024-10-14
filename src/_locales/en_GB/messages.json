@@ -4,11 +4,5 @@
   },
   "extensionDescription": {
     "message": "From the context menu (right click), you can \"View source\" \"View selection\" or \"Edit text\" with your favourite editor."
-  },
-  "optionsIconColor_alt": {
-    "message": "Colour"
-  },
-  "optionsIconColorLabel_ariaLabel": {
-    "message": "Colour Icon"
   }
 }
