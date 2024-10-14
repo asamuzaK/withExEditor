@@ -9,10 +9,6 @@
   --box-border-color: rgb(192 192 192);
   --box-border-color-alpha: rgb(192 192 192 / 50%);
   --box-color: rgb(16 16 16);
-  --icon-dark-background-color: var(--box-background-color);
-  --icon-dark-color: var(--box-color);
-  --icon-light-background-color: var(--box-color);
-  --icon-light-color: var(--box-background-color);
   --info-background-color: #008ea4;
   --info-color: #fff;
   --page-background-color: rgb(250 250 250);
@@ -135,38 +131,6 @@ details > div > p {
   margin: 0.5rem;
 }
 
-label[for^="buttonIcon"] {
-  display: inline-block;
-  position: relative;
-  margin-right: 1.2rem;
-  border: 1px solid var(--box-border-color-alpha);
-  border-radius: 4px;
-  width: 2.4rem;
-  height: 2.4rem;
-  background-color: var(--box-background-color);
-  text-align: center;
-  vertical-align: middle;
-}
-
-label[for="buttonIconBlack"],
-label[for="buttonIconDark"] {
-  background-color: var(--icon-dark-background-color);
-  color: var(--icon-dark-color);
-}
-
-label[for="buttonIconLight"],
-label[for="buttonIconWhite"] {
-  background-color: var(--icon-light-background-color);
-  color: var(--icon-light-color);
-}
-
-label[for="buttonIconAuto"] {
-  border: none;
-  background-color: transparent;
-  height: auto;
-  vertical-align: baseline;
-}
-
 label + input[type="radio"] {
   margin-left: 0.5rem;
 }
@@ -252,10 +216,6 @@ pre > code {
     --box-border-color: rgb(64 64 64);
     --box-border-color-alpha: rgb(64 64 64 / 50%);
     --box-color: rgb(240 240 240);
-    --icon-dark-background-color: var(--box-color);
-    --icon-dark-color: var(--box-background-color);
-    --icon-light-background-color: var(--box-background-color);
-    --icon-light-color: var(--box-color);
     --info-background-color: #008ea4;
     --info-color: #fff;
     --page-background-color: rgb(28 27 34);
