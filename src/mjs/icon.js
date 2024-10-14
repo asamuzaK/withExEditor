@@ -7,8 +7,7 @@ import { isString } from './common.js';
 import { ICON } from './constant.js';
 
 /* api */
-const { runtime } = browser;
-const action = browser.action ?? browser.browserAction;
+const { browserAction: action, runtime } = browser;
 
 /* variables */
 export const icon = new Map();
