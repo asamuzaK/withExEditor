@@ -67,7 +67,7 @@ export const vars = {
 /* keyboard shortcut */
 /**
  * set modifier key
- * @param {boolean} [bool] - is mac
+ * @param {boolean} bool - is mac
  * @returns {void}
  */
 export const setModifierKey = (bool = vars[IS_MAC]) => {
@@ -84,7 +84,7 @@ export const dataIds = new Map();
 /**
  * set data ID
  * @param {string} dataId - data ID
- * @param {object} [data] - data
+ * @param {object} data - data
  * @returns {object} - dataIds object
  */
 export const setDataId = (dataId, data) => {
@@ -167,7 +167,7 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
 
 /**
  * get queried items
- * @param {object} [elm] - element
+ * @param {object} elm - element
  * @returns {Array} - items
  */
 export const getQueriedItems = elm => {
@@ -194,7 +194,7 @@ export const getQueriedItems = elm => {
 
 /**
  * create ID data
- * @param {object} [elm] - target element
+ * @param {object} elm - target element
  * @returns {object} - ID data
  */
 export const createIdData = elm => {
@@ -235,7 +235,7 @@ export const createIdData = elm => {
 /* temporary file data */
 /**
  * set temporary file data
- * @param {object} [data] - temporary file data
+ * @param {object} data - temporary file data
  * @returns {?Function} - set data ID
  */
 export const setTmpFileData = (data = {}) => {
@@ -252,7 +252,7 @@ export const setTmpFileData = (data = {}) => {
 
 /**
  * update temporary file data
- * @param {object} [obj] - temporary file data object
+ * @param {object} obj - temporary file data object
  * @returns {?Function} - set data ID
  */
 export const updateTmpFileData = (obj = {}) => {
@@ -269,7 +269,7 @@ export const updateTmpFileData = (obj = {}) => {
 
 /**
  * remove temporary file data
- * @param {object} [obj] - temporary file data object
+ * @param {object} obj - temporary file data object
  * @returns {boolean} - result
  */
 export const removeTmpFileData = (obj = {}) => {
@@ -287,7 +287,7 @@ export const removeTmpFileData = (obj = {}) => {
 
 /**
  * fetch file source and create temporary file data
- * @param {object} [data] - content data
+ * @param {object} data - content data
  * @returns {Promise.<object>} - temporary file data
  */
 export const fetchSource = async (data = {}) => {
@@ -329,7 +329,7 @@ export const fetchSource = async (data = {}) => {
 
 /**
  * create temporary file data
- * @param {object} [data] - content data
+ * @param {object} data - content data
  * @returns {Promise.<object>} - temporary file data
  */
 export const createTmpFileData = async (data = {}) => {
@@ -449,7 +449,7 @@ export const createTmpFileData = async (data = {}) => {
 
 /**
  * send message
- * @param {*} [msg] - message
+ * @param {*} msg - message
  * @returns {?Promise} - sendMessage()
  */
 export const sendMsg = async msg => {
@@ -462,7 +462,7 @@ export const sendMsg = async msg => {
 
 /**
  * send each data ID
- * @param {boolean} [bool] - post data ID
+ * @param {boolean} bool - post data ID
  * @returns {Promise.<Array>} - results of each handler
  */
 export const sendEachDataId = async (bool = false) => {
@@ -545,7 +545,7 @@ export const requestTmpFile = evt => {
 /**
  * set data ID controller
  * @param {object} elm - element
- * @param {string} [dataId] - data ID
+ * @param {string} dataId - data ID
  * @returns {void}
  */
 export const setDataIdController = (elm, dataId) => {
@@ -578,8 +578,8 @@ export const setDataIdController = (elm, dataId) => {
 
 /**
  * create content data
- * @param {object} [elm] - element
- * @param {string} [mode] - context mode
+ * @param {object} elm - element
+ * @param {string} mode - context mode
  * @returns {Promise.<object>} - content data
  */
 export const createContentData = async (elm, mode) => {
@@ -632,7 +632,7 @@ export const createContentData = async (elm, mode) => {
             data.mode = mode;
             data.dataId = dataId;
             data.value = elm.hasChildNodes() ? getText(childNodes) : '';
-            data.namespaceURI = namespaceURI || getNodeNS(elm).namespaceURI;
+            data.namespaceURI = getNodeNS(elm).namespaceURI;
             setDataIdController(elm, dataId);
           }
           if (!vars[INCOGNITO] && vars[SYNC_AUTO] &&
@@ -667,7 +667,7 @@ export const createContentData = async (elm, mode) => {
 
 /**
  * create content data message
- * @param {object} [data] - temporary file data
+ * @param {object} data - temporary file data
  * @returns {Promise.<object>} - message
  */
 export const createContentDataMsg = async data => {
@@ -692,8 +692,8 @@ export const createContentDataMsg = async data => {
 
 /**
  * send content data
- * @param {object} [elm] - element
- * @param {string} [mode] - context mode
+ * @param {object} elm - element
+ * @param {string} mode - context mode
  * @returns {Promise.<Array>} - results of each handler
  */
 export const sendContent = async (elm, mode) => {
@@ -710,7 +710,7 @@ export const sendContent = async (elm, mode) => {
 
 /**
  * get context mode
- * @param {object} [elm] - element
+ * @param {object} elm - element
  * @returns {string} - context mode
  */
 export const getContextMode = elm => {
@@ -744,7 +744,7 @@ export const getContextMode = elm => {
 
 /**
  * determine content process
- * @param {object} [obj] - context menu obj
+ * @param {object} obj - context menu obj
  * @returns {Promise} - sendContent()
  */
 export const determineContentProcess = (obj = {}) => {
@@ -765,8 +765,8 @@ export const determineContentProcess = (obj = {}) => {
 /* synchronize text */
 /**
  * create replacing content
- * @param {object} [node] - node
- * @param {object} [opt] - options
+ * @param {object} node - node
+ * @param {object} opt - options
  * @returns {object} - document fragment
  */
 export const createReplacingContent = (node, opt = {}) => {
@@ -799,8 +799,8 @@ export const createReplacingContent = (node, opt = {}) => {
 
 /**
  * replace content of content editable element
- * @param {object} [node] - editable element
- * @param {object} [opt] - options
+ * @param {object} node - editable element
+ * @param {object} opt - options
  * @returns {void}
  */
 export const replaceEditableContent = (node, opt = {}) => {
@@ -884,8 +884,8 @@ export const replaceEditableContent = (node, opt = {}) => {
 
 /**
  * replace text edit control element value
- * @param {object} [elm] - element
- * @param {object} [opt] - options
+ * @param {object} elm - element
+ * @param {object} opt - options
  * @returns {void}
  */
 export const replaceEditControlValue = (elm, opt = {}) => {
@@ -928,8 +928,8 @@ export const replaceEditControlValue = (elm, opt = {}) => {
 
 /**
  * replace live edit content
- * @param {object} [elm] - element
- * @param {object} [opt] - options
+ * @param {object} elm - element
+ * @param {object} opt - options
  * @returns {void}
  */
 export const replaceLiveEditContent = (elm, opt = {}) => {
@@ -984,7 +984,7 @@ export const replaceLiveEditContent = (elm, opt = {}) => {
 
 /**
  * get target element and synchronize text
- * @param {object} [obj] - sync data object
+ * @param {object} obj - sync data object
  * @returns {Promise.<Array>} - results of each handler
  */
 export const syncText = (obj = {}) => {
@@ -1037,7 +1037,7 @@ export const syncText = (obj = {}) => {
 
 /**
  * handle message
- * @param {*} [msg] - message
+ * @param {*} msg - message
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleMsg = async msg => {

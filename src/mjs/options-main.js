@@ -50,8 +50,8 @@ export const getEditorConfig = async () => sendMsg({
 
 /**
  * create pref
- * @param {object} [elm] - element
- * @param {boolean} [executable] - executable
+ * @param {object} elm - element
+ * @param {boolean} executable - executable
  * @returns {Promise.<object>} - pref data
  */
 export const createPref = async (elm, executable = false) => {
@@ -71,7 +71,7 @@ export const createPref = async (elm, executable = false) => {
 
 /**
  * extract editor config
- * @param {object} [obj] - editor config object
+ * @param {object} obj - editor config object
  * @returns {Promise.<void>} - void
  */
 export const extractEditorConfig = async (obj = {}) => {
@@ -269,7 +269,7 @@ export const addFormSubmitListener = async () => {
 
 /**
  * set html input value
- * @param {object} [data] - data
+ * @param {object} data - data
  * @returns {Promise.<void>} - void
  */
 export const setHtmlInputValue = async (data = {}) => {
@@ -336,7 +336,7 @@ export const setValuesFromStorage = async () => {
 /* handler */
 /**
  * handle message
- * @param {object} [msg] - message
+ * @param {object} msg - message
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleMsg = async msg => {

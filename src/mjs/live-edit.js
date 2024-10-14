@@ -42,7 +42,7 @@ export { liveEdit as default };
 
 /**
  * get live edit key
- * @param {object} [elm] - element
+ * @param {object} elm - element
  * @returns {?string} - live edit key
  */
 export const getLiveEditKey = elm => {
@@ -70,7 +70,7 @@ export const getLiveEditKey = elm => {
 
 /**
  * get live edit element from ancestor
- * @param {object} [node] - node
+ * @param {object} node - node
  * @returns {object} - live edit element
  */
 export const getLiveEditElement = node => {
@@ -106,8 +106,8 @@ export const getLiveEditElement = node => {
 
 /**
  * get live edit content
- * @param {object} [elm] - Element
- * @param {string} [key] - key
+ * @param {object} elm - Element
+ * @param {string} key - key
  * @returns {?string} - content
  */
 export const getLiveEditContent = (elm, key) => {

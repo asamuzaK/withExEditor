@@ -67,7 +67,7 @@ export const localOptsKeys = new Set([
 
 /**
  * set options
- * @param {object} [opt] - user option
+ * @param {object} opt - user option
  * @param {boolean} [store] - get storage
  * @returns {Promise.<void>} - void
  */
@@ -183,7 +183,7 @@ export const menuItems = {
 
 /**
  * create menu item data
- * @param {string} [key] - item key
+ * @param {string} key - item key
  * @returns {object} - item data
  */
 export const createMenuItemData = key => {
@@ -265,7 +265,7 @@ export const createContextMenu = async () => {
 
 /**
  * update context menu
- * @param {object} [data] - context data
+ * @param {object} data - context data
  * @param {boolean} [all] - update all items
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -406,12 +406,12 @@ export const restoreTabList = async () => {
 
 /**
  * handle connectable tab
- * @param {object} [tab] - tabs.Tab
+ * @param {object} tab - tabs.Tab
  * @returns {Promise.<Array>} - results of each handler
  */
-export const handleConnectableTab = async (tab = {}) => {
+export const handleConnectableTab = async tab => {
   const func = [];
-  if (tab) {
+  if (isObjectNotEmpty(tab)) {
     const { active, id: tId, incognito, status, windowId: wId } = tab;
     const windowId = stringifyPositiveInt(wId, true);
     const tabId = stringifyPositiveInt(tId, true);
@@ -437,8 +437,8 @@ export const handleConnectableTab = async (tab = {}) => {
 
 /**
  * handle clicked context menu
- * @param {object} [info] - menus.OnClickData
- * @param {object} [tab] - tabs.Tab
+ * @param {object} info - menus.OnClickData
+ * @param {object} tab - tabs.Tab
  * @returns {?Promise} - sendMessage()
  */
 export const handleClickedMenu = async (info, tab) => {
@@ -565,7 +565,7 @@ export const hostPostMsg = async msg => {
 
 /**
  * handle host message
- * @param {object} [msg] - message
+ * @param {object} msg - message
  * @returns {Promise.<Array>} - result of each handler
  */
 export const handleHostMsg = async msg => {
@@ -640,12 +640,12 @@ export const handleHostOnDisconnect = port =>
 
 /**
  * handle host on message
- * @param {object} [msg] - message
+ * @param {object} msg - message
  * @returns {Promise} - promise chain
  */
 export const handleHostOnMsg = msg => {
   const func = [];
-  if (msg) {
+  if (isObjectNotEmpty(msg)) {
     const items = Object.entries(msg);
     for (const [key, value] of items) {
       switch (key) {
@@ -710,13 +710,13 @@ export const setHost = async () => {
 /* message */
 /**
  * handle message
- * @param {object} [msg] - message
- * @param {object} [sender] - sender
+ * @param {object} msg - message
+ * @param {object} sender - sender
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleMsg = async (msg, sender) => {
   const func = [];
-  if (msg) {
+  if (isObjectNotEmpty(msg)) {
     const items = Object.entries(msg);
     for (const [key, value] of items) {
       switch (key) {
@@ -753,7 +753,7 @@ export const handleMsg = async (msg, sender) => {
           break;
         }
         case IS_CONNECTABLE: {
-          if (sender) {
+          if (isObjectNotEmpty(sender)) {
             const { tab } = sender;
             if (tab) {
               func.push(handleConnectableTab(tab));
@@ -946,7 +946,7 @@ export const sendVariables = async obj => {
 /**
  * set storage value
  * @param {string} item - item
- * @param {object} [obj] - value object
+ * @param {object} obj - value object
  * @param {boolean} [changed] - changed
  * @returns {Promise.<Array>} - results of each handler
  */
@@ -1044,7 +1044,7 @@ export const setStorageValue = async (item, obj, changed = false) => {
 
 /**
  * handle storage
- * @param {object} [data] - data
+ * @param {object} data - data
  * @param {string} [area] - storage area
  * @returns {Promise.<Array>} - results of each handler
  */

@@ -20,7 +20,7 @@ runtime.onMessage.addListener((msg, sender) =>
 );
 
 /* startup */
-document.addEventListener('DOMContentLoaded', () => Promise.all([
+Promise.all([
   localizeHtml(),
   setValuesFromStorage(),
   addInputChangeListener(),
@@ -29,4 +29,4 @@ document.addEventListener('DOMContentLoaded', () => Promise.all([
   getHostStatus(),
   getEditorConfig(),
   showToolbarIconOptions()
-]).catch(throwErr));
+]).catch(throwErr);

@@ -14,7 +14,7 @@ export const icon = new Map();
 
 /**
  * set icon
- * @param {string} [iconId] - icon ID
+ * @param {string} iconId - icon ID
  * @returns {Promise} - action.setIcon()
  */
 export const setIcon = async (iconId = icon.get('id')) => {
@@ -26,7 +26,7 @@ export const setIcon = async (iconId = icon.get('id')) => {
 
 /**
  * set icon badge
- * @param {object} [opt] - option
+ * @param {object} opt - option
  * @returns {Promise.<Array>} - result of each handler
  */
 export const setIconBadge = async (opt = {}) => {

@@ -7,9 +7,9 @@ import { isObjectNotEmpty, isString } from './common.js';
 
 /**
  * dispatch event
- * @param {object} [target] - target
- * @param {string} [type] - type
- * @param {object} [opt] - options
+ * @param {object} target - target
+ * @param {string} type - type
+ * @param {object} opt - options
  * @returns {boolean} - event permitted
  */
 export const dispatchEvent = (target, type, opt) => {
@@ -25,7 +25,7 @@ export const dispatchEvent = (target, type, opt) => {
 
 /**
  * dispatch change event
- * @param {object} [elm] - element
+ * @param {object} elm - element
  * @returns {boolean} - event permitted
  */
 export const dispatchChangeEvent = elm => {
@@ -43,9 +43,9 @@ export const dispatchChangeEvent = elm => {
 
 /**
  * dispatch clipboard event
- * @param {object} [elm] - Element
- * @param {string} [type] - event type
- * @param {object} [opt] - init options
+ * @param {object} elm - Element
+ * @param {string} type - event type
+ * @param {object} opt - init options
  * @returns {boolean} - event permitted
  */
 export const dispatchClipboardEvent = (elm, type, opt = {
@@ -76,7 +76,7 @@ export const dispatchClipboardEvent = (elm, type, opt = {
 
 /**
  * dispatch focus event
- * @param {object} [elm] - Element
+ * @param {object} elm - Element
  * @returns {boolean} - event permitted
  */
 export const dispatchFocusEvent = elm => {
@@ -94,9 +94,9 @@ export const dispatchFocusEvent = elm => {
 
 /**
  * dispatch input event
- * @param {object} [elm] - Element
- * @param {string} [type] - event type
- * @param {object} [opt] - init options
+ * @param {object} elm - Element
+ * @param {string} type - event type
+ * @param {object} opt - init options
  * @returns {boolean} - event permitted
  */
 export const dispatchInputEvent = (elm, type, opt) => {
@@ -125,9 +125,9 @@ export const dispatchInputEvent = (elm, type, opt) => {
 
 /**
  * dispatch keyboard event
- * @param {object} [elm] - Element
- * @param {string} [type] - event type
- * @param {object} [keyOpt] - key options
+ * @param {object} elm - Element
+ * @param {string} type - event type
+ * @param {object} keyOpt - key options
  * @returns {boolean} - event permitted
  */
 export const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
