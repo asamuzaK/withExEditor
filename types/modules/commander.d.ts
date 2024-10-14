@@ -1,4 +1,3 @@
-export function createBlinkCompatFiles(cmdOpts: object): Promise<any>;
 export function saveLibraryPackage(lib: any[], info: boolean): Promise<string>;
 export function extractLibraries(cmdOpts?: object): Promise<void>;
 export function includeLibraries(cmdOpts: object): Promise<any>;
