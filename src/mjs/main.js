@@ -6,34 +6,31 @@
 import {
   checkIncognitoWindowExists, clearNotification, createNotification,
   getActiveTab, getActiveTabId, getAllStorage, getCurrentWindow, getOs,
-  getStorage, getWindow, isTab, makeConnection, removeStorage, sendMessage,
-  setStorage
+  getStorage, getWindow, isTab, makeConnection, sendMessage, setStorage
 } from './browser.js';
 import {
   getType, isObjectNotEmpty, isString, logErr, logMsg, logWarn,
   stringifyPositiveInt, throwErr
 } from './common.js';
-import { setIcon, setIconBadge } from './icon.js';
+import { setIconBadge } from './icon.js';
 import {
   CONTENT_GET, CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES,
   EDITOR_CONFIG_TS, EDITOR_EXEC, EDITOR_FILE_NAME, EDITOR_LABEL, EXT_NAME,
   FILE_EXT_SELECT, FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD,
   FILE_EXT_SELECT_TXT, HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
   HOST_STATUS, HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_CHECK,
-  HOST_VERSION_LATEST, HOST_VERSION_MIN, ICON, ICON_AUTO, ICON_BLACK,
-  ICON_COLOR, ICON_DARK, ICON_LIGHT, ICON_WHITE, INFO_COLOR, INFO_TEXT,
+  HOST_VERSION_LATEST, HOST_VERSION_MIN, ICON, INFO_COLOR, INFO_TEXT,
   IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC, LOCAL_FILE_VIEW, MENU_ENABLED,
   MODE_EDIT, MODE_EDIT_EXT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
   MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG, ONLY_EDITABLE,
   OPTIONS_OPEN, PATH_OPTIONS_PAGE, PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL,
   TMP_FILES_PB, TMP_FILES_PB_REMOVE, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
   TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET,
-  WARN_COLOR, WARN_TEXT, WEBEXT_ID
+  WARN_COLOR, WARN_TEXT
 } from './constant.js';
 
 /* api */
-const { i18n, notifications, runtime, tabs, windows } = browser;
-const menus = browser.menus ?? browser.contextMenus;
+const { i18n, menus, notifications, runtime, tabs, windows } = browser;
 
 /* constants */
 const { WINDOW_ID_NONE } = windows;
@@ -191,13 +188,10 @@ export const createMenuItemData = key => {
   if (isString(key) && menuItems[key]) {
     const { contexts, placeholder, parentId } = menuItems[key];
     if (key === OPTIONS_OPEN) {
-      if (runtime.id === WEBEXT_ID) {
-        data.set('contexts', contexts);
-        data.set('enabled', true);
-        data.set('title',
-          i18n.getMessage(`${OPTIONS_OPEN}_key`, [placeholder]));
-        data.set('visible', true);
-      }
+      data.set('contexts', contexts);
+      data.set('enabled', true);
+      data.set('title', i18n.getMessage(`${OPTIONS_OPEN}_key`, [placeholder]));
+      data.set('visible', true);
     } else {
       const hostStatus = appHost.get('status') ?? {};
       const enabled = !!localOpts.get(MENU_ENABLED) &&
@@ -228,8 +222,7 @@ export const createMenuItemData = key => {
         }
       } else {
         const label = localOpts.get(EDITOR_LABEL) || i18n.getMessage(EXT_NAME);
-        const accKey = (runtime.id === WEBEXT_ID && placeholder) ||
-                       ` ${placeholder}`;
+        const accKey = placeholder;
         data.set('contexts', contexts);
         data.set('enabled', enabled);
         data.set('title', i18n.getMessage(`${key}_key`, [label, accKey]));
@@ -989,18 +982,6 @@ export const setStorageValue = async (item, obj, changed = false) => {
       case HOST_ERR_NOTIFY:
         if (notifications && checked) {
           notifications.onClosed.addListener(clearNotification);
-        }
-        break;
-      case ICON_AUTO:
-      case ICON_BLACK:
-      case ICON_COLOR:
-      case ICON_DARK:
-      case ICON_LIGHT:
-      case ICON_WHITE:
-        if (runtime.id === WEBEXT_ID) {
-          func.push(removeStorage(item));
-        } else if (checked) {
-          func.push(setIcon(value));
         }
         break;
       case ONLY_EDITABLE:

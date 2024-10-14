@@ -3,26 +3,21 @@
 [![build](https://github.com/asamuzaK/withExEditor/workflows/build/badge.svg)](https://github.com/asamuzaK/withExEditor/actions?query=workflow%3Abuild)
 [![CodeQL](https://github.com/asamuzaK/withExEditor/workflows/CodeQL/badge.svg)](https://github.com/asamuzaK/withExEditor/actions?query=workflow%3ACodeQL)
 [![Mozilla Add-on](https://img.shields.io/amo/v/jid1-WiAigu4HIo0Tag@jetpack.svg)](https://addons.mozilla.org/addon/withexeditor/)
-[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/koghhpkkcndhhclklnnnhcpkkplfkgoi.svg)](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi)
 
 # withExEditor
 
-[お知らせ](https://github.com/asamuzaK/withExEditor/issues/166#issuecomment-1962765650)
-
-GeckoベースのブラウザとBlinkベースのブラウザ用の拡張機能。
+Firefox用のWebExtensions拡張機能。
 
 コンテキストメニュー（右クリック）から、お好みのエディタを使用して、「ソース表示」「選択部分のソース表示」、または「テキスト編集」ができるようになります。
 (X)HTML、JavaScript、CSS、MathML、SVG、XMLなどで使用可能です。
 
 ## ダウンロード
 
-Gecko:
-* [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
-
-Blink:
-* [withExEditor - Chrome ウェブストア](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi "withExEditor - Chrome ウェブストア")
+[withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
 
 ### 重要なお知らせ
+
+Blink (Chrome, Edgeなど) のサポートは終了しました。
 
 withExEditorを使うには、エディタを起動するホストも用意する必要があります。
 ブラウザはメッセージを介してホストと対話し、エディタはホストによって実行されます。
@@ -61,10 +56,6 @@ withExEditorを使うには、エディタを起動するホストも用意す�
 ***
 
 ## オプション項目
-
-### ツールバーボタンアイコン
-
-* アイコンを選択してください。
 
 ### withExEditorHost
 

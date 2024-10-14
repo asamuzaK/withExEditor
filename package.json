@@ -16,8 +16,7 @@
     "commander": "^12.1.0",
     "dompurify": "^3.1.7",
     "url-sanitizer": "^2.0.3",
-    "webext-schema": "^5.4.3",
-    "webextension-polyfill": "^0.12.0"
+    "webext-schema": "^5.4.3"
   },
   "devDependencies": {
     "@asamuzakjp/dom-selector": "^6.1.1",
@@ -26,7 +25,6 @@
     "c8": "^10.1.2",
     "chai": "^5.1.1",
     "copyfiles": "^2.4.1",
-    "esbuild": "^0.24.0",
     "eslint": "^9.12.0",
     "eslint-plugin-import-x": "^4.3.1",
     "eslint-plugin-jsdoc": "^50.3.2",
@@ -49,13 +47,8 @@
     "nwsapi": "2.2.7"
   },
   "scripts": {
-    "bundle": "npm-run-all -s bundle-*",
-    "bundle-compat": "node index compat -ci",
-    "bundle-copy": "copyfiles --up=1 --verbose src/LICENSE src/_locales/**/*.json src/css/*.css src/html/*.html src/img/*.* src/lib/**/* src/mjs/*.js --exclude=src/mjs/background.js --exclude=src/mjs/options.js bundle",
-    "bundle-esbuild": "esbuild --outfile=bundle/js/content.js --bundle --minify --sourcemap src/mjs/content-loader.js",
     "include": "npm-run-all -s include-*",
     "include-browser": "copyfiles --up=3 --verbose node_modules/webext-schema/modules/browser.js src/mjs",
-    "include-polyfill": "copyfiles -f --verbose node_modules/webextension-polyfill/LICENSE node_modules/webextension-polyfill/dist/browser-polyfill.min.js node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map src/lib/mozilla && node index include --dir=mozilla -i",
     "include-purify": "copyfiles -f --verbose node_modules/dompurify/LICENSE node_modules/dompurify/dist/purify.min.js node_modules/dompurify/dist/purify.min.js.map src/lib/purify && node index include --dir=purify -i",
     "include-url": "copyfiles -f --verbose node_modules/url-sanitizer/LICENSE node_modules/url-sanitizer/dist/url-sanitizer-wo-dompurify.min.js node_modules/url-sanitizer/dist/url-sanitizer-wo-dompurify.min.js.map src/lib/url && node index include --dir=url -i",
     "lint": "npm-run-all -s lint-*",

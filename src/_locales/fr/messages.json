@@ -241,69 +241,6 @@
   "optionsHostVersionCompatLabel": {
     "message": "Compatibilité hôte"
   },
-  "optionsIconBlack": {
-    "message": ""
-  },
-  "optionsIconBlack_alt": {
-    "message": "Retour"
-  },
-  "optionsIconBlackLabel": {
-    "message": ""
-  },
-  "optionsIconBlackLabel_ariaLabel": {
-    "message": "Icone noire"
-  },
-  "optionsIconColor": {
-    "message": ""
-  },
-  "optionsIconColor_alt": {
-    "message": "Couleure"
-  },
-  "optionsIconColorLabel": {
-    "message": ""
-  },
-  "optionsIconColorLabel_ariaLabel": {
-    "message": "Couleur Icone"
-  },
-  "optionsIconDark": {
-    "message": ""
-  },
-  "optionsIconDark_alt": {
-    "message": "Noir"
-  },
-  "optionsIconDarkLabel": {
-    "message": ""
-  },
-  "optionsIconDarkLabel_ariaLabel": {
-    "message": "Icône noirçie"
-  },
-  "optionsIconDetail": {
-    "message": "Choisir une icone."
-  },
-  "optionsIconLight": {
-    "message": ""
-  },
-  "optionsIconLight_alt": {
-    "message": "Claire"
-  },
-  "optionsIconLightLabel": {
-    "message": ""
-  },
-  "optionsIconLightLabel_ariaLabel": {
-    "message": "Icône claire"
-  },
-  "optionsIconWhite": {
-    "message": ""
-  },
-  "optionsIconWhite_alt": {
-    "message": "Blanche"
-  },
-  "optionsIconWhiteLabel": {
-    "message": ""
-  },
-  "optionsIconWhiteLabel_ariaLabel": {
-    "message": "Icone blanche"
-  },
   "optionsIsExecutable": {
     "message": "Statut de l'éditeur"
   },
@@ -333,9 +270,6 @@
   },
   "optionsTitle": {
     "message": "Options withExEditor"
-  },
-  "optionsToolbarIconLabel": {
-    "message": "Icônes du boutton de la barre d'outils"
   },
   "optionsWebsite": {
     "message": "Site d’assistance:"

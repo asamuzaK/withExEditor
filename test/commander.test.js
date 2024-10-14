@@ -8,94 +8,12 @@ import { describe, it } from 'mocha';
 
 /* test */
 import {
-  cleanDirectory, commander, createBlinkCompatFiles, extractLibraries,
-  includeLibraries, parseCommand, saveLibraryPackage
+  cleanDirectory, commander, extractLibraries, includeLibraries, parseCommand,
+  saveLibraryPackage
 } from '../modules/commander.js';
 
 /* constants */
 const DIR_CWD = process.cwd();
-
-describe('create blink compatible files', () => {
-  it('should throw', async () => {
-    const stubWrite =
-      sinon.stub(fsPromise, 'writeFile').rejects(new Error('error'));
-    await createBlinkCompatFiles().catch(e => {
-      assert.instanceOf(e, Error, 'error');
-      assert.strictEqual(e.message, 'error', 'message');
-    });
-    stubWrite.restore();
-  });
-
-  it('should call function', async () => {
-    const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const stubInfo = sinon.stub(console, 'info');
-    const res = await createBlinkCompatFiles();
-    const { called: writeCalled } = stubWrite;
-    const { called: infoCalled } = stubInfo;
-    stubWrite.restore();
-    stubInfo.restore();
-    assert.isTrue(writeCalled, 'called');
-    assert.isFalse(infoCalled, 'called');
-    assert.deepEqual(res, [
-      path.resolve(DIR_CWD, 'bundle', 'manifest.json'),
-      [
-        path.resolve(DIR_CWD, 'bundle', 'mjs', 'background.js'),
-        path.resolve(DIR_CWD, 'bundle', 'mjs', 'options.js')
-      ]
-    ], 'result');
-  });
-
-  it('should call function', async () => {
-    const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const stubInfo = sinon.stub(console, 'info');
-    const res = await createBlinkCompatFiles({
-      info: true
-    });
-    const { called: writeCalled } = stubWrite;
-    const { called: infoCalled } = stubInfo;
-    stubWrite.restore();
-    stubInfo.restore();
-    assert.isTrue(writeCalled, 'called');
-    assert.isTrue(infoCalled, 'called');
-    assert.deepEqual(res, [
-      path.resolve(DIR_CWD, 'bundle', 'manifest.json'),
-      [
-        path.resolve(DIR_CWD, 'bundle', 'mjs', 'background.js'),
-        path.resolve(DIR_CWD, 'bundle', 'mjs', 'options.js')
-      ]
-    ], 'result');
-  });
-
-  it('should call function', async () => {
-    const stubMkdir = sinon.stub(fsPromise, 'mkdir');
-    const stubRm = sinon.stub(fsPromise, 'rm');
-    const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const stubInfo = sinon.stub(console, 'info');
-    const res = await createBlinkCompatFiles({
-      clean: true,
-      info: true
-    });
-    const { called: mkdirCalled } = stubMkdir;
-    const { called: rmCalled } = stubRm;
-    const { called: writeCalled } = stubWrite;
-    const { called: infoCalled } = stubInfo;
-    stubMkdir.restore();
-    stubRm.restore();
-    stubWrite.restore();
-    stubInfo.restore();
-    assert.isTrue(mkdirCalled, 'called');
-    assert.isTrue(rmCalled, 'called');
-    assert.isTrue(writeCalled, 'called');
-    assert.isTrue(infoCalled, 'called');
-    assert.deepEqual(res, [
-      path.resolve(DIR_CWD, 'bundle', 'manifest.json'),
-      [
-        path.resolve(DIR_CWD, 'bundle', 'mjs', 'background.js'),
-        path.resolve(DIR_CWD, 'bundle', 'mjs', 'options.js')
-      ]
-    ], 'result');
-  });
-});
 
 describe('save library package info', () => {
   it('should throw', async () => {
@@ -132,15 +50,17 @@ describe('save library package info', () => {
 
   it('should throw', async () => {
     await saveLibraryPackage([
-      'mozilla',
+      'url',
       {
-        name: 'webextension-polyfill',
-        cdn: 'https://unpkg.com/webextension-polyfill',
+        name: 'url-sanitizer',
+        raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
+        vPrefix: 'v',
+        cdn: 'https://unpkg.com/url-sanitizer',
         repository: {
           type: 'git',
-          url: 'git+https://github.com/mozilla/webextension-polyfill.git'
+          url: 'https://github.com/asamuzaK/urlSanitizer.git'
         },
-        type: 'commonjs',
+        type: 'module',
         files: [
           {
             file: 'foo',
@@ -150,7 +70,7 @@ describe('save library package info', () => {
       }
     ]).catch(e => {
       const filePath = path.resolve(
-        DIR_CWD, 'node_modules', 'webextension-polyfill', 'foo.txt'
+        DIR_CWD, 'node_modules', 'url-sanitizer', 'foo.txt'
       );
       assert.instanceOf(e, Error);
       assert.strictEqual(e.message, `${filePath} is not a file.`);
@@ -159,15 +79,17 @@ describe('save library package info', () => {
 
   it('should throw', async () => {
     await saveLibraryPackage([
-      'mozilla',
+      'url',
       {
-        name: 'webextension-polyfill',
-        cdn: 'https://unpkg.com/webextension-polyfill',
+        name: 'url-sanitizer',
+        raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
+        vPrefix: 'v',
+        cdn: 'https://unpkg.com/url-sanitizer',
         repository: {
           type: 'git',
-          url: 'git+https://github.com/mozilla/webextension-polyfill.git'
+          url: 'https://github.com/asamuzaK/urlSanitizer.git'
         },
-        type: 'commonjs',
+        type: 'module',
         files: [
           {
             file: 'foo',
@@ -176,7 +98,7 @@ describe('save library package info', () => {
         ]
       }
     ]).catch(e => {
-      const filePath = path.resolve(DIR_CWD, 'src', 'lib', 'mozilla', 'foo');
+      const filePath = path.resolve(DIR_CWD, 'src', 'lib', 'url', 'foo');
       assert.instanceOf(e, Error);
       assert.strictEqual(e.message, `${filePath} is not a file.`);
     });
@@ -186,29 +108,31 @@ describe('save library package info', () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const stubInfo = sinon.stub(console, 'info');
     const filePath =
-      path.resolve(DIR_CWD, 'src', 'lib', 'mozilla', 'package.json');
+      path.resolve(DIR_CWD, 'src', 'lib', 'url', 'package.json');
     const res = await saveLibraryPackage([
-      'mozilla',
+      'url',
       {
-        name: 'webextension-polyfill',
-        cdn: 'https://unpkg.com/webextension-polyfill',
+        name: 'url-sanitizer',
+        raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
+        vPrefix: 'v',
+        cdn: 'https://unpkg.com/url-sanitizer',
         repository: {
           type: 'git',
-          url: 'git+https://github.com/mozilla/webextension-polyfill.git'
+          url: 'https://github.com/asamuzaK/urlSanitizer.git'
         },
-        type: 'commonjs',
+        type: 'module',
         files: [
           {
             file: 'LICENSE',
             path: 'LICENSE'
           },
           {
-            file: 'browser-polyfill.min.js',
-            path: 'dist/browser-polyfill.min.js'
+            file: 'url-sanitizer-wo-dompurify.min.js',
+            path: 'dist/url-sanitizer-wo-dompurify.min.js'
           },
           {
-            file: 'browser-polyfill.min.js.map',
-            path: 'dist/browser-polyfill.min.js.map'
+            file: 'url-sanitizer-wo-dompurify.min.js.map',
+            path: 'dist/url-sanitizer-wo-dompurify.min.js.map'
           }
         ]
       }
@@ -226,29 +150,31 @@ describe('save library package info', () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const stubInfo = sinon.stub(console, 'info');
     const filePath =
-      path.resolve(DIR_CWD, 'src', 'lib', 'mozilla', 'package.json');
+      path.resolve(DIR_CWD, 'src', 'lib', 'url', 'package.json');
     const res = await saveLibraryPackage([
-      'mozilla',
+      'url',
       {
-        name: 'webextension-polyfill',
-        cdn: 'https://unpkg.com/webextension-polyfill',
+        name: 'url-sanitizer',
+        raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
+        vPrefix: 'v',
+        cdn: 'https://unpkg.com/url-sanitizer',
         repository: {
           type: 'git',
-          url: 'git+https://github.com/mozilla/webextension-polyfill.git'
+          url: 'https://github.com/asamuzaK/urlSanitizer.git'
         },
-        type: 'commonjs',
+        type: 'module',
         files: [
           {
             file: 'LICENSE',
             path: 'LICENSE'
           },
           {
-            file: 'browser-polyfill.min.js',
-            path: 'dist/browser-polyfill.min.js'
+            file: 'url-sanitizer-wo-dompurify.min.js',
+            path: 'dist/url-sanitizer-wo-dompurify.min.js'
           },
           {
-            file: 'browser-polyfill.min.js.map',
-            path: 'dist/browser-polyfill.min.js.map'
+            file: 'url-sanitizer-wo-dompurify.min.js.map',
+            path: 'dist/url-sanitizer-wo-dompurify.min.js.map'
           }
         ]
       }
@@ -329,90 +255,6 @@ describe('save library package info', () => {
           {
             file: 'purify.min.js.map',
             path: 'dist/purify.min.js.map'
-          }
-        ]
-      }
-    ], true);
-    const { calledOnce: writeCalled } = stubWrite;
-    const { calledOnce: infoCalled } = stubInfo;
-    stubWrite.restore();
-    stubInfo.restore();
-    assert.isTrue(writeCalled, 'called');
-    assert.isTrue(infoCalled, 'called');
-    assert.strictEqual(res, filePath, 'result');
-  });
-
-  it('should call function', async () => {
-    const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const stubInfo = sinon.stub(console, 'info');
-    const filePath =
-      path.resolve(DIR_CWD, 'src', 'lib', 'url', 'package.json');
-    const res = await saveLibraryPackage([
-      'url',
-      {
-        name: 'url-sanitizer',
-        raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
-        vPrefix: 'v',
-        cdn: 'https://unpkg.com/url-sanitizer',
-        repository: {
-          type: 'git',
-          url: 'https://github.com/asamuzaK/urlSanitizer.git'
-        },
-        type: 'module',
-        files: [
-          {
-            file: 'LICENSE',
-            path: 'LICENSE'
-          },
-          {
-            file: 'url-sanitizer-wo-dompurify.min.js',
-            path: 'dist/url-sanitizer-wo-dompurify.min.js'
-          },
-          {
-            file: 'url-sanitizer-wo-dompurify.min.js.map',
-            path: 'dist/url-sanitizer-wo-dompurify.min.js.map'
-          }
-        ]
-      }
-    ]);
-    const { called: infoCalled } = stubInfo;
-    const { calledOnce: writeCalled } = stubWrite;
-    stubInfo.restore();
-    stubWrite.restore();
-    assert.isTrue(writeCalled, 'called');
-    assert.isFalse(infoCalled, 'not called');
-    assert.strictEqual(res, filePath, 'result');
-  });
-
-  it('should call function', async () => {
-    const stubWrite = sinon.stub(fsPromise, 'writeFile');
-    const stubInfo = sinon.stub(console, 'info');
-    const filePath =
-      path.resolve(DIR_CWD, 'src', 'lib', 'url', 'package.json');
-    const res = await saveLibraryPackage([
-      'url',
-      {
-        name: 'url-sanitizer',
-        raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
-        vPrefix: 'v',
-        cdn: 'https://unpkg.com/url-sanitizer',
-        repository: {
-          type: 'git',
-          url: 'https://github.com/asamuzaK/urlSanitizer.git'
-        },
-        type: 'module',
-        files: [
-          {
-            file: 'LICENSE',
-            path: 'LICENSE'
-          },
-          {
-            file: 'url-sanitizer-wo-dompurify.min.js',
-            path: 'dist/url-sanitizer-wo-dompurify.min.js'
-          },
-          {
-            file: 'url-sanitizer-wo-dompurify.min.js.map',
-            path: 'dist/url-sanitizer-wo-dompurify.min.js.map'
           }
         ]
       }
@@ -623,22 +465,6 @@ describe('parse command', () => {
     const j = stubVer.callCount;
     const k = spyCmd.callCount;
     parseCommand(['foo', 'bar', 'clean']);
-    assert.strictEqual(stubParse.callCount, i + 1, 'called');
-    assert.strictEqual(stubVer.callCount, j + 1, 'called');
-    assert.strictEqual(spyCmd.callCount, k + 1, 'called');
-    stubParse.restore();
-    stubVer.restore();
-    spyCmd.restore();
-  });
-
-  it('should parse', () => {
-    const stubParse = sinon.stub(commander, 'parse');
-    const stubVer = sinon.stub(commander, 'version');
-    const spyCmd = sinon.spy(commander, 'command');
-    const i = stubParse.callCount;
-    const j = stubVer.callCount;
-    const k = spyCmd.callCount;
-    parseCommand(['foo', 'bar', 'compat']);
     assert.strictEqual(stubParse.callCount, i + 1, 'called');
     assert.strictEqual(stubVer.callCount, j + 1, 'called');
     assert.strictEqual(spyCmd.callCount, k + 1, 'called');

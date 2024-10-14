@@ -241,69 +241,6 @@
   "optionsHostVersionCompatLabel": {
     "message": "Host Compatibility"
   },
-  "optionsIconBlack": {
-    "message": ""
-  },
-  "optionsIconBlack_alt": {
-    "message": "Black"
-  },
-  "optionsIconBlackLabel": {
-    "message": ""
-  },
-  "optionsIconBlackLabel_ariaLabel": {
-    "message": "Black Icon"
-  },
-  "optionsIconColor": {
-    "message": ""
-  },
-  "optionsIconColor_alt": {
-    "message": "Color"
-  },
-  "optionsIconColorLabel": {
-    "message": ""
-  },
-  "optionsIconColorLabel_ariaLabel": {
-    "message": "Color Icon"
-  },
-  "optionsIconDark": {
-    "message": ""
-  },
-  "optionsIconDark_alt": {
-    "message": "Dark"
-  },
-  "optionsIconDarkLabel": {
-    "message": ""
-  },
-  "optionsIconDarkLabel_ariaLabel": {
-    "message": "Dark Icon"
-  },
-  "optionsIconDetail": {
-    "message": "Choose the icon."
-  },
-  "optionsIconLight": {
-    "message": ""
-  },
-  "optionsIconLight_alt": {
-    "message": "Light"
-  },
-  "optionsIconLightLabel": {
-    "message": ""
-  },
-  "optionsIconLightLabel_ariaLabel": {
-    "message": "Light Icon"
-  },
-  "optionsIconWhite": {
-    "message": ""
-  },
-  "optionsIconWhite_alt": {
-    "message": "White"
-  },
-  "optionsIconWhiteLabel": {
-    "message": ""
-  },
-  "optionsIconWhiteLabel_ariaLabel": {
-    "message": "White Icon"
-  },
   "optionsIsExecutable": {
     "message": "Editor State"
   },
@@ -333,9 +270,6 @@
   },
   "optionsTitle": {
     "message": "withExEditor Options"
-  },
-  "optionsToolbarIconLabel": {
-    "message": "Toolbar Button Icon"
   },
   "optionsWebsite": {
     "message": "Support site:"

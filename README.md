@@ -7,22 +7,18 @@ EN | [JA](./README.ja.md)
 
 # withExEditor
 
-[Announcement](https://github.com/asamuzaK/withExEditor/issues/166#issuecomment-1962765650)
-
-Extension for Gecko based browsers and Blink based browsers.
+WebExtensions for Firefox.
 
 From the context menu (right click), you can "View source" "View selection" or "Edit text" with your favorite editor.
 Enabled in (X)HTML, JavaScript, CSS, MathML, SVG, XML, etc.
 
 ## Download
 
-Gecko:
-* [withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
-
-Blink:
-* [withExEditor - Chrome Web Store](https://chrome.google.com/webstore/detail/withexeditor/koghhpkkcndhhclklnnnhcpkkplfkgoi "withExEditor - Chrome Web Store")
+[withExEditor :: Add-ons for Firefox](https://addons.mozilla.org/addon/withexeditor/ "withExEditor :: Add-ons for Firefox")
 
 ### Important Notice
+
+Blink based browsers (Chrome and its variants) are no longer supported.
 
 To use withExEditor, you also need to prepare a host which executes your editor.
 The browser interacts with the host via messages, and the editor is executed by the host.
@@ -61,10 +57,6 @@ Please download the host for withExEditor from [asamuzaK/withExEditorHost (GitHu
 ***
 
 ## Options
-
-### Toolbar Button Icon
-
-* Choose the icon.
 
 ### withExEditorHost
 

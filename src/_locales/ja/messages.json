@@ -241,69 +241,6 @@
   "optionsHostVersionCompatLabel": {
     "message": "ホストの互換性"
   },
-  "optionsIconBlack": {
-    "message": ""
-  },
-  "optionsIconBlack_alt": {
-    "message": "ブラック"
-  },
-  "optionsIconBlackLabel": {
-    "message": ""
-  },
-  "optionsIconBlackLabel_ariaLabel": {
-    "message": "ブラックアイコン"
-  },
-  "optionsIconColor": {
-    "message": ""
-  },
-  "optionsIconColor_alt": {
-    "message": "カラー"
-  },
-  "optionsIconColorLabel": {
-    "message": ""
-  },
-  "optionsIconColorLabel_ariaLabel": {
-    "message": "カラーアイコン"
-  },
-  "optionsIconDark": {
-    "message": ""
-  },
-  "optionsIconDark_alt": {
-    "message": "暗色"
-  },
-  "optionsIconDarkLabel": {
-    "message": ""
-  },
-  "optionsIconDarkLabel_ariaLabel": {
-    "message": "暗色アイコン"
-  },
-  "optionsIconDetail": {
-    "message": "アイコンを選択してください。"
-  },
-  "optionsIconLight": {
-    "message": ""
-  },
-  "optionsIconLight_alt": {
-    "message": "明色"
-  },
-  "optionsIconLightLabel": {
-    "message": ""
-  },
-  "optionsIconLightLabel_ariaLabel": {
-    "message": "明色アイコン"
-  },
-  "optionsIconWhite": {
-    "message": ""
-  },
-  "optionsIconWhite_alt": {
-    "message": "ホワイト"
-  },
-  "optionsIconWhiteLabel": {
-    "message": ""
-  },
-  "optionsIconWhiteLabel_ariaLabel": {
-    "message": "ホワイトアイコン"
-  },
   "optionsIsExecutable": {
     "message": "エディタの状態"
   },
@@ -333,9 +270,6 @@
   },
   "optionsTitle": {
     "message": "withExEditor 設定"
-  },
-  "optionsToolbarIconLabel": {
-    "message": "ツールバーボタンアイコン"
   },
   "optionsWebsite": {
     "message": "サポートサイト:"
