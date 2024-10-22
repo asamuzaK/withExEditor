@@ -894,13 +894,16 @@ export const onWindowRemoved = async () => {
  * @param {object} tab - tabs.Tab
  * @returns {?Promise} - sendMessage() / openOptionsPage()
  */
-export const handleCmd = async (cmd, tab = {}) => {
+export const handleCmd = async (cmd, tab) => {
   if (!isString(cmd)) {
     throw new TypeError(`Expected String but got ${getType(cmd)}.`);
   }
   let func;
   switch (cmd) {
     case EDITOR_EXEC: {
+      if (!tab) {
+        tab = await getActiveTab();
+      }
       const { id } = tab;
       if (tabList.has(id)) {
         func = sendMessage(id, {
