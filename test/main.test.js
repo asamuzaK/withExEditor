@@ -2670,6 +2670,24 @@ describe('main', () => {
       assert.strictEqual(browser.tabs.query.callCount, j, 'not called');
       assert.deepEqual(res, {}, 'result');
     });
+
+    it('should call function', async () => {
+      const i = browser.tabs.sendMessage.callCount;
+      const j = browser.tabs.query.callCount;
+      browser.tabs.sendMessage.resolves({});
+      browser.tabs.query.withArgs({
+        windowId: browser.windows.WINDOW_ID_CURRENT,
+        active: true,
+        windowType: 'normal'
+      }).resolves([{
+        id: 2,
+        windowId: 1
+      }]);
+      const res = await func(EDITOR_EXEC);
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.tabs.query.callCount, j + 1, 'called');
+      assert.deepEqual(res, {}, 'result');
+    });
   });
 
   describe('send variable', () => {
