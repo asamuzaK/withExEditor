@@ -10,7 +10,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "jid1-WiAigu4HIo0Tag@jetpack",
-      "strict_min_version": "126.0"
+      "strict_min_version": "115.0"
     }
   },
   "commands": {
@@ -65,5 +65,5 @@
     "tabs"
   ],
   "short_name": "__MSG_extensionName__",
-  "version": "11.0.1"
+  "version": "12.0.0"
 }
