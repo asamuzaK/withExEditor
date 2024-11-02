@@ -32,20 +32,43 @@ describe('content-main', () => {
     'XMLSerializer'
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
-  const isContentEditable = elm => {
-    let bool;
-    if (elm.hasAttribute('contenteditable')) {
-      const attr = elm.getAttribute('contenteditable');
-      if (attr === 'true' || attr === '') {
-        bool = true;
-      } else if (attr === 'false') {
-        bool = false;
+  const isContentEditable = node => {
+    if (node.nodeType !== 1) {
+      return false;
+    }
+    if (typeof node.isContentEditable === 'boolean') {
+      return node.isContentEditable;
+    } else if (node.ownerDocument.designMode === 'on') {
+      return true;
+    } else {
+      let attr;
+      if (node.hasAttribute('contenteditable')) {
+        attr = node.getAttribute('contenteditable');
+      } else {
+        attr = 'inherit';
+      }
+      switch (attr) {
+        case '':
+        case 'true': {
+          return true;
+        }
+        case 'plaintext-only': {
+          // FIXME:
+          // @see https://github.com/w3c/editing/issues/470
+          // @see https://github.com/whatwg/html/issues/10651
+          return true;
+        }
+        case 'false': {
+          return false;
+        }
+        default: {
+          if (node?.parentNode?.nodeType === 1) {
+            return isContentEditable(node.parentNode);
+          }
+          return false;
+        }
       }
     }
-    if (document && document.designMode === 'on') {
-      bool = true;
-    }
-    return !!bool;
   };
 
   beforeEach(() => {
