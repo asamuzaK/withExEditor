@@ -323,7 +323,7 @@ describe('extract libraries', () => {
     const i = stubTrace.callCount;
     const j = stubWrite.callCount;
     const opt = {
-      dir: 'mozilla'
+      dir: 'url'
     };
     await extractLibraries(opt);
     const { callCount: traceCallCount } = stubTrace;
@@ -346,7 +346,7 @@ describe('extract libraries', () => {
     const i = stubTrace.callCount;
     const j = stubWrite.callCount;
     const opt = {
-      dir: 'mozilla'
+      dir: 'url'
     };
     await extractLibraries(opt);
     const { callCount: traceCallCount } = stubTrace;
