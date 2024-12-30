@@ -3,7 +3,7 @@
  */
 
 /* api */
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { describe, it } from 'mocha';
 
 /* test */
@@ -15,20 +15,20 @@ describe('ns-uri', () => {
   it('should get string', () => {
     const items = Object.entries(nsUri);
     for (const [key, value] of items) {
-      assert.isString(key);
-      assert.isString(value);
+      assert.strictEqual(typeof key, 'string');
+      assert.strictEqual(typeof value, 'string');
     }
   });
 
   it('should get string', () => {
-    assert.isString(nsHtml);
+    assert.strictEqual(typeof nsHtml, 'string');
   });
 
   it('should get string', () => {
-    assert.isString(nsMath);
+    assert.strictEqual(typeof nsMath, 'string');
   });
 
   it('should get string', () => {
-    assert.isString(nsSvg);
+    assert.strictEqual(typeof nsSvg, 'string');
   });
 });

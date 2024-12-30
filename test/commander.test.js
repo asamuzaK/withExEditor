@@ -1,9 +1,9 @@
 /* api */
+import { strict as assert } from 'node:assert';
 import fs, { promises as fsPromise } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import sinon from 'sinon';
-import { assert } from 'chai';
 import { describe, it } from 'mocha';
 
 /* test */
@@ -18,14 +18,14 @@ const DIR_CWD = process.cwd();
 describe('save library package info', () => {
   it('should throw', async () => {
     await saveLibraryPackage().catch(e => {
-      assert.instanceOf(e, TypeError);
+      assert.strictEqual(e instanceof TypeError, true);
       assert.strictEqual(e.message, 'Expected Array but got Undefined.');
     });
   });
 
   it('should throw', async () => {
     await saveLibraryPackage([]).catch(e => {
-      assert.instanceOf(e, Error);
+      assert.strictEqual(e instanceof Error, true);
     });
   });
 
@@ -33,7 +33,7 @@ describe('save library package info', () => {
     await saveLibraryPackage([
       'foo'
     ]).catch(e => {
-      assert.instanceOf(e, Error);
+      assert.strictEqual(e instanceof Error, true);
     });
   });
 
@@ -44,7 +44,7 @@ describe('save library package info', () => {
         name: 'foo'
       }
     ]).catch(e => {
-      assert.instanceOf(e, Error);
+      assert.strictEqual(e instanceof Error, true);
     });
   });
 
@@ -72,7 +72,7 @@ describe('save library package info', () => {
       const filePath = path.resolve(
         DIR_CWD, 'node_modules', 'url-sanitizer', 'foo.txt'
       );
-      assert.instanceOf(e, Error);
+      assert.strictEqual(e instanceof Error, true);
       assert.strictEqual(e.message, `${filePath} is not a file.`);
     });
   });
@@ -99,7 +99,7 @@ describe('save library package info', () => {
       }
     ]).catch(e => {
       const filePath = path.resolve(DIR_CWD, 'src', 'lib', 'url', 'foo');
-      assert.instanceOf(e, Error);
+      assert.strictEqual(e instanceof Error, true);
       assert.strictEqual(e.message, `${filePath} is not a file.`);
     });
   });
@@ -141,8 +141,8 @@ describe('save library package info', () => {
     const { calledOnce: writeCalled } = stubWrite;
     stubInfo.restore();
     stubWrite.restore();
-    assert.isTrue(writeCalled, 'called');
-    assert.isFalse(infoCalled, 'not called');
+    assert.strictEqual(writeCalled, true, 'called');
+    assert.strictEqual(infoCalled, false, 'not called');
     assert.strictEqual(res, filePath, 'result');
   });
 
@@ -183,8 +183,8 @@ describe('save library package info', () => {
     const { calledOnce: infoCalled } = stubInfo;
     stubWrite.restore();
     stubInfo.restore();
-    assert.isTrue(writeCalled, 'called');
-    assert.isTrue(infoCalled, 'called');
+    assert.strictEqual(writeCalled, true, 'called');
+    assert.strictEqual(infoCalled, true, 'called');
     assert.strictEqual(res, filePath, 'result');
   });
 
@@ -223,8 +223,8 @@ describe('save library package info', () => {
     const { calledOnce: writeCalled } = stubWrite;
     stubInfo.restore();
     stubWrite.restore();
-    assert.isTrue(writeCalled, 'called');
-    assert.isFalse(infoCalled, 'not called');
+    assert.strictEqual(writeCalled, true, 'called');
+    assert.strictEqual(infoCalled, false, 'not called');
     assert.strictEqual(res, filePath, 'result');
   });
 
@@ -263,8 +263,8 @@ describe('save library package info', () => {
     const { calledOnce: infoCalled } = stubInfo;
     stubWrite.restore();
     stubInfo.restore();
-    assert.isTrue(writeCalled, 'called');
-    assert.isTrue(infoCalled, 'called');
+    assert.strictEqual(writeCalled, true, 'called');
+    assert.strictEqual(infoCalled, true, 'called');
     assert.strictEqual(res, filePath, 'result');
   });
 });
@@ -379,7 +379,7 @@ describe('include libraries', () => {
     stubWrite.restore();
     assert.strictEqual(traceCallCount, i + 1, 'trace');
     assert.strictEqual(writeCallCount, j, 'write');
-    assert.isUndefined(res, 'result');
+    assert.strictEqual(res, undefined, 'result');
   });
 });
 
@@ -390,7 +390,7 @@ describe('clean directory', () => {
     cleanDirectory({ dir });
     const { called: rmCalled } = stubRm;
     stubRm.restore();
-    assert.isFalse(rmCalled, 'not called');
+    assert.strictEqual(rmCalled, false, 'not called');
   });
 
   it('should call funtion', () => {
@@ -402,8 +402,8 @@ describe('clean directory', () => {
     const { called: infoCalled } = stubInfo;
     stubRm.restore();
     stubInfo.restore();
-    assert.isTrue(rmCalled, 'called');
-    assert.isFalse(infoCalled, 'not called');
+    assert.strictEqual(rmCalled, true, 'called');
+    assert.strictEqual(infoCalled, false, 'not called');
   });
 
   it('should call funtion', () => {
@@ -415,8 +415,8 @@ describe('clean directory', () => {
     const { calledOnce: infoCalled } = stubInfo;
     stubRm.restore();
     stubInfo.restore();
-    assert.isTrue(rmCalled, 'called');
-    assert.isTrue(infoCalled, 'not called');
+    assert.strictEqual(rmCalled, true, 'called');
+    assert.strictEqual(infoCalled, true, 'not called');
   });
 });
 
