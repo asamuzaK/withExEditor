@@ -14,6 +14,15 @@
   "commandOpenOptions": {
     "message": "設定ページを開く"
   },
+  "commandEditHtml": {
+    "message": "HTML を編集"
+  },
+  "commandEditMarkdown": {
+    "message": "Markdown を編集"
+  },
+  "commandEditPlainText": {
+    "message": "テキストを編集"
+  },
   "hostConnection_false": {
     "message": "未接続"
   },

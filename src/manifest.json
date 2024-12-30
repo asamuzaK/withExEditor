@@ -25,6 +25,15 @@
       "suggested_key": {
         "default": "Alt+Shift+U"
       }
+    },
+    "editHtml": {
+      "description": "__MSG_commandEditHtml__"
+    },
+    "editMarkdown": {
+      "description": "__MSG_commandEditMarkdown__"
+    },
+    "editPlainText": {
+      "description": "__MSG_commandEditPlainText__"
     }
   },
   "content_scripts": [
