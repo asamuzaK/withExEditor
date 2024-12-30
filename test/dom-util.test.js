@@ -3,11 +3,11 @@
  */
 
 /* api */
+import { strict as assert } from 'node:assert';
 import { DOMSelector } from '@asamuzakjp/dom-selector';
-import sinon from 'sinon';
-import { assert } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import { browser, createJsdom, DataTransfer } from './mocha/setup.js';
+import sinon from 'sinon';
+import { createJsdom, DataTransfer } from './mocha/setup.js';
 
 /* test */
 // eslint-disable-next-line import-x/order
@@ -120,15 +120,12 @@ describe('dom util', () => {
     }
   });
 
-  it('should get browser object', () => {
-    assert.isObject(browser, 'browser');
-  });
-
   describe('strip HTML tags and decode HTML escaped characters', () => {
     const func = mjs.getDecodedContent;
 
     it('should throw', () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
+      assert.throws(() => func(), TypeError,
+        'Expected String but got Undefined.');
     });
 
     it('should get value', () => {
@@ -152,7 +149,7 @@ describe('dom util', () => {
 
     it('should get false', () => {
       const res = func();
-      assert.isFalse(res, 'result');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should get true', () => {
@@ -163,7 +160,7 @@ describe('dom util', () => {
         1,
         document.location.href
       ]);
-      assert.isTrue(res, 'result');
+      assert.strictEqual(res, true, 'result');
     });
   });
 
@@ -373,13 +370,13 @@ describe('dom util', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
       const body = document.querySelector('body');
       const res = func(body);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get result', () => {
@@ -421,7 +418,7 @@ describe('dom util', () => {
       const elm2 = document.createElement('p');
       elm2.setAttribute('data-foo', 'bar');
       func(elm);
-      assert.isFalse(elm.hasAttribute('data-foo', 'attr'));
+      assert.strictEqual(elm.hasAttribute('data-foo'), false, 'attr');
     });
 
     it('should not set attributes', async () => {
@@ -429,7 +426,7 @@ describe('dom util', () => {
       const elm2 = document.createElement('p');
       elm2.setAttribute('data-foo', 'bar');
       func(null, elm2);
-      assert.isFalse(elm.hasAttribute('data-foo', 'attr'));
+      assert.strictEqual(elm.hasAttribute('data-foo'), false, 'attr');
     });
 
     it('should set attributes', async () => {
@@ -440,8 +437,8 @@ describe('dom util', () => {
       elm2.setAttribute('onclick', 'return false');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isFalse(elm.hasAttribute('onclick'), 'func');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('onclick'), false, 'func');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
         'length');
     });
@@ -454,8 +451,8 @@ describe('dom util', () => {
       elm2.setAttribute('onclick', 'alert(1)');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isFalse(elm.hasAttribute('onclick'), 'func');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('onclick'), false, 'func');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
         'length');
     });
@@ -468,8 +465,8 @@ describe('dom util', () => {
       elm2.setAttribute('data', 'https://example.com');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('data'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('data'), true, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length,
         'length');
     });
@@ -482,8 +479,8 @@ describe('dom util', () => {
       elm2.setAttribute('data', '../baz');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('data'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('data'), true, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length,
         'length');
     });
@@ -496,8 +493,8 @@ describe('dom util', () => {
       elm2.setAttribute('data', 'javascript:void(0)');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isFalse(elm.hasAttribute('data'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('data'), false, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
         'length');
     });
@@ -511,9 +508,9 @@ describe('dom util', () => {
       elm2.setAttribute('ping', 'https://example.com https://example.net');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('href'), 'url');
-      assert.isTrue(elm.hasAttribute('ping'), 'ping url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('href'), true, 'url');
+      assert.strictEqual(elm.hasAttribute('ping'), true, 'ping url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length,
         'length');
     });
@@ -526,8 +523,8 @@ describe('dom util', () => {
       elm2.setAttribute('href', '../');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('href'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('href'), true, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length,
         'length');
     });
@@ -544,9 +541,9 @@ describe('dom util', () => {
       );
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isFalse(elm.hasAttribute('href'), 'url');
-      assert.isFalse(elm.hasAttribute('ping'), 'ping url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('href'), false, 'url');
+      assert.strictEqual(elm.hasAttribute('ping'), false, 'ping url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length - 2,
         'length');
     });
@@ -559,8 +556,8 @@ describe('dom util', () => {
       elm2.setAttribute('poster', 'https://example.com');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('poster'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('poster'), true, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length,
         'length');
     });
@@ -573,8 +570,8 @@ describe('dom util', () => {
       elm2.setAttribute('poster', '../baz');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('poster'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('poster'), true, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length,
         'length');
     });
@@ -587,8 +584,8 @@ describe('dom util', () => {
       elm2.setAttribute('poster', 'javascript:void(0)');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isFalse(elm.hasAttribute('poster'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('poster'), false, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
         'length');
     });
@@ -601,8 +598,8 @@ describe('dom util', () => {
       elm2.setAttribute('src', 'https://example.com');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('src'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('src'), true, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length,
         'length');
     });
@@ -615,8 +612,8 @@ describe('dom util', () => {
       elm2.setAttribute('src', '../baz');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('src'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('src'), true, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length,
         'length');
     });
@@ -629,8 +626,8 @@ describe('dom util', () => {
       elm2.setAttribute('src', 'javascript:void(0)');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isFalse(elm.hasAttribute('src'), 'url');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('src'), false, 'url');
       assert.strictEqual(elm.attributes.length, elm2.attributes.length - 1,
         'length');
     });
@@ -643,8 +640,8 @@ describe('dom util', () => {
       elm2.setAttribute('value', 'foo bar');
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('value'), 'attr');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('value'), true, 'attr');
       assert.strictEqual(elm2.getAttribute('value'), 'foo bar',
         'original attr value');
       assert.strictEqual(elm.getAttribute('value'), '', 'cloned attr value');
@@ -663,8 +660,8 @@ describe('dom util', () => {
       elm2.value = 'foo bar';
       body.appendChild(elm2);
       func(elm, elm2);
-      assert.isTrue(elm.hasAttribute('data-foo'), 'attr');
-      assert.isTrue(elm.hasAttribute('value'), 'attr');
+      assert.strictEqual(elm.hasAttribute('data-foo'), true, 'attr');
+      assert.strictEqual(elm.hasAttribute('value'), true, 'attr');
       assert.strictEqual(elm2.getAttribute('value'), '', 'original attr value');
       assert.strictEqual(elm.getAttribute('value'), '', 'cloned attr value');
       assert.strictEqual(elm2.value, 'foo bar', 'original value');
@@ -686,8 +683,8 @@ describe('dom util', () => {
         'bar');
       body.appendChild(svg2);
       func(svg, svg2);
-      assert.isTrue(svg.hasAttribute('xmlns:html'), 'attr');
-      assert.isTrue(svg.hasAttribute('html:data-foo'), 'attr');
+      assert.strictEqual(svg.hasAttribute('xmlns:html'), true, 'attr');
+      assert.strictEqual(svg.hasAttribute('html:data-foo'), true, 'attr');
       assert.strictEqual(svg.attributes.length, svg2.attributes.length,
         'length');
     });
@@ -698,7 +695,7 @@ describe('dom util', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -706,7 +703,7 @@ describe('dom util', () => {
       const body = document.querySelector('body');
       body.appendChild(elm);
       const res = func(elm);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get result', () => {
@@ -733,7 +730,7 @@ describe('dom util', () => {
       const res = func(elm);
       assert.strictEqual(res.nodeType, Node.ELEMENT_NODE, 'nodeType');
       assert.strictEqual(res.localName, 'div', 'localName');
-      assert.isTrue(res.hasAttribute('data-foo'), 'attr');
+      assert.strictEqual(res.hasAttribute('data-foo'), true, 'attr');
     });
 
     it('should get result', () => {
@@ -742,9 +739,9 @@ describe('dom util', () => {
       elm.setAttribute('bar', 'baz');
       body.appendChild(elm);
       const res = func(elm);
-      assert.isTrue(res instanceof HTMLUnknownElement, 'instance');
+      assert.strictEqual(res instanceof HTMLUnknownElement, true, 'instance');
       assert.strictEqual(res.localName, 'foo', 'localName');
-      assert.isFalse(res.hasAttribute('bar'), 'attr');
+      assert.strictEqual(res.hasAttribute('bar'), false, 'attr');
     });
 
     it('should throw', async () => {
@@ -764,7 +761,7 @@ describe('dom util', () => {
     it('should get document fragment', () => {
       const res = func();
       assert.strictEqual(res.nodeType, Node.DOCUMENT_FRAGMENT_NODE, 'nodeType');
-      assert.isFalse(res.hasChildNodes(), 'hasChildNodes');
+      assert.strictEqual(res.hasChildNodes(), false, 'hasChildNodes');
     });
 
     it('should get document fragment', () => {
@@ -793,7 +790,7 @@ describe('dom util', () => {
       const elm2 = document.createElement('div');
       const res = func(elm, elm2);
       assert.strictEqual(res.localName, 'p', 'localName');
-      assert.isFalse(res.hasChildNodes(), 'child');
+      assert.strictEqual(res.hasChildNodes(), false, 'child');
     });
 
     it('should get element', () => {
@@ -802,7 +799,7 @@ describe('dom util', () => {
       elm2.textContent = 'foo';
       const res = func(elm, elm2);
       assert.strictEqual(res.localName, 'p', 'localName');
-      assert.isTrue(res.hasChildNodes(), 'child');
+      assert.strictEqual(res.hasChildNodes(), true, 'child');
       assert.strictEqual(res.childNodes.length, 1, 'length');
     });
 
@@ -812,7 +809,7 @@ describe('dom util', () => {
       elm2.appendChild(document.createComment('foo'));
       const res = func(elm, elm2);
       assert.strictEqual(res.localName, 'p', 'localName');
-      assert.isFalse(res.hasChildNodes(), 'child');
+      assert.strictEqual(res.hasChildNodes(), false, 'child');
     });
 
     it('should get element', () => {
@@ -827,7 +824,7 @@ describe('dom util', () => {
       elm2.appendChild(elm4);
       const res = func(elm, elm2);
       assert.strictEqual(res.localName, 'p', 'localName');
-      assert.isTrue(res.hasChildNodes(), 'child');
+      assert.strictEqual(res.hasChildNodes(), true, 'child');
       assert.strictEqual(res.childNodes.length, 5, 'length');
     });
   });
@@ -837,7 +834,7 @@ describe('dom util', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -845,7 +842,7 @@ describe('dom util', () => {
       const body = document.querySelector('body');
       body.appendChild(elm);
       const res = func(elm);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get result', () => {
@@ -979,7 +976,7 @@ describe('dom util', () => {
       svg.appendChild(elm);
       range.selectNode(elm);
       const res = func(range);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get array', () => {
@@ -1002,7 +999,7 @@ describe('dom util', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get value', () => {
@@ -1027,100 +1024,96 @@ describe('dom util', () => {
     const func = mjs.serializeDomString;
 
     it('should throw', () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
+      assert.throws(() => func(), TypeError,
+        'Expected String but got Undefined.');
     });
 
     it('should throw', () => {
-      assert.throws(() => func('foo'), 'Expected String but got Undefined.');
+      assert.throws(() => func('foo'), TypeError,
+        'Expected String but got Undefined.');
     });
 
     it('should throw', () => {
-      assert.throws(() => func('foo', 'image/png'),
+      assert.throws(() => func('foo', 'image/png'), Error,
         'Unsupported MIME type image/png.');
     });
 
     it('should get null', () => {
       const res = func('<html></html>', 'text/html');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get result', () => {
       const res = func('<xml></xml>', 'text/xml');
       assert.strictEqual(res,
-        '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>',
-        'result');
+        '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>', 'result');
     });
 
     it('should get result', () => {
       const res = func('<xml></xml>', 'application/xml');
       assert.strictEqual(res,
-        '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>',
-        'result');
+        '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>', 'result');
     });
 
     it('should get result', () => {
       const res = func('<html></html>', 'application/xhtml+xml');
       assert.strictEqual(res,
-        '<html xmlns="http://www.w3.org/1999/xhtml"></html>',
-        'result');
+        '<html xmlns="http://www.w3.org/1999/xhtml"></html>', 'result');
     });
 
     it('should get result', () => {
       const res = func('<html xmlns="http://www.w3.org/1999/xhtml"></html>',
         'application/xhtml+xml');
       assert.strictEqual(res,
-        '<html xmlns="http://www.w3.org/1999/xhtml"></html>',
-        'result');
+        '<html xmlns="http://www.w3.org/1999/xhtml"></html>', 'result');
     });
 
     it('should get result', () => {
       const res = func('<svg></svg>', 'image/svg+xml');
       assert.strictEqual(res,
-        '<svg xmlns="http://www.w3.org/1999/xhtml"></svg>',
-        'result');
+        '<svg xmlns="http://www.w3.org/1999/xhtml"></svg>', 'result');
     });
 
     it('should get result', () => {
       const res = func('<svg xmlns="http://www.w3.org/2000/svg"></svg>',
         'image/svg+xml');
       assert.strictEqual(res,
-        '<svg xmlns="http://www.w3.org/2000/svg"/>',
-        'result');
+        '<svg xmlns="http://www.w3.org/2000/svg"/>', 'result');
     });
 
     it('should throw', () => {
-      assert.throws(() => func('<', 'text/xml'),
+      assert.throws(() => func('<', 'text/xml'), Error,
         'Error while parsing DOM string.');
     });
 
     it('should throw', () => {
-      assert.throws(() => func('</>', 'text/xml'),
+      assert.throws(() => func('</>', 'text/xml'), Error,
         'Error while parsing DOM string.');
     });
 
     it('should throw', () => {
-      assert.throws(() => func('', 'text/xml'),
+      assert.throws(() => func('', 'text/xml'), Error,
         'Error while parsing DOM string.');
     });
 
     it('should throw', () => {
-      assert.throws(() => func('<xml></xml><xml></xml>', 'text/xml'),
+      assert.throws(() => func('<xml></xml><xml></xml>', 'text/xml'), Error,
         'Error while parsing DOM string.');
     });
 
     it('should throw', () => {
       assert.throws(() => func('foo <em>bar</em>', 'application/xhtml+xml'),
-        'Error while parsing DOM string.');
+        Error, 'Error while parsing DOM string.');
     });
 
     it('should get null', () => {
       const res = func('', 'text/html');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
       const res = func('', 'text/html', true);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -1128,8 +1121,8 @@ describe('dom util', () => {
       const res = func('Example <foo@example.dom> wrote:\nfoo', 'text/html');
       const { calledOnce } = stubErr;
       stubErr.restore();
-      assert.isTrue(calledOnce, 'error');
-      assert.isNull(res, 'result');
+      assert.strictEqual(calledOnce, true, 'error');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -1138,8 +1131,8 @@ describe('dom util', () => {
         func('Example <foo@example.dom> wrote:\nfoo', 'text/html', true);
       const { calledOnce } = stubErr;
       stubErr.restore();
-      assert.isTrue(calledOnce, 'error');
-      assert.isNull(res, 'result');
+      assert.strictEqual(calledOnce, true, 'error');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get result', () => {
@@ -1149,25 +1142,19 @@ describe('dom util', () => {
 
     it('should get null', () => {
       const res = func('foo bar\nbaz', 'text/html', true);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get result', () => {
       const res = func('<<foo>>', 'text/html');
-      assert.strictEqual(
-        res,
-        '&lt;<foo xmlns="http://www.w3.org/1999/xhtml">&gt;</foo>',
-        'result'
-      );
+      assert.strictEqual(res,
+        '&lt;<foo xmlns="http://www.w3.org/1999/xhtml">&gt;</foo>', 'result');
     });
 
     it('should get result', () => {
       const res = func('<<foo>>', 'text/html', true);
-      assert.strictEqual(
-        res,
-        '&lt;<foo xmlns="http://www.w3.org/1999/xhtml">&gt;</foo>',
-        'result'
-      );
+      assert.strictEqual(res,
+        '&lt;<foo xmlns="http://www.w3.org/1999/xhtml">&gt;</foo>', 'result');
     });
 
     it('should get result', () => {
@@ -1178,29 +1165,21 @@ describe('dom util', () => {
     it('should get result', () => {
       const res =
         func('<div>foo <bar foobar="foobar">baz</bar>\nqux</div>', 'text/html');
-      assert.strictEqual(
-        res,
+      assert.strictEqual(res,
         '<div xmlns="http://www.w3.org/1999/xhtml">foo <bar>baz</bar>\nqux</div>',
-        'result'
-      );
+        'result');
     });
 
     it('should get result', () => {
       const res = func('foo <em>bar</em>\nbaz', 'text/html');
-      assert.strictEqual(
-        res,
-        'foo <em xmlns="http://www.w3.org/1999/xhtml">bar</em>\nbaz',
-        'result'
-      );
+      assert.strictEqual(res,
+        'foo <em xmlns="http://www.w3.org/1999/xhtml">bar</em>\nbaz', 'result');
     });
 
     it('should get result', () => {
       const res = func('foo <em onclick="alert(1)">bar</em>\nbaz', 'text/html');
-      assert.strictEqual(
-        res,
-        'foo <em xmlns="http://www.w3.org/1999/xhtml">bar</em>\nbaz',
-        'result'
-      );
+      assert.strictEqual(res,
+        'foo <em xmlns="http://www.w3.org/1999/xhtml">bar</em>\nbaz', 'result');
     });
 
     it('should get result', () => {
@@ -1211,65 +1190,51 @@ describe('dom util', () => {
     it('should get result', () => {
       const res =
         func('foo <div><script>alert(1)</script></div>\nbar', 'text/html');
-      assert.strictEqual(
-        res,
+      assert.strictEqual(res,
         'foo <div xmlns="http://www.w3.org/1999/xhtml">\n\n</div>\nbar',
-        'result'
-      );
+        'result');
     });
 
     it('should get result', () => {
-      const res =
-        func('<div>foo</div>\n<div>bar</div>\n', 'text/html');
-      assert.strictEqual(
-        res,
+      const res = func('<div>foo</div>\n<div>bar</div>\n', 'text/html');
+      assert.strictEqual(res,
         '<div xmlns="http://www.w3.org/1999/xhtml">foo</div>\n<div xmlns="http://www.w3.org/1999/xhtml">bar</div>\n',
-        'result'
-      );
+        'result');
     });
 
     it('should get result', () => {
       const res = func('<foo/>', 'text/xml');
       assert.strictEqual(res,
-        '<foo xmlns="http://www.w3.org/1999/xhtml"></foo>',
-        'result');
+        '<foo xmlns="http://www.w3.org/1999/xhtml"></foo>', 'result');
     });
 
     it('should get result', () => {
       const res = func('<em>foo</em>\n', 'application/xhtml+xml');
-      assert.strictEqual(
-        res,
-        '<em xmlns="http://www.w3.org/1999/xhtml">foo</em>',
-        'result'
-      );
+      assert.strictEqual(res,
+        '<em xmlns="http://www.w3.org/1999/xhtml">foo</em>', 'result');
     });
 
     it('should get result', () => {
       const res =
         func('<div><em>foo</em> bar</div>\n', 'application/xhtml+xml');
-      assert.strictEqual(
-        res,
+      assert.strictEqual(res,
         '<div xmlns="http://www.w3.org/1999/xhtml">\n<em>foo</em> bar</div>',
-        'result'
-      );
+        'result');
     });
 
     it('should get result', () => {
-      const res = func('<div><em onclick="alert(1)">foo</em> bar</div>\n', 'application/xhtml+xml');
-      assert.strictEqual(
-        res,
+      const res = func('<div><em onclick="alert(1)">foo</em> bar</div>\n',
+        'application/xhtml+xml');
+      assert.strictEqual(res,
         '<div xmlns="http://www.w3.org/1999/xhtml">\n<em>foo</em> bar</div>',
-        'result'
-      );
+        'result');
     });
 
     it('should get result', () => {
-      const res = func('<div><script>alert(1)</script> foo</div>\n', 'application/xhtml+xml');
-      assert.strictEqual(
-        res,
-        '<div xmlns="http://www.w3.org/1999/xhtml">\n foo</div>',
-        'result'
-      );
+      const res = func('<div><script>alert(1)</script> foo</div>\n',
+        'application/xhtml+xml');
+      assert.strictEqual(res,
+        '<div xmlns="http://www.w3.org/1999/xhtml">\n foo</div>', 'result');
     });
   });
 
@@ -1606,7 +1571,7 @@ describe('dom util', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -1614,7 +1579,7 @@ describe('dom util', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get value', () => {
@@ -1634,7 +1599,7 @@ describe('dom util', () => {
 
     it('should get false', () => {
       const res = func();
-      assert.isFalse(res, 'result');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should get false', () => {
@@ -1645,8 +1610,8 @@ describe('dom util', () => {
         p.isContentEditable = isContentEditable(p);
       }
       const res = func(p);
-      assert.isFalse(p.isContentEditable, 'prop');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(p.isContentEditable, false, 'prop');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should get true', () => {
@@ -1660,8 +1625,8 @@ describe('dom util', () => {
       p.appendChild(span);
       body.appendChild(p);
       const res = func(span);
-      assert.isTrue(p.isContentEditable, 'prop');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(p.isContentEditable, true, 'prop');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should get true', () => {
@@ -1675,8 +1640,8 @@ describe('dom util', () => {
       p.appendChild(span);
       body.appendChild(p);
       const res = func(span);
-      assert.isTrue(p.isContentEditable, 'prop');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(p.isContentEditable, true, 'prop');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should get false', () => {
@@ -1690,8 +1655,8 @@ describe('dom util', () => {
       p.appendChild(span);
       body.appendChild(p);
       const res = func(span);
-      assert.isFalse(p.isContentEditable, 'prop');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(p.isContentEditable, false, 'prop');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should get false', () => {
@@ -1705,8 +1670,8 @@ describe('dom util', () => {
       p.appendChild(span);
       body.appendChild(p);
       const res = func(span);
-      assert.isFalse(p.isContentEditable, 'prop');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(p.isContentEditable, false, 'prop');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should get false', () => {
@@ -1718,8 +1683,8 @@ describe('dom util', () => {
       svg.appendChild(text);
       body.appendChild(svg);
       const res = func(text);
-      assert.isUndefined(svg.isContentEditable, 'prop');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(svg.isContentEditable, undefined, 'prop');
+      assert.strictEqual(res, false, 'result');
     });
   });
 
@@ -1728,7 +1693,7 @@ describe('dom util', () => {
 
     it('should get false', () => {
       const res = func();
-      assert.isFalse(res, 'result');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should get true', () => {
@@ -1741,7 +1706,7 @@ describe('dom util', () => {
       }
       body.appendChild(p);
       const res = func(p);
-      assert.isTrue(res, 'result');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should get true', () => {
@@ -1759,7 +1724,7 @@ describe('dom util', () => {
       div.appendChild(svg);
       body.appendChild(div);
       const res = func(text);
-      assert.isTrue(res, 'result');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should get false', () => {
@@ -1777,7 +1742,7 @@ describe('dom util', () => {
       div.appendChild(svg);
       body.appendChild(div);
       const res = func(svg);
-      assert.isFalse(res, 'result');
+      assert.strictEqual(res, false, 'result');
     });
   });
 
@@ -1786,7 +1751,7 @@ describe('dom util', () => {
 
     it('should get false', () => {
       const res = func();
-      assert.isFalse(res, 'result');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should get false', () => {
@@ -1794,7 +1759,7 @@ describe('dom util', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isFalse(res, 'result');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should get true', () => {
@@ -1802,7 +1767,7 @@ describe('dom util', () => {
       const body = document.querySelector('body');
       body.appendChild(elm);
       const res = func(elm);
-      assert.isTrue(res, 'result');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should get true', () => {
@@ -1810,7 +1775,7 @@ describe('dom util', () => {
       const body = document.querySelector('body');
       body.appendChild(elm);
       const res = func(elm);
-      assert.isTrue(res, 'result');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should get true', () => {
@@ -1821,7 +1786,7 @@ describe('dom util', () => {
       for (const type of types) {
         elm.type = type;
         const res = func(elm);
-        assert.isTrue(res, 'result');
+        assert.strictEqual(res, true, 'result');
       }
     });
 
@@ -1833,7 +1798,7 @@ describe('dom util', () => {
       for (const type of types) {
         elm.type = type;
         const res = func(elm);
-        assert.isFalse(res, `result ${type}`);
+        assert.strictEqual(res, false, `result ${type}`);
       }
     });
   });
@@ -1843,7 +1808,7 @@ describe('dom util', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -1851,7 +1816,7 @@ describe('dom util', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get element', () => {
@@ -1881,11 +1846,13 @@ describe('dom util', () => {
     const func = mjs.filterEditableElements;
 
     it('should throw', async () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
+      assert.throws(() => func(), TypeError,
+        'Expected String but got Undefined.');
     });
 
     it('should throw', async () => {
-      assert.throws(() => func('p'), 'Expected String but got Undefined.');
+      assert.throws(() => func('p'), TypeError,
+        'Expected String but got Undefined.');
     });
 
     it('should get array', () => {

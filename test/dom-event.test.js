@@ -3,10 +3,10 @@
  */
 
 /* api */
-import sinon from 'sinon';
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import { browser, createJsdom, DataTransfer } from './mocha/setup.js';
+import sinon from 'sinon';
+import { createJsdom, DataTransfer } from './mocha/setup.js';
 
 /* test */
 // eslint-disable-next-line import-x/order
@@ -73,32 +73,28 @@ describe('dom event', () => {
     }
   });
 
-  it('should get browser object', () => {
-    assert.isObject(browser, 'browser');
-  });
-
   describe('dispatch event', () => {
     const func = mjs.dispatchEvent;
 
     it('should not call function', () => {
       const spy = sinon.spy(document, 'dispatchEvent');
       const res = func(document);
-      assert.isFalse(spy.called, 'not called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'not called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should not call function', () => {
       const spy = sinon.spy(document, 'dispatchEvent');
       const res = func(document, 'foo');
-      assert.isFalse(spy.called, 'not called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'not called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should not call function', () => {
       const spy = sinon.spy(document, 'dispatchEvent');
       const res = func(document, 'foo', {});
-      assert.isFalse(spy.called, 'not called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'not called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should call function', () => {
@@ -107,8 +103,8 @@ describe('dom event', () => {
         bubbles: false,
         cancelable: false
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should call function', () => {
@@ -118,8 +114,8 @@ describe('dom event', () => {
         bubbles: false,
         cancelable: false
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
   });
 
@@ -134,8 +130,8 @@ describe('dom event', () => {
       p.appendChild(text);
       body.appendChild(p);
       const res = func(text);
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should call function', () => {
@@ -144,8 +140,8 @@ describe('dom event', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
   });
 
@@ -160,8 +156,8 @@ describe('dom event', () => {
       p.appendChild(text);
       body.appendChild(p);
       const res = func(text);
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should not call function', () => {
@@ -172,8 +168,8 @@ describe('dom event', () => {
       p.appendChild(text);
       body.appendChild(p);
       const res = func(text, 'foo');
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should call function', () => {
@@ -185,8 +181,8 @@ describe('dom event', () => {
         bubbles: true,
         cancelable: true
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should call function', () => {
@@ -198,8 +194,8 @@ describe('dom event', () => {
         bubbles: true,
         cancelable: true
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should call function', () => {
@@ -214,8 +210,8 @@ describe('dom event', () => {
         cancelable: true,
         clipboardData: dataTrans
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should call function', () => {
@@ -236,9 +232,9 @@ describe('dom event', () => {
         cancelable: true,
         clipboardData: dataTrans
       });
-      assert.isTrue(stubSetData.called, 'called');
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(stubSetData.called, true, 'called');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
       delete ClipboardEvent.prototype.wrappedJSObject;
     });
   });
@@ -254,8 +250,8 @@ describe('dom event', () => {
       p.appendChild(text);
       body.appendChild(p);
       const res = func(text);
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should call function', () => {
@@ -264,8 +260,8 @@ describe('dom event', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
   });
 
@@ -280,8 +276,8 @@ describe('dom event', () => {
       p.appendChild(text);
       body.appendChild(p);
       const res = func(text);
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should not call function', () => {
@@ -290,8 +286,8 @@ describe('dom event', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should not call function', () => {
@@ -300,8 +296,8 @@ describe('dom event', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p, 'foo');
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should call function', () => {
@@ -310,8 +306,8 @@ describe('dom event', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p, 'beforeinput');
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should call function', () => {
@@ -323,8 +319,8 @@ describe('dom event', () => {
         bubbles: true,
         cancelable: true
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should call function', () => {
@@ -333,8 +329,8 @@ describe('dom event', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p, 'input');
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should call function', () => {
@@ -346,8 +342,8 @@ describe('dom event', () => {
         bubbles: true,
         cancelable: false
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should call function', () => {
@@ -362,8 +358,8 @@ describe('dom event', () => {
         cancelable: false,
         dataTransfer: dataTrans
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
   });
 
@@ -378,8 +374,8 @@ describe('dom event', () => {
       p.appendChild(text);
       body.appendChild(p);
       const res = func(text);
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should call function', () => {
@@ -393,8 +389,8 @@ describe('dom event', () => {
         keyCode: KEY_CODE_A,
         ctrlKey: true
       });
-      assert.isTrue(spy.called, 'called');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(spy.called, true, 'called');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should not call function', () => {
@@ -408,8 +404,8 @@ describe('dom event', () => {
         keyCode: KEY_CODE_A,
         ctrlKey: true
       });
-      assert.isFalse(spy.called, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(spy.called, false, 'called');
+      assert.strictEqual(res, false, 'result');
     });
   });
 
@@ -421,11 +417,11 @@ describe('dom event', () => {
     });
 
     it('should get null if given argument is not an object', () => {
-      assert.isNull(func(''));
+      assert.strictEqual(func(''), null);
     });
 
     it('should get null if given argument is empty object', () => {
-      assert.isNull(func({}));
+      assert.strictEqual(func({}), null);
     });
 
     it('should get target', () => {
@@ -435,7 +431,6 @@ describe('dom event', () => {
       };
       const evt = { target };
       const res = func(evt);
-      assert.isObject(res);
       assert.deepEqual(res, target);
       assert.strictEqual(fake.callCount, 1);
     });

@@ -4,9 +4,9 @@
 /* eslint-disable import-x/order */
 
 /* api */
-import sinon from 'sinon';
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'mocha';
+import sinon from 'sinon';
 import { browser, mockPort } from './mocha/setup.js';
 
 /* test */
@@ -39,10 +39,6 @@ describe('main', () => {
     browser._sandbox.reset();
   });
 
-  it('should get browser object', () => {
-    assert.isObject(browser, 'browser');
-  });
-
   describe('set options', () => {
     const func = mjs.setOpts;
     beforeEach(() => {
@@ -70,8 +66,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 0, 'local');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
-      assert.isTrue(mjs.globalOpts.has(SYNC_AUTO_URL), 'key');
-      assert.isNull(mjs.globalOpts.get(SYNC_AUTO_URL), 'value');
+      assert.strictEqual(mjs.globalOpts.has(SYNC_AUTO_URL), true, 'key');
+      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL), null, 'value');
     });
 
     it('should set option', async () => {
@@ -82,7 +78,7 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 0, 'local');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
-      assert.isTrue(mjs.globalOpts.has(SYNC_AUTO_URL), 'key');
+      assert.strictEqual(mjs.globalOpts.has(SYNC_AUTO_URL), true, 'key');
       assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL), '', 'value');
     });
 
@@ -94,7 +90,7 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 0, 'local');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
-      assert.isTrue(mjs.globalOpts.has(SYNC_AUTO_URL), 'key');
+      assert.strictEqual(mjs.globalOpts.has(SYNC_AUTO_URL), true, 'key');
       assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL),
         'https://example.com', 'value');
     });
@@ -107,8 +103,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 0, 'local');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
-      assert.isTrue(mjs.globalOpts.has(ONLY_EDITABLE), 'key');
-      assert.isTrue(mjs.globalOpts.get(ONLY_EDITABLE), 'value');
+      assert.strictEqual(mjs.globalOpts.has(ONLY_EDITABLE), true, 'key');
+      assert.strictEqual(mjs.globalOpts.get(ONLY_EDITABLE), true, 'value');
     });
 
     it('should set option', async () => {
@@ -119,8 +115,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 0, 'local');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
-      assert.isTrue(mjs.globalOpts.has(SYNC_AUTO), 'key');
-      assert.isTrue(mjs.globalOpts.get(SYNC_AUTO), 'value');
+      assert.strictEqual(mjs.globalOpts.has(SYNC_AUTO), true, 'key');
+      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO), true, 'value');
     });
 
     it('should set option', async () => {
@@ -131,8 +127,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(IS_EXECUTABLE), 'key');
-      assert.isFalse(mjs.localOpts.get(IS_EXECUTABLE), 'value');
+      assert.strictEqual(mjs.localOpts.has(IS_EXECUTABLE), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(IS_EXECUTABLE), false, 'value');
     });
 
     it('should set option', async () => {
@@ -145,8 +141,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(IS_EXECUTABLE), 'key');
-      assert.isFalse(mjs.localOpts.get(IS_EXECUTABLE), 'value');
+      assert.strictEqual(mjs.localOpts.has(IS_EXECUTABLE), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(IS_EXECUTABLE), false, 'value');
     });
 
     it('should set option', async () => {
@@ -159,8 +155,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(IS_EXECUTABLE), 'key');
-      assert.isTrue(mjs.localOpts.get(IS_EXECUTABLE), 'value');
+      assert.strictEqual(mjs.localOpts.has(IS_EXECUTABLE), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(IS_EXECUTABLE), true, 'value');
     });
 
     it('should set option', async () => {
@@ -169,7 +165,7 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(EDITOR_LABEL), 'key');
+      assert.strictEqual(mjs.localOpts.has(EDITOR_LABEL), true, 'key');
       assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), '', 'value');
     });
 
@@ -181,7 +177,7 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(EDITOR_LABEL), 'key');
+      assert.strictEqual(mjs.localOpts.has(EDITOR_LABEL), true, 'key');
       assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), '', 'value');
     });
 
@@ -193,7 +189,7 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(EDITOR_LABEL), 'key');
+      assert.strictEqual(mjs.localOpts.has(EDITOR_LABEL), true, 'key');
       assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), 'foo', 'value');
     });
 
@@ -205,8 +201,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(FILE_EXT_SELECT), 'key');
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT), 'value');
+      assert.strictEqual(mjs.localOpts.has(FILE_EXT_SELECT), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT), true, 'value');
     });
 
     it('should set option', async () => {
@@ -217,8 +213,9 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(FILE_EXT_SELECT_HTML), 'key');
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_HTML), 'value');
+      assert.strictEqual(mjs.localOpts.has(FILE_EXT_SELECT_HTML), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_HTML), true,
+        'value');
     });
 
     it('should set option', async () => {
@@ -229,8 +226,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(FILE_EXT_SELECT_MD), 'key');
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_MD), 'value');
+      assert.strictEqual(mjs.localOpts.has(FILE_EXT_SELECT_MD), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_MD), true, 'value');
     });
 
     it('should set option', async () => {
@@ -241,8 +238,8 @@ describe('main', () => {
       });
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
-      assert.isTrue(mjs.localOpts.has(FILE_EXT_SELECT_TXT), 'key');
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_TXT), 'value');
+      assert.strictEqual(mjs.localOpts.has(FILE_EXT_SELECT_TXT), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_TXT), true, 'value');
     });
 
     it('should set default options', async () => {
@@ -253,11 +250,11 @@ describe('main', () => {
       await func();
       assert.strictEqual(browser.storage.local.get.callCount, i, 'not called');
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
-      assert.isTrue(mjs.localOpts.has(MENU_ENABLED), 'key');
-      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.localOpts.has(MENU_ENABLED), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), false, 'value');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
-      assert.isTrue(mjs.globalOpts.has(IS_MAC), 'key');
-      assert.isFalse(mjs.globalOpts.get(IS_MAC), 'value');
+      assert.strictEqual(mjs.globalOpts.has(IS_MAC), true, 'key');
+      assert.strictEqual(mjs.globalOpts.get(IS_MAC), false, 'value');
     });
 
     it('should set default options', async () => {
@@ -268,11 +265,11 @@ describe('main', () => {
       await func();
       assert.strictEqual(browser.storage.local.get.callCount, i, 'not called');
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
-      assert.isTrue(mjs.localOpts.has(MENU_ENABLED), 'key');
-      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.localOpts.has(MENU_ENABLED), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), false, 'value');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
-      assert.isTrue(mjs.globalOpts.has(IS_MAC), 'key');
-      assert.isTrue(mjs.globalOpts.get(IS_MAC), 'value');
+      assert.strictEqual(mjs.globalOpts.has(IS_MAC), true, 'key');
+      assert.strictEqual(mjs.globalOpts.get(IS_MAC), true, 'value');
     });
 
     it('should call function', async () => {
@@ -284,11 +281,11 @@ describe('main', () => {
       await func(null, true);
       assert.strictEqual(browser.storage.local.get.callCount, i + 1, 'called');
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
-      assert.isTrue(mjs.localOpts.has(MENU_ENABLED), 'key');
-      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.localOpts.has(MENU_ENABLED), true, 'key');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), false, 'value');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
-      assert.isTrue(mjs.globalOpts.has(IS_MAC), 'key');
-      assert.isFalse(mjs.globalOpts.get(IS_MAC), 'value');
+      assert.strictEqual(mjs.globalOpts.has(IS_MAC), true, 'key');
+      assert.strictEqual(mjs.globalOpts.get(IS_MAC), false, 'value');
     });
   });
 
@@ -505,11 +502,12 @@ describe('main', () => {
       const { menuItems } = mjs;
       const items = Object.entries(menuItems);
       for (const [key, value] of items) {
-        assert.isTrue(keys.includes(key), `${key} key`);
-        assert.isObject(value, `${key} value`);
+        assert.strictEqual(keys.includes(key), true, `${key} key`);
         assert.strictEqual(value.id, key, `${key} id`);
-        assert.isTrue(Array.isArray(value.contexts), `${key} contexts`);
-        assert.isTrue(value.placeholder.includes('&'), `${key} placeholder`);
+        assert.strictEqual(Array.isArray(value.contexts), true,
+          `${key} contexts`);
+        assert.strictEqual(value.placeholder.includes('&'), true,
+          `${key} placeholder`);
       }
     });
   });
@@ -1311,7 +1309,7 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func().catch(e => {
-        assert.instanceOf(e, TypeError, 'error');
+        assert.strictEqual(e instanceof TypeError, true, 'error');
         assert.strictEqual(e.message, 'Expected Number but got Undefined.',
           'message');
       });
@@ -1319,9 +1317,9 @@ describe('main', () => {
 
     it('should add', async () => {
       const res = await func(1);
-      assert.instanceOf(res, Set, 'instance');
+      assert.strictEqual(res instanceof Set, true, 'instance');
       assert.strictEqual(res.size, 1, 'size');
-      assert.isTrue(res.has(1), 'has');
+      assert.strictEqual(res.has(1), true, 'has');
       assert.deepEqual(res, mjs.tabList, 'result');
     });
   });
@@ -1337,7 +1335,7 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func().catch(e => {
-        assert.instanceOf(e, TypeError, 'error');
+        assert.strictEqual(e instanceof TypeError, true, 'error');
         assert.strictEqual(e.message, 'Expected Number but got Undefined.',
           'message');
       });
@@ -1346,7 +1344,7 @@ describe('main', () => {
     it('should remove', async () => {
       mjs.tabList.add(1);
       const res = await func(1);
-      assert.instanceOf(res, Set, 'instance');
+      assert.strictEqual(res instanceof Set, true, 'instance');
       assert.strictEqual(res.size, 0, 'size');
       assert.deepEqual(res, mjs.tabList, 'result');
     });
@@ -1370,9 +1368,9 @@ describe('main', () => {
       browser.tabs.get.withArgs(3).resolves({});
       await func();
       assert.strictEqual(mjs.tabList.size, 2, 'size');
-      assert.isTrue(mjs.tabList.has(1), 'has');
-      assert.isFalse(mjs.tabList.has(2), 'has');
-      assert.isTrue(mjs.tabList.has(3), 'has');
+      assert.strictEqual(mjs.tabList.has(1), true, 'has');
+      assert.strictEqual(mjs.tabList.has(2), false, 'has');
+      assert.strictEqual(mjs.tabList.has(3), true, 'has');
     });
   });
 
@@ -1414,13 +1412,13 @@ describe('main', () => {
         windowId: 1
       });
       assert.strictEqual(mjs.tabList.size, 1, 'size');
-      assert.isTrue(mjs.tabList.has(2), 'has');
+      assert.strictEqual(mjs.tabList.has(2), true, 'has');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.update.callCount, j, 'not called');
-      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'menu');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), false, 'menu');
       assert.strictEqual(res.length, 2, 'length');
-      assert.instanceOf(res[0], Set, 'result');
-      assert.isNull(res[1], 'result');
+      assert.strictEqual(res[0] instanceof Set, true, 'result');
+      assert.strictEqual(res[1], null, 'result');
     });
 
     it('should call function', async () => {
@@ -1434,13 +1432,13 @@ describe('main', () => {
         windowId: 1
       });
       assert.strictEqual(mjs.tabList.size, 1, 'size');
-      assert.isTrue(mjs.tabList.has(2), 'has');
+      assert.strictEqual(mjs.tabList.has(2), true, 'has');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.update.callCount, j + 6, 'called');
-      assert.isTrue(mjs.localOpts.get(MENU_ENABLED), 'menu');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), true, 'menu');
       assert.strictEqual(res.length, 3, 'length');
-      assert.instanceOf(res[0], Set, 'result');
-      assert.isNull(res[1], 'result');
+      assert.strictEqual(res[0] instanceof Set, true, 'result');
+      assert.strictEqual(res[1], null, 'result');
       assert.deepEqual(res[2], [
         undefined,
         undefined,
@@ -1463,12 +1461,12 @@ describe('main', () => {
 
     it('should get null', async () => {
       const res = await func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', async () => {
       const res = await func({}, {});
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -1492,7 +1490,7 @@ describe('main', () => {
         id: 2
       });
       assert.strictEqual(browser.tabs.sendMessage.callCount, i, 'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -1527,7 +1525,7 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func().catch(e => {
-        assert.instanceOf(e, TypeError, 'error');
+        assert.strictEqual(e instanceof TypeError, true, 'error');
         assert.strictEqual(e.message, 'Expected String but got Undefined.',
           'message');
       });
@@ -1535,19 +1533,19 @@ describe('main', () => {
 
     it('should get null', async () => {
       const res = await func('foo');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', async () => {
       const res = await func('foo', {});
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', async () => {
       const res = await func('foo', {
         data: {}
       });
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', async () => {
@@ -1556,7 +1554,7 @@ describe('main', () => {
           tabId: 'bar'
         }
       });
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should not call function', async () => {
@@ -1570,7 +1568,7 @@ describe('main', () => {
         }
       });
       assert.strictEqual(browser.tabs.sendMessage.callCount, i, 'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -1598,7 +1596,7 @@ describe('main', () => {
       const res = await func();
       assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
         'called');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(res, undefined, 'result');
     });
   });
 
@@ -1648,9 +1646,9 @@ describe('main', () => {
         status: 'foo'
       };
       const res = await func(msg);
-      const { calledOnce } = stub;
+      const { called } = stub;
       stub.restore();
-      assert.isFalse(calledOnce, 'not called');
+      assert.strictEqual(called, false, 'not called');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -1663,7 +1661,7 @@ describe('main', () => {
       const res = await func(msg);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce, 'called');
+      assert.strictEqual(calledOnce, true, 'called');
       assert.deepEqual(res, [
         `${HOST}: bar`
       ], 'result');
@@ -1680,7 +1678,7 @@ describe('main', () => {
       const res = await func(msg);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce, 'called');
+      assert.strictEqual(calledOnce, true, 'called');
       assert.strictEqual(browser.notifications.create.callCount, i + 1,
         'called');
       assert.deepEqual(res, [
@@ -1698,9 +1696,9 @@ describe('main', () => {
       };
       browser.notifications.create.callsFake(id => id);
       const res = await func(msg);
-      const { calledOnce } = stub;
+      const { called } = stub;
       stub.restore();
-      assert.isFalse(calledOnce, 'called');
+      assert.strictEqual(called, false, 'called');
       assert.strictEqual(browser.notifications.create.callCount, i + 1,
         'called');
       assert.deepEqual(res, ['warn'], 'result');
@@ -1717,7 +1715,7 @@ describe('main', () => {
       const res = await func(msg);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce, 'called');
+      assert.strictEqual(calledOnce, true, 'called');
       assert.strictEqual(browser.notifications.create.callCount, i + 1,
         'called');
       assert.deepEqual(res, [
@@ -1735,9 +1733,9 @@ describe('main', () => {
       };
       browser.notifications.create.callsFake(id => id);
       const res = await func(msg);
-      const { calledOnce } = stub;
+      const { called } = stub;
       stub.restore();
-      assert.isFalse(calledOnce, 'called');
+      assert.strictEqual(called, false, 'called');
       assert.strictEqual(browser.notifications.create.callCount, i + 1,
         'called');
       assert.deepEqual(res, ['error'], 'result');
@@ -1754,7 +1752,7 @@ describe('main', () => {
       const res = await func(msg);
       const { calledOnce } = stub;
       stub.restore();
-      assert.isTrue(calledOnce, 'called');
+      assert.strictEqual(calledOnce, true, 'called');
       assert.strictEqual(browser.notifications.create.callCount, i + 1,
         'called');
       assert.deepEqual(res, [
@@ -1772,7 +1770,7 @@ describe('main', () => {
       };
       const res = await func(msg);
       const status = mjs.appHost.get('status');
-      assert.isTrue(status[HOST_CONNECTION], 'value');
+      assert.strictEqual(status[HOST_CONNECTION], true, 'value');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined], 'result');
     });
@@ -1789,7 +1787,7 @@ describe('main', () => {
       };
       const res = await func(msg);
       const status = mjs.appHost.get('status');
-      assert.isTrue(status[HOST_CONNECTION], 'value');
+      assert.strictEqual(status[HOST_CONNECTION], true, 'value');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined], 'result');
     });
@@ -1895,7 +1893,7 @@ describe('main', () => {
       assert.strictEqual(mjs.tabList.size, 1, 'size');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(res.length, 1, 'length');
-      assert.instanceOf(res[0][0], Set, 'set');
+      assert.strictEqual(res[0][0] instanceof Set, true, 'set');
       assert.deepEqual(res[0][1], {}, 'result');
     });
 
@@ -1972,7 +1970,7 @@ describe('main', () => {
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.strictEqual(connectedTabs.size, 1, 'size');
-      assert.isTrue(connectedTabs.has(1), 'tabs');
+      assert.strictEqual(connectedTabs.has(1), true, 'tabs');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -1993,7 +1991,7 @@ describe('main', () => {
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.strictEqual(connectedTabs.size, 2, 'size');
-      assert.isTrue(connectedTabs.has(1), 'tabs');
+      assert.strictEqual(connectedTabs.has(1), true, 'tabs');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2014,7 +2012,7 @@ describe('main', () => {
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.strictEqual(connectedTabs.size, 2, 'size');
-      assert.isTrue(connectedTabs.has(1), 'tabs');
+      assert.strictEqual(connectedTabs.has(1), true, 'tabs');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2035,7 +2033,7 @@ describe('main', () => {
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.strictEqual(connectedTabs.size, 2, 'size');
-      assert.isTrue(connectedTabs.has(1), 'tabs');
+      assert.strictEqual(connectedTabs.has(1), true, 'tabs');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2056,7 +2054,7 @@ describe('main', () => {
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.strictEqual(connectedTabs.size, 2, 'size');
-      assert.isTrue(connectedTabs.has(1), 'tabs');
+      assert.strictEqual(connectedTabs.has(1), true, 'tabs');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2149,7 +2147,7 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func().catch(e => {
-        assert.instanceOf(e, Error, 'throws');
+        assert.strictEqual(e instanceof Error, true, 'throws');
       });
     });
 
@@ -2162,7 +2160,7 @@ describe('main', () => {
       mjs.localOpts.set(MENU_ENABLED, false);
       const res = await func(info);
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
-      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), false, 'value');
       assert.deepEqual(res, [
         [
           undefined,
@@ -2187,7 +2185,7 @@ describe('main', () => {
       const res = await func(info);
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
-      assert.isTrue(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), true, 'value');
       assert.deepEqual(res, [
         null,
         [
@@ -2213,7 +2211,7 @@ describe('main', () => {
       const res = await func(info);
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j, 'not called');
-      assert.isFalse(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), false, 'value');
       assert.deepEqual(res, [
         [
           undefined,
@@ -2240,7 +2238,7 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func().catch(e => {
-        assert.instanceOf(e, TypeError, 'error');
+        assert.strictEqual(e instanceof TypeError, true, 'error');
         assert.strictEqual(e.message, 'Expected Number but got Undefined.',
           'message');
       });
@@ -2248,13 +2246,13 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func(1).catch(e => {
-        assert.instanceOf(e, Error, 'error');
+        assert.strictEqual(e instanceof Error, true, 'error');
       });
     });
 
     it('should throw', async () => {
       await func(1, undefined, { active: true }).catch(e => {
-        assert.instanceOf(e, Error, 'error');
+        assert.strictEqual(e instanceof Error, true, 'error');
       });
     });
 
@@ -2295,7 +2293,7 @@ describe('main', () => {
         url: 'https://example.com',
         windowId: 1
       });
-      assert.isTrue(mjs.localOpts.get(MENU_ENABLED), 'value');
+      assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), true, 'value');
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
       assert.deepEqual(res, [
         [
@@ -2323,7 +2321,7 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func().catch(e => {
-        assert.instanceOf(e, TypeError, 'error');
+        assert.strictEqual(e instanceof TypeError, true, 'error');
         assert.strictEqual(e.message, 'Expected Number but got Undefined.',
           'message');
       });
@@ -2341,7 +2339,7 @@ describe('main', () => {
       });
       const res = await func(3, { windowId: 1 });
       assert.strictEqual(mjs.tabList.size, 1, 'size');
-      assert.isTrue(mjs.tabList.has(2), 'has');
+      assert.strictEqual(mjs.tabList.has(2), true, 'has');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.strictEqual(browser.windows.get.callCount, j, 'not called');
       assert.deepEqual(res, [], 'result');
@@ -2361,9 +2359,9 @@ describe('main', () => {
       const res = await func(1, { windowId: 1 });
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(mjs.tabList.size, 2, 'tabList size');
-      assert.isTrue(mjs.tabList.has(2), 'tabList has id');
+      assert.strictEqual(mjs.tabList.has(2), true, 'tabList has id');
       assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
-      assert.isTrue(connectedTabs.has(2), 'connected tabs has id');
+      assert.strictEqual(connectedTabs.has(2), true, 'connected tabs has id');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j,
         'not called');
@@ -2384,13 +2382,13 @@ describe('main', () => {
       const res = await func(2, { windowId: 1 });
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(mjs.tabList.size, 1, 'tabList size');
-      assert.isFalse(mjs.tabList.has(2), 'tabList has id');
+      assert.strictEqual(mjs.tabList.has(2), false, 'tabList has id');
       assert.strictEqual(connectedTabs.size, 0, 'connected tabs size');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
         'called');
       assert.strictEqual(res.length, 1, 'length');
-      assert.instanceOf(res[0], Set, 'result');
+      assert.strictEqual(res[0] instanceof Set, true, 'result');
     });
 
     it('should not call function', async () => {
@@ -2408,14 +2406,14 @@ describe('main', () => {
       const res = await func(2, { windowId: 1 });
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(mjs.tabList.size, 2, 'tabList size');
-      assert.isFalse(mjs.tabList.has(2), 'tabList has id');
+      assert.strictEqual(mjs.tabList.has(2), false, 'tabList has id');
       assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
-      assert.isFalse(connectedTabs.has(2), 'connected tabs has id');
+      assert.strictEqual(connectedTabs.has(2), false, 'connected tabs has id');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
         'called');
       assert.strictEqual(res.length, 1, 'length');
-      assert.instanceOf(res[0], Set, 'result');
+      assert.strictEqual(res[0] instanceof Set, true, 'result');
     });
 
     it('should call function', async () => {
@@ -2433,15 +2431,15 @@ describe('main', () => {
       const res = await func(2, { windowId: 1 });
       const connectedTabs = mjs.appHost.get('tabs');
       assert.strictEqual(mjs.tabList.size, 2, 'tabList size');
-      assert.isFalse(mjs.tabList.has(2), 'tabList has id');
+      assert.strictEqual(mjs.tabList.has(2), false, 'tabList has id');
       assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
-      assert.isFalse(connectedTabs.has(2), 'connected tabs has id');
+      assert.strictEqual(connectedTabs.has(2), false, 'connected tabs has id');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
         'called');
       assert.strictEqual(res.length, 2, 'length');
-      assert.isUndefined(res[0], 'result');
-      assert.instanceOf(res[1], Set, 'result');
+      assert.strictEqual(res[0], undefined, 'result');
+      assert.strictEqual(res[1] instanceof Set, true, 'result');
     });
   });
 
@@ -2582,9 +2580,9 @@ describe('main', () => {
       ]);
       const res = await func();
       assert.strictEqual(mjs.tabList.size, 1, 'size');
-      assert.isFalse(mjs.tabList.has(1), 'removed');
-      assert.isTrue(mjs.tabList.has(2), 'not removed');
-      assert.isFalse(mjs.tabList.has(3), 'removed');
+      assert.strictEqual(mjs.tabList.has(1), false, 'removed');
+      assert.strictEqual(mjs.tabList.has(2), true, 'not removed');
+      assert.strictEqual(mjs.tabList.has(3), false, 'removed');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined, undefined], 'result');
     });
@@ -2612,9 +2610,9 @@ describe('main', () => {
       ]);
       const res = await func();
       assert.strictEqual(mjs.tabList.size, 1, 'size');
-      assert.isFalse(mjs.tabList.has(1), 'removed');
-      assert.isTrue(mjs.tabList.has(2), 'not removed');
-      assert.isFalse(mjs.tabList.has(3), 'removed');
+      assert.strictEqual(mjs.tabList.has(1), false, 'removed');
+      assert.strictEqual(mjs.tabList.has(2), true, 'not removed');
+      assert.strictEqual(mjs.tabList.has(3), false, 'removed');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
       assert.deepEqual(res, [undefined], 'result');
     });
@@ -2631,7 +2629,7 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func().catch(e => {
-        assert.instanceOf(e, TypeError, 'error');
+        assert.strictEqual(e instanceof TypeError, true, 'error');
         assert.strictEqual(e.message, 'Expected String but got Undefined.',
           'message');
       });
@@ -2639,7 +2637,7 @@ describe('main', () => {
 
     it('should get null', async () => {
       const res = await func('foo');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -2648,7 +2646,7 @@ describe('main', () => {
       const res = await func(OPTIONS_OPEN);
       assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
         'called');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(res, undefined, 'result');
     });
 
     it('should call function', async () => {
@@ -2747,7 +2745,7 @@ describe('main', () => {
 
     it('should throw', async () => {
       await func().catch(e => {
-        assert.instanceOf(e, TypeError, 'error');
+        assert.strictEqual(e instanceof TypeError, true, 'error');
         assert.strictEqual(e.message, 'Expected String but got Undefined.',
           'message');
       });
@@ -2774,7 +2772,7 @@ describe('main', () => {
           executable: true
         }
       });
-      assert.isTrue(mjs.localOpts.get(IS_EXECUTABLE), 'value');
+      assert.strictEqual(mjs.localOpts.get(IS_EXECUTABLE), true, 'value');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount, i,
         'not called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j,
@@ -2793,7 +2791,7 @@ describe('main', () => {
           executable: true
         }
       }, true);
-      assert.isTrue(mjs.localOpts.get(IS_EXECUTABLE), 'value');
+      assert.strictEqual(mjs.localOpts.get(IS_EXECUTABLE), true, 'value');
       assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
         i + 1, 'called');
       assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
@@ -2845,7 +2843,7 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT, {
         checked: true
       });
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT), 'value');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
       assert.deepEqual(res, [undefined], 'result');
     });
@@ -2855,7 +2853,7 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT, {
         checked: true
       }, true);
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT), 'value');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
         undefined,
@@ -2875,7 +2873,8 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT_HTML, {
         checked: true
       });
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_HTML), 'value');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_HTML), true,
+        'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
       assert.deepEqual(res, [undefined], 'result');
     });
@@ -2885,7 +2884,8 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT_HTML, {
         checked: true
       }, true);
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_HTML), 'value');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_HTML), true,
+        'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
         undefined,
@@ -2905,7 +2905,7 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT_MD, {
         checked: true
       });
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_MD), 'value');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_MD), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
       assert.deepEqual(res, [undefined], 'result');
     });
@@ -2915,7 +2915,7 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT_MD, {
         checked: true
       }, true);
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_MD), 'value');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_MD), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
         undefined,
@@ -2935,7 +2935,7 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT_TXT, {
         checked: true
       });
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_TXT), 'value');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_TXT), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
       assert.deepEqual(res, [undefined], 'result');
     });
@@ -2945,7 +2945,7 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT_TXT, {
         checked: true
       }, true);
-      assert.isTrue(mjs.localOpts.get(FILE_EXT_SELECT_TXT), 'value');
+      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_TXT), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.deepEqual(res, [
         undefined,
@@ -2984,7 +2984,7 @@ describe('main', () => {
       const res = await func(ONLY_EDITABLE, {
         checked: true
       });
-      assert.isTrue(mjs.globalOpts.get(ONLY_EDITABLE), 'value');
+      assert.strictEqual(mjs.globalOpts.get(ONLY_EDITABLE), true, 'value');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2994,7 +2994,7 @@ describe('main', () => {
       const res = await func(ONLY_EDITABLE, {
         checked: true
       });
-      assert.isTrue(mjs.globalOpts.get(ONLY_EDITABLE), 'value');
+      assert.strictEqual(mjs.globalOpts.get(ONLY_EDITABLE), true, 'value');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined, [null]], 'result');
     });
@@ -3006,7 +3006,7 @@ describe('main', () => {
       const res = await func(ONLY_EDITABLE, {
         checked: true
       }, true);
-      assert.isTrue(mjs.globalOpts.get(ONLY_EDITABLE), 'value');
+      assert.strictEqual(mjs.globalOpts.get(ONLY_EDITABLE), true, 'value');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.removeAll.callCount, j + 1, 'called');
       assert.deepEqual(res, [
@@ -3027,7 +3027,7 @@ describe('main', () => {
       const res = await func(SYNC_AUTO, {
         checked: true
       });
-      assert.isTrue(mjs.globalOpts.get(SYNC_AUTO), 'value');
+      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO), true, 'value');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -3037,7 +3037,7 @@ describe('main', () => {
       const res = await func(SYNC_AUTO, {
         checked: true
       });
-      assert.isTrue(mjs.globalOpts.get(SYNC_AUTO), 'value');
+      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO), true, 'value');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined, [null]], 'result');
     });
@@ -3264,7 +3264,7 @@ describe('main', () => {
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isFalse(errCalled, 'not called');
+      assert.strictEqual(errCalled, false, 'not called');
       assert.deepEqual(res, [[
         undefined,
         undefined,
@@ -3289,7 +3289,7 @@ describe('main', () => {
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isTrue(errCalled, 'called');
+      assert.strictEqual(errCalled, true, 'called');
       assert.deepEqual(res, [
         false,
         [
@@ -3318,7 +3318,7 @@ describe('main', () => {
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isTrue(errCalled, 'called');
+      assert.strictEqual(errCalled, true, 'called');
       assert.deepEqual(res, [
         false,
         [
@@ -3348,7 +3348,7 @@ describe('main', () => {
       await func({
         error: new Error('error')
       }).catch(e => {
-        assert.instanceOf(e, Error, 'error');
+        assert.strictEqual(e instanceof Error, true, 'error');
         assert.strictEqual(e.message, 'error', 'message');
       });
       stubConsole.restore();
@@ -3372,7 +3372,7 @@ describe('main', () => {
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isFalse(errCalled, 'not called');
+      assert.strictEqual(errCalled, false, 'not called');
       assert.deepEqual(res, [[
         undefined,
         undefined,
@@ -3421,14 +3421,14 @@ describe('main', () => {
           foo: 'bar'
         }
       }).catch(e => {
-        assert.instanceOf(e, Error, 'error');
+        assert.strictEqual(e instanceof Error, true, 'error');
         assert.strictEqual(e.message, 'error', 'message');
         return false;
       });
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
-      assert.isTrue(errCalled, 'called');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(errCalled, true, 'called');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should call function', async () => {
@@ -3490,8 +3490,8 @@ describe('main', () => {
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isTrue(status[HOST_COMPAT], 'compat');
-      assert.isNull(status[HOST_VERSION_LATEST], 'latest');
+      assert.strictEqual(status[HOST_COMPAT], true, 'compat');
+      assert.strictEqual(status[HOST_VERSION_LATEST], null, 'latest');
       assert.deepEqual(res, [
         [
           undefined,
@@ -3520,8 +3520,8 @@ describe('main', () => {
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isTrue(status[HOST_COMPAT], 'compat');
-      assert.isNull(status[HOST_VERSION_LATEST], 'latest');
+      assert.strictEqual(status[HOST_COMPAT], true, 'compat');
+      assert.strictEqual(status[HOST_VERSION_LATEST], null, 'latest');
       assert.deepEqual(res, [
         [
           undefined,
@@ -3551,7 +3551,7 @@ describe('main', () => {
         'called');
       assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
         'called');
-      assert.isTrue(status[HOST_COMPAT], 'compat');
+      assert.strictEqual(status[HOST_COMPAT], true, 'compat');
       assert.strictEqual(status[HOST_VERSION_LATEST], '1.2.3', 'latest');
       assert.deepEqual(res, [
         [
@@ -3678,13 +3678,14 @@ describe('main', () => {
     it('should set map', async () => {
       await func();
       assert.strictEqual(mjs.appHost.size, 3, 'size');
-      assert.isTrue(mjs.appHost.has('port'), 'port');
-      assert.isTrue(mjs.appHost.get('port').onDisconnect.addListener.called,
+      assert.strictEqual(mjs.appHost.has('port'), true, 'port');
+      assert.strictEqual(
+        mjs.appHost.get('port').onDisconnect.addListener.called, true,
         'called');
-      assert.isTrue(mjs.appHost.get('port').onMessage.addListener.called,
-        'called');
-      assert.isTrue(mjs.appHost.has('status'), 'status');
-      assert.isTrue(mjs.appHost.has('tabs'), 'tabs');
+      assert.strictEqual(mjs.appHost.get('port').onMessage.addListener.called,
+        true, 'called');
+      assert.strictEqual(mjs.appHost.has('status'), true, 'status');
+      assert.strictEqual(mjs.appHost.has('tabs'), true, 'tabs');
     });
   });
 

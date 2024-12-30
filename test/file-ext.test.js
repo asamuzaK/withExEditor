@@ -3,7 +3,7 @@
  */
 
 /* api */
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { describe, it } from 'mocha';
 
 /* test */
@@ -14,7 +14,7 @@ describe('file-ext', () => {
     const itemKeys = ['application', 'image', 'text'];
     const items = Object.keys(fileExt);
     for (const key of items) {
-      assert.isTrue(itemKeys.includes(key));
+      assert.strictEqual(itemKeys.includes(key), true);
     }
   });
 
@@ -23,15 +23,15 @@ describe('file-ext', () => {
       const subItemKeys = ['json', 'xml'];
       const items = Object.entries(fileExt.application);
       for (const [key, value] of items) {
-        assert.isString(key);
+        assert.strictEqual(typeof key, 'string');
         if (subItemKeys.includes(key)) {
           const subItems = Object.entries(value);
           for (const [subKey, subValue] of subItems) {
-            assert.isString(subKey);
-            assert.isString(subValue);
+            assert.strictEqual(typeof subKey, 'string');
+            assert.strictEqual(typeof subValue, 'string');
           }
         } else {
-          assert.isString(value);
+          assert.strictEqual(typeof value, 'string');
         }
       }
     });
@@ -42,15 +42,15 @@ describe('file-ext', () => {
       const subItemKeys = ['xml'];
       const items = Object.entries(fileExt.image);
       for (const [key, value] of items) {
-        assert.isString(key);
+        assert.strictEqual(typeof key, 'string');
         if (subItemKeys.includes(key)) {
           const subItems = Object.entries(value);
           for (const [subKey, subValue] of subItems) {
-            assert.isString(subKey);
-            assert.isString(subValue);
+            assert.strictEqual(typeof subKey, 'string');
+            assert.strictEqual(typeof subValue, 'string');
           }
         } else {
-          assert.isString(value);
+          assert.strictEqual(typeof value, 'string');
         }
       }
     });
@@ -60,8 +60,8 @@ describe('file-ext', () => {
     it('should get string', () => {
       const items = Object.entries(fileExt.text);
       for (const [key, value] of items) {
-        assert.isString(key);
-        assert.isString(value);
+        assert.strictEqual(typeof key, 'string');
+        assert.strictEqual(typeof value, 'string');
       }
     });
   });

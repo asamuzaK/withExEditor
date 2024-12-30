@@ -4,9 +4,9 @@
 /* eslint-disable import-x/order */
 
 /* api */
-import sinon from 'sinon';
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'mocha';
+import sinon from 'sinon';
 import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
 import {
   browser, createJsdom, DataTransfer
@@ -123,10 +123,6 @@ describe('content-main', () => {
     }
   });
 
-  it('should get browser object', () => {
-    assert.isObject(browser, 'browser');
-  });
-
   describe('set modifier keys', () => {
     const func = mjs.setModifierKey;
     beforeEach(() => {
@@ -145,23 +141,23 @@ describe('content-main', () => {
     it('should set value', () => {
       const { vars } = mjs;
       func(true);
-      assert.isTrue(vars.keyCtrlA.metaKey, 'meta');
-      assert.isUndefined(vars.keyCtrlA.ctrlKey, 'meta');
+      assert.strictEqual(vars.keyCtrlA.metaKey, true, 'meta');
+      assert.strictEqual(vars.keyCtrlA.ctrlKey, undefined, 'meta');
     });
 
     it('should set value', () => {
       const { vars } = mjs;
       func(false);
-      assert.isUndefined(vars.keyCtrlA.metaKey, 'meta');
-      assert.isTrue(vars.keyCtrlA.ctrlKey, 'meta');
+      assert.strictEqual(vars.keyCtrlA.metaKey, undefined, 'meta');
+      assert.strictEqual(vars.keyCtrlA.ctrlKey, true, 'meta');
     });
 
     it('should set value', () => {
       const { vars } = mjs;
       vars[IS_MAC] = true;
       func();
-      assert.isTrue(vars.keyCtrlA.metaKey, 'meta');
-      assert.isUndefined(vars.keyCtrlA.ctrlKey, 'meta');
+      assert.strictEqual(vars.keyCtrlA.metaKey, true, 'meta');
+      assert.strictEqual(vars.keyCtrlA.ctrlKey, undefined, 'meta');
     });
   });
 
@@ -175,24 +171,25 @@ describe('content-main', () => {
     });
 
     it('should throw', async () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
+      assert.throws(() => func(), TypeError,
+        'Expected String but got Undefined.');
     });
 
     it('should not set map', () => {
       const res = func('foo');
-      assert.isFalse(mjs.dataIds.has('foo'), 'not set');
-      assert.isNull(res, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), false, 'not set');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should set map', () => {
       const res = func('foo', {
         bar: 'baz'
       });
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
       assert.deepEqual(mjs.dataIds.get('foo'), {
         bar: 'baz'
       }, 'map');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should set map', () => {
@@ -202,11 +199,11 @@ describe('content-main', () => {
       const res = func('foo', {
         bar: 'baz'
       });
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
       assert.deepEqual(mjs.dataIds.get('foo'), {
         bar: 'baz'
       }, 'map');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
   });
 
@@ -220,14 +217,15 @@ describe('content-main', () => {
     });
 
     it('should throw', async () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
+      assert.throws(() => func(), TypeError,
+        'Expected String but got Undefined.');
     });
 
     it('should get null', () => {
       const p = document.createElement('p');
       p.id = 'foo';
       const res = func(p.id);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get element', () => {
@@ -252,7 +250,7 @@ describe('content-main', () => {
         queryIndex: null
       });
       const res = func(dataId);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get element', () => {
@@ -441,7 +439,8 @@ describe('content-main', () => {
     const func = mjs.getDataIdFromURI;
 
     it('should throw', async () => {
-      assert.throws(() => func(), 'Expected String but got Undefined.');
+      assert.throws(() => func(), TypeError,
+        'Expected String but got Undefined.');
     });
 
     it('should get value', () => {
@@ -592,13 +591,13 @@ describe('content-main', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
       const p = document.createElement('p');
       const res = func(p);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get result', () => {
@@ -715,7 +714,7 @@ describe('content-main', () => {
     it('should not set data', () => {
       const res = func();
       assert.strictEqual(mjs.dataIds.size, 0, 'size');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should set data', () => {
@@ -726,8 +725,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should set data', () => {
@@ -738,8 +737,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should set data', () => {
@@ -750,8 +749,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should set data', () => {
@@ -762,8 +761,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should not set data', () => {
@@ -774,7 +773,7 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 0, 'size');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
   });
 
@@ -790,7 +789,7 @@ describe('content-main', () => {
     it('should not set data', () => {
       const res = func();
       assert.strictEqual(mjs.dataIds.size, 0, 'size');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should set data', () => {
@@ -801,8 +800,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should set data', () => {
@@ -813,8 +812,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should set data', () => {
@@ -825,8 +824,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should set data', () => {
@@ -837,8 +836,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'set');
-      assert.instanceOf(res, Map, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
+      assert.strictEqual(res instanceof Map, true, 'result');
     });
 
     it('should not set data', () => {
@@ -849,7 +848,7 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 0, 'size');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
   });
 
@@ -868,8 +867,8 @@ describe('content-main', () => {
       mjs.dataIds.set('foo', 'bar');
       const res = func();
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'map');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'map');
+      assert.strictEqual(res, false, 'result');
     });
 
     it('should remove data', () => {
@@ -882,7 +881,7 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 0, 'size');
-      assert.isTrue(res, 'result');
+      assert.strictEqual(res, true, 'result');
     });
 
     it('should not remove data', () => {
@@ -895,8 +894,8 @@ describe('content-main', () => {
         }
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('foo'), 'map');
-      assert.isFalse(res, 'result');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'map');
+      assert.strictEqual(res, false, 'result');
     });
   });
 
@@ -922,9 +921,11 @@ describe('content-main', () => {
           }
         });
       const res = await func({});
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -966,9 +967,11 @@ describe('content-main', () => {
           }
         });
       const res = await func();
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -983,9 +986,11 @@ describe('content-main', () => {
       const res = await func({
         mode: MODE_SOURCE
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -995,11 +1000,13 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1010,13 +1017,15 @@ describe('content-main', () => {
         namespaceURI: 'http://www.w3.org/1999/xhtml',
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1026,11 +1035,13 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1041,13 +1052,15 @@ describe('content-main', () => {
         namespaceURI: 'http://www.w3.org/1999/xhtml',
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1057,11 +1070,13 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.html', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1072,13 +1087,15 @@ describe('content-main', () => {
         namespaceURI: 'http://www.w3.org/1999/xhtml',
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.html', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1088,11 +1105,13 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.md', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1103,13 +1122,15 @@ describe('content-main', () => {
         namespaceURI: 'http://www.w3.org/1999/xhtml',
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.md', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1124,9 +1145,11 @@ describe('content-main', () => {
       const res = await func({
         mode: MODE_EDIT
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -1135,11 +1158,13 @@ describe('content-main', () => {
         mode: MODE_MATHML,
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.mml', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1148,11 +1173,13 @@ describe('content-main', () => {
         mode: MODE_SVG,
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.svg', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1167,9 +1194,11 @@ describe('content-main', () => {
       const res = await func({
         mode: MODE_SVG
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -1178,11 +1207,13 @@ describe('content-main', () => {
         mode: MODE_SELECTION,
         value: 'bar'
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.xml', 'value');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1197,9 +1228,11 @@ describe('content-main', () => {
       const res = await func({
         mode: MODE_SELECTION
       });
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'createTmpFile'),
+      assert.strictEqual(
+        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
         'prop');
-      assert.isTrue(Object.prototype.hasOwnProperty.call(res, 'value'), 'prop');
+      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+        true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
   });
@@ -1213,7 +1246,7 @@ describe('content-main', () => {
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i,
         'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -1282,7 +1315,7 @@ describe('content-main', () => {
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i,
         'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -1497,10 +1530,10 @@ describe('content-main', () => {
       body.appendChild(p);
       func(p, 'foo');
       assert.strictEqual(mjs.dataIds.size, 2, 'size');
-      assert.isTrue(mjs.dataIds.has('html_p_0'), 'map');
+      assert.strictEqual(mjs.dataIds.has('html_p_0'), true, 'map');
       assert.deepEqual(mjs.dataIds.get('html_p_0').controls, ['foo'],
         'controls');
-      assert.isTrue(mjs.dataIds.has('foo'), 'map');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'map');
       assert.strictEqual(mjs.dataIds.get('foo').controlledBy, 'html_p_0',
         'controlled by');
     });
@@ -1518,10 +1551,10 @@ describe('content-main', () => {
       });
       func(p, 'foo');
       assert.strictEqual(mjs.dataIds.size, 2, 'size');
-      assert.isTrue(mjs.dataIds.has('html_p_0'), 'map');
+      assert.strictEqual(mjs.dataIds.has('html_p_0'), true, 'map');
       assert.deepEqual(mjs.dataIds.get('html_p_0').controls, ['bar', 'foo'],
         'controls');
-      assert.isTrue(mjs.dataIds.has('foo'), 'map');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'map');
       assert.strictEqual(mjs.dataIds.get('foo').controlledBy, 'html_p_0',
         'controlled by');
     });
@@ -1537,10 +1570,10 @@ describe('content-main', () => {
       mjs.dataIds.set('html_p_0', {});
       func(p, 'foo');
       assert.strictEqual(mjs.dataIds.size, 2, 'size');
-      assert.isTrue(mjs.dataIds.has('html_p_0'), 'map');
+      assert.strictEqual(mjs.dataIds.has('html_p_0'), true, 'map');
       assert.deepEqual(mjs.dataIds.get('html_p_0').controls, ['foo'],
         'controls');
-      assert.isTrue(mjs.dataIds.has('foo'), 'map');
+      assert.strictEqual(mjs.dataIds.has('foo'), true, 'map');
       assert.strictEqual(mjs.dataIds.get('foo').controlledBy, 'html_p_0',
         'controlled by');
     });
@@ -1577,7 +1610,7 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       const res = await func(body, MODE_SOURCE);
       assert.strictEqual(res.mode, MODE_SOURCE, 'mode');
-      assert.isTrue(res.incognito, 'incognito');
+      assert.strictEqual(res.incognito, true, 'incognito');
       assert.strictEqual(res.dir, TMP_FILES_PB, 'dir');
     });
 
@@ -1617,7 +1650,7 @@ describe('content-main', () => {
       const res = await func(textarea, MODE_EDIT);
       assert.strictEqual(res.mode, MODE_EDIT, 'mode');
       assert.strictEqual(res.dataId, 'html_textarea_0', 'data ID');
-      assert.isTrue(res.syncAuto, 'sync');
+      assert.strictEqual(res.syncAuto, true, 'sync');
     });
 
     it('should get object', async () => {
@@ -1747,7 +1780,7 @@ describe('content-main', () => {
       assert.strictEqual(res.value, 'foo', 'value');
       assert.strictEqual(res.namespaceURI, 'http://www.w3.org/2000/svg', 'ns');
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('html_text_0'), 'dataId');
+      assert.strictEqual(mjs.dataIds.has('html_text_0'), true, 'dataId');
     });
 
     it('should get object', async () => {
@@ -1769,7 +1802,7 @@ describe('content-main', () => {
       assert.strictEqual(res.value, '', 'value');
       assert.strictEqual(res.namespaceURI, 'http://www.w3.org/2000/svg', 'ns');
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('html_text_0'), 'dataId');
+      assert.strictEqual(mjs.dataIds.has('html_text_0'), true, 'dataId');
     });
 
     it('should get object', async () => {
@@ -1797,7 +1830,7 @@ describe('content-main', () => {
       assert.strictEqual(res.value, 'foo', 'value');
       assert.strictEqual(res.namespaceURI, 'http://www.w3.org/2000/svg', 'ns');
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('html_text_0'), 'dataId');
+      assert.strictEqual(mjs.dataIds.has('html_text_0'), true, 'dataId');
     });
 
     it('should get default object', async () => {
@@ -1865,14 +1898,14 @@ describe('content-main', () => {
 
     it('should get null', async () => {
       const res = await func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', async () => {
       const res = await func({
         foo: 'bar'
       });
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get object', async () => {
@@ -1930,7 +1963,7 @@ describe('content-main', () => {
         'called');
       assert.strictEqual(mjs.dataIds.size, 1, 'data');
       assert.deepEqual(res[0], {}, 'result');
-      assert.instanceOf(res[1], Map, 'map');
+      assert.strictEqual(res[1] instanceof Map, true, 'map');
     });
   });
 
@@ -2125,7 +2158,7 @@ describe('content-main', () => {
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
       assert.deepEqual(res[0], {}, 'result');
-      assert.instanceOf(res[1], Map, 'map');
+      assert.strictEqual(res[1] instanceof Map, true, 'map');
     });
   });
 
@@ -2134,7 +2167,7 @@ describe('content-main', () => {
 
     it('should not have child nodes', () => {
       const res = func();
-      assert.isFalse(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), false, 'child nodes');
     });
 
     it('should not have child nodes', () => {
@@ -2142,7 +2175,7 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       body.appendChild(elm);
       const res = func(elm);
-      assert.isFalse(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), false, 'child nodes');
     });
 
     it('should not have child nodes', () => {
@@ -2153,7 +2186,7 @@ describe('content-main', () => {
         domstr: true
       };
       const res = func(elm, opt);
-      assert.isFalse(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), false, 'child nodes');
     });
 
     it('should not have child nodes', () => {
@@ -2164,7 +2197,7 @@ describe('content-main', () => {
         value: true
       };
       const res = func(elm, opt);
-      assert.isFalse(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), false, 'child nodes');
     });
 
     it('should have child nodes', () => {
@@ -2175,7 +2208,7 @@ describe('content-main', () => {
         value: 'foo'
       };
       const res = func(elm, opt);
-      assert.isTrue(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), true, 'child nodes');
       assert.strictEqual(res.childNodes.length, 1, 'length');
       assert.strictEqual(res.childNodes[0].nodeType, 3, 'type');
       assert.strictEqual(res.childNodes[0].nodeValue, 'foo', 'value');
@@ -2194,7 +2227,7 @@ describe('content-main', () => {
         value: 'foo'
       };
       const res = func(elm, opt);
-      assert.isTrue(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), true, 'child nodes');
       assert.strictEqual(res.childNodes.length, 1, 'length');
       assert.strictEqual(res.childNodes[0].nodeType, 3, 'type');
       assert.strictEqual(res.childNodes[0].nodeValue, 'foo', 'value');
@@ -2212,7 +2245,7 @@ describe('content-main', () => {
         value: 'foo\nbar\n'
       };
       const res = func(elm, opt);
-      assert.isTrue(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), true, 'child nodes');
       assert.strictEqual(res.childNodes.length, 4, 'length');
       assert.strictEqual(res.firstChild.nodeType, 1, 'type');
       assert.strictEqual(res.firstChild.textContent, 'foo', 'content');
@@ -2231,7 +2264,7 @@ describe('content-main', () => {
         value: 'foo\nbar\n'
       };
       const res = func(elm, opt);
-      assert.isTrue(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), true, 'child nodes');
       assert.strictEqual(res.childNodes.length, 4, 'length');
       assert.strictEqual(res.firstChild.nodeType, 1, 'type');
       assert.strictEqual(res.firstChild.textContent, 'foo', 'content');
@@ -2251,7 +2284,7 @@ describe('content-main', () => {
         domstr: '<p>foo</p>\n<p>bar</p>\n'
       };
       const res = func(elm, opt);
-      assert.isTrue(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), true, 'child nodes');
       assert.strictEqual(res.childNodes.length, 4, 'length');
       assert.strictEqual(res.firstChild.nodeType, 1, 'type');
       assert.strictEqual(res.firstChild.textContent, 'foo', 'content');
@@ -2270,7 +2303,7 @@ describe('content-main', () => {
         domstr: '<p>foo</p>\n<p>bar</p>\n'
       };
       const res = func(elm, opt);
-      assert.isTrue(res.hasChildNodes(), 'child nodes');
+      assert.strictEqual(res.hasChildNodes(), true, 'child nodes');
       assert.strictEqual(res.childNodes.length, 4, 'length');
       assert.strictEqual(res.firstChild.nodeType, 1, 'type');
       assert.strictEqual(res.firstChild.textContent, 'foo', 'content');
@@ -2299,10 +2332,10 @@ describe('content-main', () => {
       p.appendChild(span);
       body.appendChild(p);
       func(p);
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(p.childNodes.length, 1, 'length');
       assert.deepEqual(p.firstChild, span, 'child');
-      assert.isFalse(span.hasChildNodes(), 'content');
+      assert.strictEqual(span.hasChildNodes(), false, 'content');
     });
 
     it('should not call function', () => {
@@ -2316,7 +2349,7 @@ describe('content-main', () => {
       func(p, {
         value: 'foo\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(p.childNodes.length, 1, 'length');
       assert.deepEqual(p.firstChild, span, 'child');
       assert.strictEqual(span.textContent, 'foo', 'content');
@@ -2331,7 +2364,7 @@ describe('content-main', () => {
       func(div, {
         value: 'foo\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(div.childNodes.length, 0, 'length');
       assert.strictEqual(div.textContent, '', 'content');
     });
@@ -2389,7 +2422,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(div.childNodes.length, 0, 'length');
       assert.strictEqual(div.textContent, '', 'content');
     });
@@ -2403,7 +2436,7 @@ describe('content-main', () => {
       func(div, {
         value: 'foo\nbar\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(div.childNodes.length, 0, 'length');
       assert.strictEqual(div.textContent, '', 'content');
     });
@@ -2463,7 +2496,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\nbar\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(div.childNodes.length, 0, 'length');
       assert.strictEqual(div.textContent, '', 'content');
     });
@@ -2480,7 +2513,7 @@ describe('content-main', () => {
       func(div, {
         value: 'foo\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(div.childNodes.length, 1, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
       assert.strictEqual(div.firstChild.localName, 'span', 'name');
@@ -2528,7 +2561,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(div.childNodes.length, 1, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
       assert.strictEqual(div.firstChild.localName, 'span', 'name');
@@ -2548,7 +2581,7 @@ describe('content-main', () => {
       func(div, {
         value: 'foo\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(div.childNodes.length, 1, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
       assert.strictEqual(div.firstChild.localName, 'span', 'name');
@@ -2598,7 +2631,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\n'
       });
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(div.childNodes.length, 1, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
       assert.strictEqual(div.firstChild.localName, 'span', 'name');
@@ -2618,7 +2651,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\nbar\n'
       });
-      assert.isTrue(stub.called, 'called');
+      assert.strictEqual(stub.called, true, 'called');
       assert.strictEqual(stub.callCount, 1, 'call count');
       assert.strictEqual(div.childNodes.length, 0, 'length');
     });
@@ -2640,7 +2673,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\n'
       });
-      assert.isTrue(stub.called, 'called');
+      assert.strictEqual(stub.called, true, 'called');
       assert.strictEqual(stub.callCount, 2, 'call count');
       assert.strictEqual(div.childNodes.length, 1, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
@@ -2666,11 +2699,11 @@ describe('content-main', () => {
         dataId: 'foo',
         value: '<span>foo</span>\n<span>bar</span>\n'
       });
-      const { calledOnce: errCalled } = stubErr;
+      const { called: errCalled } = stubErr;
       stubErr.restore();
-      assert.isTrue(stub.called, 'called');
+      assert.strictEqual(stub.called, true, 'called');
       assert.strictEqual(stub.callCount, 3, 'call count');
-      assert.isFalse(errCalled, 'error called');
+      assert.strictEqual(errCalled, false, 'error not called');
       assert.strictEqual(div.childNodes.length, 1, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
       assert.strictEqual(div.firstChild.localName, 'span', 'name');
@@ -2700,14 +2733,16 @@ describe('content-main', () => {
       });
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
-      assert.isTrue(stub.called, 'called');
+      assert.strictEqual(stub.called, true, 'called');
       assert.strictEqual(stub.callCount, 3, 'call count');
-      assert.isTrue(errCalled, 'error called');
+      assert.strictEqual(errCalled, true, 'error called');
       assert.strictEqual(div.childNodes.length, 1, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
       assert.strictEqual(div.firstChild.localName, 'span', 'name');
-      assert.strictEqual(div.firstChild.textContent, 'foo <foo@example.dom> wrote:\nbar\n', 'content');
-      assert.strictEqual(div.textContent, 'foo <foo@example.dom> wrote:\nbar\n', 'content');
+      assert.strictEqual(div.firstChild.textContent,
+        'foo <foo@example.dom> wrote:\nbar\n', 'content');
+      assert.strictEqual(div.textContent,
+        'foo <foo@example.dom> wrote:\nbar\n', 'content');
     });
 
     it('should throw if StaticRange is not supported', () => {
@@ -2746,8 +2781,8 @@ describe('content-main', () => {
       func(elm, {
         value: 'foo'
       });
-      assert.isFalse(spy.called, 'not called');
-      assert.isUndefined(elm.value, 'value');
+      assert.strictEqual(spy.called, false, 'not called');
+      assert.strictEqual(elm.value, undefined, 'value');
     });
 
     it('should not call function', () => {
@@ -2757,7 +2792,7 @@ describe('content-main', () => {
       elm.value = 'foo';
       body.appendChild(elm);
       func(elm);
-      assert.isFalse(spy.called, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       assert.strictEqual(elm.value, 'foo', 'value');
     });
 
@@ -2770,7 +2805,7 @@ describe('content-main', () => {
       func(elm, {
         value: 'bar\n'
       });
-      assert.isFalse(spy.called, 'called');
+      assert.strictEqual(spy.called, false, 'called');
       assert.strictEqual(elm.value, 'foo', 'value');
     });
 
@@ -2785,7 +2820,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar\n'
       });
-      assert.isTrue(spy.called, 'called');
+      assert.strictEqual(spy.called, true, 'called');
       assert.strictEqual(elm.value, 'bar', 'value');
     });
 
@@ -2802,7 +2837,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar\n'
       });
-      assert.isFalse(spy.called, 'called');
+      assert.strictEqual(spy.called, false, 'called');
       assert.strictEqual(elm.value, 'foo', 'value');
     });
 
@@ -2815,7 +2850,7 @@ describe('content-main', () => {
       func(elm, {
         value: 'foo\n'
       });
-      assert.isFalse(spy.called, 'note called');
+      assert.strictEqual(spy.called, false, 'note called');
       assert.strictEqual(elm.value, 'foo', 'value');
     });
 
@@ -2828,7 +2863,7 @@ describe('content-main', () => {
       func(elm, {
         value: 'foo\nbar baz\nqux\n'
       });
-      assert.isFalse(stub.called, 'not called');
+      assert.strictEqual(stub.called, false, 'not called');
       assert.strictEqual(elm.value, 'foo\nbar', 'value');
     });
 
@@ -2843,7 +2878,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\nbar baz\nqux\n'
       });
-      assert.isTrue(stub.called, 'called');
+      assert.strictEqual(stub.called, true, 'called');
       assert.strictEqual(elm.value, 'foo\nbar', 'value');
     });
 
@@ -2860,7 +2895,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\nbar baz\nqux\n'
       });
-      assert.isFalse(stub.called, 'called');
+      assert.strictEqual(stub.called, false, 'called');
       assert.strictEqual(elm.value, 'foo\nbar', 'value');
     });
 
@@ -2873,7 +2908,7 @@ describe('content-main', () => {
       func(elm, {
         value: 'foo\nbar baz\nqux\n'
       });
-      assert.isFalse(spy.called, 'called');
+      assert.strictEqual(spy.called, false, 'called');
       assert.strictEqual(elm.value, 'foo\nbar', 'value');
     });
 
@@ -2888,7 +2923,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\nbar baz\nqux\nquux\n'
       });
-      assert.isTrue(spy.called, 'called');
+      assert.strictEqual(spy.called, true, 'called');
       assert.strictEqual(elm.value, 'foo\nbar baz\nqux\nquux\n', 'value');
     });
 
@@ -2905,7 +2940,7 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'foo\nbar baz\nqux\n'
       });
-      assert.isFalse(spy.called, 'called');
+      assert.strictEqual(spy.called, false, 'called');
       assert.strictEqual(elm.value, 'foo\nbar', 'value');
     });
   });
@@ -2924,7 +2959,7 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       body.addEventListener('input', stub, true);
       func();
-      assert.isFalse(stub.called, 'not dispatched');
+      assert.strictEqual(stub.called, false, 'not dispatched');
     });
 
     it('should not replace content', () => {
@@ -2940,7 +2975,7 @@ describe('content-main', () => {
         liveEditKey: 'aceEditor',
         value: 'bar baz'
       });
-      assert.isFalse(stub.called, 'not dispatched');
+      assert.strictEqual(stub.called, false, 'not dispatched');
     });
 
     it('should not replace content', () => {
@@ -2956,7 +2991,7 @@ describe('content-main', () => {
         liveEditKey: 'aceEditor',
         value: 'bar baz'
       });
-      assert.isFalse(stub.called, 'not dispatched');
+      assert.strictEqual(stub.called, false, 'not dispatched');
       assert.strictEqual(text.value, '', 'content');
     });
 
@@ -2976,7 +3011,7 @@ describe('content-main', () => {
         liveEditKey: 'aceEditor',
         value: 'bar baz'
       });
-      assert.isTrue(stub.called, 'dispatched');
+      assert.strictEqual(stub.called, true, 'dispatched');
       assert.strictEqual(text.value, 'bar baz', 'content');
     });
 
@@ -2998,7 +3033,7 @@ describe('content-main', () => {
         liveEditKey: 'aceEditor',
         value: 'bar baz'
       });
-      assert.isFalse(stub.called, 'not dispatched');
+      assert.strictEqual(stub.called, false, 'not dispatched');
       assert.strictEqual(text.value, '', 'content');
     });
 
@@ -3016,7 +3051,7 @@ describe('content-main', () => {
         liveEditKey: 'tiddlyWiki',
         value: 'bar baz'
       });
-      assert.isFalse(stub.called, 'not dispatched');
+      assert.strictEqual(stub.called, false, 'not dispatched');
       assert.strictEqual(text.value, '', 'content');
     });
 
@@ -3036,7 +3071,7 @@ describe('content-main', () => {
         liveEditKey: 'tiddlyWiki',
         value: 'bar baz'
       });
-      assert.isTrue(stub.called, 'dispatched');
+      assert.strictEqual(stub.called, true, 'dispatched');
       assert.strictEqual(text.value, 'bar baz', 'content');
     });
 
@@ -3058,7 +3093,7 @@ describe('content-main', () => {
         liveEditKey: 'tiddlyWiki',
         value: 'bar baz'
       });
-      assert.isFalse(stub.called, 'not dispatched');
+      assert.strictEqual(stub.called, false, 'not dispatched');
       assert.strictEqual(text.value, '', 'content');
     });
 
@@ -3082,7 +3117,7 @@ describe('content-main', () => {
         liveEditKey: 'tinyMCE',
         value: 'bar baz'
       });
-      assert.isTrue(stub.called, 'dispatched');
+      assert.strictEqual(stub.called, true, 'dispatched');
       assert.strictEqual(div.textContent, 'bar baz', 'content');
     });
 
@@ -3108,7 +3143,7 @@ describe('content-main', () => {
         liveEditKey: 'tinyMCE',
         value: 'bar baz'
       });
-      assert.isFalse(stub.called, 'not dispatched');
+      assert.strictEqual(stub.called, false, 'not dispatched');
       assert.strictEqual(div.textContent, '', 'content');
     });
 
@@ -3128,7 +3163,7 @@ describe('content-main', () => {
         liveEditKey: 'tinyMCE',
         value: 'bar baz'
       });
-      assert.isFalse(stub.called, 'not dispatched');
+      assert.strictEqual(stub.called, false, 'not dispatched');
       assert.strictEqual(div.textContent, '', 'content');
     });
   });
@@ -3249,7 +3284,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.value, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3269,7 +3304,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.value, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3291,7 +3326,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.value, '', 'content');
       assert.deepEqual(res, [], 'length');
     });
@@ -3312,7 +3347,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.value, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3334,7 +3369,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.value, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3358,7 +3393,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.value, '', 'content');
       assert.deepEqual(res, [], 'length');
     });
@@ -3382,7 +3417,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.textContent, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3407,7 +3442,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.textContent, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3434,7 +3469,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.textContent, '', 'content');
       assert.deepEqual(res, [], 'length');
     });
@@ -3462,7 +3497,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.textContent, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3491,7 +3526,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.textContent, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3522,7 +3557,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(elm.textContent, '', 'content');
       assert.deepEqual(res, [], 'length');
     });
@@ -3546,7 +3581,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(text.value, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3571,7 +3606,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(text.value, 'foo', 'content');
       assert.deepEqual(res, [undefined], 'length');
     });
@@ -3598,7 +3633,7 @@ describe('content-main', () => {
         value: 'foo'
       });
       assert.strictEqual(mjs.dataIds.size, 1, 'size');
-      assert.isTrue(mjs.dataIds.has('bar'));
+      assert.strictEqual(mjs.dataIds.has('bar'), true);
       assert.strictEqual(text.value, '', 'content');
       assert.deepEqual(res, [], 'length');
     });
@@ -3674,7 +3709,7 @@ describe('content-main', () => {
       });
       assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
       assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
-      assert.isNull(mjs.vars[SYNC_AUTO_URL], 'url');
+      assert.strictEqual(mjs.vars[SYNC_AUTO_URL], null, 'url');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3686,7 +3721,7 @@ describe('content-main', () => {
       });
       assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
       assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
-      assert.isNull(mjs.vars[SYNC_AUTO_URL], 'url');
+      assert.strictEqual(mjs.vars[SYNC_AUTO_URL], null, 'url');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3698,7 +3733,7 @@ describe('content-main', () => {
       });
       assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
       assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
-      assert.isNull(mjs.vars[SYNC_AUTO_URL], 'url');
+      assert.strictEqual(mjs.vars[SYNC_AUTO_URL], null, 'url');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3708,9 +3743,9 @@ describe('content-main', () => {
         [ONLY_EDITABLE]: true,
         [SYNC_AUTO]: true
       });
-      assert.isTrue(mjs.vars[INCOGNITO], 'incognito');
-      assert.isTrue(mjs.vars[ONLY_EDITABLE], 'editable');
-      assert.isTrue(mjs.vars[SYNC_AUTO], 'sync');
+      assert.strictEqual(mjs.vars[INCOGNITO], true, 'incognito');
+      assert.strictEqual(mjs.vars[ONLY_EDITABLE], true, 'editable');
+      assert.strictEqual(mjs.vars[SYNC_AUTO], true, 'sync');
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3718,9 +3753,9 @@ describe('content-main', () => {
       const res = await func({
         [IS_MAC]: true
       });
-      assert.isTrue(mjs.vars[IS_MAC], 'vars');
-      assert.isTrue(mjs.vars.keyCtrlA.metaKey, 'metakey');
-      assert.isUndefined(mjs.vars.keyCtrlA.ctlrKey, 'ctrlkey');
+      assert.strictEqual(mjs.vars[IS_MAC], true, 'vars');
+      assert.strictEqual(mjs.vars.keyCtrlA.metaKey, true, 'metakey');
+      assert.strictEqual(mjs.vars.keyCtrlA.ctlrKey, undefined, 'ctrlkey');
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -3784,7 +3819,7 @@ describe('content-main', () => {
     it('should throw', async () => {
       browser.runtime.sendMessage.rejects(new Error('error'));
       await func().catch(e => {
-        assert.instanceOf(e, Error, 'error');
+        assert.strictEqual(e instanceof Error, true, 'error');
         assert.strictEqual(e.message, 'error', 'message');
       });
     });
@@ -3817,7 +3852,7 @@ describe('content-main', () => {
       const stubError = sinon.stub(console, 'error');
       browser.runtime.sendMessage.rejects(new Error('error'));
       await func().catch(e => {
-        assert.instanceOf(e, Error, 'error');
+        assert.strictEqual(e instanceof Error, true, 'error');
         assert.strictEqual(e.message, 'error', 'message');
       });
       stubError.restore();
@@ -3852,7 +3887,7 @@ describe('content-main', () => {
       const res = await func({});
       assert.strictEqual(browser.runtime.sendMessage.callCount, i,
         'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should not call function', async () => {
@@ -3866,7 +3901,7 @@ describe('content-main', () => {
       });
       assert.strictEqual(browser.runtime.sendMessage.callCount, i,
         'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -3895,7 +3930,7 @@ describe('content-main', () => {
       });
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
-      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.strictEqual(mjs.vars.contextNode, null, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
     });
@@ -4042,9 +4077,9 @@ describe('content-main', () => {
 
     it('should not set values', async () => {
       const res = await func({});
-      assert.isNull(mjs.vars.contextNode, 'node');
-      assert.isNull(mjs.vars.contextMode, 'mode');
-      assert.isNull(res, 'result');
+      assert.strictEqual(mjs.vars.contextNode, null, 'node');
+      assert.strictEqual(mjs.vars.contextMode, null, 'mode');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -4073,7 +4108,7 @@ describe('content-main', () => {
       });
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
-      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.strictEqual(mjs.vars.contextNode, null, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
     });
@@ -4106,7 +4141,7 @@ describe('content-main', () => {
       });
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
-      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.strictEqual(mjs.vars.contextNode, null, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
     });
@@ -4118,7 +4153,7 @@ describe('content-main', () => {
       });
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should set values', async () => {
@@ -4127,9 +4162,9 @@ describe('content-main', () => {
       const res = await func({
         target
       });
-      assert.isNull(mjs.vars.contextNode, 'node');
+      assert.strictEqual(mjs.vars.contextNode, null, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should set values', async () => {
@@ -4142,7 +4177,7 @@ describe('content-main', () => {
       });
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_MATHML, 'mode');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should set values', async () => {
@@ -4155,7 +4190,7 @@ describe('content-main', () => {
       });
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SVG, 'mode');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -4167,7 +4202,7 @@ describe('content-main', () => {
       });
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_EDIT, 'mode');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -4181,7 +4216,7 @@ describe('content-main', () => {
       });
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
   });
 
@@ -4207,10 +4242,10 @@ describe('content-main', () => {
         }
       };
       const res = await func(evt);
-      assert.isFalse(stub.called, 'not called');
+      assert.strictEqual(stub.called, false, 'not called');
       assert.strictEqual(browser.runtime.sendMessage.callCount, i,
         'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should not call function', async () => {
@@ -4224,10 +4259,10 @@ describe('content-main', () => {
         }
       };
       const res = await func(evt);
-      assert.isFalse(stub.called, 'not called');
+      assert.strictEqual(stub.called, false, 'not called');
       assert.strictEqual(browser.runtime.sendMessage.callCount, i,
         'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -4241,7 +4276,7 @@ describe('content-main', () => {
         }
       };
       const res = await func(evt);
-      assert.isTrue(stub.called, 'called');
+      assert.strictEqual(stub.called, true, 'called');
       assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
         'called');
       assert.deepEqual(res, {}, 'result');

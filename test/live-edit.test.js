@@ -3,9 +3,9 @@
  */
 
 /* api */
-import sinon from 'sinon';
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'mocha';
+import sinon from 'sinon';
 import { createJsdom, DataTransfer } from './mocha/setup.js';
 
 /* test */
@@ -114,16 +114,18 @@ describe('live-edit', () => {
       const itemKeys = ['aceEditor', 'codeMirror', 'tiddlyWiki', 'tinyMCE'];
       const items = Object.entries(liveEdit);
       for (const [key, value] of items) {
-        assert.isTrue(itemKeys.includes(key));
-        assert.isTrue(Object.prototype.hasOwnProperty.call(value, 'className'));
-        assert.isTrue(typeof value.className === 'string' ||
-                      value.className === null);
-        assert.isString(value.getContent);
-        assert.isString(value.setContent);
-        assert.isString(value.url);
+        assert.strictEqual(itemKeys.includes(key), true);
+        assert.strictEqual(
+          Object.prototype.hasOwnProperty.call(value, 'className'), true);
+        assert.strictEqual(
+          typeof value.className === 'string' || value.className === null,
+          true);
+        assert.strictEqual(typeof value.getContent, 'string');
+        assert.strictEqual(typeof value.setContent, 'string');
+        assert.strictEqual(typeof value.url, 'string');
         // optional keys
         if (Object.prototype.hasOwnProperty.call(value, 'isIframe')) {
-          assert.isBoolean(value.isIframe);
+          assert.strictEqual(typeof value.isIframe, 'boolean');
         }
       }
     });
@@ -134,7 +136,7 @@ describe('live-edit', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -143,7 +145,7 @@ describe('live-edit', () => {
       p.classList.add('foo');
       body.appendChild(p);
       const res = func(p);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -151,7 +153,7 @@ describe('live-edit', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -160,7 +162,7 @@ describe('live-edit', () => {
       p.classList.add('quux');
       body.appendChild(p);
       const res = func(p);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get value, aceEditor', () => {
@@ -209,7 +211,7 @@ describe('live-edit', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -217,7 +219,7 @@ describe('live-edit', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -225,7 +227,7 @@ describe('live-edit', () => {
       const body = document.querySelector('body');
       body.appendChild(svg);
       const res = func(svg);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get element, aceEditor', () => {
@@ -284,7 +286,7 @@ describe('live-edit', () => {
 
     it('should get null', () => {
       const res = func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -292,7 +294,7 @@ describe('live-edit', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', () => {
@@ -300,7 +302,7 @@ describe('live-edit', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p, 'foo');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get result', () => {

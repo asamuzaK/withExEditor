@@ -4,7 +4,7 @@
 /* eslint-disable import-x/order */
 
 /* api */
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
 import { browser, createJsdom, mockPort } from './mocha/setup.js';
@@ -42,10 +42,6 @@ describe('options-main', () => {
     browser._sandbox.reset();
   });
 
-  it('should get browser object', () => {
-    assert.isObject(browser, 'browser');
-  });
-
   describe('send message', () => {
     const func = mjs.sendMsg;
 
@@ -55,7 +51,7 @@ describe('options-main', () => {
       const res = await func();
       assert.strictEqual(browser.runtime.sendMessage.callCount, i,
         'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -99,7 +95,7 @@ describe('options-main', () => {
 
     it('should get null if argument not given', async () => {
       const res = await func();
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get object', async () => {
@@ -131,7 +127,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.textContent, 'foo', 'text');
-      assert.isTrue(elm.classList.contains(WARN), 'class');
+      assert.strictEqual(elm.classList.contains(WARN), true, 'class');
     });
 
     it('should remove warning', async () => {
@@ -143,7 +139,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.textContent, 'foo', 'text');
-      assert.isFalse(elm.classList.contains(WARN), 'class');
+      assert.strictEqual(elm.classList.contains(WARN), false, 'class');
     });
 
     it('should set attr even if no argument given', async () => {
@@ -193,7 +189,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.value, 'foo', 'value');
-      assert.isFalse(elm.disabled, 'disabled');
+      assert.strictEqual(elm.disabled, false, 'disabled');
     });
 
     it('should set attr', async () => {
@@ -209,7 +205,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.value, 'foo', 'value');
-      assert.isFalse(elm.disabled, 'disabled');
+      assert.strictEqual(elm.disabled, false, 'disabled');
     });
 
     it('should set attr', async () => {
@@ -226,7 +222,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.value, 'foo', 'value');
-      assert.isFalse(elm.disabled, 'disabled');
+      assert.strictEqual(elm.disabled, false, 'disabled');
     });
 
     it('should set attr', async () => {
@@ -241,7 +237,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.value, '', 'value');
-      assert.isTrue(elm.disabled, 'disabled');
+      assert.strictEqual(elm.disabled, true, 'disabled');
     });
 
     it('should set attr', async () => {
@@ -256,7 +252,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.value, '', 'value');
-      assert.isTrue(elm.disabled, 'disabled');
+      assert.strictEqual(elm.disabled, true, 'disabled');
     });
   });
 
@@ -274,7 +270,7 @@ describe('options-main', () => {
       await func(arg);
       assert.strictEqual(browser.i18n.getMessage.callCount, i, 'not called');
       assert.strictEqual(elm.textContent, '', 'text');
-      assert.isFalse(elm.classList.contains(INFO), 'class');
+      assert.strictEqual(elm.classList.contains(INFO), false, 'class');
     });
 
     it('should add string', async () => {
@@ -287,7 +283,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.textContent, 'hostLatestVersion,v1.2.3', 'text');
-      assert.isTrue(elm.classList.contains(INFO), 'class');
+      assert.strictEqual(elm.classList.contains(INFO), true, 'class');
     });
 
     it('should add warning', async () => {
@@ -299,7 +295,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.textContent, 'foo', 'text');
-      assert.isTrue(elm.classList.contains(WARN), 'class');
+      assert.strictEqual(elm.classList.contains(WARN), true, 'class');
     });
 
     it('should remove warning', async () => {
@@ -312,7 +308,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.textContent, 'foo', 'text');
-      assert.isFalse(elm.classList.contains(WARN), 'class');
+      assert.strictEqual(elm.classList.contains(WARN), false, 'class');
     });
 
     it('should add warning', async () => {
@@ -325,7 +321,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.textContent, 'foo', 'text');
-      assert.isTrue(elm.classList.contains(WARN), 'class');
+      assert.strictEqual(elm.classList.contains(WARN), true, 'class');
     });
 
     it('should remove warning', async () => {
@@ -339,7 +335,7 @@ describe('options-main', () => {
       body.appendChild(elm);
       await func(arg);
       assert.strictEqual(elm.textContent, 'foo', 'text');
-      assert.isFalse(elm.classList.contains(WARN), 'class');
+      assert.strictEqual(elm.classList.contains(WARN), false, 'class');
     });
   });
 
@@ -351,7 +347,7 @@ describe('options-main', () => {
         target: {}
       };
       const res = await func(evt);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', async () => {
@@ -361,7 +357,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', async () => {
@@ -371,7 +367,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should get null', async () => {
@@ -381,7 +377,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
 
     it('should call function', async () => {
@@ -396,7 +392,7 @@ describe('options-main', () => {
       const res = await func(evt);
       assert.strictEqual(browser.storage.local.set.callCount, i + 1,
         'called');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(res, undefined, 'result');
     });
 
     it('should call function', async () => {
@@ -411,7 +407,7 @@ describe('options-main', () => {
       const res = await func(evt);
       assert.strictEqual(browser.storage.local.set.callCount, i + 1,
         'called');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(res, undefined, 'result');
     });
 
     it('should not call function', async () => {
@@ -426,7 +422,7 @@ describe('options-main', () => {
       const res = await func(evt);
       assert.strictEqual(browser.storage.local.set.callCount, i,
         'not called');
-      assert.isNull(res, 'result');
+      assert.strictEqual(res, null, 'result');
     });
   });
 
@@ -529,7 +525,7 @@ describe('options-main', () => {
       const res = await func(evt);
       assert.strictEqual(browser.storage.local.set.callCount, i + 1,
         'called');
-      assert.isUndefined(res, 'result');
+      assert.strictEqual(res, undefined, 'result');
     });
   });
 
@@ -558,8 +554,8 @@ describe('options-main', () => {
         preventDefault: fake2
       };
       await func(evt);
-      assert.isTrue(fake.calledOnce, 'called stopPropagation');
-      assert.isTrue(fake2.calledOnce, 'called preventDefault');
+      assert.strictEqual(fake.calledOnce, true, 'called stopPropagation');
+      assert.strictEqual(fake2.calledOnce, true, 'called preventDefault');
     });
   });
 
@@ -573,7 +569,7 @@ describe('options-main', () => {
       elm.id = SYNC_AUTO_URL;
       body.appendChild(elm);
       await func();
-      assert.isTrue(spy.calledOnce, 'called');
+      assert.strictEqual(spy.calledOnce, true, 'called');
       elm.addEventListener.restore();
     });
   });
@@ -587,7 +583,7 @@ describe('options-main', () => {
       const spy = sinon.spy(elm, 'addEventListener');
       body.appendChild(elm);
       await func();
-      assert.isTrue(spy.calledOnce, 'called');
+      assert.strictEqual(spy.calledOnce, true, 'called');
       elm.addEventListener.restore();
     });
   });
@@ -601,7 +597,7 @@ describe('options-main', () => {
       const spy = sinon.spy(elm, 'addEventListener');
       body.appendChild(elm);
       await func();
-      assert.isTrue(spy.notCalled, 'not called');
+      assert.strictEqual(spy.called, false, 'not called');
       elm.addEventListener.restore();
     });
 
@@ -611,7 +607,7 @@ describe('options-main', () => {
       const spy = sinon.spy(elm, 'addEventListener');
       body.appendChild(elm);
       await func();
-      assert.isTrue(spy.calledOnce, 'called');
+      assert.strictEqual(spy.calledOnce, true, 'called');
       elm.addEventListener.restore();
     });
   });
@@ -734,7 +730,7 @@ describe('options-main', () => {
         value: 'foo'
       });
       assert.strictEqual(elm.value, 'foo', 'result');
-      assert.isFalse(elm.disabled, 'enabled');
+      assert.strictEqual(elm.disabled, false, 'enabled');
     });
 
     it('should set text value', async () => {

@@ -3,9 +3,9 @@
  */
 
 /* api */
-import sinon from 'sinon';
-import { assert } from 'chai';
+import { strict as assert } from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'mocha';
+import sinon from 'sinon';
 import { createJsdom } from './mocha/setup.js';
 
 /* test */
@@ -41,8 +41,8 @@ describe('common', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.strictEqual(msg, 'error');
-      assert.isTrue(calledOnce);
-      assert.isFalse(res);
+      assert.strictEqual(calledOnce, true);
+      assert.strictEqual(res, false);
     });
 
     it('should log error message', () => {
@@ -55,8 +55,8 @@ describe('common', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.strictEqual(msg, 'error');
-      assert.isTrue(calledOnce);
-      assert.isFalse(res);
+      assert.strictEqual(calledOnce, true);
+      assert.strictEqual(res, false);
     });
   });
 
@@ -67,7 +67,7 @@ describe('common', () => {
       const stub = sinon.stub(console, 'error');
       const i = stub.callCount;
       const e = new Error('error');
-      assert.throws(() => func(e), 'error');
+      assert.throws(() => func(e), Error, 'error');
       assert.strictEqual(stub.callCount, i + 1, 'called');
       stub.restore();
     });
@@ -82,11 +82,11 @@ describe('common', () => {
         msg = m;
       });
       const res = func();
-      const { calledOnce } = stub;
+      const { called } = stub;
       stub.restore();
-      assert.isUndefined(msg);
-      assert.isFalse(calledOnce);
-      assert.isFalse(res);
+      assert.strictEqual(msg, undefined);
+      assert.strictEqual(called, false);
+      assert.strictEqual(res, false);
     });
 
     it('should log warn message', () => {
@@ -98,8 +98,8 @@ describe('common', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.strictEqual(msg, 'foo');
-      assert.isTrue(calledOnce);
-      assert.isFalse(res);
+      assert.strictEqual(calledOnce, true);
+      assert.strictEqual(res, false);
     });
   });
 
@@ -112,11 +112,11 @@ describe('common', () => {
         msg = m;
       });
       const res = func();
-      const { calledOnce } = stub;
+      const { called } = stub;
       stub.restore();
-      assert.isUndefined(msg);
-      assert.isFalse(calledOnce);
-      assert.isUndefined(res);
+      assert.strictEqual(msg, undefined);
+      assert.strictEqual(called, false);
+      assert.strictEqual(res, undefined);
     });
 
     it('should log message', () => {
@@ -128,7 +128,7 @@ describe('common', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.strictEqual(msg, 'foo');
-      assert.isTrue(calledOnce);
+      assert.strictEqual(calledOnce, true);
       assert.strictEqual(res, msg);
     });
   });
@@ -138,37 +138,37 @@ describe('common', () => {
 
     it('should get Array', () => {
       const res = func([]);
-      assert.deepEqual(res, 'Array');
+      assert.strictEqual(res, 'Array');
     });
 
     it('should get Object', () => {
       const res = func({});
-      assert.deepEqual(res, 'Object');
+      assert.strictEqual(res, 'Object');
     });
 
     it('should get String', () => {
       const res = func('');
-      assert.deepEqual(res, 'String');
+      assert.strictEqual(res, 'String');
     });
 
     it('should get Number', () => {
       const res = func(1);
-      assert.deepEqual(res, 'Number');
+      assert.strictEqual(res, 'Number');
     });
 
     it('should get Boolean', () => {
       const res = func(true);
-      assert.deepEqual(res, 'Boolean');
+      assert.strictEqual(res, 'Boolean');
     });
 
     it('should get Undefined', () => {
       const res = func();
-      assert.deepEqual(res, 'Undefined');
+      assert.strictEqual(res, 'Undefined');
     });
 
     it('should get Null', () => {
       const res = func(null);
-      assert.deepEqual(res, 'Null');
+      assert.strictEqual(res, 'Null');
     });
   });
 
@@ -178,14 +178,14 @@ describe('common', () => {
     it('should get false', () => {
       const items = [[], ['foo'], {}, { foo: 'bar' }, undefined, null, 1, true];
       for (const item of items) {
-        assert.isFalse(func(item));
+        assert.strictEqual(func(item), false);
       }
     });
 
     it('should get true', () => {
       const items = ['', 'foo'];
       for (const item of items) {
-        assert.isTrue(func(item));
+        assert.strictEqual(func(item), true);
       }
     });
   });
@@ -196,7 +196,7 @@ describe('common', () => {
     it('should get false', () => {
       const items = [{}, [], ['foo'], '', 'foo', undefined, null, 1, true];
       for (const item of items) {
-        assert.isFalse(func(item));
+        assert.strictEqual(func(item), false);
       }
     });
 
@@ -204,7 +204,7 @@ describe('common', () => {
       const item = {
         foo: 'bar'
       };
-      assert.isTrue(func(item));
+      assert.strictEqual(func(item), true);
     });
   });
 
@@ -221,12 +221,12 @@ describe('common', () => {
 
     it('should get null if 1st argument is not integer', async () => {
       const res = await func('foo');
-      assert.isNull(res);
+      assert.strictEqual(res, null);
     });
 
     it('should get null if 1st argument is not positive integer', async () => {
       const res = await func(-1);
-      assert.isNull(res);
+      assert.strictEqual(res, null);
     });
 
     it('should resolve', async () => {
@@ -250,24 +250,24 @@ describe('common', () => {
     const func = mjs.stringifyPositiveInt;
 
     it('should get null if no argument given', () => {
-      assert.isNull(func());
+      assert.strictEqual(func(), null);
     });
 
     it('should get null if given argument exceeds max safe integer', () => {
       const i = Number.MAX_SAFE_INTEGER + 1;
-      assert.isNull(func(i));
+      assert.strictEqual(func(i), null);
     });
 
     it('should get null if given argument is not positive integer', () => {
-      assert.isNull(func(''));
+      assert.strictEqual(func(''), null);
     });
 
     it('should get null if given argument is not positive integer', () => {
-      assert.isNull(func(-1));
+      assert.strictEqual(func(-1), null);
     });
 
     it('should get null if 1st argument is 0 but 2nd argument is falsy', () => {
-      assert.isNull(func(0));
+      assert.strictEqual(func(0), null);
     });
 
     it('should get string', () => {
