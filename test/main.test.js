@@ -11,16 +11,16 @@ import { browser, mockPort } from './mocha/setup.js';
 
 /* test */
 import {
-  CONTEXT_MENU, EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_EXEC,
-  EDITOR_FILE_NAME, EDITOR_LABEL, FILE_EXT_SELECT, FILE_EXT_SELECT_HTML,
-  FILE_EXT_SELECT_MD, FILE_EXT_SELECT_TXT, HOST, HOST_COMPAT, HOST_CONNECTION,
-  HOST_ERR_NOTIFY, HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST,
-  INFO_COLOR, INFO_TEXT, IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC,
-  LOCAL_FILE_VIEW, MENU_ENABLED, MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD,
-  MODE_EDIT_TXT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG,
-  ONLY_EDITABLE, OPTIONS_OPEN, PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL,
-  TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE, TMP_FILE_GET,
-  TMP_FILE_RES, WARN_COLOR, WARN_TEXT
+  CONTEXT_MENU, EDIT_HTML, EDIT_MD, EDIT_TXT, EDITOR_CONFIG_GET,
+  EDITOR_CONFIG_RES, EDITOR_EXEC, EDITOR_FILE_NAME, EDITOR_LABEL,
+  FILE_EXT_SELECT, FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD,
+  FILE_EXT_SELECT_TXT, HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
+  HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST, INFO_COLOR, INFO_TEXT,
+  IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC, LOCAL_FILE_VIEW, MENU_ENABLED,
+  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT, MODE_MATHML,
+  MODE_SELECTION, MODE_SOURCE, MODE_SVG, ONLY_EDITABLE, OPTIONS_OPEN,
+  PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
+  TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_RES, WARN_COLOR, WARN_TEXT
 } from '../src/mjs/constant.js';
 import * as mjs from '../src/mjs/main.js';
 
@@ -2684,6 +2684,87 @@ describe('main', () => {
       const res = await func(EDITOR_EXEC);
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.tabs.query.callCount, j + 1, 'called');
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.tabs.sendMessage.withArgs(2, {
+        info: {
+          menuItemId: MODE_EDIT_HTML
+        },
+        tab: {
+          id: 2
+        }
+      }).callCount;
+      const j = browser.tabs.query.callCount;
+      browser.tabs.sendMessage.resolves({});
+      browser.tabs.query.withArgs({
+        windowId: browser.windows.WINDOW_ID_CURRENT,
+        active: true,
+        windowType: 'normal'
+      }).resolves([{
+        id: 2,
+        windowId: 1
+      }]);
+      const res = await func(EDIT_HTML, {
+        id: 2
+      });
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.tabs.query.callCount, j, 'not called');
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.tabs.sendMessage.withArgs(2, {
+        info: {
+          menuItemId: MODE_EDIT_MD
+        },
+        tab: {
+          id: 2
+        }
+      }).callCount;
+      const j = browser.tabs.query.callCount;
+      browser.tabs.sendMessage.resolves({});
+      browser.tabs.query.withArgs({
+        windowId: browser.windows.WINDOW_ID_CURRENT,
+        active: true,
+        windowType: 'normal'
+      }).resolves([{
+        id: 2,
+        windowId: 1
+      }]);
+      const res = await func(EDIT_MD, {
+        id: 2
+      });
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.tabs.query.callCount, j, 'not called');
+      assert.deepEqual(res, {}, 'result');
+    });
+
+    it('should call function', async () => {
+      const i = browser.tabs.sendMessage.withArgs(2, {
+        info: {
+          menuItemId: MODE_EDIT_TXT
+        },
+        tab: {
+          id: 2
+        }
+      }).callCount;
+      const j = browser.tabs.query.callCount;
+      browser.tabs.sendMessage.resolves({});
+      browser.tabs.query.withArgs({
+        windowId: browser.windows.WINDOW_ID_CURRENT,
+        active: true,
+        windowType: 'normal'
+      }).resolves([{
+        id: 2,
+        windowId: 1
+      }]);
+      const res = await func(EDIT_TXT, {
+        id: 2
+      });
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
+      assert.strictEqual(browser.tabs.query.callCount, j, 'not called');
       assert.deepEqual(res, {}, 'result');
     });
   });

@@ -14,6 +14,15 @@
   "commandOpenOptions": {
     "message": "Open the options page"
   },
+  "commandEditHtml": {
+    "message": "Edit HTML"
+  },
+  "commandEditMarkdown": {
+    "message": "Edit Markdown"
+  },
+  "commandEditPlainText": {
+    "message": "Edit plain text"
+  },
   "hostConnection_false": {
     "message": "Disconnected"
   },
