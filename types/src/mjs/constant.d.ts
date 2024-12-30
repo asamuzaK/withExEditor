@@ -1,5 +1,8 @@
 export const CONTENT_GET: "getContent";
 export const CONTEXT_MENU: "contextMenu";
+export const EDIT_HTML: "editHtml";
+export const EDIT_MD: "editMarkdown";
+export const EDIT_TXT: "editPlainText";
 export const EDITOR_CONFIG_GET: "getEditorConfig";
 export const EDITOR_CONFIG_RES: "resEditorConfig";
 export const EDITOR_CONFIG_TS: "editorConfigTimestamp";
@@ -53,7 +56,7 @@ export const MODE_EDIT: "modeEditText";
 export const MODE_EDIT_EXT: "modeEditTextFileExtension";
 export const MODE_EDIT_HTML: "modeEditTextHtml";
 export const MODE_EDIT_MD: "modeEditTextMarkdown";
-export const MODE_EDIT_TXT: "modeEditTextPlaintext";
+export const MODE_EDIT_TXT: "modeEditTextPlainText";
 export const MODE_MATHML: "modeViewMathML";
 export const MODE_SELECTION: "modeViewSelection";
 export const MODE_SOURCE: "modeViewSource";

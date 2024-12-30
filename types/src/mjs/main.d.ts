@@ -18,7 +18,7 @@ export namespace menuItems {
         let placeholder_1: string;
         export { placeholder_1 as placeholder };
     }
-    namespace modeEditTextPlaintext {
+    namespace modeEditTextPlainText {
         export { MODE_EDIT_TXT as id };
         let contexts_2: string[];
         export { contexts_2 as contexts };
