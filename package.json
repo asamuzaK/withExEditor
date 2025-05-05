@@ -56,7 +56,7 @@
     "test:central": "c8 mocha --require=test/mocha/setup.js --channel=central --exit test/*.test.js",
     "test:esr": "c8 mocha --require=test/mocha/setup.js --channel=esr --exit test/*.test.js",
     "test:release": "c8 mocha --require=test/mocha/setup.js --channel=release --exit test/*.test.js",
-    "test_all": "npm-run-all -s test:*",
+    "testall": "npm-run-all -s test:*",
     "tsc": "node index clean --dir=types -i && npx tsc"
   },
   "version": "12.1.1"
