@@ -922,9 +922,9 @@ describe('content-main', () => {
         });
       const res = await func({});
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
@@ -968,9 +968,9 @@ describe('content-main', () => {
         });
       const res = await func();
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
@@ -987,9 +987,9 @@ describe('content-main', () => {
         mode: MODE_SOURCE
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
@@ -1001,11 +1001,11 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1018,13 +1018,13 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1036,11 +1036,11 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1053,13 +1053,13 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1071,11 +1071,11 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.html', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1088,13 +1088,13 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.html', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1106,11 +1106,11 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.md', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1123,13 +1123,13 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.md', 'value');
       assert.strictEqual(res.createTmpFile.namespaceURI,
         'http://www.w3.org/1999/xhtml', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1146,9 +1146,9 @@ describe('content-main', () => {
         mode: MODE_EDIT
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
@@ -1159,11 +1159,11 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.mml', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1174,11 +1174,11 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.svg', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1195,9 +1195,9 @@ describe('content-main', () => {
         mode: MODE_SVG
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
@@ -1208,11 +1208,11 @@ describe('content-main', () => {
         value: 'bar'
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.xml', 'value');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
@@ -1229,9 +1229,9 @@ describe('content-main', () => {
         mode: MODE_SELECTION
       });
       assert.strictEqual(
-        Object.prototype.hasOwnProperty.call(res, 'createTmpFile'), true,
+        Object.hasOwn(res, 'createTmpFile'), true,
         'prop');
-      assert.strictEqual(Object.prototype.hasOwnProperty.call(res, 'value'),
+      assert.strictEqual(Object.hasOwn(res, 'value'),
         true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });

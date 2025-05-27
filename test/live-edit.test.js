@@ -116,7 +116,7 @@ describe('live-edit', () => {
       for (const [key, value] of items) {
         assert.strictEqual(itemKeys.includes(key), true);
         assert.strictEqual(
-          Object.prototype.hasOwnProperty.call(value, 'className'), true);
+          Object.hasOwn(value, 'className'), true);
         assert.strictEqual(
           typeof value.className === 'string' || value.className === null,
           true);
@@ -124,7 +124,7 @@ describe('live-edit', () => {
         assert.strictEqual(typeof value.setContent, 'string');
         assert.strictEqual(typeof value.url, 'string');
         // optional keys
-        if (Object.prototype.hasOwnProperty.call(value, 'isIframe')) {
+        if (Object.hasOwn(value, 'isIframe')) {
           assert.strictEqual(typeof value.isIframe, 'boolean');
         }
       }
