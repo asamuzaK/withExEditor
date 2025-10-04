@@ -235,7 +235,7 @@ export const createIdData = elm => {
 /**
  * set temporary file data
  * @param {object} data - temporary file data
- * @returns {?Function} - set data ID
+ * @returns {object} - dataIds object, or null
  */
 export const setTmpFileData = (data = {}) => {
   const tmpFileData = data[TMP_FILE_CREATE];
@@ -252,7 +252,7 @@ export const setTmpFileData = (data = {}) => {
 /**
  * update temporary file data
  * @param {object} obj - temporary file data object
- * @returns {?Function} - set data ID
+ * @returns {object} - dataIds object, or null
  */
 export const updateTmpFileData = (obj = {}) => {
   const { data } = obj;
@@ -448,7 +448,7 @@ export const createTmpFileData = async (data = {}) => {
 
 /**
  * send message
- * @param {*} msg - message
+ * @param {string|object} msg - message
  * @returns {?Promise} - sendMessage()
  */
 export const sendMsg = async msg => {
@@ -1036,7 +1036,7 @@ export const syncText = (obj = {}) => {
 
 /**
  * handle message
- * @param {*} msg - message
+ * @param {string|object} msg - message
  * @returns {Promise.<Array>} - results of each handler
  */
 export const handleMsg = async msg => {
@@ -1106,7 +1106,7 @@ export const handleMsg = async msg => {
 /* runtime */
 /**
  * runtime on message
- * @param {*} msg - message
+ * @param {string|object} msg - message
  * @returns {Promise} - handleMsg();
  */
 export const runtimeOnMsg = msg => handleMsg(msg).catch(throwErr);

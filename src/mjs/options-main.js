@@ -21,7 +21,7 @@ const { i18n } = browser;
 
 /**
  * send message
- * @param {*} msg - message
+ * @param {string|object} msg - message
  * @returns {?Promise} - sendMessage()
  */
 export const sendMsg = async msg => {

@@ -546,7 +546,7 @@ export const extractEditorConfig = async (data = {}) => {
 /* application host */
 /**
  * post message to host
- * @param {*} msg - message
+ * @param {string|object} msg - message
  * @returns {Promise.<void>} - void
  */
 export const hostPostMsg = async msg => {
