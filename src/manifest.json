@@ -10,6 +10,9 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "jid1-WiAigu4HIo0Tag@jetpack",
+      "data_collection_permissions": {
+        "required": ["none"]
+      },
       "strict_min_version": "115.0"
     }
   },
