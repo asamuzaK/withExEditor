@@ -1,4 +1,4 @@
-export function sendMsg(msg: any): Promise<any> | null;
+export function sendMsg(msg: string | object): Promise<any> | null;
 export function getHostStatus(): Promise<any>;
 export function getEditorConfig(): Promise<any>;
 export function createPref(elm: object, executable?: boolean): Promise<object>;

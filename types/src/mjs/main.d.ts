@@ -84,7 +84,7 @@ export function handleConnectableTab(tab: object): Promise<any[]>;
 export function handleClickedMenu(info: object, tab: object): Promise<any> | null;
 export function sendTmpFileData(key: string, msg?: object): Promise<any> | null;
 export function extractEditorConfig(data?: object): Promise<any[]>;
-export function hostPostMsg(msg: any): Promise<void>;
+export function hostPostMsg(msg: string | object): Promise<void>;
 export function handleHostMsg(msg: object): Promise<any[]>;
 export function handleDisconnectedHost(port?: object): Promise<any[]>;
 export function handleHostOnDisconnect(port: object): Promise<any>;
