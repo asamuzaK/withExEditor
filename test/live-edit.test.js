@@ -9,7 +9,6 @@ import sinon from 'sinon';
 import { createJsdom, DataTransfer } from './mocha/setup.js';
 
 /* test */
-// eslint-disable-next-line import-x/order
 import liveEdit, * as mjs from '../src/mjs/live-edit.js';
 
 describe('live-edit', () => {
