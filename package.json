@@ -39,7 +39,7 @@
     "stylelint": "^17.4.0",
     "stylelint-config-standard": "^40.0.0",
     "typescript": "^5.9.3",
-    "undici": "^7.22.0"
+    "undici": "^7.24.1"
   },
   "overrides": {
     "c8": {
