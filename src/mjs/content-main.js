@@ -5,7 +5,7 @@
 /* shared */
 import '../lib/purify/purify.min.js';
 import {
-  parseURLSync, sanitizeURLSync
+  inspectURLSync, sanitizeURLSync
 } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import { sendMessage } from './browser.js';
 import { getType, isObjectNotEmpty, isString, throwErr } from './common.js';
@@ -152,7 +152,7 @@ export const getDataIdFromURI = (uri, subst = SUBST) => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
-  const { pathname, protocol } = parseURLSync(uri);
+  const { pathname, protocol } = inspectURLSync(uri);
   const schemeParts = protocol && protocol.replace(/:$/, '').split('+');
   const reg = /^.*\/((?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)(?:\.(?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)*$/;
   let dataId;
@@ -1066,7 +1066,9 @@ export const handleMsg = async msg => {
           if (urlItems?.length) {
             const arr = [];
             for (const item of urlItems) {
-              const url = sanitizeURLSync(item);
+              const url = sanitizeURLSync(item, {
+                revokeObjectURL: true
+              });
               if (url) {
                 arr.push(url);
               }
