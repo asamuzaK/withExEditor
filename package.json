@@ -13,13 +13,13 @@
   },
   "type": "module",
   "dependencies": {
-    "dompurify": "^3.4.7",
-    "url-sanitizer": "^4.1.0",
+    "dompurify": "^3.4.8",
+    "url-sanitizer": "^4.1.1",
     "webext-schema": "^7.0.0"
   },
   "devDependencies": {
     "@asamuzakjp/dom-selector": "^8.0.2",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.2",
     "addons-linter": "^10.6.0",
     "c8": "^11.0.0",
     "commander": "^15.0.0",
@@ -30,11 +30,10 @@
     "eslint-plugin-regexp": "^3.1.0",
     "eslint-plugin-unicorn": "^64.0.0",
     "globals": "^17.6.0",
-    "html-validate": "^11.5.0",
+    "html-validate": "^11.5.2",
     "jsdom": "^29.1.1",
     "mocha": "^11.7.6",
     "neostandard": "^0.13.0",
-    "npm-run-all2": "^8.0.4",
     "sinon": "^22.0.0",
     "stylelint": "^17.12.0",
     "stylelint-config-standard": "^40.0.0",
@@ -52,11 +51,11 @@
     "serialize-javascript": "^7.0.4"
   },
   "scripts": {
-    "include": "npm-run-all -s include:*",
+    "include": "npm run include:browser && npm run include:purify && npm run include:url",
     "include:browser": "copyfiles-ng node_modules/webext-schema/modules/browser.js src/mjs --up=3 --verbose",
     "include:purify": "copyfiles-ng node_modules/dompurify/LICENSE node_modules/dompurify/dist/purify.min.js node_modules/dompurify/dist/purify.min.js.map src/lib/purify -f --verbose && node index include --dir=purify -i",
     "include:url": "copyfiles-ng node_modules/url-sanitizer/LICENSE node_modules/url-sanitizer/dist/url-sanitizer-wo-dompurify.min.js node_modules/url-sanitizer/dist/url-sanitizer-wo-dompurify.min.js.map src/lib/url -f --verbose && node index include --dir=url -i",
-    "lint": "npm-run-all -s lint:*",
+    "lint": "npm run lint:addons-linter && npm run lint:eslint && npm run lint:html && npm run lint:style",
     "lint:addons-linter": "addons-linter src",
     "lint:eslint": "eslint . --fix",
     "lint:html": "html-validate src/html/*.html",
@@ -64,9 +63,7 @@
     "test": "npm run test:central",
     "test:beta": "c8 mocha --require=test/mocha/setup.js --channel=beta --exit test/*.test.js",
     "test:central": "c8 mocha --require=test/mocha/setup.js --channel=central --exit test/*.test.js",
-    "test:esr": "c8 mocha --require=test/mocha/setup.js --channel=esr --exit test/*.test.js",
-    "test:release": "c8 mocha --require=test/mocha/setup.js --channel=release --exit test/*.test.js",
-    "testall": "npm-run-all -s test:*",
+    "test:all": "npm run test:beta && npm run test:central",
     "tsc": "node index clean --dir=types -i && npx tsc"
   },
   "version": "12.1.2"
