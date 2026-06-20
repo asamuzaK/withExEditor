@@ -66,5 +66,5 @@
     "test:all": "npm run test:beta && npm run test:central",
     "tsc": "node index clean --dir=types -i && npx tsc"
   },
-  "version": "12.1.2"
+  "version": "12.1.4"
 }
