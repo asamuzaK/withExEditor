@@ -6,7 +6,9 @@
 import { strict as assert } from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
-import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
+import {
+  fetch as undiciFetch, getGlobalDispatcher, MockAgent, setGlobalDispatcher
+} from 'undici';
 import {
   browser, createJsdom, DataTransfer
 } from './mocha/setup.js';
@@ -900,15 +902,18 @@ describe('content-main', () => {
 
   describe('fetch file source and create temporary file data', () => {
     const func = mjs.fetchSource;
+    const originalFetch = globalThis.fetch;
     const globalDispatcher = getGlobalDispatcher();
     const mockAgent = new MockAgent();
     beforeEach(() => {
       setGlobalDispatcher(mockAgent);
       mockAgent.disableNetConnect();
+      globalThis.fetch = undiciFetch;
     });
     afterEach(() => {
       mockAgent.enableNetConnect();
       setGlobalDispatcher(globalDispatcher);
+      globalThis.fetch = originalFetch;
     });
 
     it('should get object', async () => {
@@ -946,15 +951,18 @@ describe('content-main', () => {
 
   describe('create temporary file data', () => {
     const func = mjs.createTmpFileData;
+    const originalFetch = globalThis.fetch;
     const globalDispatcher = getGlobalDispatcher();
     const mockAgent = new MockAgent();
     beforeEach(() => {
       setGlobalDispatcher(mockAgent);
       mockAgent.disableNetConnect();
+      globalThis.fetch = undiciFetch;
     });
     afterEach(() => {
       mockAgent.enableNetConnect();
       setGlobalDispatcher(globalDispatcher);
+      globalThis.fetch = originalFetch;
     });
 
     it('should get object', async () => {
@@ -2060,17 +2068,20 @@ describe('content-main', () => {
 
   describe('determine content process', () => {
     const func = mjs.determineContentProcess;
+    const originalFetch = globalThis.fetch;
     const globalDispatcher = getGlobalDispatcher();
     const mockAgent = new MockAgent();
     beforeEach(() => {
       setGlobalDispatcher(mockAgent);
       mockAgent.disableNetConnect();
       mjs.vars.contextNode = null;
+      globalThis.fetch = undiciFetch;
     });
     afterEach(() => {
       mockAgent.enableNetConnect();
       setGlobalDispatcher(globalDispatcher);
       mjs.vars.contextNode = null;
+      globalThis.fetch = originalFetch;
     });
 
     it('should call function', async () => {
@@ -3640,6 +3651,7 @@ describe('content-main', () => {
 
   describe('handle message', () => {
     const func = mjs.handleMsg;
+    const originalFetch = globalThis.fetch;
     const globalDispatcher = getGlobalDispatcher();
     const mockAgent = new MockAgent();
     beforeEach(() => {
@@ -3657,6 +3669,7 @@ describe('content-main', () => {
       mjs.vars.contextNode = null;
       delete mjs.vars.keyCtrlA.ctrlKey;
       delete mjs.vars.keyCtrlA.metaKey;
+      globalThis.fetch = undiciFetch;
     });
     afterEach(() => {
       mockAgent.enableNetConnect();
@@ -3673,6 +3686,7 @@ describe('content-main', () => {
       mjs.vars.contextNode = null;
       delete mjs.vars.keyCtrlA.ctrlKey;
       delete mjs.vars.keyCtrlA.metaKey;
+      globalThis.fetch = originalFetch;
     });
 
     it('should get empty array', async () => {

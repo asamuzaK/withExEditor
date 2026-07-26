@@ -5,7 +5,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
-import { MockAgent, getGlobalDispatcher, setGlobalDispatcher } from 'undici';
+import {
+  fetch as undiciFetch, MockAgent, getGlobalDispatcher, setGlobalDispatcher
+} from 'undici';
 
 /* test */
 import {
@@ -181,15 +183,18 @@ describe('createFile', () => {
 });
 
 describe('fetch text', () => {
+  const originalFetch = globalThis.fetch;
   const globalDispatcher = getGlobalDispatcher();
   const mockAgent = new MockAgent();
   beforeEach(() => {
     setGlobalDispatcher(mockAgent);
     mockAgent.disableNetConnect();
+    globalThis.fetch = undiciFetch;
   });
   afterEach(() => {
     mockAgent.enableNetConnect();
     setGlobalDispatcher(globalDispatcher);
+    globalThis.fetch = originalFetch;
   });
 
   it('should throw', async () => {
