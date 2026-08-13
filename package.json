@@ -14,40 +14,37 @@
   "type": "module",
   "dependencies": {
     "dompurify": "^3.4.13",
-    "url-sanitizer": "^4.2.1",
+    "url-sanitizer": "^4.2.2",
     "webext-schema": "^7.1.0"
   },
   "devDependencies": {
-    "@asamuzakjp/dom-selector": "^8.3.0",
-    "@types/node": "^26.1.1",
-    "addons-linter": "^10.9.0",
+    "@asamuzakjp/dom-selector": "^9.0.1",
+    "@types/node": "^26.2.0",
+    "addons-linter": "^10.10.0",
     "c8": "^12.0.0",
     "commander": "^15.0.0",
     "copyfiles-ng": "^2.4.7",
     "eslint": "^9.39.5",
-    "eslint-plugin-jsdoc": "^63.2.2",
+    "eslint-plugin-jsdoc": "^64.0.1",
     "eslint-plugin-no-unsanitized": "^4.1.5",
     "eslint-plugin-regexp": "^3.1.1",
     "eslint-plugin-unicorn": "^64.0.0",
-    "globals": "^17.7.0",
-    "html-validate": "^11.5.6",
-    "jsdom": "^29.1.1",
-    "mocha": "^11.7.6",
-    "neostandard": "^0.13.0",
+    "globals": "^17.9.0",
+    "html-validate": "^11.6.2",
+    "jsdom": "^30.0.1",
+    "mocha": "^11.8.0",
+    "neostandard": "^0.14.0-next",
     "sinon": "^22.1.0",
     "stylelint": "^17.14.1",
     "stylelint-config-standard": "^40.0.0",
     "typescript": "^7.0.2",
-    "undici": "^8.9.0"
+    "undici": "^8.10.0"
   },
   "overrides": {
-    "c8": {
-      "yargs": "^18.0.0"
-    },
     "mocha": {
-      "diff": "^8.0.3"
-    },
-    "serialize-javascript": "^7.0.4"
+      "diff": "^8.0.3",
+      "serialize-javascript": "^7.0.4"
+    }
   },
   "scripts": {
     "include": "npm run include:browser && npm run include:purify && npm run include:url",
