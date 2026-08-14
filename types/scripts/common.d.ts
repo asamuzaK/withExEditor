@@ -1,6 +1,6 @@
-export function throwErr(e: object): never;
-export function logErr(e: object): boolean;
-export function logWarn(msg: string): boolean;
-export function logMsg(msg: string): string;
-export function getType(o: object): string;
-export function isString(o: object): boolean;
+export declare const throwErr: (e: object) => never;
+export declare const logErr: (e: object) => boolean;
+export declare const logWarn: (msg: string) => boolean;
+export declare const logMsg: (msg: string) => string;
+export declare const getType: (o: object) => string;
+export declare const isString: (o: object) => boolean;

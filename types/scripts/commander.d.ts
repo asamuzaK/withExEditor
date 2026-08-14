@@ -1,7 +1,7 @@
-export function saveLibraryPackage(lib: any[], info: boolean): Promise<string>;
-export function extractLibraries(cmdOpts?: object): Promise<void>;
-export function includeLibraries(cmdOpts: object): Promise<any>;
-export function cleanDirectory(cmdOpts?: object): void;
-export function parseCommand(args: any[]): void;
-export { commander };
 import { program as commander } from 'commander';
+export declare const saveLibraryPackage: (lib: any[], info: boolean) => Promise<string>;
+export declare const extractLibraries: (cmdOpts?: object) => Promise<void>;
+export declare const includeLibraries: (cmdOpts: object) => Promise<any>;
+export declare const cleanDirectory: (cmdOpts?: object) => void;
+export declare const parseCommand: (args: any[]) => void;
+export { commander };
