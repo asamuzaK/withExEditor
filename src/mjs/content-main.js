@@ -5,7 +5,7 @@
 /* shared */
 import '../lib/purify/purify.min.js';
 import {
-  inspectURLSync, sanitizeURLSync
+  inspectURL, sanitizeURLSync
 } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import { sendMessage } from './browser.js';
 import { getType, isObjectNotEmpty, isString, throwErr } from './common.js';
@@ -146,13 +146,13 @@ export const getTargetElementFromDataId = dataId => {
  * get data ID from URI path
  * @param {string} uri - URI
  * @param {string} [subst] - substitute file name
- * @returns {string} - data ID
+ * @returns {Promise.<string>} - data ID
  */
-export const getDataIdFromURI = (uri, subst = SUBST) => {
+export const getDataIdFromURI = async (uri, subst = SUBST) => {
   if (!isString(uri)) {
     throw new TypeError(`Expected String but got ${getType(uri)}.`);
   }
-  const { pathname, protocol } = inspectURLSync(uri);
+  const { pathname, protocol } = await inspectURL(uri);
   const schemeParts = protocol && protocol.replace(/:$/, '').split('+');
   const reg = /^.*\/((?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)(?:\.(?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)*$/;
   let dataId;
@@ -315,7 +315,7 @@ export const fetchSource = async (data = {}) => {
     const [type] = res.headers.get('Content-Type').split(';');
     const extType = getFileExtension(type);
     const value = await res.text();
-    const dataId = getDataIdFromURI(uri, SUBST);
+    const dataId = await getDataIdFromURI(uri, SUBST);
     obj = {
       [TMP_FILE_CREATE]: {
         dataId, dir, extType, host, incognito, mode, tabId, windowId
@@ -403,7 +403,8 @@ export const createTmpFileData = async (data = {}) => {
       break;
     case MODE_MATHML:
     case MODE_SVG:
-      if (value && (dataId = getDataIdFromURI(uri, SUBST))) {
+      dataId = await getDataIdFromURI(uri, SUBST);
+      if (dataId && value) {
         tmpFileData = {
           [TMP_FILE_CREATE]: {
             extType: mode === MODE_MATHML ? '.mml' : '.svg',
@@ -420,7 +421,7 @@ export const createTmpFileData = async (data = {}) => {
       }
       break;
     case MODE_SELECTION:
-      dataId = getDataIdFromURI(uri, SUBST);
+      dataId = await getDataIdFromURI(uri, SUBST);
       if (dataId && value &&
           /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
         tmpFileData = {

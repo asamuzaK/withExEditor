@@ -440,42 +440,43 @@ describe('content-main', () => {
     const func = mjs.getDataIdFromURI;
 
     it('should throw', async () => {
-      assert.throws(() => func(), TypeError,
+      assert.rejects(() => func(), TypeError,
         'Expected String but got Undefined.');
     });
 
-    it('should get value', () => {
-      const res = func('https://example.com/foo');
+    it('should get value', async () => {
+      const res = await func('https://example.com/foo');
       assert.strictEqual(res, 'foo', 'result');
     });
 
-    it('should get value', () => {
-      const res = func('https://example.com/foo', 'bar');
+    it('should get value', async () => {
+      const res = await func('https://example.com/foo', 'bar');
       assert.strictEqual(res, 'foo', 'result');
     });
 
-    it('should get value', () => {
-      const res = func('https://example.com/', 'bar');
+    it('should get value', async () => {
+      const res = await func('https://example.com/', 'bar');
       assert.strictEqual(res, 'bar', 'result');
     });
 
-    it('should get value', () => {
-      const res = func('https://example.com/');
+    it('should get value', async () => {
+      const res = await func('https://example.com/');
       assert.strictEqual(res, 'index', 'result');
     });
 
-    it('should get value', () => {
-      const res = func('https://example.com/foo%20bar');
+    it('should get value', async () => {
+      const res = await func('https://example.com/foo%20bar');
       assert.strictEqual(res, 'foo bar', 'result');
     });
 
-    it('should get value', () => {
-      const res = func('data:image/svg+xml;utf8,<svg></svg>');
+    it('should get value', async () => {
+      const res = await func('data:image/svg+xml;utf8,<svg></svg>');
       assert.strictEqual(res, 'index', 'result');
     });
 
-    it('should get value', () => {
-      const res = func('data:,https://example.com/#<script>alert(1);</script>');
+    it('should get value', async () => {
+      const res =
+        await func('data:,https://example.com/#<script>alert(1);</script>');
       assert.strictEqual(res, 'index', 'result');
     });
   });
