@@ -2395,7 +2395,7 @@ describe('content-main', () => {
       assert.strictEqual(stubEvt.callCount, 3, 'called');
       assert.strictEqual(div.childNodes.length, 2, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
-      assert.strictEqual(div.firstChild.localName, 'div', 'name');
+      assert.strictEqual(div.firstChild.localName, 'p', 'name');
       assert.strictEqual(div.firstChild.textContent, 'foo', 'content');
       assert.strictEqual(div.lastChild.nodeType, 3, 'child');
       assert.strictEqual(div.lastChild.nodeValue, '\n', 'value');
@@ -2466,7 +2466,7 @@ describe('content-main', () => {
       assert.strictEqual(spy.callCount, 3, 'called');
       assert.strictEqual(div.childNodes.length, 4, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
-      assert.strictEqual(div.firstChild.localName, 'div', 'name');
+      assert.strictEqual(div.firstChild.localName, 'p', 'name');
       assert.strictEqual(div.firstChild.textContent, 'foo', 'content');
       assert.strictEqual(div.lastChild.nodeType, 3, 'child');
       assert.strictEqual(div.lastChild.nodeValue, '\n', 'value');
@@ -2549,7 +2549,7 @@ describe('content-main', () => {
       assert.strictEqual(spy.callCount, 3, 'called');
       assert.strictEqual(div.childNodes.length, 2, 'length');
       assert.strictEqual(div.firstChild.nodeType, 1, 'child');
-      assert.strictEqual(div.firstChild.localName, 'div', 'name');
+      assert.strictEqual(div.firstChild.localName, 'p', 'name');
       assert.strictEqual(div.firstChild.textContent, 'foo', 'content');
       assert.strictEqual(div.lastChild.nodeType, 3, 'child');
       assert.strictEqual(div.lastChild.nodeValue, '\n', 'value');

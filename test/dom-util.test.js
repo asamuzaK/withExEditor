@@ -4,7 +4,6 @@
 
 /* api */
 import { strict as assert } from 'node:assert';
-import { DOMSelector } from '@asamuzakjp/dom-selector';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
 import { createJsdom, DataTransfer } from './mocha/setup.js';
@@ -63,21 +62,7 @@ describe('dom util', () => {
   beforeEach(() => {
     const dom = createJsdom();
     window = dom && dom.window;
-    const domSelector = new DOMSelector(window);
-    // Overwrite Element.matches(), Element.closest()
-    const matches = domSelector.matches.bind(domSelector);
-    window.Element.prototype.matches = function (sel) {
-      return matches(sel, this);
-    };
-    const closest = domSelector.closest.bind(domSelector);
-    window.Element.prototype.closest = function (sel) {
-      return closest(sel, this);
-    };
     document = window && window.document;
-    if (typeof document.queryCommandValue !== 'function') {
-      document.queryCommandValue =
-        sinon.stub().withArgs('defaultParagraphSeparator').returns('div');
-    }
     global.window = window;
     global.document = document;
     for (const key of globalKeys) {
@@ -2058,35 +2043,25 @@ describe('dom util', () => {
       const dom = createJsdom('file:///foo/bar');
       window = dom.window;
       document = window.document;
-      if (typeof document.queryCommandValue !== 'function') {
-        document.queryCommandValue =
-          sinon.stub().withArgs('defaultParagraphSeparator').returns(undefined);
-      }
       global.window = window;
       global.document = document;
       const res = func('foo\nbar baz\n\nqux');
       assert.strictEqual(res.nodeType, 11, 'nodeType');
-      assert.strictEqual(res.childNodes.length, 10, 'length');
-      assert.strictEqual(res.childNodes[0].nodeType, 3, 'contentType');
-      assert.strictEqual(res.childNodes[0].nodeValue, 'foo', 'value');
-      assert.strictEqual(res.childNodes[1].nodeType, 1, 'contentType');
-      assert.strictEqual(res.childNodes[1].localName, 'br', 'value');
-      assert.strictEqual(res.childNodes[2].nodeType, 3, 'contentType');
-      assert.strictEqual(res.childNodes[2].nodeValue, '\n', 'value');
+      assert.strictEqual(res.childNodes.length, 7, 'length');
+      assert.strictEqual(res.childNodes[0].nodeType, 1, 'contentType');
+      assert.strictEqual(res.childNodes[0].textContent, 'foo', 'value');
+      assert.strictEqual(res.childNodes[1].nodeType, 3, 'contentType');
+      assert.strictEqual(res.childNodes[1].nodeValue, '\n', 'value');
+      assert.strictEqual(res.childNodes[2].nodeType, 1, 'contentType');
+      assert.strictEqual(res.childNodes[2].textContent, 'bar baz', 'value');
       assert.strictEqual(res.childNodes[3].nodeType, 3, 'contentType');
-      assert.strictEqual(res.childNodes[3].textContent, 'bar baz', 'value');
+      assert.strictEqual(res.childNodes[3].nodeValue, '\n', 'value');
       assert.strictEqual(res.childNodes[4].nodeType, 1, 'contentType');
-      assert.strictEqual(res.childNodes[4].localName, 'br', 'value');
+      assert.strictEqual(res.childNodes[4].firstChild.localName, 'br', 'value');
       assert.strictEqual(res.childNodes[5].nodeType, 3, 'contentType');
       assert.strictEqual(res.childNodes[5].nodeValue, '\n', 'value');
       assert.strictEqual(res.childNodes[6].nodeType, 1, 'contentType');
-      assert.strictEqual(res.childNodes[6].localName, 'br', 'value');
-      assert.strictEqual(res.childNodes[7].nodeType, 1, 'contentType');
-      assert.strictEqual(res.childNodes[7].localName, 'br', 'value');
-      assert.strictEqual(res.childNodes[8].nodeType, 3, 'contentType');
-      assert.strictEqual(res.childNodes[8].nodeValue, '\n', 'value');
-      assert.strictEqual(res.childNodes[9].nodeType, 3, 'contentType');
-      assert.strictEqual(res.childNodes[9].nodeValue, 'qux', 'value');
+      assert.strictEqual(res.childNodes[6].textContent, 'qux', 'value');
     });
 
     it('should get content', () => {
