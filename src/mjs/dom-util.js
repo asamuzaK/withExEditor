@@ -622,8 +622,7 @@ export const createParagraphedContent = (value, ns = nsHtml) => {
       frag.appendChild(document.createTextNode('\n'));
     }
   } else {
-    let i = 0;
-    while (i < l) {
+    for (let i = 0; i < l; i++) {
       const text = arr[i];
       if (ns === nsHtml) {
         const elm = document.createElementNS(ns, 'p');
@@ -644,7 +643,6 @@ export const createParagraphedContent = (value, ns = nsHtml) => {
       if (i < l - 1) {
         frag.appendChild(document.createTextNode('\n'));
       }
-      i++;
     }
   }
   return frag;
