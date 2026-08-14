@@ -622,33 +622,19 @@ export const createParagraphedContent = (value, ns = nsHtml) => {
       frag.appendChild(document.createTextNode('\n'));
     }
   } else {
-    const sep = document.queryCommandValue('defaultParagraphSeparator');
     let i = 0;
     while (i < l) {
       const text = arr[i];
       if (ns === nsHtml) {
-        if (sep === 'div' || sep === 'p') {
-          const elm = document.createElementNS(ns, sep);
-          if (text) {
-            elm.appendChild(document.createTextNode(text));
-          } else if (i < l - 1) {
-            const br = document.createElementNS(ns, 'br');
-            elm.appendChild(br);
-          }
-          if (elm.hasChildNodes()) {
-            frag.appendChild(elm);
-          }
-        } else {
-          if (text) {
-            frag.appendChild(document.createTextNode(text));
-          } else {
-            const br = document.createElementNS(ns, 'br');
-            frag.appendChild(br);
-          }
-          if (i < l - 1) {
-            const br = document.createElementNS(ns, 'br');
-            frag.appendChild(br);
-          }
+        const elm = document.createElementNS(ns, 'p');
+        if (text) {
+          elm.appendChild(document.createTextNode(text));
+        } else if (i < l - 1) {
+          const br = document.createElementNS(ns, 'br');
+          elm.appendChild(br);
+        }
+        if (elm.hasChildNodes()) {
+          frag.appendChild(elm);
         }
       } else if (text) {
         frag.appendChild(document.createTextNode(text));
