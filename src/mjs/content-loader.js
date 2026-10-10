@@ -4,7 +4,10 @@
 
 /* shared */
 import {
-  handleBeforeContextMenu, handleKeyDown, handleReadyState, runtimeOnMsg,
+  handleBeforeContextMenu,
+  handleKeyDown,
+  handleReadyState,
+  runtimeOnMsg,
   startup
 } from './content-main.js';
 

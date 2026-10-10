@@ -8,7 +8,9 @@ import { describe, it } from 'mocha';
 
 /* test */
 import nsUri, {
-  html as nsHtml, math as nsMath, svg as nsSvg
+  html as nsHtml,
+  math as nsMath,
+  svg as nsSvg
 } from '../src/mjs/ns-uri.js';
 
 describe('ns-uri', () => {

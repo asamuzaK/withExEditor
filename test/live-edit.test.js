@@ -14,9 +14,20 @@ import liveEdit, * as mjs from '../src/mjs/live-edit.js';
 describe('live-edit', () => {
   let window, document;
   const globalKeys = [
-    'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'Event',
-    'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
-    'KeyboardEvent', 'Node', 'NodeList', 'Selection', 'StaticRange',
+    'ClipboardEvent',
+    'DataTransfer',
+    'DOMTokenList',
+    'DOMParser',
+    'Event',
+    'FocusEvent',
+    'Headers',
+    'HTMLUnknownElement',
+    'InputEvent',
+    'KeyboardEvent',
+    'Node',
+    'NodeList',
+    'Selection',
+    'StaticRange',
     'XMLSerializer'
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
@@ -64,8 +75,10 @@ describe('live-edit', () => {
     window = dom && dom.window;
     document = window && window.document;
     if (typeof document.queryCommandValue !== 'function') {
-      document.queryCommandValue =
-        sinon.stub().withArgs('defaultParagraphSeparator').returns('div');
+      document.queryCommandValue = sinon
+        .stub()
+        .withArgs('defaultParagraphSeparator')
+        .returns('div');
     }
     global.window = window;
     global.document = document;
@@ -73,10 +86,13 @@ describe('live-edit', () => {
       // Not implemented in jsdom
       if (key === 'InputEvent') {
         if (typeof window.InputEvent.prototype.getTargetRanges !== 'function') {
-          Object.defineProperty(window.InputEvent.prototype,
-            'getTargetRanges', {
+          Object.defineProperty(
+            window.InputEvent.prototype,
+            'getTargetRanges',
+            {
               value: sinon.stub()
-            });
+            }
+          );
         }
         if (typeof window.InputEvent.prototype.dataTransfer === 'undefined') {
           window.InputEvent.prototype.dataTransfer = new DataTransfer();
@@ -114,11 +130,11 @@ describe('live-edit', () => {
       const items = Object.entries(liveEdit);
       for (const [key, value] of items) {
         assert.strictEqual(itemKeys.includes(key), true);
-        assert.strictEqual(
-          Object.hasOwn(value, 'className'), true);
+        assert.strictEqual(Object.hasOwn(value, 'className'), true);
         assert.strictEqual(
           typeof value.className === 'string' || value.className === null,
-          true);
+          true
+        );
         assert.strictEqual(typeof value.getContent, 'string');
         assert.strictEqual(typeof value.setContent, 'string');
         assert.strictEqual(typeof value.url, 'string');
@@ -411,8 +427,11 @@ describe('live-edit', () => {
       div.appendChild(sec);
       body.appendChild(div);
       const res = func(body, 'codeMirror');
-      assert.strictEqual(res, 'foo bar\n\nbaz qux\n\nquux\n\ncorge\n\n',
-        'result');
+      assert.strictEqual(
+        res,
+        'foo bar\n\nbaz qux\n\nquux\n\ncorge\n\n',
+        'result'
+      );
     });
 
     it('should get result', () => {
@@ -443,8 +462,7 @@ describe('live-edit', () => {
       div.appendChild(sec);
       body.appendChild(div);
       const res = func(body, 'codeMirror');
-      assert.strictEqual(res, 'foo bar\n\nbaz qux\nquux\ncorge\n\n',
-        'result');
+      assert.strictEqual(res, 'foo bar\n\nbaz qux\nquux\ncorge\n\n', 'result');
     });
   });
 });

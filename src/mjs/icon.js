@@ -19,11 +19,13 @@ export const icon = new Map();
 export const setIconBadge = async (opt = {}) => {
   const { color, text } = opt;
   const func = [];
-  if (color &&
-      (isString(color) ||
-       (Array.isArray(color) &&
+  if (
+    color &&
+    (isString(color) ||
+      (Array.isArray(color) &&
         color.every(i => Number.isInteger(i) && i >= 0 && i <= 255))) &&
-      isString(text)) {
+    isString(text)
+  ) {
     func.push(
       action.setBadgeBackgroundColor({ color }),
       action.setBadgeText({ text })

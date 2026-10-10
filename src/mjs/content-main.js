@@ -5,31 +5,71 @@
 /* shared */
 import '../lib/purify/purify.min.js';
 import {
-  inspectURL, sanitizeURLSync
+  inspectURL,
+  sanitizeURLSync
 } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import { sendMessage } from './browser.js';
 import { getType, isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
-  dispatchClipboardEvent, dispatchEvent, dispatchFocusEvent, dispatchInputEvent,
+  dispatchClipboardEvent,
+  dispatchEvent,
+  dispatchFocusEvent,
+  dispatchInputEvent,
   dispatchKeyboardEvent
 } from './dom-event.js';
 import {
-  createParagraphedContent, createDomStringFromSelectionRange,
-  createXmlBasedDomString, getAncestorId, getEditableElm, getFileExtension,
-  getNodeNS, getText, isContentTextNode, isEditControl, matchDocUrl,
+  createParagraphedContent,
+  createDomStringFromSelectionRange,
+  createXmlBasedDomString,
+  getAncestorId,
+  getEditableElm,
+  getFileExtension,
+  getNodeNS,
+  getText,
+  isContentTextNode,
+  isEditControl,
+  matchDocUrl,
   serializeDomString
 } from './dom-util.js';
 import liveEdit, {
-  getLiveEditContent, getLiveEditElement, getLiveEditKey
+  getLiveEditContent,
+  getLiveEditElement,
+  getLiveEditKey
 } from './live-edit.js';
 import { html as nsHtml, math as nsMath, svg as nsSvg } from './ns-uri.js';
 import {
-  CONTENT_GET, CONTEXT_MENU, ID_TAB, ID_WIN, IS_CONNECTABLE, IS_MAC, INCOGNITO,
-  LABEL, LOCAL_FILE_VIEW, MIME_HTML, MIME_PLAIN, MODE_EDIT, MODE_EDIT_HTML,
-  MODE_EDIT_MD, MODE_EDIT_TXT, MODE_MATHML, MODE_SELECTION, MODE_SOURCE,
-  MODE_SVG, ONLY_EDITABLE, SUBST, SYNC_AUTO, SYNC_AUTO_URL, TMP_FILES,
-  TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT, TMP_FILE_DATA_REMOVE,
-  TMP_FILE_GET, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
+  CONTENT_GET,
+  CONTEXT_MENU,
+  ID_TAB,
+  ID_WIN,
+  IS_CONNECTABLE,
+  IS_MAC,
+  INCOGNITO,
+  LABEL,
+  LOCAL_FILE_VIEW,
+  MIME_HTML,
+  MIME_PLAIN,
+  MODE_EDIT,
+  MODE_EDIT_HTML,
+  MODE_EDIT_MD,
+  MODE_EDIT_TXT,
+  MODE_MATHML,
+  MODE_SELECTION,
+  MODE_SOURCE,
+  MODE_SVG,
+  ONLY_EDITABLE,
+  SUBST,
+  SYNC_AUTO,
+  SYNC_AUTO_URL,
+  TMP_FILES,
+  TMP_FILES_PB,
+  TMP_FILE_CREATE,
+  TMP_FILE_DATA_PORT,
+  TMP_FILE_DATA_REMOVE,
+  TMP_FILE_GET,
+  TMP_FILE_REQ,
+  TMP_FILE_RES,
+  VARS_SET
 } from './constant.js';
 
 /* constants */
@@ -154,10 +194,15 @@ export const getDataIdFromURI = async (uri, subst = SUBST) => {
   }
   const { pathname, protocol } = await inspectURL(uri);
   const schemeParts = protocol && protocol.replace(/:$/, '').split('+');
-  const reg = /^.*\/((?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)(?:\.(?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)*$/;
+  const reg =
+    /^.*\/((?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)(?:\.(?:[\w\x27~!$&()*+,;=:@-]|%[\dA-F]{2})+)*$/;
   let dataId;
-  if (schemeParts && schemeParts.every(s => !/^(?:blob|data)$/.test(s)) &&
-      pathname && reg.test(pathname)) {
+  if (
+    schemeParts &&
+    schemeParts.every(s => !/^(?:blob|data)$/.test(s)) &&
+    pathname &&
+    reg.test(pathname)
+  ) {
     const [, fileName] = reg.exec(pathname);
     dataId = decodeURIComponent(fileName);
   }
@@ -223,7 +268,11 @@ export const createIdData = elm => {
           ? `${ancestorId}_${targetElm}_${queryIndex}`
           : `${rootLocalName}_${targetElm}_${queryIndex}`;
         data = {
-          ancestorId, localName, prefix, queryIndex, dataId
+          ancestorId,
+          localName,
+          prefix,
+          queryIndex,
+          dataId
         };
       }
     }
@@ -276,8 +325,11 @@ export const removeTmpFileData = (obj = {}) => {
   let res;
   if (data) {
     const { dataId, tabId, timestamp } = data;
-    if (dataId && tabId === vars[ID_TAB] &&
-        timestamp === FILE_NOT_FOUND_TIMESTAMP) {
+    if (
+      dataId &&
+      tabId === vars[ID_TAB] &&
+      timestamp === FILE_NOT_FOUND_TIMESTAMP
+    ) {
       res = dataIds.delete(dataId);
     }
   }
@@ -291,7 +343,10 @@ export const removeTmpFileData = (obj = {}) => {
  */
 export const fetchSource = async (data = {}) => {
   const {
-    characterSet, contentType, documentURI: uri, location: { protocol }
+    characterSet,
+    contentType,
+    documentURI: uri,
+    location: { protocol }
   } = document;
   let obj;
   if (protocol === 'file:') {
@@ -318,7 +373,14 @@ export const fetchSource = async (data = {}) => {
     const dataId = await getDataIdFromURI(uri, SUBST);
     obj = {
       [TMP_FILE_CREATE]: {
-        dataId, dir, extType, host, incognito, mode, tabId, windowId
+        dataId,
+        dir,
+        extType,
+        host,
+        incognito,
+        mode,
+        tabId,
+        windowId
       },
       value
     };
@@ -334,7 +396,15 @@ export const fetchSource = async (data = {}) => {
 export const createTmpFileData = async (data = {}) => {
   const { contentType, documentURI: uri } = document;
   const {
-    dir, host, incognito, liveEditKey, mode, syncAuto, tabId, value, windowId
+    dir,
+    host,
+    incognito,
+    liveEditKey,
+    mode,
+    syncAuto,
+    tabId,
+    value,
+    windowId
   } = data;
   let { dataId, namespaceURI } = data;
   let tmpFileData;
@@ -422,8 +492,13 @@ export const createTmpFileData = async (data = {}) => {
       break;
     case MODE_SELECTION:
       dataId = await getDataIdFromURI(uri, SUBST);
-      if (dataId && value &&
-          /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(contentType)) {
+      if (
+        dataId &&
+        value &&
+        /^(?:(?:application\/(?:[\w\-.]+\+)?|image\/[\w\-.]+\+)x|text\/(?:ht|x))ml$/.test(
+          contentType
+        )
+      ) {
         tmpFileData = {
           [TMP_FILE_CREATE]: {
             extType: '.xml',
@@ -472,9 +547,11 @@ export const sendEachDataId = async (bool = false) => {
       const { controls } = value;
       const elm = getTargetElementFromDataId(key);
       if (elm && !controls) {
-        func.push(sendMsg({
-          [TMP_FILE_GET]: value
-        }));
+        func.push(
+          sendMsg({
+            [TMP_FILE_GET]: value
+          })
+        );
       }
     });
   }
@@ -635,8 +712,11 @@ export const createContentData = async (elm, mode) => {
             data.namespaceURI = getNodeNS(elm).namespaceURI;
             setDataIdController(elm, dataId);
           }
-          if (!vars[INCOGNITO] && vars[SYNC_AUTO] &&
-              isString(vars[SYNC_AUTO_URL])) {
+          if (
+            !vars[INCOGNITO] &&
+            vars[SYNC_AUTO] &&
+            isString(vars[SYNC_AUTO_URL])
+          ) {
             data.syncAuto = matchDocUrl(vars[SYNC_AUTO_URL].split(/\r?\n/));
           }
         }
@@ -700,10 +780,7 @@ export const sendContent = async (elm, mode) => {
   const func = [];
   if (elm?.nodeType === Node.ELEMENT_NODE) {
     const data = await createContentData(elm, mode).then(createTmpFileData);
-    func.push(
-      createContentDataMsg(data).then(sendMsg),
-      setTmpFileData(data)
-    );
+    func.push(createContentDataMsg(data).then(sendMsg), setTmpFileData(data));
   }
   return Promise.all(func);
 };
@@ -714,20 +791,22 @@ export const sendContent = async (elm, mode) => {
  * @returns {string} - context mode
  */
 export const getContextMode = elm => {
-  const {
-    anchorNode, focusNode, isCollapsed, rangeCount
-  } = document.getSelection();
+  const { anchorNode, focusNode, isCollapsed, rangeCount } =
+    document.getSelection();
   let mode = MODE_SOURCE;
   if (elm) {
-    elm = (!isCollapsed &&
-           ((anchorNode.nodeType === Node.TEXT_NODE && anchorNode.parentNode) ||
-            (focusNode.nodeType === Node.TEXT_NODE && focusNode.parentNode))) ||
-          elm;
-    if ((elm.isContentEditable || isEditControl(elm) ||
-         isContentTextNode(elm)) &&
-        (isCollapsed ||
-         (rangeCount && anchorNode.parentNode === focusNode.parentNode &&
-          elm !== document.documentElement))) {
+    elm =
+      (!isCollapsed &&
+        ((anchorNode.nodeType === Node.TEXT_NODE && anchorNode.parentNode) ||
+          (focusNode.nodeType === Node.TEXT_NODE && focusNode.parentNode))) ||
+      elm;
+    if (
+      (elm.isContentEditable || isEditControl(elm) || isContentTextNode(elm)) &&
+      (isCollapsed ||
+        (rangeCount &&
+          anchorNode.parentNode === focusNode.parentNode &&
+          elm !== document.documentElement))
+    ) {
       mode = MODE_EDIT;
     } else if (isCollapsed) {
       if (elm.namespaceURI === nsMath) {
@@ -754,8 +833,10 @@ export const determineContentProcess = (obj = {}) => {
   let mode;
   if (info) {
     const { menuItemId } = info;
-    mode = (menuItemId !== MODE_SOURCE && menuItemId) || vars.contextMode ||
-           (isTop && MODE_SOURCE);
+    mode =
+      (menuItemId !== MODE_SOURCE && menuItemId) ||
+      vars.contextMode ||
+      (isTop && MODE_SOURCE);
   } else {
     mode = getContextMode(elm);
   }
@@ -773,15 +854,15 @@ export const createReplacingContent = (node, opt = {}) => {
   const frag = document.createDocumentFragment();
   if (node?.nodeType === Node.ELEMENT_NODE) {
     const { controlledBy, domstr, namespaceURI, value } = opt;
-    const ctrl = controlledBy && isString(controlledBy) &&
-                 getTargetElementFromDataId(controlledBy);
+    const ctrl =
+      controlledBy &&
+      isString(controlledBy) &&
+      getTargetElementFromDataId(controlledBy);
     if (!ctrl || ctrl === node) {
       if (domstr && isString(domstr)) {
         const dom = new DOMParser().parseFromString(domstr, MIME_HTML);
         const {
-          body: {
-            childNodes
-          }
+          body: { childNodes }
         } = dom;
         for (const child of childNodes) {
           frag.appendChild(child.cloneNode(true));
@@ -805,18 +886,28 @@ export const createReplacingContent = (node, opt = {}) => {
  */
 export const replaceEditableContent = (node, opt = {}) => {
   const { controlledBy, dataId, namespaceURI, value } = opt;
-  if (node?.nodeType === Node.ELEMENT_NODE &&
-      dataIds.has(dataId) && isString(value)) {
-    const changed = value !== node.textContent.replace(/^\s*/, '')
-      .replace(/\n +/g, '\n').replace(/([^\n])$/, (m, c) => `${c}\n`);
+  if (
+    node?.nodeType === Node.ELEMENT_NODE &&
+    dataIds.has(dataId) &&
+    isString(value)
+  ) {
+    const changed =
+      value !==
+      node.textContent
+        .replace(/^\s*/, '')
+        .replace(/\n +/g, '\n')
+        .replace(/([^\n])$/, (m, c) => `${c}\n`);
     const data = dataIds.get(dataId);
     if (changed && !data.mutex) {
       const sel = node.ownerDocument.getSelection();
       const dataTransfer = new DataTransfer();
       const doctype = new XMLSerializer().serializeToString(document.doctype);
       const dataValue = value.replace(/\u200B/g, '');
-      const domstr =
-        serializeDomString(`${doctype}${dataValue}`, MIME_HTML, true);
+      const domstr = serializeDomString(
+        `${doctype}${dataValue}`,
+        MIME_HTML,
+        true
+      );
       data.mutex = true;
       setDataId(dataId, data);
       sel.selectAllChildren(node);
@@ -835,11 +926,13 @@ export const replaceEditableContent = (node, opt = {}) => {
         composed: true
       });
       if (proceed) {
-        const {
-          endContainer, endOffset, startContainer, startOffset
-        } = sel.getRangeAt(0);
+        const { endContainer, endOffset, startContainer, startOffset } =
+          sel.getRangeAt(0);
         const insertTarget = new StaticRange({
-          endContainer, endOffset, startContainer, startOffset
+          endContainer,
+          endOffset,
+          startContainer,
+          startOffset
         });
         proceed = dispatchInputEvent(node, 'beforeinput', {
           dataTransfer,
@@ -890,9 +983,12 @@ export const replaceEditableContent = (node, opt = {}) => {
  */
 export const replaceEditControlValue = (elm, opt = {}) => {
   const { dataId, value } = opt;
-  if (elm?.nodeType === Node.ELEMENT_NODE &&
-      /^(?:input|textarea)$/.test(elm.localName) &&
-      dataIds.has(dataId) && isString(value)) {
+  if (
+    elm?.nodeType === Node.ELEMENT_NODE &&
+    /^(?:input|textarea)$/.test(elm.localName) &&
+    dataIds.has(dataId) &&
+    isString(value)
+  ) {
     const data = dataIds.get(dataId);
     let dataValue = value.replace(/\u200B/g, '');
     if (/^input$/.test(elm.localName)) {
@@ -934,8 +1030,12 @@ export const replaceEditControlValue = (elm, opt = {}) => {
  */
 export const replaceLiveEditContent = (elm, opt = {}) => {
   const { dataId, liveEditKey, value } = opt;
-  if (elm?.nodeType === Node.ELEMENT_NODE &&
-      dataIds.has(dataId) && liveEdit[liveEditKey] && isString(value)) {
+  if (
+    elm?.nodeType === Node.ELEMENT_NODE &&
+    dataIds.has(dataId) &&
+    liveEdit[liveEditKey] &&
+    isString(value)
+  ) {
     const { isIframe, setContent } = liveEdit[liveEditKey];
     const data = dataIds.get(dataId);
     let liveElm;
@@ -992,7 +1092,12 @@ export const syncText = (obj = {}) => {
   const func = [];
   if (isObjectNotEmpty(data)) {
     const {
-      controlledBy, dataId, lastUpdate, liveEditKey, namespaceURI, tabId,
+      controlledBy,
+      dataId,
+      lastUpdate,
+      liveEditKey,
+      namespaceURI,
+      tabId,
       timestamp
     } = data;
     if (dataId && tabId === vars[ID_TAB]) {
@@ -1003,29 +1108,42 @@ export const syncText = (obj = {}) => {
         } else {
           const storedData = dataIds.get(dataId);
           const mutex = storedData?.mutex;
-          const isUpdated = !lastUpdate ||
-                            (Number.isInteger(timestamp) &&
-                             Number.isInteger(lastUpdate) &&
-                             timestamp > lastUpdate);
+          const isUpdated =
+            !lastUpdate ||
+            (Number.isInteger(timestamp) &&
+              Number.isInteger(lastUpdate) &&
+              timestamp > lastUpdate);
           if (!mutex && isUpdated) {
             const ctrl =
               controlledBy && getTargetElementFromDataId(controlledBy);
             data.lastUpdate = timestamp;
             if (liveEdit[liveEditKey]) {
               setDataId(dataId, data);
-              func.push(replaceLiveEditContent(elm, {
-                dataId, liveEditKey, value
-              }));
+              func.push(
+                replaceLiveEditContent(elm, {
+                  dataId,
+                  liveEditKey,
+                  value
+                })
+              );
             } else if (ctrl || elm.isContentEditable) {
               setDataId(dataId, data);
-              func.push(replaceEditableContent(elm, {
-                controlledBy, dataId, namespaceURI, value
-              }));
+              func.push(
+                replaceEditableContent(elm, {
+                  controlledBy,
+                  dataId,
+                  namespaceURI,
+                  value
+                })
+              );
             } else if (/^(?:input|textarea)$/.test(elm.localName)) {
               setDataId(dataId, data);
-              func.push(replaceEditControlValue(elm, {
-                dataId, value
-              }));
+              func.push(
+                replaceEditControlValue(elm, {
+                  dataId,
+                  value
+                })
+              );
             }
           }
         }
@@ -1137,12 +1255,17 @@ export const startup = () => sendTabStatus().catch(throwErr);
 export const handleBeforeContextMenu = evt => {
   const { button, key, shiftKey, target } = evt;
   let func;
-  if (button === MOUSE_BUTTON_RIGHT || key === 'ContextMenu' ||
-      (shiftKey && key === 'F10')) {
+  if (
+    button === MOUSE_BUTTON_RIGHT ||
+    key === 'ContextMenu' ||
+    (shiftKey && key === 'F10')
+  ) {
     const { localName, namespaceURI, type } = target;
     const { anchorNode, focusNode, isCollapsed } = document.getSelection();
-    const mode = (namespaceURI === nsMath && MODE_MATHML) ||
-                 (namespaceURI === nsSvg && MODE_SVG) || MODE_SOURCE;
+    const mode =
+      (namespaceURI === nsMath && MODE_MATHML) ||
+      (namespaceURI === nsSvg && MODE_SVG) ||
+      MODE_SOURCE;
     const isChildNodeText = isContentTextNode(target);
     const editableElm = getEditableElm(target);
     const liveEditElm = getLiveEditElement(target);
@@ -1151,8 +1274,11 @@ export const handleBeforeContextMenu = evt => {
     if (localName === 'input') {
       enabled = !type || /^(?:(?:emai|te|ur)l|search|text)$/.test(type);
     } else {
-      enabled = isCollapsed || !!liveEditElm || !!editableElm ||
-                anchorNode.parentNode === focusNode.parentNode;
+      enabled =
+        isCollapsed ||
+        !!liveEditElm ||
+        !!editableElm ||
+        anchorNode.parentNode === focusNode.parentNode;
     }
     vars.contextMode = mode;
     if (liveEditElm) {
@@ -1190,7 +1316,12 @@ export const handleKeyDown = evt => {
   let func;
   if (key === 'ContextMenu' || (shiftKey && key === 'F10')) {
     func = handleBeforeContextMenu(evt);
-  } else if (target && /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(document.contentType)) {
+  } else if (
+    target &&
+    /^(?:application\/(?:(?:[\w\-.]+\+)?(?:json|xml)|(?:(?:x-)?jav|ecm)ascript)|image\/[\w\-.]+\+xml|text\/[\w\-.]+)$/.test(
+      document.contentType
+    )
+  ) {
     const { namespaceURI } = target;
     const mode = getContextMode(target);
     const isChildNodeText = isContentTextNode(target);

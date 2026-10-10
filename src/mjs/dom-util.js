@@ -13,15 +13,63 @@ import { MIME_HTML, MIME_PLAIN } from './constant.js';
 /* constants */
 const TAGS_ALT = ['area', 'img', 'input'];
 const TAGS_BLOCK = [
-  'address', 'article', 'aside', 'blockquote', 'details', 'dialog', 'dd', 'div',
-  'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer', 'form', 'header',
-  'hgroup', 'li', 'main', 'nav', 'ol', 'pre', 'section', 'table', 'ul'
+  'address',
+  'article',
+  'aside',
+  'blockquote',
+  'details',
+  'dialog',
+  'dd',
+  'div',
+  'dl',
+  'dt',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'footer',
+  'form',
+  'header',
+  'hgroup',
+  'li',
+  'main',
+  'nav',
+  'ol',
+  'pre',
+  'section',
+  'table',
+  'ul'
 ];
 const TAGS_BLOCK_SPACING = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'];
 const TAGS_PHRASING = [
-  'a', 'abbr', 'b', 'bdo', 'cite', 'code', 'data', 'datalist', 'del', 'dfn',
-  'em', 'i', 'ins', 'kbd', 'mark', 'map', 'meter', 'output', 'progress', 'q',
-  'ruby', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'var'
+  'a',
+  'abbr',
+  'b',
+  'bdo',
+  'cite',
+  'code',
+  'data',
+  'datalist',
+  'del',
+  'dfn',
+  'em',
+  'i',
+  'ins',
+  'kbd',
+  'mark',
+  'map',
+  'meter',
+  'output',
+  'progress',
+  'q',
+  'ruby',
+  'samp',
+  'small',
+  'span',
+  'strong',
+  'sub',
+  'sup',
+  'time',
+  'var'
 ];
 const TAGS_TABLE_CELL = ['td', 'th'];
 
@@ -35,7 +83,9 @@ export const getDecodedContent = str => {
     throw new TypeError(`Expected String but got ${getType(str)}.`);
   }
   const doc = new DOMParser().parseFromString(str, MIME_HTML);
-  return doc.body.textContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  return doc.body.textContent
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
 };
 
@@ -48,16 +98,23 @@ export const matchDocUrl = arr => {
   let bool;
   if (Array.isArray(arr) && arr.length) {
     const {
-      protocol: docProtocol, hostname: docHost, href: docHref
+      protocol: docProtocol,
+      hostname: docHost,
+      href: docHref
     } = document.location;
     for (const item of arr) {
       if (isString(item)) {
         try {
           const {
-            protocol: itemProtocol, hostname: itemHost, href: itemHref
+            protocol: itemProtocol,
+            hostname: itemHost,
+            href: itemHref
           } = new URL(item.trim());
-          if (docProtocol === itemProtocol && docHost === itemHost &&
-              docHref.startsWith(itemHref)) {
+          if (
+            docProtocol === itemProtocol &&
+            docHost === itemHost &&
+            docHref.startsWith(itemHref)
+          ) {
             bool = true;
             break;
           }
@@ -77,8 +134,9 @@ export const matchDocUrl = arr => {
  * @returns {string} - file extension
  */
 export const getFileExtension = (media = MIME_PLAIN, subst = 'txt') => {
-  const arr =
-    /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(media);
+  const arr = /^(application|image|text)\/([\w\-.]+)(?:\+(json|xml))?$/.exec(
+    media
+  );
   let ext;
   if (arr) {
     const [, type, subtype, suf] = arr;
@@ -240,8 +298,10 @@ export const createFragment = nodes => {
   const frag = document.createDocumentFragment();
   if (Array.isArray(nodes)) {
     for (const node of nodes) {
-      if (node?.nodeType === Node.ELEMENT_NODE ||
-          node?.nodeType === Node.TEXT_NODE) {
+      if (
+        node?.nodeType === Node.ELEMENT_NODE ||
+        node?.nodeType === Node.TEXT_NODE
+      ) {
         frag.appendChild(node);
       }
     }
@@ -354,7 +414,11 @@ export const serializeDomString = (domstr, mime, reqElm = false) => {
     throw new TypeError(`Expected String but got ${getType(domstr)}.`);
   }
   if (isString(mime)) {
-    if (!/text\/(?:ht|x)ml|application\/(?:xhtml\+)?xml|image\/svg\+xml/.test(mime)) {
+    if (
+      !/text\/(?:ht|x)ml|application\/(?:xhtml\+)?xml|image\/svg\+xml/.test(
+        mime
+      )
+    ) {
       throw new TypeError(`Unsupported MIME type ${mime}.`);
     }
   } else {
@@ -405,22 +469,32 @@ export const getText = (nodes, pre = false) => {
   if (nodes instanceof NodeList) {
     for (const node of nodes) {
       const {
-        alt, lastChild, localName: nodeName, nextElementSibling: nextElm,
-        nextSibling, nodeType, nodeValue: value, parentNode
+        alt,
+        lastChild,
+        localName: nodeName,
+        nextElementSibling: nextElm,
+        nextSibling,
+        nodeType,
+        nodeValue: value,
+        parentNode
       } = node;
       const {
         firstElementChild: parentFirstElmChild,
         lastElementChild: parentLastElmChild,
-        lastChild: parentLastChild, localName: parentName
+        lastChild: parentLastChild,
+        localName: parentName
       } = parentNode;
-      const isParentBlock = TAGS_BLOCK.includes(parentName) ||
-                            TAGS_BLOCK_SPACING.includes(parentName);
+      const isParentBlock =
+        TAGS_BLOCK.includes(parentName) ||
+        TAGS_BLOCK_SPACING.includes(parentName);
       pre = pre || parentName === 'pre';
       switch (nodeType) {
         case Node.ELEMENT_NODE: {
           if (node.hasChildNodes()) {
-            if (TAGS_BLOCK_SPACING.includes(nodeName) &&
-                node !== parentFirstElmChild) {
+            if (
+              TAGS_BLOCK_SPACING.includes(nodeName) &&
+              node !== parentFirstElmChild
+            ) {
               arr.push('\n');
             }
             arr.push(getText(node.childNodes, pre));
@@ -428,40 +502,46 @@ export const getText = (nodes, pre = false) => {
               if (node === parentLastChild) {
                 const isLastChild =
                   (lastChild.nodeType === Node.TEXT_NODE &&
-                   lastChild.nodeValue) ||
+                    lastChild.nodeValue) ||
                   (lastChild.nodeType === Node.ELEMENT_NODE &&
-                   TAGS_PHRASING.includes(nodeName) &&
-                   TAGS_PHRASING.includes(lastChild.localName));
+                    TAGS_PHRASING.includes(nodeName) &&
+                    TAGS_PHRASING.includes(lastChild.localName));
                 if (isLastChild) {
                   arr.push('\n');
                 }
               } else {
-                const isPhrase = (!nextElm || nextElm.localName !== 'br') &&
-                                 !pre && TAGS_PHRASING.includes(nodeName);
+                const isPhrase =
+                  (!nextElm || nextElm.localName !== 'br') &&
+                  !pre &&
+                  TAGS_PHRASING.includes(nodeName);
                 if (isPhrase) {
                   arr.push(' ');
                 }
               }
             }
-            if (TAGS_TABLE_CELL.includes(nodeName) &&
-                node !== parentLastElmChild) {
+            if (
+              TAGS_TABLE_CELL.includes(nodeName) &&
+              node !== parentLastElmChild
+            ) {
               arr.push('\t');
-            } else if (nodeName === 'tr' ||
-                       (TAGS_BLOCK_SPACING.includes(nodeName) &&
-                        node !== parentLastElmChild &&
-                        !TAGS_BLOCK_SPACING.includes(nextElm.localName))) {
+            } else if (
+              nodeName === 'tr' ||
+              (TAGS_BLOCK_SPACING.includes(nodeName) &&
+                node !== parentLastElmChild &&
+                !TAGS_BLOCK_SPACING.includes(nextElm.localName))
+            ) {
               arr.push('\n');
             }
           } else if (TAGS_ALT.includes(nodeName)) {
             if ((nodeName !== 'input' || node.type === 'image') && alt) {
-              const trail = isParentBlock && (
-                node === parentLastChild ||
-                (node === parentLastElmChild &&
-                 nextSibling.nodeType === Node.TEXT_NODE &&
-                 /^\s*$/.test(nextSibling.nodeValue))
-              )
-                ? '\n'
-                : ' ';
+              const trail =
+                isParentBlock &&
+                (node === parentLastChild ||
+                  (node === parentLastElmChild &&
+                    nextSibling.nodeType === Node.TEXT_NODE &&
+                    /^\s*$/.test(nextSibling.nodeValue)))
+                  ? '\n'
+                  : ' ';
               arr.push(`${alt}${trail}`);
             }
           } else if (nodeName === 'br') {
@@ -528,8 +608,12 @@ export const isEditable = node => {
  */
 export const isContentTextNode = node => {
   let isText = isEditable(node);
-  if (isText && node?.namespaceURI && node?.namespaceURI !== nsHtml &&
-      node?.hasChildNodes()) {
+  if (
+    isText &&
+    node?.namespaceURI &&
+    node?.namespaceURI !== nsHtml &&
+    node?.hasChildNodes()
+  ) {
     const nodes = node.childNodes;
     for (const child of nodes) {
       isText = child.nodeType === Node.TEXT_NODE;
@@ -550,9 +634,10 @@ export const isEditControl = elm => {
   let bool;
   if (elm) {
     const { localName, type } = elm;
-    bool = localName === 'textarea' ||
-           (localName === 'input' &&
-            (!type || /^(?:email|search|tel|text|url)$/.test(type)));
+    bool =
+      localName === 'textarea' ||
+      (localName === 'input' &&
+        (!type || /^(?:email|search|tel|text|url)$/.test(type)));
   }
   return !!bool;
 };
@@ -568,8 +653,11 @@ export const getEditableElm = node => {
     elm = node;
   } else {
     while (node?.parentNode) {
-      if (node.hasAttribute('contenteditable') && node.isContentEditable &&
-          (!node.namespaceURI || node.namespaceURI === nsHtml)) {
+      if (
+        node.hasAttribute('contenteditable') &&
+        node.isContentEditable &&
+        (!node.namespaceURI || node.namespaceURI === nsHtml)
+      ) {
         elm = node;
         break;
       }

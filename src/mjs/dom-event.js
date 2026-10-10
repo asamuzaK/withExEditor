@@ -14,9 +14,12 @@ import { isObjectNotEmpty, isString } from './common.js';
  */
 export const dispatchEvent = (target, type, opt) => {
   let res;
-  if ((target?.nodeType === Node.DOCUMENT_NODE ||
-       target?.nodeType === Node.ELEMENT_NODE) &&
-      isString(type) && isObjectNotEmpty(opt)) {
+  if (
+    (target?.nodeType === Node.DOCUMENT_NODE ||
+      target?.nodeType === Node.ELEMENT_NODE) &&
+    isString(type) &&
+    isObjectNotEmpty(opt)
+  ) {
     const evt = new Event(type, opt);
     res = target.dispatchEvent(evt);
   }
@@ -48,14 +51,21 @@ export const dispatchChangeEvent = elm => {
  * @param {object} opt - init options
  * @returns {boolean} - event permitted
  */
-export const dispatchClipboardEvent = (elm, type, opt = {
-  bubbles: true,
-  cancelable: true,
-  composed: true
-}) => {
+export const dispatchClipboardEvent = (
+  elm,
+  type,
+  opt = {
+    bubbles: true,
+    cancelable: true,
+    composed: true
+  }
+) => {
   let res;
-  if (elm?.nodeType === Node.ELEMENT_NODE &&
-      isString(type) && /^(?:c(?:opy|ut)|paste)$/.test(type)) {
+  if (
+    elm?.nodeType === Node.ELEMENT_NODE &&
+    isString(type) &&
+    /^(?:c(?:opy|ut)|paste)$/.test(type)
+  ) {
     const evt = new ClipboardEvent(type, opt);
     const { clipboardData } = opt;
     if (clipboardData) {
@@ -101,8 +111,11 @@ export const dispatchFocusEvent = elm => {
  */
 export const dispatchInputEvent = (elm, type, opt) => {
   let res;
-  if (elm?.nodeType === Node.ELEMENT_NODE &&
-      isString(type) && /^(?:before)?input$/.test(type)) {
+  if (
+    elm?.nodeType === Node.ELEMENT_NODE &&
+    isString(type) &&
+    /^(?:before)?input$/.test(type)
+  ) {
     if (!isObjectNotEmpty(opt)) {
       opt = {
         bubbles: true,
@@ -132,12 +145,13 @@ export const dispatchInputEvent = (elm, type, opt) => {
  */
 export const dispatchKeyboardEvent = (elm, type, keyOpt = {}) => {
   let res;
-  if (elm?.nodeType === Node.ELEMENT_NODE &&
-      isString(type) && /^key(?:down|press|up)$/.test(type) &&
-      isObjectNotEmpty(keyOpt)) {
-    const {
-      altKey, code, ctrlKey, key, keyCode, metaKey, shiftKey
-    } = keyOpt;
+  if (
+    elm?.nodeType === Node.ELEMENT_NODE &&
+    isString(type) &&
+    /^key(?:down|press|up)$/.test(type) &&
+    isObjectNotEmpty(keyOpt)
+  ) {
+    const { altKey, code, ctrlKey, key, keyCode, metaKey, shiftKey } = keyOpt;
     if (isString(key) && isString(code) && Number.isInteger(keyCode)) {
       const opt = {
         key,

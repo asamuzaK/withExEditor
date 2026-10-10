@@ -5,7 +5,12 @@ import { describe, it } from 'mocha';
 
 /* test */
 import {
-  getType, isString, logErr, logMsg, logWarn, throwErr
+  getType,
+  isString,
+  logErr,
+  logMsg,
+  logWarn,
+  throwErr
 } from '../scripts/common.js';
 
 describe('getType', () => {

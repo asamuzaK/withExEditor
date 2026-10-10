@@ -7,29 +7,61 @@ import { strict as assert } from 'node:assert';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
 import {
-  fetch as undiciFetch, getGlobalDispatcher, MockAgent, setGlobalDispatcher
+  fetch as undiciFetch,
+  getGlobalDispatcher,
+  MockAgent,
+  setGlobalDispatcher
 } from 'undici';
-import {
-  browser, createJsdom, DataTransfer
-} from './mocha/setup.js';
+import { browser, createJsdom, DataTransfer } from './mocha/setup.js';
 
 /* test */
 import {
-  CONTENT_GET, IS_MAC, ID_TAB, ID_WIN, INCOGNITO, LABEL,
-  LOCAL_FILE_VIEW, MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT,
-  MODE_MATHML, MODE_SELECTION, MODE_SOURCE, MODE_SVG, ONLY_EDITABLE,
-  SYNC_AUTO, SYNC_AUTO_URL,
-  TMP_FILES_PB, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
-  TMP_FILE_DATA_REMOVE, TMP_FILE_REQ, TMP_FILE_RES, VARS_SET
+  CONTENT_GET,
+  IS_MAC,
+  ID_TAB,
+  ID_WIN,
+  INCOGNITO,
+  LABEL,
+  LOCAL_FILE_VIEW,
+  MODE_EDIT,
+  MODE_EDIT_HTML,
+  MODE_EDIT_MD,
+  MODE_EDIT_TXT,
+  MODE_MATHML,
+  MODE_SELECTION,
+  MODE_SOURCE,
+  MODE_SVG,
+  ONLY_EDITABLE,
+  SYNC_AUTO,
+  SYNC_AUTO_URL,
+  TMP_FILES_PB,
+  TMP_FILE_CREATE,
+  TMP_FILE_DATA_PORT,
+  TMP_FILE_DATA_REMOVE,
+  TMP_FILE_REQ,
+  TMP_FILE_RES,
+  VARS_SET
 } from '../src/mjs/constant.js';
 import * as mjs from '../src/mjs/content-main.js';
 
 describe('content-main', () => {
   let window, document;
   const globalKeys = [
-    'ClipboardEvent', 'DataTransfer', 'DOMPurify', 'DOMTokenList', 'DOMParser',
-    'Event', 'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
-    'KeyboardEvent', 'Node', 'NodeList', 'Selection', 'StaticRange',
+    'ClipboardEvent',
+    'DataTransfer',
+    'DOMPurify',
+    'DOMTokenList',
+    'DOMParser',
+    'Event',
+    'FocusEvent',
+    'Headers',
+    'HTMLUnknownElement',
+    'InputEvent',
+    'KeyboardEvent',
+    'Node',
+    'NodeList',
+    'Selection',
+    'StaticRange',
     'XMLSerializer'
   ];
   // NOTE: not implemented in jsdom https://github.com/jsdom/jsdom/issues/1670
@@ -77,8 +109,10 @@ describe('content-main', () => {
     window = dom && dom.window;
     document = window && window.document;
     if (typeof document.queryCommandValue !== 'function') {
-      document.queryCommandValue =
-        sinon.stub().withArgs('defaultParagraphSeparator').returns('div');
+      document.queryCommandValue = sinon
+        .stub()
+        .withArgs('defaultParagraphSeparator')
+        .returns('div');
     }
 
     global.window = window;
@@ -88,10 +122,13 @@ describe('content-main', () => {
       // Not implemented in jsdom
       if (key === 'InputEvent') {
         if (typeof window.InputEvent.prototype.getTargetRanges !== 'function') {
-          Object.defineProperty(window.InputEvent.prototype,
-            'getTargetRanges', {
+          Object.defineProperty(
+            window.InputEvent.prototype,
+            'getTargetRanges',
+            {
               value: sinon.stub()
-            });
+            }
+          );
         }
         if (typeof window.InputEvent.prototype.dataTransfer === 'undefined') {
           window.InputEvent.prototype.dataTransfer = new DataTransfer();
@@ -172,8 +209,11 @@ describe('content-main', () => {
     });
 
     it('should throw', async () => {
-      assert.throws(() => func(), TypeError,
-        'Expected String but got Undefined.');
+      assert.throws(
+        () => func(),
+        TypeError,
+        'Expected String but got Undefined.'
+      );
     });
 
     it('should not set map', () => {
@@ -187,9 +227,13 @@ describe('content-main', () => {
         bar: 'baz'
       });
       assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
-      assert.deepEqual(mjs.dataIds.get('foo'), {
-        bar: 'baz'
-      }, 'map');
+      assert.deepEqual(
+        mjs.dataIds.get('foo'),
+        {
+          bar: 'baz'
+        },
+        'map'
+      );
       assert.strictEqual(res instanceof Map, true, 'result');
     });
 
@@ -201,9 +245,13 @@ describe('content-main', () => {
         bar: 'baz'
       });
       assert.strictEqual(mjs.dataIds.has('foo'), true, 'set');
-      assert.deepEqual(mjs.dataIds.get('foo'), {
-        bar: 'baz'
-      }, 'map');
+      assert.deepEqual(
+        mjs.dataIds.get('foo'),
+        {
+          bar: 'baz'
+        },
+        'map'
+      );
       assert.strictEqual(res instanceof Map, true, 'result');
     });
   });
@@ -218,8 +266,11 @@ describe('content-main', () => {
     });
 
     it('should throw', async () => {
-      assert.throws(() => func(), TypeError,
-        'Expected String but got Undefined.');
+      assert.throws(
+        () => func(),
+        TypeError,
+        'Expected String but got Undefined.'
+      );
     });
 
     it('should get null', () => {
@@ -307,14 +358,21 @@ describe('content-main', () => {
 
     it('should get element', () => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const fo =
-        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      const p =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const fo = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'foreignObject'
+      );
+      const p = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
       const body = document.querySelector('body');
       svg.id = 'foo';
-      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
-        'http://www.w3.org/1999/xhtml');
+      svg.setAttributeNS(
+        'http://www.w3.org/2000/xmlns/',
+        'xmlns:html',
+        'http://www.w3.org/1999/xhtml'
+      );
       fo.appendChild(p);
       svg.appendChild(fo);
       body.appendChild(svg);
@@ -332,16 +390,25 @@ describe('content-main', () => {
 
     it('should get element', () => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const fo =
-        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      const p =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
-      const p2 =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const fo = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'foreignObject'
+      );
+      const p = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
+      const p2 = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
       const body = document.querySelector('body');
       svg.id = 'foo';
-      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
-        'http://www.w3.org/1999/xhtml');
+      svg.setAttributeNS(
+        'http://www.w3.org/2000/xmlns/',
+        'xmlns:html',
+        'http://www.w3.org/1999/xhtml'
+      );
       fo.appendChild(p);
       fo.appendChild(p2);
       svg.appendChild(fo);
@@ -360,13 +427,20 @@ describe('content-main', () => {
 
     it('should get element', () => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const fo =
-        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      const p =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const fo = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'foreignObject'
+      );
+      const p = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
       const body = document.querySelector('body');
-      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
-        'http://www.w3.org/1999/xhtml');
+      svg.setAttributeNS(
+        'http://www.w3.org/2000/xmlns/',
+        'xmlns:html',
+        'http://www.w3.org/1999/xhtml'
+      );
       fo.appendChild(p);
       svg.appendChild(fo);
       body.appendChild(svg);
@@ -384,15 +458,24 @@ describe('content-main', () => {
 
     it('should get element', () => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const fo =
-        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      const p =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
-      const p2 =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const fo = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'foreignObject'
+      );
+      const p = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
+      const p2 = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
       const body = document.querySelector('body');
-      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
-        'http://www.w3.org/1999/xhtml');
+      svg.setAttributeNS(
+        'http://www.w3.org/2000/xmlns/',
+        'xmlns:html',
+        'http://www.w3.org/1999/xhtml'
+      );
       fo.appendChild(p);
       fo.appendChild(p2);
       svg.appendChild(fo);
@@ -412,8 +495,10 @@ describe('content-main', () => {
     it('should get element', () => {
       const div = document.createElement('div');
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const text =
-        document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const text = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       const body = document.querySelector('body');
       svg.appendChild(text);
       div.setAttribute('contenteditable', 'true');
@@ -440,8 +525,11 @@ describe('content-main', () => {
     const func = mjs.getDataIdFromURI;
 
     it('should throw', async () => {
-      assert.rejects(() => func(), TypeError,
-        'Expected String but got Undefined.');
+      assert.rejects(
+        () => func(),
+        TypeError,
+        'Expected String but got Undefined.'
+      );
     });
 
     it('should get value', async () => {
@@ -475,8 +563,9 @@ describe('content-main', () => {
     });
 
     it('should get value', async () => {
-      const res =
-        await func('data:,https://example.com/#<script>alert(1);</script>');
+      const res = await func(
+        'data:,https://example.com/#<script>alert(1);</script>'
+      );
       assert.strictEqual(res, 'index', 'result');
     });
   });
@@ -550,16 +639,25 @@ describe('content-main', () => {
 
     it('should get result', () => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const fo =
-        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      const p =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
-      const div =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:div');
+      const fo = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'foreignObject'
+      );
+      const p = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
+      const div = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:div'
+      );
       const body = document.querySelector('body');
       svg.id = 'foo';
-      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
-        'http://www.w3.org/1999/xhtml');
+      svg.setAttributeNS(
+        'http://www.w3.org/2000/xmlns/',
+        'xmlns:html',
+        'http://www.w3.org/1999/xhtml'
+      );
       fo.appendChild(p);
       fo.appendChild(div);
       svg.appendChild(fo);
@@ -570,15 +668,24 @@ describe('content-main', () => {
 
     it('should get result', () => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const fo =
-        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      const p =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
-      const div =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:div');
+      const fo = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'foreignObject'
+      );
+      const p = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
+      const div = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:div'
+      );
       const body = document.querySelector('body');
-      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
-        'http://www.w3.org/1999/xhtml');
+      svg.setAttributeNS(
+        'http://www.w3.org/2000/xmlns/',
+        'xmlns:html',
+        'http://www.w3.org/1999/xhtml'
+      );
       fo.appendChild(p);
       fo.appendChild(div);
       svg.appendChild(fo);
@@ -607,13 +714,17 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       body.appendChild(p);
       const res = func(p);
-      assert.deepEqual(res, {
-        ancestorId: null,
-        dataId: 'html_p_0',
-        localName: 'p',
-        prefix: null,
-        queryIndex: 0
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          ancestorId: null,
+          dataId: 'html_p_0',
+          localName: 'p',
+          prefix: null,
+          queryIndex: 0
+        },
+        'result'
+      );
     });
 
     it('should get result', () => {
@@ -622,13 +733,17 @@ describe('content-main', () => {
       body.id = 'foo';
       body.appendChild(p);
       const res = func(p);
-      assert.deepEqual(res, {
-        ancestorId: 'foo',
-        dataId: 'foo_p_0',
-        localName: 'p',
-        prefix: null,
-        queryIndex: 0
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          ancestorId: 'foo',
+          dataId: 'foo_p_0',
+          localName: 'p',
+          prefix: null,
+          queryIndex: 0
+        },
+        'result'
+      );
     });
 
     it('should get result', () => {
@@ -638,13 +753,17 @@ describe('content-main', () => {
       body.appendChild(p);
       body.appendChild(p2);
       const res = func(p2);
-      assert.deepEqual(res, {
-        ancestorId: null,
-        dataId: 'html_p_1',
-        localName: 'p',
-        prefix: null,
-        queryIndex: 1
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          ancestorId: null,
+          dataId: 'html_p_1',
+          localName: 'p',
+          prefix: null,
+          queryIndex: 1
+        },
+        'result'
+      );
     });
 
     it('should get result', () => {
@@ -653,54 +772,80 @@ describe('content-main', () => {
       p.id = 'foo';
       body.appendChild(p);
       const res = func(p);
-      assert.deepEqual(res, {
-        dataId: 'foo'
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          dataId: 'foo'
+        },
+        'result'
+      );
     });
 
     it('should get value', () => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const fo =
-        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      const p =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const fo = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'foreignObject'
+      );
+      const p = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
       const body = document.querySelector('body');
       svg.id = 'foo';
-      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
-        'http://www.w3.org/1999/xhtml');
+      svg.setAttributeNS(
+        'http://www.w3.org/2000/xmlns/',
+        'xmlns:html',
+        'http://www.w3.org/1999/xhtml'
+      );
       fo.appendChild(p);
       svg.appendChild(fo);
       body.appendChild(svg);
       const res = func(p);
-      assert.deepEqual(res, {
-        ancestorId: 'foo',
-        dataId: 'foo_html:p_0',
-        localName: 'p',
-        prefix: 'html',
-        queryIndex: 0
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          ancestorId: 'foo',
+          dataId: 'foo_html:p_0',
+          localName: 'p',
+          prefix: 'html',
+          queryIndex: 0
+        },
+        'result'
+      );
     });
 
     it('should get value', () => {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const fo =
-        document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-      const p =
-        document.createElementNS('http://www.w3.org/1999/xhtml', 'html:p');
+      const fo = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'foreignObject'
+      );
+      const p = document.createElementNS(
+        'http://www.w3.org/1999/xhtml',
+        'html:p'
+      );
       const body = document.querySelector('body');
-      svg.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:html',
-        'http://www.w3.org/1999/xhtml');
+      svg.setAttributeNS(
+        'http://www.w3.org/2000/xmlns/',
+        'xmlns:html',
+        'http://www.w3.org/1999/xhtml'
+      );
       fo.appendChild(p);
       svg.appendChild(fo);
       body.appendChild(svg);
       const res = func(p);
-      assert.deepEqual(res, {
-        ancestorId: null,
-        dataId: 'html_html:p_0',
-        localName: 'p',
-        prefix: 'html',
-        queryIndex: 0
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          ancestorId: null,
+          dataId: 'html_html:p_0',
+          localName: 'p',
+          prefix: 'html',
+          queryIndex: 0
+        },
+        'result'
+      );
     });
   });
 
@@ -919,18 +1064,17 @@ describe('content-main', () => {
 
     it('should get object', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
         });
       const res = await func({});
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -942,11 +1086,15 @@ describe('content-main', () => {
       global.window = window;
       global.document = document;
       const res = await func({});
-      assert.deepEqual(res, {
-        [LOCAL_FILE_VIEW]: {
-          uri: url.href
-        }
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          [LOCAL_FILE_VIEW]: {
+            uri: url.href
+          }
+        },
+        'result'
+      );
     });
   });
 
@@ -968,25 +1116,26 @@ describe('content-main', () => {
 
     it('should get object', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
         });
       const res = await func();
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
     it('should get object', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
@@ -994,11 +1143,8 @@ describe('content-main', () => {
       const res = await func({
         mode: MODE_SOURCE
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -1008,13 +1154,10 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1025,15 +1168,15 @@ describe('content-main', () => {
         namespaceURI: 'http://www.w3.org/1999/xhtml',
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
-      assert.strictEqual(res.createTmpFile.namespaceURI,
-        'http://www.w3.org/1999/xhtml', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(
+        res.createTmpFile.namespaceURI,
+        'http://www.w3.org/1999/xhtml',
+        'value'
+      );
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1043,13 +1186,10 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1060,15 +1200,15 @@ describe('content-main', () => {
         namespaceURI: 'http://www.w3.org/1999/xhtml',
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.txt', 'value');
-      assert.strictEqual(res.createTmpFile.namespaceURI,
-        'http://www.w3.org/1999/xhtml', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(
+        res.createTmpFile.namespaceURI,
+        'http://www.w3.org/1999/xhtml',
+        'value'
+      );
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1078,13 +1218,10 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.html', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1095,15 +1232,15 @@ describe('content-main', () => {
         namespaceURI: 'http://www.w3.org/1999/xhtml',
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.html', 'value');
-      assert.strictEqual(res.createTmpFile.namespaceURI,
-        'http://www.w3.org/1999/xhtml', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(
+        res.createTmpFile.namespaceURI,
+        'http://www.w3.org/1999/xhtml',
+        'value'
+      );
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1113,13 +1250,10 @@ describe('content-main', () => {
         dataId: 'foo',
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.md', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1130,22 +1264,24 @@ describe('content-main', () => {
         namespaceURI: 'http://www.w3.org/1999/xhtml',
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'foo', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.md', 'value');
-      assert.strictEqual(res.createTmpFile.namespaceURI,
-        'http://www.w3.org/1999/xhtml', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(
+        res.createTmpFile.namespaceURI,
+        'http://www.w3.org/1999/xhtml',
+        'value'
+      );
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
     it('should get object', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
@@ -1153,11 +1289,8 @@ describe('content-main', () => {
       const res = await func({
         mode: MODE_EDIT
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -1166,13 +1299,10 @@ describe('content-main', () => {
         mode: MODE_MATHML,
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.mml', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
@@ -1181,20 +1311,19 @@ describe('content-main', () => {
         mode: MODE_SVG,
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.svg', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
     it('should get object', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
@@ -1202,11 +1331,8 @@ describe('content-main', () => {
       const res = await func({
         mode: MODE_SVG
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
 
@@ -1215,20 +1341,19 @@ describe('content-main', () => {
         mode: MODE_SELECTION,
         value: 'bar'
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
       assert.strictEqual(res.createTmpFile.dataId, 'index', 'value');
       assert.strictEqual(res.createTmpFile.extType, '.xml', 'value');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'bar', 'value');
     });
 
     it('should get object', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
@@ -1236,11 +1361,8 @@ describe('content-main', () => {
       const res = await func({
         mode: MODE_SELECTION
       });
-      assert.strictEqual(
-        Object.hasOwn(res, 'createTmpFile'), true,
-        'prop');
-      assert.strictEqual(Object.hasOwn(res, 'value'),
-        true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'createTmpFile'), true, 'prop');
+      assert.strictEqual(Object.hasOwn(res, 'value'), true, 'prop');
       assert.strictEqual(res.value, 'foo', 'value');
     });
   });
@@ -1252,8 +1374,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.strictEqual(res, null, 'result');
     });
 
@@ -1261,8 +1386,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func('foo');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
   });
@@ -1280,8 +1408,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -1302,8 +1433,11 @@ describe('content-main', () => {
         dataId: 'bar'
       });
       const res = await func(true);
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 2,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 2,
+        'called'
+      );
       assert.deepEqual(res, [{}, {}], 'result');
     });
   });
@@ -1321,8 +1455,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.strictEqual(res, null, 'result');
     });
 
@@ -1331,8 +1468,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func('foo');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
   });
@@ -1354,8 +1494,11 @@ describe('content-main', () => {
         currentTarget: p,
         target: p
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -1369,8 +1512,11 @@ describe('content-main', () => {
         currentTarget: p,
         target: p
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -1385,8 +1531,11 @@ describe('content-main', () => {
         currentTarget: p,
         target: p
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, [{}], 'result');
     });
 
@@ -1408,8 +1557,11 @@ describe('content-main', () => {
         currentTarget: p,
         target: p
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, [{}], 'result');
     });
 
@@ -1425,8 +1577,11 @@ describe('content-main', () => {
         currentTarget: p,
         target: textarea
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -1444,8 +1599,11 @@ describe('content-main', () => {
         currentTarget: p,
         target: textarea
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -1464,8 +1622,11 @@ describe('content-main', () => {
         currentTarget: p,
         target: textarea
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, [{}], 'result');
     });
 
@@ -1486,8 +1647,11 @@ describe('content-main', () => {
         currentTarget: p,
         target: textarea
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, [{}], 'result');
     });
   });
@@ -1539,11 +1703,17 @@ describe('content-main', () => {
       func(p, 'foo');
       assert.strictEqual(mjs.dataIds.size, 2, 'size');
       assert.strictEqual(mjs.dataIds.has('html_p_0'), true, 'map');
-      assert.deepEqual(mjs.dataIds.get('html_p_0').controls, ['foo'],
-        'controls');
+      assert.deepEqual(
+        mjs.dataIds.get('html_p_0').controls,
+        ['foo'],
+        'controls'
+      );
       assert.strictEqual(mjs.dataIds.has('foo'), true, 'map');
-      assert.strictEqual(mjs.dataIds.get('foo').controlledBy, 'html_p_0',
-        'controlled by');
+      assert.strictEqual(
+        mjs.dataIds.get('foo').controlledBy,
+        'html_p_0',
+        'controlled by'
+      );
     });
 
     it('should set data', () => {
@@ -1560,11 +1730,17 @@ describe('content-main', () => {
       func(p, 'foo');
       assert.strictEqual(mjs.dataIds.size, 2, 'size');
       assert.strictEqual(mjs.dataIds.has('html_p_0'), true, 'map');
-      assert.deepEqual(mjs.dataIds.get('html_p_0').controls, ['bar', 'foo'],
-        'controls');
+      assert.deepEqual(
+        mjs.dataIds.get('html_p_0').controls,
+        ['bar', 'foo'],
+        'controls'
+      );
       assert.strictEqual(mjs.dataIds.has('foo'), true, 'map');
-      assert.strictEqual(mjs.dataIds.get('foo').controlledBy, 'html_p_0',
-        'controlled by');
+      assert.strictEqual(
+        mjs.dataIds.get('foo').controlledBy,
+        'html_p_0',
+        'controlled by'
+      );
     });
 
     it('should set data', () => {
@@ -1579,11 +1755,17 @@ describe('content-main', () => {
       func(p, 'foo');
       assert.strictEqual(mjs.dataIds.size, 2, 'size');
       assert.strictEqual(mjs.dataIds.has('html_p_0'), true, 'map');
-      assert.deepEqual(mjs.dataIds.get('html_p_0').controls, ['foo'],
-        'controls');
+      assert.deepEqual(
+        mjs.dataIds.get('html_p_0').controls,
+        ['foo'],
+        'controls'
+      );
       assert.strictEqual(mjs.dataIds.has('foo'), true, 'map');
-      assert.strictEqual(mjs.dataIds.get('foo').controlledBy, 'html_p_0',
-        'controlled by');
+      assert.strictEqual(
+        mjs.dataIds.get('foo').controlledBy,
+        'html_p_0',
+        'controlled by'
+      );
     });
   });
 
@@ -1771,8 +1953,10 @@ describe('content-main', () => {
     it('should get object', async () => {
       const div = document.createElement('div');
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const text =
-        document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const text = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       const body = document.querySelector('body');
       text.textContent = 'foo';
       svg.appendChild(text);
@@ -1794,8 +1978,10 @@ describe('content-main', () => {
     it('should get object', async () => {
       const div = document.createElement('div');
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const text =
-        document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const text = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       const body = document.querySelector('body');
       svg.appendChild(text);
       div.setAttribute('contenteditable', 'true');
@@ -1818,8 +2004,10 @@ describe('content-main', () => {
       const range = document.createRange();
       const div = document.createElement('div');
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const text =
-        document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const text = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       const body = document.querySelector('body');
       text.textContent = 'foo';
       svg.appendChild(text);
@@ -1848,15 +2036,19 @@ describe('content-main', () => {
     });
 
     it('should get object', async () => {
-      const math =
-        document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
+      const math = document.createElementNS(
+        'http://www.w3.org/1998/Math/MathML',
+        'math'
+      );
       const body = document.querySelector('body');
       body.appendChild(math);
       const res = await func(math, MODE_MATHML);
       assert.strictEqual(res.mode, MODE_MATHML, 'mode');
-      assert.strictEqual(res.value,
+      assert.strictEqual(
+        res.value,
         '<math xmlns="http://www.w3.org/1998/Math/MathML"/>\n',
-        'value');
+        'value'
+      );
     });
 
     it('should get default object', async () => {
@@ -1871,9 +2063,11 @@ describe('content-main', () => {
       body.appendChild(svg);
       const res = await func(svg, MODE_SVG);
       assert.strictEqual(res.mode, MODE_SVG, 'mode');
-      assert.strictEqual(res.value,
+      assert.strictEqual(
+        res.value,
         '<svg xmlns="http://www.w3.org/2000/svg"/>\n',
-        'value');
+        'value'
+      );
     });
 
     it('should get default object', async () => {
@@ -1895,9 +2089,11 @@ describe('content-main', () => {
       sel.addRange(range);
       const res = await func(body, MODE_SELECTION);
       assert.strictEqual(res.mode, MODE_SELECTION, 'mode');
-      assert.strictEqual(res.value,
+      assert.strictEqual(
+        res.value,
         '<p xmlns="http://www.w3.org/1999/xhtml">foo</p>\n',
-        'value');
+        'value'
+      );
     });
   });
 
@@ -1921,12 +2117,16 @@ describe('content-main', () => {
         [TMP_FILE_CREATE]: {},
         value: 'foo'
       });
-      assert.deepEqual(res, {
-        [TMP_FILE_CREATE]: {
-          data: {},
-          value: 'foo'
-        }
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          [TMP_FILE_CREATE]: {
+            data: {},
+            value: 'foo'
+          }
+        },
+        'result'
+      );
     });
 
     it('should get object', async () => {
@@ -1935,9 +2135,13 @@ describe('content-main', () => {
           uri: 'file:///foo/bar'
         }
       });
-      assert.deepEqual(res, {
-        [LOCAL_FILE_VIEW]: 'file:///foo/bar'
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          [LOCAL_FILE_VIEW]: 'file:///foo/bar'
+        },
+        'result'
+      );
     });
   });
 
@@ -1954,8 +2158,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.strictEqual(mjs.dataIds.size, 0, 'data');
       assert.deepEqual(res, [], 'result');
     });
@@ -1967,8 +2174,11 @@ describe('content-main', () => {
       const body = document.querySelector('body');
       body.appendChild(text);
       const res = await func(text, MODE_EDIT);
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.strictEqual(mjs.dataIds.size, 1, 'data');
       assert.deepEqual(res[0], {}, 'result');
       assert.strictEqual(res[1] instanceof Map, true, 'map');
@@ -1992,8 +2202,10 @@ describe('content-main', () => {
     });
 
     it('should get result', () => {
-      const math =
-        document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
+      const math = document.createElementNS(
+        'http://www.w3.org/1998/Math/MathML',
+        'math'
+      );
       const body = document.querySelector('body');
       body.appendChild(math);
       const res = func(math);
@@ -2087,8 +2299,10 @@ describe('content-main', () => {
 
     it('should call function', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
@@ -2096,18 +2310,20 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.deepEqual(res, [
-        {},
-        null
-      ], 'result');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
+      assert.deepEqual(res, [{}, null], 'result');
     });
 
     it('should call function', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
@@ -2119,18 +2335,20 @@ describe('content-main', () => {
       body.appendChild(p);
       mjs.vars.contextNode = p;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.deepEqual(res, [
-        {},
-        null
-      ], 'result');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
+      assert.deepEqual(res, [{}, null], 'result');
     });
 
     it('should call function', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
@@ -2146,12 +2364,12 @@ describe('content-main', () => {
           menuItemId: MODE_SOURCE
         }
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.deepEqual(res, [
-        {},
-        null
-      ], 'result');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
+      assert.deepEqual(res, [{}, null], 'result');
     });
 
     it('should call function', async () => {
@@ -2166,8 +2384,11 @@ describe('content-main', () => {
           menuItemId: MODE_EDIT
         }
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res[0], {}, 'result');
       assert.strictEqual(res[1] instanceof Map, true, 'map');
     });
@@ -2725,37 +2946,6 @@ describe('content-main', () => {
       assert.strictEqual(div.textContent, 'foo\nbar\n', 'content');
     });
 
-    it('should replace content', () => {
-      const div = document.createElement('div');
-      const span = document.createElement('span');
-      const stub = sinon.stub(span, 'dispatchEvent').returns(true);
-      const stubErr = sinon.stub(console, 'error');
-      const body = document.querySelector('body');
-      div.id = 'div';
-      span.textContent = 'bar';
-      div.appendChild(span);
-      mjs.vars.contextNode = div;
-      mjs.dataIds.set('foo', {});
-      body.appendChild(div);
-      func(span, {
-        controlledBy: '#div',
-        dataId: 'foo',
-        value: 'foo <foo@example.dom> wrote:\nbar\n'
-      });
-      const { calledOnce: errCalled } = stubErr;
-      stubErr.restore();
-      assert.strictEqual(stub.called, true, 'called');
-      assert.strictEqual(stub.callCount, 3, 'call count');
-      assert.strictEqual(errCalled, true, 'error called');
-      assert.strictEqual(div.childNodes.length, 1, 'length');
-      assert.strictEqual(div.firstChild.nodeType, 1, 'child');
-      assert.strictEqual(div.firstChild.localName, 'span', 'name');
-      assert.strictEqual(div.firstChild.textContent,
-        'foo <foo@example.dom> wrote:\nbar\n', 'content');
-      assert.strictEqual(div.textContent,
-        'foo <foo@example.dom> wrote:\nbar\n', 'content');
-    });
-
     it('should throw if StaticRange is not supported', () => {
       delete global.StaticRange;
       const div = document.createElement('div');
@@ -2767,11 +2957,13 @@ describe('content-main', () => {
       mjs.vars.contextNode = div;
       mjs.dataIds.set('foo', {});
       body.appendChild(div);
-      assert.throws(() => func(span, {
-        controlledBy: '#div',
-        dataId: 'foo',
-        value: 'foo\n'
-      }));
+      assert.throws(() =>
+        func(span, {
+          controlledBy: '#div',
+          dataId: 'foo',
+          value: 'foo\n'
+        })
+      );
     });
   });
 
@@ -3710,8 +3902,11 @@ describe('content-main', () => {
       });
       assert.strictEqual(mjs.vars[ID_TAB], '1', 'tab');
       assert.strictEqual(mjs.vars[ID_WIN], '2', 'window');
-      assert.strictEqual(mjs.vars[SYNC_AUTO_URL],
-        'https://example.com/\nhttps://example.com/baz', 'url');
+      assert.strictEqual(
+        mjs.vars[SYNC_AUTO_URL],
+        'https://example.com/\nhttps://example.com/baz',
+        'url'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3775,8 +3970,10 @@ describe('content-main', () => {
 
     it('should call function', async () => {
       const url = new URL('https://localhost/');
-      mockAgent.get(url.origin)
-        .intercept({ path: url.pathname, method: 'GET' }).reply(200, 'foo', {
+      mockAgent
+        .get(url.origin)
+        .intercept({ path: url.pathname, method: 'GET' })
+        .reply(200, 'foo', {
           headers: {
             'content-type': 'text/plain'
           }
@@ -3786,8 +3983,11 @@ describe('content-main', () => {
       const res = await func({
         [CONTENT_GET]: {}
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, [[{}, null]], 'result');
     });
 
@@ -3853,8 +4053,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
   });
@@ -3876,8 +4079,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
   });
@@ -3899,8 +4105,11 @@ describe('content-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func({});
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.strictEqual(res, null, 'result');
     });
 
@@ -3913,8 +4122,11 @@ describe('content-main', () => {
         key: 'a',
         shiftKey: true
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.strictEqual(res, null, 'result');
     });
 
@@ -3926,8 +4138,11 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -3942,8 +4157,11 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.strictEqual(mjs.vars.contextNode, null, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -3957,8 +4175,11 @@ describe('content-main', () => {
         target,
         key: 'ContextMenu'
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -3973,8 +4194,11 @@ describe('content-main', () => {
         key: 'F10',
         shiftKey: true
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -3983,16 +4207,21 @@ describe('content-main', () => {
     it('should call function', async () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
-      const target =
-        document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
+      const target = document.createElementNS(
+        'http://www.w3.org/1998/Math/MathML',
+        'math'
+      );
       const body = document.querySelector('body');
       body.appendChild(target);
       const res = await func({
         target,
         button: 2
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_MATHML, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4001,16 +4230,21 @@ describe('content-main', () => {
     it('should call function', async () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
-      const target =
-        document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const target = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'svg'
+      );
       const body = document.querySelector('body');
       body.appendChild(target);
       const res = await func({
         target,
         button: 2
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SVG, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4026,8 +4260,11 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4049,8 +4286,11 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4068,8 +4308,11 @@ describe('content-main', () => {
         target,
         button: 2
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4104,8 +4347,11 @@ describe('content-main', () => {
         target,
         key: 'ContextMenu'
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4120,8 +4366,11 @@ describe('content-main', () => {
         target,
         key: 'ContextMenu'
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.strictEqual(mjs.vars.contextNode, null, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4136,8 +4385,11 @@ describe('content-main', () => {
         key: 'F10',
         shiftKey: true
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(mjs.vars.contextNode, target, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4153,8 +4405,11 @@ describe('content-main', () => {
         key: 'F10',
         shiftKey: true
       });
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.strictEqual(mjs.vars.contextNode, null, 'node');
       assert.strictEqual(mjs.vars.contextMode, MODE_SOURCE, 'mode');
       assert.deepEqual(res, {}, 'result');
@@ -4182,8 +4437,10 @@ describe('content-main', () => {
     });
 
     it('should set values', async () => {
-      const target =
-        document.createElementNS('http://www.w3.org/1998/Math/MathML', 'math');
+      const target = document.createElementNS(
+        'http://www.w3.org/1998/Math/MathML',
+        'math'
+      );
       const body = document.querySelector('body');
       body.appendChild(target);
       const res = await func({
@@ -4195,8 +4452,10 @@ describe('content-main', () => {
     });
 
     it('should set values', async () => {
-      const target =
-        document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const target = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'svg'
+      );
       const body = document.querySelector('body');
       body.appendChild(target);
       const res = await func({
@@ -4257,8 +4516,11 @@ describe('content-main', () => {
       };
       const res = await func(evt);
       assert.strictEqual(stub.called, false, 'not called');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.strictEqual(res, null, 'result');
     });
 
@@ -4274,8 +4536,11 @@ describe('content-main', () => {
       };
       const res = await func(evt);
       assert.strictEqual(stub.called, false, 'not called');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.strictEqual(res, null, 'result');
     });
 
@@ -4291,8 +4556,11 @@ describe('content-main', () => {
       };
       const res = await func(evt);
       assert.strictEqual(stub.called, true, 'called');
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
   });

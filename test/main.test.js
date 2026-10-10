@@ -10,16 +10,53 @@ import { browser, mockPort } from './mocha/setup.js';
 
 /* test */
 import {
-  CONTEXT_MENU, EDIT_HTML, EDIT_MD, EDIT_TXT, EDITOR_CONFIG_GET,
-  EDITOR_CONFIG_RES, EDITOR_EXEC, EDITOR_FILE_NAME, EDITOR_LABEL,
-  FILE_EXT_SELECT, FILE_EXT_SELECT_HTML, FILE_EXT_SELECT_MD,
-  FILE_EXT_SELECT_TXT, HOST, HOST_COMPAT, HOST_CONNECTION, HOST_ERR_NOTIFY,
-  HOST_STATUS_GET, HOST_VERSION, HOST_VERSION_LATEST, INFO_COLOR, INFO_TEXT,
-  IS_CONNECTABLE, IS_EXECUTABLE, IS_MAC, LOCAL_FILE_VIEW, MENU_ENABLED,
-  MODE_EDIT, MODE_EDIT_HTML, MODE_EDIT_MD, MODE_EDIT_TXT, MODE_MATHML,
-  MODE_SELECTION, MODE_SOURCE, MODE_SVG, ONLY_EDITABLE, OPTIONS_OPEN,
-  PROCESS_CHILD, SYNC_AUTO, SYNC_AUTO_URL, TMP_FILE_CREATE, TMP_FILE_DATA_PORT,
-  TMP_FILE_DATA_REMOVE, TMP_FILE_GET, TMP_FILE_RES, WARN_COLOR, WARN_TEXT
+  CONTEXT_MENU,
+  EDIT_HTML,
+  EDIT_MD,
+  EDIT_TXT,
+  EDITOR_CONFIG_GET,
+  EDITOR_CONFIG_RES,
+  EDITOR_EXEC,
+  EDITOR_FILE_NAME,
+  EDITOR_LABEL,
+  FILE_EXT_SELECT,
+  FILE_EXT_SELECT_HTML,
+  FILE_EXT_SELECT_MD,
+  FILE_EXT_SELECT_TXT,
+  HOST,
+  HOST_COMPAT,
+  HOST_CONNECTION,
+  HOST_ERR_NOTIFY,
+  HOST_STATUS_GET,
+  HOST_VERSION,
+  HOST_VERSION_LATEST,
+  INFO_COLOR,
+  INFO_TEXT,
+  IS_CONNECTABLE,
+  IS_EXECUTABLE,
+  IS_MAC,
+  LOCAL_FILE_VIEW,
+  MENU_ENABLED,
+  MODE_EDIT,
+  MODE_EDIT_HTML,
+  MODE_EDIT_MD,
+  MODE_EDIT_TXT,
+  MODE_MATHML,
+  MODE_SELECTION,
+  MODE_SOURCE,
+  MODE_SVG,
+  ONLY_EDITABLE,
+  OPTIONS_OPEN,
+  PROCESS_CHILD,
+  SYNC_AUTO,
+  SYNC_AUTO_URL,
+  TMP_FILE_CREATE,
+  TMP_FILE_DATA_PORT,
+  TMP_FILE_DATA_REMOVE,
+  TMP_FILE_GET,
+  TMP_FILE_RES,
+  WARN_COLOR,
+  WARN_TEXT
 } from '../src/mjs/constant.js';
 import * as mjs from '../src/mjs/main.js';
 
@@ -90,8 +127,11 @@ describe('main', () => {
       assert.strictEqual(mjs.localOpts.size, 0, 'local');
       assert.strictEqual(mjs.globalOpts.size, 1, 'global');
       assert.strictEqual(mjs.globalOpts.has(SYNC_AUTO_URL), true, 'key');
-      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL),
-        'https://example.com', 'value');
+      assert.strictEqual(
+        mjs.globalOpts.get(SYNC_AUTO_URL),
+        'https://example.com',
+        'value'
+      );
     });
 
     it('should set option', async () => {
@@ -213,8 +253,11 @@ describe('main', () => {
       assert.strictEqual(mjs.localOpts.size, 1, 'local');
       assert.strictEqual(mjs.globalOpts.size, 0, 'global');
       assert.strictEqual(mjs.localOpts.has(FILE_EXT_SELECT_HTML), true, 'key');
-      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_HTML), true,
-        'value');
+      assert.strictEqual(
+        mjs.localOpts.get(FILE_EXT_SELECT_HTML),
+        true,
+        'value'
+      );
     });
 
     it('should set option', async () => {
@@ -307,23 +350,36 @@ describe('main', () => {
       browser.action.setBadgeText.callsFake(arg => arg);
       browser.action.setBadgeTextColor.callsFake(arg => arg);
       const res = await func();
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.deepEqual(res, [
-        {
-          color: WARN_COLOR
-        },
-        {
-          text: WARN_TEXT
-        },
-        {
-          color: 'white'
-        }
-      ], 'result');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
+      assert.deepEqual(
+        res,
+        [
+          {
+            color: WARN_COLOR
+          },
+          {
+            text: WARN_TEXT
+          },
+          {
+            color: 'white'
+          }
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -339,20 +395,33 @@ describe('main', () => {
       });
       mjs.localOpts.set(IS_EXECUTABLE, true);
       const res = await func();
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
-        'not called');
-      assert.deepEqual(res, [
-        {
-          color: [0, 0, 0, 0]
-        },
-        {
-          text: ''
-        }
-      ], 'result');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k,
+        'not called'
+      );
+      assert.deepEqual(
+        res,
+        [
+          {
+            color: [0, 0, 0, 0]
+          },
+          {
+            text: ''
+          }
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -368,23 +437,36 @@ describe('main', () => {
       });
       mjs.localOpts.set(IS_EXECUTABLE, true);
       const res = await func();
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.deepEqual(res, [
-        {
-          color: WARN_COLOR
-        },
-        {
-          text: WARN_TEXT
-        },
-        {
-          color: 'white'
-        }
-      ], 'result');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
+      assert.deepEqual(
+        res,
+        [
+          {
+            color: WARN_COLOR
+          },
+          {
+            text: WARN_TEXT
+          },
+          {
+            color: 'white'
+          }
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -400,23 +482,36 @@ describe('main', () => {
       });
       mjs.localOpts.set(IS_EXECUTABLE, true);
       const res = await func();
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.deepEqual(res, [
-        {
-          color: WARN_COLOR
-        },
-        {
-          text: WARN_TEXT
-        },
-        {
-          color: 'white'
-        }
-      ], 'result');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
+      assert.deepEqual(
+        res,
+        [
+          {
+            color: WARN_COLOR
+          },
+          {
+            text: WARN_TEXT
+          },
+          {
+            color: 'white'
+          }
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -432,23 +527,36 @@ describe('main', () => {
       });
       mjs.localOpts.set(IS_EXECUTABLE, false);
       const res = await func();
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.deepEqual(res, [
-        {
-          color: WARN_COLOR
-        },
-        {
-          text: WARN_TEXT
-        },
-        {
-          color: 'white'
-        }
-      ], 'result');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
+      assert.deepEqual(
+        res,
+        [
+          {
+            color: WARN_COLOR
+          },
+          {
+            text: WARN_TEXT
+          },
+          {
+            color: 'white'
+          }
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -465,23 +573,36 @@ describe('main', () => {
       });
       mjs.localOpts.set(IS_EXECUTABLE, true);
       const res = await func();
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.deepEqual(res, [
-        {
-          color: INFO_COLOR
-        },
-        {
-          text: INFO_TEXT
-        },
-        {
-          color: 'white'
-        }
-      ], 'result');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
+      assert.deepEqual(
+        res,
+        [
+          {
+            color: INFO_COLOR
+          },
+          {
+            text: INFO_TEXT
+          },
+          {
+            color: 'white'
+          }
+        ],
+        'result'
+      );
     });
   });
 
@@ -503,10 +624,16 @@ describe('main', () => {
       for (const [key, value] of items) {
         assert.strictEqual(keys.includes(key), true, `${key} key`);
         assert.strictEqual(value.id, key, `${key} id`);
-        assert.strictEqual(Array.isArray(value.contexts), true,
-          `${key} contexts`);
-        assert.strictEqual(value.placeholder.includes('&'), true,
-          `${key} placeholder`);
+        assert.strictEqual(
+          Array.isArray(value.contexts),
+          true,
+          `${key} contexts`
+        );
+        assert.strictEqual(
+          value.placeholder.includes('&'),
+          true,
+          `${key} placeholder`
+        );
       }
     });
   });
@@ -539,28 +666,32 @@ describe('main', () => {
 
     it('should get object', () => {
       const res = func(OPTIONS_OPEN);
-      assert.deepEqual(res, {
-        contexts: [
-          'browser_action'
-        ],
-        enabled: true,
-        title: 'openOptionsPage_key,(&T)',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['browser_action'],
+          enabled: true,
+          title: 'openOptionsPage_key,(&T)',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
       mjs.localOpts.set(EDITOR_LABEL, 'foo');
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: false,
-        title: 'modeEditText_key,foo,(&E)',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: false,
+          title: 'modeEditText_key,foo,(&E)',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -568,14 +699,16 @@ describe('main', () => {
       mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: false,
-        title: 'modeEditText_key,foo,(&E)',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: false,
+          title: 'modeEditText_key,foo,(&E)',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -586,28 +719,32 @@ describe('main', () => {
       mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: true,
-        title: 'modeEditText_key,foo,(&E)',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: true,
+          title: 'modeEditText_key,foo,(&E)',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
       mjs.localOpts.set(EDITOR_LABEL, 'foo');
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_SELECTION);
-      assert.deepEqual(res, {
-        contexts: [
-          'selection'
-        ],
-        enabled: false,
-        title: 'modeViewSelection_key,foo,(&V)',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['selection'],
+          enabled: false,
+          title: 'modeViewSelection_key,foo,(&V)',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -616,14 +753,16 @@ describe('main', () => {
       mjs.localOpts.set(MENU_ENABLED, true);
       mjs.globalOpts.set(ONLY_EDITABLE, true);
       const res = func(MODE_SELECTION);
-      assert.deepEqual(res, {
-        contexts: [
-          'selection'
-        ],
-        enabled: false,
-        title: 'modeViewSelection_key,foo,(&V)',
-        visible: false
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['selection'],
+          enabled: false,
+          title: 'modeViewSelection_key,foo,(&V)',
+          visible: false
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -635,29 +774,32 @@ describe('main', () => {
       mjs.localOpts.set(MENU_ENABLED, true);
       mjs.globalOpts.set(ONLY_EDITABLE, true);
       const res = func(MODE_SELECTION);
-      assert.deepEqual(res, {
-        contexts: [
-          'selection'
-        ],
-        enabled: true,
-        title: 'modeViewSelection_key,foo,(&V)',
-        visible: false
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['selection'],
+          enabled: true,
+          title: 'modeViewSelection_key,foo,(&V)',
+          visible: false
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
       mjs.localOpts.set(EDITOR_LABEL, 'foo');
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_SOURCE);
-      assert.deepEqual(res, {
-        contexts: [
-          'frame',
-          'page'
-        ],
-        enabled: false,
-        title: 'modeViewSource_key,foo,(&V)',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['frame', 'page'],
+          enabled: false,
+          title: 'modeViewSource_key,foo,(&V)',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -666,15 +808,16 @@ describe('main', () => {
       mjs.localOpts.set(MENU_ENABLED, true);
       mjs.globalOpts.set(ONLY_EDITABLE, true);
       const res = func(MODE_SOURCE);
-      assert.deepEqual(res, {
-        contexts: [
-          'frame',
-          'page'
-        ],
-        enabled: false,
-        title: 'modeViewSource_key,foo,(&V)',
-        visible: false
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['frame', 'page'],
+          enabled: false,
+          title: 'modeViewSource_key,foo,(&V)',
+          visible: false
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -686,15 +829,16 @@ describe('main', () => {
       mjs.localOpts.set(MENU_ENABLED, true);
       mjs.globalOpts.set(ONLY_EDITABLE, true);
       const res = func(MODE_SOURCE);
-      assert.deepEqual(res, {
-        contexts: [
-          'frame',
-          'page'
-        ],
-        enabled: true,
-        title: 'modeViewSource_key,foo,(&V)',
-        visible: false
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['frame', 'page'],
+          enabled: true,
+          title: 'modeViewSource_key,foo,(&V)',
+          visible: false
+        },
+        'result'
+      );
     });
 
     it('should get empty object', () => {
@@ -712,15 +856,17 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT, true);
       mjs.localOpts.set(FILE_EXT_SELECT_HTML, true);
       const res = func(MODE_EDIT_HTML);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: false,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&html',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: false,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&html',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -729,15 +875,17 @@ describe('main', () => {
       mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_HTML);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: false,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&html',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: false,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&html',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -749,15 +897,17 @@ describe('main', () => {
       mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_HTML);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: true,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&html',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: true,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&html',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get empty object', () => {
@@ -775,15 +925,17 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT, true);
       mjs.localOpts.set(FILE_EXT_SELECT_MD, true);
       const res = func(MODE_EDIT_MD);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: false,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&md',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: false,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&md',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -792,15 +944,17 @@ describe('main', () => {
       mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_MD);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: false,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&md',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: false,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&md',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -812,15 +966,17 @@ describe('main', () => {
       mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_MD);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: true,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&md',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: true,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&md',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get empty object', () => {
@@ -838,15 +994,17 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT, true);
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, true);
       const res = func(MODE_EDIT_TXT);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: false,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&txt',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: false,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&txt',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -855,15 +1013,17 @@ describe('main', () => {
       mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_TXT);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: false,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&txt',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: false,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&txt',
+          visible: true
+        },
+        'result'
+      );
     });
 
     it('should get object', () => {
@@ -875,15 +1035,17 @@ describe('main', () => {
       mjs.localOpts.set(IS_EXECUTABLE, true);
       mjs.localOpts.set(MENU_ENABLED, true);
       const res = func(MODE_EDIT_TXT);
-      assert.deepEqual(res, {
-        contexts: [
-          'editable'
-        ],
-        enabled: true,
-        parentId: 'modeEditText',
-        title: 'modeEditTextFileExtension_key,.&txt',
-        visible: true
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          contexts: ['editable'],
+          enabled: true,
+          parentId: 'modeEditText',
+          title: 'modeEditTextFileExtension_key,.&txt',
+          visible: true
+        },
+        'result'
+      );
     });
   });
 
@@ -905,28 +1067,22 @@ describe('main', () => {
       const i = browser.menus.create.callCount;
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 6, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [undefined, undefined, undefined, undefined, undefined, undefined],
+        'result'
+      );
     });
 
     it('should call function', async () => {
       const i = browser.menus.create.callCount;
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 6, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [undefined, undefined, undefined, undefined, undefined, undefined],
+        'result'
+      );
     });
 
     it('should get result', async () => {
@@ -937,14 +1093,11 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 6, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [undefined, undefined, undefined, undefined, undefined, undefined],
+        'result'
+      );
     });
 
     it('should get result', async () => {
@@ -955,15 +1108,19 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 7, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ],
+        'result'
+      );
     });
 
     it('should get result', async () => {
@@ -974,16 +1131,20 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 8, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ],
+        'result'
+      );
     });
 
     it('should get result', async () => {
@@ -994,17 +1155,21 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, true);
       const res = await func();
       assert.strictEqual(browser.menus.create.callCount, i + 9, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ],
+        'result'
+      );
     });
   });
 
@@ -1147,11 +1312,7 @@ describe('main', () => {
         }
       });
       assert.strictEqual(browser.menus.update.callCount, i + 3, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
     });
 
     it('should call function', async () => {
@@ -1162,11 +1323,7 @@ describe('main', () => {
         }
       });
       assert.strictEqual(browser.menus.update.callCount, i + 3, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
     });
 
     it('should call function', async () => {
@@ -1177,25 +1334,18 @@ describe('main', () => {
         }
       });
       assert.strictEqual(browser.menus.update.callCount, i + 3, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
     });
 
     it('should call function', async () => {
       const i = browser.menus.update.callCount;
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [undefined, undefined, undefined, undefined, undefined, undefined],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -1206,14 +1356,11 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [undefined, undefined, undefined, undefined, undefined, undefined],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -1224,15 +1371,19 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 7, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -1243,16 +1394,20 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, false);
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 8, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -1263,17 +1418,21 @@ describe('main', () => {
       mjs.localOpts.set(FILE_EXT_SELECT_TXT, true);
       const res = await func(null, true);
       assert.strictEqual(browser.menus.update.callCount, i + 9, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined
+        ],
+        'result'
+      );
     });
   });
 
@@ -1286,14 +1445,11 @@ describe('main', () => {
       const res = await func();
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.create.callCount, j + 6, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [undefined, undefined, undefined, undefined, undefined, undefined],
+        'result'
+      );
     });
   });
 
@@ -1309,8 +1465,11 @@ describe('main', () => {
     it('should throw', async () => {
       await func().catch(e => {
         assert.strictEqual(e instanceof TypeError, true, 'error');
-        assert.strictEqual(e.message, 'Expected Number but got Undefined.',
-          'message');
+        assert.strictEqual(
+          e.message,
+          'Expected Number but got Undefined.',
+          'message'
+        );
       });
     });
 
@@ -1335,8 +1494,11 @@ describe('main', () => {
     it('should throw', async () => {
       await func().catch(e => {
         assert.strictEqual(e instanceof TypeError, true, 'error');
-        assert.strictEqual(e.message, 'Expected Number but got Undefined.',
-          'message');
+        assert.strictEqual(
+          e.message,
+          'Expected Number but got Undefined.',
+          'message'
+        );
       });
     });
 
@@ -1438,14 +1600,11 @@ describe('main', () => {
       assert.strictEqual(res.length, 3, 'length');
       assert.strictEqual(res[0] instanceof Set, true, 'result');
       assert.strictEqual(res[1], null, 'result');
-      assert.deepEqual(res[2], [
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(
+        res[2],
+        [undefined, undefined, undefined, undefined, undefined, undefined],
+        'result'
+      );
     });
   });
 
@@ -1471,23 +1630,32 @@ describe('main', () => {
     it('should call function', async () => {
       const i = browser.runtime.openOptionsPage.callCount;
       browser.runtime.openOptionsPage.resolves({});
-      const res = await func({
-        menuItemId: OPTIONS_OPEN
-      }, {
-        id: 1
-      });
-      assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
-        'called');
+      const res = await func(
+        {
+          menuItemId: OPTIONS_OPEN
+        },
+        {
+          id: 1
+        }
+      );
+      assert.strictEqual(
+        browser.runtime.openOptionsPage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
 
     it('should not call function', async () => {
       const i = browser.tabs.sendMessage.callCount;
-      const res = await func({
-        menuItemId: 'foo'
-      }, {
-        id: 2
-      });
+      const res = await func(
+        {
+          menuItemId: 'foo'
+        },
+        {
+          id: 2
+        }
+      );
       assert.strictEqual(browser.tabs.sendMessage.callCount, i, 'not called');
       assert.strictEqual(res, null, 'result');
     });
@@ -1496,11 +1664,14 @@ describe('main', () => {
       const i = browser.tabs.sendMessage.callCount;
       browser.tabs.sendMessage.resolves({});
       mjs.tabList.add(2);
-      const res = await func({
-        menuItemId: 'foo'
-      }, {
-        id: 2
-      });
+      const res = await func(
+        {
+          menuItemId: 'foo'
+        },
+        {
+          id: 2
+        }
+      );
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, {}, 'result');
     });
@@ -1509,11 +1680,14 @@ describe('main', () => {
       const i = browser.tabs.sendMessage.callCount;
       browser.tabs.sendMessage.resolves({});
       mjs.tabList.add(2);
-      const res = await func({
-        frameId: 0
-      }, {
-        id: 2
-      });
+      const res = await func(
+        {
+          frameId: 0
+        },
+        {
+          id: 2
+        }
+      );
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, {}, 'result');
     });
@@ -1525,8 +1699,11 @@ describe('main', () => {
     it('should throw', async () => {
       await func().catch(e => {
         assert.strictEqual(e instanceof TypeError, true, 'error');
-        assert.strictEqual(e.message, 'Expected String but got Undefined.',
-          'message');
+        assert.strictEqual(
+          e.message,
+          'Expected String but got Undefined.',
+          'message'
+        );
       });
     });
 
@@ -1558,9 +1735,11 @@ describe('main', () => {
 
     it('should not call function', async () => {
       const i = browser.tabs.sendMessage.callCount;
-      browser.tabs.query.resolves([{
-        id: 3
-      }]);
+      browser.tabs.query.resolves([
+        {
+          id: 3
+        }
+      ]);
       const res = await func('foo', {
         data: {
           tabId: '2'
@@ -1573,9 +1752,11 @@ describe('main', () => {
     it('should call function', async () => {
       const i = browser.tabs.sendMessage.callCount;
       browser.tabs.sendMessage.resolves({});
-      browser.tabs.query.resolves([{
-        id: 2
-      }]);
+      browser.tabs.query.resolves([
+        {
+          id: 2
+        }
+      ]);
       const res = await func('foo', {
         data: {
           tabId: '2'
@@ -1593,8 +1774,11 @@ describe('main', () => {
       const i = browser.runtime.openOptionsPage.callCount;
       browser.runtime.openOptionsPage.resolves(undefined);
       const res = await func();
-      assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.openOptionsPage.callCount,
+        i + 1,
+        'called'
+      );
       assert.strictEqual(res, undefined, 'result');
     });
   });
@@ -1661,9 +1845,7 @@ describe('main', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.strictEqual(calledOnce, true, 'called');
-      assert.deepEqual(res, [
-        `${HOST}: bar`
-      ], 'result');
+      assert.deepEqual(res, [`${HOST}: bar`], 'result');
     });
 
     it('should call function', async () => {
@@ -1678,12 +1860,12 @@ describe('main', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.strictEqual(calledOnce, true, 'called');
-      assert.strictEqual(browser.notifications.create.callCount, i + 1,
-        'called');
-      assert.deepEqual(res, [
-        false,
-        'warn'
-      ], 'result');
+      assert.strictEqual(
+        browser.notifications.create.callCount,
+        i + 1,
+        'called'
+      );
+      assert.deepEqual(res, [false, 'warn'], 'result');
     });
 
     it('should call function', async () => {
@@ -1698,8 +1880,11 @@ describe('main', () => {
       const { called } = stub;
       stub.restore();
       assert.strictEqual(called, false, 'called');
-      assert.strictEqual(browser.notifications.create.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.notifications.create.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, ['warn'], 'result');
     });
 
@@ -1715,12 +1900,12 @@ describe('main', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.strictEqual(calledOnce, true, 'called');
-      assert.strictEqual(browser.notifications.create.callCount, i + 1,
-        'called');
-      assert.deepEqual(res, [
-        false,
-        'error'
-      ], 'result');
+      assert.strictEqual(
+        browser.notifications.create.callCount,
+        i + 1,
+        'called'
+      );
+      assert.deepEqual(res, [false, 'error'], 'result');
     });
 
     it('should call function', async () => {
@@ -1735,8 +1920,11 @@ describe('main', () => {
       const { called } = stub;
       stub.restore();
       assert.strictEqual(called, false, 'called');
-      assert.strictEqual(browser.notifications.create.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.notifications.create.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, ['error'], 'result');
     });
 
@@ -1752,12 +1940,12 @@ describe('main', () => {
       const { calledOnce } = stub;
       stub.restore();
       assert.strictEqual(calledOnce, true, 'called');
-      assert.strictEqual(browser.notifications.create.callCount, i + 1,
-        'called');
-      assert.deepEqual(res, [
-        false,
-        `${PROCESS_CHILD}_stderr`
-      ], 'result');
+      assert.strictEqual(
+        browser.notifications.create.callCount,
+        i + 1,
+        'called'
+      );
+      assert.deepEqual(res, [false, `${PROCESS_CHILD}_stderr`], 'result');
     });
 
     it('should call function', async () => {
@@ -1826,8 +2014,11 @@ describe('main', () => {
         [HOST_STATUS_GET]: true
       };
       const res = await func(msg);
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, [null], 'result');
     });
 
@@ -1837,8 +2028,11 @@ describe('main', () => {
         [OPTIONS_OPEN]: true
       };
       const res = await func(msg);
-      assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.openOptionsPage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2160,16 +2354,11 @@ describe('main', () => {
       const res = await func(info);
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
       assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), false, 'value');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [[undefined, undefined, undefined, undefined, undefined, undefined]],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -2185,17 +2374,14 @@ describe('main', () => {
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
       assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), true, 'value');
-      assert.deepEqual(res, [
-        null,
+      assert.deepEqual(
+        res,
         [
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          null,
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -2211,16 +2397,11 @@ describe('main', () => {
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j, 'not called');
       assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), false, 'value');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [[undefined, undefined, undefined, undefined, undefined, undefined]],
+        'result'
+      );
     });
   });
 
@@ -2238,8 +2419,11 @@ describe('main', () => {
     it('should throw', async () => {
       await func().catch(e => {
         assert.strictEqual(e instanceof TypeError, true, 'error');
-        assert.strictEqual(e.message, 'Expected Number but got Undefined.',
-          'message');
+        assert.strictEqual(
+          e.message,
+          'Expected Number but got Undefined.',
+          'message'
+        );
       });
     });
 
@@ -2269,41 +2453,35 @@ describe('main', () => {
       const i = browser.menus.update.callCount;
       const res = await func(2, { status: 'complete' }, { active: true });
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [[undefined, undefined, undefined, undefined, undefined, undefined]],
+        'result'
+      );
     });
 
     it('should call function', async () => {
       const i = browser.menus.update.callCount;
       mjs.localOpts.set(MENU_ENABLED, false);
       mjs.tabList.add(2);
-      const res = await func(2, {
-        status: 'complete'
-      }, {
-        active: true,
-        url: 'https://example.com',
-        windowId: 1
-      });
+      const res = await func(
+        2,
+        {
+          status: 'complete'
+        },
+        {
+          active: true,
+          url: 'https://example.com',
+          windowId: 1
+        }
+      );
       assert.strictEqual(mjs.localOpts.get(MENU_ENABLED), true, 'value');
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [[undefined, undefined, undefined, undefined, undefined, undefined]],
+        'result'
+      );
     });
   });
 
@@ -2321,8 +2499,11 @@ describe('main', () => {
     it('should throw', async () => {
       await func().catch(e => {
         assert.strictEqual(e instanceof TypeError, true, 'error');
-        assert.strictEqual(e.message, 'Expected Number but got Undefined.',
-          'message');
+        assert.strictEqual(
+          e.message,
+          'Expected Number but got Undefined.',
+          'message'
+        );
       });
     });
 
@@ -2362,8 +2543,11 @@ describe('main', () => {
       assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
       assert.strictEqual(connectedTabs.has(2), true, 'connected tabs has id');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
-      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j,
-        'not called');
+      assert.strictEqual(
+        browser.windows.get.withArgs(1, null).callCount,
+        j,
+        'not called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -2384,8 +2568,11 @@ describe('main', () => {
       assert.strictEqual(mjs.tabList.has(2), false, 'tabList has id');
       assert.strictEqual(connectedTabs.size, 0, 'connected tabs size');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
-      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
-        'called');
+      assert.strictEqual(
+        browser.windows.get.withArgs(1, null).callCount,
+        j + 1,
+        'called'
+      );
       assert.strictEqual(res.length, 1, 'length');
       assert.strictEqual(res[0] instanceof Set, true, 'result');
     });
@@ -2409,8 +2596,11 @@ describe('main', () => {
       assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
       assert.strictEqual(connectedTabs.has(2), false, 'connected tabs has id');
       assert.strictEqual(port.postMessage.callCount, i, 'not called');
-      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
-        'called');
+      assert.strictEqual(
+        browser.windows.get.withArgs(1, null).callCount,
+        j + 1,
+        'called'
+      );
       assert.strictEqual(res.length, 1, 'length');
       assert.strictEqual(res[0] instanceof Set, true, 'result');
     });
@@ -2434,8 +2624,11 @@ describe('main', () => {
       assert.strictEqual(connectedTabs.size, 1, 'connected tabs size');
       assert.strictEqual(connectedTabs.has(2), false, 'connected tabs has id');
       assert.strictEqual(port.postMessage.callCount, i + 1, 'called');
-      assert.strictEqual(browser.windows.get.withArgs(1, null).callCount, j + 1,
-        'called');
+      assert.strictEqual(
+        browser.windows.get.withArgs(1, null).callCount,
+        j + 1,
+        'called'
+      );
       assert.strictEqual(res.length, 2, 'length');
       assert.strictEqual(res[0], undefined, 'result');
       assert.strictEqual(res[1] instanceof Set, true, 'result');
@@ -2498,28 +2691,29 @@ describe('main', () => {
         id: 1,
         type: 'normal'
       });
-      browser.tabs.query.withArgs({
-        windowId: 1,
-        active: true,
-        windowType: 'normal'
-      }).resolves([{
-        id: 2
-      }]);
+      browser.tabs.query
+        .withArgs({
+          windowId: 1,
+          active: true,
+          windowType: 'normal'
+        })
+        .resolves([
+          {
+            id: 2
+          }
+        ]);
       mjs.tabList.add(2);
       const res = await func(1);
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
       assert.strictEqual(browser.tabs.sendMessage.callCount, j + 1, 'called');
-      assert.deepEqual(res, [
-        null,
+      assert.deepEqual(
+        res,
         [
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          null,
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should not call function', async () => {
@@ -2530,13 +2724,17 @@ describe('main', () => {
         id: 1,
         type: 'normal'
       });
-      browser.tabs.query.withArgs({
-        windowId: 1,
-        active: true,
-        windowType: 'normal'
-      }).resolves([{
-        id: browser.tabs.TAB_ID_NONE
-      }]);
+      browser.tabs.query
+        .withArgs({
+          windowId: 1,
+          active: true,
+          windowType: 'normal'
+        })
+        .resolves([
+          {
+            id: browser.tabs.TAB_ID_NONE
+          }
+        ]);
       mjs.tabList.add(2);
       const res = await func(1);
       assert.strictEqual(browser.menus.update.callCount, i, 'not called');
@@ -2566,17 +2764,19 @@ describe('main', () => {
       browser.tabs.get.withArgs(1).rejects(new Error('error'));
       browser.tabs.get.withArgs(2).resolves({});
       browser.tabs.get.withArgs(3).rejects(new Error('error'));
-      browser.windows.getAll.withArgs({
-        populate: false,
-        windowTypes: ['normal']
-      }).resolves([
-        {
-          incognito: false
-        },
-        {
-          incognito: false
-        }
-      ]);
+      browser.windows.getAll
+        .withArgs({
+          populate: false,
+          windowTypes: ['normal']
+        })
+        .resolves([
+          {
+            incognito: false
+          },
+          {
+            incognito: false
+          }
+        ]);
       const res = await func();
       assert.strictEqual(mjs.tabList.size, 1, 'size');
       assert.strictEqual(mjs.tabList.has(1), false, 'removed');
@@ -2596,17 +2796,19 @@ describe('main', () => {
       browser.tabs.get.withArgs(1).rejects(new Error('error'));
       browser.tabs.get.withArgs(2).resolves({});
       browser.tabs.get.withArgs(3).rejects(new Error('error'));
-      browser.windows.getAll.withArgs({
-        populate: false,
-        windowTypes: ['normal']
-      }).resolves([
-        {
-          incognito: false
-        },
-        {
-          incognito: true
-        }
-      ]);
+      browser.windows.getAll
+        .withArgs({
+          populate: false,
+          windowTypes: ['normal']
+        })
+        .resolves([
+          {
+            incognito: false
+          },
+          {
+            incognito: true
+          }
+        ]);
       const res = await func();
       assert.strictEqual(mjs.tabList.size, 1, 'size');
       assert.strictEqual(mjs.tabList.has(1), false, 'removed');
@@ -2629,8 +2831,11 @@ describe('main', () => {
     it('should throw', async () => {
       await func().catch(e => {
         assert.strictEqual(e instanceof TypeError, true, 'error');
-        assert.strictEqual(e.message, 'Expected String but got Undefined.',
-          'message');
+        assert.strictEqual(
+          e.message,
+          'Expected String but got Undefined.',
+          'message'
+        );
       });
     });
 
@@ -2643,8 +2848,11 @@ describe('main', () => {
       const i = browser.runtime.openOptionsPage.callCount;
       browser.runtime.openOptionsPage.resolves(undefined);
       const res = await func(OPTIONS_OPEN);
-      assert.strictEqual(browser.runtime.openOptionsPage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.openOptionsPage.callCount,
+        i + 1,
+        'called'
+      );
       assert.strictEqual(res, undefined, 'result');
     });
 
@@ -2652,14 +2860,18 @@ describe('main', () => {
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.tabs.query.callCount;
       browser.tabs.sendMessage.resolves({});
-      browser.tabs.query.withArgs({
-        windowId: browser.windows.WINDOW_ID_CURRENT,
-        active: true,
-        windowType: 'normal'
-      }).resolves([{
-        id: 2,
-        windowId: 1
-      }]);
+      browser.tabs.query
+        .withArgs({
+          windowId: browser.windows.WINDOW_ID_CURRENT,
+          active: true,
+          windowType: 'normal'
+        })
+        .resolves([
+          {
+            id: 2,
+            windowId: 1
+          }
+        ]);
       const res = await func(EDITOR_EXEC, {
         id: 2
       });
@@ -2672,14 +2884,18 @@ describe('main', () => {
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.tabs.query.callCount;
       browser.tabs.sendMessage.resolves({});
-      browser.tabs.query.withArgs({
-        windowId: browser.windows.WINDOW_ID_CURRENT,
-        active: true,
-        windowType: 'normal'
-      }).resolves([{
-        id: 2,
-        windowId: 1
-      }]);
+      browser.tabs.query
+        .withArgs({
+          windowId: browser.windows.WINDOW_ID_CURRENT,
+          active: true,
+          windowType: 'normal'
+        })
+        .resolves([
+          {
+            id: 2,
+            windowId: 1
+          }
+        ]);
       const res = await func(EDITOR_EXEC);
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.tabs.query.callCount, j + 1, 'called');
@@ -2697,14 +2913,18 @@ describe('main', () => {
       }).callCount;
       const j = browser.tabs.query.callCount;
       browser.tabs.sendMessage.resolves({});
-      browser.tabs.query.withArgs({
-        windowId: browser.windows.WINDOW_ID_CURRENT,
-        active: true,
-        windowType: 'normal'
-      }).resolves([{
-        id: 2,
-        windowId: 1
-      }]);
+      browser.tabs.query
+        .withArgs({
+          windowId: browser.windows.WINDOW_ID_CURRENT,
+          active: true,
+          windowType: 'normal'
+        })
+        .resolves([
+          {
+            id: 2,
+            windowId: 1
+          }
+        ]);
       const res = await func(EDIT_HTML, {
         id: 2
       });
@@ -2724,14 +2944,18 @@ describe('main', () => {
       }).callCount;
       const j = browser.tabs.query.callCount;
       browser.tabs.sendMessage.resolves({});
-      browser.tabs.query.withArgs({
-        windowId: browser.windows.WINDOW_ID_CURRENT,
-        active: true,
-        windowType: 'normal'
-      }).resolves([{
-        id: 2,
-        windowId: 1
-      }]);
+      browser.tabs.query
+        .withArgs({
+          windowId: browser.windows.WINDOW_ID_CURRENT,
+          active: true,
+          windowType: 'normal'
+        })
+        .resolves([
+          {
+            id: 2,
+            windowId: 1
+          }
+        ]);
       const res = await func(EDIT_MD, {
         id: 2
       });
@@ -2751,14 +2975,18 @@ describe('main', () => {
       }).callCount;
       const j = browser.tabs.query.callCount;
       browser.tabs.sendMessage.resolves({});
-      browser.tabs.query.withArgs({
-        windowId: browser.windows.WINDOW_ID_CURRENT,
-        active: true,
-        windowType: 'normal'
-      }).resolves([{
-        id: 2,
-        windowId: 1
-      }]);
+      browser.tabs.query
+        .withArgs({
+          windowId: browser.windows.WINDOW_ID_CURRENT,
+          active: true,
+          windowType: 'normal'
+        })
+        .resolves([
+          {
+            id: 2,
+            windowId: 1
+          }
+        ]);
       const res = await func(EDIT_TXT, {
         id: 2
       });
@@ -2826,8 +3054,11 @@ describe('main', () => {
     it('should throw', async () => {
       await func().catch(e => {
         assert.strictEqual(e instanceof TypeError, true, 'error');
-        assert.strictEqual(e.message, 'Expected String but got Undefined.',
-          'message');
+        assert.strictEqual(
+          e.message,
+          'Expected String but got Undefined.',
+          'message'
+        );
       });
     });
 
@@ -2853,12 +3084,21 @@ describe('main', () => {
         }
       });
       assert.strictEqual(mjs.localOpts.get(IS_EXECUTABLE), true, 'value');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount, i,
-        'not called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j,
-        'not called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
-        'not called');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i,
+        'not called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j,
+        'not called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k,
+        'not called'
+      );
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -2866,26 +3106,36 @@ describe('main', () => {
       const i = browser.action.setBadgeBackgroundColor.callCount;
       const j = browser.action.setBadgeText.callCount;
       const k = browser.action.setBadgeTextColor.callCount;
-      const res = await func(EDITOR_FILE_NAME, {
-        app: {
-          executable: true
-        }
-      }, true);
+      const res = await func(
+        EDITOR_FILE_NAME,
+        {
+          app: {
+            executable: true
+          }
+        },
+        true
+      );
       assert.strictEqual(mjs.localOpts.get(IS_EXECUTABLE), true, 'value');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.deepEqual(res, [
-        undefined,
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
+      assert.deepEqual(
+        res,
+        [undefined, [undefined, undefined, undefined]],
+        'result'
+      );
     });
 
     it('should set value', async () => {
@@ -2900,22 +3150,23 @@ describe('main', () => {
 
     it('should call function', async () => {
       const i = browser.menus.update.callCount;
-      const res = await func(EDITOR_LABEL, {
-        value: 'foo'
-      }, true);
+      const res = await func(
+        EDITOR_LABEL,
+        {
+          value: 'foo'
+        },
+        true
+      );
       assert.strictEqual(mjs.localOpts.get(EDITOR_LABEL), 'foo', 'value');
       assert.strictEqual(browser.menus.update.callCount, i + 6, 'called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should set value', async () => {
@@ -2930,22 +3181,23 @@ describe('main', () => {
 
     it('should call function', async () => {
       const i = browser.menus.removeAll.callCount;
-      const res = await func(FILE_EXT_SELECT, {
-        checked: true
-      }, true);
+      const res = await func(
+        FILE_EXT_SELECT,
+        {
+          checked: true
+        },
+        true
+      );
       assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should set value', async () => {
@@ -2953,31 +3205,38 @@ describe('main', () => {
       const res = await func(FILE_EXT_SELECT_HTML, {
         checked: true
       });
-      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_HTML), true,
-        'value');
+      assert.strictEqual(
+        mjs.localOpts.get(FILE_EXT_SELECT_HTML),
+        true,
+        'value'
+      );
       assert.strictEqual(browser.menus.removeAll.callCount, i, 'not called');
       assert.deepEqual(res, [undefined], 'result');
     });
 
     it('should call function', async () => {
       const i = browser.menus.removeAll.callCount;
-      const res = await func(FILE_EXT_SELECT_HTML, {
-        checked: true
-      }, true);
-      assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_HTML), true,
-        'value');
+      const res = await func(
+        FILE_EXT_SELECT_HTML,
+        {
+          checked: true
+        },
+        true
+      );
+      assert.strictEqual(
+        mjs.localOpts.get(FILE_EXT_SELECT_HTML),
+        true,
+        'value'
+      );
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should set value', async () => {
@@ -2992,22 +3251,23 @@ describe('main', () => {
 
     it('should call function', async () => {
       const i = browser.menus.removeAll.callCount;
-      const res = await func(FILE_EXT_SELECT_MD, {
-        checked: true
-      }, true);
+      const res = await func(
+        FILE_EXT_SELECT_MD,
+        {
+          checked: true
+        },
+        true
+      );
       assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_MD), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should set value', async () => {
@@ -3022,22 +3282,23 @@ describe('main', () => {
 
     it('should call function', async () => {
       const i = browser.menus.removeAll.callCount;
-      const res = await func(FILE_EXT_SELECT_TXT, {
-        checked: true
-      }, true);
+      const res = await func(
+        FILE_EXT_SELECT_TXT,
+        {
+          checked: true
+        },
+        true
+      );
       assert.strictEqual(mjs.localOpts.get(FILE_EXT_SELECT_TXT), true, 'value');
       assert.strictEqual(browser.menus.removeAll.callCount, i + 1, 'called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should not call function', async () => {
@@ -3045,8 +3306,11 @@ describe('main', () => {
       const res = await func(HOST_ERR_NOTIFY, {
         checked: false
       });
-      assert.strictEqual(browser.notifications.onClosed.addListener.callCount,
-        i, 'not called');
+      assert.strictEqual(
+        browser.notifications.onClosed.addListener.callCount,
+        i,
+        'not called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3055,8 +3319,11 @@ describe('main', () => {
       const res = await func(HOST_ERR_NOTIFY, {
         checked: true
       });
-      assert.strictEqual(browser.notifications.onClosed.addListener.callCount,
-        i + 1, 'called');
+      assert.strictEqual(
+        browser.notifications.onClosed.addListener.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3083,24 +3350,25 @@ describe('main', () => {
       mjs.tabList.add(1);
       const i = browser.tabs.sendMessage.callCount;
       const j = browser.menus.removeAll.callCount;
-      const res = await func(ONLY_EDITABLE, {
-        checked: true
-      }, true);
+      const res = await func(
+        ONLY_EDITABLE,
+        {
+          checked: true
+        },
+        true
+      );
       assert.strictEqual(mjs.globalOpts.get(ONLY_EDITABLE), true, 'value');
       assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.strictEqual(browser.menus.removeAll.callCount, j + 1, 'called');
-      assert.deepEqual(res, [
-        undefined,
-        [null],
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          [null],
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should set value', async () => {
@@ -3126,8 +3394,11 @@ describe('main', () => {
       const res = await func(SYNC_AUTO_URL, {
         value: 'https://example.com'
       });
-      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL),
-        'https://example.com', 'value');
+      assert.strictEqual(
+        mjs.globalOpts.get(SYNC_AUTO_URL),
+        'https://example.com',
+        'value'
+      );
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -3137,10 +3408,12 @@ describe('main', () => {
       const res = await func(SYNC_AUTO_URL, {
         value: 'https://example.com'
       });
-      assert.strictEqual(mjs.globalOpts.get(SYNC_AUTO_URL),
-        'https://example.com', 'value');
-      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        mjs.globalOpts.get(SYNC_AUTO_URL),
+        'https://example.com',
+        'value'
+      );
+      assert.strictEqual(browser.tabs.sendMessage.callCount, i + 1, 'called');
       assert.deepEqual(res, [undefined, [null]], 'result');
     });
   });
@@ -3154,11 +3427,14 @@ describe('main', () => {
     });
 
     it('should not set variables', async () => {
-      const res = await func({
-        foo: {
-          checked: true
-        }
-      }, 'bar');
+      const res = await func(
+        {
+          foo: {
+            checked: true
+          }
+        },
+        'bar'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3172,11 +3448,14 @@ describe('main', () => {
     });
 
     it('should set variables', async () => {
-      const res = await func({
-        foo: {
-          checked: true
-        }
-      }, 'local');
+      const res = await func(
+        {
+          foo: {
+            checked: true
+          }
+        },
+        'local'
+      );
       assert.deepEqual(res, [[]], 'result');
     });
 
@@ -3199,47 +3478,51 @@ describe('main', () => {
       const i = browser.runtime.sendMessage.callCount;
       browser.runtime.sendMessage.resolves({});
       browser.runtime.getURL.returns('moz-extension://foo/bar.html');
-      browser.tabs.query.resolves([{
-        url: 'https://example.com'
-      }]);
+      browser.tabs.query.resolves([
+        {
+          url: 'https://example.com'
+        }
+      ]);
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should send message', async () => {
       const i = browser.runtime.sendMessage.callCount;
       browser.runtime.sendMessage.resolves({});
       browser.runtime.getURL.returns('moz-extension://foo/bar.html');
-      browser.tabs.query.resolves([{
-        url: 'moz-extension://foo/bar.html'
-      }]);
+      browser.tabs.query.resolves([
+        {
+          url: 'moz-extension://foo/bar.html'
+        }
+      ]);
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
+          [undefined, undefined, undefined, undefined, undefined, undefined],
+          {}
         ],
-        {}
-      ], 'result');
+        'result'
+      );
     });
 
     it('should not send message', async () => {
@@ -3251,34 +3534,35 @@ describe('main', () => {
       const i = browser.runtime.sendMessage.callCount;
       browser.runtime.sendMessage.resolves({});
       browser.runtime.getURL.returns('moz-extension://foo/bar.html');
-      browser.tabs.query.resolves([{
-        url: 'https://example.com'
-      }]);
-      browser.storage.local.get.withArgs([
-        EDITOR_FILE_NAME,
-        EDITOR_LABEL
-      ]).resolves({
-        [EDITOR_FILE_NAME]: {
-          value: 'bar'
-        },
-        [EDITOR_LABEL]: {
-          value: 'baz'
+      browser.tabs.query.resolves([
+        {
+          url: 'https://example.com'
         }
-      });
+      ]);
+      browser.storage.local.get
+        .withArgs([EDITOR_FILE_NAME, EDITOR_LABEL])
+        .resolves({
+          [EDITOR_FILE_NAME]: {
+            value: 'bar'
+          },
+          [EDITOR_LABEL]: {
+            value: 'baz'
+          }
+        });
       const res = await func(data);
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+          [undefined, undefined, undefined, undefined, undefined, undefined]
+        ],
+        'result'
+      );
     });
 
     it('should send message', async () => {
@@ -3290,28 +3574,29 @@ describe('main', () => {
       const i = browser.runtime.sendMessage.callCount;
       browser.runtime.sendMessage.resolves({});
       browser.runtime.getURL.returns('moz-extension://foo/bar.html');
-      browser.tabs.query.resolves([{
-        url: 'moz-extension://foo/bar.html'
-      }]);
-      browser.storage.local.get.withArgs([
-        EDITOR_FILE_NAME,
-        EDITOR_LABEL
-      ]).resolves({});
+      browser.tabs.query.resolves([
+        {
+          url: 'moz-extension://foo/bar.html'
+        }
+      ]);
+      browser.storage.local.get
+        .withArgs([EDITOR_FILE_NAME, EDITOR_LABEL])
+        .resolves({});
       const res = await func(data);
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
-      assert.deepEqual(res, [
-        undefined,
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
+      assert.deepEqual(
+        res,
         [
           undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined
+          [undefined, undefined, undefined, undefined, undefined, undefined],
+          {}
         ],
-        {}
-      ], 'result');
+        'result'
+      );
     });
   });
 
@@ -3338,18 +3623,23 @@ describe('main', () => {
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.strictEqual(mjs.appHost.size, 0, 'size');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
       assert.strictEqual(errCalled, false, 'not called');
-      assert.deepEqual(res, [[
-        undefined,
-        undefined,
-        undefined
-      ]], 'result');
+      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
     });
 
     it('should call function and log error', async () => {
@@ -3363,21 +3653,27 @@ describe('main', () => {
       const { calledOnce: errCalled } = stubErr;
       stubErr.restore();
       assert.strictEqual(mjs.appHost.size, 0, 'size');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
       assert.strictEqual(errCalled, true, 'called');
-      assert.deepEqual(res, [
-        false,
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [false, [undefined, undefined, undefined]],
+        'result'
+      );
     });
 
     it('should call function and log error', async () => {
@@ -3391,22 +3687,27 @@ describe('main', () => {
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.strictEqual(mjs.appHost.size, 0, 'size');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called'
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
       );
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
       assert.strictEqual(errCalled, true, 'called');
-      assert.deepEqual(res, [
-        false,
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(
+        res,
+        [false, [undefined, undefined, undefined]],
+        'result'
+      );
     });
   });
 
@@ -3446,18 +3747,23 @@ describe('main', () => {
       stubErr.restore();
       browser.runtime.lastError = lastErrorDefaultValue;
       assert.strictEqual(mjs.appHost.size, 0, 'size');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
       assert.strictEqual(errCalled, false, 'not called');
-      assert.deepEqual(res, [[
-        undefined,
-        undefined,
-        undefined
-      ]], 'result');
+      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
     });
   });
 
@@ -3519,29 +3825,31 @@ describe('main', () => {
         [EDITOR_CONFIG_RES]: {}
       };
       browser.runtime.getURL.returns('moz-extension://foo/bar.html');
-      browser.tabs.query.resolves([{
-        url: 'moz-extension://foo/bar.html'
-      }]);
+      browser.tabs.query.resolves([
+        {
+          url: 'moz-extension://foo/bar.html'
+        }
+      ]);
       browser.storage.local.get.resolves({});
       const res = await func(msg);
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.strictEqual(browser.storage.local.set.callCount, j + 1, 'called');
       assert.strictEqual(browser.menus.removeAll.callCount, k + 1, 'called');
-      assert.deepEqual(res, [
+      assert.deepEqual(
+        res,
         [
-          undefined,
           [
             undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined
-          ],
-          null
-        ]
-      ], 'result');
+            [undefined, undefined, undefined, undefined, undefined, undefined],
+            null
+          ]
+        ],
+        'result'
+      );
     });
 
     it('should call function', async () => {
@@ -3564,21 +3872,24 @@ describe('main', () => {
       };
       const res = await func(msg);
       const status = mjs.appHost.get('status');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
       assert.strictEqual(status[HOST_COMPAT], true, 'compat');
       assert.strictEqual(status[HOST_VERSION_LATEST], null, 'latest');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
@@ -3594,21 +3905,24 @@ describe('main', () => {
       };
       const res = await func(msg);
       const status = mjs.appHost.get('status');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
       assert.strictEqual(status[HOST_COMPAT], true, 'compat');
       assert.strictEqual(status[HOST_VERSION_LATEST], null, 'latest');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
@@ -3624,22 +3938,24 @@ describe('main', () => {
       };
       const res = await func(msg);
       const status = mjs.appHost.get('status');
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called'
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
       );
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
       assert.strictEqual(status[HOST_COMPAT], true, 'compat');
       assert.strictEqual(status[HOST_VERSION_LATEST], '1.2.3', 'latest');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
     });
 
     it('should call function', async () => {
@@ -3652,19 +3968,22 @@ describe('main', () => {
         }
       };
       const res = await func(msg);
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount,
-        i + 1, 'called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j + 1,
-        'called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k + 1,
-        'called');
-      assert.deepEqual(res, [
-        [
-          undefined,
-          undefined,
-          undefined
-        ]
-      ], 'result');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j + 1,
+        'called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k + 1,
+        'called'
+      );
+      assert.deepEqual(res, [[undefined, undefined, undefined]], 'result');
     });
 
     it('should not call function', async () => {
@@ -3675,12 +3994,21 @@ describe('main', () => {
         [HOST_VERSION]: {}
       };
       const res = await func(msg);
-      assert.strictEqual(browser.action.setBadgeBackgroundColor.callCount, i,
-        'not called');
-      assert.strictEqual(browser.action.setBadgeText.callCount, j,
-        'not called');
-      assert.strictEqual(browser.action.setBadgeTextColor.callCount, k,
-        'not called');
+      assert.strictEqual(
+        browser.action.setBadgeBackgroundColor.callCount,
+        i,
+        'not called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeText.callCount,
+        j,
+        'not called'
+      );
+      assert.strictEqual(
+        browser.action.setBadgeTextColor.callCount,
+        k,
+        'not called'
+      );
       assert.deepEqual(res, [], 'result');
     });
 
@@ -3700,9 +4028,11 @@ describe('main', () => {
     it('should call function', async () => {
       const i = browser.tabs.query.callCount;
       const j = browser.tabs.sendMessage.callCount;
-      browser.tabs.query.resolves([{
-        id: 2
-      }]);
+      browser.tabs.query.resolves([
+        {
+          id: 2
+        }
+      ]);
       mjs.tabList.add(2);
       const msg = {
         [TMP_FILE_DATA_REMOVE]: {
@@ -3721,9 +4051,11 @@ describe('main', () => {
     it('should call function', async () => {
       const i = browser.tabs.query.callCount;
       const j = browser.tabs.sendMessage.callCount;
-      browser.tabs.query.resolves([{
-        id: 2
-      }]);
+      browser.tabs.query.resolves([
+        {
+          id: 2
+        }
+      ]);
       mjs.tabList.add(2);
       const msg = {
         [TMP_FILE_RES]: {
@@ -3760,10 +4092,15 @@ describe('main', () => {
       assert.strictEqual(mjs.appHost.size, 3, 'size');
       assert.strictEqual(mjs.appHost.has('port'), true, 'port');
       assert.strictEqual(
-        mjs.appHost.get('port').onDisconnect.addListener.called, true,
-        'called');
-      assert.strictEqual(mjs.appHost.get('port').onMessage.addListener.called,
-        true, 'called');
+        mjs.appHost.get('port').onDisconnect.addListener.called,
+        true,
+        'called'
+      );
+      assert.strictEqual(
+        mjs.appHost.get('port').onMessage.addListener.called,
+        true,
+        'called'
+      );
       assert.strictEqual(mjs.appHost.has('status'), true, 'status');
       assert.strictEqual(mjs.appHost.has('tabs'), true, 'tabs');
     });
@@ -3786,11 +4123,7 @@ describe('main', () => {
       });
       browser.storage.local.get.resolves({});
       const res = await func();
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
     });
 
     it('should get array', async () => {
@@ -3799,11 +4132,7 @@ describe('main', () => {
       });
       browser.storage.local.get.resolves({});
       const res = await func();
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
     });
 
     it('should get array', async () => {
@@ -3812,11 +4141,7 @@ describe('main', () => {
       });
       browser.storage.local.get.resolves({});
       const res = await func();
-      assert.deepEqual(res, [
-        undefined,
-        undefined,
-        undefined
-      ], 'result');
+      assert.deepEqual(res, [undefined, undefined, undefined], 'result');
     });
   });
 });

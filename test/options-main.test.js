@@ -10,9 +10,19 @@ import { browser, createJsdom, mockPort } from './mocha/setup.js';
 
 /* test */
 import {
-  EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL, HOST_CONNECTION,
-  HOST_ERR_NOTIFY, HOST_STATUS, HOST_VERSION, HOST_VERSION_LATEST,
-  HOST_VERSION_MIN, INFO, IS_EXECUTABLE, SYNC_AUTO_URL, WARN
+  EDITOR_CONFIG_RES,
+  EDITOR_FILE_NAME,
+  EDITOR_LABEL,
+  HOST_CONNECTION,
+  HOST_ERR_NOTIFY,
+  HOST_STATUS,
+  HOST_VERSION,
+  HOST_VERSION_LATEST,
+  HOST_VERSION_MIN,
+  INFO,
+  IS_EXECUTABLE,
+  SYNC_AUTO_URL,
+  WARN
 } from '../src/mjs/constant.js';
 import * as mjs from '../src/mjs/options-main.js';
 
@@ -48,8 +58,11 @@ describe('options-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i,
-        'not called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i,
+        'not called'
+      );
       assert.strictEqual(res, null, 'result');
     });
 
@@ -57,8 +70,11 @@ describe('options-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func({});
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
   });
@@ -70,8 +86,11 @@ describe('options-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
   });
@@ -83,8 +102,11 @@ describe('options-main', () => {
       browser.runtime.sendMessage.resolves({});
       const i = browser.runtime.sendMessage.callCount;
       const res = await func();
-      assert.strictEqual(browser.runtime.sendMessage.callCount, i + 1,
-        'called');
+      assert.strictEqual(
+        browser.runtime.sendMessage.callCount,
+        i + 1,
+        'called'
+      );
       assert.deepEqual(res, {}, 'result');
     });
   });
@@ -101,16 +123,20 @@ describe('options-main', () => {
       const res = await func({
         id: 'foo'
       });
-      assert.deepEqual(res, {
-        foo: {
-          app: {
-            executable: false
-          },
-          id: 'foo',
-          checked: false,
-          value: ''
-        }
-      }, 'result');
+      assert.deepEqual(
+        res,
+        {
+          foo: {
+            app: {
+              executable: false
+            },
+            id: 'foo',
+            checked: false,
+            value: ''
+          }
+        },
+        'result'
+      );
     });
   });
 
@@ -311,7 +337,8 @@ describe('options-main', () => {
     });
 
     it('should add warning', async () => {
-      browser.i18n.getMessage.withArgs('hostVersion_false', HOST_VERSION_MIN)
+      browser.i18n.getMessage
+        .withArgs('hostVersion_false', HOST_VERSION_MIN)
         .returns('foo');
       const elm = document.createElement('p');
       const body = document.querySelector('body');
@@ -324,7 +351,8 @@ describe('options-main', () => {
     });
 
     it('should remove warning', async () => {
-      browser.i18n.getMessage.withArgs('hostVersion_true', HOST_VERSION_MIN)
+      browser.i18n.getMessage
+        .withArgs('hostVersion_true', HOST_VERSION_MIN)
         .returns('foo');
       const elm = document.createElement('p');
       const body = document.querySelector('body');
@@ -389,8 +417,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.strictEqual(browser.storage.local.set.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1, 'called');
       assert.strictEqual(res, undefined, 'result');
     });
 
@@ -404,8 +431,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.strictEqual(browser.storage.local.set.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1, 'called');
       assert.strictEqual(res, undefined, 'result');
     });
 
@@ -419,8 +445,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.strictEqual(browser.storage.local.set.callCount, i,
-        'not called');
+      assert.strictEqual(browser.storage.local.set.callCount, i, 'not called');
       assert.strictEqual(res, null, 'result');
     });
   });
@@ -489,8 +514,11 @@ describe('options-main', () => {
       };
       const res = await func(evt);
       assert.strictEqual(browser.storage.local.set.callCount, i + 1, 'called');
-      assert.strictEqual(browser.permissions.request.callCount, j + 1,
-        'called');
+      assert.strictEqual(
+        browser.permissions.request.callCount,
+        j + 1,
+        'called'
+      );
       assert.deepEqual(res, [undefined], 'result');
     });
 
@@ -522,8 +550,7 @@ describe('options-main', () => {
         }
       };
       const res = await func(evt);
-      assert.strictEqual(browser.storage.local.set.callCount, i + 1,
-        'called');
+      assert.strictEqual(browser.storage.local.set.callCount, i + 1, 'called');
       assert.strictEqual(res, undefined, 'result');
     });
   });
@@ -742,8 +769,11 @@ describe('options-main', () => {
         id: SYNC_AUTO_URL,
         value: 'https://example.com/foo\nbaz:qux\n\nhttps://example.com/bar\n'
       });
-      assert.strictEqual(elm.value,
-        'https://example.com/foo\nhttps://example.com/bar', 'value');
+      assert.strictEqual(
+        elm.value,
+        'https://example.com/foo\nhttps://example.com/bar',
+        'value'
+      );
     });
 
     it('should set text value', async () => {

@@ -76,7 +76,7 @@ export const isString = o => typeof o === 'string' || o instanceof String;
  */
 export const isObjectNotEmpty = o => {
   const items = /Object/i.test(getType(o)) && Object.keys(o);
-  return !!(items?.length);
+  return !!items?.length;
 };
 
 /**

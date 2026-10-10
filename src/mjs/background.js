@@ -5,9 +5,17 @@
 /* shared */
 import { throwErr } from './common.js';
 import {
-  handleClickedMenu, handleCmd, handleMsg, handleStorage,
-  onTabActivated, onTabRemoved, onTabUpdated, onWindowFocusChanged,
-  onWindowRemoved, openOptionsPage, startup
+  handleClickedMenu,
+  handleCmd,
+  handleMsg,
+  handleStorage,
+  onTabActivated,
+  onTabRemoved,
+  onTabUpdated,
+  onWindowFocusChanged,
+  onWindowRemoved,
+  openOptionsPage,
+  startup
 } from './main.js';
 
 /* api */
@@ -18,7 +26,8 @@ const menus = browser.menus ?? browser.contextMenus;
 /* listeners */
 action.onClicked.addListener(() => openOptionsPage().catch(throwErr));
 commands.onCommand.addListener((cmd, tab) =>
-  handleCmd(cmd, tab).catch(throwErr));
+  handleCmd(cmd, tab).catch(throwErr)
+);
 menus.onClicked.addListener((info, tab) =>
   handleClickedMenu(info, tab).catch(throwErr)
 );

@@ -19,7 +19,8 @@ const liveEdit = {
   codeMirror: {
     className: 'CodeMirror',
     getContent: '.CodeMirror-line',
-    setContent: '.CodeMirror > div:nth-child(1) > textarea:nth-child(1), .CodeMirror .CodeMirror-code[contenteditable="true"]',
+    setContent:
+      '.CodeMirror > div:nth-child(1) > textarea:nth-child(1), .CodeMirror .CodeMirror-code[contenteditable="true"]',
     url: 'https://codemirror.net/'
   },
   tiddlyWiki: {
@@ -52,9 +53,11 @@ export const getLiveEditKey = elm => {
     for (const [key, value] of items) {
       const { className, getContent, isIframe, setContent } = value;
       if (isIframe && elm.contentDocument) {
-        if ((!className || elm.classList.contains(className)) &&
-            elm.contentDocument.querySelector(getContent) &&
-            elm.contentDocument.querySelector(setContent)) {
+        if (
+          (!className || elm.classList.contains(className)) &&
+          elm.contentDocument.querySelector(getContent) &&
+          elm.contentDocument.querySelector(setContent)
+        ) {
           liveEditKey = key;
         }
       } else if (elm.classList.contains(className)) {
@@ -85,10 +88,12 @@ export const getLiveEditElement = node => {
         if (isIframe) {
           const iframes = node.querySelectorAll('iframe');
           for (const iframe of iframes) {
-            if ((!className || iframe.classList.contains(className)) &&
-                iframe.contentDocument &&
-                iframe.contentDocument.querySelector(getContent) &&
-                iframe.contentDocument.querySelector(setContent)) {
+            if (
+              (!className || iframe.classList.contains(className)) &&
+              iframe.contentDocument &&
+              iframe.contentDocument.querySelector(getContent) &&
+              iframe.contentDocument.querySelector(setContent)
+            ) {
               elm = iframe;
               break;
             }

@@ -6,13 +6,28 @@
 import '../lib/purify/purify.min.js';
 import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
 import {
-  getStorage, removePermission, requestPermission, sendMessage, setStorage
+  getStorage,
+  removePermission,
+  requestPermission,
+  sendMessage,
+  setStorage
 } from './browser.js';
 import { isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
-  EDITOR_CONFIG_GET, EDITOR_CONFIG_RES, EDITOR_FILE_NAME, EDITOR_LABEL,
-  HOST_CONNECTION, HOST_ERR_NOTIFY, HOST_STATUS, HOST_STATUS_GET, HOST_VERSION,
-  HOST_VERSION_LATEST, HOST_VERSION_MIN, INFO, IS_EXECUTABLE, SYNC_AUTO_URL,
+  EDITOR_CONFIG_GET,
+  EDITOR_CONFIG_RES,
+  EDITOR_FILE_NAME,
+  EDITOR_LABEL,
+  HOST_CONNECTION,
+  HOST_ERR_NOTIFY,
+  HOST_STATUS,
+  HOST_STATUS_GET,
+  HOST_VERSION,
+  HOST_VERSION_LATEST,
+  HOST_VERSION_MIN,
+  INFO,
+  IS_EXECUTABLE,
+  SYNC_AUTO_URL,
   WARN
 } from './constant.js';
 
@@ -36,17 +51,19 @@ export const sendMsg = async msg => {
  * get host status
  * @returns {Promise} - sendMsg()
  */
-export const getHostStatus = async () => sendMsg({
-  [HOST_STATUS_GET]: true
-});
+export const getHostStatus = async () =>
+  sendMsg({
+    [HOST_STATUS_GET]: true
+  });
 
 /**
  * get editor config
  * @returns {Promise} - sendMsg()
  */
-export const getEditorConfig = async () => sendMsg({
-  [EDITOR_CONFIG_GET]: true
-});
+export const getEditorConfig = async () =>
+  sendMsg({
+    [EDITOR_CONFIG_GET]: true
+  });
 
 /**
  * create pref
@@ -114,8 +131,10 @@ export const extractHostStatus = async status => {
   if (latest) {
     if (hostLatestVersion) {
       latest.classList.add(INFO);
-      latest.textContent =
-        i18n.getMessage('hostLatestVersion', `v${hostLatestVersion}`);
+      latest.textContent = i18n.getMessage(
+        'hostLatestVersion',
+        `v${hostLatestVersion}`
+      );
     } else {
       latest.classList.remove(INFO);
       latest.textContent = '';
@@ -130,8 +149,10 @@ export const extractHostStatus = async status => {
     }
   }
   if (version) {
-    version.textContent =
-      i18n.getMessage(`hostVersion_${hostCompatibility}`, HOST_VERSION_MIN);
+    version.textContent = i18n.getMessage(
+      `hostVersion_${hostCompatibility}`,
+      HOST_VERSION_MIN
+    );
     if (hostCompatibility) {
       version.classList.remove(WARN);
     } else {

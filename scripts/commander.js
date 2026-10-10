@@ -40,15 +40,11 @@ export const saveLibraryPackage = async (lib, info) => {
   const moduleDir = path.resolve(DIR_CWD, PATH_MODULE, moduleName);
   const pkgJsonPath = path.join(moduleDir, 'package.json');
   const pkgJson = await readFile(pkgJsonPath, { encoding: CHAR, flag: 'r' });
-  const {
-    author, description, homepage, license, name, version
-  } = JSON.parse(pkgJson);
+  const { author, description, homepage, license, name, version } =
+    JSON.parse(pkgJson);
   const origins = [];
   for (const item of files) {
-    const {
-      file,
-      path: itemPath
-    } = item;
+    const { file, path: itemPath } = item;
     const itemFile = path.join(moduleDir, itemPath);
     if (!isFile(itemFile)) {
       throw new Error(`${itemFile} is not a file.`);
@@ -65,17 +61,21 @@ export const saveLibraryPackage = async (lib, info) => {
     fileMap.set('cdn', `${cdnUrl}@${version}/${itemPath}`);
     origins.push(Object.fromEntries(fileMap));
   }
-  const content = `${JSON.stringify({
-    name,
-    description,
-    author,
-    license,
-    homepage,
-    repository,
-    type,
-    version,
-    origins
-  }, null, INDENT)}\n`;
+  const content = `${JSON.stringify(
+    {
+      name,
+      description,
+      author,
+      license,
+      homepage,
+      repository,
+      type,
+      version,
+      origins
+    },
+    null,
+    INDENT
+  )}\n`;
   const filePath = await createFile(path.join(libDir, 'package.json'), content);
   if (filePath && info) {
     console.info(`Created: ${filePath}`);
@@ -193,13 +193,15 @@ export const parseCommand = args => {
     commander.exitOverride();
     commander.version(process.env.npm_package_version, '-v, --version');
     if (args.includes('clean')) {
-      commander.command('clean')
+      commander
+        .command('clean')
         .description('clean directory')
         .option('-d, --dir <name>', 'specify directory')
         .option('-i, --info', 'console info')
         .action(cleanDirectory);
     } else if (args.includes('include')) {
-      commander.command('include')
+      commander
+        .command('include')
         .description('include library packages')
         .option('-d, --dir <name>', 'specify library directory')
         .option('-i, --info', 'console info')
@@ -210,6 +212,4 @@ export const parseCommand = args => {
 };
 
 /* For test */
-export {
-  commander
-};
+export { commander };

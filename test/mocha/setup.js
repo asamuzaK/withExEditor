@@ -96,9 +96,21 @@ global.document = document;
 global.browser = browser;
 
 const globalKeys = [
-  'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'DOMPurify',
-  'Event', 'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
-  'KeyboardEvent', 'Node', 'NodeList', 'Selection', 'StaticRange',
+  'ClipboardEvent',
+  'DataTransfer',
+  'DOMTokenList',
+  'DOMParser',
+  'DOMPurify',
+  'Event',
+  'FocusEvent',
+  'Headers',
+  'HTMLUnknownElement',
+  'InputEvent',
+  'KeyboardEvent',
+  'Node',
+  'NodeList',
+  'Selection',
+  'StaticRange',
   'XMLSerializer'
 ];
 for (const key of globalKeys) {

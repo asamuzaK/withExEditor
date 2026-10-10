@@ -6,8 +6,13 @@
 import { throwErr } from './common.js';
 import { localizeHtml } from './localize.js';
 import {
-  addFormSubmitListener, addInputChangeListener, addSyncUrlsInputListener,
-  getEditorConfig, getHostStatus, handleMsg, setValuesFromStorage
+  addFormSubmitListener,
+  addInputChangeListener,
+  addSyncUrlsInputListener,
+  getEditorConfig,
+  getHostStatus,
+  handleMsg,
+  setValuesFromStorage
 } from './options-main.js';
 
 /* api */

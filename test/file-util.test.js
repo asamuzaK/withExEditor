@@ -6,17 +6,28 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
 import {
-  fetch as undiciFetch, MockAgent, getGlobalDispatcher, setGlobalDispatcher
+  fetch as undiciFetch,
+  MockAgent,
+  getGlobalDispatcher,
+  setGlobalDispatcher
 } from 'undici';
 
 /* test */
 import {
-  createFile, fetchText, getStat, isDir, isFile, mkdir, readFile, removeDir, rm
+  createFile,
+  fetchText,
+  getStat,
+  isDir,
+  isFile,
+  mkdir,
+  readFile,
+  removeDir,
+  rm
 } from '../scripts/file-util.js';
 
 /* constants */
-const TMPDIR = process.env.TMP || process.env.TMPDIR || process.env.TEMP ||
-               os.tmpdir();
+const TMPDIR =
+  process.env.TMP || process.env.TMPDIR || process.env.TEMP || os.tmpdir();
 
 describe('getStat', () => {
   it('should be an object', () => {
@@ -116,7 +127,9 @@ describe('removeDir', () => {
     const filePath = path.join(subDirPath, 'test.txt');
     const value = 'test file.\n';
     await fsPromise.writeFile(filePath, value, {
-      encoding: 'utf8', flag: 'w', mode: 0o666
+      encoding: 'utf8',
+      flag: 'w',
+      mode: 0o666
     });
     const res1 = await Promise.all([
       fs.existsSync(dirPath),
@@ -209,14 +222,18 @@ describe('fetch text', () => {
     mockAgent.get(base).intercept({ path: '/', method: 'GET' }).reply(404);
     await fetchText(base).catch(e => {
       assert.strictEqual(e instanceof Error, true, 'error');
-      assert.strictEqual(e.message,
-        `Network response was not ok. status: 404 url: ${base}`);
+      assert.strictEqual(
+        e.message,
+        `Network response was not ok. status: 404 url: ${base}`
+      );
     });
   });
 
   it('should get result', async () => {
     const base = 'https://example.com';
-    mockAgent.get(base).intercept({ path: '/', method: 'GET' })
+    mockAgent
+      .get(base)
+      .intercept({ path: '/', method: 'GET' })
       .reply(200, 'foo');
     const res = await fetchText('https://example.com');
     assert.strictEqual(res, 'foo', 'result');

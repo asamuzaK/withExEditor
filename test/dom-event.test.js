@@ -17,9 +17,20 @@ const KEY_CODE_A = 65;
 describe('dom event', () => {
   let window, document;
   const globalKeys = [
-    'ClipboardEvent', 'DataTransfer', 'DOMTokenList', 'DOMParser', 'Event',
-    'FocusEvent', 'Headers', 'HTMLUnknownElement', 'InputEvent',
-    'KeyboardEvent', 'Node', 'NodeList', 'Selection', 'StaticRange',
+    'ClipboardEvent',
+    'DataTransfer',
+    'DOMTokenList',
+    'DOMParser',
+    'Event',
+    'FocusEvent',
+    'Headers',
+    'HTMLUnknownElement',
+    'InputEvent',
+    'KeyboardEvent',
+    'Node',
+    'NodeList',
+    'Selection',
+    'StaticRange',
     'XMLSerializer'
   ];
 
@@ -28,8 +39,10 @@ describe('dom event', () => {
     window = dom && dom.window;
     document = window && window.document;
     if (typeof document.queryCommandValue !== 'function') {
-      document.queryCommandValue =
-        sinon.stub().withArgs('defaultParagraphSeparator').returns('div');
+      document.queryCommandValue = sinon
+        .stub()
+        .withArgs('defaultParagraphSeparator')
+        .returns('div');
     }
     global.window = window;
     global.document = document;
@@ -37,10 +50,13 @@ describe('dom event', () => {
       // Not implemented in jsdom
       if (key === 'InputEvent') {
         if (typeof window.InputEvent.prototype.getTargetRanges !== 'function') {
-          Object.defineProperty(window.InputEvent.prototype,
-            'getTargetRanges', {
+          Object.defineProperty(
+            window.InputEvent.prototype,
+            'getTargetRanges',
+            {
               value: sinon.stub()
-            });
+            }
+          );
         }
         if (typeof window.InputEvent.prototype.dataTransfer === 'undefined') {
           window.InputEvent.prototype.dataTransfer = new DataTransfer();

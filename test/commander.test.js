@@ -8,7 +8,11 @@ import { describe, it } from 'mocha';
 
 /* test */
 import {
-  cleanDirectory, commander, extractLibraries, includeLibraries, parseCommand,
+  cleanDirectory,
+  commander,
+  extractLibraries,
+  includeLibraries,
+  parseCommand,
   saveLibraryPackage
 } from '../scripts/commander.js';
 
@@ -30,9 +34,7 @@ describe('save library package info', () => {
   });
 
   it('should throw', async () => {
-    await saveLibraryPackage([
-      'foo'
-    ]).catch(e => {
+    await saveLibraryPackage(['foo']).catch(e => {
       assert.strictEqual(e instanceof Error, true);
     });
   });
@@ -70,7 +72,10 @@ describe('save library package info', () => {
       }
     ]).catch(e => {
       const filePath = path.resolve(
-        DIR_CWD, 'node_modules', 'url-sanitizer', 'foo.txt'
+        DIR_CWD,
+        'node_modules',
+        'url-sanitizer',
+        'foo.txt'
       );
       assert.strictEqual(e instanceof Error, true);
       assert.strictEqual(e.message, `${filePath} is not a file.`);
@@ -107,8 +112,7 @@ describe('save library package info', () => {
   it('should call function', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const stubInfo = sinon.stub(console, 'info');
-    const filePath =
-      path.resolve(DIR_CWD, 'src', 'lib', 'url', 'package.json');
+    const filePath = path.resolve(DIR_CWD, 'src', 'lib', 'url', 'package.json');
     const res = await saveLibraryPackage([
       'url',
       {
@@ -149,36 +153,38 @@ describe('save library package info', () => {
   it('should call function', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const stubInfo = sinon.stub(console, 'info');
-    const filePath =
-      path.resolve(DIR_CWD, 'src', 'lib', 'url', 'package.json');
-    const res = await saveLibraryPackage([
-      'url',
-      {
-        name: 'url-sanitizer',
-        raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
-        vPrefix: 'v',
-        cdn: 'https://unpkg.com/url-sanitizer',
-        repository: {
-          type: 'git',
-          url: 'https://github.com/asamuzaK/urlSanitizer.git'
-        },
-        type: 'module',
-        files: [
-          {
-            file: 'LICENSE',
-            path: 'LICENSE'
+    const filePath = path.resolve(DIR_CWD, 'src', 'lib', 'url', 'package.json');
+    const res = await saveLibraryPackage(
+      [
+        'url',
+        {
+          name: 'url-sanitizer',
+          raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
+          vPrefix: 'v',
+          cdn: 'https://unpkg.com/url-sanitizer',
+          repository: {
+            type: 'git',
+            url: 'https://github.com/asamuzaK/urlSanitizer.git'
           },
-          {
-            file: 'url-sanitizer-wo-dompurify.min.js',
-            path: 'dist/url-sanitizer-wo-dompurify.min.js'
-          },
-          {
-            file: 'url-sanitizer-wo-dompurify.min.js.map',
-            path: 'dist/url-sanitizer-wo-dompurify.min.js.map'
-          }
-        ]
-      }
-    ], true);
+          type: 'module',
+          files: [
+            {
+              file: 'LICENSE',
+              path: 'LICENSE'
+            },
+            {
+              file: 'url-sanitizer-wo-dompurify.min.js',
+              path: 'dist/url-sanitizer-wo-dompurify.min.js'
+            },
+            {
+              file: 'url-sanitizer-wo-dompurify.min.js.map',
+              path: 'dist/url-sanitizer-wo-dompurify.min.js.map'
+            }
+          ]
+        }
+      ],
+      true
+    );
     const { calledOnce: writeCalled } = stubWrite;
     const { calledOnce: infoCalled } = stubInfo;
     stubWrite.restore();
@@ -191,8 +197,13 @@ describe('save library package info', () => {
   it('should call function', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const stubInfo = sinon.stub(console, 'info');
-    const filePath =
-      path.resolve(DIR_CWD, 'src', 'lib', 'purify', 'package.json');
+    const filePath = path.resolve(
+      DIR_CWD,
+      'src',
+      'lib',
+      'purify',
+      'package.json'
+    );
     const res = await saveLibraryPackage([
       'purify',
       {
@@ -231,34 +242,42 @@ describe('save library package info', () => {
   it('should call function', async () => {
     const stubWrite = sinon.stub(fsPromise, 'writeFile');
     const stubInfo = sinon.stub(console, 'info');
-    const filePath =
-      path.resolve(DIR_CWD, 'src', 'lib', 'purify', 'package.json');
-    const res = await saveLibraryPackage([
+    const filePath = path.resolve(
+      DIR_CWD,
+      'src',
+      'lib',
       'purify',
-      {
-        name: 'dompurify',
-        raw: 'https://raw.githubusercontent.com/cure53/DOMPurify/',
-        cdn: 'https://unpkg.com/dompurify',
-        repository: {
-          type: 'git',
-          url: 'git://github.com/cure53/DOMPurify.git'
-        },
-        files: [
-          {
-            file: 'LICENSE',
-            path: 'LICENSE'
+      'package.json'
+    );
+    const res = await saveLibraryPackage(
+      [
+        'purify',
+        {
+          name: 'dompurify',
+          raw: 'https://raw.githubusercontent.com/cure53/DOMPurify/',
+          cdn: 'https://unpkg.com/dompurify',
+          repository: {
+            type: 'git',
+            url: 'git://github.com/cure53/DOMPurify.git'
           },
-          {
-            file: 'purify.min.js',
-            path: 'dist/purify.min.js'
-          },
-          {
-            file: 'purify.min.js.map',
-            path: 'dist/purify.min.js.map'
-          }
-        ]
-      }
-    ], true);
+          files: [
+            {
+              file: 'LICENSE',
+              path: 'LICENSE'
+            },
+            {
+              file: 'purify.min.js',
+              path: 'dist/purify.min.js'
+            },
+            {
+              file: 'purify.min.js.map',
+              path: 'dist/purify.min.js.map'
+            }
+          ]
+        }
+      ],
+      true
+    );
     const { calledOnce: writeCalled } = stubWrite;
     const { calledOnce: infoCalled } = stubInfo;
     stubWrite.restore();
