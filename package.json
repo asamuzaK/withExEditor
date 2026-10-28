@@ -40,7 +40,7 @@
     "stylelint": "^17.16.0",
     "stylelint-config-standard": "^40.0.0",
     "typescript": "^7.0.2",
-    "undici": "^8.11.2"
+    "undici": "^8.12.3"
   },
   "scripts": {
     "include": "npm run include:browser && npm run include:purify && npm run include:url",
