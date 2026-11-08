@@ -3,8 +3,7 @@
  */
 
 /* shared */
-import '../lib/purify/purify.min.js';
-import { sanitizeURLSync } from '../lib/url/url-sanitizer-wo-dompurify.min.js';
+import { sanitizeURLSync } from '../lib/url/url-sanitizer.min.js';
 import {
   getStorage,
   removePermission,

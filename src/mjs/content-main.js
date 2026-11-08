@@ -3,11 +3,7 @@
  */
 
 /* shared */
-import '../lib/purify/purify.min.js';
-import {
-  inspectURL,
-  sanitizeURLSync
-} from '../lib/url/url-sanitizer-wo-dompurify.min.js';
+import { inspectURL, sanitizeURLSync } from '../lib/url/url-sanitizer.min.js';
 import { sendMessage } from './browser.js';
 import { getType, isObjectNotEmpty, isString, throwErr } from './common.js';
 import {
