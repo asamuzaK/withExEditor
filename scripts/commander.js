@@ -91,6 +91,30 @@ export const saveLibraryPackage = async (lib, info) => {
 export const extractLibraries = async (cmdOpts = {}) => {
   const { dir, info } = cmdOpts;
   const libraries = {
+    purify: {
+      name: 'dompurify',
+      raw: 'https://raw.githubusercontent.com/cure53/DOMPurify/',
+      cdn: 'https://unpkg.com/dompurify',
+      repository: {
+        type: 'git',
+        url: 'git://github.com/cure53/DOMPurify.git'
+      },
+      type: 'commonjs',
+      files: [
+        {
+          file: 'LICENSE',
+          path: 'LICENSE'
+        },
+        {
+          file: 'purify.min.js',
+          path: 'dist/purify.min.js'
+        },
+        {
+          file: 'purify.min.js.map',
+          path: 'dist/purify.min.js.map'
+        }
+      ]
+    },
     url: {
       name: 'url-sanitizer',
       raw: 'https://raw.githubusercontent.com/asamuzaK/urlSanitizer/',
@@ -107,12 +131,12 @@ export const extractLibraries = async (cmdOpts = {}) => {
           path: 'LICENSE'
         },
         {
-          file: 'url-sanitizer.min.js',
-          path: 'dist/url-sanitizer.min.js'
+          file: 'url-sanitizer-wo-dompurify.min.js',
+          path: 'dist/url-sanitizer-wo-dompurify.min.js'
         },
         {
-          file: 'url-sanitizer.min.js.map',
-          path: 'dist/url-sanitizer.min.js.map'
+          file: 'url-sanitizer-wo-dompurify.min.js.map',
+          path: 'dist/url-sanitizer-wo-dompurify.min.js.map'
         }
       ]
     }
